@@ -3,15 +3,13 @@ module.exports = {
     name: "del",
     category: "moderation",
     description: "delete messages in bulk",
-    execute(message, args)  {
+    run: async (message, args) => {
 
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
 
             if (!message.member.hasPermission("MANAGE_MESSAGES")) {
                 return message.reply("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
             }
-
-            console.log(args.length);
 
             if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
                 return message.reply("❌\ninvalid number");

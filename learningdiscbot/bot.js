@@ -27,19 +27,26 @@ client.once("ready", () => {
     console.log('nypsi is online..\n\n');
 });
 
+
+
 client.on("message", message => {
 
-    if (message.member.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(`${prefix}`)) return;
 
     const args = message.content.substring(prefix.length).split(" ");
     const cmd = args[0].toLowerCase();
 
-    if (client.commands.get(cmd)) {
-        client.commands.get(cmd).execute(message, args);
+    if (cmd == "ig") {
+        client.commands.get("instagram").run(message, args);
 
-        console.log(message.member.user.tag + " ran command '" + cmd + "'");
+        return console.log(message.member.user.tag + " ran command '" + cmd + "'");
+    }
+
+    if (client.commands.get(cmd)) {
+        client.commands.get(cmd).run(message, args);
+
+        return console.log(message.member.user.tag + " ran command '" + cmd + "'");
     }
 });
 
