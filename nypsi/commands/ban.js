@@ -8,7 +8,7 @@ module.exports = {
         if (message.member.hasPermission("BAN_MEMBERS")) {
 
             if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-                return message.reply("❌ \ni am lacking permission: 'BAN_MEMBERS'");
+                return message.channel.send("❌ \ni am lacking permission: 'BAN_MEMBERS'");
             }
 
             if (message.mentions.members.first() == null) {

@@ -7,12 +7,12 @@ module.exports = {
 
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
 
-            if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-                return message.reply("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
+            if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
+                return message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");
             }
 
             if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-                return message.reply("❌\ninvalid number");
+                return message.channel.send("❌\ninvalid number");
             }
 
             let amount = (parseInt(args[1]) + 1);
