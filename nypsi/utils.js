@@ -1,7 +1,10 @@
 /*jshint esversion: 8 */
+const { wholesome } = require("./config.json");
+
+
 module.exports = {
     getMember: function(message, args) {
-        if (args.length == 1) {
+        if (args.length == 0) {
             return message.member;
         }
     
@@ -10,7 +13,7 @@ module.exports = {
         }
     
         const target = message.guild.members.find(member => {
-            return member.displayName.toLowerCase().includes(args[1]) || member.user.tag.toLowerCase().includes(args[1]);
+            return member.displayName.toLowerCase().includes(args[0].toLowerCase()) || member.user.tag.toLowerCase().includes(args[0].toLowerCase());
         });
     
         return target;
@@ -19,5 +22,9 @@ module.exports = {
     formatDate: function(date) {
         var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
+    },
+
+    wholesomeImg: function() {
+        return wholesome[Math.floor(Math.random() * wholesome.length)];
     }
 };

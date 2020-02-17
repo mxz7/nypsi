@@ -1,9 +1,8 @@
 /*jshint esversion: 8 */
 module.exports = {
     name: "kick",
-    category: "moderation",
-    description: "kicks people",
-    execute(message, args) {
+    description: "generic kick command",
+    run: async (message, args) => {
 
 
         if (message.member.hasPermission("KICK_MEMBERS")) {

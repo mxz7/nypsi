@@ -1,38 +1,47 @@
 /*jshint esversion: 8 */
 const { RichEmbed } = require("discord.js");
-const { getMember } = require("../utils");
+const { stripIndents } = require("common-tags");
+const { wholesomeImg } = require("../utils.js");
+
+var cooldown = new Set();
 
 module.exports = {
-    name: "avatar",
-    description: "get a person's avatar",
+    name: "wholesome",
+    description: "get a random wholesome picture",
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
 
-        const member = getMember(message, args);
-
-        if (!member) {
-            return message.channel.send("❌ \ninvalid user");
+        if (cooldown.has(message.member.id)) {
+            return message.channel.send("❌\nstill on cooldown");
         }
+
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 2500);
 
         let color;
 
-        if (member.displayHexColor == "#000000") {
+        if (message.member.displayHexColor == "#000000") {
             color = "#FC4040";
         } else {
-            color = member.displayHexColor;
+            color = message.member.displayHexColor;
         }
 
+        
+
         const embed = new RichEmbed()
-            .setTitle(member.user.tag)
             .setColor(color)
-            .setImage(member.user.avatarURL)
+            .setTitle("<3")
+            .setImage(wholesomeImg())
 
             .setFooter(message.member.user.tag, message.member.user.avatarURL)
             .setTimestamp();
-
+        
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });

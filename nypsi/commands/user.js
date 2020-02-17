@@ -6,7 +6,7 @@ const { getMember, formatDate } = require("../utils.js");
 module.exports = {
     name: "user",
     category: "info",
-    description: "get info about a user",
+    description: "view info about a user",
     run: async (message, args) => {
         
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
@@ -37,10 +37,10 @@ module.exports = {
             .setTitle(member.user.tag)
             .setDescription(member.user)
             
-            .addField(member.displayName, stripIndents `**username:** ${member.user.tag}\n
-            **created:** ${created}\n
-            **joined:** ${joined}\n
-            **id:** ${member.user.id}`)
+            .addField(member.displayName, stripIndents `**username** ${member.user.tag}\n
+            **created** ${created}\n
+            **joined** ${joined}\n
+            **id** ${member.user.id}`)
 
             .setFooter(message.member.user.tag, message.member.user.avatarURL)
             .setTimestamp();
