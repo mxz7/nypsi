@@ -71,7 +71,7 @@ module.exports = {
             **followers** ${account.edge_followed_by.count.toLocaleString()}
             **following** ${account.edge_follow.count.toLocaleString()}
             **posts** ${account.edge_owner_to_timeline_media.count.toLocaleString()}`)
-            .setFooter(message.member.user.tag, message.member.user.avatarURL)
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
 
         message.channel.send(embed).catch(() => {

@@ -39,7 +39,7 @@ module.exports = {
             .setTitle("<3")
             .setImage(wholesomeImg())
 
-            .setFooter(message.member.user.tag, message.member.user.avatarURL)
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
         message.channel.send(embed).catch(() => {

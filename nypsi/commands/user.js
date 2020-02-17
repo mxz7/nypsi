@@ -42,7 +42,7 @@ module.exports = {
             **joined** ${joined}\n
             **id** ${member.user.id}`)
 
-            .setFooter(message.member.user.tag, message.member.user.avatarURL)
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
 
         message.channel.send(embed).catch(() => {

@@ -109,7 +109,7 @@ function helpCmd(message) {
         
         .addField("commands", cmdMenu)
 
-        .setFooter(message.member.user.tag, message.member.user.avatarURL)
+        .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
         .setTimestamp();
 
     message.channel.send(embed).catch(() => {
