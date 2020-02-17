@@ -5,6 +5,7 @@ const { prefix, token } = require("./config.json");
 const fs = require("fs");
 
 client.commands = new Discord.Collection();
+var aliases = new Discord.Collection();
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
 
@@ -23,7 +24,12 @@ client.once("ready", () => {
         status: "dnd"
     });
 
-    console.log("- - -");
+    aliases.set("ig", "instagram");
+    aliases.set("av", "avatar");
+    aliases.set("whois", "user");
+    aliases.set("who", "user");
+
+    console.log("\n\n- - -");
     console.log('nypsi is online..\n\n');
 });
 
@@ -32,22 +38,30 @@ client.once("ready", () => {
 client.on("message", message => {
 
     if (!message.guild) return;
-    if (!message.content.startsWith(`${prefix}`)) return;
+    if (!message.content.startsWith(prefix)) return;
 
     const args = message.content.substring(prefix.length).split(" ");
-    const cmd = args[0].toLowerCase();
+    let cmd = args[0].toLowerCase();
 
-    if (cmd == "ig") {
-        client.commands.get("instagram").run(message, args);
-
-        return console.log(message.member.user.tag + " ran command '" + cmd + "'");
+    if (aliases.get(cmd)) {
+        runCommand(aliases.get(cmd), message, args);
+        return logCommand(message, args);
     }
 
     if (client.commands.get(cmd)) {
-        client.commands.get(cmd).run(message, args);
-
-        return console.log(message.member.user.tag + " ran command '" + cmd + "'");
+        runCommand(cmd, message, args);
+        return logCommand(message, args);
     }
+    
 });
 
 client.login(token);
+
+function logCommand(message, args) {
+    args.shift();
+    console.log(message.member.user.tag + " ran command '" + message.content.split(" ")[0] + "'" + " with args: '" + args.join(" ") + "'");
+}
+
+function runCommand(cmd, message, args) {
+    client.commands.get(cmd).run(message, args);
+}
