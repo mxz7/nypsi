@@ -1,9 +1,8 @@
 /*jshint esversion: 8 */
 module.exports = {
     name: "ban",
-    category: "moderation",
-    description: "kicks people",
-    execute(message, args) {
+    description: "generic ban command",
+    run: async (message, args) => {
         
         if (message.member.hasPermission("BAN_MEMBERS")) {
 
@@ -19,19 +18,20 @@ module.exports = {
 
             let reason;
 
-            if (args.length == 2) {
+            if (args.length == 1) {
                 reason = "no reason provided";
             } else {
-                args.shift();
                 args.shift();
                 reason = args.join(" ");
             }
 
+            let banned = member.user.tag;
+
             member.ban({
                 reason: ("moderator: " + message.member.user.tag + " | | | reason: " + reason)
             }).then((member) => {
-                message.channel.send("👋\n**" + member.user.tag + "was banned for** *" + reason + "*");
-                console.log(member.user.tag + " was banned by " + message.member.tag.user + " for: " + reason);
+                console.log(banned + " was banned by " + message.member.user.tag + " for: " + reason);
+                message.channel.send("👋\n**" + banned + "was banned for** *" + reason + "*");
             }).catch(() => {
                 message.channel.send("❌ \ni'm unable to ban this user");
             });

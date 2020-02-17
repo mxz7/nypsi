@@ -8,8 +8,7 @@ var cooldown = new Set();
 
 module.exports = {
     name: "instagram",
-    category: "info",
-    description: "find instagram info about an account",
+    description: "view stats for an instagram account",
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
@@ -19,8 +18,8 @@ module.exports = {
         if (cooldown.has(message.member.id)) {
             return message.channel.send("❌\nstill on cooldown");
         }
-
-        if (args.length == 1) {
+        
+        if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");
         }
 
@@ -28,9 +27,9 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 2000);
+        }, 4000);
 
-        const name = args[1];
+        const name = args[0];
 
         const url = `https://instagram.com/${name}/?__a=1`;
         
@@ -53,17 +52,25 @@ module.exports = {
             title = account.username;
         }
 
+        let color;
+
+        if (message.member.displayHexColor == "#000000") {
+            color = "#FC4040";
+        } else {
+            color = message.member.displayHexColor;
+        }
+
         const embed = new RichEmbed()
-            .setColor("#FC4040")
+            .setColor(color)
             .setTitle(title)
             .setURL(`https://instagram.com/${name}`)
             .setThumbnail(account.profile_pic_url_hd)
-            .addField("profile", stripIndents`**name:** ${account.full_name}
-            **bio:** ${account.biography.length == 0 ? "none" : account.biography}
-            **link:** ${account.external_url == null ? "none" : account.external_url}
-            **followers:** ${account.edge_followed_by.count.toLocaleString()}
-            **following:** ${account.edge_follow.count.toLocaleString()}
-            **posts:** ${account.edge_owner_to_timeline_media.count.toLocaleString()}`)
+            .addField("profile", stripIndents`**name** ${account.full_name}
+            **bio** ${account.biography.length == 0 ? "none" : account.biography}
+            **link** ${account.external_url == null ? "none" : account.external_url}
+            **followers** ${account.edge_followed_by.count.toLocaleString()}
+            **following** ${account.edge_follow.count.toLocaleString()}
+            **posts** ${account.edge_owner_to_timeline_media.count.toLocaleString()}`)
             .setFooter(message.member.user.tag, message.member.user.avatarURL)
             .setTimestamp();
 

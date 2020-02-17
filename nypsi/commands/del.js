@@ -1,8 +1,7 @@
 /*jshint esversion: 8 */
 module.exports = {
     name: "del",
-    category: "moderation",
-    description: "delete messages in bulk",
+    description: "bulk delete/purge messages",
     run: async (message, args) => {
 
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
@@ -11,11 +10,11 @@ module.exports = {
                 return message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");
             }
 
-            if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
+            if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
                 return message.channel.send("❌\ninvalid number");
             }
 
-            let amount = (parseInt(args[1]) + 1);
+            let amount = (parseInt(args[0]) + 1);
 
             if (amount > 100) {
                 amount = 100;
@@ -28,8 +27,5 @@ module.exports = {
         } else {
             message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");
         }
-
-        
-
     }
 };
