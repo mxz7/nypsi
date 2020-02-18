@@ -1,6 +1,5 @@
 /*jshint esversion: 8 */
 const { RichEmbed } = require("discord.js");
-const { stripIndents } = require("common-tags");
 const { wholesomeImg } = require("../utils.js");
 
 var cooldown = new Set();

@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { wholesome } = require("./config.json");
+const { wholesome } = require("./images.json");
 
 
 module.exports = {
@@ -18,6 +18,13 @@ module.exports = {
     
         return target;
     },
+
+    getMember1: function(message, memberName) {
+        const target = message.guild.members.find(member => {
+            return member.displayName.toLowerCase().includes(memberName.toLowerCase()) || member.user.tag.toLowerCase().includes(memberName.toLowerCase());
+        });
+        return target;
+    },
     
     formatDate: function(date) {
         var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -26,5 +33,18 @@ module.exports = {
 
     wholesomeImg: function() {
         return wholesome[Math.floor(Math.random() * wholesome.length)];
+    },
+
+    getMention: function(message, memberMention) {
+        if (!memberMention) return;
+
+        if (memberMention.startsWith("<@") && memberMention.endsWith(">")) {
+            memberMention = memberMention.slice(2, -1);
+            if (memberMention.startsWith('!')) {
+                memberMention = memberMention.slice(1);
+            }
+
+            return message.guild.members.get(memberMention);
+        }
     }
 };
