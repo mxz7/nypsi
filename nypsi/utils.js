@@ -1,7 +1,6 @@
 /*jshint esversion: 8 */
 const { wholesome } = require("./images.json");
 
-
 module.exports = {
     getMember: function(message, memberName) {
         let target = message.guild.members.find(member => {
