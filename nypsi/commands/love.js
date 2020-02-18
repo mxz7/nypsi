@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
 const { RichEmbed } = require("discord.js");
-const { getMember1, getMention } = require("../utils.js");
+const { getMember, getMention } = require("../utils.js");
 
 var cooldown = new Set();
 
@@ -35,7 +35,7 @@ module.exports = {
             target1 = message.member;
 
             if (!message.mentions.members.first()) {
-                target2 = getMember1(message, args[0]);
+                target2 = getMember(message, args[0]);
             } else {
                 target2 = message.mentions.members.first();
             }
@@ -43,13 +43,13 @@ module.exports = {
 
         if (args.length == 2) {
             if (!message.mentions.members.first()) {
-                target1 = getMember1(message, args[0]);
+                target1 = getMember(message, args[0]);
             } else {
                 target1 = message.mentions.members.first();
             }
 
             if (getMember1(message, args[1])) {
-                target2 = getMember1(message, args[1]);
+                target2 = getMember(message, args[1]);
             } else {
                 target2 = getMention(message, args[1]);
             }

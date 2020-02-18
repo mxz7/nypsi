@@ -20,7 +20,7 @@ module.exports = {
                 amount = 100;
             }
 
-            message.channel.bulkDelete(amount, true).then(deleted => {
+            message.channel.bulkDelete(amount).then(deleted => {
                 message.channel.send("✅\n**successfully deleted " + (amount - 1) + " messages**").then(m => m.delete(2500));
                 console.log("deleted " + amount + " by " + message.member.user.tag);
             }).catch();
