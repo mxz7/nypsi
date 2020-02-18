@@ -5,7 +5,6 @@ const { getMember, formatDate } = require("../utils.js");
 
 module.exports = {
     name: "user",
-    category: "info",
     description: "view info about a user",
     run: async (message, args) => {
         
@@ -13,10 +12,16 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
 
-        const member = getMember(message, args);
+        let member;
 
-        if (!member) {
-            return message.channel.send("❌ \ninvalid user");
+        if (args.length == 0) {
+            member = message.member;
+        } else {
+            if (!message.mentions.members.first()) {
+                member = getMember(message, args[0]);
+            } else {
+                member = message.mentions.members.first();
+            }
         }
 
         const joined = formatDate(member.joinedAt);

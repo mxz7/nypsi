@@ -35,6 +35,7 @@ client.once("ready", () => {
     aliases.set("who", "user");
     aliases.set("serverinfo", "server");
     aliases.set("ws", "wholesome");
+    aliases.set("rick", "rickroll");
 
     console.log("\n\n- - -");
     console.log('nypsi is online..\n\n');
@@ -51,6 +52,7 @@ client.on("message", message => {
     const cmd = args[0].toLowerCase();
 
     if (cmd == "help") {
+        logCommand(message, args);
         return helpCmd(message);
     }
 
