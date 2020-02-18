@@ -68,7 +68,11 @@ client.on("message", message => {
 
 function logCommand(message, args) {
     args.shift();
-    console.log(message.member.user.tag + " ran command '" + message.content.split(" ")[0] + "'" + " with args: '" + args.join(" ") + "'");
+
+    let date = new Date();
+    let timestamp = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+    console.log("[" + timestamp + "] " + message.member.user.tag + " ran command '" + message.content.split(" ")[0] + "'" + " with args: '" + args.join(" ") + "'");
 }
 
 function runCommand(cmd, message, args) {
