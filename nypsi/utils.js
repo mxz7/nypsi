@@ -3,26 +3,19 @@ const { wholesome } = require("./images.json");
 
 
 module.exports = {
-    getMember: function(message, args) {
-        if (args.length == 0) {
-            return message.member;
-        }
-    
-        if (message.mentions.members.first()) {
-            return message.mentions.members.first();
-        }
-    
-        const target = message.guild.members.find(member => {
-            return member.displayName.toLowerCase().includes(args[0].toLowerCase()) || member.user.tag.toLowerCase().includes(args[0].toLowerCase());
+    getMember: function(message, memberName) {
+        let target = message.guild.members.find(member => {
+            if (member.user.tag.slice(0, -5).toLowerCase() == memberName.toLowerCase()) {
+                return member;
+            }
         });
-    
-        return target;
-    },
 
-    getMember1: function(message, memberName) {
-        const target = message.guild.members.find(member => {
-            return member.displayName.toLowerCase().includes(memberName.toLowerCase()) || member.user.tag.toLowerCase().includes(memberName.toLowerCase());
-        });
+        if (!target) {
+            target = message.guild.members.find(member => {
+                return member.displayName.toLowerCase().includes(memberName.toLowerCase()) || member.user.tag.toLowerCase().includes(memberName.toLowerCase());
+            });
+        }
+
         return target;
     },
     

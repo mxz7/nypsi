@@ -11,7 +11,17 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
 
-        const member = getMember(message, args);
+        let member;
+
+        if (args.length == 0) {
+            member = message.member;
+        } else {
+            if (!message.mentions.members.first()) {
+                member = getMember(message, args[0]);
+            } else {
+                member = message.mentions.members.first();
+            }
+        }
 
         if (!member) {
             return message.channel.send("❌ \ninvalid user");
