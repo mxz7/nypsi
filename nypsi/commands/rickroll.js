@@ -1,5 +1,6 @@
 /*jshint esversion: 8 */
 const { getMember } = require("../utils.js");
+const { list } = require("../optout.json");
 
 var cooldown = new Set();
 
@@ -37,6 +38,14 @@ module.exports = {
 
         if (!target) {
             return message.channel.send("❌\ninvalid user");
+        }
+
+        if (list.includes(message.member.user.id)) {
+            return message.channel.send("❌\nyou have opted out of bot dms, use $optin to be able to use this command");
+        }
+
+        if (list.includes(target.user.id)) {
+            return message.channel.send("❌\nthis user has opted out of bot dms");
         }
 
         target.send("https://youtu.be/dQw4w9WgXcQ").then( () => {
