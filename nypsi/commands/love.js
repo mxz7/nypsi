@@ -2,6 +2,8 @@
 const { RichEmbed } = require("discord.js");
 const { getMember1, getMention } = require("../utils.js");
 
+var cooldown = new Set();
+
 module.exports = {
     name: "love",
     description: "calculate your love with another person",
@@ -10,6 +12,17 @@ module.exports = {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
+
+        if (cooldown.has(message.member.id)) {
+            message.delete();
+            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+        }
+
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 4000);
 
         if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");

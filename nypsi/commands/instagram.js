@@ -16,11 +16,8 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            return message.channel.send("❌\nstill on cooldown");
-        }
-        
-        if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
+            message.delete();
+            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
         cooldown.add(message.member.id);
@@ -28,6 +25,10 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 4000);
+        
+        if (args.length == 0) {
+            return message.channel.send("❌\ninvalid account");
+        }
 
         const name = args[0];
 

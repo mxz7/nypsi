@@ -14,14 +14,15 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            return message.channel.send("❌\nstill on cooldown");
+            message.delete();
+            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
         cooldown.add(message.member.id);
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 2500);
+        }, 4000);
 
         let color;
 
