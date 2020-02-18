@@ -48,7 +48,7 @@ module.exports = {
                 target1 = message.mentions.members.first();
             }
 
-            if (getMember1(message, args[1])) {
+            if (getMember(message, args[1])) {
                 target2 = getMember(message, args[1]);
             } else {
                 target2 = getMention(message, args[1]);
