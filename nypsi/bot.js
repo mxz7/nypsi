@@ -74,7 +74,7 @@ function logCommand(message, args) {
     let minutes = date.getMinutes().toString();
     let seconds = date.getSeconds().toString();
 
-    if (hourslength == 1) {
+    if (hours.length == 1) {
         hours = "0" + hours;
     } 
 
