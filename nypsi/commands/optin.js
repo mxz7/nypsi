@@ -20,7 +20,7 @@ module.exports = {
         }, 10000);
 
         if (!list.includes(message.member.user.id)) {
-            return message.channel.send("❌\nyou are already opted into bot dms");
+            return message.channel.send("❌\nyou are already opted into bot dms - use $optout to opt out");
         }
 
         const index = list.indexOf(message.member.user.id);

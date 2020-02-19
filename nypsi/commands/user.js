@@ -24,6 +24,10 @@ module.exports = {
             }
         }
 
+        if (!member) {
+            return message.channel.send("❌ \ninvalid user");
+        }
+        
         const joined = formatDate(member.joinedAt);
 
         const created = formatDate(member.user.createdAt);

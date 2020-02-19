@@ -22,7 +22,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 4000);
+        }, 5000);
 
         if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");
@@ -68,6 +68,9 @@ module.exports = {
         if (lovePercent == 100) {
             loveLevel = "perfect!!";
             loveEmoji = "💞👀🍆🍑";
+        } else if (lovePercent == 69) {
+            loveLevel = "ooo 69 hehe horny";
+            loveEmoji = "🍆🍑💦😩";
         } else if (lovePercent > 90) {
             loveLevel = "perfect!!";
             loveEmoji = "💞👀";
