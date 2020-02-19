@@ -26,18 +26,10 @@ module.exports = {
 
         let target;
 
-        if (args.length == 0) {
-            target = message.member;
-        } else {
-            if (!message.mentions.members.first()) {
-                target = getMember(message, args[0]);
-            } else {
-                target = message.mentions.members.first();
-            }
-        }
+        target = message.mentions.members.first();
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user");
+            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
         }
 
         if (list.includes(message.member.user.id)) {
@@ -48,7 +40,7 @@ module.exports = {
             return message.channel.send("❌\nthis user has opted out of bot dms");
         }
 
-        target.send("https://youtu.be/dQw4w9WgXcQ").then( () => {
+        target.send("**sent by " + message.member.user.tag + " in " + message.guild.name + "** use $optout to optout" + " https://youtu.be/dQw4w9WgXcQ").then( () => {
             message.channel.send("✅\nsuccess");
         }).catch( () => {
             return message.channel.send("❌\ni cannot message that user");

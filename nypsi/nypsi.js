@@ -4,6 +4,7 @@ const { RichEmbed } = require("discord.js");
 const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const fs = require("fs");
+const { list } = require("./optout.json");
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
@@ -36,6 +37,8 @@ client.once("ready", () => {
     aliases.set("serverinfo", "server");
     aliases.set("ws", "wholesome");
     aliases.set("rick", "rickroll");
+    aliases.set("dice", "roll");
+    aliases.set("git", "github");
 
     console.log("\n\n- - -");
     console.log('nypsi is online..\n\n');
@@ -44,9 +47,15 @@ client.once("ready", () => {
 
 
 client.on("message", message => {
+    const { banned } = require("./banned.json");
 
     if (!message.guild) return;
     if (!message.content.startsWith(prefix)) return;
+
+    if (banned.includes(message.member.user.id)) {
+        message.delete().catch();
+        return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
+    }
 
     const args = message.content.substring(prefix.length).split(" ");
     const cmd = args[0].toLowerCase();
@@ -119,11 +128,11 @@ function helpCmd(message) {
 
     let color;
 
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+    if (message.member.displayHexColor == "#000000") {
+        color = "#FC4040";
+    } else {
+        color = message.member.displayHexColor;
+    }
 
     const embed = new RichEmbed()
         .setTitle("help")
@@ -133,6 +142,16 @@ function helpCmd(message) {
 
         .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
         .setTimestamp();
+
+    if (!list.includes(message.member.user.id)) {
+        return message.member.send(embed).then( () => {
+            message.react("✅");
+        }).catch( () => {
+            message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        });
+    }
 
     message.channel.send(embed).catch(() => {
         return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

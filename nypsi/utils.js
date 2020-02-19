@@ -15,6 +15,12 @@ module.exports = {
             });
         }
 
+        if (!target) {
+            target = message.guild.members.find(member => {
+                return member.user.id == memberName;
+            });
+        }
+
         return target;
     },
     
