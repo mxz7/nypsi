@@ -5,6 +5,7 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const fs = require("fs");
 const { list } = require("./optout.json");
+const figlet = require("figlet");
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
@@ -40,8 +41,17 @@ client.once("ready", () => {
     aliases.set("dice", "roll");
     aliases.set("git", "github");
 
-    console.log("\n\n- - -");
-    console.log('nypsi is online..\n\n');
+    console.log("\n\n- - -\n");
+    console.log("logged in as " + client.user.tag + "\n\n");
+
+    figlet("n y p s i", function(err, data) {
+        if (!err) {
+            console.log(data + "\n\n- - -\n\n");
+        }
+    });
+
+
+    
 });
 
 

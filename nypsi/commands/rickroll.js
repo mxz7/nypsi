@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
-const { getMember } = require("../utils.js");
 const { list } = require("../optout.json");
+const { banned } = require("../banned.json");
 
 var cooldown = new Set();
 
@@ -10,7 +10,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {
-            message.delete();
+            message.delete().catch();
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
@@ -38,6 +38,10 @@ module.exports = {
 
         if (list.includes(target.user.id)) {
             return message.channel.send("❌\nthis user has opted out of bot dms");
+        }
+
+        if (banned.includes(target.user.id)) {
+            return message.channel.send("❌\nthis user is banned from the bot");
         }
 
         target.send("**sent by " + message.member.user.tag + " in " + message.guild.name + "** use $optout to optout" + " https://youtu.be/dQw4w9WgXcQ").then( () => {

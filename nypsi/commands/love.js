@@ -14,15 +14,15 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            message.delete();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            message.delete().catch();
+            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(2500));
         }
 
         cooldown.add(message.member.id);
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5000);
+        }, 15000);
 
         if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");
@@ -60,7 +60,7 @@ module.exports = {
             return message.channel.send("❌\ninvalid account");
         }
 
-        const lovePercent = Math.ceil(Math.random() * 100);
+        const lovePercent = Math.ceil(Math.random() * 101) - 1;
         let loveLevel;
         let loveEmoji;
         let loveBar = "";
