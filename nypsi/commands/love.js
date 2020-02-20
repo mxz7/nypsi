@@ -22,7 +22,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 15000);
+        }, 10000);
 
         if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");

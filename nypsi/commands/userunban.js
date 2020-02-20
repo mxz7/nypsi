@@ -10,7 +10,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\nspecify a user");
+            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
         }
 
         let target;
