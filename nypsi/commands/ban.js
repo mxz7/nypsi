@@ -13,7 +13,7 @@ module.exports = {
         }
 
         if (message.mentions.members.first() == null) {
-            message.channel.send("❌\nproper usage: $ban @user (reason)");
+            message.channel.send("❌\n$ban @user (reason)");
             return;
         }
         let member = message.mentions.members.first();

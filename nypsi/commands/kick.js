@@ -12,13 +12,15 @@ module.exports = {
             }
 
             if (message.mentions.members.first() == null) {
-                message.channel.send("❌ \nproper usage: $kick @user");
+                message.channel.send("❌ \n$kick @user (reason)");
                 return;
             }
 
             let member = message.mentions.members.first();
             
-            member.kick().then((member) => {
+            args.shift();
+            
+            member.kick(args.join(" ")).then((member) => {
                 message.channel.send("👋 **" + member.user + "**");
                 console.log(member.user.tag + " was kicked by " + message.member.user.tag);
             }).catch(() => {

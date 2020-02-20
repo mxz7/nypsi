@@ -5,7 +5,7 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const fs = require("fs");
 const { list } = require("./optout.json");
-const figlet = require("figlet");
+const ascii = require("figlet");
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
@@ -16,9 +16,18 @@ console.log(" -- commands -- \n");
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
 
-    commands.set(command.name, command);
+    let enabled = true;
 
-    console.log(command.name + " ✅");
+    if (!command.name || !command.description || !command.run) {
+        enabled = false;
+    }
+
+    if (enabled) {
+        commands.set(command.name, command);
+        console.log(command.name + " ✅");
+    } else {
+        console.log(command.name + " ❌");
+    }
 }
 console.log("\n -- commands -- ");
 
@@ -40,20 +49,17 @@ client.once("ready", () => {
     aliases.set("rick", "rickroll");
     aliases.set("dice", "roll");
     aliases.set("git", "github");
+    aliases.set("q", "question");
 
-    console.log("\n\n- - -\n");
+    console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
 
-    figlet("n y p s i", function(err, data) {
+    ascii("n y p s i", function(err, data) {
         if (!err) {
             console.log(data + "\n\n- - -\n\n");
         }
     });
-
-
-    
 });
-
 
 
 client.on("message", message => {
