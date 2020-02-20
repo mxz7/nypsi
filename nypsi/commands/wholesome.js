@@ -14,7 +14,7 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            message.delete();
+            message.delete().catch();
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
