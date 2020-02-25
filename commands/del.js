@@ -38,7 +38,6 @@ module.exports = {
         if (amount <= 100) {
             message.channel.bulkDelete(amount).then( () => {
                 message.channel.send("✅\n**successfully deleted " + args[0] + " messages**").then(m => m.delete(2500));
-                console.log("deleted " + amount + " by " + message.member.user.tag);
             }).catch();
         } else {
             let amount1 = Math.round(amount / 100);

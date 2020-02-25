@@ -47,12 +47,17 @@ module.exports = {
             .setDescription(member.user)
             
             .addField(member.displayName, stripIndents `**username** ${member.user.tag}\n
-            **created** ${created}\n
-            **joined** ${joined}\n
+            **created** ${created.toString().toLowerCase()}\n
+            **joined** ${joined.toString().toLowerCase()}\n
+            **status** ${member.presence.status}\n
             **id** ${member.user.id}`)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
+        
+        if (member.presence.game && member.presence.game.toString().toLowerCase() != "custom status") {
+            embed.addField("game", stripIndents `**currently playing** ${member.presence.game.name.toString().toLowerCase()}`);
+        }
 
         message.channel.send(embed).catch(() => {
              return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

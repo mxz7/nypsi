@@ -21,9 +21,9 @@ module.exports = {
         const embed = new RichEmbed()
             .setColor(color)
             .setTitle("github")
-            .setURL("https://github.com/tekohxd/js/tree/master/nypsi")
+            .setURL("https://github.com/tekohxd/nypsi")
             .setDescription(message.member + "\nthis bot is opensource and you can view/use the code for completely free\n" +
-            "click the [here](https://github.com/tekohxd/js/tree/master/nypsi) to view the source code on github")
+            "click the [here](https://github.com/tekohxd/nypsi) to view the source code on github")
             
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
