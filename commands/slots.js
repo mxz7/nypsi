@@ -28,6 +28,14 @@ module.exports = {
             return message.channel.send("❌\n$slots <amount>")
         }
 
+        if (args[0] == "all") {
+            args[0] = getBalance(message.member)
+        }
+
+        if (args[0] == "half") {
+            args[0] = getBalance(message.member) / 2
+        }
+
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
             return message.channel.send("❌\n$slots <amount>");
         }
