@@ -62,6 +62,32 @@ client.once("ready", () => {
     });
 });
 
+client.on("rateLimit", () => {
+
+    args.shift();
+
+    const date = new Date();
+    let hours = date.getHours().toString();
+    let minutes = date.getMinutes().toString();
+    let seconds = date.getSeconds().toString();
+
+    if (hours.length == 1) {
+        hours = "0" + hours;
+    } 
+
+    if (minutes.length == 1) {
+        minutes = "0" + minutes;
+    } 
+
+    if (seconds.length == 1) {
+        seconds = "0" + seconds;
+    }
+
+    let timestamp = hours + ":" + minutes + ":" + seconds;
+
+    console.log("\x1b[31m" + "[" + timestamp + "] " + "BEING RATE LIMITED!!\x1b[37m")
+})
+
 
 client.on("message", message => {
     const { banned } = require("./banned.json");
@@ -129,6 +155,10 @@ function getCmdName(cmd) {
 
 function getCmdDesc(cmd) {
     return commands.get(cmd).description;
+}
+
+function getCmdCategory(cmd) {
+    return commands.get(cmd).category;
 }
 
 function helpCmd(message) {
