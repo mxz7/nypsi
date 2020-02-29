@@ -1,18 +1,13 @@
-/*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
-const { wholesomeImg } = require("../utils.js");
+const { topAmount } = require("../utils.js")
+const { RichEmbed } = require("discord.js")
 
-var cooldown = new Set();
+var cooldown = new Set()
 
 module.exports = {
-    name: "wholesome",
-    description: "get a random wholesome picture",
-    category: "fun",
+    name: "baltop",
+    description: "view top users",
+    category: "money",
     run: async (message, args) => {
-
-        if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
-        }
 
         if (cooldown.has(message.member.id)) {
             message.delete().catch();
@@ -23,7 +18,25 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 4000);
+        }, 10000);
+
+        let amount
+
+        if (args.length == 0) {
+            args[0] = 5
+        }
+
+        if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
+            args[0] = 5;
+        }
+
+        amount = parseInt(args[0]);
+
+        const balTop = topAmount(message.guild, amount - 1)
+
+        let filtered = balTop.filter(function (el) {
+            return el != null;
+        });
 
         let color;
 
@@ -32,18 +45,18 @@ module.exports = {
         } else {
             color = message.member.displayHexColor;
         }
-
+          
         const embed = new RichEmbed()
+            .setTitle("richest people in this server")
             .setColor(color)
-            .setTitle("<3")
-            .setImage(wholesomeImg())
+            .addField("top " + filtered.length, filtered)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
-        
+
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
 
     }
-};
+}

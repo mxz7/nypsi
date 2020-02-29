@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { getBalance, createUser } = require("../utils.js")
+const { getBalance, createUser, userExists } = require("../utils.js")
 
 module.exports = {
     name: "balance",
@@ -7,7 +7,7 @@ module.exports = {
     category: "money",
     run: async (message, args) => {
         
-        if (!getBalance(message.member)) {
+        if (!userExists(message.member)) {
             createUser(message.member)
         }
 
