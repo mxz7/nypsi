@@ -52,6 +52,7 @@ client.once("ready", () => {
     aliases.set("q", "question");
     aliases.set("bal", "balance");
     aliases.set("top", "baltop")
+    aliases.set("gamble", "slots")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
@@ -194,16 +195,17 @@ function helpCmd(message, args) {
         color = message.member.displayHexColor;
     }
 
-    if (args.length == 0 && args[0] != "fun" && args[0] != "info" && args[0] != "money" && args[0] != "mod") {
+    if (args.length == 0 && args[0] != "fun" && args[0] != "info" && args[0] != "money" && args[0] != "mod" && args[0] != aliases) {
 
         const embed = new RichEmbed()
             .setTitle("help")
             .setColor(color)
         
-            .addField("fun", "$help fun")
-            .addField("info", "$help info")
-            .addField("money", "$help money")
-            .addField("mod", "$help mod")
+            .addField("fun", "$**help** fun")
+            .addField("info", "$**help** info")
+            .addField("money", "$**help** money")
+            .addField("mod", "$**help** mod")
+            .addField("aliases", "$**help** aliases")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
@@ -332,6 +334,37 @@ function helpCmd(message, args) {
             .setColor(color)
         
             .addField("mod commands", cmdList)
+
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+            .setTimestamp();
+        
+        if (!list.includes(message.member.user.id)) {
+            return message.member.send(embed).then( () => {
+                message.react("✅");
+            }).catch( () => {
+                message.channel.send(embed).catch(() => {
+                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                   });
+            });
+        }
+        
+        message.channel.send(embed).catch(() => {
+            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+        });
+    }
+
+    if (args[0] == "aliases") {
+        cmdList = ""
+
+        for (cmd of aliases.sort().keys()) {
+            cmdList = cmdList + "$**" + cmd + "** -> $**" + aliases.get(cmd) + "**\n"
+        }
+
+        const embed = new RichEmbed()
+            .setTitle("help")
+            .setColor(color)
+        
+            .addField("aliases", cmdList)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

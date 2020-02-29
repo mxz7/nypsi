@@ -91,7 +91,7 @@ module.exports = {
 
         let usersFinal = []
 
-        let count = 0
+        let count = 1
 
         for (user of users) {
             if (count >= amount) break
