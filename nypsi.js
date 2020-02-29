@@ -51,6 +51,7 @@ client.once("ready", () => {
     aliases.set("git", "github");
     aliases.set("q", "question");
     aliases.set("bal", "balance");
+    aliases.set("top", "baltop")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");

@@ -97,10 +97,9 @@ module.exports = {
             if (count >= amount) break
 
             if (getMemberID(guild, user)) {
-                usersFinal[count] = "**" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance
+                usersFinal[count] = count + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance
+                count++
             }
-
-            count++
         }
         return usersFinal
     },
