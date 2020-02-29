@@ -6,6 +6,7 @@ var cooldown = new Set();
 module.exports = {
     name: "optin",
     description: "optin to dms from the bot",
+    category: "info",
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

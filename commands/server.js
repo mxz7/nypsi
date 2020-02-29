@@ -6,6 +6,7 @@ const { formatDate } = require("../utils.js");
 module.exports = {
     name: "server",
     description: "view information about current server",
+    category: "info",
     run: async (message, args) => {
 
         const server = message.guild;

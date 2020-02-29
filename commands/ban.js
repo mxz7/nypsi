@@ -2,6 +2,7 @@
 module.exports = {
     name: "ban",
     description: "generic ban command",
+    category: "moderation",
     run: async (message, args) => {
         
         if (!message.member.hasPermission("BAN_MEMBERS")) {

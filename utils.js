@@ -1,5 +1,7 @@
 /*jshint esversion: 8 */
 const { wholesome } = require("./images.json");
+const fs = require("fs");
+const balance = JSON.parse(fs.readFileSync("./users.json"));
 
 module.exports = {
     getMember: function(message, memberName) {
@@ -44,5 +46,21 @@ module.exports = {
 
             return message.guild.members.get(memberMention);
         }
+    },
+
+    getBalance: function(member) {
+        return balance[member.user.id].balance
+    },
+
+    createUser: function(member) {
+        balance[member.user.id] = {
+            balance: 100
+        }
+
+        fs.writeFile("./users.json", JSON.stringify(balance), (err) => {
+            if (err) {
+                console.log(err)
+            }
+        })
     }
 };

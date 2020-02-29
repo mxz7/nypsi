@@ -7,6 +7,7 @@ var cooldown = new Set();
 module.exports = {
     name: "poll",
     description: "create a poll with two answers",
+    category: "info",
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {

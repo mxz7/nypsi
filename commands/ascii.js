@@ -5,6 +5,7 @@ const { list } = require("../optout.json");
 module.exports = {
     name: "ascii",
     description: "create ascii text",
+    category: "fun",
     run: async (message, args) => {
 
         if (args.length == 0) {

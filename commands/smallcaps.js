@@ -4,6 +4,7 @@ const smallCaps = require('smallcaps');
 module.exports = {
     name: "smallcaps",
     description: "change any text to small caps",
+    category: "fun",
     run: async (message, args) => {
 
         if (args.length == 0) {

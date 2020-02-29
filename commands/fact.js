@@ -7,6 +7,7 @@ var cooldown = new Set();
 module.exports = {
     name: "fact",
     description: "get a random fact",
+    category: "fun",
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

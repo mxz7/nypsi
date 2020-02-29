@@ -3,6 +3,7 @@
 module.exports = {
     name: "flip",
     description: "flip a coin",
+    category: "fun",
     run: async (message, args) => {
         const headTails = ["heads", "tails"];
 

@@ -7,6 +7,7 @@ var cooldown = new Set();
 module.exports = {
     name: "rickroll",
     description: "rickroll your friends",
+    category: "fun",
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

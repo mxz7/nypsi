@@ -18,7 +18,7 @@ for (const file of commandFiles) {
 
     let enabled = true;
 
-    if (!command.name || !command.description || !command.run) {
+    if (!command.name || !command.description || !command.run || !command.category) {
         enabled = false;
     }
 
@@ -26,7 +26,7 @@ for (const file of commandFiles) {
         commands.set(command.name, command);
         console.log(command.name + " ✅");
     } else {
-        console.log(command.name + " ❌");
+        console.log(file + " ❌");
     }
 }
 console.log("\n -- commands -- ");
@@ -50,6 +50,7 @@ client.once("ready", () => {
     aliases.set("dice", "roll");
     aliases.set("git", "github");
     aliases.set("q", "question");
+    aliases.set("bal", "balance");
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");

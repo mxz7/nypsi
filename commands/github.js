@@ -4,6 +4,7 @@ const { RichEmbed } = require("discord.js");
 module.exports = {
     name: "github",
     description: "view code for the bot on github",
+    category: "info",
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
