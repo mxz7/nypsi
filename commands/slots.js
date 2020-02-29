@@ -48,7 +48,7 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["💕", "💕", "💕", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💚", "💚", "💚", "💚", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️"]
+        const values = ["💛", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "❤️", "❤️", "❤️"]
 
         let one = values[Math.floor(Math.random() * values.length)]
         let two = values[Math.floor(Math.random() * values.length)]
