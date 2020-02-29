@@ -15,9 +15,7 @@ module.exports = {
             return message.channel.send("❌\ninvalid user - you must tag the user for this command");
         }
 
-        let target;
-
-        target = message.mentions.members.first();
+        const target = message.mentions.members.first();
 
         if (!target) {
             return message.channel.send("❌\ninvalid user - you must tag the user for this command");

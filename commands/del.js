@@ -5,7 +5,7 @@ var cooldown = new Set();
 module.exports = {
     name: "del",
     description: "bulk delete/purge messages",
-    category: "fun",
+    category: "moderation",
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {

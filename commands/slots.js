@@ -32,7 +32,7 @@ module.exports = {
             return message.channel.send("❌\n$slots <amount>");
         }
 
-        let bet = (parseInt(args[0]));
+        const bet = (parseInt(args[0]));
 
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this bet")
@@ -40,7 +40,7 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["💕", "💛", "💛", "💙", "💙", "💚", "💚", "💚", "❤️", "❤️", "❤️", "❤️", "❤️"]
+        const values = ["💕", "💕", "💕", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💚", "💚", "💚", "💚", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️", "❤️"]
 
         let one = values[Math.floor(Math.random() * values.length)]
         let two = values[Math.floor(Math.random() * values.length)]
@@ -54,9 +54,9 @@ module.exports = {
             const multiplier = getMultiplier(one)
 
             win = true
-            winnings = multiplier * bet
+            winnings = Math.round(multiplier * bet)
 
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings))
+            updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
         let color;
@@ -70,7 +70,7 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("slots")
-            .setDescription(one + " " + two + " " + three)
+            .setDescription(one + " | " + two + " | " + three)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
@@ -78,10 +78,10 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** " + winnings)
+                embed.addField("**winner!!**", "**you win** $" + winnings)
                 embed.setColor("#31E862")
             } else {
-                embed.addField("**loser!!**", "**you lost** " + bet)
+                embed.addField("**loser!!**", "**you lost** $" + bet)
                 embed.setColor("#FF0000")
             }
 
