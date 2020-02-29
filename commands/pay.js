@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { updateBalance, getBalance } = require("../utils.js")
+const { updateBalance, getBalance, userExists, createUser } = require("../utils.js")
 
 var cooldown = new Set();
 
@@ -18,7 +18,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 5000);
 
         if (args.length != 2) {
             return message.channel.send("❌\n$pay <user> <amount>")
@@ -29,6 +29,12 @@ module.exports = {
         if (!target) {
             return message.channel.send("❌\ninvalid user - you must tag the user for this command");
         }
+
+        if (!userExists(target)) {
+            return message.channel.send("❌\nthis user cannot recieve money")
+        }
+
+        if (!userExists(message.member)) createUser(message.member)
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
             return message.channel.send("❌\n$pay <user> <amount>");
