@@ -2,8 +2,8 @@
 module.exports = {
     name: "kick",
     description: "generic kick command",
+    category: "moderation",
     run: async (message, args) => {
-
 
         if (message.member.hasPermission("KICK_MEMBERS")) {
 

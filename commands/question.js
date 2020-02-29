@@ -7,6 +7,7 @@ var cooldown = new Set();
 module.exports = {
     name: "question",
     description: "create a question",
+    category: "info",
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {

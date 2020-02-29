@@ -4,6 +4,7 @@ const { banned } = require("../banned.json");
 module.exports = {
     name: "userban",
     description: "ban a user from the bot",
+    category: "none",
     run: async (message, args) => {
 
         if (message.member.user.id != "672793821850894347") {

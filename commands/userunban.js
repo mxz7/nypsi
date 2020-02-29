@@ -4,6 +4,7 @@ const { banned } = require("../banned.json");
 module.exports = {
     name: "userunban",
     description: "unban a user from the bot",
+    category: "none",
     run: async (message, args) => {
         if (message.member.user.id != "672793821850894347") {
             return message.channel.send("❌\nyou do not have permission");

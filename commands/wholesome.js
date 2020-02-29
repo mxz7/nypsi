@@ -7,6 +7,7 @@ var cooldown = new Set();
 module.exports = {
     name: "wholesome",
     description: "get a random wholesome picture",
+    category: "fun",
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
