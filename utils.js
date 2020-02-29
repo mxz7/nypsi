@@ -91,13 +91,13 @@ module.exports = {
 
         let usersFinal = []
 
-        let count = 1
+        let count = 0
 
         for (user of users) {
             if (count >= amount) break
 
             if (getMemberID(guild, user)) {
-                usersFinal[count] = count + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance
+                usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance
                 count++
             }
         }
