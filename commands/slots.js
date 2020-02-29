@@ -65,7 +65,7 @@ module.exports = {
             winnings = Math.round(multiplier * bet)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
-        } else if (one == two || two == three) {
+        } else if (one == two) {
             win = true
             winnings = Math.round(bet * 2)
 

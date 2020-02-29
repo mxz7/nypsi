@@ -14,12 +14,6 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 600000);
-
         if (args.length == 0) {
             return message.channel.send("❌\n$rob <user>")
         }
@@ -34,11 +28,15 @@ module.exports = {
             return message.channel.send("❌\ninvalid user")
         }
 
+        if (message.member == target) {
+            return message.channel.send("❌\nyou cant rob yourself")
+        }
+
         if (!userExists(target) || getBalance(target) <= 500) {
             return message.channel.send("❌\nthis user doesnt have sufficient funds")
         }
 
-        if (!getBalance(message.member) >= 750) {
+        if (getBalance(message.member) < 750) {
             return message.channel.send("❌\nyou dont have sufficient funds")
         }
 
@@ -55,7 +53,7 @@ module.exports = {
         let robberySuccess = true
         let robbedAmount = 0
 
-        if (amount >= 45) {
+        if (amount >= 60) {
             robberySuccess = false
             updateBalance(message.member, getBalance(message.member) - 750)
             updateBalance(target, getBalance(target) + 750)
@@ -67,6 +65,12 @@ module.exports = {
             updateBalance(target, getBalance(target) - robbedAmount)
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
+
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 600000);
 
         let embed = new RichEmbed()
             .setColor(color)
