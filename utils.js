@@ -4,8 +4,37 @@ const fs = require("fs");
 const balance = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
 
+setInterval(() => {
+    fs.writeFile("./users.json", JSON.stringify(balance), (err) => {
+        if (err) {
+            console.log(err);
+        }
+        const date = new Date();
+        let hours = date.getHours().toString();
+        let minutes = date.getMinutes().toString();
+        let seconds = date.getSeconds().toString();
+
+        if (hours.length == 1) {
+           hours = "0" + hours;
+        } 
+
+        if (minutes.length == 1) {
+            minutes = "0" + minutes;
+        } 
+
+        if (seconds.length == 1) {
+            seconds = "0" + seconds;
+        }
+
+        let timestamp = hours + ":" + minutes + ":" + seconds;
+
+        console.log("[" + timestamp + "] saving data..")
+    })
+}, 30000)
+
 module.exports = {
     getMember: function(message, memberName) {
+        if (!message.guild) return null
         let target = message.guild.members.find(member => {
             if (member.user.tag.slice(0, -5).toLowerCase() == memberName.toLowerCase()) {
                 return member;
@@ -69,12 +98,6 @@ module.exports = {
         balance[member.user.id] = {
             balance: amount
         }
-
-        fs.writeFile("./users.json", JSON.stringify(balance), (err) => {
-            if (err) {
-                console.log(err)
-            }
-        })
     },
 
     topAmount: function(guild, amount) {
@@ -108,12 +131,6 @@ module.exports = {
         balance[member.user.id] = {
             balance: 100
         }
-
-        fs.writeFile("./users.json", JSON.stringify(balance), (err) => {
-            if (err) {
-                console.log(err)
-            }
-        })
     }
 };
 
