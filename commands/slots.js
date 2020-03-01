@@ -71,12 +71,28 @@ module.exports = {
 
         const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒", "🍒"]
 
-        const one = shuffle(values)[Math.floor(Math.random() * values.length)]
+        let one = shuffle(values)[Math.floor(Math.random() * values.length)]
         const two = shuffle(values)[Math.floor(Math.random() * values.length)]
-        const three = shuffle(values)[Math.floor(Math.random() * values.length)]
+        let three = shuffle(values)[Math.floor(Math.random() * values.length)]
 
         let win = false
         let winnings = 0
+
+        if (one == two) {
+            const chanceToWin = Math.floor(Math.random() * 10)
+
+            if (chanceToWin <= 3) {
+                three = two
+            }
+        }
+
+        if (two == three) {
+            const chanceToWin = Math.floor(Math.random() * 10)
+
+            if (chanceToWin <= 3) {
+                one = two
+            }
+        }
 
         if (one == two && two == three) {
             const multiplier = getMultiplier(one)
@@ -126,6 +142,11 @@ module.exports = {
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
+    
+        delete values
+        delete one
+        delete two
+        delete three
 
     }
 }

@@ -20,8 +20,8 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
 
         if (args.length == 1 && args[0].toLowerCase() == "odds") {
-            return message.channel.send("🔴 " + ((values.length - 1) / 2) + ":" + values.length + " win **2**x\n" + 
-                "⚫ " + ((values.length - 1) / 2) + ":" + values.length + " win **2**x\n" + 
+            return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
+                "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
                 "🟢 1/" + values.length + " win **36**x")
         }
 
