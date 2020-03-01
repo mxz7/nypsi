@@ -1,5 +1,6 @@
 const { getBalance, createUser, getMultiplier, updateBalance, userExists } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
+const shuffle = require("shuffle-array")
 
 var cooldown = new Set()
 
@@ -50,9 +51,9 @@ module.exports = {
 
         const values = ["💛", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "❤️", "❤️", "❤️"]
 
-        const one = values[Math.floor(Math.random() * values.length)]
-        const two = values[Math.floor(Math.random() * values.length)]
-        const three = values[Math.floor(Math.random() * values.length)]
+        const one = shuffle(values)[Math.floor(Math.random() * values.length)]
+        const two = shuffle(values)[Math.floor(Math.random() * values.length)]
+        const three = shuffle(values)[Math.floor(Math.random() * values.length)]
 
         let win = false
         let winnings = 0
