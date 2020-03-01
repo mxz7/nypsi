@@ -23,104 +23,108 @@ module.exports = {
             createUser(message.member)
         }
 
-        if (args[0].toLowerCase() == "accept") {
-            if (waiting.get(message.member.user.id)) {
+        if (args.length == 1) {
 
-                if (!getMember(message, waiting.get(message.member.user.id).challenger)) return
-
-                const challenger = getMember(message, waiting.get(message.member.user.id).challenger)
-                const bet = waiting.get(message.member.user.id).bet
-                const choice = waiting.get(message.member.user.id).choice
-
-                waiting.delete(message.member.user.id)
-
-                if (getBalance(challenger) < bet || getBalance(message.member) < bet) {
-                    return message.channel.send("❌\nerror placing bets")
-                }
-
-                updateBalance(challenger, getBalance(challenger) - bet)
-                updateBalance(message.member, getBalance(message.member) - bet)
-
-                const lols = ["heads", "tails"]
-
-                const choice1 = shuffle(lols)[Math.floor(Math.random() * lols.length)]
-        
-                let winner
-                let loser
-
-                let color;
-        
-                if (message.member.displayHexColor == "#000000") {
-                    color = "#FC4040";
-                } else {
-                    color = message.member.displayHexColor;
-                }
-
-        
-                if (choice == choice1) {
-                    winner = challenger.user.tag
-                    color = challenger.displayHexColor
-                    loser = message.member.user.tag
-                    updateBalance(challenger, getBalance(challenger) + (bet * 2))
-                } else {
-                    winner = message.member.user.tag
-                    color = message.member.displayHexColor
-                    loser = challenger.user.tag
-                    updateBalance(message.member, getBalance(message.member) + (bet * 2))
-                }
-        
-                delete lols
-                delete choice
-        
-                
-                let choice2
-
-                if (choice == "heads") {
-                    choice2 = "tails"
-                } else {
-                    choice2 = "heads"
-                }
-        
-        
-                let embed = new RichEmbed()
-                    .setColor(color)
-                    .setTitle("coinflip")
-                    .setDescription("**bet** $" + bet + "\n\n" + 
-                        "**" + challenger.user.tag + "** " + choice + "\n" +
-                        "**" + message.member.user.tag + "** " + choice2 + "\n" +
-                        "*throwing..*")
-        
-                    .setFooter(challenger.user.tag + " | bot.tekoh.wtf", challenger.user.avatarURL)
-                    .setTimestamp();
-                
-                message.channel.send(embed).then(m => {
-        
-                    embed.setDescription("**bet** $" + bet + "\n\n" + 
-                        "**" + challenger.user.tag + "** " + choice + "\n" +
-                        "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
-                        "**threw** " + choice1)
-
+            if (args[0].toLowerCase() == "accept") {
+                if (waiting.get(message.member.user.id)) {
+    
+                    if (!getMember(message, waiting.get(message.member.user.id).challenger)) return
+    
+                    const challenger = getMember(message, waiting.get(message.member.user.id).challenger)
+                    const bet = waiting.get(message.member.user.id).bet
+                    const choice = waiting.get(message.member.user.id).choice
+    
+                    waiting.delete(message.member.user.id)
+    
+                    if (getBalance(challenger) < bet || getBalance(message.member) < bet) {
+                        return message.channel.send("❌\nerror placing bets")
+                    }
+    
+                    updateBalance(challenger, getBalance(challenger) - bet)
+                    updateBalance(message.member, getBalance(message.member) - bet)
+    
+                    const lols = ["heads", "tails"]
+    
+                    const choice1 = shuffle(lols)[Math.floor(Math.random() * lols.length)]
+            
+                    let winner
+                    let loser
+    
+                    let color;
+            
+                    if (message.member.displayHexColor == "#000000") {
+                        color = "#FC4040";
+                    } else {
+                        color = message.member.displayHexColor;
+                    }
+    
+            
+                    if (choice == choice1) {
+                        winner = challenger.user.tag
+                        color = challenger.displayHexColor
+                        loser = message.member.user.tag
+                        updateBalance(challenger, getBalance(challenger) + (bet * 2))
+                    } else {
+                        winner = message.member.user.tag
+                        color = message.member.displayHexColor
+                        loser = challenger.user.tag
+                        updateBalance(message.member, getBalance(message.member) + (bet * 2))
+                    }
+            
+                    delete lols
+                    delete choice
+            
                     
+                    let choice2
+    
+                    if (choice == "heads") {
+                        choice2 = "tails"
+                    } else {
+                        choice2 = "heads"
+                    }
+            
+            
+                    let embed = new RichEmbed()
+                        .setColor(color)
+                        .setTitle("coinflip")
+                        .setDescription("**bet** $" + bet + "\n\n" + 
+                            "**" + challenger.user.tag + "** " + choice + "\n" +
+                            "**" + message.member.user.tag + "** " + choice2 + "\n" +
+                            "*throwing..*")
+            
+                        .setFooter(challenger.user.tag + " | bot.tekoh.wtf", challenger.user.avatarURL)
+                        .setTimestamp();
                     
+                    message.channel.send(embed).then(m => {
             
-                    setTimeout(() => {
-                        m.edit(embed).then(() => {
-
-                            embed.addField("**winner**", winner + " +$" + bet)
-                            embed.addField("**loser**", loser)
-
-                            setTimeout(() => {
-                                m.edit(embed)
-                            }, 1000)
-                        })
-                    }, 1500)
-            
-            
-                }).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
-                });
-                return
+                        embed.setDescription("**bet** $" + bet + "\n\n" + 
+                            "**" + challenger.user.tag + "** " + choice + "\n" +
+                            "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
+                            "**threw** " + choice1)
+    
+                        
+                        
+                
+                        setTimeout(() => {
+                            m.edit(embed).then(() => {
+    
+                                embed.addField("**winner**", winner + " +$" + bet)
+                                embed.addField("**loser**", loser)
+    
+                                setTimeout(() => {
+                                    m.edit(embed)
+                                }, 1000)
+                            })
+                        }, 1500)
+                
+                
+                    }).catch(() => {
+                        return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    });
+                    return
+                }
             }
+
         }
 
         if (args.length != 2 && args.length != 3) {
@@ -171,7 +175,7 @@ module.exports = {
 
             setTimeout(() => {
                 cooldown.delete(message.member.id);
-            }, 5000);
+            }, 30000);
 
             const obj = {
                 challenger: message.member.user.id,
@@ -182,13 +186,13 @@ module.exports = {
             waiting.set(target.user.id, obj)
 
             setTimeout(() => {
-                if (waiting.get(target.user.id)) {
+                if (waiting.get(target.user.id) && waiting.get(target.user.id).challenger == message.member.user.id && waiting.get(target.user.id).choice == args[1].toLowerCase() && waiting.get(target.user.id).bet == bet) {
                     waiting.delete(target.user.id)
                     message.channel.send(target + " game expired")
                 }
             }, 15000)
 
-            return message.channel.send(target + " you have received a coinflip challenge from " + message.member + "\nyou have 15 seconds to accept with $cf accept")
+            return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet + "\nyou have 15 seconds to accept with $cf accept")
 
         }
 
