@@ -4,7 +4,7 @@ var cooldown = new Set();
 
 module.exports = {
     name: "freemoney",
-    description: "get $1k every hour",
+    description: "get $1k every 5 minutes",
     category: "money",
     run: async (message, args) => {
         if (cooldown.has(message.member.id)) {

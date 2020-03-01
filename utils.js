@@ -140,7 +140,7 @@ module.exports = {
         lol = ""
 
         for (item in multiplier) {
-            lol = lol + item + " | win: **" + multiplier[item] + "**x\n"
+            lol = lol + item + " | " + item + " | " + item + "  **||** win: **" + multiplier[item] + "**x\n"
         }
 
         return lol

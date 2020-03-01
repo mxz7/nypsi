@@ -128,7 +128,7 @@ module.exports = {
         }
 
         if (args.length != 2 && args.length != 3) {
-            return message.channel.send("❌\n$coinflip <h/t> <amount>\n$coinflip <user> <h/t> <amount>")
+            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
 
         if (args.length == 3) {
@@ -144,7 +144,7 @@ module.exports = {
             if (args[1].toLowerCase() == "h") args[1] = "heads"
 
             if (args[1].toLowerCase() != "tails" && args[1].toLowerCase() != "heads") {
-                return message.channel.send("❌\n$coinflip <h/t> <amount>\n$coinflip <user> <h/t> <amount>")
+                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
             }
 
             if (args[2] == "all") {
@@ -156,7 +156,7 @@ module.exports = {
             }
     
             if (isNaN(args[2]) || parseInt(args[2]) <= 0) {
-                return message.channel.send("❌\n$coinflip <h/t> <amount>\n$coinflip <user> <h/t> <amount>")
+                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
             }
 
             const bet = (parseInt(args[2]));
@@ -205,7 +205,7 @@ module.exports = {
         if (args[0].toLowerCase() == "h") args[0] = "heads"
 
         if (args[0].toLowerCase() != "tails" && args[0].toLowerCase() != "heads") {
-            return message.channel.send("❌\n$coinflip <h/t> <amount>\n$coinflip <user> <h/t> <amount>")
+            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
 
         if (args[1] == "all") {
@@ -217,7 +217,7 @@ module.exports = {
         }
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            return message.channel.send("❌\n$coinflip <h/t> <amount>\n$coinflip <user> <h/t> <amount>")
+            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
 
         const bet = (parseInt(args[1]));
