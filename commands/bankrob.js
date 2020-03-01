@@ -7,13 +7,13 @@ var cooldown = new Set()
 
 var bankWorth = new Discord.Collection()
 
-bankWorth.set("barclays", 100000)
-bankWorth.set("santander", 50000)
-bankWorth.set("bankofamerica", 175000)
-bankWorth.set("lloyds", 60000)
-bankWorth.set("hsbc", 75000)
-bankWorth.set("fleeca", 25000)
-bankWorth.set("mazebank", 90000)
+bankWorth.set("barclays", 200000)
+bankWorth.set("santander", 100000)
+bankWorth.set("bankofamerica", 300000)
+bankWorth.set("lloyds", 75000)
+bankWorth.set("hsbc", 125000)
+bankWorth.set("fleeca", 50000)
+bankWorth.set("mazebank", 150000)
 
 module.exports = {
     name: "bankrob",
@@ -21,13 +21,42 @@ module.exports = {
     category: "money",
     run: async (message, args) => {
 
+        if (!userExists(message.member)) createUser(message.member)
+
+        if (args[0] == "status") {
+            let bankList = ""
+
+            for (bank1 of bankWorth.keys()) {
+                bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
+            }
+
+            bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
+
+            let color;
+
+            if (message.member.displayHexColor == "#000000") {
+                color = "#FC4040";
+            } else {
+                color = message.member.displayHexColor;
+            }
+
+            const embed = new RichEmbed()
+                .setTitle("current bank balances")
+                .setColor(color)
+                .setDescription(bankList)
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+            
+            
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        }
+
         if (cooldown.has(message.member.id)) {
             message.delete().catch();
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
-
-        if (!userExists(message.member)) createUser(message.member)
-
 
         if (getBalance(message.member) < 5000) {
             return message.channel.send("❌\nyou must have atleast $5k to rob a bank")
@@ -37,7 +66,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 1800000);
+        }, 600000);
 
         const banks = ["barclays", "santander", "bankofamerica", "lloyds", "hsbc", "fleeca", "mazebank"]
 
@@ -51,7 +80,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 11) {
+        if (caught <= 10) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 70) + 10
@@ -85,10 +114,10 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (robberySuccess) {
-                embed.addField("**success!!**", "**you stole** $" + robbedAmount + " (" + amount + "%) from **" + bank + "**")
+                embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + bank + "**")
                 embed.setColor("#31E862")
             } else {
-                embed.addField("**you were caught**", "**you lost** $" + amountLost + " (" + percentLost + "%)")
+                embed.addField("**you were caught**", "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)")
                 embed.setColor("#FF0000")
             }
 

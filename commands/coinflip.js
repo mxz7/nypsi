@@ -97,7 +97,7 @@ module.exports = {
                     
                     message.channel.send(embed).then(m => {
             
-                        embed.setDescription("**bet** $" + bet + "\n\n" + 
+                        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n" + 
                             "**" + challenger.user.tag + "** " + choice + "\n" +
                             "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
                             "**threw** " + choice1)
@@ -108,7 +108,7 @@ module.exports = {
                         setTimeout(() => {
                             m.edit(embed).then(() => {
     
-                                embed.addField("**winner**", winner + " +$" + bet)
+                                embed.addField("**winner**", winner + " +$" + bet.toLocaleString())
                                 embed.addField("**loser**", loser)
     
                                 setTimeout(() => {
@@ -171,6 +171,10 @@ module.exports = {
                 return message.channel.send("❌\nthey cannot afford this bet")
             }
 
+            if (waiting.get(target.user.id)) {
+                return message.channel.send("❌\nthey are already invite to a game")
+            }
+
             cooldown.add(message.member.id);
 
             setTimeout(() => {
@@ -192,7 +196,7 @@ module.exports = {
                 }
             }, 15000)
 
-            return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet + "\nyou have 15 seconds to accept with $cf accept")
+            return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet.toLocaleString() + "\nyou have 15 seconds to accept with $cf accept")
 
         }
 
@@ -256,7 +260,7 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("coinflip")
-            .setDescription("**bet** $" + bet + "\n" + 
+            .setDescription("**bet** $" + bet.toLocaleString() + "\n" + 
                 "**side** " + args[0].toLowerCase() + "\n" +
                 "*throwing..*")
 
@@ -270,10 +274,10 @@ module.exports = {
                 "**threw** " + choice)
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + (bet * 2))
+                embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())
                 embed.setColor("#31E862")
             } else {
-                embed.addField("**loser!!**", "**you lost** $" + bet)
+                embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
                 embed.setColor("#FF0000")
             }
     

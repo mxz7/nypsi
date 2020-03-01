@@ -1,4 +1,4 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists } = require("../utils.js")
+const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -20,7 +20,27 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$slots <amount>")
+            return message.channel.send("❌\n$slots <amount> | $**slots info** shows the winning board")
+        }
+
+        if (args.length == 1 && args[0] == "info") {let color;
+
+            if (message.member.displayHexColor == "#000000") {
+                color = "#FC4040";
+            } else {
+                color = message.member.displayHexColor;
+            }
+
+            const embed = new RichEmbed()
+                .setTitle("win board")
+                .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.8**x win")
+                .setColor(color)
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+            
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            })
         }
 
         if (args[0] == "all") {
@@ -49,7 +69,7 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["💛", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "❤️", "❤️", "❤️"]
+        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒", "🍒"]
 
         const one = shuffle(values)[Math.floor(Math.random() * values.length)]
         const two = shuffle(values)[Math.floor(Math.random() * values.length)]
@@ -65,9 +85,9 @@ module.exports = {
             winnings = Math.round(multiplier * bet)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
-        } else if (one == two) {
+        } else if (one == two || two == three) {
             win = true
-            winnings = Math.round(bet * 2)
+            winnings = Math.round(bet * 1.8)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
@@ -91,10 +111,10 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + winnings)
+                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
                 embed.setColor("#31E862")
             } else {
-                embed.addField("**loser!!**", "**you lost** $" + bet)
+                embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
                 embed.setColor("#FF0000")
             }
 
