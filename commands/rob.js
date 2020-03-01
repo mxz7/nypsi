@@ -46,7 +46,9 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 600000);
 
-        const amount = (Math.floor(Math.random() * 50) + 25)
+        const amount = (Math.floor(Math.random() * 60) + 15)
+
+        const caught = Math.floor(Math.random() * 15)
         
         let color;
 
@@ -59,10 +61,26 @@ module.exports = {
         let robberySuccess = true
         let robbedAmount = 0
 
-        if (amount >= 60) {
+        let caughtByPolice = false
+        let percentReturned
+        let amountReturned
+
+        if (amount >= 55) {
             robberySuccess = false
             updateBalance(message.member, getBalance(message.member) - 750)
             updateBalance(target, getBalance(target) + 750)
+        }
+
+        if (caught <= 3) {
+            caughtByPolice = true
+            robberySuccess = false
+
+            percentReturned = (Math.floor(Math.random() * 30) + 15)
+
+            amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
+
+            updateBalance(target, getBalance(target) + amountReturned)
+            updateBalance(message.member, getBalance(message.member) - amountReturned)
         }
 
         if (robberySuccess) {
@@ -82,9 +100,13 @@ module.exports = {
         
         message.channel.send(embed).then(m => {
             
-            if (robberySuccess) {
+            if (robberySuccess && !caughtByPolice) {
                 embed.addField("**success!!**", "**you stole** $" + robbedAmount + " (" + amount + "%)")
                 embed.setColor("#31E862")
+            } else if (caughtByPolice) {
+                embed.setColor("#374F6B")
+                embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned + " (" + percentReturned + "%)" +
+                    "\nfrom your balance for their troubles")
             } else {
                 embed.addField("**fail!!**", "**you lost** $750")
                 embed.setColor("#FF0000")

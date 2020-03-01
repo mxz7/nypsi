@@ -2,6 +2,8 @@ const { getBalance, createUser, updateBalance, userExists } = require("../utils.
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
+const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
+
 var cooldown = new Set()
 
 module.exports = {
@@ -16,6 +18,12 @@ module.exports = {
         }
 
         if (!userExists(message.member)) createUser(message.member)
+
+        if (args.length == 1 && args[0].toLowerCase() == "odds") {
+            return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " 2/1 win\n" + 
+                "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " 2/1 win\n" + 
+                "🟢 1/" + values.length + " 36/1 win")
+        }
 
         if (args.length != 2) {
             return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount>")
@@ -60,8 +68,6 @@ module.exports = {
         let colorBet = args[0].toLowerCase()
 
         updateBalance(message.member, getBalance(message.member) - bet)
-
-        const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
 
         let roll = shuffle(values)[Math.floor(Math.random() * values.length)]
 
