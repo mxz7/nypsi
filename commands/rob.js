@@ -22,7 +22,9 @@ module.exports = {
 
         let target = message.mentions.members.first()
 
-        if (!target) target = getMember(args[0])
+        if (!target) {
+            target = getMember(message, args[0])
+        }
 
         if (!target) {
             return message.channel.send("❌\ninvalid user")
@@ -101,11 +103,11 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (robberySuccess && !caughtByPolice) {
-                embed.addField("**success!!**", "**you stole** $" + robbedAmount + " (" + amount + "%)")
+                embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%)")
                 embed.setColor("#31E862")
             } else if (caughtByPolice) {
                 embed.setColor("#374F6B")
-                embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned + " (" + percentReturned + "%)" +
+                embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)" +
                     "\nfrom your balance for their troubles")
             } else {
                 embed.addField("**fail!!**", "**you lost** $750")

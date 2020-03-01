@@ -51,7 +51,7 @@ module.exports = {
             const embed = new RichEmbed()
                 .setColor(color)
                 .setTitle(target.user.tag)
-                .setDescription("**balance** $" + getBalance(target))
+                .setDescription("**balance** $" + getBalance(target).toLocaleString())
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();
@@ -73,7 +73,7 @@ module.exports = {
         const embed = new RichEmbed()
             .setColor(color)
             .setTitle(message.member.user.tag)
-            .setDescription("**balance** $" + getBalance(message.member))
+            .setDescription("**balance** $" + getBalance(message.member).toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

@@ -65,8 +65,8 @@ module.exports = {
             .setTitle("processing..")
             .setColor(color)
             .setDescription(message.member + " -> " + target)
-            .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount) + "\n**-** $" + amount)
-            .addField(target.user.tag, "$" + (getBalance(target) - amount) + "\n**+** $" + amount)
+            .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
+            .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
@@ -76,8 +76,8 @@ module.exports = {
                 .setTitle("transaction success")
                 .setColor("#31E862")
                 .setDescription(message.member + " -> " + target)
-                .addField(message.member.user.tag, "$" + getBalance(message.member))
-                .addField(target.user.tag, "$" + getBalance(target))
+                .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
+                .addField(target.user.tag, "$" + getBalance(target).toLocaleString())
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();

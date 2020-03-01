@@ -121,7 +121,7 @@ module.exports = {
 
             if (getMemberID(guild, user)) {
                 if (!balance[user].balance == 0) {
-                    usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance
+                    usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance.toLocaleString()
                     count++
                 }
             }
@@ -133,6 +133,17 @@ module.exports = {
         balance[member.user.id] = {
             balance: 100
         }
+    },
+
+    winBoard: function() {
+
+        lol = ""
+
+        for (item in multiplier) {
+            lol = lol + item + " | win: **" + multiplier[item] + "**x\n"
+        }
+
+        return lol
     }
 };
 

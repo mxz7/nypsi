@@ -2,7 +2,7 @@ const { getBalance, createUser, updateBalance, userExists } = require("../utils.
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
+const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
 
 var cooldown = new Set()
 
@@ -20,13 +20,13 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
 
         if (args.length == 1 && args[0].toLowerCase() == "odds") {
-            return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " 2/1 win\n" + 
-                "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " 2/1 win\n" + 
-                "🟢 1/" + values.length + " 36/1 win")
+            return message.channel.send("🔴 " + ((values.length - 1) / 2) + ":" + values.length + " win **2**x\n" + 
+                "⚫ " + ((values.length - 1) / 2) + ":" + values.length + " win **2**x\n" + 
+                "🟢 1/" + values.length + " win **36**x")
         }
 
         if (args.length != 2) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount>")
+            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount> | $**roulette odds** shows the odds of winning")
         }
 
         if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
@@ -120,13 +120,13 @@ module.exports = {
         
         message.channel.send(embed).then(m => {
 
-            embed.setDescription("**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet)
+            embed.setDescription("**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + winnings)
+                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
                 embed.setColor("#31E862")
             } else {
-                embed.addField("**loser!!**", "**you lost** $" + bet)
+                embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
                 embed.setColor("#FF0000")
             }
 
