@@ -15,12 +15,6 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
         if (!userExists(message.member)) {
             createUser(message.member)
         }
@@ -55,6 +49,12 @@ module.exports = {
             return message.channel.send("❌\nyou cannot afford this bet")
         }
 
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 5000);
+
         updateBalance(message.member, getBalance(message.member) - bet)
 
         const lols = ["heads", "tails"]
@@ -67,6 +67,9 @@ module.exports = {
             win = true
             updateBalance(message.member, getBalance(message.member) + (bet * 2))
         }
+
+        delete lols
+        delete choice
 
         let color;
 
@@ -81,24 +84,22 @@ module.exports = {
             .setColor(color)
             .setTitle("coinflip")
             .setDescription("**bet** $" + bet + "\n" + 
-                "**choice** " + args[0].toLowerCase() + "\n" +
+                "**side** " + args[0].toLowerCase() + "\n" +
                 "*throwing..*")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
         message.channel.send(embed).then(m => {
+
+            embed.setDescription("**bet** $" + bet + "\n" + 
+                "**side** " + args[0].toLowerCase() + "\n" +
+                "**threw** " + choice)
             
             if (win) {
-                embed.setDescription("**bet** $" + bet + "\n" + 
-                "**choice** " + args[0].toLowerCase() + "\n" +
-                "**threw** " + choice)
                 embed.addField("**winner!!**", "**you win** $" + (bet * 2))
                 embed.setColor("#31E862")
             } else {
-                embed.setDescription("**bet** $" + bet + "\n" + 
-                "**choice** " + args[0].toLowerCase() + "\n" +
-                "**threw** " + choice)
                 embed.addField("**loser!!**", "**you lost** $" + bet)
                 embed.setColor("#FF0000")
             }

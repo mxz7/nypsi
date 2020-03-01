@@ -35,7 +35,6 @@ module.exports = {
             .setColor(color)
             .setTitle("fact")
             .setDescription(fact)
-            .setThumbnail(message.member.user.avatarURL)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

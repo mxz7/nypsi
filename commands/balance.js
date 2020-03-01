@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { getBalance, createUser, userExists, updateBalance } = require("../utils.js")
+const { getBalance, createUser, userExists, updateBalance, getMember } = require("../utils.js")
 
 module.exports = {
     name: "balance",
@@ -25,6 +25,41 @@ module.exports = {
             updateBalance(target, amount)
 
             return message.react("✅")
+        }
+
+        if (args.length == 1) {
+            let target = message.mentions.members.first();
+
+            if (!target) {
+                target = getMember(message, args[0])
+            }
+
+            if (!target) {
+                return message.channel.send("❌\ninvalid user")
+            }
+
+            let color;
+
+            if (message.member.displayHexColor == "#000000") {
+                color = "#FC4040";
+            } else {
+                color = message.member.displayHexColor;
+            }
+
+            if (!userExists(target)) createUser(target)
+
+            const embed = new RichEmbed()
+                .setColor(color)
+                .setTitle(target.user.tag)
+                .setDescription("**balance** $" + getBalance(target))
+
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+
         }
 
         let color;

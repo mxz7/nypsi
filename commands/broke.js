@@ -25,7 +25,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 3600000);
+        }, 60000);
 
         createUser(message.member)
 

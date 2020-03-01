@@ -18,7 +18,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 5000);
 
         let amount
 

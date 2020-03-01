@@ -28,7 +28,7 @@ setInterval(() => {
 
         let timestamp = hours + ":" + minutes + ":" + seconds;
 
-        console.log("[" + timestamp + "] saving data..")
+        console.log("\x1b[32m[" + timestamp + "] data saved..\x1b[37m")
     })
 }, 30000)
 

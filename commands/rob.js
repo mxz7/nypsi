@@ -40,6 +40,12 @@ module.exports = {
             return message.channel.send("❌\nyou dont have sufficient funds")
         }
 
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 600000);
+
         const amount = (Math.floor(Math.random() * 50) + 25)
         
         let color;
@@ -66,12 +72,6 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 600000);
-
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("robbery")
@@ -83,7 +83,7 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (robberySuccess) {
-                embed.addField("**success!!**", "**you stole** $" + robbedAmount)
+                embed.addField("**success!!**", "**you stole** $" + robbedAmount + " (" + amount + "%)")
                 embed.setColor("#31E862")
             } else {
                 embed.addField("**fail!!**", "**you lost** $750")
@@ -92,7 +92,7 @@ module.exports = {
 
             setTimeout(() => {
                 m.edit(embed)
-            }, 500)
+            }, 1000)
 
 
         }).catch(() => {
