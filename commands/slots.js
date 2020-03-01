@@ -14,12 +14,6 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
         if (!userExists(message.member)) {
             createUser(message.member)
         }
@@ -46,14 +40,19 @@ module.exports = {
             return message.channel.send("❌\nyou cannot afford this bet")
         }
 
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 5000);
+
         updateBalance(message.member, getBalance(message.member) - bet)
 
         const values = ["💛", "💛", "💛", "💛", "💛", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "💙", "❤️", "❤️", "❤️"]
 
-        let one = values[Math.floor(Math.random() * values.length)]
-        let two = values[Math.floor(Math.random() * values.length)]
-        let three = values[Math.floor(Math.random() * values.length)]
-
+        const one = values[Math.floor(Math.random() * values.length)]
+        const two = values[Math.floor(Math.random() * values.length)]
+        const three = values[Math.floor(Math.random() * values.length)]
 
         let win = false
         let winnings = 0

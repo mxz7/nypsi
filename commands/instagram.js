@@ -19,16 +19,16 @@ module.exports = {
             message.delete().catch();
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
+        
+        if (args.length == 0) {
+            return message.channel.send("❌\ninvalid account");
+        }
 
         cooldown.add(message.member.id);
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 4000);
-        
-        if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
-        }
 
         const name = args[0];
 

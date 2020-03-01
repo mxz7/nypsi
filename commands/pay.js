@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { updateBalance, getBalance, userExists, createUser } = require("../utils.js")
+const { updateBalance, getBalance, userExists, createUser, getMember } = require("../utils.js")
 
 var cooldown = new Set();
 
@@ -14,20 +14,18 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
         if (args.length != 2) {
             return message.channel.send("❌\n$pay <user> <amount>")
         }
 
-        const target = message.mentions.members.first();
+        let target = message.mentions.members.first();
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
+            target = getMember(message, args[0])
+        }
+
+        if (!target) {
+            return message.channel.send("❌\ninvalid user")
         }
 
         if (!userExists(target)) {
@@ -46,6 +44,12 @@ module.exports = {
             return message.channel.send("❌\nyou cannot afford this payment")
         }
 
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 5000);
+
         updateBalance(message.member, getBalance(message.member) - amount)
         updateBalance(target, getBalance(target) + amount)
 
@@ -58,16 +62,30 @@ module.exports = {
         }
 
         const embed = new RichEmbed()
-            .setTitle("transaction success!!")
+            .setTitle("processing..")
             .setColor(color)
             .setDescription(message.member + " -> " + target)
-            .addField(message.member.user.tag + " new balance", "   $" + getBalance(message.member) + "\n**-** $" + amount)
-            .addField(target.user.tag + " new balance", "   $" + getBalance(target) + "\n**+** $" + amount)
+            .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount) + "\n**-** $" + amount)
+            .addField(target.user.tag, "$" + (getBalance(target) - amount) + "\n**+** $" + amount)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
 
-        message.channel.send(embed).catch(() => {
+        message.channel.send(embed).then(m => {
+            const embed = new RichEmbed()
+                .setTitle("transaction success")
+                .setColor("#31E862")
+                .setDescription(message.member + " -> " + target)
+                .addField(message.member.user.tag, "$" + getBalance(message.member))
+                .addField(target.user.tag, "$" + getBalance(target))
+
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+            
+            setTimeout(() =>{
+                m.edit(embed)
+            }, 750)
+        }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
 

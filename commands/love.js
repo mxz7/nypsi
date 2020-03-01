@@ -19,12 +19,6 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown").then(m => m.delete(2500));
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 10000);
-
         if (args.length == 0) {
             return message.channel.send("❌\ninvalid account");
         }
@@ -60,6 +54,12 @@ module.exports = {
         if (!target1 || !target2) {
             return message.channel.send("❌\ninvalid account");
         }
+
+        cooldown.add(message.member.id);
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 10000);
 
         const lovePercent = Math.ceil(Math.random() * 101) - 1;
         let loveLevel;

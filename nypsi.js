@@ -52,8 +52,8 @@ client.once("ready", () => {
     aliases.set("q", "question");
     aliases.set("bal", "balance");
     aliases.set("top", "baltop")
-    aliases.set("gamble", "slots")
     aliases.set("cf", "coinflip")
+    aliases.set("r", "roulette")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
