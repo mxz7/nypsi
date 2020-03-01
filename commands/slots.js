@@ -20,7 +20,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$slots <amount> | $**slots info** shows the winning board")
+            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
         }
 
         if (args.length == 1 && args[0] == "info") {let color;
@@ -52,7 +52,7 @@ module.exports = {
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌\n$slots <amount>");
+            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
         }
 
         const bet = (parseInt(args[0]));

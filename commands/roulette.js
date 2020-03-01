@@ -26,11 +26,11 @@ module.exports = {
         }
 
         if (args.length != 2) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount> | $**roulette odds** shows the odds of winning")
+            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
         if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount>")
+            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
         if (args[0] == "red") {
@@ -50,7 +50,7 @@ module.exports = {
         }
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <amount>")
+            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
         const bet = parseInt(args[1])
