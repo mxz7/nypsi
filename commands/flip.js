@@ -1,4 +1,5 @@
 /*jshint esversion: 8 */
+const shuffle = require("shuffle-array")
 
 module.exports = {
     name: "flip",
@@ -7,7 +8,7 @@ module.exports = {
     run: async (message, args) => {
         const headTails = ["heads", "tails"];
 
-        const answer = headTails[Math.floor(Math.random() * headTails.length)];
+        const answer = shuffle(headTails)[Math.floor(Math.random() * headTails.length)];
 
         message.channel.send("**" + answer + "!**");
     }
