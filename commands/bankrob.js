@@ -11,6 +11,7 @@ bankWorth.set("barclays", 100000)
 bankWorth.set("santander", 50000)
 bankWorth.set("bankofamerica", 175000)
 bankWorth.set("lloyds", 60000)
+bankWorth.set("hsbc", 75000)
 bankWorth.set("fleeca", 25000)
 bankWorth.set("mazebank", 90000)
 
@@ -28,8 +29,8 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
 
 
-        if (getBalance(message.member) < 10000) {
-            return message.channel.send("❌\nyou must have atleast $10k to rob a bank")
+        if (getBalance(message.member) < 5000) {
+            return message.channel.send("❌\nyou must have atleast $5k to rob a bank")
         }
 
         cooldown.add(message.member.id);
@@ -50,7 +51,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 13) {
+        if (caught <= 11) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 70) + 10
