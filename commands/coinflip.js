@@ -181,16 +181,19 @@ module.exports = {
                 cooldown.delete(message.member.id);
             }, 30000);
 
+            const id = Math.random()
+
             const obj = {
                 challenger: message.member.user.id,
                 choice: args[1].toLowerCase(),
-                bet: bet
+                bet: bet,
+                id: id
             }
 
             waiting.set(target.user.id, obj)
 
             setTimeout(() => {
-                if (waiting.get(target.user.id) && waiting.get(target.user.id).challenger == message.member.user.id && waiting.get(target.user.id).choice == args[1].toLowerCase() && waiting.get(target.user.id).bet == bet) {
+                if (waiting.get(target.user.id) && waiting.get(target.user.id).id == id && waiting.get(target.user.id).challenger == message.member.user.id && waiting.get(target.user.id).choice == args[1].toLowerCase() && waiting.get(target.user.id).bet == bet) {
                     waiting.delete(target.user.id)
                     message.channel.send(target + " game expired")
                 }

@@ -78,19 +78,19 @@ module.exports = {
         let win = false
         let winnings = 0
 
-        if (one == two) {
+        if (one != two && two != three) {
             const chanceToWin = Math.floor(Math.random() * 10)
-
-            if (chanceToWin <= 3) {
+            if (chanceToWin <= 1) {
+                one = two
                 three = two
             }
         }
 
-        if (two == three) {
+        if (one == two) {
             const chanceToWin = Math.floor(Math.random() * 10)
 
-            if (chanceToWin <= 3) {
-                one = two
+            if (chanceToWin <= 2) {
+                three = two
             }
         }
 
@@ -101,9 +101,9 @@ module.exports = {
             winnings = Math.round(multiplier * bet)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
-        } else if (one == two || two == three) {
+        } else if (one == two) {
             win = true
-            winnings = Math.round(bet * 1.8)
+            winnings = Math.round(bet * 1.5)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
