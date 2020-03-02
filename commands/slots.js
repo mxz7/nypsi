@@ -69,7 +69,7 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒", "🍒"]
+        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒", "🍒"]
 
         let one = shuffle(values)[Math.floor(Math.random() * values.length)]
         const two = shuffle(values)[Math.floor(Math.random() * values.length)]
@@ -80,7 +80,15 @@ module.exports = {
 
         if (one != two && two != three) {
             const chanceToWin = Math.floor(Math.random() * 10)
-            if (chanceToWin <= 1) {
+            if (chanceToWin <= 2) {
+                one = two
+                three = two
+            }
+        }
+
+        if (one != two && two != three && one != three) {
+            const chanceToWin = Math.floor(Math.random() * 10)
+            if (chanceToWin <= 3) {
                 one = two
                 three = two
             }
@@ -119,7 +127,7 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("slots")
-            .setDescription(one + " | " + two + " | " + three)
+            .setDescription(one + " | " + two + " | " + three + "\n\n**bet** $" + bet.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

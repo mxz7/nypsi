@@ -28,9 +28,7 @@ module.exports = {
             return message.channel.send("❌\ninvalid user")
         }
 
-        if (!userExists(target)) {
-            return message.channel.send("❌\nthis user cannot recieve money")
-        }
+        if (!userExists(target)) createUser(target)
 
         if (!userExists(message.member)) createUser(message.member)
 
