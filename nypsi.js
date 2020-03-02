@@ -93,6 +93,7 @@ client.on("rateLimit", () => {
 client.on("message", message => {
     const { banned } = require("./banned.json");
 
+    if(message.author.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(prefix)) return;
 
