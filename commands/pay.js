@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { updateBalance, getBalance, userExists, createUser, getMember } = require("../utils.js")
+const { updateBalance, getBalance, userExists, createUser, getMember, formatBet } = require("../utils.js")
 
 var cooldown = new Set();
 
@@ -32,8 +32,20 @@ module.exports = {
 
         if (!userExists(message.member)) createUser(message.member)
 
+        if (args[1] == "all") {
+            args[1] = getBalance(message.member)
+        }
+
+        if (args[1] == "half") {
+            args[1] = getBalance(message.member) / 2
+        }
+
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            return message.channel.send("❌\n$pay <user> <amount>");
+            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
+                args[1] = formatBet(args[1])
+            } else {
+                return message.channel.send("❌\n$pay <user> <amount>")
+            }
         }
 
         const amount = (parseInt(args[1]));

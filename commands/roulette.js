@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -50,7 +50,11 @@ module.exports = {
         }
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
+                args[1] = formatBet(args[1])
+            } else {
+                return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            }
         }
 
         const bet = parseInt(args[1])
@@ -113,7 +117,7 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("roulette wheel")
-            .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet)
+            .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

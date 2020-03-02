@@ -57,7 +57,8 @@ module.exports = {
 
             setTimeout(() => {
                 m.edit(embed)
-            }, 1500);
+            }, 1500)
+
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
