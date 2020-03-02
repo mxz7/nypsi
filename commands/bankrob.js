@@ -7,13 +7,13 @@ var cooldown = new Set()
 
 var bankWorth = new Discord.Collection()
 
-bankWorth.set("barclays", 200000)
-bankWorth.set("santander", 100000)
-bankWorth.set("bankofamerica", 300000)
-bankWorth.set("lloyds", 75000)
-bankWorth.set("hsbc", 125000)
-bankWorth.set("fleeca", 50000)
-bankWorth.set("mazebank", 150000)
+bankWorth.set("barclays", 750000)
+bankWorth.set("santander", 500000)
+bankWorth.set("bankofamerica", 1000000)
+bankWorth.set("lloyds", 350000)
+bankWorth.set("hsbc", 600000)
+bankWorth.set("fleeca", 100000)
+bankWorth.set("mazebank", 550000)
 
 module.exports = {
     name: "bankrob",

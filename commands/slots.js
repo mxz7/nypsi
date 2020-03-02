@@ -1,4 +1,4 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard } = require("../utils.js")
+const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -33,7 +33,7 @@ module.exports = {
 
             const embed = new RichEmbed()
                 .setTitle("win board")
-                .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.8**x win")
+                .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.5**x win")
                 .setColor(color)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();
@@ -41,6 +41,10 @@ module.exports = {
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
             })
+        }
+
+        if (!args[0]) {
+            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
         }
 
         if (args[0] == "all") {
@@ -52,7 +56,11 @@ module.exports = {
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
+            if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
+                args[0] = formatBet(args[0])
+            } else {
+                return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
+            }
         }
 
         const bet = (parseInt(args[0]));
@@ -69,38 +77,61 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒", "🍒"]
+        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒"]
 
         let one = shuffle(values)[Math.floor(Math.random() * values.length)]
-        const two = shuffle(values)[Math.floor(Math.random() * values.length)]
+        let two = shuffle(values)[Math.floor(Math.random() * values.length)]
         let three = shuffle(values)[Math.floor(Math.random() * values.length)]
 
         let win = false
         let winnings = 0
 
-        if (one != two && two != three) {
-            const chanceToWin = Math.floor(Math.random() * 10)
-            if (chanceToWin <= 2) {
-                one = two
-                three = two
-            }
-        }
 
-        if (one != two && two != three && one != three) {
-            const chanceToWin = Math.floor(Math.random() * 10)
-            if (chanceToWin <= 3) {
-                one = two
-                three = two
+        //Start of processing designed to make winning easier, but designed to make winning harder for people with over 1T
+
+        if (one != two && two != three) {
+            if (getBalance(message.member) < 1000000000000) {
+                const chanceToWin = Math.floor(Math.random() * 15)
+                if (chanceToWin <= 1) {
+                    one = two
+                    three = two
+                }
             }
         }
 
         if (one == two) {
-            const chanceToWin = Math.floor(Math.random() * 10)
+            if (!getBalance(message.member) < 1000000000000) {
+                const chanceToWin = Math.floor(Math.random() * 10)
 
-            if (chanceToWin <= 2) {
-                three = two
+                if (chanceToWin <= 1) {
+                    three = two
+                }
+            } else {
+                const chanceToWin = Math.floor(Math.random() * 10)
+
+                if (chanceToWin <= 5) {
+                    two = three
+                } 
             }
         }
+
+        if (one == two && two == three && one == "🍒") {
+            const chanceToLose = Math.floor(Math.random() * 10)
+
+            if (chanceToLose <= 4) {
+                if (getBalance(message.member) < 1000000000000) {
+                    one = "🍋"
+                    two = "🍋"
+                    three = "🍋"
+                } else {
+                    one = "🍉"
+                    two = "🍉"
+                    three = "🍉"
+                }
+            }
+        }
+
+        //End of processing
 
         if (one == two && two == three) {
             const multiplier = getMultiplier(one)

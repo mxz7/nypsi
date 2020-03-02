@@ -139,6 +139,14 @@ module.exports = {
         }
 
         return lol
+    },
+
+    formatBet: function(number) {
+        const a = number.toString().toLowerCase().replace("t", "000000000000")
+        const b = a.replace("b", "000000000")
+        const c = b.replace("m", "000000")
+
+        return c
     }
 };
 

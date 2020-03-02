@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, getMember } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, getMember, formatBet } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
@@ -149,7 +149,11 @@ module.exports = {
             }
     
             if (isNaN(args[2]) || parseInt(args[2]) <= 0) {
-                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                if (!isNaN(formatBet(args[2]) || !parseInt(formatBet[args[2]]))) {
+                    args[2] = formatBet(args[2])
+                } else {
+                    return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                }
             }
 
             const bet = (parseInt(args[2]));
@@ -213,7 +217,11 @@ module.exports = {
         }
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
+                args[1] = formatBet(args[1])
+            } else {
+                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            }
         }
 
         const bet = (parseInt(args[1]));
