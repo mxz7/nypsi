@@ -1,5 +1,4 @@
 /*jshint esversion: 8 */
-const { wholesome } = require("./lists.json");
 const fs = require("fs");
 const balance = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
@@ -59,10 +58,6 @@ module.exports = {
     formatDate: function(date) {
         var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
-    },
-
-    wholesomeImg: function() {
-        return wholesome[Math.floor(Math.random() * wholesome.length)];
     },
 
     getMention: function(message, memberMention) {

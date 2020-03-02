@@ -113,7 +113,7 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("roulette wheel")
-            .setDescription("**spinning wheel..**\n\n**choice** " + colorBet + "\n**your bet** $" + bet)
+            .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

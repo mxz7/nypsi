@@ -7,6 +7,8 @@ const fs = require("fs");
 const { list } = require("./optout.json");
 const ascii = require("figlet");
 const { banned } = require("./banned.json");
+const balance = JSON.parse(fs.readFileSync("./users.json"));
+const { workMessages, facts, wholesome } = require("./lists.json")
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
@@ -55,6 +57,15 @@ client.once("ready", () => {
     aliases.set("cf", "coinflip")
     aliases.set("r", "roulette")
     aliases.set("steal", "rob")
+
+    console.log("\n\n")
+
+    console.log(balance.size.toLocaleString() + " users loaded")
+    console.log(list.length.toLocaleString() + " users opted out of bot dms")
+    console.log(banned.length.toLocaleString() + " banned users loaded")
+    console.log(workMessages.length.toLocaleString() + " work messages loaded")
+    console.log(facts.length.toLocaleString() + " facts loaded")
+    console.log(wholesome.length.toLocaleString() + " wholesome images loaded")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
