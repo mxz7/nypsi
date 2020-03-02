@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 const { RichEmbed } = require("discord.js");
 const { wholesomeImg } = require("../utils.js");
+const { wholesome } = require("../lists.json")
 
 var cooldown = new Set();
 
@@ -36,7 +37,7 @@ module.exports = {
         const embed = new RichEmbed()
             .setColor(color)
             .setTitle("<3")
-            .setImage(wholesomeImg())
+            .setImage(wholesome[Math.floor(Math.random() * wholesome.length)])
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

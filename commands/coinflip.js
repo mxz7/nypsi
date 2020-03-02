@@ -165,7 +165,7 @@ module.exports = {
             }
 
             if (waiting.get(target.user.id)) {
-                return message.channel.send("❌\nthey are already invite to a game")
+                return message.channel.send("❌\nthey have already been invited to a game")
             }
 
             cooldown.add(message.member.id);
