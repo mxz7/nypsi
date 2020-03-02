@@ -1,5 +1,6 @@
 const { userExists, updateBalance, createUser, getMember, getBalance } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
+const { list } = require("../optout.json")
 
 var cooldown = new Set();
 
@@ -48,7 +49,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 600000);
 
-        const amount = (Math.floor(Math.random() * 60) + 15)
+        const amount = (Math.floor(Math.random() * 50) + 10)
 
         const caught = Math.floor(Math.random() * 15)
         
@@ -67,7 +68,7 @@ module.exports = {
         let percentReturned
         let amountReturned
 
-        if (amount >= 55) {
+        if (amount >= 45) {
             robberySuccess = false
             updateBalance(message.member, getBalance(message.member) - 750)
             updateBalance(target, getBalance(target) + 750)
@@ -81,12 +82,22 @@ module.exports = {
 
             amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
 
+            if (!list.includes(target)) {
+                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +
+                    "** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*")
+            }
+
             updateBalance(target, getBalance(target) + amountReturned)
             updateBalance(message.member, getBalance(message.member) - amountReturned)
         }
 
         if (robberySuccess) {
             robbedAmount = Math.round((amount / 100) * getBalance(target))
+
+            if (!list.includes(target)) {
+                target.send("**you have been robbed!!**\nyou were robbed by **" + message.member.user.tag + "** in **" + message.guild.name + 
+                    "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*")
+            }
 
             updateBalance(target, getBalance(target) - robbedAmount)
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
