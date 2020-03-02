@@ -70,10 +70,6 @@ module.exports = {
                         loser = challenger.user.tag
                         updateBalance(message.member, getBalance(message.member) + (bet * 2))
                     }
-            
-                    delete lols
-                    delete choice
-            
                     
                     let choice2
     
@@ -87,23 +83,20 @@ module.exports = {
                     let embed = new RichEmbed()
                         .setColor(color)
                         .setTitle("coinflip")
-                        .setDescription("**bet** $" + bet + "\n\n" + 
+                        .setDescription("*throwing..* " + "\n\n" + 
                             "**" + challenger.user.tag + "** " + choice + "\n" +
-                            "**" + message.member.user.tag + "** " + choice2 + "\n" +
-                            "*throwing..*")
+                            "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
+                            "**bet** $" + bet.toLocaleString())
             
                         .setFooter(challenger.user.tag + " | bot.tekoh.wtf", challenger.user.avatarURL)
                         .setTimestamp();
                     
                     message.channel.send(embed).then(m => {
             
-                        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n" + 
+                        embed.setDescription("**threw** " + choice1 + "\n\n" + 
                             "**" + challenger.user.tag + "** " + choice + "\n" +
                             "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
-                            "**threw** " + choice1)
-    
-                        
-                        
+                            "**bet** $" + bet.toLocaleString())
                 
                         setTimeout(() => {
                             m.edit(embed).then(() => {
@@ -263,18 +256,18 @@ module.exports = {
         let embed = new RichEmbed()
             .setColor(color)
             .setTitle("coinflip")
-            .setDescription("**bet** $" + bet.toLocaleString() + "\n" + 
+            .setDescription("*throwing..*" + "\n\n" + 
                 "**side** " + args[0].toLowerCase() + "\n" +
-                "*throwing..*")
+                "**bet** $" + bet.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
         message.channel.send(embed).then(m => {
 
-            embed.setDescription("**bet** $" + bet + "\n" + 
+            embed.setDescription("**threw** " + choice + "\n\n" + 
                 "**side** " + args[0].toLowerCase() + "\n" +
-                "**threw** " + choice)
+                "**bet** $" + bet.toLocaleString())
             
             if (win) {
                 embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())

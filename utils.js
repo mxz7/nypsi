@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { wholesome } = require("./images.json");
+const { wholesome } = require("./lists.json");
 const fs = require("fs");
 const balance = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))

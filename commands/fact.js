@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
 const { RichEmbed } = require("discord.js");
-const { list } = require("../facts.json");
+const { facts } = require("../lists.json");
 
 var cooldown = new Set();
 
@@ -21,7 +21,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 4000);
         
-        const fact = list[Math.floor(Math.random() * list.length)];
+        const fact = facts[Math.floor(Math.random() * facts.length)];
 
         let color;
 

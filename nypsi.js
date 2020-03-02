@@ -6,6 +6,7 @@ const { prefix, token } = require("./config.json");
 const fs = require("fs");
 const { list } = require("./optout.json");
 const ascii = require("figlet");
+const { banned } = require("./banned.json");
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
@@ -49,11 +50,11 @@ client.once("ready", () => {
     aliases.set("rick", "rickroll");
     aliases.set("dice", "roll");
     aliases.set("git", "github");
-    aliases.set("q", "question");
     aliases.set("bal", "balance");
     aliases.set("top", "baltop")
     aliases.set("cf", "coinflip")
     aliases.set("r", "roulette")
+    aliases.set("steal", "rob")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
@@ -91,7 +92,6 @@ client.on("rateLimit", () => {
 
 
 client.on("message", message => {
-    const { banned } = require("./banned.json");
 
     if(message.author.bot) return;
     if (!message.guild) return;
