@@ -50,7 +50,6 @@ client.once("ready", () => {
     aliases.set("serverinfo", "server");
     aliases.set("ws", "wholesome");
     aliases.set("rick", "rickroll");
-    aliases.set("dice", "roll");
     aliases.set("git", "github");
     aliases.set("bal", "balance");
     aliases.set("top", "baltop")
@@ -58,6 +57,7 @@ client.once("ready", () => {
     aliases.set("r", "roulette")
     aliases.set("steal", "rob")
     aliases.set("rps", "rockpaperscissors")
+    aliases.set("mc", "minecraft")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
@@ -96,7 +96,7 @@ client.on("rateLimit", () => {
 
 client.on("message", message => {
 
-    if(message.author.bot) return;
+    if (message.author.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(prefix)) return;
 
@@ -105,7 +105,8 @@ client.on("message", message => {
         return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
     }
 
-    const args = message.content.substring(prefix.length).split(" ");
+    const args = message.content.substring(prefix.length).toLowerCase().split(" ");
+
     const cmd = args[0].toLowerCase();
 
     if (cmd == "help") {
