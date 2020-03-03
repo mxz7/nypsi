@@ -1,10 +1,10 @@
 /*jshint esversion: 8 */
 const fs = require("fs");
-const balance = JSON.parse(fs.readFileSync("./users.json"));
+const users = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
 
 setInterval(() => {
-    fs.writeFile("./users.json", JSON.stringify(balance), (err) => {
+    fs.writeFile("./users.json", JSON.stringify(users), (err) => {
         if (err) {
             console.log(err);
         }
@@ -74,7 +74,7 @@ module.exports = {
     },
 
     getBalance: function(member) {
-        return balance[member.user.id].balance
+        return users[member.user.id].balance
     },
 
     getMultiplier: function(item) {
@@ -82,7 +82,7 @@ module.exports = {
     },
 
     userExists: function(member) {
-        if (balance[member.user.id]) {
+        if (users[member.user.id]) {
             return true
         } else {
             return false
@@ -90,33 +90,35 @@ module.exports = {
     },
 
     updateBalance: function(member, amount) {
-        balance[member.user.id] = {
-            balance: amount
+        const amount1 = Math.round(amount)
+        users[member.user.id] = {
+            balance: amount1,
+            padlockStatus: hasPadlocklol(member)
         }
     },
 
     topAmount: function(guild, amount) {
     
-        let users = []
+        let users1 = []
 
-        for (user in balance) {
-            users.push(user)
+        for (user in users) {
+            users1.push(user)
         }
 
-        users.sort(function(a, b) {
-            return balance[b].balance - balance[a].balance;
+        users1.sort(function(a, b) {
+            return users[b].balance - users[a].balance;
         })
 
         let usersFinal = []
 
         let count = 0
 
-        for (user of users) {
+        for (user of users1) {
             if (count >= amount) break
 
             if (getMemberID(guild, user)) {
-                if (!balance[user].balance == 0) {
-                    usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + balance[user].balance.toLocaleString()
+                if (!users[user].balance == 0) {
+                    usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].balance.toLocaleString()
                     count++
                 }
             }
@@ -125,8 +127,9 @@ module.exports = {
     },
 
     createUser: function(member) {
-        balance[member.user.id] = {
-            balance: 100
+        users[member.user.id] = {
+            balance: 100,
+            padlockStatus: false
         }
     },
 
@@ -145,8 +148,21 @@ module.exports = {
         const a = number.toString().toLowerCase().replace("t", "000000000000")
         const b = a.replace("b", "000000000")
         const c = b.replace("m", "000000")
+        const d = c.replace("k", "000")
 
-        return c
+        return d
+    },
+
+    hasPadlock: function(member) {
+        if (users[member.user.id].padlockStatus) {
+            return true
+        } else {
+            return false
+        }
+    },
+
+    setPadlock: function(member, setting) {
+        users[member.user.id].padlockStatus = setting
     }
 };
 
@@ -157,3 +173,12 @@ function getMemberID(guild, id) {
 
     return target
 }
+
+function hasPadlocklol(member) {
+    if (users[member.user.id].padlockStatus) {
+        return true
+    } else {
+        return false
+    }
+}
+

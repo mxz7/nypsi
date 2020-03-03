@@ -91,14 +91,14 @@ module.exports = {
                 .setColor("#31E862")
                 .setDescription(message.member + " -> " + target)
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
-                .addField(target.user.tag, "$" + getBalance(target).toLocaleString())
+                .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();
             
             setTimeout(() =>{
                 m.edit(embed)
-            }, 750)
+            }, 1000)
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });

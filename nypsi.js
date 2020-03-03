@@ -13,6 +13,8 @@ var aliases = new Discord.Collection();
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
 
+//TODO: ADD ROCK PAPER FUCKING SCISSORS
+
 console.log(" -- commands -- \n");
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -55,6 +57,7 @@ client.once("ready", () => {
     aliases.set("cf", "coinflip")
     aliases.set("r", "roulette")
     aliases.set("steal", "rob")
+    aliases.set("rps", "rockpaperscissors")
 
     console.log("\n\n\n\n\n\n\n\n- - -\n");
     console.log("logged in as " + client.user.tag + "\n\n");
