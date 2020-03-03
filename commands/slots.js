@@ -87,46 +87,64 @@ module.exports = {
         let winnings = 0
 
 
-        //Start of processing designed to make winning easier, but designed to make winning harder for people with over 1T
+        //Start of processing designed to make winning easier, but designed to make winning harder for rich people
 
-        if (one != two && two != three) {
-            if (getBalance(message.member) < 1000000000000) {
-                const chanceToWin = Math.floor(Math.random() * 15)
-                if (chanceToWin <= 1) {
+        //if no win - balances smaller than 1b have a chance to win
+        if (one != two) {
+            if (getBalance(message.member) < 1000000000) {
+                const chanceToWin = Math.floor(Math.random() * 12)
+                if (chanceToWin <= 3) {
                     one = two
+                }
+                if (chanceToWin <= 1) {
                     three = two
                 }
             }
         }
 
+        //if 1 and 2 are equal (1.5 win) balances over 1b have 4/10 chance to lose - others have 2/10 to win
         if (one == two) {
-            if (!getBalance(message.member) < 1000000000000) {
+            if (getBalance(message.member) > 1000000000) {
                 const chanceToWin = Math.floor(Math.random() * 10)
 
-                if (chanceToWin <= 1) {
-                    three = two
-                }
+                if (chanceToWin <= 4) {
+                    two = three
+                } 
+                
             } else {
                 const chanceToWin = Math.floor(Math.random() * 10)
 
-                if (chanceToWin <= 5) {
-                    two = three
-                } 
+                if (chanceToWin <= 2) {
+                    three = two
+                }
             }
         }
 
+        //if its a cherry win & balance over 1t, 7/10 chance to get melon win. balance over 1b, 6/10 for melon win. others have 2/10 for lemon win
         if (one == two && two == three && one == "🍒") {
-            const chanceToLose = Math.floor(Math.random() * 10)
+            if (getBalance(message.member) > 1000000000000) {
+                const chanceToLose = Math.floor(Math.random() * 10)
 
-            if (chanceToLose <= 4) {
-                if (getBalance(message.member) < 1000000000000) {
-                    one = "🍋"
-                    two = "🍋"
-                    three = "🍋"
-                } else {
+                if (chanceToLose <= 7) {
                     one = "🍉"
                     two = "🍉"
                     three = "🍉"
+                }
+            } else if (getBalance(message.member) > 1000000000) {
+                const chanceToLose = Math.floor(Math.random() * 10)
+
+                if (chanceToLose <= 6) {
+                    one = "🍉"
+                    two = "🍉"
+                    three = "🍉"
+                }
+            } else {
+                const chanceToLose = Math.floor(Math.random() * 10)
+
+                if (chanceToLose <= 2) {
+                    one = "🍋"
+                    two = "🍋"
+                    three = "🍋"
                 }
             }
         }

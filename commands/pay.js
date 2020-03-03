@@ -28,6 +28,10 @@ module.exports = {
             return message.channel.send("❌\ninvalid user")
         }
 
+        if (message.member == target) {
+            return message.channel.send("❌\ninvalid user");
+        }
+
         if (!userExists(target)) createUser(target)
 
         if (!userExists(message.member)) createUser(message.member)
