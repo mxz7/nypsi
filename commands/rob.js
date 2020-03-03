@@ -62,7 +62,7 @@ module.exports = {
         }
 
         let robberySuccess = true
-        let robbedAmount = 0
+        let robbedAmount = Math.round((amount / 100) * getBalance(target))
 
         let caughtByPolice = false
         let percentReturned
