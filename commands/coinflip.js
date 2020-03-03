@@ -126,9 +126,17 @@ module.exports = {
 
         if (args.length == 3) {
 
-            const target = message.mentions.members.first()
+            let target = message.mentions.members.first()
 
             if (!target) {
+                target = getMember(message, args[0])
+            }
+
+            if (!target) {
+                return message.channel.send("❌\ninvalid user");
+            }
+
+            if (message.member == target) {
                 return message.channel.send("❌\ninvalid user");
             }
 
@@ -194,7 +202,7 @@ module.exports = {
                     waiting.delete(target.user.id)
                     message.channel.send(target + " game expired")
                 }
-            }, 15000)
+            }, 7500)
 
             return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet.toLocaleString() + "\nyou have 15 seconds to accept with $cf accept")
 
