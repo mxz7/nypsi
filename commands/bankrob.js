@@ -80,7 +80,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 10) {
+        if (caught <= 7) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 70) + 10

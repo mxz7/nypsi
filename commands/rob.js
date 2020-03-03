@@ -1,4 +1,4 @@
-const { userExists, updateBalance, createUser, getMember, getBalance } = require("../utils.js")
+const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock, setPadlock } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
@@ -68,10 +68,36 @@ module.exports = {
         let percentReturned
         let amountReturned
 
-        if (amount >= 45) {
-            robberySuccess = false
-            updateBalance(message.member, getBalance(message.member) - 750)
-            updateBalance(target, getBalance(target) + 750)
+        if (hasPadlock(target)) {
+            setPadlock(target, false)
+
+            if (!list.includes(target.user.id)) {
+                target.send("**your padlock has saved you from a robbery!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name +
+                    "**\nthey would have stolen a total of $**" + robbedAmount.toLocaleString() + "**\n*your padlock is now broken*").catch()
+            }
+
+            const embed = new RichEmbed()
+            .setColor(color)
+            .setTitle("robbery")
+            .setDescription("robbing " + target.user + "..")
+
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+            .setTimestamp();
+        
+            message.channel.send(embed).then(m => {
+
+                embed.setColor("#FF0000")
+                embed.addField("**fail!!**", "**" + target.user.tag + "** had a padlock, which has now been broken")
+
+                setTimeout(() => {
+                    m.edit(embed)
+                }, 1000)
+
+
+            }).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+            return
         }
 
         if (caught <= 3) {
@@ -82,21 +108,30 @@ module.exports = {
 
             amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
 
-            if (!list.includes(target)) {
+            if (!list.includes(target.user.id)) {
                 target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +
-                    "** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*")
+                    "** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*").catch()
             }
 
             updateBalance(target, getBalance(target) + amountReturned)
             updateBalance(message.member, getBalance(message.member) - amountReturned)
+        } else if (amount >= 45) {
+            robberySuccess = false
+
+            percentReturned = (Math.floor(Math.random() * 20) + 5)
+
+            amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
+
+            updateBalance(message.member, getBalance(message.member) - amountReturned)
+            updateBalance(target, getBalance(target) + amountReturned)
         }
 
         if (robberySuccess) {
             robbedAmount = Math.round((amount / 100) * getBalance(target))
 
-            if (!list.includes(target)) {
+            if (!list.includes(target.user.id)) {
                 target.send("**you have been robbed!!**\nyou were robbed by **" + message.member.user.tag + "** in **" + message.guild.name + 
-                    "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*")
+                    "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*").catch()
             }
 
             updateBalance(target, getBalance(target) - robbedAmount)

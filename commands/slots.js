@@ -103,7 +103,7 @@ module.exports = {
         }
 
         //if 1 and 2 are equal (1.5 win) balances over 1b have 4/10 chance to lose - others have 2/10 to win
-        if (one == two) {
+        if (one == two ** two != three) {
             if (getBalance(message.member) > 1000000000) {
                 const chanceToWin = Math.floor(Math.random() * 10)
 
@@ -193,7 +193,7 @@ module.exports = {
 
             setTimeout(() => {
                 m.edit(embed)
-            }, 500)
+            }, 750)
 
 
         }).catch(() => {

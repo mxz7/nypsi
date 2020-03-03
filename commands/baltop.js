@@ -34,6 +34,8 @@ module.exports = {
 
         if (amount > 10 && message.member.user.id != "672793821850894347") amount = 10
 
+        if (amount < 5) amount = 5
+
         const balTop = topAmount(message.guild, amount)
 
         let filtered = balTop.filter(function (el) {
