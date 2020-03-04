@@ -115,6 +115,7 @@ module.exports = {
 
         for (user of users1) {
             if (count >= amount) break
+            if (usersFinal.join().length >= 950) break
 
             if (getMemberID(guild, user)) {
                 if (!users[user].balance == 0) {

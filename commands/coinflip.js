@@ -184,7 +184,7 @@ module.exports = {
 
             setTimeout(() => {
                 cooldown.delete(message.member.id);
-            }, 30000);
+            }, 15000);
 
             const id = Math.random()
 
@@ -202,7 +202,7 @@ module.exports = {
                     waiting.delete(target.user.id)
                     message.channel.send(target + " game expired")
                 }
-            }, 7500)
+            }, 15000)
 
             return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet.toLocaleString() + "\nyou have 15 seconds to accept with $cf accept")
 
