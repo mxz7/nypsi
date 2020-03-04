@@ -38,7 +38,7 @@ module.exports = {
         const embed = new RichEmbed()
             .setColor(color)
             .setTitle("pp predictor 5000")
-            .setDescription(message.member + "\n\n" + sizeMsg)
+            .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
