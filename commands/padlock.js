@@ -39,6 +39,19 @@ module.exports = {
 
         if (args[0].toString().toLowerCase() == "buy") {
 
+            if (hasPadlock(message.member)) {
+                const embed = new RichEmbed()
+                    .setTitle("padlock")
+                    .setDescription(message.member + "\n\n**protected**\nyou currently have a padlock")
+                    .setColor("#31E862")
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                    .setTimestamp();
+
+                return message.channel.send(embed).catch(() => {
+                    return message.channel.send("**protected** 🔒\nyou currently have a padlock")
+                })
+            }
+
             if (getBalance(message.member) < 1000000) {
                 return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
             }

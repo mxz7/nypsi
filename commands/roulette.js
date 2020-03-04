@@ -2,7 +2,7 @@ const { getBalance, createUser, updateBalance, userExists, formatBet } = require
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
+const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
 
 var cooldown = new Set()
 

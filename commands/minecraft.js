@@ -44,23 +44,35 @@ module.exports = {
 
         nameHistory.reverse()
 
-        nameHistory.forEach(item => {
-            if (item.changedToAt) {
-                const date = new Date(item.changedToAt)
+        const BreakException = {}
 
-                const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+        try {
+            nameHistory.forEach(item => {
+                if (names.join().length >= 800) {
+                    names.push(`view more at [namemc](https://namemc.com/profile/${username})`)
+                    throw BreakException
+                }
     
-                const year = date.getFullYear()
-                const month = months[date.getMonth()]
-                const day = date.getDay() + 1
+                if (item.changedToAt) {
+                    const date = new Date(item.changedToAt)
     
-                const timestamp = month + " " + day + " " + year
-    
-                names.push("`" + item.name + "` **|** `" + timestamp + "`")
-            } else {
-                names.push("`" + item.name + "`")
-            }
-        });
+                    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+        
+                    const year = date.getFullYear()
+                    const month = months[date.getMonth()]
+                    const day = date.getDay() + 1
+        
+                    const timestamp = month + " " + day + " " + year
+        
+                    names.push("`" + item.name + "` **|** `" + timestamp + "`")
+                } else {
+                    names.push("`" + item.name + "`")
+                }
+            });
+        } catch (e) {
+            if (e != BreakException) throw e
+        }
+        
 
         let color;
 
