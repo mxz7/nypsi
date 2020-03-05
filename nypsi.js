@@ -10,6 +10,7 @@ const { banned } = require("./banned.json");
 
 var commands = new Discord.Collection();
 var aliases = new Discord.Collection();
+const cooldown = new Set()
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
 
@@ -104,6 +105,17 @@ client.on("message", message => {
         message.delete().catch();
         return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
     }
+
+    if (cooldown.includes(message.member.user.id)) {
+        message.delete().catch()
+        return message.channel.send("❌\nplease wait before using commands again")
+    }
+
+    cooldown.add(message.member.user.id)
+
+    setTimeout(() => {
+        cooldown.delete(message.member.user.id)
+    }, 250)
 
     const args = message.content.substring(prefix.length).toLowerCase().split(" ");
 
