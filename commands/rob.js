@@ -2,7 +2,7 @@ const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock
 const { RichEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
-var cooldown = new Set();
+var cooldown = new Map();
 
 module.exports = {
     name: "rob",
@@ -11,8 +11,22 @@ module.exports = {
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {
-            message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 5 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
@@ -43,7 +57,7 @@ module.exports = {
             return message.channel.send("❌\nyou dont have sufficient funds")
         }
 
-        cooldown.add(message.member.id);
+        cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);

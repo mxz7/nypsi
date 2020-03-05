@@ -2,7 +2,7 @@
 
 const { RichEmbed } = require("discord.js");
 
-var cooldown = new Set();
+var cooldown = new Map();
 
 module.exports = {
     name: "question",
@@ -14,6 +14,25 @@ module.exports = {
             return message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");  
         } 
 
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 60 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
+        }
+
         if (args.length == 0) {
             return message.channel.send("❌\n$question <channel> <title> | <text>");
         }
@@ -22,17 +41,10 @@ module.exports = {
             return message.channel.send("❌\n$poll <channel> <title> | <text>");
         }
 
-        if (!message.member.hasPermission("ADMINISTRATOR")) {
-            cooldown.add(message.member.id);
-            setTimeout(() => {
-                cooldown.delete(message.member.id);
-            }, 60000);
-        } else {
-            cooldown.add(message.member.id);
-            setTimeout(() => {
-                cooldown.delete(message.member.id);
-            }, 30000);
-        }
+        cooldown.set(message.member.id, new Date());
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 60000);
 
         let channel = message.mentions.channels.first();
 

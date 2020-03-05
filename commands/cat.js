@@ -1,16 +1,13 @@
-/*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
-const { wholesomeImg } = require("../utils.js");
-const { wholesome } = require("../lists.json")
+const fetch = require("node-fetch")
+const { RichEmbed } = require("discord.js")
 
-var cooldown = new Map();
+const cooldown = new Map()
 
 module.exports = {
-    name: "wholesome",
-    description: "get a random wholesome picture",
+    name: "cat",
+    description: "get a random picture of a cat",
     category: "fun",
     run: async (message, args) => {
-
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
@@ -40,6 +37,18 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
+        const url = "http://aws.random.cat/meow"
+        let cat
+
+        try {
+            cat = await fetch(url).then(url => url.json())
+        } catch (e) {
+            console.log(e)
+            return message.channel.send("❌\nerror")
+        }
+
+        cat = cat.file
+
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -49,16 +58,15 @@ module.exports = {
         }
 
         const embed = new RichEmbed()
+            .setTitle("cat")
+            .setURL("https://random.cat")
             .setColor(color)
-            .setTitle("<3")
-            .setImage(wholesome[Math.floor(Math.random() * wholesome.length)])
-
+            .setImage(cat)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
-        message.channel.send(embed).catch(() => {
+        return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
-        });
-
+        })
     }
-};
+}

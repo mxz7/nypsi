@@ -106,16 +106,15 @@ client.on("message", message => {
         return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
     }
 
-    if (cooldown.includes(message.member.user.id)) {
-        message.delete().catch()
-        return message.channel.send("❌\nplease wait before using commands again")
+    if (cooldown.has(message.member.user.id)) {
+        return
     }
 
     cooldown.add(message.member.user.id)
 
     setTimeout(() => {
         cooldown.delete(message.member.user.id)
-    }, 250)
+    }, 500)
 
     const args = message.content.substring(prefix.length).toLowerCase().split(" ");
 

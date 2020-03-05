@@ -1,11 +1,38 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 
+const cooldown = new Map()
+
 module.exports = {
     name: "padlock",
     description: "buy a padlock for 10% of your current balance",
     category: "money",
     run: async (message, args) => {
+
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 5 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
+        }
+
+        cooldown.set(message.member.id, new Date());
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 2500);
 
         if (!userExists(message.member)) createUser(message.member)
         if (args.length == 0) {

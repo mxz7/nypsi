@@ -3,7 +3,7 @@ const Discord = require("discord.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-var cooldown = new Set()
+var cooldown = new Map()
 
 var bankWorth = new Discord.Collection()
 
@@ -54,15 +54,29 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 600 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
         if (getBalance(message.member) < 5000) {
             return message.channel.send("❌\nyou must have atleast $5k to rob a bank")
         }
 
-        cooldown.add(message.member.id);
+        cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
