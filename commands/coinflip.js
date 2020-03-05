@@ -238,12 +238,6 @@ module.exports = {
             return message.channel.send("❌\nyou cannot afford this bet")
         }
 
-        cooldown.add(message.member.id);
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
         updateBalance(message.member, getBalance(message.member) - bet)
 
         const lols = ["heads", "tails"]

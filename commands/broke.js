@@ -4,7 +4,7 @@ var cooldown = new Set()
 
 module.exports = {
     name: "broke",
-    description: "reset money back to 100",
+    description: "reset money back to 100 if you have $0",
     category: "money",
     run: async (message, args) => {
 

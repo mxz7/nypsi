@@ -30,7 +30,7 @@ module.exports = {
 
         try {
             uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
-        } catch {
+        } catch (e) {
             return message.channel.send("❌\ninvalid account");
         }
 
