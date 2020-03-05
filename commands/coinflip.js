@@ -3,7 +3,7 @@ const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
 
-var cooldown = new Set();
+var cooldown = new Map();
 
 var waiting = new Discord.Collection();
 
@@ -13,11 +13,6 @@ module.exports = {
     description: "flip a coin, double or nothing",
     category: "money",
     run: async (message, args) => {
-
-        if (cooldown.has(message.member.id)) {
-            message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
-        }
 
         if (!userExists(message.member)) {
             createUser(message.member)
@@ -120,6 +115,27 @@ module.exports = {
 
         }
 
+        
+
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 10 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
+        }
+
         if (args.length != 2 && args.length != 3) {
             return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
@@ -180,11 +196,11 @@ module.exports = {
                 return message.channel.send("❌\nthey have already been invited to a game")
             }
 
-            cooldown.add(message.member.id);
+            cooldown.set(message.member.id, new Date());
 
             setTimeout(() => {
                 cooldown.delete(message.member.id);
-            }, 15000);
+            }, 10000);
 
             const id = Math.random()
 
@@ -237,6 +253,12 @@ module.exports = {
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this bet")
         }
+
+        cooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 10000);
 
         updateBalance(message.member, getBalance(message.member) - bet)
 

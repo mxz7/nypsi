@@ -1,6 +1,7 @@
 const { RichEmbed } = require("discord.js")
+const { getMember } = require("../utils")
 
-var cooldown = new Set()
+var cooldown = new Map()
 
 module.exports = {
     name: "pp",
@@ -9,17 +10,31 @@ module.exports = {
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {
-            message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 3 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
-        cooldown.add(message.member.id);
+        cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 2500);
+        }, 3000);
 
-        const size = Math.floor(Math.random() * 15)
+        const size = Math.floor(Math.random() * 20)
         let sizeMsg = "8"
 
         for (let i = 0; i < size; i++) {
@@ -35,17 +50,52 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
-            .setColor(color)
-            .setTitle("pp predictor 5000")
-            .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
+        if (args.length == 0) {
+            const embed = new RichEmbed()
+                .setColor(color)
+                .setTitle("pp predictor 5000")
+                .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
         
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
-        });
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        } else {
+            let member
 
+            if (!message.mentions.members.first()) {
+                member = getMember(message, args[0])
+            } else {
+                member = message.mentions.members.first()
+            }
+
+            if (!member) {
+                const embed = new RichEmbed()
+                .setColor(color)
+                .setTitle("pp predictor 5000")
+                .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
+
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+        
+                return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                });
+            }
+
+            const embed = new RichEmbed()
+                .setColor(color)
+                .setTitle("pp predictor 5000")
+                .setDescription(member + "\n" + sizeMsg + "\n📏 " + size + " inches")
+
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+        
+            message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        }
     }  
 }

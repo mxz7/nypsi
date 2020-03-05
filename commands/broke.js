@@ -1,6 +1,6 @@
 const { createUser, getBalance, userExists } = require("../utils.js")
 
-var cooldown = new Set()
+var cooldown = new Map()
 
 module.exports = {
     name: "broke",
@@ -17,15 +17,29 @@ module.exports = {
         }
 
         if (cooldown.has(message.member.id)) {
-            message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 20 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
-        cooldown.add(message.member.id);
+        cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5000);
+        }, 20000);
 
         createUser(message.member)
 

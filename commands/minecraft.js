@@ -1,7 +1,7 @@
 const { RichEmbed } = require("discord.js");
 const fetch = require("node-fetch");
 
-var cooldown = new Set()
+var cooldown = new Map()
 
 module.exports = {
     name: "minecraft",
@@ -17,7 +17,26 @@ module.exports = {
             return message.channel.send("❌\ninvalid account");
         }
 
-        cooldown.add(message.member.id);
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 10 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
+        }
+
+        cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
