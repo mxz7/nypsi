@@ -72,8 +72,9 @@ module.exports = {
             setPadlock(target, false)
 
             if (!list.includes(target.user.id)) {
-                target.send("**your padlock has saved you from a robbery!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name +
-                    "**\nthey would have stolen a total of $**" + robbedAmount.toLocaleString() + "**\n*your padlock is now broken*").catch()
+                target.send("**your padlock has saved you from a robbery!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name +"**\nthey would have stolen a total of $**" + robbedAmount.toLocaleString() + "**\n*your padlock is now broken*").catch(() => {
+                    
+                })
             }
 
             const embed = new RichEmbed()
@@ -109,8 +110,9 @@ module.exports = {
             amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
 
             if (!list.includes(target.user.id)) {
-                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +
-                    "** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*").catch()
+                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +"** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*").catch(() => {
+
+                })
             }
 
             updateBalance(target, getBalance(target) + amountReturned)
@@ -130,8 +132,9 @@ module.exports = {
             robbedAmount = Math.round((amount / 100) * getBalance(target))
 
             if (!list.includes(target.user.id)) {
-                target.send("**you have been robbed!!**\nyou were robbed by **" + message.member.user.tag + "** in **" + message.guild.name + 
-                    "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*").catch()
+                target.send("**you have been robbed!!**\nyou were robbed by **" + message.member.user.tag + "** in **" + message.guild.name + "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*").catch(() => {
+
+                })
             }
 
             updateBalance(target, getBalance(target) - robbedAmount)
