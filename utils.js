@@ -146,12 +146,12 @@ module.exports = {
     },
 
     formatBet: function(number) {
-        const a = number.toString().toLowerCase().replace("t", "000000000000")
-        const b = a.replace("b", "000000000")
-        const c = b.replace("m", "000000")
-        const d = c.replace("k", "000")
+        let a = number.toString().toLowerCase().replace("t", "000000000000")
+        a = a.replace("b", "000000000")
+        a = a.replace("m", "000000")
+        a = a.replace("k", "000")
 
-        return d
+        return a
     },
 
     hasPadlock: function(member) {
