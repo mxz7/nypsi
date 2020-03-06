@@ -14,7 +14,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+            const time = 600 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
