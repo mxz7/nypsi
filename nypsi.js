@@ -189,6 +189,7 @@ function helpCmd(message, args) {
     let info = []
     let money = []
     let moderation = []
+    let nsfw = []
 
     for (cmd of commands.keys()) {
 
@@ -203,6 +204,10 @@ function helpCmd(message, args) {
 
         if (getCmdCategory(cmd) == "moderation") {
             moderation.push(cmd)
+        }
+
+        if (getCmdCategory(cmd) == "nsfw") {
+            nsfw.push(cmd)
         }
     }
 
@@ -224,6 +229,7 @@ function helpCmd(message, args) {
             .addField("info", "$**help** info")
             .addField("money", "$**help** money")
             .addField("mod", "$**help** mod")
+            .addField("nsfw", "$**help** nsfw")
             .addField("aliases", "$**help** aliases")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
@@ -384,6 +390,38 @@ function helpCmd(message, args) {
             .setColor(color)
         
             .addField("aliases", cmdList)
+
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+            .setTimestamp();
+        
+        if (!list.includes(message.member.user.id)) {
+            return message.member.send(embed).then( () => {
+                message.react("✅");
+            }).catch( () => {
+                message.channel.send(embed).catch(() => {
+                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                   });
+            });
+        }
+        
+        message.channel.send(embed).catch(() => {
+            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+        });
+    }
+    
+    if (args[0] == "nsfw") {
+
+        let cmdList = ""
+
+        for (command of nsfw) {
+            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
+        }
+
+        const embed = new RichEmbed()
+            .setTitle("help")
+            .setColor(color)
+        
+            .addField("nsfw commands", cmdList)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
