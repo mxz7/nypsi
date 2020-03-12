@@ -13,7 +13,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+            const time = 60 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -32,7 +32,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 2500);
+        }, 60000);
 
         if (!userExists(message.member)) createUser(message.member)
         if (args.length == 0) {

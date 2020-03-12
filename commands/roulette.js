@@ -36,7 +36,7 @@ module.exports = {
         if (args.length == 1 && args[0].toLowerCase() == "odds") {
             return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
                 "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
-                "🟢 1/" + values.length + " win **36**x")
+                "🟢 1/" + values.length + " win **25**x")
         }
 
         if (args.length != 2) {
@@ -95,7 +95,7 @@ module.exports = {
         if (colorBet == roll) {
             win = true
             if (roll == "g") {
-                winnings = Math.round(bet * 36)
+                winnings = Math.round(bet * 25)
             } else {
                 winnings = Math.round(bet * 2)
             }
