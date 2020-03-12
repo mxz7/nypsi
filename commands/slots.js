@@ -136,7 +136,7 @@ module.exports = {
 
         //if its a cherry win & balance over 1t, 7/10 chance to get melon win. balance over 1b, 6/10 for melon win. others have 2/10 for lemon win
         if (one == two && two == three && one == "🍒") {
-            if (getBalance(message.member) > 1000000000000) {
+            if (getBalance(message.member) > 1000000000) {
                 const chanceToLose = Math.floor(Math.random() * 10)
 
                 if (chanceToLose <= 7) {
@@ -144,7 +144,7 @@ module.exports = {
                     two = "🍉"
                     three = "🍉"
                 }
-            } else if (getBalance(message.member) > 1000000000) {
+            } else if (getBalance(message.member) > 1000000) {
                 const chanceToLose = Math.floor(Math.random() * 10)
 
                 if (chanceToLose <= 6) {

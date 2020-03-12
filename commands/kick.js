@@ -20,9 +20,8 @@ module.exports = {
             
             args.shift();
             
-            member.kick(args.join(" ")).then((member) => {
+            member.kick(args.join(" ")).then(() => {
                 message.channel.send("👋 **" + member.user + "**");
-                console.log(member.user.tag + " was kicked by " + message.member.user.tag);
             }).catch(() => {
                 message.channel.send("❌ \ni'm unable to kick this user");
             });

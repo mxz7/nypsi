@@ -5,11 +5,6 @@ const shuffle = require("shuffle-array")
 const cooldown = new Map()
 const games = new Map()
 
-const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
-            "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
-            "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
-            "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
-
 module.exports = {
     name: "blackjack",
     description: "play blackjack",
@@ -71,6 +66,10 @@ module.exports = {
 
         const bet = (parseInt(args[0]));
 
+        if (bet == 0) {
+            return message.channel.send("❌\n$blackjack <bet>")
+        }
+
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this bet")
         }
@@ -84,13 +83,19 @@ module.exports = {
         updateBalance(message.member, getBalance(message.member) - bet)
 
         const id = Math.random()
+
+        const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
+            "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
+            "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
+            "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
     
         games.set(message.member.user.id, {
             bet: bet,
             deck: shuffle(newDeck),
             cards: [],
             dealerCards: [],
-            id: id
+            id: id,
+            first: true
         })
 
         setTimeout(() => {
@@ -115,16 +120,13 @@ module.exports = {
 
         const embed = new RichEmbed()
             .setTitle("blackjack")
-            .setDescription(message.member + "\n\n**bet** " + bet.toLocaleString())
+            .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
             .setColor(color)
-            .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+            .addField("dealer", games.get(message.member.user.id).dealerCards[0])
             .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+            .addField("help", ":one: hit | :two: stand")
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
-        
-        if (calcTotalDealer(message.member) != 21 && calcTotal(message.member) != 21) {
-            embed.addField("help", "use :one: for a new card, :two: to stand")
-        }
 
         message.channel.send(embed).then(m => {
             return playGame(message, m)
@@ -138,6 +140,7 @@ function newCard(member) {
     const cards = games.get(member.user.id).cards
     const dealerCards = games.get(member.user.id).dealerCards
     const id = games.get(member.user.id).id
+    const first = games.get(member.user.id).first
 
     const choice = deck[Math.floor(Math.random() * deck.length)]
 
@@ -149,7 +152,8 @@ function newCard(member) {
         deck: deck,
         cards: cards,
         dealerCards: dealerCards,
-        id : id
+        id: id,
+        first: first
     })
 }
 
@@ -159,6 +163,7 @@ function newDealerCard(member) {
     const cards = games.get(member.user.id).cards
     const dealerCards = games.get(member.user.id).dealerCards
     const id = games.get(member.user.id).id
+    const first = games.get(member.user.id).first
 
     const choice = deck[Math.floor(Math.random() * deck.length)]
 
@@ -170,7 +175,8 @@ function newDealerCard(member) {
         deck: deck,
         cards: cards,
         dealerCards: dealerCards,
-        id : id
+        id: id,
+        first: first
     })
 }
 
@@ -289,6 +295,7 @@ function getDealerCards(member) {
 async function playGame(message, m) {
 
     const bet = games.get(message.member.user.id).bet
+    const first = games.get(message.member.user.id).first
 
     let color;
 
@@ -301,13 +308,40 @@ async function playGame(message, m) {
     const newEmbed = new RichEmbed()
         .setTitle("blackjack")
         .setColor(color)
-        .setDescription(message.member + "\n\n**bet** " + bet.toLocaleString())
+        .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
         .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
         .setTimestamp();
 
-    if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21 || games.get(message.member.user.id).dealerCards.length == 5) {
+    if (calcTotalDealer(message.member) > 21 && !first) {
+        newEmbed.setColor("#31E862")
+        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
+        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        updateBalance(message.member, getBalance(message.member) + (bet * 2))
+        return setTimeout(() => {
+            games.delete(message.member.user.id)
+            m.clearReactions()
+            m.edit(newEmbed)
+        }, 1000)
+    }
+
+    if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21 || games.get(message.member.user.id).dealerCards.length == 5 && !first) {
+
+        if (calcTotal(message.member) == calcTotalDealer(message.member) && games.get(message.member.user.id).dealerCards.length != 5 && games.get(message.member.user.id).cards.length != 5) {
+            newEmbed.setColor("#E5FF00")
+            newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+            newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+            newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+            updateBalance(message.member, getBalance(message.member) + bet)
+            return setTimeout(() => {
+                games.delete(message.member.user.id)
+                m.clearReactions()
+                m.edit(newEmbed)
+            }, 1000)
+        }
+
         newEmbed.setColor("#FF0000")
-        newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**you lose!!**")
+        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         return setTimeout(() => {
@@ -315,9 +349,9 @@ async function playGame(message, m) {
             m.clearReactions()
             m.edit(newEmbed)
         }, 1000)
-    } else if (calcTotal(message.member) == 21 || games.get(message.member.user.id).cards.length == 5) {
+    } else if (calcTotal(message.member) == 21 || games.get(message.member.user.id).cards.length == 5 && !first) {
         newEmbed.setColor("#31E862")
-        newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**winner!!**\n**you win** " + (bet * 2).toLocaleString())
+        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + (bet * 2))
@@ -327,17 +361,24 @@ async function playGame(message, m) {
             m.edit(newEmbed)
         }, 1000)
     } else {
-        m.react("1️⃣").then(() => m.react("2️⃣"))
+        await m.react("1️⃣").then(() => m.react("2️⃣"))
+        games.set(message.member.user.id, {
+            bet: bet,
+            deck: games.get(message.member.user.id).deck,
+            cards: games.get(message.member.user.id).cards,
+            dealerCards: games.get(message.member.user.id).dealerCards,
+            id: games.get(message.member.user.id).id,
+            first: false
+        })
 
         const filter = (reaction, user) => {
             return ["1️⃣", "2️⃣"].includes(reaction.emoji.name) && user.id == message.member.user.id
         }
     
-        const reaction = await m.awaitReactions(filter, { max: 1, time: 60000, errors: ["time"] })
+        const reaction = await m.awaitReactions(filter, { max: 1, time: 240000, errors: ["time"] })
             .then(collected => {
                 return collected.first().emoji.name
             }).catch(() => {
-                return "error"
             })
 
         if (reaction == "1️⃣") {
@@ -345,7 +386,7 @@ async function playGame(message, m) {
 
             if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21) {
                 newEmbed.setColor("#FF0000")
-                newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**you lose!!**")
+                newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
                 newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
                 games.delete(message.member.user.id)
@@ -353,7 +394,7 @@ async function playGame(message, m) {
                 return m.edit(newEmbed)
             } else if (calcTotal(message.member) == 21) {
                 newEmbed.setColor("#31E862")
-                newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**winner!!**\n**you win** " + (bet * 2).toLocaleString())
+                newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
                 newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
                 updateBalance(message.member, getBalance(message.member) + (bet * 2))
@@ -362,7 +403,7 @@ async function playGame(message, m) {
                 return m.edit(newEmbed)
             }
 
-            newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+            newEmbed.addField("dealer", games.get(message.member.user.id).dealerCards[0])
             newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             
             m.edit(newEmbed)
@@ -374,29 +415,55 @@ async function playGame(message, m) {
         } else if (reaction == "2️⃣") {
             m.reactions.get(reaction).remove(message.member.user.id)
 
-            dealerPlay(message)
+            
+            const newEmbed1 = new RichEmbed()
+                .setTitle("blackjack")
+                .setColor(color)
+                .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
+                .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
+                .setTimestamp();
+            m.edit(newEmbed1)
+            
+            setTimeout(() => {
+                dealerPlay(message)
 
-            if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21) {
-                newEmbed.setColor("#FF0000")
-                newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**you lose!!**")
-                newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-                games.delete(message.member.user.id)
-                m.clearReactions()
-                return m.edit(newEmbed)
-            } else if (calcTotal(message.member) == 21) {
-                newEmbed.setColor("#31E862")
-                newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**winner!!**\n**you win** " + (bet * 2).toLocaleString())
-                newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-                updateBalance(message.member, getBalance(message.member) + (bet * 2))
-                games.delete(message.member.user.id)
-                m.clearReactions()
-                return m.edit(newEmbed)
-            } else {
-                if (calcTotal(message.member) > calcTotalDealer(message.member)) {
+                if (calcTotal(message.member) == calcTotalDealer(message.member)) {
+                    newEmbed.setColor("##E5FF00")
+                    newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+                    newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                    newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                    updateBalance(message.member, getBalance(message.member) + bet)
+                    return setTimeout(() => {
+                        games.delete(message.member.user.id)
+                        m.clearReactions()
+                        m.edit(newEmbed)
+                    }, 1000)
+                }
+    
+                if (calcTotalDealer(message.member) > 21) {
                     newEmbed.setColor("#31E862")
-                    newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**winner!!**\n**you win** " + (bet * 2).toLocaleString())
+                    newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
+                    newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                    newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                    updateBalance(message.member, getBalance(message.member) + (bet * 2))
+                    games.delete(message.member.user.id)
+                    m.clearReactions()
+                    return m.edit(newEmbed)
+                }
+            
+                if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21 || games.get(message.member.user.id).dealerCards.length == 5) {
+                    newEmbed.setColor("#FF0000")
+                    newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
+                    newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                    newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                    games.delete(message.member.user.id)
+                    m.clearReactions()
+                    return m.edit(newEmbed)
+                } else if (calcTotal(message.member) == 21 || games.get(message.member.user.id).cards.length == 5) {
+                    newEmbed.setColor("#31E862")
+                    newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
                     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                     newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
                     updateBalance(message.member, getBalance(message.member) + (bet * 2))
@@ -404,16 +471,26 @@ async function playGame(message, m) {
                     m.clearReactions()
                     return m.edit(newEmbed)
                 } else {
-                    newEmbed.setColor("#FF0000")
-                    newEmbed.setDescription(message.member + "\n\n**bet** " + bet.toLocaleString() + "\n\n**you lose!!**")
-                    newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                    newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-                    games.delete(message.member.user.id)
-                    m.clearReactions()
-                    return m.edit(newEmbed)
+                    if (calcTotal(message.member) > calcTotalDealer(message.member)) {
+                        newEmbed.setColor("#31E862")
+                        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
+                        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                        updateBalance(message.member, getBalance(message.member) + (bet * 2))
+                        games.delete(message.member.user.id)
+                        m.clearReactions()
+                        return m.edit(newEmbed)
+                    } else {
+                        newEmbed.setColor("#FF0000")
+                        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
+                        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+                        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                        games.delete(message.member.user.id)
+                        m.clearReactions()
+                        return m.edit(newEmbed)
+                    }
                 }
-            }
-
+            }, 1000)
 
         } else {
             games.delete(message.member.user.id)
@@ -424,11 +501,11 @@ async function playGame(message, m) {
 
 function dealerPlay(message) {
 
-    if (calcTotalDealer(message.member) >= 19) {
+    if (calcTotalDealer(message.member) >= 16) {
         return
     }
 
-    while (calcTotalDealer(message.member) < 19 || games.get(message.member.user.id).dealerCards.length < 5 || calcTotalDealer(message.member) < calcTotal(message.member)) {
+    while (calcTotalDealer(message.member) < 16 && games.get(message.member.user.id).dealerCards.length < 5 && calcTotalDealer(message.member) < calcTotal(message.member) && calcTotalDealer(message.member) < 21) {
         newDealerCard(message.member)
     }
     return 

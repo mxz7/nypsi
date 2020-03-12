@@ -1,6 +1,8 @@
 const { RichEmbed } = require("discord.js")
 const { updateBalance, getBalance, userExists, createUser, getMember, formatBet } = require("../utils.js")
 
+const tax = 0.15
+
 var cooldown = new Map();
 
 module.exports = {
@@ -66,7 +68,9 @@ module.exports = {
             }
         }
 
-        const amount = (parseInt(args[1]));
+        let amount = parseInt(args[1]) 
+
+        let taxEnabled = false
 
         if (amount > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this payment")
@@ -81,6 +85,11 @@ module.exports = {
         updateBalance(message.member, getBalance(message.member) - amount)
         updateBalance(target, getBalance(target) + amount)
 
+        if (getBalance(message.member) >= 500000 || getBalance(target) >= 500000) {
+            taxEnabled = true
+            amount = amount - Math.round(amount * tax)
+        }
+
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -92,12 +101,18 @@ module.exports = {
         const embed = new RichEmbed()
             .setTitle("processing..")
             .setColor(color)
-            .setDescription(message.member + " -> " + target)
+            
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
             .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
+
+        if (taxEnabled) {
+            embed.setDescription(message.member + " -> " + target + "\n**" + (tax * 100) + "**% tax")
+        } else {
+            embed.setDescription(message.member + " -> " + target)
+        }
 
         message.channel.send(embed).then(m => {
             const embed = new RichEmbed()

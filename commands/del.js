@@ -20,7 +20,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 20 - diff
+            const time = 30 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -32,45 +32,62 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌\nstill on cooldown for " + remaining);
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
             return message.channel.send("❌\n$del <amount>");
         }
 
-        let amount = (parseInt(args[0]) + 1);
+        let amount = parseInt(args[0])
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            amount = 15;
+            if (amount > 15) {
+                amount = 15
+            }
             cooldown.set(message.member.id, new Date());
 
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 20000);
+            setTimeout(() => {
+                cooldown.delete(message.member.id);
+            }, 30000);
         }
 
+        await message.delete()
+        
         if (amount <= 100) {
-            message.channel.bulkDelete(amount).then( () => {
-                message.channel.send("✅\n**successfully deleted " + args[0] + " messages**").then(m => m.delete(2500));
-            }).catch();
+            await message.channel.bulkDelete(amount).then(m => {
+                return message.channel.send("✅\n**successfully deleted " + m.size + " messages**").then(m => m.delete(10000));
+            }).catch(() => {
+                message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(10000))
+                return
+            })
         } else {
-            let amount1 = Math.round(amount / 100);
-
-            if (amount1 > 10) {
-                amount1 = 10;
+            const amount1 = amount
+            let fail = false
+            if (amount > 10000) {
+                amount = 10000
             }
 
-            for (var i = 0; i < amount1; i++) {
-                if (amount < 100) {
-                    message.channel.bulkDelete(amount).then( () => {
-                        message.channel.send("✅\n**successfully deleted " + args[0] + " messages**").then(m => m.delete(10000));
-                    });
+            for (let i = 0; i < (amount1 / 100); i++) {
+                if (amount <= 100) {
+                    await message.channel.bulkDelete(amount).then(m => {
+                        return message.channel.send("✅\n**successfully deleted " + amount1 + " messages**").then(m => m.delete(10000));
+                    }).catch(() => {
+                        message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(10000))
+                        fail = true
+                    })
                 }
-                message.channel.bulkDelete(100);
-                amount -= 100;
-            }
 
+                await message.channel.bulkDelete(100).catch(() => {
+                    message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(10000))
+                    fail = true
+                })
+                if (fail) {
+                    break
+                }
+                amount = amount - 100
+            }
         }
+
     }
-};
+}

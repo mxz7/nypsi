@@ -5,16 +5,6 @@ const shuffle = require("shuffle-array")
 
 var cooldown = new Map()
 
-var bankWorth = new Discord.Collection()
-
-bankWorth.set("barclays", 750000)
-bankWorth.set("santander", 500000)
-bankWorth.set("bankofamerica", 1000000)
-bankWorth.set("lloyds", 350000)
-bankWorth.set("hsbc", 600000)
-bankWorth.set("fleeca", 100000)
-bankWorth.set("mazebank", 550000)
-
 module.exports = {
     name: "bankrob",
     description: "rob a bank for a high reward/high risk",
@@ -22,6 +12,16 @@ module.exports = {
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)
+
+        const bankWorth = new Discord.Collection()
+
+        bankWorth.set("barclays", getBalance(message.member) * 3)
+        bankWorth.set("santander", getBalance(message.member) * 2.5)
+        bankWorth.set("bankofamerica", getBalance(message.member) * 7.5)
+        bankWorth.set("lloyds", getBalance(message.member) * 1.5)
+        bankWorth.set("hsbc", getBalance(message.member) * 4)
+        bankWorth.set("fleeca", getBalance(message.member) * 1.2)
+        bankWorth.set("mazebank", getBalance(message.member) * 3.5)
 
         if (args[0] == "status") {
             let bankList = ""
@@ -94,7 +94,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 7) {
+        if (caught <= 11) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 70) + 10
