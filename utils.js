@@ -4,6 +4,10 @@ const users = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
+const { topgg } = require("./config.json")
+const { client } = require("./nypsi.js")
+const DBL = require("dblapi.js")
+const dbl = new DBL(topgg, client)
 
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./users.json"))
@@ -39,6 +43,16 @@ setInterval(() => {
 }, 30000)
 
 module.exports = {
+
+    getVoteMulti: async function(member) {
+
+        const voted = await dbl.hasVoted(member.user.id)
+
+        if (voted) {
+            return 0.10
+        }
+
+    },
 
     redditImage: async function(post)  {
 

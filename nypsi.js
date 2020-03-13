@@ -14,8 +14,6 @@ const cooldown = new Set()
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
 
-//TODO: ADD ROCK PAPER FUCKING SCISSORS
-
 console.log(" -- commands -- \n");
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -39,7 +37,7 @@ client.once("ready", () => {
     client.user.setPresence({
         status: "dnd",
         game: {
-            name: "tekoh.wtf | $help",
+            name: "tekoh.wtf | $help | " + client.guilds.size,
             type: "PLAYING"
         }
     });
@@ -444,3 +442,7 @@ function helpCmd(message, args) {
 }
 
 client.login(token);
+
+module.exports = {
+    client
+}

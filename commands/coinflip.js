@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, getMember, formatBet } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, getMember, formatBet, getVoteMulti } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
@@ -104,18 +104,21 @@ module.exports = {
                                 }, 1000)
                             })
                         }, 1500)
-                
-                
                     }).catch(() => {
                         return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
                     });
+
+                    const multi = await getVoteMulti(winner)
+
+                    if (multi > 0) {
+                        updateBalance(winner, getBalance(winner) + Math.round((multi * (bet * 2))))
+                    }
+
                     return
                 }
             }
 
         }
-
-        
 
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
@@ -317,5 +320,13 @@ module.exports = {
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
+
+        if (win) {
+            const multi = await getVoteMulti(message.member)
+
+            if (multi > 0) {
+                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
+            }
+        }
     }
 }
