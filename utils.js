@@ -2,6 +2,8 @@
 const fs = require("fs");
 const users = JSON.parse(fs.readFileSync("./users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
+const isImageUrl = require('is-image-url');
+const fetch = require("node-fetch")
 
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./users.json"))
@@ -37,6 +39,75 @@ setInterval(() => {
 }, 30000)
 
 module.exports = {
+
+    redditImage: async function(post)  {
+
+        let image = post.data.url 
+
+        let final = false
+
+        if (image.includes("imgur.com/a/")) {
+            chosen = allowed[Math.floor(Math.random() * allowed.length)]
+            image = chosen.data.url
+        }
+
+        if (image.includes("imgur") && !image.includes("gif")) {
+            image = "https://i.imgur.com/" + image.split("/")[3]
+            if (!isImageUrl(image)) {
+                image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
+            }
+            final = true
+        }
+
+        if (image.includes("gfycat")) {
+
+            const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
+            
+            image = link.gfyItem.max5mbGif
+            final = true
+        }
+
+        let count = 0
+
+        while (!isImageUrl(image)) {
+            if (lol) {
+                break
+            }
+
+            if (count >= 10) {
+                console.log("couldnt find porn @ " + subredditChoice)
+                return message.channel.send("❌\nunable to find porn image")
+            }
+
+            count++
+
+            chosen = allowed[Math.floor(Math.random() * allowed.length)]
+            image = chosen.data.url
+
+            if (image.includes("imgur.com/a/")) {
+                chosen = allowed[Math.floor(Math.random() * allowed.length)]
+                image = chosen.data.url
+            }
+
+            if (image.includes("imgur") && !image.includes("gif")) {
+                image = "https://i.imgur.com/" + image.split("/")[3]
+                if (!isImageUrl(image)) {
+                    image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
+                }
+            }
+    
+            if (image.includes("gfycat")) {
+    
+                const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
+    
+                image = link.gfyItem.max5mbGif
+            }
+        }
+
+        return image
+
+    },
+
     getMember: function(message, memberName) {
         if (!message.guild) return null
         let target = message.guild.members.find(member => {

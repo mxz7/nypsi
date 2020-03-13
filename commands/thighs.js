@@ -1,7 +1,6 @@
 const { RichEmbed } = require("discord.js")
+const { redditImage } = require("../utils.js")
 const snekfetch = require("snekfetch")
-const isImageUrl = require('is-image-url');
-const fetch = require("node-fetch")
 
 const links = ["https://www.reddit.com/r/legs.json?sort=top&t=day",
     "https://www.reddit.com/r/thickthighs.json?sort=top&t=day",
@@ -51,8 +50,9 @@ module.exports = {
             .query({ limit: 800 })
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
-
         let chosen = allowed[Math.floor(Math.random() * allowed.length)]
+
+        const image = await redditImage(chosen)
 
         let color;
 
@@ -60,67 +60,6 @@ module.exports = {
             color = "#FC4040";
         } else {
             color = message.member.displayHexColor;
-        }
-
-        let image = chosen.data.url
-
-        let lol = false
-
-        if (image.includes("imgur.com/a/")) {
-            chosen = allowed[Math.floor(Math.random() * allowed.length)]
-            image = chosen.data.url
-        }
-
-        if (image.includes("imgur") && !image.includes("gif")) {
-            image = "https://i.imgur.com/" + image.split("/")[3]
-            if (!isImageUrl(image)) {
-                image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
-            }
-        }
-
-        if (image.includes("gfycat")) {
-
-            const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
-            
-            image = link.gfyItem.max5mbGif
-            lol = true
-        }
-
-        let count = 0
-
-        while (!isImageUrl(image)) {
-            if (lol) {
-                break
-            }
-
-            if (count >= 10) {
-                console.log("couldnt find porn @ " + subredditChoice)
-                return message.channel.send("❌\nunable to find porn image")
-            }
-
-            count++
-
-            chosen = allowed[Math.floor(Math.random() * allowed.length)]
-            image = chosen.data.url
-
-            if (image.includes("imgur.com/a/")) {
-                chosen = allowed[Math.floor(Math.random() * allowed.length)]
-                image = chosen.data.url
-            }
-
-            if (image.includes("imgur") && !image.includes("gif")) {
-                image = "https://i.imgur.com/" + image.split("/")[3]
-                if (!isImageUrl(image)) {
-                    image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
-                }
-            }
-    
-            if (image.includes("gfycat")) {
-    
-                const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
-    
-                image = link.gfyItem.max5mbGif
-            }
         }
 
         const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
