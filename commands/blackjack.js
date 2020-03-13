@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet } = require("../utils.js")
+const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti } = require("../utils.js")
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -318,10 +318,12 @@ async function playGame(message, m) {
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + (bet * 2))
+        voteMulti(message, bet)
         return setTimeout(() => {
             games.delete(message.member.user.id)
             m.clearReactions()
             m.edit(newEmbed)
+            voteMulti(message, bet)
         }, 1000)
     }
 
@@ -355,10 +357,12 @@ async function playGame(message, m) {
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + (bet * 2))
+        voteMulti(message, bet)
         return setTimeout(() => {
             games.delete(message.member.user.id)
             m.clearReactions()
             m.edit(newEmbed)
+            voteMulti(message, bet)
         }, 1000)
     } else {
         await m.react("1️⃣").then(() => m.react("2️⃣"))
@@ -400,6 +404,7 @@ async function playGame(message, m) {
                 updateBalance(message.member, getBalance(message.member) + (bet * 2))
                 games.delete(message.member.user.id)
                 m.clearReactions()
+                voteMulti(message, bet)
                 return m.edit(newEmbed)
             }
 
@@ -450,6 +455,7 @@ async function playGame(message, m) {
                     updateBalance(message.member, getBalance(message.member) + (bet * 2))
                     games.delete(message.member.user.id)
                     m.clearReactions()
+                    voteMulti(message, bet)
                     return m.edit(newEmbed)
                 }
             
@@ -469,6 +475,7 @@ async function playGame(message, m) {
                     updateBalance(message.member, getBalance(message.member) + (bet * 2))
                     games.delete(message.member.user.id)
                     m.clearReactions()
+                    voteMulti(message, bet)
                     return m.edit(newEmbed)
                 } else {
                     if (calcTotal(message.member) > calcTotalDealer(message.member)) {
@@ -479,6 +486,7 @@ async function playGame(message, m) {
                         updateBalance(message.member, getBalance(message.member) + (bet * 2))
                         games.delete(message.member.user.id)
                         m.clearReactions()
+                        voteMulti(message, bet)
                         return m.edit(newEmbed)
                     } else {
                         newEmbed.setColor("#FF0000")
@@ -509,4 +517,12 @@ function dealerPlay(message) {
         newDealerCard(message.member)
     }
     return 
+}
+
+async function voteMulti(message, bet) {
+    const multi = await getVoteMulti(message.member)
+
+    if (multi > 0) {
+        updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
+    }
 }

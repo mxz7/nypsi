@@ -55,9 +55,7 @@ module.exports = {
         await message.delete()
         
         if (amount <= 100) {
-            await message.channel.bulkDelete(amount).then(m => {
-                return message.channel.send("✅\n**successfully deleted " + m.size + " messages**").then(m => m.delete(5000));
-            }).catch(() => {
+            await message.channel.bulkDelete(amount).catch(() => {
                 message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(5000))
                 return
             })
@@ -70,9 +68,8 @@ module.exports = {
 
             for (let i = 0; i < (amount1 / 100); i++) {
                 if (amount <= 100) {
-                    await message.channel.bulkDelete(amount).then(m => {
-                        return message.channel.send("✅\n**successfully deleted " + amount1 + " messages**").then(m => m.delete(5000));
-                    }).catch(() => {
+                    message.channel.send("deleting " + amount)
+                    await message.channel.bulkDelete(amount).catch(() => {
                         message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(5000))
                         fail = true
                     })

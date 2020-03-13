@@ -1,4 +1,4 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet } = require("../utils.js")
+const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -214,10 +214,13 @@ module.exports = {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
     
-        delete values
-        delete one
-        delete two
-        delete three
+        if (win) {
+            const multi = await getVoteMulti(message.member)
+
+            if (multi > 0) {
+                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
+            }
+        }
 
     }
 }

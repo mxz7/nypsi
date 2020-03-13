@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../utils.js")
 const { RichEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -157,7 +157,13 @@ module.exports = {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
 
+        if (win) {
+            const multi = await getVoteMulti(message.member)
 
+            if (multi > 0) {
+                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
+            }
+        }
 
     }
 }
