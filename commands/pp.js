@@ -53,7 +53,7 @@ module.exports = {
         if (args.length == 0) {
             const embed = new RichEmbed()
                 .setColor(color)
-                .setTitle("pp predictor 5000")
+                .setTitle("pp predictor 1337")
                 .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)

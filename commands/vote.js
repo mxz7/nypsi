@@ -12,7 +12,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+            const time = 10 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -31,7 +31,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5000);
+        }, 10000);
 
         const voted = await getVoteMulti(message.member) > 0
 
@@ -44,7 +44,7 @@ module.exports = {
         if (voted) {
             embed.setTitle("vote ✅")
             embed.setColor("#31E862")
-            embed.addField("status", "you currently have a 5% bonus on gambling wins")
+            embed.addField("status", "you currently have a 10% bonus on gambling wins")
         } else {
             embed.setTitle("vote ❌")
             embed.setColor("#FF0000")

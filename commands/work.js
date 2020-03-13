@@ -43,7 +43,7 @@ module.exports = {
 
         
 
-        const earnedPercent = Math.floor(Math.random() * 30) + 5
+        const earnedPercent = Math.floor(Math.random() * 14) + 1
         const earned = Math.round((earnedPercent / 100) * getBalance(message.member))
 
         const work = workMessages[Math.floor(Math.random() * workMessages.length)]

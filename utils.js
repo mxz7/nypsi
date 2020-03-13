@@ -84,7 +84,7 @@ module.exports = {
         let count = 0
 
         while (!isImageUrl(image)) {
-            if (lol) {
+            if (final) {
                 break
             }
 
