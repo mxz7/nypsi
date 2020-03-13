@@ -83,7 +83,7 @@ module.exports = {
         }, 10000);
 
         updateBalance(message.member, getBalance(message.member) - amount)
-        updateBalance(target, getBalance(target) + amount)
+        updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
 
         if (getBalance(message.member) >= 500000 || getBalance(target) >= 500000) {
             taxEnabled = true
