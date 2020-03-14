@@ -65,6 +65,10 @@ module.exports = {
 
         const bet = (parseInt(args[1]))
 
+        if (bet <= 0) {
+            return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+        }
+
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this bet")
         }

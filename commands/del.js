@@ -68,7 +68,6 @@ module.exports = {
 
             for (let i = 0; i < (amount1 / 100); i++) {
                 if (amount <= 100) {
-                    message.channel.send("deleting " + amount)
                     await message.channel.bulkDelete(amount).catch(() => {
                         message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete(5000))
                         fail = true

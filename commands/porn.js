@@ -2,7 +2,6 @@ const { RichEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
 const snekfetch = require("snekfetch")
 
-
 const links = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day", 
     "https://www.reddit.com/r/realgirls.json?sort=top&t=day", 
     "https://www.reddit.com/r/legalteens.json?sort=top&t=day",
@@ -72,7 +71,11 @@ module.exports = {
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
-        const image = await redditImage(chosen)
+        const image = await redditImage(chosen, chosen, allowed)
+
+        if (image == "lol") {
+            return message.channel.send("❌\nunable to find porn image")
+        }
 
         let color;
 
@@ -93,9 +96,9 @@ module.exports = {
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
 
-        message.channel.send(embed)/*.catch(() => {
+        message.channel.send(embed).catch(() => {
             return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
-        })*/
+        })
 
     }
 }

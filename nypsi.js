@@ -8,8 +8,8 @@ const { list } = require("./optout.json");
 const ascii = require("figlet");
 const { banned } = require("./banned.json");
 
-var commands = new Discord.Collection();
-var aliases = new Discord.Collection();
+const commands = new Discord.Collection();
+const aliases = new Discord.Collection();
 const cooldown = new Set()
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
@@ -33,7 +33,7 @@ for (const file of commandFiles) {
 }
 console.log("\n -- commands -- ");
 
-client.once("ready", () => {
+client.once("ready", async () => {
     client.user.setPresence({
         status: "dnd",
         game: {
@@ -41,6 +41,16 @@ client.once("ready", () => {
             type: "PLAYING"
         }
     });
+
+    setInterval(() => {
+        client.user.setPresence({
+            status: "dnd",
+            game: {
+                name: "tekoh.wtf | $help | " + client.guilds.size,
+                type: "PLAYING"
+            }
+        })
+    }, 600000)
 
     aliases.set("ig", "instagram");
     aliases.set("av", "avatar");
@@ -58,12 +68,15 @@ client.once("ready", () => {
     aliases.set("rps", "rockpaperscissors")
     aliases.set("mc", "minecraft")
 
-    console.log("\n\n\n\n\n\n\n\n- - -\n");
-    console.log("logged in as " + client.user.tag + "\n\n");
+    console.log("\nserver count: " + client.guilds.size)
+    console.log("commands count: " + commands.size)
+    console.log("\n- - -\n");
 
-    ascii("n y p s i", function(err, data) {
+    await ascii("n y p s i", function(err, data) {
         if (!err) {
-            console.log(data + "\n\n- - -\n\n");
+            console.log(data);
+            console.log("\n\nlogged in as " + client.user.tag + "\n");
+            console.log("- - -\n\n")
         }
     });
 });
@@ -138,6 +151,12 @@ client.on("message", message => {
 function logCommand(message, args) {
     args.shift();
 
+    const server = message.guild.name
+
+    console.log("[" + getTimeStamp() + "] " + message.member.user.tag + " -> '" + message.content.split(" ")[0] + "'" + " -> '" + args.join(" ") + "' -> '" + server + "'");
+}
+
+function getTimeStamp() {
     const date = new Date();
     let hours = date.getHours().toString();
     let minutes = date.getMinutes().toString();
@@ -156,14 +175,13 @@ function logCommand(message, args) {
     }
 
     const timestamp = hours + ":" + minutes + ":" + seconds;
-    const server = message.guild.name
 
-
-    console.log("[" + timestamp + "] " + message.member.user.tag + " -> '" + message.content.split(" ")[0] + "'" + " -> '" + args.join(" ") + "' -> '" + server + "'");
+    return timestamp
 }
 
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args);
+    
 }
 
 function getCmdName(cmd) {

@@ -54,7 +54,7 @@ module.exports = {
 
     },
 
-    redditImage: async function(post)  {
+    redditImage: async function(post, chosen, allowed)  {
 
         let image = post.data.url 
 
@@ -90,7 +90,7 @@ module.exports = {
 
             if (count >= 10) {
                 console.log("couldnt find porn @ " + subredditChoice)
-                return message.channel.send("❌\nunable to find porn image")
+                return "lol"
             }
 
             count++

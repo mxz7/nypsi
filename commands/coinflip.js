@@ -185,6 +185,10 @@ module.exports = {
 
             const bet = (parseInt(args[2]));
 
+            if (bet <= 0) {
+                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            }
+
             if (bet > getBalance(message.member)) {
                 return message.channel.send("❌\nyou cannot afford this bet")
             }
@@ -252,6 +256,10 @@ module.exports = {
         }
 
         const bet = (parseInt(args[1]));
+
+        if (bet <= 0) {
+            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+        }
 
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌\nyou cannot afford this bet")

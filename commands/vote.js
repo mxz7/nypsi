@@ -6,8 +6,9 @@ const cooldown = new Map()
 module.exports = {
     name: "vote",
     description: "vote every 12 hours to get a 5% bonus on gambling wins",
-    category: "fun",
+    category: "money",
     run: async (message, args) => {
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()

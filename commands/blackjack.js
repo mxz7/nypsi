@@ -66,7 +66,7 @@ module.exports = {
 
         const bet = (parseInt(args[0]));
 
-        if (bet == 0) {
+        if (bet <= 0) {
             return message.channel.send("❌\n$blackjack <bet>")
         }
 
@@ -129,6 +129,9 @@ module.exports = {
             .setTimestamp();
 
         message.channel.send(embed).then(m => {
+            if (calcTotal(message.member) == 21) {
+                return playGame(message, m)
+            }
             m.react("1️⃣").then(() => {
                 m.react("2️⃣").then(() => {
                     playGame(message, m)
@@ -347,18 +350,15 @@ async function playGame(message, m) {
         m.edit(newEmbed)
     }
     
-    if (calcTotalDealer(message.member) > 21 && !first) {
+    if (calcTotalDealer(message.member) > 21) {
         return win()
-    }
-
-    if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21 || games.get(message.member.user.id).dealerCards.length == 5 && !first) {
-
-        if (calcTotal(message.member) == calcTotalDealer(message.member) && games.get(message.member.user.id).dealerCards.length != 5 && games.get(message.member.user.id).cards.length != 5) {
-            return draw()
-        }
-
+    } else if (calcTotalDealer(message.member) == 21 && !first) {
         return lose()
-    } else if (calcTotal(message.member) == 21 || games.get(message.member.user.id).cards.length == 5 && !first) {
+    } else if (calcTotal(message.member) == 21) {
+        return win()
+    } else if (calcTotal(message.member) > 21) {
+        return lose()
+    } else if (games.get(message.member.user.id).cards.length == 5) {
         return win()
     } else {
         games.set(message.member.user.id, {
@@ -399,8 +399,6 @@ async function playGame(message, m) {
             return playGame(message, m)
 
         } else if (reaction == "2️⃣") {
-            await m.reactions.get(reaction).remove(message.member.user.id)
-
             const newEmbed1 = new RichEmbed()
                 .setTitle("blackjack")
                 .setColor(color)
@@ -416,13 +414,9 @@ async function playGame(message, m) {
 
                 if (calcTotal(message.member) == calcTotalDealer(message.member)) {
                     return draw()
-                }
-    
-                if (calcTotalDealer(message.member) > 21) {
+                } else if (calcTotalDealer(message.member) > 21) {
                     return win()
-                }
-            
-                if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21 || games.get(message.member.user.id).dealerCards.length == 5) {
+                } else if (calcTotalDealer(message.member) == 21 || games.get(message.member.user.id).dealerCards.length == 5) {
                     return lose()
                 } else if (calcTotal(message.member) == 21 || games.get(message.member.user.id).cards.length == 5) {
                     return win()
