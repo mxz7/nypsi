@@ -8,6 +8,38 @@ const { topgg } = require("./config.json")
 const { client } = require("./nypsi.js")
 const DBL = require("dblapi.js")
 const dbl = new DBL(topgg, client)
+const snekfetch = require("snekfetch")
+
+const pornCache = new Map()
+const bdsmCache = new Map()
+const thighsCache = new Map()
+
+const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?sort=top&t=day", "https://www.reddit.com/r/bondage.json?sort=top&t=day", "https://www.reddit.com/r/dominated.json?sort=top&t=day"]
+const thighsLinks = ["https://www.reddit.com/r/legs.json?sort=top&t=day",
+    "https://www.reddit.com/r/thickthighs.json?sort=top&t=day",
+    "https://www.reddit.com/r/perfectthighs.json?sort=top&t=day",
+    "https://www.reddit.com/r/thighs.json?sort=top&t=day"]
+const pornLinks = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day", 
+    "https://www.reddit.com/r/realgirls.json?sort=top&t=day", 
+    "https://www.reddit.com/r/legalteens.json?sort=top&t=day",
+    "https://www.reddit.com/r/amateur.json?sort=top&t=day",
+    "https://www.reddit.com/r/nsfw_snapchat.json?sort=top&t=day",
+    "https://www.reddit.com/r/wet.json?sort=top&t=day",
+    "https://www.reddit.com/r/bathing.json?sort=top&t=day",
+    "https://www.reddit.com/r/nsfw_gif.json?sort=top&t=day",
+    "https://www.reddit.com/r/nsfw_gifs.json?sort=top&t=day",
+    "https://www.reddit.com/r/porngifs.json?sort=top&t=day",
+    "https://www.reddit.com/r/gonewild.json?sort=top&t=day",
+    "https://www.reddit.com/r/gonewild18.json?sort=top&t=day",
+    "https://www.reddit.com/r/collegeamateurs.json?sort=top&t=day",
+    "https://www.reddit.com/r/irlgirls.json?sort=top&t=day",
+    "https://www.reddit.com/r/camwhores.json?sort=top&t=day",
+    "https://www.reddit.com/r/camsluts.json?sort=top&t=day",
+    "https://www.reddit.com/r/cumsluts.json?sort=top&t=day",
+    "https://www.reddit.com/r/girlsfinishingthejob.json?sort=top&t=day",
+    "https://www.reddit.com/r/cumfetish.json?sort=top&t=day",
+    "https://www.reddit.com/r/creampies.json?sort=top&t=day",
+    "https://www.reddit.com/r/throatpies.json?sort=top&t=day"]
 
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./users.json"))
@@ -42,7 +74,110 @@ setInterval(() => {
     /**/
 }, 30000)
 
+setTimeout( async () => {
+    //BDSM CACHE
+    for (link of bdsmLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            bdsmCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache loaded\x1b[37m")
+
+    //THIGHS CACHE
+    for (link of thighsLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            thighsCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] thigh cache loaded\x1b[37m")
+
+    //PORN CACHE
+    for (link of pornLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            pornCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
+}, 100)
+
+setInterval( async () => {
+    console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache updating..\x1b[37m")
+
+    //BDSM CACHE
+    for (link of bdsmLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+    
+        if (allowed) {
+            cache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache updated\x1b[37m")
+
+    //THIGHS CACHE
+    for (link of thighsLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            thighsCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] thigh cache updated\x1b[37m")
+
+    //PORN CACHE
+    for (link of pornLinks) {
+        const { body } = await snekfetch
+                .get(link)
+                .query({ limit: 800 })
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            pornCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
+
+    console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache update finished\x1b[37m")
+}, 240000)
+
 module.exports = {
+
+    bdsmCache,
+    thighsCache,
+    pornCache,
 
     getVoteMulti: async function(member) {
 
@@ -58,8 +193,6 @@ module.exports = {
 
         let image = post.data.url 
 
-        let final = false
-
         if (image.includes("imgur.com/a/")) {
             chosen = allowed[Math.floor(Math.random() * allowed.length)]
             image = chosen.data.url
@@ -70,23 +203,22 @@ module.exports = {
             if (!isImageUrl(image)) {
                 image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
             }
-            final = true
+            return image
         }
 
         if (image.includes("gfycat")) {
 
             const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
-            
-            image = link.gfyItem.max5mbGif
-            final = true
+
+            if (link) {
+                image = link.gfyItem.max5mbGif
+                return image
+            }
         }
 
         let count = 0
 
         while (!isImageUrl(image)) {
-            if (final) {
-                break
-            }
 
             if (count >= 10) {
                 console.log("couldnt find porn @ " + subredditChoice)
@@ -107,6 +239,8 @@ module.exports = {
                 image = "https://i.imgur.com/" + image.split("/")[3]
                 if (!isImageUrl(image)) {
                     image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
+                    console.log("c")
+                    return image
                 }
             }
     
@@ -114,7 +248,11 @@ module.exports = {
     
                 const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
     
-                image = link.gfyItem.max5mbGif
+                if (link) {
+                    image = link.gfyItem.max5mbGif
+                    console.log("d")
+                    return image
+                }
             }
         }
 
@@ -273,3 +411,25 @@ function hasPadlocklol(member) {
     }
 }
 
+function getTimestamp() {
+    const date = new Date();
+    let hours = date.getHours().toString();
+    let minutes = date.getMinutes().toString();
+    let seconds = date.getSeconds().toString();
+    
+    if (hours.length == 1) {
+        hours = "0" + hours;
+    } 
+    
+    if (minutes.length == 1) {
+        minutes = "0" + minutes;
+    } 
+    
+    if (seconds.length == 1) {
+        seconds = "0" + seconds;
+    }
+    
+    const timestamp = hours + ":" + minutes + ":" + seconds;
+
+    return timestamp
+}

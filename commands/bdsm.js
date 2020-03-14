@@ -1,8 +1,6 @@
 const { RichEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
-const snekfetch = require("snekfetch")
-
-const links = ["https://www.reddit.com/r/bdsm.json?sort=top&t=day", "https://www.reddit.com/r/bondage.json?sort=top&t=day", "https://www.reddit.com/r/dominated.json?sort=top&t=day"]
+const { bdsmCache } = require("../utils.js")
 
 var cooldown = new Map()
 
@@ -30,30 +28,32 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
+        if (!message.channel.nsfw) {
+            return message.channel.send("❌\nyou must do this in an nsfw channel")
+        }
+
+        if (bdsmCache.size <= 2) {
+            return message.channel.send("❌\nplease wait a couple more seconds..")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        if (!message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
-        }
+        const bdsmLinks = Array.from(bdsmCache.keys())
 
-        const subredditChoice = links[Math.floor(Math.random() * links.length)]
+        const subredditChoice = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)]
 
-        const { body } = await snekfetch
-            .get(subredditChoice)
-            .query({ limit: 800 })
-        
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = await bdsmCache.get(subredditChoice)
 
-        let chosen = allowed[Math.floor(Math.random() * allowed.length)]
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
         const image = await redditImage(chosen, chosen, allowed)
 
         if (image == "lol") {
-            return message.channel.send("❌\nunable to find porn image")
+            return message.channel.send("❌\nunable to find bdsm image")
         }
 
         let color;

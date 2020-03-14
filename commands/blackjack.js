@@ -361,6 +361,10 @@ async function playGame(message, m) {
     } else if (games.get(message.member.user.id).cards.length == 5) {
         return win()
     } else {
+        if (!first) {
+            await m.reactions.get("1️⃣").remove(message.member.user.id)
+        }
+
         games.set(message.member.user.id, {
             bet: bet,
             deck: games.get(message.member.user.id).deck,
@@ -381,8 +385,6 @@ async function playGame(message, m) {
             })
 
         if (reaction == "1️⃣") {
-            await m.reactions.get(reaction).remove(message.member.user.id)
-
             newCard(message.member)
 
             if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21) {

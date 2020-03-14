@@ -125,7 +125,6 @@ module.exports = {
 
             if (!list.includes(target.user.id)) {
                 target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +"** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*").catch(() => {
-
                 })
             }
 
@@ -134,9 +133,14 @@ module.exports = {
         } else if (amount >= 45) {
             robberySuccess = false
 
-            percentReturned = (Math.floor(Math.random() * 20) + 5)
+            percentReturned = (Math.floor(Math.random() * 10) + 5)
 
             amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
+
+            if (!list.includes(target.user.id)) {
+                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +"** but they failed\nyou have been given $**" + amountReturned.toLocaleString() + "** from their balance\n*use $optout to optout of bot dms*").catch(() => {
+                })
+            }
 
             updateBalance(message.member, getBalance(message.member) - amountReturned)
             updateBalance(target, getBalance(target) + amountReturned)
@@ -173,7 +177,7 @@ module.exports = {
                 embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)" +
                     "\nfrom your balance for their troubles")
             } else {
-                embed.addField("**fail!!**", "**you lost** $750")
+                embed.addField("**fail!!**", "**you lost** $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)")
                 embed.setColor("#FF0000")
             }
 

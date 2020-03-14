@@ -1,13 +1,8 @@
 const { RichEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
-const snekfetch = require("snekfetch")
+const { thighsCache } = require("../utils.js")
 
-const links = ["https://www.reddit.com/r/legs.json?sort=top&t=day",
-    "https://www.reddit.com/r/thickthighs.json?sort=top&t=day",
-    "https://www.reddit.com/r/perfectthighs.json?sort=top&t=day",
-    "https://www.reddit.com/r/thighs.json?sort=top&t=day"]
-
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "thighs",
@@ -33,29 +28,32 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
+        if (!message.channel.nsfw) {
+            return message.channel.send("❌\nyou must do this in an nsfw channel")
+        }
+
+        if (thighsCache.size <= 2) {
+            return message.channel.send("❌\nplease wait a couple more seconds..")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        if (!message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
-        }
+        const thighsLinks = Array.from(thighsCache.keys())
 
-        const subredditChoice = links[Math.floor(Math.random() * links.length)]
+        const subredditChoice = thighsLinks[Math.floor(Math.random() * thighsLinks.length)]
 
-        const { body } = await snekfetch
-            .get(subredditChoice)
-            .query({ limit: 800 })
-        
-        const allowed = body.data.children.filter(post => !post.data.is_self)
-        let chosen = allowed[Math.floor(Math.random() * allowed.length)]
+        const allowed = await thighsCache.get(subredditChoice)
+
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
         const image = await redditImage(chosen, chosen, allowed)
 
         if (image == "lol") {
-            return message.channel.send("❌\nunable to find porn image")
+            return message.channel.send("❌\nunable to find thighs image")
         }
 
         let color;
