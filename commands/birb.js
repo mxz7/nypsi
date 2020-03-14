@@ -1,5 +1,6 @@
-const fetch = require("node-fetch")
+const snekfetch = require("snekfetch")
 const { RichEmbed } = require("discord.js")
+const { redditImage } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -39,17 +40,24 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const url = "https://some-random-api.ml/img/birb"
-        let birb
+        const { body } = await snekfetch.get("https://www.reddit.com/r/birb.json?sort=top&t=day")
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
-        try {
-            birb = await fetch(url).then(url => url.json())
-        } catch (e) {
-            console.log(e)
-            return message.channel.send("❌\nerror")
+        const a = await redditImage(chosen, allowed)
+
+        if (a == "lol") {
+            return message.channel.send("❌\nunable to find image")
         }
 
-        birb = birb.link
+        const image = a.split("|")[0]
+        const title = a.split("|")[1]
+        let url = a.split("|")[2]
+        const author = a.split("|")[3]
+
+        url = "https://reddit.com" + url
 
         let color;
 
@@ -60,10 +68,11 @@ module.exports = {
         }
 
         const embed = new RichEmbed()
-            .setTitle("birb")
-            .setURL("https://some-random-api.ml/")
+            .setAuthor("u/" + author + " | r/birb")
+            .setTitle(title)
+            .setURL(url)
             .setColor(color)
-            .setImage(birb)
+            .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         

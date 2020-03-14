@@ -50,11 +50,18 @@ module.exports = {
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
-        const image = await redditImage(chosen, chosen, allowed)
+        const a = await redditImage(chosen, allowed)
 
-        if (image == "lol") {
+        if (a == "lol") {
             return message.channel.send("❌\nunable to find bdsm image")
         }
+
+        const image = a.split("|")[0]
+        const title = a.split("|")[1]
+        let url = a.split("|")[2]
+        const author = a.split("|")[3]
+
+        url = "https://reddit.com" + url
 
         let color;
 
@@ -68,9 +75,9 @@ module.exports = {
 
         const embed = new RichEmbed()
             .setColor(color)
-            .setTitle(chosen.data.title)
-            .setAuthor("u/" + chosen.data.author + " | r/" + subreddit)
-            .setURL(chosen.data.url)
+            .setTitle(title)
+            .setAuthor("u/" + author + " | r/" + subreddit)
+            .setURL(url)
             .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

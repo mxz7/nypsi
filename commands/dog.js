@@ -1,5 +1,6 @@
-const fetch = require("node-fetch")
+const snekfetch = require("snekfetch")
 const { RichEmbed } = require("discord.js")
+const { redditImage } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -37,17 +38,24 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const url = "https://dog.ceo/api/breeds/image/random"
-        let dog
+        const { body } = await snekfetch.get("https://www.reddit.com/r/dog.json?sort=top&t=day")
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
-        try {
-            dog = await fetch(url).then(url => url.json())
-        } catch (e) {
-            console.log(e)
-            return message.channel.send("❌\nerror")
+        const a = await redditImage(chosen, allowed)
+
+        if (a == "lol") {
+            return message.channel.send("❌\nunable to find image")
         }
 
-        dog = dog.message
+        const image = a.split("|")[0]
+        const title = a.split("|")[1]
+        let url = a.split("|")[2]
+        const author = a.split("|")[3]
+
+        url = "https://reddit.com" + url
 
         let color;
 
@@ -58,10 +66,11 @@ module.exports = {
         }
 
         const embed = new RichEmbed()
-            .setTitle("dog")
-            .setURL("https://dog.ceo/dog-api/")
+            .setAuthor("u/" + author + " | r/dog")
+            .setTitle(title)
+            .setURL(url)
             .setColor(color)
-            .setImage(dog)
+            .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
