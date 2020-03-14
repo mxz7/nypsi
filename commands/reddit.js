@@ -60,7 +60,11 @@ module.exports = {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
 
-        const image = await redditImage(chosen)
+        const image = await redditImage(chosen, chosen, allowed)
+
+        if (image == "lol") {
+            return message.channel.send("❌\nunable to find porn image")
+        }
 
         let color;
 
