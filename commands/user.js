@@ -3,6 +3,16 @@ const { RichEmbed } = require("discord.js");
 const { stripIndents } = require("common-tags");
 const { getMember, formatDate } = require("../utils.js");
 
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+//MAKE LOOK MORE LIKE $SERVER
+
 module.exports = {
     name: "user",
     description: "view info about a user",
@@ -47,11 +57,11 @@ module.exports = {
             .setTitle(member.user.tag)
             .setDescription(member.user)
             
-            .addField(member.displayName, stripIndents `**username** ${member.user.tag}\n
-            **created** ${created.toString().toLowerCase()}\n
-            **joined** ${joined.toString().toLowerCase()}\n
+            .addField(member.displayName, stripIndents `**username** ${member.user.tag}
+            **id** ${member.user.id}
             **status** ${member.presence.status}\n
-            **id** ${member.user.id}`)
+            **created** ${created.toString().toLowerCase()}
+            **joined** ${joined.toString().toLowerCase()}`)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
