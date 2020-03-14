@@ -77,9 +77,7 @@ setInterval(() => {
 setTimeout( async () => {
     //BDSM CACHE
     for (link of bdsmLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
         if (allowed) {
@@ -92,9 +90,7 @@ setTimeout( async () => {
 
     //THIGHS CACHE
     for (link of thighsLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
         if (allowed) {
@@ -107,9 +103,7 @@ setTimeout( async () => {
 
     //PORN CACHE
     for (link of pornLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
         if (allowed) {
@@ -119,21 +113,19 @@ setTimeout( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
-}, 100)
+}, 5000)
 
 setInterval( async () => {
     console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache updating..\x1b[37m")
 
     //BDSM CACHE
     for (link of bdsmLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
     
         if (allowed) {
-            cache.set(link, allowed)
+            bdsmCache.set(link, allowed)
         } else {
             console.error("no images @ " + link)
         }
@@ -142,9 +134,7 @@ setInterval( async () => {
 
     //THIGHS CACHE
     for (link of thighsLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
         if (allowed) {
@@ -157,9 +147,7 @@ setInterval( async () => {
 
     //PORN CACHE
     for (link of pornLinks) {
-        const { body } = await snekfetch
-                .get(link)
-                .query({ limit: 800 })
+        const { body } = await snekfetch.get(link)
         
         const allowed = body.data.children.filter(post => !post.data.is_self)
         if (allowed) {
@@ -168,10 +156,10 @@ setInterval( async () => {
             console.error("no images @ " + link)
         }
     }
-    console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
+    console.log("\x1b[32m[" + getTimestamp() + "] porn cache updated\x1b[37m")
 
     console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache update finished\x1b[37m")
-}, 240000)
+}, 21600000)
 
 module.exports = {
 
@@ -189,13 +177,13 @@ module.exports = {
 
     },
 
-    redditImage: async function(post, chosen, allowed)  {
+    redditImage: async function(post, allowed)  {
 
         let image = post.data.url 
 
         if (image.includes("imgur.com/a/")) {
-            chosen = allowed[Math.floor(Math.random() * allowed.length)]
-            image = chosen.data.url
+            post = allowed[Math.floor(Math.random() * allowed.length)]
+            image = post.data.url
         }
 
         if (image.includes("imgur") && !image.includes("gif")) {
@@ -203,7 +191,7 @@ module.exports = {
             if (!isImageUrl(image)) {
                 image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
             }
-            return image
+            return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
         }
 
         if (image.includes("gfycat")) {
@@ -212,7 +200,7 @@ module.exports = {
 
             if (link) {
                 image = link.gfyItem.max5mbGif
-                return image
+                return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
             }
         }
 
@@ -227,20 +215,19 @@ module.exports = {
 
             count++
 
-            chosen = allowed[Math.floor(Math.random() * allowed.length)]
-            image = chosen.data.url
+            post = allowed[Math.floor(Math.random() * allowed.length)]
+            image = post.data.url
 
             if (image.includes("imgur.com/a/")) {
-                chosen = allowed[Math.floor(Math.random() * allowed.length)]
-                image = chosen.data.url
+                post = allowed[Math.floor(Math.random() * allowed.length)]
+                image = post.data.url
             }
 
             if (image.includes("imgur") && !image.includes("gif")) {
                 image = "https://i.imgur.com/" + image.split("/")[3]
                 if (!isImageUrl(image)) {
                     image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
-                    console.log("c")
-                    return image
+                    return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
                 }
             }
     
@@ -250,14 +237,11 @@ module.exports = {
     
                 if (link) {
                     image = link.gfyItem.max5mbGif
-                    console.log("d")
-                    return image
+                    return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
                 }
             }
         }
-
-        return image
-
+        return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
     },
 
     getMember: function(message, memberName) {

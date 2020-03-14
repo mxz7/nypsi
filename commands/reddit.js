@@ -40,27 +40,29 @@ module.exports = {
 
         let allowed
 
-        const url = "https://www.reddit.com/r/" + args[0] + ".json"
-
         try {
-            const { body } = await snekfetch
-                .get(url)
-                .query({ limit: 800 })
+            const { body } = await snekfetch.get("https://www.reddit.com/r/" + args[0] + ".json")
 
             allowed = body.data.children.filter(post => !post.data.is_self)
 
         } catch (e) {
             return message.channel.send("❌\n invalid subreddit")
         }
-        
 
-        let chosen = allowed[Math.floor(Math.random() * allowed.length)]
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
         if (chosen.data.over_18 && !message.channel.nsfw) {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
 
-        const image = await redditImage(chosen, chosen, allowed)
+        const a = await redditImage(chosen, allowed)
+
+        const image = a.split("|")[0]
+        const title = a.split("|")[1]
+        let url = a.split("|")[2]
+        const author = a.split("|")[3]
+
+        url = "https://reddit.com" + url
 
         if (image == "lol") {
             return message.channel.send("❌\nunable to find porn image")
@@ -78,9 +80,9 @@ module.exports = {
 
         const embed = new RichEmbed()
             .setColor(color)
-            .setTitle(chosen.data.title)
-            .setAuthor("u/" + chosen.data.author + " | r/" + subreddit)
-            .setURL(chosen.data.url)
+            .setTitle(title)
+            .setAuthor("u/" + author + " | r/" + subreddit)
+            .setURL(url)
             .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

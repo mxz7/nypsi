@@ -67,6 +67,7 @@ client.once("ready", async () => {
     aliases.set("steal", "rob")
     aliases.set("rps", "rockpaperscissors")
     aliases.set("mc", "minecraft")
+    aliases.set("bunny", "rabbit")
 
     console.log("\nserver count: " + client.guilds.size)
     console.log("commands count: " + commands.size)

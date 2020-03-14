@@ -1,11 +1,12 @@
-const fetch = require("node-fetch")
+const snekfetch = require("snekfetch")
 const { RichEmbed } = require("discord.js")
+const { redditImage } = require("../utils.js")
 
 const cooldown = new Map()
 
 module.exports = {
-    name: "panda",
-    description: "get a random picture of a panda",
+    name: "rabbit",
+    description: "get a random picture of a rabbit",
     category: "fun",
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
@@ -37,17 +38,30 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const url = "https://some-random-api.ml/img/panda"
-        let panda
+        cooldown.set(message.member.id, new Date());
 
-        try {
-            panda = await fetch(url).then(url => url.json())
-        } catch (e) {
-            console.log(e)
-            return message.channel.send("❌\nerror")
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 5000);
+
+        const { body } = await snekfetch.get("https://www.reddit.com/r/rabbits.json?sort=top&t=day")
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        
+        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
+
+        const a = await redditImage(chosen, allowed)
+
+        if (a == "lol") {
+            return message.channel.send("❌\nunable to find image")
         }
 
-        panda = panda.link
+        const image = a.split("|")[0]
+        const title = a.split("|")[1]
+        let url = a.split("|")[2]
+        const author = a.split("|")[3]
+
+        url = "https://reddit.com" + url
 
         let color;
 
@@ -58,10 +72,11 @@ module.exports = {
         }
 
         const embed = new RichEmbed()
-            .setTitle("panda")
-            .setURL("https://some-random-api.ml")
+            .setAuthor("u/" + author + " | r/rabbits")
+            .setTitle(title)
+            .setURL(url)
             .setColor(color)
-            .setImage(panda)
+            .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
         
