@@ -1,28 +1,6 @@
 const { RichEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
-const snekfetch = require("snekfetch")
-
-const links = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day", 
-    "https://www.reddit.com/r/realgirls.json?sort=top&t=day", 
-    "https://www.reddit.com/r/legalteens.json?sort=top&t=day",
-    "https://www.reddit.com/r/amateur.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_snapchat.json?sort=top&t=day",
-    "https://www.reddit.com/r/wet.json?sort=top&t=day",
-    "https://www.reddit.com/r/bathing.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_gif.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_gifs.json?sort=top&t=day",
-    "https://www.reddit.com/r/porngifs.json?sort=top&t=day",
-    "https://www.reddit.com/r/gonewild.json?sort=top&t=day",
-    "https://www.reddit.com/r/gonewild18.json?sort=top&t=day",
-    "https://www.reddit.com/r/collegeamateurs.json?sort=top&t=day",
-    "https://www.reddit.com/r/irlgirls.json?sort=top&t=day",
-    "https://www.reddit.com/r/camwhores.json?sort=top&t=day",
-    "https://www.reddit.com/r/camsluts.json?sort=top&t=day",
-    "https://www.reddit.com/r/cumsluts.json?sort=top&t=day",
-    "https://www.reddit.com/r/girlsfinishingthejob.json?sort=top&t=day",
-    "https://www.reddit.com/r/cumfetish.json?sort=top&t=day",
-    "https://www.reddit.com/r/creampies.json?sort=top&t=day",
-    "https://www.reddit.com/r/throatpies.json?sort=top&t=day"]
+const { pornCache } = require("../utils.js")
 
 var cooldown = new Map()
 
@@ -50,24 +28,25 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
+        if (!message.channel.nsfw) {
+            return message.channel.send("❌\nyou must do this in an nsfw channel")
+        }
+
+        if (pornCache.size <= 2) {
+            return message.channel.send("❌\nplease wait a couple more seconds..")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        if (!message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
-        }
+        const pornLinks = Array.from(pornCache.keys())
 
-        const subredditChoice = links[Math.floor(Math.random() * links.length)]
+        const subredditChoice = pornLinks[Math.floor(Math.random() * pornLinks.length)]
 
-        const { body } = await snekfetch
-            .get(subredditChoice)
-            .query({ limit: 800 })
-
-
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = await pornCache.get(subredditChoice)
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
