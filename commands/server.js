@@ -15,7 +15,7 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
 
-        const created = formatDate(server.createdAt);
+        const created = formatDate(server.createdAt).toLowerCase();
 
         let color;
 
@@ -31,12 +31,12 @@ module.exports = {
             .setTitle(server.name)
             
             .addField("server info", stripIndents `**owner** ${server.owner.user.tag}
+            **id** ${server.id}
             **created** ${created}
             **region** ${server.region}
             **channels** ${server.channels.size}
             **roles** ${server.roles.size}
-            **members** ${server.memberCount}
-            **id** ${server.id}`)
+            **members** ${server.memberCount}`)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
