@@ -1,7 +1,7 @@
 /*jshint esversion: 8 */
 const fs = require("fs");
-const users = JSON.parse(fs.readFileSync("./users.json"));
-const multiplier = JSON.parse(fs.readFileSync("./slotsmulti.json"))
+const users = JSON.parse(fs.readFileSync("./economy/users.json"));
+const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 const { topgg } = require("./config.json")
@@ -42,36 +42,16 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day",
     "https://www.reddit.com/r/throatpies.json?sort=top&t=day"]
 
 setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./users.json"))
+    const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
 
     if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./users.json", JSON.stringify(users), (err) => {
+        fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 console.log(err);
             }
-            const date = new Date();
-            let hours = date.getHours().toString();
-            let minutes = date.getMinutes().toString();
-            let seconds = date.getSeconds().toString();
-    
-            if (hours.length == 1) {
-               hours = "0" + hours;
-            } 
-    
-            if (minutes.length == 1) {
-                minutes = "0" + minutes;
-            } 
-    
-            if (seconds.length == 1) {
-                seconds = "0" + seconds;
-            }
-    
-            let timestamp = hours + ":" + minutes + ":" + seconds;
-    
-            console.log("\x1b[32m[" + timestamp + "] data saved..\x1b[37m")
+            console.log("\x1b[32m[" + getTimestamp() + "] economy saved..\x1b[37m")
         })
     }
-    /**/
 }, 30000)
 
 setTimeout( async () => {
@@ -177,8 +157,11 @@ module.exports = {
 
     },
 
-    redditImage: async function(post, allowed)  {
+    getUserCount: function() {
+        return Object.keys(users).length
+    },
 
+    redditImage: async function(post, allowed)  {
         let image = post.data.url 
 
         if (image.includes("imgur.com/a/")) {
@@ -198,7 +181,7 @@ module.exports = {
 
             const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
 
-            if (link) {
+            if (link.gfyItem) {
                 image = link.gfyItem.max5mbGif
                 return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
             }
@@ -209,7 +192,7 @@ module.exports = {
         while (!isImageUrl(image)) {
 
             if (count >= 10) {
-                console.log("couldnt find porn @ " + subredditChoice)
+                console.log("couldnt find image @ " + post.data.subreddit_name_prefixed)
                 return "lol"
             }
 
@@ -223,8 +206,9 @@ module.exports = {
                 image = post.data.url
             }
 
-            if (image.includes("imgur") && !image.includes("gif")) {
+            if (image.includes("imgur") && !image.includes("gif") && !image.includes("png")) {
                 image = "https://i.imgur.com/" + image.split("/")[3]
+                image = "https://i.imgur.com/" + image.split("/")[3] + ".png"
                 if (!isImageUrl(image)) {
                     image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
                     return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author

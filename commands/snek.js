@@ -1,14 +1,18 @@
+const snekfetch = require("snekfetch")
 const { RichEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
-const snekfetch = require("snekfetch")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
-    name: "reddit",
-    description: "get a random image from any subreddit",
-    category: "info",
+    name: "snek",
+    description: "get a random picture of a snek",
+    category: "fun",
     run: async (message, args) => {
+        if (!message.guild.me.hasPermission("EMBED_LINKS")) {
+            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+        }
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -25,11 +29,9 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
-        }
 
-        if (args.length == 0) {
-            return message.channel.send("❌\n$reddit <subreddit>")
+
+            return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
         cooldown.set(message.member.id, new Date());
@@ -38,24 +40,17 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        let allowed
-
-        try {
-            const { body } = await snekfetch.get("https://www.reddit.com/r/" + args[0] + ".json")
-
-            allowed = body.data.children.filter(post => !post.data.is_self)
-
-        } catch (e) {
-            return message.channel.send("❌\n invalid subreddit")
-        }
-
+        const { body } = await snekfetch.get("https://www.reddit.com/r/snek.json?sort=top&t=day")
+        
+        const allowed = body.data.children.filter(post => !post.data.is_self)
+        
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
-        if (chosen.data.over_18 && !message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
-        }
-
         const a = await redditImage(chosen, allowed)
+
+        if (a == "lol") {
+            return message.channel.send("❌\nunable to find image")
+        }
 
         const image = a.split("|")[0]
         const title = a.split("|")[1]
@@ -63,10 +58,6 @@ module.exports = {
         const author = a.split("|")[3]
 
         url = "https://reddit.com" + url
-
-        if (image == "lol") {
-            return message.channel.send("❌\nunable to find image")
-        }
 
         let color;
 
@@ -76,20 +67,17 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const subreddit = args[0]
-
         const embed = new RichEmbed()
-            .setColor(color)
+            .setAuthor("u/" + author + " | r/snek")
             .setTitle(title)
-            .setAuthor("u/" + author + " | r/" + subreddit)
             .setURL(url)
+            .setColor(color)
             .setImage(image)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
-
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
+        
+        return message.channel.send(embed).catch(() => {
+            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         })
-
     }
 }

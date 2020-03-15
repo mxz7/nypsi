@@ -5,7 +5,7 @@ const cooldown = new Map()
 
 module.exports = {
     name: "vote",
-    description: "vote every 12 hours to get a 5% bonus on gambling wins",
+    description: "vote every 12 hours to get a 10% bonus on gambling wins",
     category: "money",
     run: async (message, args) => {
 
