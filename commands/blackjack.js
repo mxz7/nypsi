@@ -95,7 +95,8 @@ module.exports = {
             cards: [],
             dealerCards: [],
             id: id,
-            first: true
+            first: true,
+            dealerPlay: false
         })
 
         setTimeout(() => {
@@ -160,7 +161,8 @@ function newCard(member) {
         cards: cards,
         dealerCards: dealerCards,
         id: id,
-        first: first
+        first: first,
+        dealerPlay: false
     })
 }
 
@@ -183,7 +185,8 @@ function newDealerCard(member) {
         cards: cards,
         dealerCards: dealerCards,
         id: id,
-        first: first
+        first: first,
+        dealerPlay: false
     })
 }
 
@@ -303,6 +306,7 @@ async function playGame(message, m) {
 
     const bet = games.get(message.member.user.id).bet
     const first = games.get(message.member.user.id).first
+    const dealerPlaya = games.get(message.member.user.id).dealerPlay
 
     let color;
 
@@ -352,7 +356,7 @@ async function playGame(message, m) {
     
     if (calcTotalDealer(message.member) > 21) {
         return win()
-    } else if (calcTotalDealer(message.member) == 21 && !first) {
+    } else if (calcTotalDealer(message.member) == 21 && !first && dealerPlaya) {
         return lose()
     } else if (calcTotal(message.member) == 21) {
         return win()
@@ -371,7 +375,8 @@ async function playGame(message, m) {
             cards: games.get(message.member.user.id).cards,
             dealerCards: games.get(message.member.user.id).dealerCards,
             id: games.get(message.member.user.id).id,
-            first: false
+            first: false,
+            dealerPlay: false
         })
 
         const filter = (reaction, user) => {
@@ -410,6 +415,16 @@ async function playGame(message, m) {
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();
             m.edit(newEmbed1)
+
+            games.set(message.member.user.id, {
+                bet: bet,
+                deck: games.get(message.member.user.id).deck,
+                cards: games.get(message.member.user.id).cards,
+                dealerCards: games.get(message.member.user.id).dealerCards,
+                id: games.get(message.member.user.id).id,
+                first: false,
+                dealerPlay: true
+            })
             
             setTimeout(() => {
                 dealerPlay(message)

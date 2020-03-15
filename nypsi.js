@@ -7,6 +7,7 @@ const fs = require("fs");
 const { list } = require("./optout.json");
 const ascii = require("figlet");
 const { banned } = require("./banned.json");
+const { getUserCount } = require("./utils.js")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
@@ -17,13 +18,13 @@ const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(
 console.log(" -- commands -- \n");
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-
+    
     let enabled = true;
-
+    
     if (!command.name || !command.description || !command.run || !command.category) {
         enabled = false;
     }
-
+    
     if (enabled) {
         commands.set(command.name, command);
         console.log(command.name + " ✅");
@@ -71,6 +72,7 @@ client.once("ready", async () => {
 
     console.log("\nserver count: " + client.guilds.size)
     console.log("commands count: " + commands.size)
+    console.log("users in memory: " + getUserCount())
     console.log("\n- - -\n");
 
     await ascii("n y p s i", function(err, data) {
@@ -82,28 +84,16 @@ client.once("ready", async () => {
     });
 });
 
+client.on("guildCreate", guild => {
+    console.log("joined new server '" + guild.name + "' new count: " + client.guilds.size)
+})
+
+client.on("guildDelete", guild => {
+    console.log("removed from server '" + guild.name + "' new count: " + client.guilds.size)
+})
+
 client.on("rateLimit", () => {
-
-    const date = new Date();
-    let hours = date.getHours().toString();
-    let minutes = date.getMinutes().toString();
-    let seconds = date.getSeconds().toString();
-
-    if (hours.length == 1) {
-        hours = "0" + hours;
-    } 
-
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    } 
-
-    if (seconds.length == 1) {
-        seconds = "0" + seconds;
-    }
-
-    let timestamp = hours + ":" + minutes + ":" + seconds;
-
-    console.log("\x1b[31m" + "[" + timestamp + "] " + "BEING RATE LIMITED!!\x1b[37m")
+    console.log("\x1b[31m" + "[" + getTimeStamp() + "] " + "BEING RATE LIMITED!!\x1b[37m")
 })
 
 
