@@ -12,6 +12,8 @@ const { getUserCount } = require("./utils.js")
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const cooldown = new Set()
+let cmdCount = 0
+let ready = false
 
 const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
 
@@ -32,6 +34,24 @@ for (const file of commandFiles) {
         console.log(file + " ❌");
     }
 }
+aliases.set("ig", "instagram");
+aliases.set("av", "avatar");
+aliases.set("whois", "user");
+aliases.set("who", "user");
+aliases.set("serverinfo", "server");
+aliases.set("ws", "wholesome");
+aliases.set("rick", "rickroll");
+aliases.set("git", "github");
+aliases.set("bal", "balance");
+aliases.set("top", "baltop")
+aliases.set("cf", "coinflip")
+aliases.set("r", "roulette")
+aliases.set("steal", "rob")
+aliases.set("rps", "rockpaperscissors")
+aliases.set("mc", "minecraft")
+aliases.set("bunny", "rabbit")
+aliases.set("lock", "lockdown")
+aliases.set("ch", "channel")
 console.log("\n -- commands -- ");
 
 client.once("ready", async () => {
@@ -53,29 +73,12 @@ client.once("ready", async () => {
         })
     }, 600000)
 
-    aliases.set("ig", "instagram");
-    aliases.set("av", "avatar");
-    aliases.set("whois", "user");
-    aliases.set("who", "user");
-    aliases.set("serverinfo", "server");
-    aliases.set("ws", "wholesome");
-    aliases.set("rick", "rickroll");
-    aliases.set("git", "github");
-    aliases.set("bal", "balance");
-    aliases.set("top", "baltop")
-    aliases.set("cf", "coinflip")
-    aliases.set("r", "roulette")
-    aliases.set("steal", "rob")
-    aliases.set("rps", "rockpaperscissors")
-    aliases.set("mc", "minecraft")
-    aliases.set("bunny", "rabbit")
-
     console.log("\nserver count: " + client.guilds.size)
     console.log("commands count: " + commands.size)
     console.log("users in memory: " + getUserCount())
     console.log("\n- - -\n");
 
-    await ascii("n y p s i", function(err, data) {
+    ascii("n y p s i", function(err, data) {
         if (!err) {
             console.log(data);
             console.log("\n\nlogged in as " + client.user.tag + "\n");
@@ -85,15 +88,15 @@ client.once("ready", async () => {
 });
 
 client.on("guildCreate", guild => {
-    console.log("joined new server '" + guild.name + "' new count: " + client.guilds.size)
+    console.log("\x1b[36m[" + getTimeStamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.size + "\x1b[37m")
 })
 
 client.on("guildDelete", guild => {
-    console.log("removed from server '" + guild.name + "' new count: " + client.guilds.size)
+    console.log("\x1b[36m[" + getTimeStamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.size + "\x1b[37m")
 })
 
 client.on("rateLimit", () => {
-    console.log("\x1b[31m" + "[" + getTimeStamp() + "] " + "BEING RATE LIMITED!!\x1b[37m")
+    console.log("\x1b[31m[" + getTimeStamp() + "] BEING RATE LIMITED!!\x1b[37m")
 })
 
 
@@ -102,6 +105,10 @@ client.on("message", message => {
     if (message.author.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(prefix)) return;
+
+    if (!ready) {
+        return message.channel.send("❌\nplease wait before using commands")
+    }
 
     if (banned.includes(message.member.user.id)) {
         message.delete().catch();
@@ -140,6 +147,8 @@ client.on("message", message => {
 });
 
 function logCommand(message, args) {
+    cmdCount++
+    exports.cmdCount = cmdCount
     args.shift();
 
     const server = message.guild.name
@@ -450,8 +459,12 @@ function helpCmd(message, args) {
 
 }
 
-client.login(token);
+exports.cmdCount = cmdCount
+exports.commandsSize = commands.size
+exports.aliasesSize = aliases.size
 
-module.exports = {
-    client
-}
+client.login(token).then(() => {
+    setTimeout(() => {
+        ready = true
+    }, 500)
+})

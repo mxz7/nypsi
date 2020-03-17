@@ -6,7 +6,7 @@ module.exports = {
     run: async (message, args) => {
         
         if (!message.member.hasPermission("BAN_MEMBERS")) {
-            return message.channel.send("❌ \nyou are lacking permission: 'BAN_MEMBERS'");
+            return 
         }
 
         if (!message.guild.me.hasPermission("BAN_MEMBERS")) {

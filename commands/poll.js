@@ -11,7 +11,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");  
+            return
         } 
 
         if (cooldown.has(message.member.id)) {
