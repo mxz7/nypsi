@@ -45,6 +45,10 @@ module.exports = {
             return message.channel.send("❌\ninvalid user")
         }
 
+        if (target.user.bot) {
+            return message.channel.send("❌\ninvalid user")
+        }
+
         if (message.member == target) {
             return message.channel.send("❌\nyou cant rob yourself")
         }

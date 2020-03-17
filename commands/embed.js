@@ -1,24 +1,22 @@
-/*jshint esversion: 8 */
-
 const { RichEmbed } = require("discord.js");
 
 var cooldown = new Map();
 
 module.exports = {
-    name: "question",
-    description: "create a question",
+    name: "embed",
+    description: "create an embed message",
     category: "info",
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-            return 
+            return message.channel.send("❌ \nyou are lacking permission: 'MANAGE_MESSAGES'");  
         } 
 
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 60 - diff
+            const time = 25 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -34,17 +32,17 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$question <channel> <title> | <text>");
+            return message.channel.send("❌\n$embed <channel> <title> | <text>");
         }
 
         if (!message.content.includes("|")) {
-            return message.channel.send("❌\n$question <channel> <title> | <text>");
+            return message.channel.send("❌\n$embed <channel> <title> | <text>");
         }
 
         cooldown.set(message.member.id, new Date());
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 60000);
+        }, 25000);
 
         let channel = message.mentions.channels.first();
 
@@ -77,10 +75,7 @@ module.exports = {
             .setTimestamp();
 
         
-        channel.send(embed).then( m => {
-            m.react("👍").then( () => {
-                m.react("👎");
-            });
+        channel.send(embed).then(() => {
             if (message.channel.id != channel.id) {
                 message.channel.send("✅\n**success**");
             }

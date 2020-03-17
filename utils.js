@@ -5,9 +5,8 @@ const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 const { topgg } = require("./config.json")
-const { client } = require("./nypsi.js")
 const DBL = require("dblapi.js")
-const dbl = new DBL(topgg, client)
+const dbl = new DBL(topgg)
 const snekfetch = require("snekfetch")
 
 const pornCache = new Map()
@@ -44,12 +43,33 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day",
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
 
+    for (user in users) {
+        if (users[user].balance == NaN || users[user].balance == null || users[user].balance == undefined ||
+                users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined) {
+
+            let padlock
+
+            if (users[user].padlockStatus == true) {
+                padlock = true
+            } else {
+                padlock = false 
+            }
+
+            users[user] = {
+                balance: 0,
+                padlockStatus: padlock
+            }
+            console.log(user + " set to 0 because NaN")
+        }
+    }
+
     if (JSON.stringify(users) != JSON.stringify(users1)) {
+
         fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 console.log(err);
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] economy saved..\x1b[37m")
+            console.log("\x1b[32m[" + getTimestamp() + "] data saved..\x1b[37m")
         })
     }
 }, 30000)
@@ -270,6 +290,13 @@ module.exports = {
     },
 
     getBalance: function(member) {
+        if (users[member.user.id].balance == NaN || users[member.user.id].balance == null || users[member.user.id].balance == undefined) {
+            console.log(member.user.id + " set to 0 because NaN")
+            users[member.user.id] = {
+                balance: 0,
+                padlockStatus: hasPadlocklol(member)
+            }
+        }
         return users[member.user.id].balance
     },
 

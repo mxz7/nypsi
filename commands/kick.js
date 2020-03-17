@@ -8,7 +8,7 @@ module.exports = {
         if (message.member.hasPermission("KICK_MEMBERS")) {
 
             if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
-                return message.channel.send("❌ \ni am lacking permission: 'KICK_MEMBERS'");
+                return 
             }
 
             if (message.mentions.members.first() == null) {
