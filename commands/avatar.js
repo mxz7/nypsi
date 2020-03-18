@@ -28,6 +28,12 @@ module.exports = {
             return message.channel.send("❌ \ninvalid user");
         }
 
+        let avatar = member.user.avatarURL
+
+        if (avatar.includes("gif") && !avatar.includes("size")) {
+            avatar = avatar + "?size=256"
+        }
+
         let color;
 
         if (member.displayHexColor == "#000000") {
@@ -39,7 +45,7 @@ module.exports = {
         const embed = new RichEmbed()
             .setTitle(member.user.tag)
             .setColor(color)
-            .setImage(member.user.avatarURL)
+            .setImage(avatar)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();

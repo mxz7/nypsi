@@ -52,6 +52,7 @@ aliases.set("mc", "minecraft")
 aliases.set("bunny", "rabbit")
 aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
+
 console.log("\n -- commands -- ");
 
 client.once("ready", async () => {
