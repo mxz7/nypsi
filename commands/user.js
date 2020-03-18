@@ -3,16 +3,6 @@ const { RichEmbed } = require("discord.js");
 const { stripIndents } = require("common-tags");
 const { getMember, formatDate } = require("../utils.js");
 
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-//MAKE LOOK MORE LIKE $SERVER
-
 module.exports = {
     name: "user",
     description: "view info about a user",
@@ -61,13 +51,53 @@ module.exports = {
             **id** ${member.user.id}
             **status** ${member.presence.status}\n
             **created** ${created.toString().toLowerCase()}
-            **joined** ${joined.toString().toLowerCase()}`)
+            **joined** ${joined.toString().toLowerCase()}
+            **roles** ${member._roles.length}`)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
-        
-        if (member.presence.game && member.presence.game.toString().toLowerCase() != "custom status") {
-            embed.addField("game", stripIndents `**currently playing** ${member.presence.game.name.toString().toLowerCase()}`);
+
+        if (member.presence.activities.length > 0) {
+            let hasStatus = false
+            let status = ""
+            let hasGame = false
+            let game = ""
+            let hasSpotify = false
+            let spotify = ""
+            
+            for (activity of member.presence.activities) {
+                if (activity.name.toLowerCase() == "custom status") {
+                    if (hasStatus) return
+
+                    status = "**custom status** " + activity.state
+                    hasStatus = true
+                }
+
+                if (activity.name.toLowerCase() == "spotify") {
+                    if (hasSpotify) return
+
+                    spotify = "**listening to** " + activity.details + " by " + activity.state
+                    hasSpotify = true
+                }
+
+                if (!hasGame && activity.name.toLowerCase() != "custom status" && activity.name.toLowerCase() != "spotify") {
+                    game = "**currently playing** " + activity.name
+                    hasGame = true
+                }
+            }
+
+            let status1 = ""
+            if (hasStatus) {
+                status1 = status1 + status + "\n"
+            }
+            if (hasSpotify) {
+                status1 = status1 + spotify + "\n"
+            }
+            if (hasGame) {
+                status1 = status1 + game
+            }
+
+            embed.addField("status", status1)
         }
 
         message.channel.send(embed).catch(() => {

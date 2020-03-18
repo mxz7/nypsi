@@ -47,40 +47,44 @@ module.exports = {
         }
 
         if (args[0] == "create" || args[0] == "c") {
-            if (!args.length >= 2) {
-                return message.channel.send("❌\n$channel **c**reate <name>")
+            if (args.length == 1) {
+                return message.channel.send("❌\n$channel **c**reate <name1 name2>\nexample: $channel c channel1 channel2")
             }
             args.shift()
-            const name = args.join("-")
 
-            await message.guild.createChannel(name).then(channel => {
-                const embed = new RichEmbed()
+            let channels = ""
+
+            for (arg of args) {
+                const newChannel = await message.guild.createChannel(arg)
+                channels = channels + newChannel + " ✅\n"
+            }
+
+            const embed = new RichEmbed()
                     .setTitle("channel")
-                    .setDescription(channel + "\n\n✅ channel created")
+                    .setDescription(channels)
                     .setColor(color)
                     .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                     .setTimestamp();
-                return message.channel.send(embed)
-            }).catch(() => {
-                return message.channel.send("❌\nthere was an error. possibly invalid characters")
-            })
+            return message.channel.send(embed)
         }
 
         if (args[0] == "delete" || args[0] == "del") {
-            if (args.length != 2) {
+            if (args.length == 1) {
                 return message.channel.send("❌\n$channel **del**ete <channel>")
             }
-            const channel = message.mentions.channels.first()
 
-            if (!channel) {
-                return message.channel.send("❌\ninvalid channel")
-            }
+            args.shift()
 
-            await channel.delete()
+            let count = 0
+
+            message.mentions.channels.forEach(async channel => {
+                count++
+                await channel.delete()
+            })
 
             const embed = new RichEmbed()
                 .setTitle("channel")
-                .setDescription("✅ channel deleted")
+                .setDescription("✅ **" + count + "** channels deleted")
                 .setColor(color)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
                 .setTimestamp();

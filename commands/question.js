@@ -34,23 +34,17 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$question <channel> <title> | <text>");
+            return message.channel.send("❌\n$question <title> | <text>");
         }
 
         if (!message.content.includes("|")) {
-            return message.channel.send("❌\n$question <channel> <title> | <text>");
+            return message.channel.send("❌\n$question <title> | <text>");
         }
 
         cooldown.set(message.member.id, new Date());
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 60000);
-
-        let channel = message.mentions.channels.first();
-
-        if (!channel) {
-            return message.channel.send("❌\ninvalid channel");
-        }
 
         let color;
 
@@ -60,13 +54,9 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        args.shift();
+        const title = args.join(" ").split("|")[0]
 
-        const newArgs = args.join(" ").split("|");
-
-        const title = newArgs[0];
-
-        const description = newArgs[1];
+        const description = args.join(" ").split("|")[1]
 
         const embed = new RichEmbed()
             .setTitle(title)
@@ -77,16 +67,12 @@ module.exports = {
             .setTimestamp();
 
         
-        channel.send(embed).then( m => {
+        message.channel.send(embed).then( m => {
             m.react("👍").then( () => {
                 m.react("👎");
             });
-            if (message.channel.id != channel.id) {
-                message.channel.send("✅\n**success**");
-            }
-        }).catch( () => {
-            message.channel.send("❌\ni dont have permission to send messages there");
-        });
+            message.delete()
+        })
 
     }
 };

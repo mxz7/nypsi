@@ -358,7 +358,7 @@ async function playGame(message, m) {
         return win()
     } else if (calcTotalDealer(message.member) == 21 && !first && dealerPlaya) {
         return lose()
-    } else if (calcTotal(message.member) == 21) {
+    } else if (calcTotal(message.member) == 21 && !first) {
         return win()
     } else if (calcTotal(message.member) > 21) {
         return lose()
