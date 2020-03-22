@@ -1,24 +1,19 @@
-/*jshint esversion: 8 */
+const urban = require("relevant-urban")
+const { RichEmbed } = require("discord.js")
 
-const { RichEmbed } = require("discord.js");
-
-var cooldown = new Map();
+const cooldown = new Map()
 
 module.exports = {
-    name: "poll",
-    description: "create a poll with two answers",
+    name: "urban",
+    description: "get a definition from urban dictionary",
     category: "info",
     run: async (message, args) => {
-
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-            return
-        } 
-
+        
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 10 - diff
+            const time = 5 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -34,17 +29,20 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$poll <title> | <text>");
-        }
-
-        if (!message.content.includes("|")) {
-            return message.channel.send("❌\n$poll <title> | <text>");
+            return message.channel.send("❌\n$urban <definition>")
         }
 
         cooldown.set(message.member.id, new Date());
+
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 5000);
+
+        const result = await urban(args.join()).catch(() => {
+            return message.channel.send("❌\nunknown definition")
+        })
+
+        if (!result.word) return
 
         let color;
 
@@ -54,25 +52,17 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const title = args.join(" ").split("|")[0]
-
-        const description = args.join(" ").split("|")[1]
-
         const embed = new RichEmbed()
-            .setTitle(title)
-            .setDescription(description)
+            .setTitle(result.word)
+            .setDescription(result.definition + "\n\n" + result.example)
             .setColor(color)
-
+            .setAuthor("published by " + result.author)
+            .addField("👍", result.thumbsUp.toLocaleString(), true)
+            .addField("👎", result.thumbsDown.toLocaleString(), true)
+            .setURL(result.urbanURL)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
             .setTimestamp();
 
-        
-        message.channel.send(embed).then( m => {
-            m.react("1️⃣").then( () => {
-                m.react("2️⃣");
-            });
-            message.delete()
-        })
-
+        message.channel.send(embed)
     }
-};
+}
