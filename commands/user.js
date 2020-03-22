@@ -66,7 +66,7 @@ module.exports = {
             let spotify = ""
             
             for (activity of member.presence.activities) {
-                if (activity.name.toLowerCase() == "custom status") {
+                if (activity.name.toLowerCase() == "custom status" && activity.state != undefined) {
                     if (hasStatus) return
 
                     status = "**custom status** " + activity.state
@@ -96,8 +96,9 @@ module.exports = {
             if (hasGame) {
                 status1 = status1 + game
             }
-
-            embed.addField("status", status1)
+            if (hasStatus || hasSpotify || hasGame) {
+                embed.addField("status", status1)
+            }
         }
 
         message.channel.send(embed).catch(() => {

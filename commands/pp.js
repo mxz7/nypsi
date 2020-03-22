@@ -34,7 +34,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 3000);
 
-        const size = Math.floor(Math.random() * 20)
+        let size = Math.floor(Math.random() * 20)
         let sizeMsg = "8"
 
         for (let i = 0; i < size; i++) {

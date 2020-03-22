@@ -28,12 +28,6 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
-        cooldown.set(message.member.id, new Date());
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 60000);
-
         if (!userExists(message.member)) createUser(message.member)
         if (args.length == 0) {
             if (hasPadlock(message.member)) {
@@ -65,6 +59,12 @@ module.exports = {
         }
 
         if (args[0].toString().toLowerCase() == "buy") {
+
+            cooldown.set(message.member.id, new Date());
+
+            setTimeout(() => {
+                cooldown.delete(message.member.id);
+            }, 60000);
 
             if (hasPadlock(message.member)) {
                 const embed = new RichEmbed()
