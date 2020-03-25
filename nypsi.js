@@ -12,6 +12,7 @@ const { getUserCount } = require("./utils.js")
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const cooldown = new Set()
+const snipe = new Map()
 let cmdCount = 0
 let ready = false
 
@@ -100,6 +101,12 @@ client.on("rateLimit", () => {
     console.log("\x1b[31m[" + getTimeStamp() + "] BEING RATE LIMITED!!\x1b[37m")
 })
 
+client.on("messageDelete", message => {
+
+    snipe.set(message.guild.id, message)
+
+    exports.snipe = snipe
+})
 
 client.on("message", message => {
 
@@ -463,6 +470,7 @@ function helpCmd(message, args) {
 exports.cmdCount = cmdCount
 exports.commandsSize = commands.size
 exports.aliasesSize = aliases.size
+exports.snipe
 
 client.login(token).then(() => {
     setTimeout(() => {

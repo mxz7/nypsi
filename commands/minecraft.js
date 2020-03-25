@@ -40,7 +40,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 2000);
 
         const username = args[0]
 
@@ -79,7 +79,7 @@ module.exports = {
         
                     const year = date.getFullYear()
                     const month = months[date.getMonth()]
-                    const day = date.getDay() + 1
+                    const day = date.getDate()
         
                     const timestamp = month + " " + day + " " + year
         
