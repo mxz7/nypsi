@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { wholesomeImg } = require("../utils.js");
 const { wholesome } = require("../lists.json")
 
@@ -48,13 +48,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("<3")
             .setImage(wholesome[Math.floor(Math.random() * wholesome.length)])
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

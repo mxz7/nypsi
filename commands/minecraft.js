@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const fetch = require("node-fetch");
 
 var cooldown = new Map()
@@ -42,22 +42,17 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 2000);
 
-        const username = args[0]
+        let username = args[0]
 
-        const uuidURL = "https://api.mojang.com/users/profiles/minecraft/" + username
-        let uuid
+        const url = `https://mc-heads.net/minecraft/profile/${username}`
 
-        try {
-            uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
-        } catch (e) {
-            return message.channel.send("❌\ninvalid account");
-        }
+        const res = await fetch(url).then(url => url.json())
 
-        const skin = "https://visage.surgeplay.com/face/" + uuid.id
+        const uuid = res.id
+        username = res.name
+        const nameHistory = res.name_history
 
-        const nameHistoryURL = "https://api.mojang.com/user/profiles/" + uuid.id +"/names"
-
-        const nameHistory = await fetch(nameHistoryURL).then(nameHistoryURL => nameHistoryURL.json())
+        const skin = `https://mc-heads.net/avatar/${uuid}/64`
 
         const names = []
 
@@ -92,7 +87,6 @@ module.exports = {
             if (e != BreakException) throw e
         }
         
-
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -101,15 +95,14 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
-            .setTitle(uuid.name)
+        const embed = new MessageEmbed()
+            .setTitle(username)
             .setURL("https://namemc.com/profile/" + username)
-            .setDescription(`[skin](https://crafatar.com/skins/${uuid.id})`)
+            .setDescription(`[skin](https://mc-heads.net/download/${uuid})`)
             .setColor(color)
             .setThumbnail(skin)
             .addField("previous names", names)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

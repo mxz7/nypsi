@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti } = require("../utils.js")
 const shuffle = require("shuffle-array")
 
@@ -102,7 +102,7 @@ module.exports = {
         setTimeout(() => {
             if (games.has(message.member.user.id) && games.get(message.member.user.id).id == id) {
                 games.delete(message.member.user.id)
-                return message.channel.send(message.member + " blackjack expired")
+                return message.channel.send("<@" + message.member + ">" + " blackjack expired")
             }
         }, 120000)
 
@@ -119,20 +119,16 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("blackjack")
-            .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
+            .setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString())
             .setColor(color)
             .addField("dealer", games.get(message.member.user.id).dealerCards[0])
             .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             .addField("help", ":one: hit | :two: stand")
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).then(m => {
-            if (calcTotal(message.member) == 21) {
-                return playGame(message, m)
-            }
             m.react("1️⃣").then(() => {
                 m.react("2️⃣").then(() => {
                     playGame(message, m)
@@ -316,16 +312,15 @@ async function playGame(message, m) {
         color = message.member.displayHexColor;
     }
 
-    const newEmbed = new RichEmbed()
+    const newEmbed = new MessageEmbed()
         .setTitle("blackjack")
         .setColor(color)
-        .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
-        .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-        .setTimestamp();
+        .setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString())
+        .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
     const lose = async () => {
         newEmbed.setColor("#FF0000")
-        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
+        newEmbed.setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         games.delete(message.member.user.id)
@@ -334,7 +329,7 @@ async function playGame(message, m) {
 
     const win = async () => {
         newEmbed.setColor("#31E862")
-        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
+        newEmbed.setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + (bet * 2))
@@ -346,7 +341,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+        newEmbed.setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + bet)
@@ -366,7 +361,7 @@ async function playGame(message, m) {
         return win()
     } else {
         if (!first) {
-            await m.reactions.get("1️⃣").remove(message.member.user.id)
+            await m.reactions.cache.get("1️⃣").users.remove(message.member)
         }
 
         games.set(message.member.user.id, {
@@ -392,7 +387,7 @@ async function playGame(message, m) {
         if (reaction == "1️⃣") {
             newCard(message.member)
 
-            if (calcTotalDealer(message.member) == 21 || calcTotal(message.member) > 21) {
+            if (calcTotal(message.member) > 21) {
                 return lose()
             } else if (calcTotal(message.member) == 21) {
                 return win()
@@ -406,14 +401,13 @@ async function playGame(message, m) {
             return playGame(message, m)
 
         } else if (reaction == "2️⃣") {
-            const newEmbed1 = new RichEmbed()
+            const newEmbed1 = new MessageEmbed()
                 .setTitle("blackjack")
                 .setColor(color)
-                .setDescription(message.member + "\n\n**bet** $" + bet.toLocaleString())
+                .setDescription("<@" + message.member + ">" + "\n\n**bet** $" + bet.toLocaleString())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             m.edit(newEmbed1)
 
             games.set(message.member.user.id, {

@@ -1,5 +1,5 @@
 const urban = require("relevant-urban")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()
 
@@ -52,7 +52,7 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(result.word)
             .setDescription(result.definition + "\n\n" + result.example)
             .setColor(color)
@@ -60,8 +60,7 @@ module.exports = {
             .addField("👍", result.thumbsUp.toLocaleString(), true)
             .addField("👎", result.thumbsDown.toLocaleString(), true)
             .setURL(result.urbanURL)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed)
     }

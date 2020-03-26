@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 
 module.exports = {
     name: "github",
@@ -19,15 +19,14 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("github")
             .setURL("https://github.com/tekohxd/nypsi")
             .setDescription(message.member + "\nthis bot is opensource and you can view/use the code for completely free\n" +
             "click the [here](https://github.com/tekohxd/nypsi) to view the source code on github")
             
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
 
         message.channel.send(embed).catch(() => {

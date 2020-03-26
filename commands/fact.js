@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { facts } = require("../lists.json");
 
 var cooldown = new Map();
@@ -45,13 +45,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("fact")
             .setDescription(fact)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

@@ -1,5 +1,5 @@
 const { topAmount } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 var cooldown = new Map()
 
@@ -64,13 +64,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
           
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("richest people in this server")
             .setColor(color)
             .addField("top " + filtered.length, filtered)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

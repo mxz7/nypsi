@@ -1,6 +1,6 @@
 const { workMessages } = require("../lists.json")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 var cooldown = new Map()
 
@@ -58,13 +58,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("work")
             .setDescription(work)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")

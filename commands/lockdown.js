@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const Discord = require("discord.js")
 
 const cooldown = new Map()
@@ -51,44 +51,44 @@ module.exports = {
 
         let locked = false
 
-        const a = message.channel.permissionOverwrites.get(message.guild.defaultRole.id)
+        const role = message.guild.roles.cache.find(role => role.name == "@everyone")
+
+        const a = message.channel.permissionOverwrites.get(role.id)
 
         if (!a) {
             locked = false
-        } else if (!a.denied) {
+        } else if (!a.deny) {
             locked = false
-        } else if (!a.denied.bitfield) {
+        } else if (!a.deny.bitfield) {
             locked = false
         } else {
-            const b = new Discord.Permissions(a.denied.bitfield).toArray()
+            const b = new Discord.Permissions(a.deny.bitfield).toArray()
             if (b.includes("SEND_MESSAGES")) {
                 locked = true
             }
         }
         
         if (!locked) {
-            await message.channel.overwritePermissions(message.guild.defaultRole, {
+            await message.channel.updateOverwrite(role, {
                 SEND_MESSAGES: false
             })
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("lockdown")
                 .setColor(color)
                 .setDescription("✅ lockdown enabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
             return message.channel.send(embed)
         } else {
-            await message.channel.overwritePermissions(message.guild.defaultRole, {
+            await message.channel.updateOverwrite(role, {
                 SEND_MESSAGES: null
             })
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("lockdown")
                 .setColor(color)
                 .setDescription("✅ lockdown disabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
             return message.channel.send(embed)
         }

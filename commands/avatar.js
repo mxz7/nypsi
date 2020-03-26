@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { getMember } = require("../utils");
 
 module.exports = {
@@ -28,11 +28,7 @@ module.exports = {
             return message.channel.send("❌ \ninvalid user");
         }
 
-        let avatar = member.user.avatarURL
-
-        if (avatar.includes("gif") && !avatar.includes("size")) {
-            avatar = avatar + "?size=256"
-        }
+        let avatar = member.user.avatarURL({ format: "png", dynamic: true, size: 256 })
 
         let color;
 
@@ -42,13 +38,12 @@ module.exports = {
             color = member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(member.user.tag)
             .setColor(color)
             .setImage(avatar)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

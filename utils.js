@@ -250,7 +250,7 @@ module.exports = {
 
     getMember: function(message, memberName) {
         if (!message.guild) return null
-        let target = message.guild.members.find(member => {
+        let target = message.guild.members.cache.find(member => {
             if (member.user.tag.slice(0, -5).toLowerCase() == memberName.toLowerCase()) {
                 return member;
             }
@@ -391,7 +391,7 @@ module.exports = {
 };
 
 function getMemberID(guild, id) {
-    let target = guild.members.find(member => {
+    let target = guild.members.cache.find(member => {
         return member.user.id == id
     })
 

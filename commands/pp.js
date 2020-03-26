@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { getMember } = require("../utils")
 
 var cooldown = new Map()
@@ -51,13 +51,12 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 1337")
                 .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -72,26 +71,24 @@ module.exports = {
             }
 
             if (!member) {
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription(message.member + "\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription("<@" + message.member + ">\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
                 return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
                 });
             }
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription(member + "\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription("<@" + member + ">\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
             message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

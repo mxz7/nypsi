@@ -1,5 +1,5 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()
 
@@ -31,12 +31,11 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
         if (args.length == 0) {
             if (hasPadlock(message.member)) {
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("padlock")
-                    .setDescription(message.member + "\n\n**protected**\nyou currently have a padlock")
+                    .setDescription("<@" + message.member + ">" + "\n\n**protected**\nyou currently have a padlock")
                     .setColor("#31E862")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() =>{
                     return message.channel.send("**protected**\nyou currently have a padlock")
@@ -45,13 +44,11 @@ module.exports = {
                 if (getBalance(message.member) < 1000000) {
                     return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
                 }
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("padlock")
-                    .setDescription(message.member + "\n\n**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    .setDescription("<@" + message.member + ">" + "\n\n**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                     .setColor("#FF0000")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
-
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed).catch(() => {
                     return message.channel.send("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                 })
@@ -67,12 +64,11 @@ module.exports = {
             }, 60000);
 
             if (hasPadlock(message.member)) {
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("padlock")
-                    .setDescription(message.member + "\n\n**protected**\nyou currently have a padlock")
+                    .setDescription("<@" + message.member + ">" + "\n\n**protected**\nyou currently have a padlock")
                     .setColor("#31E862")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() => {
                     return message.channel.send("**protected** 🔒\nyou currently have a padlock")
@@ -89,12 +85,11 @@ module.exports = {
 
         } else {
             if (hasPadlock(message.member)) {
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("padlock")
-                    .setDescription(message.member + "\n\n**protected**\nyou currently have a padlock")
+                    .setDescription("<@" + message.member + ">" + "\n\n**protected**\nyou currently have a padlock")
                     .setColor("#31E862")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() => {
                     return message.channel.send("**protected** 🔒\nyou currently have a padlock")
@@ -103,12 +98,11 @@ module.exports = {
                 if (getBalance(message.member) < 1000000) {
                     return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
                 }
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("padlock")
-                    .setDescription(message.member + "\n\n**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    .setDescription("<@" + message.member + ">" + "\n\n**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                     .setColor("#FF0000")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() => {
                     return message.channel.send("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")

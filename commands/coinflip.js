@@ -1,5 +1,5 @@
 const { getBalance, createUser, updateBalance, userExists, getMember, formatBet, getVoteMulti } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
 
@@ -75,7 +75,7 @@ module.exports = {
                     }
             
             
-                    let embed = new RichEmbed()
+                    let embed = new MessageEmbed()
                         .setColor(color)
                         .setTitle("coinflip")
                         .setDescription("*throwing..* " + "\n\n" + 
@@ -83,8 +83,7 @@ module.exports = {
                             "**" + message.member.user.tag + "** " + choice2 + "\n\n" +
                             "**bet** $" + bet.toLocaleString())
             
-                        .setFooter(challenger.user.tag + " | bot.tekoh.wtf", challenger.user.avatarURL)
-                        .setTimestamp();
+                        .setFooter(challenger.user.tag + " | bot.tekoh.wtf")
                     
                     message.channel.send(embed).then(m => {
             
@@ -296,15 +295,14 @@ module.exports = {
         }
 
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("coinflip")
             .setDescription("*throwing..*" + "\n\n" + 
                 "**side** " + args[0].toLowerCase() + "\n" +
                 "**bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
 

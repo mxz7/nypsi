@@ -1,5 +1,5 @@
 const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
 var cooldown = new Map()
@@ -45,12 +45,11 @@ module.exports = {
                 color = message.member.displayHexColor;
             }
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("win board")
                 .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.5**x win")
                 .setColor(color)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -191,13 +190,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("slots")
             .setDescription(one + " | " + two + " | " + three + "\n\n**bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

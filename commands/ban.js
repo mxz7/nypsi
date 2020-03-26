@@ -1,4 +1,6 @@
-/*jshint esversion: 8 */
+const { MessageEmbed } = require("discord.js")
+
+
 module.exports = {
     name: "ban",
     description: "generic ban command",
@@ -14,29 +16,55 @@ module.exports = {
         }
 
         if (message.mentions.members.first() == null) {
-            message.channel.send("❌\n$ban @user (reason)");
+            message.channel.send("❌\n$ban <@user(s)> (reason)");
             return;
         }
-        let member = message.mentions.members.first();
 
-        let reason;
+        const members = message.mentions.members
+        let reason = message.member.user.tag + " | | "
 
-        if (args.length == 1) {
-            reason = "no reason provided";
+        if (args.length != members.size) {
+            for (let i = 0; i < members.size; i++) {
+                args.shift()
+            }
+            reason = reason + args.join(" ")
         } else {
-            args.shift();
-            reason = args.join(" ");
+            reason = reason + "no reason specified"
         }
 
-        let banned = member.user.tag;
+        let count = 0
+        let failed = []
 
-        member.ban({
-            reason: ("moderator: " + message.member.user.tag + " | | | reason: " + reason)
-        }).then(() => {
-            message.channel.send("👋\n**" + banned + "was banned for** *" + reason + "*");
-        }).catch(() => {
-            message.channel.send("❌ \ni'm unable to ban this user");
-        });
+        for (member of members.keyArray()) {
+            await message.guild.members.ban(member, {
+                days: 1,
+                reason: reason
+            }).then(() => {
+                count++
+            }).catch(() => {
+                failed.push(members.get(member).user.tag)
+            })
+        }
+
+        let color;
+
+        if (message.member.displayHexColor == "#000000") {
+            color = "#FC4040";
+        } else {
+            color = message.member.displayHexColor;
+        }
+
+        const embed = new MessageEmbed()
+            .setTitle("channel")
+            .setDescription("✅ **" + count + "** member(s) banned for: " + reason.split("| | ")[1])
+            .setColor(color)
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+
+        if (failed.length != 0) {
+            embed.addField("error", "unable to ban: " + failed.join(", "))
+        }
+        
+        return message.channel.send(embed)
 
     }
 };

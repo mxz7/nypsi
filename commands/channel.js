@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()
 
@@ -55,16 +55,15 @@ module.exports = {
             let channels = ""
 
             for (arg of args) {
-                const newChannel = await message.guild.createChannel(arg)
-                channels = channels + newChannel + " ✅\n"
+                const newChannel = await message.guild.channels.create(arg)
+                channels = channels + "**" + newChannel.name + "** ✅\n"
             }
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                     .setTitle("channel")
                     .setDescription(channels)
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             return message.channel.send(embed)
         }
 
@@ -82,12 +81,11 @@ module.exports = {
                 await channel.delete()
             })
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("channel")
                 .setDescription("✅ **" + count + "** channels deleted")
                 .setColor(color)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             return message.channel.send(embed)
         }
 
@@ -106,17 +104,16 @@ module.exports = {
 
             const name = args.join("-")
 
-            channel.edit({name: name}).then(() => {
-                const embed = new RichEmbed()
-                    .setTitle("channel")
-                    .setDescription(channel + "\n\n✅ channel renamed to " + name)
-                    .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
-                return message.channel.send(embed)
+            await channel.edit({name: name}).then(() => {
             }).catch(() => {
                 return message.channel.send("❌\nthere was an error. possibly invalid characters")
             })
+            const embed = new MessageEmbed()
+                .setTitle("channel")
+                .setDescription("✅ channel renamed to " + name)
+                .setColor(color)
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            return message.channel.send(embed)
         }
 
         if (args[0] == "nsfw") {
@@ -132,21 +129,19 @@ module.exports = {
 
             if (!channel.nsfw) {
                 await channel.edit({nsfw: true})
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("channel")
                     .setDescription(channel + "\n\n✅ channel is now nsfw")
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed)
             } else {
                 await channel.edit({nsfw: false})
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setTitle("channel")
                     .setDescription(channel + "\n\n✅ channel is no longer nsfw")
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                    .setTimestamp();
+                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed)
             }
         }

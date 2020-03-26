@@ -1,5 +1,5 @@
 const snekfetch = require("snekfetch")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
 
 const cooldown = new Map()
@@ -67,14 +67,13 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setAuthor("u/" + author + " | r/birb")
             .setTitle(title)
             .setURL(url)
             .setColor(color)
             .setImage(image)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
