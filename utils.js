@@ -7,7 +7,6 @@ const fetch = require("node-fetch")
 const { topgg } = require("./config.json")
 const DBL = require("dblapi.js")
 const dbl = new DBL(topgg)
-const snekfetch = require("snekfetch")
 
 const pornCache = new Map()
 const bdsmCache = new Map()
@@ -77,9 +76,9 @@ setInterval(() => {
 setTimeout( async () => {
     //BDSM CACHE
     for (link of bdsmLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             bdsmCache.set(link, allowed)
         } else {
@@ -90,9 +89,9 @@ setTimeout( async () => {
 
     //THIGHS CACHE
     for (link of thighsLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             thighsCache.set(link, allowed)
         } else {
@@ -103,9 +102,9 @@ setTimeout( async () => {
 
     //PORN CACHE
     for (link of pornLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             pornCache.set(link, allowed)
         } else {
@@ -120,10 +119,9 @@ setInterval( async () => {
 
     //BDSM CACHE
     for (link of bdsmLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
-    
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             bdsmCache.set(link, allowed)
         } else {
@@ -134,9 +132,9 @@ setInterval( async () => {
 
     //THIGHS CACHE
     for (link of thighsLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             thighsCache.set(link, allowed)
         } else {
@@ -147,9 +145,9 @@ setInterval( async () => {
 
     //PORN CACHE
     for (link of pornLinks) {
-        const { body } = await snekfetch.get(link)
+        const res = await fetch(link).then(a => a.json())
         
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
             pornCache.set(link, allowed)
         } else {

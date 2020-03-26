@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
-const snekfetch = require("snekfetch")
+const fetch = require("node-fetch")
 
 var cooldown = new Map()
 
@@ -41,9 +41,9 @@ module.exports = {
         let allowed
 
         try {
-            const { body } = await snekfetch.get("https://www.reddit.com/r/" + args[0] + ".json")
+            const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json").then(a => a.json())
 
-            allowed = body.data.children.filter(post => !post.data.is_self)
+            allowed = res.data.children.filter(post => !post.data.is_self)
 
         } catch (e) {
             return message.channel.send("❌\n invalid subreddit")
