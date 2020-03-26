@@ -53,7 +53,7 @@ module.exports = {
 
         await message.delete()
 
-        const collected = await message.channel.fetchMessages({limit: amount})
+        const collected = await message.channel.messages.fetch({limit: amount})
 
         const collecteda = collected.filter(msg => msg.member.user.id == target.user.id)
 
@@ -61,5 +61,5 @@ module.exports = {
             await msg.delete()
         }
 
-        message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete(5000))    }
+        message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete({timeout: 5000}))    }
 }

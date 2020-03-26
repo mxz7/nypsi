@@ -1,5 +1,5 @@
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
 const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
@@ -132,13 +132,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("roulette wheel")
             .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
 

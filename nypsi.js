@@ -69,13 +69,13 @@ client.once("ready", async () => {
         client.user.setPresence({
             status: "dnd",
             game: {
-                name: "tekoh.wtf | $help | " + client.guilds.size,
+                name: "tekoh.wtf | $help | " + client.guilds.cache.size,
                 type: "PLAYING"
             }
         })
     }, 600000)
 
-    console.log("\nserver count: " + client.guilds.size)
+    console.log("\nserver count: " + client.guilds.cache.size)
     console.log("commands count: " + commands.size)
     console.log("users in memory: " + getUserCount())
     console.log("\n- - -\n");

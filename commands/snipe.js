@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 
 module.exports = {
     name: "snipe",
@@ -11,6 +11,14 @@ module.exports = {
             return message.channel.send("❌\nnothing to snipe")
         }
 
+        let content = snipe.get(message.guild.id).content
+
+        if (snipe.get(message.guild.id).content == "") {
+            if (snipe.get(message.guild.id).attachments.url) {
+                content = snipe.get(message.guild.id).attachments.url
+            }
+        }
+
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -19,13 +27,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle(snipe.get(message.guild.id).member.user.tag)
-            .setDescription(snipe.get(message.guild.id).content)
+            .setDescription(content)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed)
 

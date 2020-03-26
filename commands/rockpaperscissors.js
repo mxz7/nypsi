@@ -1,5 +1,5 @@
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
 var cooldown = new Map()
@@ -119,12 +119,11 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("rock paper scissors")
             .setDescription("*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
     
         message.channel.send(embed).then(m => {
 

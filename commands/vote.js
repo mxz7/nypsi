@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { getVoteMulti } = require("../utils.js")
 
 const cooldown = new Map()
@@ -36,11 +36,10 @@ module.exports = {
 
         const voted = await getVoteMulti(message.member) > 0
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
         embed.setURL("https://top.gg/bot/678711738845102087/vote")
         embed.setDescription("https://top.gg/bot/678711738845102087/vote")
-        embed.setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-        embed.setTimestamp();
+        embed.setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         if (voted) {
             embed.setTitle("vote ✅")

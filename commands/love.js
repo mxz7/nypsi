@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { getMember, getMention } = require("../utils.js");
 
 var cooldown = new Map();
@@ -140,7 +140,7 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("❤ " + target1.displayName + " ❤ " + target2.displayName + " ❤")
             .setDescription(target1 + " x " + target2)
@@ -150,8 +150,7 @@ module.exports = {
             loveBar + "\n\n" +
             "**" + loveLevel + "** " + loveEmoji)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 
 var cooldown = new Map();
 
@@ -56,12 +56,11 @@ module.exports = {
 
         const description = args.join(" ").split("|")[1]
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(title)
             .setDescription(description)
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         
         message.channel.send(embed).then(() => {

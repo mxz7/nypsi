@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
 const { thighsCache } = require("../utils.js")
 
@@ -73,14 +73,13 @@ module.exports = {
 
         const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(title)
             .setAuthor("u/" + author + " | r/" + subreddit)
             .setURL(url)
             .setImage(image)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")

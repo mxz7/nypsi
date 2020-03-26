@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { getBalance, createUser, userExists, updateBalance, getMember } = require("../utils.js")
 
 module.exports = {
@@ -48,13 +48,12 @@ module.exports = {
 
             if (!userExists(target)) createUser(target)
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle(target.user.tag)
                 .setDescription("**balance** $" + getBalance(target).toLocaleString())
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -70,13 +69,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(message.member.user.tag)
             .setDescription("**balance** $" + getBalance(message.member).toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

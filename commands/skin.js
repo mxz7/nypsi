@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const fetch = require("node-fetch")
 
 const cooldown = new Map()
@@ -54,7 +54,6 @@ module.exports = {
         }
 
         const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
-        const skinDL = "https://crafatar.com/skins/" + uuid.id
 
         let color;
 
@@ -64,14 +63,13 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
             .setURL("https://namemc.com/profile/" + username)
             .setTitle(uuid.name)
-            .setDescription(`[download](${skinDL})`)
+            .setDescription(`[download](https://mc-heads.net/download/${uuid})`)
             .setImage(skinIMG)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

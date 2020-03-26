@@ -1,5 +1,5 @@
 const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock, setPadlock } = require("../utils.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
 var cooldown = new Map();
@@ -95,13 +95,12 @@ module.exports = {
                 })
             }
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("robbery")
-            .setDescription("robbing " + target.user + "..")
+            .setDescription("robbing " + "<@" + target.user + ">" + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
             message.channel.send(embed).then(m => {
 
@@ -163,13 +162,12 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("robbery")
-            .setDescription("robbing " + target.user + "..")
+            .setDescription("robbing " + "<@" + target.user + ">" + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

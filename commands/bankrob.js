@@ -1,6 +1,6 @@
 const { getBalance, createUser, updateBalance, userExists } = require("../utils.js")
 const Discord = require("discord.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
 var cooldown = new Map()
@@ -40,12 +40,11 @@ module.exports = {
                 color = message.member.displayHexColor;
             }
 
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("current bank balances")
                 .setColor(color)
                 .setDescription(bankList)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             
             
             return message.channel.send(embed).catch(() => {
@@ -117,13 +116,12 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        let embed = new RichEmbed()
+        let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("bank robbery")
             .setDescription("robbing " + bank + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

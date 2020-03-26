@@ -1,5 +1,5 @@
 const { cmdCount } = require("../nypsi.js")
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { getUserCount } = require("../utils.js")
 
 const cooldown = new Map()
@@ -45,16 +45,15 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("stats")
             .setColor(color)
-            .setDescription("**server count** " + message.client.guilds.size.toLocaleString() + "\n" + 
+            .setDescription("**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" + 
                 "**users in memory** " + getUserCount() + "\n" +
                 "**total commands** " + commandsSize + "\n" +
                 "**command aliases** " + aliasesSize + "\n" +
                 "**commands used since restart** " + cmdCount.toLocaleString())
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌\n i may be lacking permission: 'EMBED_LINKS'")

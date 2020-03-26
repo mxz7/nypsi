@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { stripIndents } = require("common-tags");
 const { getMember, formatDate } = require("../utils.js");
 
@@ -41,8 +41,8 @@ module.exports = {
             color = member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
-            .setThumbnail(member.user.avatarURL)
+        const embed = new MessageEmbed()
+            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 256 }))
             .setColor(color)
             .setTitle(member.user.tag)
             .setDescription(member.user)
@@ -54,8 +54,7 @@ module.exports = {
             **joined** ${joined.toString().toLowerCase()}
             **roles** ${member._roles.length}`)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         if (member.presence.activities.length > 0) {
             let hasStatus = false

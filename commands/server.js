@@ -1,5 +1,5 @@
 /*jshint esversion: 8 */
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { stripIndents } = require("common-tags");
 const { formatDate } = require("../utils.js");
 
@@ -17,6 +17,8 @@ module.exports = {
 
         const created = formatDate(server.createdAt).toLowerCase();
 
+        const onlineCount = server.members.cache.filter(member => member.presence.status != "offline").size
+
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -25,8 +27,8 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
-            .setThumbnail(server.iconURL)
+        const embed = new MessageEmbed()
+            .setThumbnail(server.iconURL())
             .setColor(color)
             .setTitle(server.name)
             
@@ -34,12 +36,12 @@ module.exports = {
             **id** ${server.id}
             **created** ${created}
             **region** ${server.region}
-            **channels** ${server.channels.size}
-            **roles** ${server.roles.size}
-            **members** ${server.memberCount}`)
+            **channels** ${server.channels.cache.size}
+            **roles** ${server.roles.cache.size}
+            **members** ${server.memberCount}
+            **online members** ${onlineCount}`)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
              return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

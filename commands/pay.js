@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const { updateBalance, getBalance, userExists, createUser, getMember, formatBet } = require("../utils.js")
 
 const tax = 0.15
@@ -102,32 +102,30 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("processing..")
             .setColor(color)
             
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
             .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         if (taxEnabled) {
-            embed.setDescription(message.member + " -> " + target + "\n**" + (tax * 100) + "**% tax")
+            embed.setDescription("<@" + message.member + ">" + " -> " + "<@" + target + ">" + "\n**" + (tax * 100) + "**% tax")
         } else {
-            embed.setDescription(message.member + " -> " + target)
+            embed.setDescription("<@" + message.member + ">" + " -> " + "<@" + target + ">")
         }
 
         message.channel.send(embed).then(m => {
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle("transaction success")
                 .setColor("#31E862")
-                .setDescription(message.member + " -> " + target)
+                .setDescription("<@" + message.member + ">" + " -> " + "<@" + target + ">")
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
                 .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-                .setTimestamp();
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             
             setTimeout(() =>{
                 m.edit(embed)
