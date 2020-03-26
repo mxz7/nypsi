@@ -131,7 +131,7 @@ module.exports = {
                 await channel.edit({nsfw: true})
                 const embed = new MessageEmbed()
                     .setTitle("channel")
-                    .setDescription(channel + "\n\n✅ channel is now nsfw")
+                    .setDescription(channel.name + "\n\n✅ channel is now nsfw")
                     .setColor(color)
                     .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed)

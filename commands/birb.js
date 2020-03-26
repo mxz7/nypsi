@@ -1,6 +1,6 @@
-const snekfetch = require("snekfetch")
 const { MessageEmbed } = require("discord.js")
 const { redditImage } = require("../utils.js")
+const fetch = require("node-fetch")
 
 const cooldown = new Map()
 
@@ -40,9 +40,9 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const { body } = await snekfetch.get("https://www.reddit.com/r/birb.json?sort=top&t=day")
-        
-        const allowed = body.data.children.filter(post => !post.data.is_self)
+        const res = await fetch("https://www.reddit.com/r/birb.json?sort=top&t=day").then(a => a.json())
+
+        const allowed = res.data.children.filter(post => !post.data.is_self)
         
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
