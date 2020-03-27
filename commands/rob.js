@@ -96,11 +96,11 @@ module.exports = {
             }
 
             const embed = new MessageEmbed()
-            .setColor(color)
-            .setTitle("robbery")
-            .setDescription("robbing " + "<@" + target.user + ">" + "..")
+                .setColor(color)
+                .setTitle("robbery")
+                .setDescription("robbing " + "*" + target.user.tag + "*" + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
             message.channel.send(embed).then(m => {
 
@@ -165,7 +165,7 @@ module.exports = {
         let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("robbery")
-            .setDescription("robbing " + "<@" + target.user + ">" + "..")
+            .setDescription("robbing " + "*" + target.user.tag + "*" + "..")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         

@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
-const { getMember, getMention } = require("../utils.js");
+const { getMember } = require("../utils.js");
 
 var cooldown = new Map();
 
@@ -34,7 +34,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌\n$love <user> (user)");
         }
 
         let target1;
@@ -51,22 +51,34 @@ module.exports = {
         }
 
         if (args.length == 2) {
-            if (!message.mentions.members.first()) {
-                target1 = getMember(message, args[0]);
-            } else {
-                target1 = message.mentions.members.first();
-            }
+            if (message.mentions.members.size == 2) {
+                target1 = message.mentions.members.first()
+                
+                target2 = message.mentions.members.get(message.mentions.members.keyArray()[1])
+            } else if (message.mentions.members.size == 1) {
+                if (args[0].startsWith("<@")) {
+                    target1 = message.mentions.members.first()
 
-            if (getMember(message, args[1])) {
-                target2 = getMember(message, args[1]);
-            } else {
-                target2 = getMention(message, args[1]);
-            }
+                    target2 = getMember(message, args[1])
+                } else {
+                    target2 = message.mentions.members.first()
 
+                    target1 = getMember(message, args[0])
+                }
+            } else if (message.mentions.members.size == 0) {
+                target1 = getMember(args[0])
+                target2 = getMember(args[1])
+            } else {
+                return message.channel.send("❌\n$love <user> (user)");
+            }
         }
-
+        
         if (!target1 || !target2) {
             return message.channel.send("❌\ninvalid account");
+        }
+
+        if (target1 == target2) {
+            return message.channel.send("❌\nlol loner");
         }
 
         cooldown.set(message.member.id, new Date());
@@ -143,7 +155,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("❤ " + target1.displayName + " ❤ " + target2.displayName + " ❤")
-            .setDescription(target1 + " x " + target2)
+            .setDescription(target1.user.username + " **x** " + target2.user.username)
 
             .addField("love level", 
             "**" + lovePercent + "**%\n" +

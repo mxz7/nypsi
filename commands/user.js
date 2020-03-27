@@ -30,8 +30,13 @@ module.exports = {
         }
         
         const joined = formatDate(member.joinedAt);
-
         const created = formatDate(member.user.createdAt);
+
+        let username = member.user.tag
+
+        if (username.includes("*")) {
+            username = "`" + member.user.tag + "`"
+        }
 
         let color;
 
@@ -42,12 +47,12 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 256 }))
+            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
             .setColor(color)
             .setTitle(member.user.tag)
             .setDescription(member.user)
             
-            .addField(member.displayName, stripIndents `**username** ${member.user.tag}
+            .addField(member.displayName, stripIndents `**username** ${username}
             **id** ${member.user.id}
             **status** ${member.presence.status}\n
             **created** ${created.toString().toLowerCase()}

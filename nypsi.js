@@ -1,6 +1,5 @@
-/*jshint esversion: 6 */
 const Discord = require("discord.js");
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const fs = require("fs");
@@ -57,20 +56,22 @@ aliases.set("ch", "channel")
 console.log("\n -- commands -- ");
 
 client.once("ready", async () => {
-    client.user.setPresence({
-        status: "dnd",
-        game: {
-            name: "tekoh.wtf | $help | " + client.guilds.size,
-            type: "PLAYING"
-        }
-    });
+    
+
+    setTimeout(() => {
+        client.user.setPresence({
+            status: "dnd",
+            activity: {
+                name: "tekoh.wtf | $help | " + client.guilds.cache.size
+            }
+        });
+    }, 5000)
 
     setInterval(() => {
         client.user.setPresence({
             status: "dnd",
-            game: {
-                name: "tekoh.wtf | $help | " + client.guilds.cache.size,
-                type: "PLAYING"
+            activity: {
+                name: "tekoh.wtf | $help | " + client.guilds.cache.size
             }
         })
     }, 600000)
@@ -120,6 +121,11 @@ client.on("message", message => {
 
     if (banned.includes(message.member.user.id)) {
         message.delete().catch();
+        cooldown.add(message.member.user.id)
+
+        setTimeout(() => {
+            cooldown.delete(message.member.user.id)
+        }, 10000)
         return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
     }
 
@@ -245,7 +251,7 @@ function helpCmd(message, args) {
 
     if (args.length == 0 && args[0] != "fun" && args[0] != "info" && args[0] != "money" && args[0] != "mod" && args[0] != aliases) {
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
@@ -256,8 +262,7 @@ function helpCmd(message, args) {
             .addField("nsfw", "$**help** nsfw")
             .addField("aliases", "$**help** aliases")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -282,14 +287,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("fun commands", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -314,14 +318,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("info commands", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf");
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -346,14 +349,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("money commands", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -378,14 +380,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("mod commands", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -409,14 +410,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + cmd + "** -> $**" + aliases.get(cmd) + "**\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("aliases", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -441,14 +441,13 @@ function helpCmd(message, args) {
             cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
         }
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("help")
             .setColor(color)
         
             .addField("nsfw commands", cmdList)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf", message.member.user.avatarURL)
-            .setTimestamp();
+            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
         if (!list.includes(message.member.user.id)) {
             return message.member.send(embed).then( () => {
@@ -475,5 +474,5 @@ exports.snipe
 client.login(token).then(() => {
     setTimeout(() => {
         ready = true
-    }, 500)
+    }, 2000)
 })

@@ -64,10 +64,10 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setColor(color)
-            .setURL("https://namemc.com/profile/" + username)
             .setTitle(uuid.name)
-            .setDescription(`[download](https://mc-heads.net/download/${uuid})`)
+            .setURL("https://namemc.com/profile/" + username)
+            .setDescription(`[download](https://mc-heads.net/download/${uuid.id})`)
+            .setColor(color)
             .setImage(skinIMG)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         

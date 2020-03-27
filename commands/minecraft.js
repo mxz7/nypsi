@@ -45,8 +45,14 @@ module.exports = {
         let username = args[0]
 
         const url = `https://mc-heads.net/minecraft/profile/${username}`
+        let invalid = false
 
-        const res = await fetch(url).then(url => url.json())
+        const res = await fetch(url).then(url => url.json()).catch(() => {
+            invalid = true
+            return message.channel.send("❌\ninvalid account")
+        })
+        
+        if (invalid) return
 
         const uuid = res.id
         username = res.name

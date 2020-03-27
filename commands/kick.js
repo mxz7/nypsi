@@ -52,7 +52,7 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setTitle("channel")
+            .setTitle("kick")
             .setDescription("✅ **" + count + "** member(s) kicked for: " + reason.split("| | ")[1])
             .setColor(color)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
