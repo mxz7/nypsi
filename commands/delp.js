@@ -25,7 +25,7 @@ module.exports = {
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌\n$delp <amount>");
+            return message.channel.send("❌\n$delp <amount> (@user)");
         }
 
         let amount = parseInt(args[0])

@@ -1,18 +1,33 @@
-const fetch = require("node-fetch")
 const { MessageEmbed } = require("discord.js")
-const { redditImage } = require("../utils.js")
+
+const answers = [" As I see it, yes.",
+    "Ask again later.",
+    "Better not tell you now.",
+    "Cannot predict now.",
+    "Concentrate and ask again.",
+    "Don’t count on it.",
+    "It is certain.",
+    "It is decidedly so.",
+    "Most likely.",
+    "My reply is no.",
+    "My sources say no.",
+    "Outlook not so good.",
+    "Outlook good.",
+    "Reply hazy, try again.",
+    "Signs point to yes.",
+    "Very doubtful.",
+    "Without a doubt.",
+    "Yes.",
+    "Yes – definitely.",
+    "You may rely on it."]
 
 const cooldown = new Map()
 
 module.exports = {
-    name: "snek",
-    description: "get a random picture of a snek",
+    name: "8ball",
+    description: "ask the 8ball a question",
     category: "fun",
     run: async (message, args) => {
-        if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
-        }
-
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -29,9 +44,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-
-
             return message.channel.send("❌\nstill on cooldown for " + remaining );
+        }
+
+        if (args.length == 0) {
+            return message.channel.send("❌\nyou must ask the 8ball something")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -40,24 +57,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const res = await fetch("https://www.reddit.com/r/snek.json?sort=top&t=day").then(a => a.json())
-        
-        const allowed = res.data.children.filter(post => !post.data.is_self)
-        
-        const chosen = allowed[Math.floor(Math.random() * allowed.length)]
-
-        const a = await redditImage(chosen, allowed)
-
-        if (a == "lol") {
-            return message.channel.send("❌\nunable to find image")
-        }
-
-        const image = a.split("|")[0]
-        const title = a.split("|")[1]
-        let url = a.split("|")[2]
-        const author = a.split("|")[3]
-
-        url = "https://reddit.com" + url
+        const question = args.join(" ")
 
         let color;
 
@@ -68,15 +68,13 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setAuthor("u/" + author + " | r/snek")
-            .setTitle(title)
-            .setURL(url)
             .setColor(color)
-            .setImage(image)
+            .setTitle("8ball")
+            .setDescription("**" + question + "** - *" + message.member.user.tag + "*\n\n" + answers[Math.floor(Math.random() * answers.length)])
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+
+        message.channel.send(embed).catch(() => {
+            return message.channel.send("❌\ni may be lacking permission: 'EMBED_MESSAGES'")
         })
     }
 }
