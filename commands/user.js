@@ -54,10 +54,11 @@ module.exports = {
             
             .addField(member.displayName, stripIndents `**username** ${username}
             **id** ${member.user.id}
-            **status** ${member.presence.status}\n
-            **created** ${created.toString().toLowerCase()}
-            **joined** ${joined.toString().toLowerCase()}
-            **roles** ${member._roles.length}`)
+            **status** ${member.presence.status}`, true)
+
+            .addField(member.displayName, "**created** " + created.toString().toLowerCase() + "\n" + 
+                "**joined** " + joined.toString().toLowerCase() + "\n" + 
+                "**roles** " + member._roles.length, true)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 

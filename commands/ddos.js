@@ -69,25 +69,25 @@ module.exports = {
                 "**status** *online*")
         
         return message.channel.send(embed).then(m => {
-            embed.setDescription("*" + member.user.tag + "*" + "\n\n" +
+            embed.setDescription(message.member.user.toString() + "\n\n" +
                 `**ip** *${ip}*` + "\n" +
                 "**port** *scanning..*" + "\n\n" +
                 "**status** *online*")
             
             setTimeout(() => {
                 m.edit(embed).then(() => {
-                    embed.setDescription("*" + member.user.tag + "*" + "\n\n" +
+                    embed.setDescription(message.member.user.toString() + "\n\n" +
                         `**ip** *${ip}*` + "\n" +
                         `**port** *${port}*` + "\n\n" +
                         "**status** *online*")
                     
                     setTimeout(() => {
                         m.edit(embed).then(() => {
-                            embed.setDescription("*" + member.user.tag + "*" + "\n\n" +
+                            embed.setDescription(message.member.user.toString() + "\n\n" +
                                 `**ip** *${ip}*` + "\n" +
                                 `**port** *${port}*` + "\n\n" +
                                 "**status** *offline*")
-                            embed.setColor("#31E862")
+                            embed.setColor("#5efb8f")
                             
                             setTimeout(() => {
                                 m.edit(embed)

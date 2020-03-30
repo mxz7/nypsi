@@ -155,7 +155,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("❤ " + target1.displayName + " ❤ " + target2.displayName + " ❤")
-            .setDescription(target1.user.username + " **x** " + target2.user.username)
+            .setDescription(target1.user.toString() + " **x** " + target2.user.toString())
 
             .addField("love level", 
             "**" + lovePercent + "**%\n" +

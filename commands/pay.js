@@ -120,7 +120,7 @@ module.exports = {
         message.channel.send(embed).then(m => {
             const embed = new MessageEmbed()
                 .setTitle("transaction success")
-                .setColor("#31E862")
+                .setColor("#5efb8f")
                 .setDescription("*" + message.member.user.tag + "*" + " -> " + "*" + target.user.tag + "*")
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
                 .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")

@@ -52,11 +52,11 @@ aliases.set("mc", "minecraft")
 aliases.set("bunny", "rabbit")
 aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
+aliases.set("colour", "color")
 
 console.log("\n -- commands -- ");
 
 client.once("ready", async () => {
-    
 
     setTimeout(() => {
         client.user.setPresence({
@@ -91,11 +91,11 @@ client.once("ready", async () => {
 });
 
 client.on("guildCreate", guild => {
-    console.log("\x1b[36m[" + getTimeStamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.size + "\x1b[37m")
+    console.log("\x1b[36m[" + getTimeStamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
 })
 
 client.on("guildDelete", guild => {
-    console.log("\x1b[36m[" + getTimeStamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.size + "\x1b[37m")
+    console.log("\x1b[36m[" + getTimeStamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
 })
 
 client.on("rateLimit", () => {
