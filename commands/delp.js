@@ -24,6 +24,10 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining);
         }
 
+        if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
+            return message.channel.send("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
+        }
+
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
             return message.channel.send("❌\n$delp <amount> (@user)");
         }

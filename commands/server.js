@@ -1,6 +1,5 @@
 /*jshint esversion: 8 */
-const { MessageEmbed } = require("discord.js");
-const { stripIndents } = require("common-tags");
+const { MessageEmbed } = require("discord.js");;
 const { formatDate } = require("../utils.js");
 
 module.exports = {
@@ -16,8 +15,10 @@ module.exports = {
         }
 
         const created = formatDate(server.createdAt).toLowerCase();
-
-        const onlineCount = server.members.cache.filter(member => member.presence.status != "offline").size
+        const members = server.members.cache
+        const users = members.filter(member => !member.user.bot)
+        const bots = members.filter(member => member.user.bot)
+        const online = users.filter(member => member.presence.status != "offline")
 
         let color;
 
@@ -32,14 +33,17 @@ module.exports = {
             .setColor(color)
             .setTitle(server.name)
             
-            .addField("server info", stripIndents `**owner** ${server.owner.user.tag}
-            **id** ${server.id}
-            **created** ${created}
-            **region** ${server.region}
-            **channels** ${server.channels.cache.size}
-            **roles** ${server.roles.cache.size}
-            **members** ${server.memberCount}
-            **online members** ${onlineCount}`)
+            .addField("info", "**owner** " + server.owner.user.tag + "\n" +
+                "**created** " + created + "\n" +
+                "**region** " + server.region, true)
+
+            .addField("info", "**roles** " + server.roles.cache.size + "\n" + 
+                "**channels** " + server.channels.cache.size + "\n" +
+                "**id** " + server.id, true)
+
+            .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
+                "**bots** " + bots.size.toLocaleString() + "\n" + 
+                "**online** " + online.size.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 

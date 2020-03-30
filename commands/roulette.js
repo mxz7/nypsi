@@ -145,7 +145,7 @@ module.exports = {
             
             if (win) {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
-                embed.setColor("#31E862")
+                embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
                 embed.setColor("#FF0000")

@@ -43,7 +43,7 @@ module.exports = {
 
         if (voted) {
             embed.setTitle("vote ✅")
-            embed.setColor("#31E862")
+            embed.setColor("#5efb8f")
             embed.addField("status", "you currently have a 10% bonus on gambling wins")
         } else {
             embed.setTitle("vote ❌")

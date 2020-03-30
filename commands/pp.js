@@ -54,7 +54,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 1337")
-                .setDescription("*" + message.member.user.tag + "*\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(message.member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
@@ -74,7 +74,7 @@ module.exports = {
                 const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription("*" + message.member.user.tag + "*\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(message.member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
@@ -86,7 +86,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription("*" + message.member.user.tag + "*\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         

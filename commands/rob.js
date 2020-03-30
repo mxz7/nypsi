@@ -98,7 +98,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("robbery")
-                .setDescription("robbing " + "*" + target.user.tag + "*" + "..")
+                .setDescription("robbing " + target.user.toString() + "..")
 
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
@@ -165,7 +165,7 @@ module.exports = {
         let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("robbery")
-            .setDescription("robbing " + "*" + target.user.tag + "*" + "..")
+            .setDescription("robbing " + target.user.toString() + "..")
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
@@ -173,7 +173,7 @@ module.exports = {
             
             if (robberySuccess && !caughtByPolice) {
                 embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%)")
-                embed.setColor("#31E862")
+                embed.setColor("#5efb8f")
             } else if (caughtByPolice) {
                 embed.setColor("#374F6B")
                 embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)" +

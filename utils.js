@@ -66,7 +66,7 @@ setInterval(() => {
 
         fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
-                console.log(err);
+                return console.log(err);
             }
             console.log("\x1b[32m[" + getTimestamp() + "] data saved..\x1b[37m")
         })
