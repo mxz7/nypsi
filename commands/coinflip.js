@@ -222,11 +222,11 @@ module.exports = {
             setTimeout(() => {
                 if (waiting.get(target.user.id) && waiting.get(target.user.id).id == id && waiting.get(target.user.id).challenger == message.member.user.id && waiting.get(target.user.id).choice == args[1].toLowerCase() && waiting.get(target.user.id).bet == bet) {
                     waiting.delete(target.user.id)
-                    message.channel.send(target + " game expired")
+                    message.channel.send(target.user.toString() + " game expired")
                 }
             }, 15000)
 
-            return message.channel.send(target + " you have received a coinflip challenge from " + message.member + " worth $" + bet.toLocaleString() + "\nyou have 15 seconds to accept with $cf accept")
+            return message.channel.send(target.user.toString() + " you have received a coinflip challenge from " + message.member.user.toString() + " worth $" + bet.toLocaleString() + "\nyou have 15 seconds to accept with $cf accept")
 
         }
 

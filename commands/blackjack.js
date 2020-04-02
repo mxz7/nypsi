@@ -138,7 +138,7 @@ module.exports = {
         setTimeout(() => {
             if (games.has(message.member.user.id) && games.get(message.member.user.id).id == id) {
                 games.delete(message.member.user.id)
-                return message.channel.send("<@" + message.member + ">" + " blackjack expired")
+                return message.channel.send(message.member.user.toString() + " blackjack expired")
             }
         }, 120000)
 
@@ -422,8 +422,7 @@ async function playGame(message, m) {
         const reaction = await m.awaitReactions(filter, { max: 1, time: 240000, errors: ["time"] })
             .then(collected => {
                 return collected.first().emoji.name
-            }).catch(() => {
-            })
+            }).catch()
 
         if (reaction == "1️⃣") {
             newCard(message.member)
@@ -483,7 +482,7 @@ async function playGame(message, m) {
 
         } else {
             games.delete(message.member.user.id)
-            return message.channel.send(message.member + " error: invalid emoji")
+            return m.reactions.removeAll()
         }
     }
 }
