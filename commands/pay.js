@@ -112,16 +112,16 @@ module.exports = {
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         if (taxEnabled) {
-            embed.setDescription("*" + message.member.user.tag + "*" + " -> " + "*" + target.user.tag + "*" + "\n**" + (tax * 100) + "**% tax")
+            embed.setDescription(message.member.user.toString() + " -> " + message.member.user.toString() + "\n**" + (tax * 100) + "**% tax")
         } else {
-            embed.setDescription("*" + message.member.user.tag + "*" + " -> " + "*" + target.user.tag + "*")
+            embed.setDescription(message.member.user.toString() + " -> " + message.member.user.toString())
         }
 
         message.channel.send(embed).then(m => {
             const embed = new MessageEmbed()
                 .setTitle("transaction success")
                 .setColor("#5efb8f")
-                .setDescription("*" + message.member.user.tag + "*" + " -> " + "*" + target.user.tag + "*")
+                .setDescription(message.member.user.toString() + " -> " + message.member.user.toString())
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
                 .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
 

@@ -66,8 +66,8 @@ module.exports = {
                     target1 = getMember(message, args[0])
                 }
             } else if (message.mentions.members.size == 0) {
-                target1 = getMember(args[0])
-                target2 = getMember(args[1])
+                target1 = getMember(message, args[0])
+                target2 = getMember(message, args[1])
             } else {
                 return message.channel.send("❌\n$love <user> (user)");
             }
