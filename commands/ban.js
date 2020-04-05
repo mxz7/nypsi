@@ -63,8 +63,12 @@ module.exports = {
         if (failed.length != 0) {
             embed.addField("error", "unable to ban: " + failed.join(", "))
         }
-        
-        return message.channel.send(embed)
 
+        if (args.join(" ").includes("-s")) {
+            message.delete()
+            return message.member.send(embed)
+        } else {
+            return message.channel.send(embed)
+        }
     }
 };
