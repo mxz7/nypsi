@@ -1,14 +1,11 @@
-/*jshint esversion: 8 */
-const { MessageEmbed } = require("discord.js");
-const { stripIndents } = require("common-tags");
-const { getMember, formatDate } = require("../utils.js");
+const { MessageEmbed } = require("discord.js")
+const { getMember } = require("../utils.js");
 
 module.exports = {
-    name: "user",
-    description: "view info about a user",
+    name: "presence",
+    description: "view active presences for a user",
     category: "info",
     run: async (message, args) => {
-        
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
@@ -37,40 +34,11 @@ module.exports = {
             color = member.displayHexColor;
         }
 
-        if (args.length > 1) {
-            if (args[1] == "-id") {
-                const embed = new MessageEmbed()
-                    .setTitle(member.user.tag)
-                    .setColor(color)
-                    .setDescription(member.user.id)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-                return message.channel.send(embed)
-            }
-        }
-        
-        const joined = formatDate(member.joinedAt);
-        const created = formatDate(member.user.createdAt);
-
-        let username = member.user.tag
-
-        if (username.includes("*")) {
-            username = "`" + member.user.tag + "`"
-        }
-
         const embed = new MessageEmbed()
-            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
             .setColor(color)
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
-            
-            .addField(member.displayName, stripIndents `**username** ${username}
-            **id** ${member.user.id}
-            **status** ${member.presence.status}`, true)
-
-            .addField(member.displayName, "**created** " + created.toString().toLowerCase() + "\n" + 
-                "**joined** " + joined.toString().toLowerCase() + "\n" + 
-                "**roles** " + member._roles.length, true)
-
+            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         if (member.presence.activities.length > 0) {
@@ -114,11 +82,14 @@ module.exports = {
             }
             if (hasStatus || hasSpotify || hasGame) {
                 embed.addField("status", status1)
+            } else {
+                return message.channel.send("❌\nthis user has no active presence")
             }
+        } else {
+            return message.channel.send("❌\nthis user has no active presence")
         }
 
-        message.channel.send(embed).catch(() => {
-             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
-        });
+        message.channel.send(embed)
     }
-};
+    
+}
