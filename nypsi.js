@@ -7,6 +7,7 @@ const { list } = require("./optout.json");
 const ascii = require("figlet");
 const { banned } = require("./banned.json");
 const { getUserCount } = require("./utils.js")
+const { runCheck, hasGuild, createGuild } = require("./guilds/utils.js")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
@@ -53,6 +54,7 @@ aliases.set("bunny", "rabbit")
 aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
 aliases.set("colour", "color")
+aliases,set("activity", "presence")
 
 console.log("\n -- commands -- ");
 
@@ -84,7 +86,7 @@ client.once("ready", async () => {
     ascii("n y p s i", function(err, data) {
         if (!err) {
             console.log(data);
-            console.log("\n\nlogged in as " + client.user.tag + "\n");
+            console.log("\n\nlogged in as " + client.user.tag + " @ " + getTimeStamp() + "\n");
             console.log("- - -\n\n")
         }
     });
@@ -92,6 +94,9 @@ client.once("ready", async () => {
 
 client.on("guildCreate", guild => {
     console.log("\x1b[36m[" + getTimeStamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
+    if (!hasGuild(guild)) {
+        createGuild(guild)
+    }
 })
 
 client.on("guildDelete", guild => {
@@ -474,5 +479,18 @@ exports.snipe
 client.login(token).then(() => {
     setTimeout(() => {
         ready = true
+        runChecks()
     }, 2000)
 })
+
+function runChecks() {
+    setInterval(() => {
+        client.guilds.cache.forEach(guild => {
+            if (!hasGuild(guild)) {
+                createGuild(guild)
+            } else {
+                runCheck(guild)
+            }
+        })
+    }, 45000)
+}

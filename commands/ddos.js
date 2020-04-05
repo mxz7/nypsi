@@ -63,27 +63,27 @@ module.exports = {
             .setTitle("ddos tool")
             .setColor(color)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-            .setDescription("*" + member.user.tag + "*\n\n" +
+            .setDescription(member.user.toString() + "\n\n" +
                 "**ip** *obtaining..*" + "\n" +
                 "**port** *waiting...*" + "\n\n" +
                 "**status** *online*")
         
         return message.channel.send(embed).then(m => {
-            embed.setDescription(message.member.user.toString() + "\n\n" +
+            embed.setDescription(member.user.toString() + "\n\n" +
                 `**ip** *${ip}*` + "\n" +
                 "**port** *scanning..*" + "\n\n" +
                 "**status** *online*")
             
             setTimeout(() => {
                 m.edit(embed).then(() => {
-                    embed.setDescription(message.member.user.toString() + "\n\n" +
+                    embed.setDescription(member.user.toString() + "\n\n" +
                         `**ip** *${ip}*` + "\n" +
                         `**port** *${port}*` + "\n\n" +
                         "**status** *online*")
                     
                     setTimeout(() => {
                         m.edit(embed).then(() => {
-                            embed.setDescription(message.member.user.toString() + "\n\n" +
+                            embed.setDescription(member.user.toString() + "\n\n" +
                                 `**ip** *${ip}*` + "\n" +
                                 `**port** *${port}*` + "\n\n" +
                                 "**status** *offline*")

@@ -1,6 +1,5 @@
-const { cmdCount } = require("../nypsi.js")
 const { MessageEmbed } = require("discord.js")
-const { getUserCount } = require("../utils.js")
+const { getUserCount, getUserCountGuild } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -50,6 +49,7 @@ module.exports = {
             .setColor(color)
             .setDescription("**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" + 
                 "**users in memory** " + getUserCount() + "\n" +
+                " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
                 "**total commands** " + commandsSize + "\n" +
                 "**command aliases** " + aliasesSize + "\n" +
                 "**commands used since restart** " + cmdCount.toLocaleString())

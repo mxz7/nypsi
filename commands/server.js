@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");;
 const { formatDate } = require("../utils.js");
+const { getPeaks } = require("../guilds/utils.js")
 
 module.exports = {
     name: "server",
@@ -43,7 +44,9 @@ module.exports = {
 
             .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
                 "**bots** " + bots.size.toLocaleString() + "\n" + 
-                "**online** " + online.size.toLocaleString())
+                "**online** " + online.size.toLocaleString() + "\n" +
+                "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
+                "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 

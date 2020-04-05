@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
 const fs = require("fs");
-const users = JSON.parse(fs.readFileSync("./economy/users.json"));
+let users = JSON.parse(fs.readFileSync("./economy/users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
@@ -39,6 +39,8 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day",
     "https://www.reddit.com/r/creampies.json?sort=top&t=day",
     "https://www.reddit.com/r/throatpies.json?sort=top&t=day"]
 
+let timer = 0
+let timerCheck = true
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
 
@@ -70,8 +72,21 @@ setInterval(() => {
             }
             console.log("\x1b[32m[" + getTimestamp() + "] data saved..\x1b[37m")
         })
+
+        timer = 0
+        timerCheck = false
+    } else if (!timerCheck) {
+        timer++
     }
-}, 30000)
+
+    if (timer >= 10 && !timerCheck) {
+        users = JSON.parse(fs.readFileSync("./economy/users.json"));
+        console.log("\x1b[32m[" + getTimestamp() + "] data refreshed..\x1b[37m")
+        timerCheck = true
+        timer = 0
+    }
+
+}, 60000)
 
 setTimeout( async () => {
     //BDSM CACHE
@@ -179,6 +194,18 @@ module.exports = {
         return Object.keys(users).length
     },
 
+    getUserCountGuild: function(guild) {
+        let count = 0
+
+        for (user in users) {
+            if (guild.members.cache.find(member => member.user.id == user)) {
+                count++
+            }
+        }
+
+        return count
+    },
+
     redditImage: async function(post, allowed)  {
         let image = post.data.url 
 
@@ -270,7 +297,7 @@ module.exports = {
     },
     
     formatDate: function(date) {
-        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
     },
 
@@ -307,10 +334,12 @@ module.exports = {
 
     topAmount: function(guild, amount) {
     
-        let users1 = []
+        const users1 = []
 
         for (user in users) {
-            users1.push(user)
+            if (guild.members.cache.find(member => member.user.id == user) && users[user].balance != 0) {
+                users1.push(user)
+            }
         }
 
         users1.sort(function(a, b) {
@@ -325,11 +354,9 @@ module.exports = {
             if (count >= amount) break
             if (usersFinal.join().length >= 950) break
 
-            if (getMemberID(guild, user)) {
-                if (!users[user].balance == 0) {
-                    usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].balance.toLocaleString()
-                    count++
-                }
+            if (!users[user].balance == 0) {
+                usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].balance.toLocaleString()
+                count++
             }
         }
         return usersFinal
