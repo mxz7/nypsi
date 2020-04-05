@@ -42,7 +42,7 @@ module.exports = {
                 const embed = new MessageEmbed()
                     .setTitle(member.user.tag)
                     .setColor(color)
-                    .setDescription(member.user.id)
+                    .setDescription("`" + member.user.id + "`")
                     .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed)
             }

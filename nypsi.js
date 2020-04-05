@@ -16,25 +16,52 @@ const snipe = new Map()
 let cmdCount = 0
 let ready = false
 
-const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
+let commandFiles 
 
-console.log(" -- commands -- \n");
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    
-    let enabled = true;
-    
-    if (!command.name || !command.description || !command.run || !command.category) {
-        enabled = false;
+function loadCommands() {
+    commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
+
+    if (commands.size > 0) {
+        for (command of commands.keyArray()) {
+            delete require.cache[require.resolve(`./commands/${command}.js`)]
+        }
+        commands.clear()
     }
-    
-    if (enabled) {
-        commands.set(command.name, command);
-        console.log(command.name + " ✅");
-    } else {
-        console.log(file + " ❌");
+
+    for (file of commandFiles) {
+        let command
+        
+        try {
+            command = require(`./commands/${file}`);
+
+            let enabled = true;
+        
+            if (!command.name || !command.description || !command.run || !command.category) {
+                enabled = false;
+            }
+
+            if (enabled) {
+                commands.set(command.name, command);
+                console.log(command.name + " ✅");
+            } else {
+                console.log(file + " ❌");
+            }
+        } catch (e) {
+            console.log(" - - - - - - - - - - ")
+            console.log(file + " ❌");
+            console.log("type $reload " + file + " to view error")
+            console.log(" - - - - - - - - - - ")
+        }
+
+        
     }
 }
+exports.reloadCommands = loadCommands
+
+console.log(" -- commands -- \n");
+
+loadCommands()
+
 aliases.set("ig", "instagram");
 aliases.set("av", "avatar");
 aliases.set("whois", "user");
@@ -54,7 +81,7 @@ aliases.set("bunny", "rabbit")
 aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
 aliases.set("colour", "color")
-aliases,set("activity", "presence")
+aliases.set("activity", "presence")
 
 console.log("\n -- commands -- ");
 
@@ -471,10 +498,38 @@ function helpCmd(message, args) {
 
 }
 
+function reloadCommand(command) {
+    try {
+        commands.delete(command)
+        delete require.cache[require.resolve(`./commands/${command}`)]
+    
+        const commandData = require(`./commands/${command}`);
+    
+        let enabled = true;
+        
+        if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
+            enabled = false;
+        }
+        
+        if (enabled) {
+            commands.set(commandData.name, commandData);
+            console.log(commandData.name + " ✅");
+            return true
+        } else {
+            console.log(command + " ❌");
+            return false
+        }
+    } catch (e) {
+        console.log(e)
+        return false
+    }
+}
+
 exports.cmdCount = cmdCount
 exports.commandsSize = commands.size
 exports.aliasesSize = aliases.size
 exports.snipe
+exports.reloadCommand = reloadCommand
 
 client.login(token).then(() => {
     setTimeout(() => {
