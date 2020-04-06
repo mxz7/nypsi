@@ -9,25 +9,6 @@ module.exports = {
     category: "money",
     run: async (message, args) => {
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 60 - diff
-
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
-
-            let remaining
-
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
-        }
-
         if (!userExists(message.member)) createUser(message.member)
         if (args.length == 0) {
             if (hasPadlock(message.member)) {
@@ -56,6 +37,25 @@ module.exports = {
         }
 
         if (args[0].toString().toLowerCase() == "buy") {
+
+            if (cooldown.has(message.member.id)) {
+                const init = cooldown.get(message.member.id)
+                const curr = new Date()
+                const diff = Math.round((curr - init) / 1000)
+                const time = 60 - diff
+    
+                const minutes = Math.floor(time / 60)
+                const seconds = time - minutes * 60
+    
+                let remaining
+    
+                if (minutes != 0) {
+                    remaining = `${minutes}m${seconds}s`
+                } else {
+                    remaining = `${seconds}s`
+                }
+                return message.channel.send("❌\nstill on cooldown for " + remaining );
+            }
 
             cooldown.set(message.member.id, new Date());
 
