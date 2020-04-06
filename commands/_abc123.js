@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { formatDate, getBalance, userExists, getVoteMulti } = require("../utils.js")
+const { formatDate, getBalance, userExists, getVoteMulti, topAmount } = require("../utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 
 module.exports = {
@@ -109,6 +109,12 @@ module.exports = {
             const bots = members.filter(member => member.user.bot)
             const online = users.filter(member => member.presence.status != "offline")
 
+            const balTop = topAmount(guild, 5)
+
+            const filtered = balTop.filter(function (el) {
+                return el != null;
+            });
+
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
@@ -118,13 +124,13 @@ module.exports = {
                     "**created** " + formatDate(guild.createdAt) + "\n" +
                     "**region** " + guild.region, true)
                 .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
-                    "**channels** " + guild.channels.cache.size + "\n" +
-                    "**id** " + guild.id, true)
+                    "**channels** " + guild.channels.cache.size, true)
                 .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
                     "**bots** " + bots.size.toLocaleString() + "\n" + 
                     "**online** " + online.size.toLocaleString() + "\n" +
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
-                    "**online peak** " + getPeaks(guild).onlines.toLocaleString())
+                    "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
+                .addField("top 5", filtered)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             message.channel.send(embed)
         } else if (args[0] == "gname") {
@@ -141,6 +147,12 @@ module.exports = {
             const bots = members.filter(member => member.user.bot)
             const online = users.filter(member => member.presence.status != "offline")
 
+            const balTop = topAmount(guild, 5)
+
+            const filtered = balTop.filter(function (el) {
+                return el != null;
+            });
+
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
@@ -150,13 +162,13 @@ module.exports = {
                     "**created** " + formatDate(guild.createdAt) + "\n" +
                     "**region** " + guild.region, true)
                 .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
-                    "**channels** " + guild.channels.cache.size + "\n" +
-                    "**id** " + guild.id, true)
+                    "**channels** " + guild.channels.cache.size, true)
                 .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
                     "**bots** " + bots.size.toLocaleString() + "\n" + 
                     "**online** " + online.size.toLocaleString() + "\n" +
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
-                    "**online peak** " + getPeaks(guild).onlines.toLocaleString())
+                    "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
+                .addField("top 5", filtered)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             message.channel.send(embed)
         }
