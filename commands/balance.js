@@ -27,7 +27,7 @@ module.exports = {
             return message.react("✅")
         }
 
-        if (args.length == 1) {
+        if (args.length >= 1) {
             let target = message.mentions.members.first();
 
             if (!target) {

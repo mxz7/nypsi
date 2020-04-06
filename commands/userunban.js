@@ -7,11 +7,11 @@ module.exports = {
     category: "none",
     run: async (message, args) => {
         if (message.member.user.id != "672793821850894347") {
-            return message.channel.send("❌\nyou do not have permission");
+            return
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
+            return message.react("❌")
         }
 
         let target;
@@ -19,11 +19,11 @@ module.exports = {
         target = message.mentions.members.first();
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
+            return message.react("❌")
         }
 
         if (!banned.includes(target.user.id)) {
-            return message.channel.send("❌\nthis user isnt banned");
+            return message.react("❌")
         }
 
         const index = banned.indexOf(target.user.id);
@@ -43,6 +43,6 @@ module.exports = {
             if (err) console.log(err);
         });
 
-        message.channel.send("✅\nuser has been unbanned");
+        message.react("✅")
     }
 };

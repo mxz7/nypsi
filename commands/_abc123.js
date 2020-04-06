@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { formatDate, getBalance, userExists, getVoteMulti, topAmount } = require("../utils.js")
+const { formatDate, getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal } = require("../utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 
 module.exports = {
@@ -87,7 +87,7 @@ module.exports = {
 
             if (userExists(user)) {
                 let voted = false
-                if (getVoteMulti(user) > 0) voted = true
+                if (await getVoteMulti(user) > 0) voted = true
                 embed.addField("economy", "**balance** $" + getBalance(user).toLocaleString() + "\n" +
                     "**voted** " + voted, true)
             }
@@ -115,12 +115,20 @@ module.exports = {
                 return el != null;
             });
 
+            let owner
+
+            try {
+                owner = guild.owner.user.tag
+            } catch (e) {
+                owner = "`" + guild.ownerID + "`"
+            }
+
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
                 .setThumbnail(guild.iconURL())
                 .setDescription("`" + guild.id + "`")
-                .addField("info", "**owner** " + guild.owner.user.tag + "\n" + 
+                .addField("info", "**owner** " + owner + "\n" + 
                     "**created** " + formatDate(guild.createdAt) + "\n" +
                     "**region** " + guild.region, true)
                 .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
@@ -130,7 +138,7 @@ module.exports = {
                     "**online** " + online.size.toLocaleString() + "\n" +
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
                     "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
-                .addField("top 5", filtered)
+                .addField("top " + filtered.length, filtered)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
             message.channel.send(embed)
         } else if (args[0] == "gname") {
@@ -153,12 +161,20 @@ module.exports = {
                 return el != null;
             });
 
+            let owner
+
+            try {
+                owner = guild.owner.user.tag
+            } catch (e) {
+                owner = "`" + guild.ownerID + "`"
+            }
+
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
                 .setThumbnail(guild.iconURL())
                 .setDescription("`" + guild.id + "`")
-                .addField("info", "**owner** " + guild.owner.user.tag + "\n" + 
+                .addField("info", "**owner** " + owner + "\n" + 
                     "**created** " + formatDate(guild.createdAt) + "\n" +
                     "**region** " + guild.region, true)
                 .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
@@ -168,8 +184,31 @@ module.exports = {
                     "**online** " + online.size.toLocaleString() + "\n" +
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
                     "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
-                .addField("top 5", filtered)
+                .addField("top " + filtered.length, filtered)
                 .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            message.channel.send(embed)
+        } else if (args[0] == "top") {
+
+            let amount = 5
+
+            
+
+            if (args.length > 1 && parseInt(args[1])) {
+                amount = parseInt(args[1])
+            }
+
+            const balTop = topAmountGlobal(amount)
+
+            const filtered = balTop.filter(function (el) {
+                return el != null;
+            });
+
+            const embed = new MessageEmbed()
+                .setTitle("baltop")
+                .setColor("#60d16b")
+                .addField("top " + filtered.length, filtered)
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+
             message.channel.send(embed)
         }
     }

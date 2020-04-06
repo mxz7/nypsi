@@ -79,7 +79,13 @@ setInterval(() => {
         timer++
     }
 
-    if (timer >= 10 && !timerCheck) {
+    if (timer >= 5 && !timerCheck) {
+        users = JSON.parse(fs.readFileSync("./economy/users.json"));
+        console.log("\x1b[32m[" + getTimestamp() + "] data refreshed..\x1b[37m")
+        timerCheck = true
+    }
+
+    if (timer >= 15) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
         console.log("\x1b[32m[" + getTimestamp() + "] data refreshed..\x1b[37m")
         timerCheck = true
@@ -330,6 +336,35 @@ module.exports = {
             balance: amount1,
             padlockStatus: hasPadlocklol(member)
         }
+    },
+
+    topAmountGlobal: function(amount) {
+
+        const users1 = []
+
+        for (user in users) {
+            users1.push(user)
+        }
+
+        users1.sort(function(a, b) {
+            return users[b].balance - users[a].balance;
+        })
+
+        let usersFinal = []
+
+        let count = 0
+
+        for (user of users1) {
+            if (count >= amount) break
+            if (usersFinal.join().length >= 950) break
+
+            if (!users[user].balance == 0) {
+                usersFinal[count] = (count + 1) + " `" + user + "` $" + users[user].balance.toLocaleString()
+                count++
+            }
+        }
+        return usersFinal
+
     },
 
     topAmount: function(guild, amount) {
