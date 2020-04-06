@@ -15,7 +15,7 @@ module.exports = {
         const collecteda = collected.filter(msg => msg.member.user.id == message.client.user.id || msg.content.startsWith("$"))
 
         for (msg of collecteda.array()) {
-            await msg.delete()
+            await msg.delete().catch()
         }
         message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete({timeout: 5000}))
     }
