@@ -16,7 +16,7 @@ module.exports = {
         }
 
         if (message.mentions.members.first() == null) {
-            message.channel.send("❌\n$ban <@user(s)> (reason)");
+            message.channel.send("❌\n$ban <@user(s)> (reason) [-s]");
             return;
         }
 
@@ -66,7 +66,7 @@ module.exports = {
 
         if (args.join(" ").includes("-s")) {
             message.delete()
-            return message.member.send(embed)
+            return message.member.send(embed).catch()
         } else {
             return message.channel.send(embed)
         }

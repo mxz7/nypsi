@@ -13,7 +13,9 @@ module.exports = {
     
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
-            reloadCommand(args[0])
+            if (!reloadCommand(args[0])) {
+                return message.react("❌")
+            }
         }
 
 

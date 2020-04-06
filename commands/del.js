@@ -52,7 +52,7 @@ module.exports = {
             }, 30000);
         }
 
-        await message.delete()
+        await message.delete().catch()
         
         if (amount <= 100) {
             await message.channel.bulkDelete(amount).catch(() => {

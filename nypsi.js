@@ -499,10 +499,13 @@ function helpCmd(message, args) {
 }
 
 function reloadCommand(command) {
+    commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
     try {
         commands.delete(command)
-        delete require.cache[require.resolve(`./commands/${command}`)]
-    
+        try {
+            delete require.cache[require.resolve(`./commands/${command}`)]
+        } catch (e) {}
+        
         const commandData = require(`./commands/${command}`);
     
         let enabled = true;
