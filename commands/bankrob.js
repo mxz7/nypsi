@@ -127,7 +127,7 @@ module.exports = {
             
             if (robberySuccess) {
                 embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + bank + "**")
-                embed.setColor("#31E862")
+                embed.setColor("#5efb8f")
             } else {
                 embed.addField("**you were caught**", "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)")
                 embed.setColor("#FF0000")

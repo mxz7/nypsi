@@ -67,7 +67,7 @@ module.exports = {
                 const embed = new MessageEmbed()
                     .setTitle("padlock")
                     .setDescription(message.member.user.toString() + "\n\n**protected**\nyou currently have a padlock")
-                    .setColor("#31E862")
+                    .setColor("#5efb8f")
                     .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() => {
@@ -78,10 +78,12 @@ module.exports = {
             if (getBalance(message.member) < 1000000) {
                 return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
             }
+
+            const cost = Math.round(getBalance(message.member) * 0.1)
             
-            updateBalance(message.member, Math.round(getBalance(message.member) - (getBalance(message.member) * 0.1)))
+            updateBalance(message.member, getBalance(message.member) - cost)
             setPadlock(message.member, true)
-            return message.channel.send("✅\nyou have successfully bought a padlock")
+            return message.channel.send("✅\nyou have successfully bought a padlock for $**" + cost.toLocaleString() + "**")
 
         } else {
             if (hasPadlock(message.member)) {

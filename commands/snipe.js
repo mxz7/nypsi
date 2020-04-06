@@ -7,15 +7,15 @@ module.exports = {
     run: async (message, args) => {
         const { snipe } = require("../nypsi.js")
 
-        if (!snipe || !snipe.get(message.guild.id)) {
+        if (!snipe || !snipe.get(message.channel.id)) {
             return message.channel.send("❌\nnothing to snipe")
         }
 
-        let content = snipe.get(message.guild.id).content
+        let content = snipe.get(message.channel.id).content
 
-        if (snipe.get(message.guild.id).content == "") {
-            if (snipe.get(message.guild.id).attachments.url) {
-                content = snipe.get(message.guild.id).attachments.url
+        if (content) {
+            if (snipe.get(message.channel.id).attachments.url) {
+                content = snipe.get(message.channel.id).attachments.url
             }
         }
 
@@ -27,9 +27,9 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        let embed = new MessageEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle(snipe.get(message.guild.id).member.user.tag)
+            .setTitle(snipe.get(message.channel.id).member.user.tag)
             .setDescription(content)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")

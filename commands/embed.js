@@ -32,11 +32,19 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$embed <title> | <text>");
+            return message.channel.send("❌\n$embed <title> | (text) | (hex color)");
         }
 
+        let mode = ""
+
+        console.log(args.join(" ").split("|").length)
+
         if (!message.content.includes("|")) {
-            return message.channel.send("❌\n$embed <title> | <text>");
+            mode = "title_only"
+        } else if (args.join(" ").split("|").length == 2) {
+            mode = "title_desc"
+        } else if (args.join(" ").split("|").length == 3) {
+            mode = "title_desc_color"
         }
 
         cooldown.set(message.member.id, new Date());
@@ -44,6 +52,8 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 10000);
 
+        const title = args.join(" ").split("|")[0]
+        let description
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -51,16 +61,23 @@ module.exports = {
         } else {
             color = message.member.displayHexColor;
         }
+        
+        if (mode.includes("desc")) {
+            description = args.join(" ").split("|")[1]
+        } 
 
-        const title = args.join(" ").split("|")[0]
-
-        const description = args.join(" ").split("|")[1]
+        if (mode.includes("color")) {
+            color = args.join(" ").split("|")[2]
+        }
 
         const embed = new MessageEmbed()
             .setTitle(title)
-            .setDescription(description)
             .setColor(color)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+        
+        if (mode.includes("desc")) {
+            embed.setDescription(description)
+        }
 
         
         message.channel.send(embed).then(() => {

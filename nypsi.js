@@ -136,7 +136,7 @@ client.on("rateLimit", () => {
 
 client.on("messageDelete", message => {
 
-    snipe.set(message.guild.id, message)
+    snipe.set(message.channel.id, message)
 
     exports.snipe = snipe
 })

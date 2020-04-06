@@ -34,11 +34,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$question <title> | <text>");
-        }
-
-        if (!message.content.includes("|")) {
-            return message.channel.send("❌\n$question <title> | <text>");
+            return message.channel.send("❌\n$question <text> | (hex color)");
         }
 
         cooldown.set(message.member.id, new Date());
@@ -46,6 +42,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 10000);
 
+        const question = args.join(" ").split("|")[0]
         let color;
 
         if (message.member.displayHexColor == "#000000") {
@@ -54,23 +51,20 @@ module.exports = {
             color = message.member.displayHexColor;
         }
 
-        const title = args.join(" ").split("|")[0]
-
-        const description = args.join(" ").split("|")[1]
+        if (args.join(" ").includes("|")) {
+            color = args.join(" ").split("|")[1]
+        }
 
         const embed = new MessageEmbed()
-            .setTitle(title)
-            .setDescription(description)
+            .setTitle(question)
             .setColor(color)
-
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         
-        message.channel.send(embed).then( m => {
-            m.react("👍").then( () => {
-                m.react("👎");
-            });
+        message.channel.send(embed).then(async m => {
             message.delete()
+            await m.react("✅")
+            await m.react("❌");
         })
 
     }

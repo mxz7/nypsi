@@ -1,3 +1,5 @@
+const { MessageEmbed } = require("discord.js")
+
 module.exports = {
     name: "reload",
     description: "reload all commands",
@@ -13,14 +15,31 @@ module.exports = {
     
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
-            if (!reloadCommand(args[0])) {
-                return message.react("❌")
+
+            let msg = " - - - "
+
+            console.log(" - - - ")
+
+            for (arg of args) {
+                if (!reloadCommand(arg)) {
+                    msg = msg + "\n**" + arg + "** ❌"
+                } else {
+                    msg = msg + "\n**" + arg + "** ✅"
+                }
             }
+
+            msg = msg + "\n - - - "
+
+            console.log(" - - - ")
+
+            const embed = new MessageEmbed()
+                .setTitle("reload")
+                .setDescription(msg)
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setColor("#60d16b")
+            
+            message.channel.send(embed)
         }
-
-
-        
-        message.react("✅")
     }
 }
 
