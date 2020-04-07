@@ -82,6 +82,7 @@ aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
 aliases.set("colour", "color")
 aliases.set("activity", "presence")
+aliases.set("purge", "delete")
 
 console.log("\n -- commands -- ");
 
@@ -145,6 +146,10 @@ client.on("messageDelete", message => {
 
 client.on("message", message => {
 
+    if (softLock(message) && message.content.length > 250) {
+        message.delete().catch()
+    }
+
     if (message.author.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(prefix)) return;
@@ -201,6 +206,26 @@ function logCommand(message, args) {
     const server = message.guild.name
 
     console.log("[" + getTimeStamp() + "] " + message.member.user.tag + " -> '" + message.content.split(" ")[0] + "'" + " -> '" + args.join(" ") + "' -> '" + server + "'");
+}
+
+function softLock(message) {
+    const role = message.guild.roles.cache.find(role => role.name == "@everyone")
+
+    const a = message.channel.permissionOverwrites.get(role.id)
+
+    if (!a) {
+        locked = false
+    } else if (!a.deny) {
+        locked = false
+    } else if (!a.deny.bitfield) {
+        locked = false
+    } else {
+        const b = new Discord.Permissions(a.deny.bitfield).toArray()
+        if (b.includes("EMBED_LINKS") && b.includes("ATTACH_FILES")) {
+            locked = true
+        }
+    }
+    return locked
 }
 
 function getTimeStamp() {
