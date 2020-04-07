@@ -106,9 +106,9 @@ module.exports = {
 
         //Start of processing designed to make winning easier, but designed to make winning harder for rich people
 
-        //if no win - balances smaller than 1b have a chance to win
+        //if no win - balances smaller than 1m have a chance to win
         if (one != two) {
-            if (getBalance(message.member) < 1000000000) {
+            if (getBalance(message.member) < 1000000) {
                 const chanceToWin = Math.floor(Math.random() * 12)
                 if (chanceToWin <= 3) {
                     one = two
@@ -119,8 +119,20 @@ module.exports = {
             }
         }
 
-        //if 1 and 2 are equal (1.5 win) balances over 1b have 4/10 chance to lose - others have 2/10 to win
+        //if 1 & 2 are equal
+        //balance over 1t 8/10 to lose
+        //balance over 1b 4/10 to lose
+        //others 2/10 to win
         if (one == two ** two != three) {
+
+            if (getBalance(message.member) > 1000000000000) {
+                const chanceToWin = Math.floor(Math.random() * 10)
+
+                if (chanceToWin <= 8) {
+                    two = three
+                } 
+            }
+
             if (getBalance(message.member) > 1000000000) {
                 const chanceToWin = Math.floor(Math.random() * 10)
 
@@ -137,8 +149,12 @@ module.exports = {
             }
         }
 
-        //if its a cherry win & balance over 1t, 7/10 chance to get melon win. balance over 1b, 6/10 for melon win. others have 2/10 for lemon win
+        //if cherry win
+        //balance over 1t -> 7/10 chance melon win
+        //balance over 1b -> 6/10 melon win
+        //others -> 2/10 lemon win
         if (one == two && two == three && one == "🍒") {
+            
             if (getBalance(message.member) > 1000000000) {
                 const chanceToLose = Math.floor(Math.random() * 10)
 

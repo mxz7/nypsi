@@ -136,9 +136,11 @@ client.on("rateLimit", () => {
 
 client.on("messageDelete", message => {
 
-    snipe.set(message.channel.id, message)
+    if (message.content != "") {
+        snipe.set(message.channel.id, message)
 
-    exports.snipe = snipe
+        exports.snipe = snipe
+    }
 })
 
 client.on("message", message => {
@@ -152,13 +154,12 @@ client.on("message", message => {
     }
 
     if (banned.includes(message.member.user.id)) {
-        message.delete().catch();
         cooldown.add(message.member.user.id)
 
         setTimeout(() => {
             cooldown.delete(message.member.user.id)
         }, 10000)
-        return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete(2500));
+        return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete({ timeout: 2500}));
     }
 
     if (cooldown.has(message.member.user.id)) {

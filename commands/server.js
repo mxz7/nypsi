@@ -20,14 +20,36 @@ module.exports = {
         const users = members.filter(member => !member.user.bot)
         const bots = members.filter(member => member.user.bot)
         const online = users.filter(member => member.presence.status != "offline")
-
+        
         let color;
 
         if (message.member.displayHexColor == "#000000") {
             color = "#FC4040";
-        } else {
+        } else { 
             color = message.member.displayHexColor;
         }
+           
+
+        if (args.length == 1 && args[0] == "-m") {
+            const embed = new MessageEmbed()
+                .setThumbnail(server.iconURL())
+                .setColor(color)
+                .setTitle(server.name)
+
+                .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
+                    "**bots** " + bots.size.toLocaleString() + "\n" + 
+                    "**online** " + online.size.toLocaleString() + "\n" +
+                    "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
+                    "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
+
+                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        }
+
+         
 
         const embed = new MessageEmbed()
             .setThumbnail(server.iconURL())
