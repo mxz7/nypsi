@@ -38,6 +38,8 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        const uptime = getUptime(message.client.uptime)
+
         const embed = new MessageEmbed()
             .setTitle("stats")
             .setColor(color)
@@ -46,11 +48,36 @@ module.exports = {
                 " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
                 "**total commands** " + commandsSize + "\n" +
                 "**command aliases** " + aliasesSize + "\n" +
-                "**commands used since restart** " + cmdCount.toLocaleString())
+                "**commands used since restart** " + cmdCount.toLocaleString() + "\n" +
+                "**uptime** " + uptime)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌\n i may be lacking permission: 'EMBED_LINKS'")
         })
     }
+}
+
+function getUptime(ms) {
+    const sec = Math.floor((ms / 1000) % 60)
+    const min = Math.floor((ms / (1000 * 60)) % 60).toString()
+    const hrs = Math.floor((ms / (1000 * 60 * 60)) % 60).toString()
+    const days = Math.floor((ms / (1000 * 60 * 60 * 24)) % 60).toString()
+
+    let output = ""
+
+    if (days != "0") {
+        output = output + days + "days "
+    }
+    if (hrs != "0") {
+        output = output + "" + hrs + "hours "
+    }
+    if (min != "0") {
+        output = output + "" + min + "mins "
+    }
+    if (sec != "0") {
+        output = output + "" + sec + "secs"
+    }
+
+    return output
 }
