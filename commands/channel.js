@@ -1,4 +1,5 @@
 const { MessageEmbed } = require("discord.js")
+const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -38,13 +39,7 @@ module.exports = {
             return message.channel.send("❌\n$channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)")
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         if (args[0] == "create" || args[0] == "c") {
             if (args.length == 1) {
@@ -78,7 +73,9 @@ module.exports = {
 
             message.mentions.channels.forEach(async channel => {
                 count++
-                await channel.delete()
+                await channel.delete().catch(() => {
+                    return message.channel.send("❌\nunable to delete channel: " + channel.name)
+                })
             })
 
             const embed = new MessageEmbed()
@@ -106,7 +103,7 @@ module.exports = {
 
             await channel.edit({name: name}).then(() => {
             }).catch(() => {
-                return message.channel.send("❌\nthere was an error. possibly invalid characters")
+                return message.channel.send("❌\nunable to rename channel")
             })
             const embed = new MessageEmbed()
                 .setTitle("channel")
@@ -127,8 +124,16 @@ module.exports = {
                 return message.channel.send("❌\ninvalid channel")
             }
 
+            let perms = true
+
             if (!channel.nsfw) {
-                await channel.edit({nsfw: true})
+                await channel.edit({nsfw: true}).catch(() => {
+                    perms = false
+                    return message.channel.send("❌\nunable to edit that channel")
+                })
+                if (!perms) {
+                    return
+                }
                 const embed = new MessageEmbed()
                     .setTitle("channel")
                     .setDescription(channel.name + "\n\n✅ channel is now nsfw")
@@ -136,7 +141,13 @@ module.exports = {
                     .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
                 return message.channel.send(embed)
             } else {
-                await channel.edit({nsfw: false})
+                await channel.edit({nsfw: false}).catch(() => {
+                    perms = false
+                    return message.channel.send("❌\nunable to edit that channel")
+                })
+                if (!perms) {
+                    return
+                }
                 const embed = new MessageEmbed()
                     .setTitle("channel")
                     .setDescription(channel + "\n\n✅ channel is no longer nsfw")

@@ -1,8 +1,8 @@
-const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock, setPadlock } = require("../utils.js")
+const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock, setPadlock, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "rob",
@@ -71,13 +71,7 @@ module.exports = {
 
         const caught = Math.floor(Math.random() * 15)
         
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         let robberySuccess = true
         let robbedAmount = Math.round((amount / 100) * getBalance(target))
@@ -104,7 +98,7 @@ module.exports = {
         
             message.channel.send(embed).then(m => {
 
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
                 embed.addField("**fail!!**", "**" + target.user.tag + "** had a padlock, which has now been broken")
 
                 setTimeout(() => {
@@ -180,7 +174,7 @@ module.exports = {
                     "\nfrom your balance for their troubles")
             } else {
                 embed.addField("**fail!!**", "**you lost** $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)")
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
             }
 
             setTimeout(() => {

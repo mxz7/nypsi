@@ -1,8 +1,7 @@
-/*jshint esversion: 8 */
-
 const { MessageEmbed } = require("discord.js");
+const { getColor } = require("../utils.js")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "poll",
@@ -43,13 +42,8 @@ module.exports = {
         }, 10000);
 
         const question = args.join(" ").split("|")[0]
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        
+        let color = getColor(message.member);
 
         if (args.join(" ").includes("|")) {
             color = args.join(" ").split("|")[1]

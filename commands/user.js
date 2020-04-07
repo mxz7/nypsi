@@ -1,7 +1,6 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
 const { stripIndents } = require("common-tags");
-const { getMember, formatDate } = require("../utils.js");
+const { getMember, formatDate, getColor } = require("../utils.js");
 
 module.exports = {
     name: "user",
@@ -29,13 +28,7 @@ module.exports = {
             return message.channel.send("❌ \ninvalid user");
         }
 
-        let color;
-
-        if (member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = member.displayHexColor;
-        }
+        const color = getColor(member);
 
         if (args.length > 1) {
             if (args[1] == "-id") {

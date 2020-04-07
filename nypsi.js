@@ -136,7 +136,7 @@ client.on("rateLimit", () => {
 
 client.on("messageDelete", message => {
 
-    if (message.content != "") {
+    if (message.content != "" && !message.member.user.bot) {
         snipe.set(message.channel.id, message)
 
         exports.snipe = snipe

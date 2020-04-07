@@ -1,5 +1,6 @@
 const urban = require("relevant-urban")
 const { MessageEmbed } = require("discord.js")
+const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -44,13 +45,7 @@ module.exports = {
 
         if (!result.word) return
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle(result.word)

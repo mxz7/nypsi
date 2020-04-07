@@ -1,8 +1,7 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage } = require("../utils.js")
-const { bdsmCache } = require("../utils.js")
+const { redditImage, bdsmCache, getColor } = require("../utils.js")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "bdsm",
@@ -63,13 +62,7 @@ module.exports = {
 
         url = "https://reddit.com" + url
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 

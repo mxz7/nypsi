@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-
+const { getColor } = require("../utils.js")
 
 module.exports = {
     name: "ban",
@@ -46,13 +46,7 @@ module.exports = {
             })
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle("ban")

@@ -1,8 +1,8 @@
 const { workMessages } = require("../lists.json")
-const { getBalance, updateBalance, userExists, createUser } = require("../utils.js")
+const { getBalance, updateBalance, userExists, createUser, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "work",
@@ -50,13 +50,7 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) + earned)
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

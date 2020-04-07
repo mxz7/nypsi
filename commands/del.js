@@ -1,6 +1,4 @@
-/*jshint esversion: 8 */
-
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "del",

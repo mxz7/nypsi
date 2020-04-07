@@ -1,5 +1,5 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
+const { getColor } = require("../utils.js")
 
 module.exports = {
     name: "github",
@@ -11,13 +11,7 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

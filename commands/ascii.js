@@ -1,4 +1,3 @@
-/*jshint esversion: 8 */
 const ascii = require("figlet");
 const { list } = require("../optout.json");
 

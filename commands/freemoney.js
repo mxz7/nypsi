@@ -1,6 +1,6 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../utils.js")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "freemoney",

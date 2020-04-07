@@ -1,8 +1,8 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage } = require("../utils.js")
+const { redditImage, getColor } = require("../utils.js")
 const fetch = require("node-fetch")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "reddit",
@@ -51,6 +51,10 @@ module.exports = {
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
+        if (!chosen) {
+            return message.channel.send("❌\nunable to find image")
+        }
+
         if (chosen.data.over_18 && !message.channel.nsfw) {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
@@ -68,13 +72,7 @@ module.exports = {
             return message.channel.send("❌\nunable to find image")
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const subreddit = args[0]
 

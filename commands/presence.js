@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getMember } = require("../utils.js");
+const { getMember, getColor } = require("../utils.js");
 
 module.exports = {
     name: "presence",
@@ -26,13 +26,7 @@ module.exports = {
             return message.channel.send("❌ \ninvalid user");
         }
 
-        let color;
-
-        if (member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

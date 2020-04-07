@@ -1,4 +1,5 @@
 const { MessageEmbed } = require("discord.js")
+const { getColor } = require("../utils")
 
 const answers = [" As I see it, yes.",
     "Ask again later.",
@@ -59,13 +60,7 @@ module.exports = {
 
         const question = args.join(" ")
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

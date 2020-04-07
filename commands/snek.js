@@ -1,6 +1,6 @@
 const fetch = require("node-fetch")
 const { MessageEmbed } = require("discord.js")
-const { redditImage } = require("../utils.js")
+const { redditImage, getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -59,13 +59,7 @@ module.exports = {
 
         url = "https://reddit.com" + url
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setAuthor("u/" + author + " | r/snek")

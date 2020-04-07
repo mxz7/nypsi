@@ -1,7 +1,6 @@
-/*jshint esversion: 8 */
 const { list } = require("../optout.json");
 
-var cooldown = new Set();
+const cooldown = new Set();
 
 module.exports = {
     name: "optout",

@@ -47,7 +47,7 @@ module.exports = {
             embed.addField("status", "you currently have a 10% bonus on gambling wins")
         } else {
             embed.setTitle("vote ❌")
-            embed.setColor("#FF0000")
+            embed.setColor("#e4334f")
             embed.addField("status", "by voting you can gain a 10% bonus on gambling wins\n" +  
                 "this process will be done in the background")
         }

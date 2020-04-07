@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js")
-const { getMember } = require("../utils")
+const { getMember, getColor } = require("../utils")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "pp",
@@ -42,13 +42,7 @@ module.exports = {
         }
         sizeMsg = sizeMsg + "D"
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         if (args.length == 0) {
             const embed = new MessageEmbed()

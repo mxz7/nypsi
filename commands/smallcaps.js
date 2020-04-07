@@ -1,4 +1,3 @@
-/*jshint esversion: 8 */
 const smallCaps = require('smallcaps');
 
 module.exports = {
