@@ -93,10 +93,10 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 11) {
+        if (caught <= 9) {
             robberySuccess = false
 
-            percentLost = Math.floor(Math.random() * 70) + 10
+            percentLost = Math.floor(Math.random() * 50) + 10
             amountLost = Math.round((percentLost / 100) * getBalance(message.member))
 
             updateBalance(message.member, getBalance(message.member) - amountLost)

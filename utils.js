@@ -85,7 +85,7 @@ setInterval(() => {
         timerCheck = true
     }
 
-    if (timer >= 15) {
+    if (timer >= 30) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
         console.log("\x1b[32m[" + getTimestamp() + "] data refreshed..\x1b[37m")
         timerCheck = true
