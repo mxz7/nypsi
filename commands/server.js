@@ -1,6 +1,5 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");;
-const { formatDate } = require("../utils.js");
+const { formatDate, getColor } = require("../utils.js");
 const { getPeaks } = require("../guilds/utils.js")
 
 module.exports = {
@@ -21,15 +20,8 @@ module.exports = {
         const bots = members.filter(member => member.user.bot)
         const online = users.filter(member => member.presence.status != "offline")
         
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else { 
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
            
-
         if (args.length == 1 && args[0] == "-m") {
             const embed = new MessageEmbed()
                 .setThumbnail(server.iconURL())

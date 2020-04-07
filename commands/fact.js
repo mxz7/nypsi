@@ -1,8 +1,8 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
 const { facts } = require("../lists.json");
+const { getColor } = require("../utils.js")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "fact",
@@ -37,13 +37,7 @@ module.exports = {
         
         const fact = facts[Math.floor(Math.random() * facts.length)];
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

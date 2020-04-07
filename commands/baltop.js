@@ -1,7 +1,7 @@
-const { topAmount } = require("../utils.js")
+const { topAmount, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "baltop",
@@ -56,13 +56,7 @@ module.exports = {
             return el != null;
         });
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
           
         const embed = new MessageEmbed()
             .setTitle("richest people in this server")

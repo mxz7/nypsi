@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js");
+const { getColor } = require("../utils.js")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "embed",
@@ -54,13 +55,7 @@ module.exports = {
 
         const title = args.join(" ").split("|")[0]
         let description
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        let color = getColor(message.member);
         
         if (mode.includes("desc")) {
             description = args.join(" ").split("|")[1]

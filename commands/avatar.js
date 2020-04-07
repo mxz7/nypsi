@@ -1,6 +1,5 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
-const { getMember } = require("../utils");
+const { getMember, getColor } = require("../utils");
 
 module.exports = {
     name: "avatar",
@@ -30,13 +29,7 @@ module.exports = {
 
         let avatar = member.user.avatarURL({ format: "png", dynamic: true, size: 256 })
 
-        let color;
-
-        if (member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = member.displayHexColor;
-        }
+        const color = getColor(member);
 
         const embed = new MessageEmbed()
             .setTitle(member.user.tag)

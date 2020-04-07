@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getBalance, createUser, userExists, updateBalance, getMember } = require("../utils.js")
+const { getBalance, createUser, userExists, updateBalance, getMember, getColor } = require("../utils.js")
 
 module.exports = {
     name: "balance",
@@ -27,6 +27,8 @@ module.exports = {
             return message.react("✅")
         }
 
+        const color = getColor(message.member);
+
         if (args.length >= 1) {
             let target = message.mentions.members.first();
 
@@ -36,14 +38,6 @@ module.exports = {
 
             if (!target) {
                 return message.channel.send("❌\ninvalid user")
-            }
-
-            let color;
-
-            if (message.member.displayHexColor == "#000000") {
-                color = "#FC4040";
-            } else {
-                color = message.member.displayHexColor;
             }
 
             if (!userExists(target)) createUser(target)
@@ -59,14 +53,6 @@ module.exports = {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
             });
 
-        }
-
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
         }
 
         const embed = new MessageEmbed()

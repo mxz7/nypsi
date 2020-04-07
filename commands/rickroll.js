@@ -1,8 +1,7 @@
-/*jshint esversion: 8 */
 const { list } = require("../optout.json");
 const { banned } = require("../banned.json");
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "rickroll",

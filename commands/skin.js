@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const fetch = require("node-fetch")
+const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -55,13 +56,7 @@ module.exports = {
 
         const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle(uuid.name)

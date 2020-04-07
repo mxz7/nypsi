@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getMember } = require("../utils");
+const { getMember, getColor } = require("../utils");
 
 const cooldown = new Map()
 
@@ -51,13 +51,7 @@ module.exports = {
         const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
         const port = `${randPort()}`
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle("ddos tool")

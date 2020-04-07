@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getUserCount, getUserCountGuild } = require("../utils.js")
+const { getUserCount, getUserCountGuild, getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -36,13 +36,7 @@ module.exports = {
 
         const { cmdCount, commandsSize, aliasesSize } = require("../nypsi.js")
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle("stats")

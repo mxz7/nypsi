@@ -1,9 +1,9 @@
 const { MessageEmbed } = require("discord.js")
-const { updateBalance, getBalance, userExists, createUser, getMember, formatBet } = require("../utils.js")
+const { updateBalance, getBalance, userExists, createUser, getMember, formatBet, getColor } = require("../utils.js")
 
 const tax = 0.15
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "pay",
@@ -94,13 +94,7 @@ module.exports = {
             amount = amount - Math.round(amount * tax)
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle("processing..")

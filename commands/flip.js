@@ -1,4 +1,3 @@
-/*jshint esversion: 8 */
 const shuffle = require("shuffle-array")
 
 module.exports = {

@@ -1,7 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 const fetch = require("node-fetch");
+const { getColor } = require("../utils.js")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "minecraft",
@@ -93,13 +94,7 @@ module.exports = {
             if (e != BreakException) throw e
         }
         
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle(username)

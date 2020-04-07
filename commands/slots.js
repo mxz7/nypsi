@@ -1,8 +1,8 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti } = require("../utils.js")
+const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "slots",
@@ -37,13 +37,9 @@ module.exports = {
             return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
         }
 
-        if (args.length == 1 && args[0] == "info") {let color;
+        const color = getColor(message.member);
 
-            if (message.member.displayHexColor == "#000000") {
-                color = "#FC4040";
-            } else {
-                color = message.member.displayHexColor;
-            }
+        if (args.length == 1 && args[0] == "info") {
 
             const embed = new MessageEmbed()
                 .setTitle("win board")
@@ -198,14 +194,6 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
-
         let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("slots")
@@ -220,7 +208,7 @@ module.exports = {
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
             }
 
             setTimeout(() => {

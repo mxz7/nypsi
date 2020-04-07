@@ -1,4 +1,3 @@
-/*jshint esversion: 8 */
 const fs = require("fs");
 let users = JSON.parse(fs.readFileSync("./economy/users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
@@ -186,6 +185,14 @@ module.exports = {
     thighsCache,
     pornCache,
 
+    getColor: function(member) {
+        if (member.displayHexColor == "#000000") {
+           return "#d3d160";
+        } else {
+            return member.displayHexColor;
+        }
+    },
+
     getVoteMulti: async function(member) {
 
         const voted = await dbl.hasVoted(member.user.id)
@@ -303,7 +310,7 @@ module.exports = {
     },
     
     formatDate: function(date) {
-        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
     },
 

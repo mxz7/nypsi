@@ -1,4 +1,4 @@
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "delp",

@@ -1,9 +1,8 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
-const { wholesomeImg } = require("../utils.js");
+const { getColor } = require("../utils.js");
 const { wholesome } = require("../lists.json")
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "wholesome",
@@ -40,13 +39,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

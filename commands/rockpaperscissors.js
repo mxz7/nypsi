@@ -1,8 +1,8 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "rockpaperscissors",
@@ -111,13 +111,7 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)
@@ -134,7 +128,7 @@ module.exports = {
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
             }
 
             setTimeout(() => {

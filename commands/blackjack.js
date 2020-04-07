@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti } = require("../utils.js")
+const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getColor } = require("../utils.js")
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -21,6 +21,8 @@ module.exports = {
 
         if (!userExists(message.member)) createUser(message.member)
 
+        const color = getColor(message.member);
+
         if (args[0] == "status" && message.member.user.id == "672793821850894347") {
             if (args.length == 1) {
                 return message.channel.send("$blackjack status <@user>")
@@ -36,14 +38,6 @@ module.exports = {
             }
 
             const game = games.get(member.user.id)
-
-            let color;
-
-            if (message.member.displayHexColor == "#000000") {
-                color = "#FC4040";
-            } else {
-                color = message.member.displayHexColor;
-            }
 
             const embed = new MessageEmbed()
                 .setTitle("blackjack status")
@@ -146,14 +140,6 @@ module.exports = {
         newCard(message.member)
         newDealerCard(message.member)
         newCard(message.member)
-
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
 
         const embed = new MessageEmbed()
             .setTitle("blackjack")
@@ -342,13 +328,7 @@ async function playGame(message, m) {
     const first = games.get(message.member.user.id).first
     const dealerPlaya = games.get(message.member.user.id).dealerPlay
 
-    let color;
-
-    if (message.member.displayHexColor == "#000000") {
-        color = "#FC4040";
-    } else {
-        color = message.member.displayHexColor;
-    }
+    const color = getColor(message.member);
 
     const newEmbed = new MessageEmbed()
         .setTitle("blackjack")
@@ -357,7 +337,7 @@ async function playGame(message, m) {
         .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
     const lose = async () => {
-        newEmbed.setColor("#FF0000")
+        newEmbed.setColor("#e4334f")
         newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")

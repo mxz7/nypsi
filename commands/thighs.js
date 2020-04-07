@@ -1,6 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage } = require("../utils.js")
-const { thighsCache } = require("../utils.js")
+const { redditImage, thighsCache, getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -63,13 +62,7 @@ module.exports = {
 
         url = "https://reddit.com" + url
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 

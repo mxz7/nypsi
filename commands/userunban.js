@@ -1,4 +1,3 @@
-/*jshint esversion: 8 */
 const { banned } = require("../banned.json");
 
 module.exports = {

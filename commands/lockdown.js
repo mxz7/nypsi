@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const Discord = require("discord.js")
+const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -41,13 +42,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 3000);
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         let locked = false
 

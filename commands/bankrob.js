@@ -1,9 +1,9 @@
-const { getBalance, createUser, updateBalance, userExists } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, getColor } = require("../utils.js")
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
-var cooldown = new Map()
+const cooldown = new Map()
 
 module.exports = {
     name: "bankrob",
@@ -23,6 +23,8 @@ module.exports = {
         bankWorth.set("fleeca", getBalance(message.member) * 1.2)
         bankWorth.set("mazebank", getBalance(message.member) * 3.5)
 
+        const color = getColor(message.member);
+
         if (args[0] == "status") {
             let bankList = ""
 
@@ -31,14 +33,6 @@ module.exports = {
             }
 
             bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
-
-            let color;
-
-            if (message.member.displayHexColor == "#000000") {
-                color = "#FC4040";
-            } else {
-                color = message.member.displayHexColor;
-            }
 
             const embed = new MessageEmbed()
                 .setTitle("current bank balances")
@@ -108,14 +102,6 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
-
         let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("bank robbery")
@@ -130,7 +116,7 @@ module.exports = {
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**you were caught**", "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)")
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
             }
 
             setTimeout(() => {

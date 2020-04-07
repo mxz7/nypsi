@@ -1,4 +1,5 @@
 const cooldown = new Map();
+const { prefix } = require("../config.json")
 
 module.exports = {
     name: "clean",
@@ -37,7 +38,7 @@ module.exports = {
 
         const collected = await message.channel.messages.fetch({limit: 25})
 
-        const collecteda = collected.filter(msg => msg.member.user.id == message.client.user.id || msg.content.startsWith("$"))
+        const collecteda = collected.filter(msg => msg.member.user.id == message.client.user.id || msg.content.startsWith(prefix))
 
         for (msg of collecteda.array()) {
             await msg.delete().catch()

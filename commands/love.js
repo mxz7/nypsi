@@ -1,8 +1,7 @@
-/*jshint esversion: 8 */
 const { MessageEmbed } = require("discord.js");
-const { getMember } = require("../utils.js");
+const { getMember, getColor } = require("../utils.js");
 
-var cooldown = new Map();
+const cooldown = new Map();
 
 module.exports = {
     name: "love",
@@ -144,13 +143,7 @@ module.exports = {
             loveBar = "💔💔💔💔💔💔💔💔💔💔";
         }
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

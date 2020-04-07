@@ -1,11 +1,11 @@
-const { getBalance, createUser, updateBalance, userExists, getMember, formatBet, getVoteMulti } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, getMember, formatBet, getVoteMulti, getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
 
-var cooldown = new Map();
+const cooldown = new Map();
 
-var waiting = new Discord.Collection();
+const waiting = new Discord.Collection();
 
 
 module.exports = {
@@ -17,6 +17,8 @@ module.exports = {
         if (!userExists(message.member)) {
             createUser(message.member)
         }
+
+        const color = getColor(message.member);
 
         if (args.length == 1) {
 
@@ -44,15 +46,6 @@ module.exports = {
             
                     let winner
                     let loser
-    
-                    let color;
-            
-                    if (message.member.displayHexColor == "#000000") {
-                        color = "#FC4040";
-                    } else {
-                        color = message.member.displayHexColor;
-                    }
-    
             
                     if (choice == choice1) {
                         winner = challenger.user.tag
@@ -286,15 +279,6 @@ module.exports = {
         delete lols
         delete choice
 
-        let color;
-
-        if (message.member.displayHexColor == "#000000") {
-            color = "#FC4040";
-        } else {
-            color = message.member.displayHexColor;
-        }
-
-
         let embed = new MessageEmbed()
             .setColor(color)
             .setTitle("coinflip")
@@ -315,7 +299,7 @@ module.exports = {
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
-                embed.setColor("#FF0000")
+                embed.setColor("#e4334f")
             }
     
             setTimeout(() => {
