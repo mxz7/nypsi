@@ -40,8 +40,18 @@ module.exports = {
                 "🟢 1/" + values.length + " win **25**x")
         }
 
+        const color = getColor(message.member);
+
         if (args.length != 2) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            const embed = new MessageEmbed()
+                .setTitle("roulette help")
+                .setColor(color)
+                .addField("usage", "$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n$roulette odds")
+                .addField("help", "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
+                    "red and black give a **2x** win and green gives a **25**x win")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
         }
 
         if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
@@ -125,8 +135,6 @@ module.exports = {
             roll = "🟢"
         }
 
-        const color = getColor(message.member);
-
         let voted = false
         let voteMulti = 0
 
@@ -145,10 +153,10 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("roulette wheel")
+            .setTitle("roulette wheel | " + message.member.user.username)
             .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
 

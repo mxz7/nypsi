@@ -66,7 +66,7 @@ module.exports = {
                 "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
                 "**nsfw imgs** " + nsfwCache.toLocaleString(), true)
             .addField("usage", "**memory** " + memUsage + "mb", true)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌\n i may be lacking permission: 'EMBED_LINKS'")

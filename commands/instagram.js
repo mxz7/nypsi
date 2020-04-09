@@ -35,7 +35,7 @@ module.exports = {
         }
         
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌\n$insagram <account>");
         }
 
         cooldown.set(message.member.id, new Date());
@@ -80,7 +80,7 @@ module.exports = {
             **followers** ${account.edge_followed_by.count.toLocaleString()}
             **following** ${account.edge_follow.count.toLocaleString()}
             **posts** ${account.edge_owner_to_timeline_media.count.toLocaleString()}`)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

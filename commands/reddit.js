@@ -82,7 +82,7 @@ module.exports = {
             .setAuthor("u/" + author + " | r/" + subreddit)
             .setURL(url)
             .setImage(image)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")

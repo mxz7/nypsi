@@ -39,7 +39,7 @@ module.exports = {
                 .setTitle("current bank balances")
                 .setColor(color)
                 .setDescription(bankList)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             
             
             return message.channel.send(embed).catch(() => {
@@ -103,12 +103,12 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
 
-        let embed = new MessageEmbed()
+        const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("bank robbery")
+            .setTitle("bank robbery | " + message.member.user.username)
             .setDescription("robbing " + bank + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

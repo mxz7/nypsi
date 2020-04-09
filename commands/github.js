@@ -20,7 +20,7 @@ module.exports = {
             .setDescription("this bot is opensource and you can view/use the code for completely free\n" +
             "click the [here](https://github.com/tekohxd/nypsi) to view the source code on github")
             
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
 
         message.channel.send(embed).catch(() => {

@@ -31,9 +31,21 @@ module.exports = {
             }
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
+        
+        let color = getColor(message.member);
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$poll <text> | (hex color)");
+
+            const embed = new MessageEmbed()
+                .setTitle("poll help")
+                .setColor(color)
+                .addField("usage", "$poll <text> | (hex color)")
+                .addField("help", "**<>** required | **()** optional\n" +
+                    "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
+                    "the emojis used for the reactions will be 🅰 and 🅱")
+                .addField("examples", "$poll this or that\n$poll this or that | #35adce")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$poll <text> | (hex color)"))
         }
 
         cooldown.set(message.member.id, new Date());
@@ -42,8 +54,6 @@ module.exports = {
         }, 10000);
 
         const question = args.join(" ").split("|")[0]
-        
-        let color = getColor(message.member);
 
         if (args.join(" ").includes("|")) {
             color = args.join(" ").split("|")[1]
@@ -52,7 +62,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle(question)
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         
         message.channel.send(embed).then(async m => {

@@ -31,8 +31,17 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
-        if (args.length != 2) {
-            return message.channel.send("❌\n$pay <user> <amount>")
+        const color = getColor(message.member);
+
+        if (args.length == 0) {
+            const embed = new MessageEmbed() 
+                .setTitle("pay help")
+                .setColor(color)
+                .addField("usage", "$pay <user> <amount>")
+                .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$pay <user> <amount>"))
         }
 
         let target = message.mentions.members.first();
@@ -95,8 +104,6 @@ module.exports = {
             amount = amount - Math.round(amount * tax)
         }
 
-        const color = getColor(message.member);
-
         const embed = new MessageEmbed()
             .setTitle("processing..")
             .setColor(color)
@@ -104,7 +111,7 @@ module.exports = {
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
             .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         if (taxEnabled) {
             embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
@@ -120,7 +127,7 @@ module.exports = {
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
                 .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             
             setTimeout(() =>{
                 m.edit(embed)

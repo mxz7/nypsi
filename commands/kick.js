@@ -15,9 +15,21 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'KICK_MEMBERS'");
         }
 
-        if (message.mentions.members.first() == null) {
-            message.channel.send("❌ \n$kick <@user(s)> (reason) [-s]");
-            return;
+        const color = getColor(message.member);
+
+        if (message.mentions.members.first() == null || args.length == 0) {
+
+            const embed = new MessageEmbed()
+                .setTitle("kick help")
+                .setColor(color)
+                .addField("usage", "$kick <@user(s)> (reason) [-s]")
+                .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can kick one or more members in one command (must tag them)\n" +
+                    "**(reason)** reason for the kick, will be given to all kicked members\n" +
+                    "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
+                .addField("examples", "$kick @member hacking\n$kick @member @member2 @member3 hacking\n$kick @member hacking -s")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$kick <@user(s)> (reason) [-s]"))
         }
 
         const members = message.mentions.members
@@ -43,13 +55,11 @@ module.exports = {
             })
         }
 
-        const color = getColor(message.member);
-
         const embed = new MessageEmbed()
-            .setTitle("kick")
+            .setTitle("kick | " + message.member.user.username)
             .setDescription("✅ **" + count + "** member(s) kicked for: " + reason.split("| | ")[1])
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         if (failed.length != 0) {
             embed.addField("error", "unable to kick: " + failed.join(", "))

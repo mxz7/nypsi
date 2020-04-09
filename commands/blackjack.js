@@ -75,8 +75,32 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
-        if (!args[0]) {
-            return message.channel.send("❌\n$blackjack <bet>")
+        if (args.length == 0) {
+            const embed = new MessageEmbed()
+                .setTitle("blackjack help")
+                .setColor(color)
+                .addField("usage", "$blackjack <bet>\n$blackjack info")
+                .addField("game rules", "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
+                    "the dealer will always stand on or above **17**\n" +
+                    "receiving **5** cards without going bust will also result in a win\n" +
+                    "**2**x multiplier for winning, on a draw you receive your bet back")
+                .addField("help", "**hit** receive a new card\n**stand** end your turn and allow the dealer to play\n**double down** take another card and double your bet")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$blackjack <bet>"))
+        }
+
+        if (args[0] == "info") {
+            const embed = new MessageEmbed()
+                .setTitle("blackjack help")
+                .setColor(color)
+                .addField("technical info", "blackjack works exactly how it would in real life\n" +
+                    "when you create a game, a full 52 deck is shuffled in a random order\n" +
+                    "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+                    "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)")
+                .setFooter("bot.tekoh.wtf")
+            
+            return message.channel.send(embed).catch()
         }
 
         if (args[0] == "all") {
@@ -147,13 +171,13 @@ module.exports = {
         newCard(message.member)
 
         const embed = new MessageEmbed()
-            .setTitle("blackjack")
-            .setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
+            .setTitle("blackjack | " + message.member.user.username)
+            .setDescription("**bet** $" + bet.toLocaleString())
             .setColor(color)
             .addField("dealer", games.get(message.member.user.id).dealerCards[0])
             .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             .addField("help", ":one: hit | :two: stand")
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).then(m => {
             m.react("1️⃣").then(() => {
@@ -340,14 +364,14 @@ async function playGame(message, m) {
     const color = getColor(message.member);
 
     const newEmbed = new MessageEmbed()
-        .setTitle("blackjack")
+        .setTitle("blackjack | " + message.member.user.username)
         .setColor(color)
-        .setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
-        .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+        .setDescription("**bet** $" + bet.toLocaleString())
+        .setFooter("bot.tekoh.wtf")
 
     const lose = async () => {
         newEmbed.setColor("#e4334f")
-        newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         games.delete(message.member.user.id)
@@ -365,27 +389,25 @@ async function playGame(message, m) {
 
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
-            newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + 
+            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
                 "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% vote bonus")
         } else {
-            newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + 
+            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
         }
         
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + winnings)
-        voteMulti(message, bet)
         games.delete(message.member.user.id)
         m.edit(newEmbed)
         m.reactions.removeAll()
-        voteMulti(message, bet)
     }
 
     const draw = async () => {
         newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + bet)
@@ -452,7 +474,7 @@ async function playGame(message, m) {
                 .setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             m.edit(newEmbed1)
 
             games.set(message.member.user.id, {
@@ -495,20 +517,12 @@ async function playGame(message, m) {
 
 function dealerPlay(message) {
 
-    if (calcTotalDealer(message.member) >= 16) {
+    if (calcTotalDealer(message.member) >= 17) {
         return
     }
 
-    while (calcTotalDealer(message.member) < 16 && games.get(message.member.user.id).dealerCards.length < 5 && calcTotalDealer(message.member) < calcTotal(message.member) && calcTotalDealer(message.member) < 21) {
+    while (calcTotalDealer(message.member) < 17 && games.get(message.member.user.id).dealerCards.length < 5 && calcTotalDealer(message.member) < calcTotal(message.member) && calcTotalDealer(message.member) < 21) {
         newDealerCard(message.member)
     }
     return 
-}
-
-async function voteMulti(message, bet) {
-    const multi = await getVoteMulti(message.member)
-
-    if (multi > 0) {
-        updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
-    }
 }

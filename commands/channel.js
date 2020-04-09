@@ -35,11 +35,27 @@ module.exports = {
             return message.channel.send("❌\ni am lacking permission: 'MANAGE_CHANNELS")
         }
 
+        const color = getColor(message.member);
+
         if (args.length == 0) {
-            return message.channel.send("❌\n$channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)")
+
+            const embed = new MessageEmbed()
+                .setTitle("channel help")
+                .setColor(color)
+                .addField("usage", "$channel create <name(s)>\n" +
+                    "$channel delete <#channel(s)>\n" +
+                    "$channel rename <#channel> <name>\n" +
+                    "$channel nsfw <#channel>")
+                .addField("help", "you can create/delete multiple channels at the same time, examples on this can be seen below")
+                .addField("examples", "$channel create channel\n" +
+                    "$channel create channel1 channel2 channel3\n" +
+                    "$channel delete #channel1 #channel2 #channel3")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)"))   
         }
 
-        const color = getColor(message.member);
+        
 
         if (args[0] == "create" || args[0] == "c") {
             if (args.length == 1) {
@@ -55,10 +71,10 @@ module.exports = {
             }
 
             const embed = new MessageEmbed()
-                    .setTitle("channel")
+                    .setTitle("channel | " + message.member.user.username)
                     .setDescription(channels)
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                    .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed)
         }
 
@@ -79,10 +95,10 @@ module.exports = {
             })
 
             const embed = new MessageEmbed()
-                .setTitle("channel")
+                .setTitle("channel | " + message.member.user.username)
                 .setDescription("✅ **" + count + "** channels deleted")
                 .setColor(color)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed)
         }
 
@@ -106,10 +122,10 @@ module.exports = {
                 return message.channel.send("❌\nunable to rename channel")
             })
             const embed = new MessageEmbed()
-                .setTitle("channel")
+                .setTitle("channel | " + message.member.user.username)
                 .setDescription("✅ channel renamed to " + name)
                 .setColor(color)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed)
         }
 
@@ -135,10 +151,10 @@ module.exports = {
                     return
                 }
                 const embed = new MessageEmbed()
-                    .setTitle("channel")
+                    .setTitle("channel | " + message.member.user.username)
                     .setDescription(channel.name + "\n\n✅ channel is now nsfw")
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                    .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)
             } else {
                 await channel.edit({nsfw: false}).catch(() => {
@@ -152,7 +168,7 @@ module.exports = {
                     .setTitle("channel")
                     .setDescription(channel + "\n\n✅ channel is no longer nsfw")
                     .setColor(color)
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                    .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)
             }
         }

@@ -11,42 +11,25 @@ let timerCheck = true
 setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
 
-    for (user in users) {
-        if (users[user].balance == NaN || users[user].balance == null || users[user].balance == undefined ||
-                users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined) {
-
-            let padlock
-
-            if (users[user].padlockStatus == true) {
-                padlock = true
-            } else {
-                padlock = false 
-            }
-
-            users[user] = {
-                balance: 0,
-                padlockStatus: padlock
-            }
-            console.log(user + " set to 0 because NaN")
-        }
-    }
-
     if (JSON.stringify(users) != JSON.stringify(users1)) {
 
-        fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
+        /*fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 return console.log(err);
             }
             console.log("\x1b[32m[" + getTimestamp() + "] data saved\x1b[37m")
-        })
+        })*/
 
-        timer = 0
+        console.log("a")
+
+        //timer = 0
+        timer++
         timerCheck = false
     } else if (!timerCheck) {
         timer++
     }
 
-    if (timer >= 5 && !timerCheck) {
+    if (timer >= 2 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
         console.log("\x1b[32m[" + getTimestamp() + "] data refreshed\x1b[37m")
         timerCheck = true
@@ -60,6 +43,27 @@ setInterval(() => {
 
 }, 60000)
 
+setInterval(() => {
+    for (user in users) {
+        if (users[user].balance == NaN || users[user].balance == null || users[user].balance == undefined || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == -NaN) {
+
+            let padlock
+
+            if (users[user].padlockStatus == true) {
+                padlock = true
+            } else {
+                padlock = false 
+            }
+
+            users[user] = {
+                balance: 0,
+                padlockStatus: padlock
+            }
+            console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
+        }
+    }
+}, 15000)
+
 module.exports = {
 
     getVoteCacheSize: function() {
@@ -70,16 +74,7 @@ module.exports = {
 
         if (voteCache.has(member.user.id)) {
             if (!voteCache.get(member.user.id)) {
-
-                const voted = await dbl.hasVoted(member.user.id)
-
-                if (!voted) {
-                    return 0
-                } else {
-                    voteCache.set(member.user.id, true)
-                    setTimeout(() => voteCache.delete(member.user.id), 900000)
-                    return 0.2
-                }
+               return 0
             }
             return 0.2
         } 
@@ -92,7 +87,7 @@ module.exports = {
             return 0.2
         } else {
             voteCache.set(member.user.id, false)
-            setTimeout(() => voteCache.delete(member.user.id), 900000)
+            setTimeout(() => voteCache.delete(member.user.id), 300000)
             return 0
         }
 
@@ -115,7 +110,7 @@ module.exports = {
     },
 
     getBalance: function(member) {
-        if (users[member.user.id].balance == NaN || users[member.user.id].balance == null || users[member.user.id].balance == undefined) {
+        if (users[member.user.id].balance == NaN || users[member.user.id].balance == null || users[member.user.id].balance == undefined || users[member.user.id].balance == -NaN) {
             console.log(member.user.id + " set to 0 because NaN")
             users[member.user.id] = {
                 balance: 0,

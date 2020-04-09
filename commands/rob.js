@@ -29,9 +29,20 @@ module.exports = {
             }
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
+        
+        const color = getColor(message.member);
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$rob <user>")
+            const embed = new MessageEmbed()
+                .setTitle("rob help")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+                .addField("usage", "$rob <user>")
+                .addField("help", "robbing a user is a useful way for you to make money\nyou can rob a maximum of **45**% of their balance\n" +
+                    "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
+                    "you can lose up to **30**% of your balance by failing a robbery")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$rob <user>"))
         }
 
         if (!userExists(message.member)) createUser(message.member)
@@ -68,11 +79,9 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 600000);
 
-        const amount = (Math.floor(Math.random() * 50) + 10)
+        const amount = (Math.floor(Math.random() * 45) + 10)
 
         const caught = Math.floor(Math.random() * 15)
-        
-        const color = getColor(message.member);
 
         let robberySuccess = true
         let robbedAmount = Math.round((amount / 100) * getBalance(target))
@@ -92,10 +101,10 @@ module.exports = {
 
             const embed = new MessageEmbed()
                 .setColor(color)
-                .setTitle("robbery")
+                .setTitle("robbery | " + message.member.user.username)
                 .setDescription("robbing " + target.user.toString() + "..")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
         
             message.channel.send(embed).then(m => {
 
@@ -117,7 +126,7 @@ module.exports = {
             caughtByPolice = true
             robberySuccess = false
 
-            percentReturned = (Math.floor(Math.random() * 30) + 15)
+            percentReturned = (Math.floor(Math.random() * 20) + 10)
 
             amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
 
@@ -159,10 +168,10 @@ module.exports = {
 
         let embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("robbery")
+            .setTitle("robbery | " + message.member.user.username)
             .setDescription("robbing " + target.user.toString() + "..")
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

@@ -126,7 +126,18 @@ module.exports = {
         }
 
         if (args.length != 2 && args.length != 3) {
-            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            const embed = new MessageEmbed()
+                .setTitle("coinflip help")
+                .setColor(color)
+                .addField("usage", "$coinflip <heads/tails> <bet>\n" +
+                    "$coinflip <user> <heads/tails> <bet>")
+                .addField("help", "with coinflip you can play against the bot or against another user\n" +
+                    "when playing against another user they must have enough money for the bet\n" +
+                    "when playing against another user you will not receive a 20% vote bonus")
+                .addField("examples", "$coinflip heads 100\n$coinflip member tails 500")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>"))
         }
 
         if (args.length == 3) {
@@ -290,12 +301,12 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("coinflip")
+            .setTitle("coinflip | " + message.member.user.username)
             .setDescription("*throwing..*" + "\n\n" + 
                 "**side** " + args[0].toLowerCase() + "\n" +
                 "**bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
 
