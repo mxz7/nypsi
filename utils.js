@@ -1,6 +1,4 @@
 const fs = require("fs");
-let users = JSON.parse(fs.readFileSync("./economy/users.json"));
-const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 
@@ -9,32 +7,32 @@ const pornCache = new Map()
 const bdsmCache = new Map()
 const thighsCache = new Map()
 
-const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?sort=top&t=day", "https://www.reddit.com/r/bondage.json?sort=top&t=day", "https://www.reddit.com/r/dominated.json?sort=top&t=day"]
-const thighsLinks = ["https://www.reddit.com/r/legs.json?sort=top&t=day",
-    "https://www.reddit.com/r/thickthighs.json?sort=top&t=day",
-    "https://www.reddit.com/r/perfectthighs.json?sort=top&t=day",
-    "https://www.reddit.com/r/thighs.json?sort=top&t=day"]
-const pornLinks = ["https://www.reddit.com/r/collegesluts.json?sort=top&t=day", 
-    "https://www.reddit.com/r/realgirls.json?sort=top&t=day", 
-    "https://www.reddit.com/r/legalteens.json?sort=top&t=day",
-    "https://www.reddit.com/r/amateur.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_snapchat.json?sort=top&t=day",
-    "https://www.reddit.com/r/wet.json?sort=top&t=day",
-    "https://www.reddit.com/r/bathing.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_gif.json?sort=top&t=day",
-    "https://www.reddit.com/r/nsfw_gifs.json?sort=top&t=day",
-    "https://www.reddit.com/r/porngifs.json?sort=top&t=day",
-    "https://www.reddit.com/r/gonewild.json?sort=top&t=day",
-    "https://www.reddit.com/r/gonewild18.json?sort=top&t=day",
-    "https://www.reddit.com/r/collegeamateurs.json?sort=top&t=day",
-    "https://www.reddit.com/r/irlgirls.json?sort=top&t=day",
-    "https://www.reddit.com/r/camwhores.json?sort=top&t=day",
-    "https://www.reddit.com/r/camsluts.json?sort=top&t=day",
-    "https://www.reddit.com/r/cumsluts.json?sort=top&t=day",
-    "https://www.reddit.com/r/girlsfinishingthejob.json?sort=top&t=day",
-    "https://www.reddit.com/r/cumfetish.json?sort=top&t=day",
-    "https://www.reddit.com/r/creampies.json?sort=top&t=day",
-    "https://www.reddit.com/r/throatpies.json?sort=top&t=day"]
+const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?limit=777", "https://www.reddit.com/r/bondage.json?limit=777", "https://www.reddit.com/r/dominated.json?limit=777"]
+const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777",
+    "https://www.reddit.com/r/thickthighs.json?limit=777",
+    "https://www.reddit.com/r/perfectthighs.json?limit=777",
+    "https://www.reddit.com/r/thighs.json?limit=777"]
+const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777", 
+    "https://www.reddit.com/r/realgirls.json?limit=777", 
+    "https://www.reddit.com/r/legalteens.json?limit=777",
+    "https://www.reddit.com/r/amateur.json?limit=777",
+    "https://www.reddit.com/r/nsfw_snapchat.json?limit=777",
+    "https://www.reddit.com/r/wet.json?limit=777",
+    "https://www.reddit.com/r/bathing.json?limit=777",
+    "https://www.reddit.com/r/nsfw_gif.json?limit=777",
+    "https://www.reddit.com/r/nsfw_gifs.json?limit=777",
+    "https://www.reddit.com/r/porngifs.json?limit=777",
+    "https://www.reddit.com/r/gonewild.json?limit=777",
+    "https://www.reddit.com/r/gonewild18.json?limit=777",
+    "https://www.reddit.com/r/collegeamateurs.json?limit=777",
+    "https://www.reddit.com/r/irlgirls.json?limit=777",
+    "https://www.reddit.com/r/camwhores.json?limit=777",
+    "https://www.reddit.com/r/camsluts.json?limit=777",
+    "https://www.reddit.com/r/cumsluts.json?limit=777",
+    "https://www.reddit.com/r/girlsfinishingthejob.json?limit=777",
+    "https://www.reddit.com/r/cumfetish.json?limit=777",
+    "https://www.reddit.com/r/creampies.json?limit=777",
+    "https://www.reddit.com/r/throatpies.json?limit=777"]
 
 
 setTimeout( async () => {
@@ -50,6 +48,7 @@ setTimeout( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache loaded\x1b[37m")
+    exports.bdsmCache = bdsmCache
 
     //THIGHS CACHE
     for (link of thighsLinks) {
@@ -63,6 +62,7 @@ setTimeout( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] thigh cache loaded\x1b[37m")
+    exports.thighsCache = thighsCache
 
     //PORN CACHE
     for (link of pornLinks) {
@@ -76,9 +76,13 @@ setTimeout( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
+    exports.pornCache = pornCache
 }, 5000)
 
 setInterval( async () => {
+    bdsmCache.clear()
+    thighsCache.clear()
+    pornCache.clear()
     console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache updating..\x1b[37m")
 
     //BDSM CACHE
@@ -93,6 +97,7 @@ setInterval( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache updated\x1b[37m")
+    exports.bdsmCache = bdsmCache
 
     //THIGHS CACHE
     for (link of thighsLinks) {
@@ -106,6 +111,7 @@ setInterval( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] thigh cache updated\x1b[37m")
+    exports.thighsCache = thighsCache
 
     //PORN CACHE
     for (link of pornLinks) {
@@ -119,6 +125,7 @@ setInterval( async () => {
         }
     }
     console.log("\x1b[32m[" + getTimestamp() + "] porn cache updated\x1b[37m")
+    exports.pornCache = pornCache
 
     console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache update finished\x1b[37m")
 }, 21600000)

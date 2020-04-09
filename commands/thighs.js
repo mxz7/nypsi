@@ -31,6 +31,8 @@ module.exports = {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
 
+        const { thighsCache } = require("../utils.js")
+
         if (thighsCache.size <= 2) {
             return message.channel.send("❌\nplease wait a couple more seconds..")
         }
@@ -40,8 +42,6 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
-
-        const { thighsCache } = require("../utils.js")
 
         const thighsLinks = Array.from(thighsCache.keys())
 

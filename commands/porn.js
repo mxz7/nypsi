@@ -31,11 +31,11 @@ module.exports = {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
 
+        const { pornCache } = require("../utils.js")
+
         if (pornCache.size <= 2) {
             return message.channel.send("❌\nplease wait a couple more seconds..")
         }
-
-        const { pornCache } = require("../utils.js")
 
         cooldown.set(message.member.id, new Date());
 
