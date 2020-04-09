@@ -31,6 +31,8 @@ module.exports = {
             return message.channel.send("❌\nyou must do this in an nsfw channel")
         }
 
+        const { bdsmCache } = require("../utils.js")
+
         if (bdsmCache.size <= 2) {
             return message.channel.send("❌\nplease wait a couple more seconds..")
         }
@@ -41,13 +43,11 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const { bdsmCache } = require("../utils.js")
-
         const bdsmLinks = Array.from(bdsmCache.keys())
 
         const subredditChoice = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)]
 
-        const allowed = await bdsmCache.get(subredditChoice)
+        const allowed = bdsmCache.get(subredditChoice)
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 

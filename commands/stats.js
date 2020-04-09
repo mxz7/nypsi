@@ -39,8 +39,19 @@ module.exports = {
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
+        const { bdsmCache, thighsCache, pornCache } = require("../utils.js")
+        let nsfwCache = 0
 
-        process.mem
+        for (link of Array.from(bdsmCache.keys())) {
+            nsfwCache = nsfwCache + bdsmCache.get(link).length
+        }
+
+        for (link of Array.from(thighsCache.keys())) {
+            nsfwCache = nsfwCache + thighsCache.get(link).length
+        }
+        for (link of Array.from(pornCache.keys())) {
+            nsfwCache = nsfwCache + pornCache.get(link).length
+        }
 
         const embed = new MessageEmbed()
             .setTitle("stats")
@@ -52,7 +63,8 @@ module.exports = {
                 "**uptime** " + uptime, true)
             .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
                 " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
-                "**vote** " + getVoteCacheSize().toLocaleString(), true)
+                "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
+                "**nsfw imgs** " + nsfwCache.toLocaleString(), true)
             .addField("usage", "**memory** " + memUsage + "mb", true)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
