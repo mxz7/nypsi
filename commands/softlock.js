@@ -4,6 +4,8 @@ const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
+const lockedChannels = new Set()
+
 module.exports = {
     name: "softlock",
     description: "softlock a channel - make chat more readable when active",
@@ -69,6 +71,8 @@ module.exports = {
                 ATTACH_FILES: false
             })
 
+            lockedChannels.add(message.channel.id)
+
             const embed = new MessageEmbed()
                 .setTitle("lockdown")
                 .setColor(color)
@@ -81,6 +85,11 @@ module.exports = {
                 EMBED_LINKS: null,
                 ATTACH_FILES: null
             })
+
+            if (lockedChannels.has(message.channel.id)) {
+                lockedChannels.delete(message.channel.id)
+            }
+
             const embed = new MessageEmbed()
                 .setTitle("lockdown")
                 .setColor(color)
@@ -90,5 +99,13 @@ module.exports = {
             return message.channel.send(embed)
         }
 
+    },
+    
+    isLocked: function(channelID) {
+        if (lockedChannels.has(channelID)) {
+            return true
+        } else {
+            return false
+        }
     }
 }

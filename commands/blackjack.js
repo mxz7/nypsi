@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti } = require("../economy/utils.js")
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -119,6 +120,9 @@ module.exports = {
             "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
             "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
     
+        
+        const voteMulti = await getVoteMulti(message.member)
+        
         games.set(message.member.user.id, {
             bet: bet,
             deck: shuffle(newDeck),
@@ -126,7 +130,8 @@ module.exports = {
             dealerCards: [],
             id: id,
             first: true,
-            dealerPlay: false
+            dealerPlay: false,
+            voted: voteMulti
         })
 
         setTimeout(() => {
@@ -167,6 +172,7 @@ function newCard(member) {
     const dealerCards = games.get(member.user.id).dealerCards
     const id = games.get(member.user.id).id
     const first = games.get(member.user.id).first
+    const voted = games.get(member.user.id).voted
 
     const choice = deck[0]
 
@@ -181,7 +187,8 @@ function newCard(member) {
         dealerCards: dealerCards,
         id: id,
         first: first,
-        dealerPlay: false
+        dealerPlay: false,
+        voted: voted
     })
 }
 
@@ -192,6 +199,7 @@ function newDealerCard(member) {
     const dealerCards = games.get(member.user.id).dealerCards
     const id = games.get(member.user.id).id
     const first = games.get(member.user.id).first
+    const voted = games.get(member.user.id).voted
 
     const choice = deck[0]
 
@@ -206,7 +214,8 @@ function newDealerCard(member) {
         dealerCards: dealerCards,
         id: id,
         first: first,
-        dealerPlay: false
+        dealerPlay: false,
+        voted: voted
     })
 }
 
@@ -347,11 +356,26 @@ async function playGame(message, m) {
     }
 
     const win = async () => {
+
+        let winnings = bet * 2
+
+        if (games.get(message.member.user.id).voted > 0) {
+            winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
+        }
+
         newEmbed.setColor("#5efb8f")
-        newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + (bet * 2).toLocaleString())
+        if (games.get(message.member.user.id).voted > 0) {
+            newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + 
+                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
+                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% vote bonus")
+        } else {
+            newEmbed.setDescription(message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString() + 
+                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
+        }
+        
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-        updateBalance(message.member, getBalance(message.member) + (bet * 2))
+        updateBalance(message.member, getBalance(message.member) + winnings)
         voteMulti(message, bet)
         games.delete(message.member.user.id)
         m.edit(newEmbed)
@@ -392,7 +416,8 @@ async function playGame(message, m) {
             dealerCards: games.get(message.member.user.id).dealerCards,
             id: games.get(message.member.user.id).id,
             first: false,
-            dealerPlay: false
+            dealerPlay: false,
+            voted: games.get(message.member.user.id).voted
         })
 
         const filter = (reaction, user) => {
@@ -437,7 +462,8 @@ async function playGame(message, m) {
                 dealerCards: games.get(message.member.user.id).dealerCards,
                 id: games.get(message.member.user.id).id,
                 first: false,
-                dealerPlay: true
+                dealerPlay: true,
+                voted: games.get(message.member.user.id).voted
             })
             
             setTimeout(() => {
@@ -458,7 +484,7 @@ async function playGame(message, m) {
                         return lose()
                     }
                 }
-            }, 1000)
+            }, 1500)
 
         } else {
             games.delete(message.member.user.id)

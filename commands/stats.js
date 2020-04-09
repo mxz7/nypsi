@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getUserCount, getUserCountGuild, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js")
 
 const cooldown = new Map()
 
@@ -34,22 +35,25 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const { cmdCount, commandsSize, aliasesSize } = require("../nypsi.js")
-
+        const { commandsSize, aliasesSize } = require("../nypsi.js")
         const color = getColor(message.member);
-
         const uptime = getUptime(message.client.uptime)
+        const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
+
+        process.mem
 
         const embed = new MessageEmbed()
             .setTitle("stats")
             .setColor(color)
-            .setDescription("**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" + 
-                "**users in memory** " + getUserCount() + "\n" +
-                " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
+            .addField("bot", "**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" +
+                "**user count** " + message.client.users.cache.size.toLocaleString() + "\n" +
                 "**total commands** " + commandsSize + "\n" +
                 "**command aliases** " + aliasesSize + "\n" +
-                "**commands used since restart** " + cmdCount.toLocaleString() + "\n" +
-                "**uptime** " + uptime)
+                "**uptime** " + uptime, true)
+            .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
+                " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
+                "**vote** " + getVoteCacheSize().toLocaleString(), true)
+            .addField("usage", "**memory** " + memUsage + "mb", true)
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
@@ -67,16 +71,16 @@ function getUptime(ms) {
     let output = ""
 
     if (days != "0") {
-        output = output + days + "days "
+        output = output + days + "d "
     }
     if (hrs != "0") {
-        output = output + "" + hrs + "hours "
+        output = output + "" + hrs + "h "
     }
     if (min != "0") {
-        output = output + "" + min + "mins "
+        output = output + "" + min + "m "
     }
     if (sec != "0") {
-        output = output + "" + sec + "secs"
+        output = output + "" + sec + "s"
     }
 
     return output

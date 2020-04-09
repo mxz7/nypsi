@@ -6,14 +6,13 @@ const fs = require("fs");
 const { list } = require("./optout.json");
 const ascii = require("figlet");
 const { banned } = require("./banned.json");
-const { getUserCount } = require("./utils.js")
+const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild } = require("./guilds/utils.js")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const cooldown = new Set()
 const snipe = new Map()
-let cmdCount = 0
 let ready = false
 
 let commandFiles 
@@ -106,9 +105,10 @@ client.once("ready", async () => {
         })
     }, 600000)
 
-    console.log("\nserver count: " + client.guilds.cache.size)
+    console.log("\nserver count: " + client.guilds.cache.size.toLocaleString())
+    console.log("user count: " + client.users.cache.size.toLocaleString())
     console.log("commands count: " + commands.size)
-    console.log("users in memory: " + getUserCount())
+    console.log("users in currency: " + getUserCount())
     console.log("\n- - -\n");
 
     ascii("n y p s i", function(err, data) {
@@ -144,11 +144,18 @@ client.on("messageDelete", message => {
     }
 })
 
+const { isLocked } = require("./commands/softlock.js")
 client.on("message", message => {
 
-    if (softLock(message) && message.content.length > 250) {
+    if (!cooldown.has(message.channel.id) && isLocked(message.channel.id) && message.content.length > 250 && !message.content.startsWith("$softlock")) {
         message.delete().catch()
     }
+
+    cooldown.add(message.channel.id)
+        
+    setTimeout(() => {
+        cooldown.delete(message.channel.id)
+    }, 5000)
 
     if (message.author.bot) return;
     if (!message.guild) return;
@@ -199,33 +206,11 @@ client.on("message", message => {
 });
 
 function logCommand(message, args) {
-    cmdCount++
-    exports.cmdCount = cmdCount
     args.shift();
 
     const server = message.guild.name
 
     console.log("[" + getTimeStamp() + "] " + message.member.user.tag + " -> '" + message.content.split(" ")[0] + "'" + " -> '" + args.join(" ") + "' -> '" + server + "'");
-}
-
-function softLock(message) {
-    const role = message.guild.roles.cache.find(role => role.name == "@everyone")
-
-    const a = message.channel.permissionOverwrites.get(role.id)
-
-    if (!a) {
-        locked = false
-    } else if (!a.deny) {
-        locked = false
-    } else if (!a.deny.bitfield) {
-        locked = false
-    } else {
-        const b = new Discord.Permissions(a.deny.bitfield).toArray()
-        if (b.includes("EMBED_LINKS") && b.includes("ATTACH_FILES")) {
-            locked = true
-        }
-    }
-    return locked
 }
 
 function getTimeStamp() {
@@ -543,9 +528,11 @@ function reloadCommand(command) {
         if (enabled) {
             commands.set(commandData.name, commandData);
             console.log(commandData.name + " ✅");
+            exports.commandsSize = commands.size
             return true
         } else {
             console.log(command + " ❌");
+            exports.commandsSize = commands.size
             return false
         }
     } catch (e) {
@@ -554,7 +541,6 @@ function reloadCommand(command) {
     }
 }
 
-exports.cmdCount = cmdCount
 exports.commandsSize = commands.size
 exports.aliasesSize = aliases.size
 exports.snipe

@@ -1,4 +1,4 @@
-const { userExists, updateBalance, getBalance, createUser } = require("../utils.js")
+const { userExists, updateBalance, getBalance, createUser } = require("../economy/utils.js")
 
 const cooldown = new Map();
 

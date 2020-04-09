@@ -1,4 +1,5 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -113,6 +114,22 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        let voted = false
+        let voteMulti = 0
+
+        if (win) {
+            voteMulti = await getVoteMulti(message.member)
+    
+            if (voteMulti > 0) {
+                voted = true
+            }
+
+            if (voted) {
+                updateBalance(message.member, getBalance(message.member), + Math.round(winnings * voteMulti))
+                winnings = winnings + Math.round(winnings * voteMulti)
+            }
+        }
+
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("rock paper scissors")
@@ -124,7 +141,14 @@ module.exports = {
             embed.setDescription("**threw** " + winning + "\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
 
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+
+                if (voted) {
+                    embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
+                        "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                } else {
+                    embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+                }
+
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())

@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getVoteMulti } = require("../utils.js")
+const { getVoteMulti } = require("../economy/utils.js")
 
 const cooldown = new Map()
 
@@ -44,12 +44,11 @@ module.exports = {
         if (voted) {
             embed.setTitle("vote ✅")
             embed.setColor("#5efb8f")
-            embed.addField("status", "you currently have a 10% bonus on gambling wins")
+            embed.addField("status", "you currently have a 20% bonus on all gambling wins")
         } else {
             embed.setTitle("vote ❌")
             embed.setColor("#e4334f")
-            embed.addField("status", "by voting you can gain a 10% bonus on gambling wins\n" +  
-                "this process will be done in the background")
+            embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins")
         }
 
         message.channel.send(embed).catch(() => {

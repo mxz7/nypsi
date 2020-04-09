@@ -1,4 +1,4 @@
-const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists } = require("../utils.js")
+const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()

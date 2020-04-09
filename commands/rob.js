@@ -1,4 +1,5 @@
-const { userExists, updateBalance, createUser, getMember, getBalance, hasPadlock, setPadlock, getColor } = require("../utils.js")
+const { getColor, getMember } = require("../utils.js")
+const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 

@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage, thighsCache, getColor } = require("../utils.js")
+const { redditImage, getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -40,6 +40,8 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
+
+        const { thighsCache } = require("../utils.js")
 
         const thighsLinks = Array.from(thighsCache.keys())
 
