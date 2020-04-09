@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js")
-const { formatDate, getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal } = require("../utils.js")
+const { formatDate } = require("../utils.js")
 const { getPeaks } = require("../guilds/utils.js")
+const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal } = require("../economy/utils.js")
 
 module.exports = {
     name: "_abc123",

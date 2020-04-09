@@ -12,7 +12,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err);
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] guilds saved..\x1b[37m")
+            console.log("\x1b[32m[" + getTimestamp() + "] guilds saved\x1b[37m")
         })
 
         timer = 0
@@ -23,7 +23,7 @@ setInterval(() => {
 
     if (timer >= 10 && !timerCheck) {
         guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
-        console.log("\x1b[32m[" + getTimestamp() + "] data refreshed..\x1b[37m")
+        console.log("\x1b[32m[" + getTimestamp() + "] guild data refreshed\x1b[37m")
         timerCheck = true
         timer = 0
     }

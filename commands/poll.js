@@ -56,9 +56,9 @@ module.exports = {
 
         
         message.channel.send(embed).then(async m => {
-            message.delete()
-            await m.react("1️⃣")
-            await m.react("2️⃣")
+            await message.delete()
+            await m.react("🅰")
+            await m.react("🅱")
         })
 
     }

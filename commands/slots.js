@@ -1,4 +1,5 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 
@@ -194,7 +195,24 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
-        let embed = new MessageEmbed()
+        let voted = false
+        let voteMulti = 0
+
+        if (win) {
+            voteMulti = await getVoteMulti(message.member)
+    
+            if (voteMulti > 0) {
+                voted = true
+            }
+
+            if (voted) {
+                updateBalance(message.member, getBalance(message.member), + Math.round(winnings * voteMulti))
+                winnings = winnings + Math.round(winnings * voteMulti)
+            }
+        }
+        
+
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("slots")
             .setDescription(one + " | " + two + " | " + three + "\n\n**bet** $" + bet.toLocaleString())
@@ -204,7 +222,14 @@ module.exports = {
         message.channel.send(embed).then(m => {
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+
+                if (voted) {
+                    embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
+                        "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                } else {
+                    embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+                }
+
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
@@ -213,20 +238,11 @@ module.exports = {
 
             setTimeout(() => {
                 m.edit(embed)
-            }, 750)
+            }, 1500)
 
 
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
-    
-        if (win) {
-            const multi = await getVoteMulti(message.member)
-
-            if (multi > 0) {
-                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
-            }
-        }
-
     }
 }

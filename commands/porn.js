@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage, pornCache, getColor } = require("../utils.js")
+const { redditImage, getColor } = require("../utils.js")
 
 const cooldown = new Map()
 
@@ -34,6 +34,8 @@ module.exports = {
         if (pornCache.size <= 2) {
             return message.channel.send("❌\nplease wait a couple more seconds..")
         }
+
+        const { pornCache } = require("../utils.js")
 
         cooldown.set(message.member.id, new Date());
 

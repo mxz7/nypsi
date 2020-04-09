@@ -1,4 +1,5 @@
-const { getBalance, createUser, updateBalance, userExists, getMember, formatBet, getVoteMulti, getColor } = require("../utils.js")
+const { getMember, getColor } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
@@ -99,13 +100,6 @@ module.exports = {
                     }).catch(() => {
                         return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
                     });
-
-                    const multi = await getVoteMulti(winner)
-
-                    if (multi > 0) {
-                        updateBalance(winner, getBalance(winner) + Math.round((multi * (bet * 2))))
-                    }
-
                     return
                 }
             }
@@ -279,7 +273,22 @@ module.exports = {
         delete lols
         delete choice
 
-        let embed = new MessageEmbed()
+        let voted = false
+        let voteMulti = 0
+
+        if (win) {
+            voteMulti = await getVoteMulti(message.member)
+
+            if (voteMulti > 0) {
+                voted = true
+            }
+
+            if (voted) {
+                updateBalance(message.member, getBalance(message.member) + Math.round((bet * 2) * voteMulti))
+            }
+        }
+
+        const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("coinflip")
             .setDescription("*throwing..*" + "\n\n" + 
@@ -295,7 +304,14 @@ module.exports = {
                 "**bet** $" + bet.toLocaleString())
             
             if (win) {
-                embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())
+
+                if (voted) {
+                    embed.addField("**winner!!**", "**you win** $" + ((bet * 2) + ((bet * 2) * voteMulti)).toLocaleString() + "\n" +
+                        "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                } else {
+                    embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())
+                }
+
                 embed.setColor("#5efb8f")
             } else {
                 embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
@@ -304,19 +320,11 @@ module.exports = {
     
             setTimeout(() => {
                 m.edit(embed)
-            }, 500)
+            }, 1500)
     
     
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
-
-        if (win) {
-            const multi = await getVoteMulti(message.member)
-
-            if (multi > 0) {
-                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
-            }
-        }
     }
 }

@@ -1,4 +1,5 @@
-const { getBalance, createUser, updateBalance, userExists, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { getBalance, createUser, updateBalance, userExists } = require("../economy/utils.js")
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
@@ -15,13 +16,13 @@ module.exports = {
 
         const bankWorth = new Discord.Collection()
 
-        bankWorth.set("barclays", getBalance(message.member) * 3)
-        bankWorth.set("santander", getBalance(message.member) * 2.5)
-        bankWorth.set("bankofamerica", getBalance(message.member) * 7.5)
-        bankWorth.set("lloyds", getBalance(message.member) * 1.5)
-        bankWorth.set("hsbc", getBalance(message.member) * 4)
-        bankWorth.set("fleeca", getBalance(message.member) * 1.2)
-        bankWorth.set("mazebank", getBalance(message.member) * 3.5)
+        bankWorth.set("barclays", Math.round(getBalance(message.member) * 2.1))
+        bankWorth.set("santander", Math.round(getBalance(message.member) * 2.2))
+        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 3))
+        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 1.5))
+        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 2.5))
+        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.2))
+        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2))
 
         const color = getColor(message.member);
 
@@ -87,7 +88,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 9) {
+        if (caught <= 6) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 50) + 10
@@ -121,7 +122,7 @@ module.exports = {
 
             setTimeout(() => {
                 m.edit(embed)
-            }, 3000)
+            }, 1500)
 
 
         }).catch(() => {

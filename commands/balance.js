@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getBalance, createUser, userExists, updateBalance, getMember, getColor } = require("../utils.js")
+const { getColor } = require("../utils.js")
+const { getBalance, createUser, userExists, updateBalance, getMember } = require("../economy/utils.js")
 
 module.exports = {
     name: "balance",
