@@ -34,11 +34,23 @@ module.exports = {
             createUser(message.member)
         }
 
+        const color = getColor(message.member);
+
         if (args.length == 0 || args.length == 1) {
-            return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+            const embed = new MessageEmbed()
+                .setTitle("rockpaperscissors help")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+                .addField("usage", "$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+                .addField("help", "rock paper scissors works exactly how this game does in real life\n" +
+                    "**2.5**x multiplier for winning")
+
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
         }
 
         let choice = args[0]
+        let memberEmoji = ""
 
         if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
             return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
@@ -47,6 +59,10 @@ module.exports = {
         if (choice == "r") choice = "rock"
         if (choice == "p") choice = "paper"
         if (choice == "s") choice = "scissors"
+
+        if (choice == "rock") memberEmoji = "🗿"
+        if (choice == "paper") memberEmoji = "📰"
+        if (choice == "scissors") memberEmoji = "✂"
 
         if (args[1] == "all") {
             args[1] = getBalance(message.member)
@@ -91,6 +107,11 @@ module.exports = {
         }
         
         const winning = shuffle(values)[Math.floor(Math.random() * values.length)]
+        let winningEmoji = ""
+
+        if (winning == "rock") winningEmoji = "🗿"
+        if (winning == "paper") winningEmoji = "📰"
+        if (winning == "scissors") winningEmoji = "✂"
 
         let win = false
         let winnings = 0
@@ -112,8 +133,6 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
-        const color = getColor(message.member);
-
         let voted = false
         let voteMulti = 0
 
@@ -132,13 +151,13 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("rock paper scissors")
-            .setDescription("*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setTitle("rock paper scissors | " + message.member.user.username)
+            .setDescription("*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
+            .setFooter("bot.tekoh.wtf")
     
         message.channel.send(embed).then(m => {
 
-            embed.setDescription("**threw** " + winning + "\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
+            embed.setDescription("**threw** " + winning + " " + winningEmoji + "\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
 
             if (win) {
 
@@ -161,13 +180,5 @@ module.exports = {
         }).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
         });
-
-        if (win) {
-            const multi = await getVoteMulti(message.member)
-
-            if (multi > 0) {
-                updateBalance(message.member, getBalance(message.member) + Math.round((multi * (bet * 2))))
-            }
-        }
     }
 }

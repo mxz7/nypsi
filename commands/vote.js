@@ -39,14 +39,14 @@ module.exports = {
         const embed = new MessageEmbed()
         embed.setURL("https://top.gg/bot/678711738845102087/vote")
         embed.setDescription("https://top.gg/bot/678711738845102087/vote")
-        embed.setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+        embed.setFooter("bot.tekoh.wtf")
 
         if (voted) {
-            embed.setTitle("vote ✅")
+            embed.setTitle("vote ✅ | " + message.member.user.username)
             embed.setColor("#5efb8f")
             embed.addField("status", "you currently have a 20% bonus on all gambling wins")
         } else {
-            embed.setTitle("vote ❌")
+            embed.setTitle("vote ❌ | " + message.member.user.username)
             embed.setColor("#e4334f")
             embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins")
         }

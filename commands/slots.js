@@ -34,11 +34,17 @@ module.exports = {
             createUser(message.member)
         }
 
-        if (args.length == 0) {
-            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
-        }
-
         const color = getColor(message.member);
+
+        if (args.length == 0) {
+            const embed = new MessageEmbed()
+                .setTitle("slots help")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+                .addField("usage", "$slots <bet>\n$slots info")
+                .addField("help", "you should know how a slot machine works..")
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board"))
+        }
 
         if (args.length == 1 && args[0] == "info") {
 
@@ -46,7 +52,7 @@ module.exports = {
                 .setTitle("win board")
                 .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.5**x win")
                 .setColor(color)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -214,10 +220,10 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("slots")
+            .setTitle("slots | " + message.member.user.username)
             .setDescription(one + " | " + two + " | " + three + "\n\n**bet** $" + bet.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             

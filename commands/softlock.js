@@ -74,10 +74,10 @@ module.exports = {
             lockedChannels.add(message.channel.id)
 
             const embed = new MessageEmbed()
-                .setTitle("lockdown")
+                .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
                 .setDescription("✅ soft lock enabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
         } else {
@@ -91,10 +91,10 @@ module.exports = {
             }
 
             const embed = new MessageEmbed()
-                .setTitle("lockdown")
+                .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
                 .setDescription("✅ soft lock disabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
         }

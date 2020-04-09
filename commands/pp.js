@@ -48,9 +48,9 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 1337")
-                .setDescription(message.member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(message.member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
         
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -68,9 +68,9 @@ module.exports = {
                 const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription(message.member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(message.member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
         
                 return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -80,9 +80,9 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle("pp predictor 5000")
-                .setDescription(member.user.toString() + "\n\n" + sizeMsg + "\n📏 " + size + " inches")
+                .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
         
             message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

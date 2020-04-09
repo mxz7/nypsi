@@ -15,6 +15,20 @@ const cooldown = new Set()
 const snipe = new Map()
 let ready = false
 
+/*
+
+
+
+
+    TODO: 
+
+    ADD DOUBLE DOWN BLACKJACK
+
+
+
+
+*/
+
 let commandFiles 
 
 function loadCommands() {
@@ -135,9 +149,13 @@ client.on("rateLimit", () => {
     console.log("\x1b[31m[" + getTimeStamp() + "] BEING RATE LIMITED!!\x1b[37m")
 })
 
+client.on("guildMemberAdd", member => {
+    runCheck(member.guild)
+})
+
 client.on("messageDelete", message => {
 
-    if (message.content != "" && !message.member.user.bot) {
+    if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
         snipe.set(message.channel.id, message)
 
         exports.snipe = snipe

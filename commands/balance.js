@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils.js")
-const { getBalance, createUser, userExists, updateBalance, getMember } = require("../economy/utils.js")
+const { getColor, getMember } = require("../utils.js")
+const { getBalance, createUser, userExists, updateBalance } = require("../economy/utils.js")
 
 module.exports = {
     name: "balance",
@@ -48,7 +48,7 @@ module.exports = {
                 .setTitle(target.user.tag)
                 .setDescription("**balance** $" + getBalance(target).toLocaleString())
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -61,7 +61,7 @@ module.exports = {
             .setTitle(message.member.user.tag)
             .setDescription("**balance** $" + getBalance(message.member).toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

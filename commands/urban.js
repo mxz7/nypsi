@@ -55,7 +55,7 @@ module.exports = {
             .addField("👍", result.thumbsUp.toLocaleString(), true)
             .addField("👎", result.thumbsDown.toLocaleString(), true)
             .setURL(result.urbanURL)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed)
     }

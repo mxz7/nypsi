@@ -15,7 +15,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌\n$minecraft <name>");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -103,7 +103,7 @@ module.exports = {
             .setColor(color)
             .setThumbnail(skin)
             .addField("previous names", names)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

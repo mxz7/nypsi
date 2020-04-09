@@ -32,7 +32,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle("#" + color)
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         if (member) {
             embed.setDescription(member.user.toString())

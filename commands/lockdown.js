@@ -69,10 +69,10 @@ module.exports = {
             })
 
             const embed = new MessageEmbed()
-                .setTitle("lockdown")
+                .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
                 .setDescription("✅ lockdown enabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
         } else {
@@ -80,10 +80,10 @@ module.exports = {
                 SEND_MESSAGES: null
             })
             const embed = new MessageEmbed()
-                .setTitle("lockdown")
+                .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
                 .setDescription("✅ lockdown disabled for channel **" + message.channel.name + "**")
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
         }

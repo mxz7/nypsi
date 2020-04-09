@@ -33,7 +33,7 @@ module.exports = {
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
             .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         if (member.presence.activities.length > 0) {
             let hasStatus = false

@@ -42,7 +42,7 @@ module.exports = {
                 .setThumbnail(user.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
                 .addField("user info", "**tag** " + user.user.tag + "\n" +
                     "**created** " + formatDate(user.user.createdAt), true)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             if (userExists(user)) {
                 let voted = false
@@ -84,7 +84,7 @@ module.exports = {
                 .setThumbnail(user.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
                 .addField("user info", "**tag** " + user.user.tag + "\n" +
                     "**created** " + formatDate(user.user.createdAt), true)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             if (userExists(user)) {
                 let voted = false
@@ -140,7 +140,7 @@ module.exports = {
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
                     "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
                 .addField("top " + filtered.length, filtered)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             message.channel.send(embed)
         } else if (args[0] == "gname") {
             if (args.length == 1) return
@@ -186,7 +186,7 @@ module.exports = {
                     "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
                     "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
                 .addField("top " + filtered.length, filtered)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
             message.channel.send(embed)
         } else if (args[0] == "top") {
 
@@ -208,7 +208,7 @@ module.exports = {
                 .setTitle("baltop")
                 .setColor("#60d16b")
                 .addField("top " + filtered.length, filtered)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             message.channel.send(embed)
         }

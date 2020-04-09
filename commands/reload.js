@@ -13,6 +13,7 @@ module.exports = {
             reloadCommands()
             console.log("\n -- commands -- \n");
     
+            message.react("✅")
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
 
@@ -35,7 +36,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("reload")
                 .setDescription(msg)
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
                 .setColor("#60d16b")
             
             message.channel.send(embed)

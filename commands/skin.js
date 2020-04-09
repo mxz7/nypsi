@@ -15,7 +15,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌\n$skin <account>");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -64,7 +64,7 @@ module.exports = {
             .setDescription(`[download](https://mc-heads.net/download/${uuid.id})`)
             .setColor(color)
             .setImage(skinIMG)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

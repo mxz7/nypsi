@@ -55,10 +55,10 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle("work")
+            .setTitle("work | " + message.member.user.username)
             .setDescription(work)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")

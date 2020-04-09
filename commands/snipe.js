@@ -27,7 +27,7 @@ module.exports = {
             .setTitle(snipe.get(message.channel.id).member.user.tag)
             .setDescription(content)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed)
 

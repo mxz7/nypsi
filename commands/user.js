@@ -36,7 +36,7 @@ module.exports = {
                     .setTitle(member.user.tag)
                     .setColor(color)
                     .setDescription("`" + member.user.id + "`")
-                    .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                    .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)
             }
         }
@@ -64,7 +64,7 @@ module.exports = {
                 "**joined** " + joined.toString().toLowerCase() + "\n" + 
                 "**roles** " + member._roles.length, true)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         if (member.presence.activities.length > 0) {
             let hasStatus = false

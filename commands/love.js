@@ -155,7 +155,7 @@ module.exports = {
             loveBar + "\n\n" +
             "**" + loveLevel + "** " + loveEmoji)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

@@ -32,8 +32,21 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
+        let color = getColor(message.member);
+
         if (args.length == 0) {
-            return message.channel.send("❌\n$embed <title> | (text) | (hex color)");
+            const embed = new MessageEmbed()
+                .setTitle("embed help")
+                .setColor(color)
+                .addField("usage", "$embed <title> | (text) | (hex color)")
+                .addField("help", "with this command you can create a simple embed message\n" +
+                    "**<>** required | **()** optional\n")
+                .addField("examples", "$embed hello\n" +
+                    "$embed hello | this is a description\n" +
+                    "$embed hello | this is a description | #13c696")
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed).catch(() => message.channel.send("❌\n$embed <title> | (text) | (hex color)"))
         }
 
         let mode = ""
@@ -55,7 +68,6 @@ module.exports = {
 
         const title = args.join(" ").split("|")[0]
         let description
-        let color = getColor(message.member);
         
         if (mode.includes("desc")) {
             description = args.join(" ").split("|")[1]
@@ -68,7 +80,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle(title)
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         if (mode.includes("desc")) {
             embed.setDescription(description)

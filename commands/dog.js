@@ -65,7 +65,7 @@ module.exports = {
             .setURL(url)
             .setColor(color)
             .setImage(image)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

@@ -34,7 +34,7 @@ module.exports = {
                     "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
                     "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
 
-                .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
@@ -62,7 +62,7 @@ module.exports = {
                 "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
                 "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
              return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");

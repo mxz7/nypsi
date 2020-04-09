@@ -56,7 +56,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle("ddos tool")
             .setColor(color)
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
+            .setFooter("bot.tekoh.wtf")
             .setDescription(member.user.toString() + "\n\n" +
                 "**ip** *obtaining..*" + "\n" +
                 "**port** *waiting...*" + "\n\n" +
