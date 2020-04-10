@@ -13,23 +13,20 @@ setInterval(() => {
 
     if (JSON.stringify(users) != JSON.stringify(users1)) {
 
-        /*fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
+        fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 return console.log(err);
             }
             console.log("\x1b[32m[" + getTimestamp() + "] data saved\x1b[37m")
-        })*/
+        })
 
-        console.log("a")
-
-        //timer = 0
-        timer++
+        timer = 0
         timerCheck = false
     } else if (!timerCheck) {
         timer++
     }
 
-    if (timer >= 2 && !timerCheck) {
+    if (timer >= 5 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
         console.log("\x1b[32m[" + getTimestamp() + "] data refreshed\x1b[37m")
         timerCheck = true
