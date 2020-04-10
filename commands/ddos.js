@@ -54,7 +54,7 @@ module.exports = {
         const color = getColor(message.member);
 
         const embed = new MessageEmbed()
-            .setTitle("ddos tool")
+            .setTitle("ddos tool | " + message.member.user.username)
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
             .setDescription(member.user.toString() + "\n\n" +
