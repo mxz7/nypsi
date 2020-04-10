@@ -27,11 +27,11 @@ module.exports = {
                 }
                 const embed = new MessageEmbed()
                     .setTitle("padlock | " + message.member.user.username)
-                    .setDescription("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    .setDescription("**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                     .setColor("#e4334f")
                     .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed).catch(() => {
-                    return message.channel.send("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    return message.channel.send("**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                 })
             }
         }
@@ -102,12 +102,12 @@ module.exports = {
                 }
                 const embed = new MessageEmbed()
                     .setTitle("padlock | " + message.member.user.username)
-                    .setDescription("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    .setDescription("**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                     .setColor("#e4334f")
                     .setFooter("bot.tekoh.wtf")
 
                 return message.channel.send(embed).catch(() => {
-                    return message.channel.send("**vulnerable**\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
+                    return message.channel.send("**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**" + (Math.round(getBalance(message.member) * 0.1)).toLocaleString() + "** with $padlock buy")
                 })
             }
         }
