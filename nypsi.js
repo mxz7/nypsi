@@ -15,20 +15,6 @@ const cooldown = new Set()
 const snipe = new Map()
 let ready = false
 
-/*
-
-
-
-
-    TODO: 
-
-    ADD DOUBLE DOWN BLACKJACK
-
-
-
-
-*/
-
 let commandFiles 
 
 function loadCommands() {
