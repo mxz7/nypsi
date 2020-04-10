@@ -99,7 +99,7 @@ module.exports = {
                 .setDescription("✅ **" + count + "** channels deleted")
                 .setColor(color)
                 .setFooter("bot.tekoh.wtf")
-            return message.channel.send(embed)
+            return message.channel.send(embed).catch()
         }
 
         if (args[0] == "rename" || args[0] == "r") {
@@ -166,7 +166,7 @@ module.exports = {
                 }
                 const embed = new MessageEmbed()
                     .setTitle("channel")
-                    .setDescription(channel + "\n\n✅ channel is no longer nsfw")
+                    .setDescription(channel.name + "\n\n✅ channel is no longer nsfw")
                     .setColor(color)
                     .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)
