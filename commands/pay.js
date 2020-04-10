@@ -74,12 +74,10 @@ module.exports = {
             args[1] = getBalance(message.member) / 2
         }
 
-        if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-                args[1] = formatBet(args[1])
-            } else {
-                return message.channel.send("❌\n$pay <user> <amount>")
-            }
+        if (parseInt(args[1])) {
+            args[1] = formatBet(args[1])
+        } else {
+            return message.channel.send("❌\ninvalid amount")
         }
 
         let amount = parseInt(args[1]) 
