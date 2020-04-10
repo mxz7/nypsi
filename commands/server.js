@@ -21,6 +21,18 @@ module.exports = {
         const online = users.filter(member => member.presence.status != "offline")
         
         const color = getColor(message.member);
+
+        if (args.length == 1 && args[0] == "-id") {
+            const embed = new MessageEmbed()
+                .setTitle(server.name)
+                .setColor(color)
+                .setDescription("`" + server.id + "`")
+                .setFooter("bot.tekoh.wtf")
+            
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            });
+        }
            
         if (args.length == 1 && args[0] == "-m") {
             const embed = new MessageEmbed()
