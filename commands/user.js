@@ -43,6 +43,15 @@ module.exports = {
         
         const joined = formatDate(member.joinedAt);
         const created = formatDate(member.user.createdAt);
+        const roles = member.roles._roles
+
+        let rolesText = ""
+
+        roles.forEach(role => {
+            rolesText = rolesText + role.toString() + " "
+        })
+
+        rolesText = rolesText.split("@everyone").join("")
 
         let username = member.user.tag
 
@@ -65,6 +74,10 @@ module.exports = {
                 "**roles** " + member._roles.length, true)
 
             .setFooter("bot.tekoh.wtf")
+        
+        if (rolesText != " ") {
+            embed.addField("roles", rolesText)
+        }
 
         if (member.presence.activities.length > 0) {
             let hasStatus = false
@@ -106,7 +119,7 @@ module.exports = {
                 status1 = status1 + game
             }
             if (hasStatus || hasSpotify || hasGame) {
-                embed.addField("status", status1)
+                embed.addField("status", status1, true)
             }
         }
 
