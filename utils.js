@@ -1,10 +1,10 @@
-const fs = require("fs");
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 
 
 const pornCache = new Map()
 const bdsmCache = new Map()
+const assCache = new Map()
 const thighsCache = new Map()
 
 const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?limit=777", "https://www.reddit.com/r/bondage.json?limit=777", "https://www.reddit.com/r/dominated.json?limit=777"]
@@ -12,6 +12,15 @@ const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777",
     "https://www.reddit.com/r/thickthighs.json?limit=777",
     "https://www.reddit.com/r/perfectthighs.json?limit=777",
     "https://www.reddit.com/r/thighs.json?limit=777"]
+const assLinks = ["https://www.reddit.com/r/ass.json?limit=777",
+    "https://www.reddit.com/r/asstastic.json?limit=777",
+    "https://www.reddit.com/r/facedownassup.json?limit=777",
+    "https://www.reddit.com/r/assinthong.json?limit=777",
+    "https://www.reddit.com/r/buttplug.json?limit=777",
+    "https://www.reddit.com/r/TheUnderbun.json?limit=777",
+    "https://www.reddit.com/r/booty.json?limit=777",
+    "https://www.reddit.com/r/HungryButts.json?limit=777",
+    "https://www.reddit.com/r/whooties.json?limit=777"]
 const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777", 
     "https://www.reddit.com/r/realgirls.json?limit=777", 
     "https://www.reddit.com/r/legalteens.json?limit=777",
@@ -50,6 +59,20 @@ setTimeout( async () => {
     console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache loaded\x1b[37m")
     exports.bdsmCache = bdsmCache
 
+    //ASS CACHE
+    for (link of assLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            assCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] ass cache loaded\x1b[37m")
+    exports.assCache = assCache
+
     //THIGHS CACHE
     for (link of thighsLinks) {
         const res = await fetch(link).then(a => a.json())
@@ -81,6 +104,7 @@ setTimeout( async () => {
 
 setInterval( async () => {
     bdsmCache.clear()
+    assCache.clear()
     thighsCache.clear()
     pornCache.clear()
     console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache updating..\x1b[37m")
@@ -98,6 +122,20 @@ setInterval( async () => {
     }
     console.log("\x1b[32m[" + getTimestamp() + "] bdsm cache updated\x1b[37m")
     exports.bdsmCache = bdsmCache
+
+    //ASS CACHE
+    for (link of assLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+        if (allowed) {
+            assCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] ass cache updated\x1b[37m")
+    exports.assCache = assCache
 
     //THIGHS CACHE
     for (link of thighsLinks) {
@@ -135,6 +173,7 @@ module.exports = {
     bdsmCache,
     thighsCache,
     pornCache,
+    assCache,
 
     getColor: function(member) {
         if (member.displayHexColor == "#000000") {

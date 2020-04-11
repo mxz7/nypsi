@@ -39,13 +39,15 @@ module.exports = {
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
-        const { bdsmCache, thighsCache, pornCache } = require("../utils.js")
+        const { bdsmCache, thighsCache, pornCache, assCache } = require("../utils.js")
         let nsfwCache = 0
 
         for (link of Array.from(bdsmCache.keys())) {
             nsfwCache = nsfwCache + bdsmCache.get(link).length
         }
-
+        for (link of Array.from(assCache.keys())) {
+            nsfwCache = nsfwCache + assCache.get(link).length
+        }
         for (link of Array.from(thighsCache.keys())) {
             nsfwCache = nsfwCache + thighsCache.get(link).length
         }
