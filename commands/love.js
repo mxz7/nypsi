@@ -47,9 +47,7 @@ module.exports = {
             } else {
                 target2 = message.mentions.members.first();
             }
-        }
-
-        if (args.length == 2) {
+        } else {
             if (message.mentions.members.size == 2) {
                 target1 = message.mentions.members.first()
                 

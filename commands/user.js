@@ -22,6 +22,9 @@ module.exports = {
             } else {
                 member = message.mentions.members.first();
             }
+            if (args[0] == "-id") {
+                member = message.member
+            }
         }
 
         if (!member) {
@@ -30,15 +33,13 @@ module.exports = {
 
         const color = getColor(member);
 
-        if (args.length > 1) {
-            if (args[1] == "-id") {
-                const embed = new MessageEmbed()
-                    .setTitle(member.user.tag)
-                    .setColor(color)
-                    .setDescription("`" + member.user.id + "`")
-                    .setFooter("bot.tekoh.wtf")
-                return message.channel.send(embed)
-            }
+        if (args.join(" ").includes("-id")) {
+            const embed = new MessageEmbed()
+                .setTitle(member.user.tag)
+                .setColor(color)
+                .setDescription("`" + member.user.id + "`")
+                .setFooter("bot.tekoh.wtf")
+            return message.channel.send(embed)
         }
         
         const joined = formatDate(member.joinedAt);
