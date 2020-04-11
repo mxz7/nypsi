@@ -112,15 +112,13 @@ module.exports = {
             args[0] = getBalance(message.member) / 2
         }
 
-        if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
-                args[0] = formatBet(args[0])
-            } else {
-                return message.channel.send("❌\n$blackjack <bet>")
-            }
+        if (parseInt(args[0])) {
+            args[0] = formatBet(args[0])
+        } else {
+            return message.channel.send("❌\ninvalid bet")
         }
 
-        const bet = (parseInt(args[0]));
+        const bet = parseInt(args[0])
 
         if (bet <= 0) {
             return message.channel.send("❌\n$blackjack <bet>")
@@ -398,12 +396,9 @@ async function playGame(message, m) {
 
         let winnings = bet * 2
 
-        if (games.get(message.member.user.id).voted > 0) {
-            winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
-        }
-
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
+            winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
                 "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% vote bonus")

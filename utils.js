@@ -1,7 +1,6 @@
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 
-
 const pornCache = new Map()
 const bdsmCache = new Map()
 const assCache = new Map()
