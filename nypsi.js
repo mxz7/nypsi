@@ -302,12 +302,12 @@ function helpCmd(message, args) {
             .setTitle("help")
             .setColor(color)
         
-            .addField("fun", "$**help** fun")
-            .addField("info", "$**help** info")
-            .addField("money", "$**help** money")
-            .addField("mod", "$**help** mod")
-            .addField("nsfw", "$**help** nsfw")
-            .addField("aliases", "$**help** aliases")
+            .addField("fun", "$**help** fun", true)
+            .addField("info", "$**help** info", true)
+            .addField("money", "$**help** money", true)
+            .addField("mod", "$**help** mod", true)
+            .addField("nsfw", "$**help** nsfw", true)
+            .addField("aliases", "$**help** aliases", true)
 
             .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
         
