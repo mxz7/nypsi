@@ -1,26 +1,26 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils")
 
-const answers = [" As I see it, yes.",
-    "Ask again later.",
-    "Better not tell you now.",
-    "Cannot predict now.",
-    "Concentrate and ask again.",
-    "Don’t count on it.",
-    "It is certain.",
-    "It is decidedly so.",
-    "Most likely.",
-    "My reply is no.",
-    "My sources say no.",
-    "Outlook not so good.",
-    "Outlook good.",
-    "Reply hazy, try again.",
-    "Signs point to yes.",
-    "Very doubtful.",
-    "Without a doubt.",
-    "Yes.",
-    "Yes – definitely.",
-    "You may rely on it."]
+const answers = ["as i see it, yes",
+    "ask again later",
+    "better not tell you now",
+    "cannot predict now",
+    "concentrate and ask again",
+    "don’t count on it",
+    "it is certain",
+    "it is decidedly so",
+    "most likely",
+    "my reply is no",
+    "my sources say no",
+    "outlook not so good",
+    "outlook good",
+    "reply hazy, try again",
+    "signs point to yes",
+    "very doubtful",
+    "without a doubt",
+    "yes.",
+    "yes – definitely",
+    "you may rely on it"]
 
 const cooldown = new Map()
 
