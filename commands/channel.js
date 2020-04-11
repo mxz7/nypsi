@@ -67,7 +67,7 @@ module.exports = {
 
             for (arg of args) {
                 const newChannel = await message.guild.channels.create(arg)
-                channels = channels + "**" + newChannel.name + "** ✅\n"
+                channels = channels + "**" + newChannel.toString() + "** ✅\n"
             }
 
             const embed = new MessageEmbed()
@@ -152,7 +152,7 @@ module.exports = {
                 }
                 const embed = new MessageEmbed()
                     .setTitle("channel | " + message.member.user.username)
-                    .setDescription(channel.name + "\n\n✅ channel is now nsfw")
+                    .setDescription(channel.toString() + "\n\n✅ channel is now nsfw")
                     .setColor(color)
                     .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)
@@ -166,7 +166,7 @@ module.exports = {
                 }
                 const embed = new MessageEmbed()
                     .setTitle("channel")
-                    .setDescription(channel.name + "\n\n✅ channel is no longer nsfw")
+                    .setDescription(channel.toString() + "\n\n✅ channel is no longer nsfw")
                     .setColor(color)
                     .setFooter("bot.tekoh.wtf")
                 return message.channel.send(embed)

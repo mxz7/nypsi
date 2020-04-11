@@ -28,6 +28,10 @@ module.exports = {
             return message.channel.send("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
         }
 
+        if (args.length == 0) {
+            args[0] = 7
+        }
+
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
             return message.channel.send("❌\n$delp <amount> (@user)");
         }

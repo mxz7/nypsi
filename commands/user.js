@@ -120,7 +120,7 @@ module.exports = {
                 status1 = status1 + game
             }
             if (hasStatus || hasSpotify || hasGame) {
-                embed.addField("status", status1, true)
+                embed.addField("activity", status1, true)
             }
         }
 

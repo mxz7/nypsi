@@ -51,8 +51,6 @@ module.exports = {
 
         let mode = ""
 
-        console.log(args.join(" ").split("|").length)
-
         if (!message.content.includes("|")) {
             mode = "title_only"
         } else if (args.join(" ").split("|").length == 2) {

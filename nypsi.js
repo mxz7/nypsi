@@ -141,6 +141,10 @@ client.on("guildMemberAdd", member => {
 
 client.on("messageDelete", message => {
 
+    if (!message) return
+
+    if (!message.member) return
+
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
         snipe.set(message.channel.id, message)
 
