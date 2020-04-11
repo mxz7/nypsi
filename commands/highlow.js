@@ -54,6 +54,7 @@ module.exports = {
                     "⬆ **higher** the next card will be higher in value than your current card\n" +
                     "⬇ **lower** the next card will be lower in value than your current card\n" +
                     "💰 **cash out** end the game and receive the current win\nmax win **26**x")
+                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌\n$highlow <bet>"))
         }
