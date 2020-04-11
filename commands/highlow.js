@@ -65,7 +65,7 @@ module.exports = {
                 .addField("technical info", "highlow works exactly how it would in real life\n" +
                     "when you create a game, a full 52 deck is shuffled in a random order\n" +
                     "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-                    "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)")
+                    "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)")
                 .setFooter("bot.tekoh.wtf")
             
             return message.channel.send(embed).catch()
