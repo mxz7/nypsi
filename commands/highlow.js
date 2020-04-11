@@ -143,7 +143,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("highlow | " + message.member.user.username)
-            .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+            .setDescription("**bet** $" + bet.toLocaleString() + "\n**0.5**x ($" + Math.round(bet * 0.5).toLocaleString() + ")")
             .setColor(color)
             .addField("card", "| " + games.get(message.member.user.id).card + " |")
             .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
