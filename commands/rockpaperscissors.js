@@ -157,7 +157,7 @@ module.exports = {
     
         message.channel.send(embed).then(m => {
 
-            embed.setDescription("**threw** " + winning + " " + winningEmoji + "\n\n**choice** " + choice + "\n**bet** $" + bet.toLocaleString())
+            embed.setDescription("**threw** " + winning + " " + winningEmoji + "\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
 
             if (win) {
 
