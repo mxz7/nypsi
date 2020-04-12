@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js")
 
 module.exports = {
     name: "reload",
-    description: "reload all commands",
+    description: "reload commands",
     category: "none",
     run: async (message, args) => {
         const { reloadCommands, reloadCommand } = require("../nypsi.js")
