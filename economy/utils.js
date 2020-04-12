@@ -71,7 +71,8 @@ module.exports = {
 
         if (voteCache.has(member.user.id)) {
             if (!voteCache.get(member.user.id)) {
-               return 0
+                voteCache.delete(member.user.id)
+                return 0
             }
             return 0.2
         } 
@@ -84,7 +85,7 @@ module.exports = {
             return 0.2
         } else {
             voteCache.set(member.user.id, false)
-            setTimeout(() => voteCache.delete(member.user.id), 300000)
+            setTimeout(() => voteCache.delete(member.user.id), 60000)
             return 0
         }
 
