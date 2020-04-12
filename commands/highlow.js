@@ -120,7 +120,7 @@ module.exports = {
         
         games.set(message.member.user.id, {
             bet: bet,
-            win: 0.5,
+            win: 0,
             deck: shuffle(newDeck),
             card: "",
             id: id,
@@ -143,7 +143,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("highlow | " + message.member.user.username)
-            .setDescription("**bet** $" + bet.toLocaleString() + "\n**0.5**x ($" + Math.round(bet * 0.5).toLocaleString() + ")")
+            .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
             .setColor(color)
             .addField("card", "| " + games.get(message.member.user.id).card + " |")
             .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
@@ -257,7 +257,7 @@ async function playGame(message, m) {
         return ["⬆", "⬇", "💰"].includes(reaction.emoji.name) && user.id == message.member.user.id
     }
 
-    const reaction = await m.awaitReactions(filter, { max: 1, time: 240000, errors: ["time"] }).then(collected => {
+    const reaction = await m.awaitReactions(filter, { max: 1, time: 300000, errors: ["time"] }).then(collected => {
         return collected.first().emoji.name
     }).catch()
 
@@ -269,7 +269,7 @@ async function playGame(message, m) {
         const newCard1 = getValue(message.member)
 
         if (newCard1 > oldCard) {
-            win = win + 0.5
+            win = win + 1
             games.set(message.member.user.id, {
                 bet: bet,
                 win: win,
@@ -303,7 +303,7 @@ async function playGame(message, m) {
         const newCard1 = getValue(message.member)
 
         if (newCard1 < oldCard) {
-            win = win + 0.5
+            win = win + 1
             games.set(message.member.user.id, {
                 bet: bet,
                 win: win,
