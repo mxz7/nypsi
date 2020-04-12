@@ -19,7 +19,6 @@ module.exports = {
             const guilds = message.client.guilds.cache
 
             let user = users.find(u => u.id == args[1])
-
             if (!user) {
                 return message.react("❌")
             }
@@ -46,7 +45,7 @@ module.exports = {
 
             if (userExists(user)) {
                 let voted = false
-                if (getVoteMulti(user) > 0) voted = true
+                if (await getVoteMulti(user) > 0) voted = true
                 embed.addField("economy", "**balance** $" + getBalance(user).toLocaleString() + "\n" +
                     "**voted** " + voted, true)
             }
