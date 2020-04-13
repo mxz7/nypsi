@@ -78,22 +78,27 @@ module.exports = {
 
 function getUptime(ms) {
     const sec = Math.floor((ms / 1000) % 60)
-    const min = Math.floor((ms / (1000 * 60)) % 60).toString()
-    const hrs = Math.floor((ms / (1000 * 60 * 60)) % 60).toString()
-    const days = Math.floor((ms / (1000 * 60 * 60 * 24)) % 60).toString()
+    const min = Math.floor(sec % 60)
+    let hrs = Math.floor(min % 60)
+    let days = 0
+
+    while (hrs >= 24) {
+       hrs = hrs - 24
+       days++
+    }
 
     let output = ""
 
-    if (days != "0") {
+    if (days > 0) {
         output = output + days + "d "
     }
-    if (hrs != "0") {
+    if (hrs > 0) {
         output = output + "" + hrs + "h "
     }
-    if (min != "0") {
+    if (min > 0) {
         output = output + "" + min + "m "
     }
-    if (sec != "0") {
+    if (sec > 0) {
         output = output + "" + sec + "s"
     }
 
