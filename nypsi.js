@@ -250,12 +250,13 @@ function getTimeStamp() {
     return timestamp
 }
 
-const { updateXp, getXp } = require("./economy/utils.js")
+const { updateXp, getXp, userExists, createUser } = require("./economy/utils.js")
 const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args);
 
     if (!xpCooldown.has(message.member.user.id)) {
+        if (!userExists(message.member)) createUser(message.member)
         updateXp(message.member, getXp(message.member) + 1)
 
         xpCooldown.add(message.member.user.id)
