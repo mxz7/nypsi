@@ -13,11 +13,11 @@ module.exports = {
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
+            return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
         }
 
         if (!userExists(message.member)) createUser(message.member)
@@ -38,7 +38,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         const color = getColor(message.member)
@@ -56,7 +56,7 @@ module.exports = {
                     "💰 **cash out** end the game and receive the current win\nmax win **26**x")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$highlow <bet>"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $highlow <bet>"))
         }
 
         if (args[0] == "info") {
@@ -83,21 +83,21 @@ module.exports = {
         if (parseInt(args[0])) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send("❌\ninvalid bet")
+            return message.channel.send("❌ invalid bet")
         }
 
         const bet = parseInt(args[0])
 
         if (bet <= 0) {
-            return message.channel.send("❌\n$blackjack <bet>")
+            return message.channel.send("❌ $blackjack <bet>")
         }
 
         if (bet > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this bet")
+            return message.channel.send("❌ you cannot afford this bet")
         }
 
         if (games.has(message.member.user.id)) {
-            return message.channel.send("❌\nyou are already playing highlow")
+            return message.channel.send("❌ you are already playing highlow")
         }
 
         cooldown.set(message.member.id, new Date())

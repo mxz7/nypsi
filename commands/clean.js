@@ -10,7 +10,7 @@ module.exports = {
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
         if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
+            return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -29,7 +29,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining);
+            return message.channel.send("❌ still on cooldown for " + remaining);
         }
 
         setTimeout(() => {

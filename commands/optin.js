@@ -10,7 +10,7 @@ module.exports = {
 
         if (cooldown.has(message.member.id)) {
             message.delete().catch();
-            return message.channel.send("❌\nstill on cooldown").then(m => m.delete(1000));
+            return message.channel.send("❌ still on cooldown").then(m => m.delete(1000));
         }
 
         cooldown.add(message.member.id);
@@ -20,7 +20,7 @@ module.exports = {
         }, 10000);
 
         if (!list.includes(message.member.user.id)) {
-            return message.channel.send("❌\nyou are already opted into bot dms - use $optout to opt out");
+            return message.channel.send("❌ you are already opted into bot dms - use $optout to opt out");
         }
 
         const index = list.indexOf(message.member.user.id);

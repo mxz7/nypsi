@@ -45,11 +45,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\nyou must ask the 8ball something")
+            return message.channel.send("❌ you must ask the 8ball something")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -69,7 +69,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\ni may be lacking permission: 'EMBED_MESSAGES'")
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_MESSAGES'")
         })
     }
 }

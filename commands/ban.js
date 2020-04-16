@@ -12,7 +12,7 @@ module.exports = {
         }
 
         if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'BAN_MEMBERS'");
+            return message.channel.send("❌ i am lacking permission: 'BAN_MEMBERS'");
         }
 
         const color = getColor(message.member);
@@ -29,7 +29,7 @@ module.exports = {
                 .addField("examples", "$ban @member hacking\n$ban @member @member2 @member3 hacking\n$ban @member hacking -s")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$ban <@user(s)> (reason) [-s]"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $ban <@user(s)> (reason) [-s]"))
         }
 
         const members = message.mentions.members

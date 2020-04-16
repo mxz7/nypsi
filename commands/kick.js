@@ -12,7 +12,7 @@ module.exports = {
         }
 
         if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'KICK_MEMBERS'");
+            return message.channel.send("❌ i am lacking permission: 'KICK_MEMBERS'");
         }
 
         const color = getColor(message.member);
@@ -29,7 +29,7 @@ module.exports = {
                 .addField("examples", "$kick @member hacking\n$kick @member @member2 @member3 hacking\n$kick @member hacking -s")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$kick <@user(s)> (reason) [-s]"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $kick <@user(s)> (reason) [-s]"))
         }
 
         const members = message.mentions.members

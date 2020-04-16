@@ -29,7 +29,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         let color = getColor(message.member);
@@ -46,7 +46,7 @@ module.exports = {
                     "$embed hello | this is a description | #13c696")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$embed <title> | (text) | (hex color)"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $embed <title> | (text) | (hex color)"))
         }
 
         let mode = ""

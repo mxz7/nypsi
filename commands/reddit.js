@@ -25,11 +25,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$reddit <subreddit>")
+            return message.channel.send("❌ $reddit <subreddit>")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -46,17 +46,17 @@ module.exports = {
             allowed = res.data.children.filter(post => !post.data.is_self)
 
         } catch (e) {
-            return message.channel.send("❌\n invalid subreddit")
+            return message.channel.send("❌  invalid subreddit")
         }
 
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
         if (!chosen) {
-            return message.channel.send("❌\nunable to find image")
+            return message.channel.send("❌ unable to find image")
         }
 
         if (chosen.data.over_18 && !message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
+            return message.channel.send("❌ you must do this in an nsfw channel")
         }
 
         const a = await redditImage(chosen, allowed)
@@ -69,7 +69,7 @@ module.exports = {
         url = "https://reddit.com" + url
 
         if (image == "lol") {
-            return message.channel.send("❌\nunable to find image")
+            return message.channel.send("❌ unable to find image")
         }
 
         const color = getColor(message.member);
@@ -85,7 +85,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
+            return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
         })
 
     }

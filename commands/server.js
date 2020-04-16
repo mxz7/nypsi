@@ -11,7 +11,7 @@ module.exports = {
         const server = message.guild;
 
         if (!server.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         const created = formatDate(server.createdAt).toLowerCase();
@@ -30,7 +30,7 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
             
             return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
             });
         }
            
@@ -49,7 +49,7 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
             });
         }
 
@@ -77,7 +77,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 };

@@ -23,7 +23,7 @@ module.exports = {
                 })
             } else {
                 if (getBalance(message.member) < 1000000) {
-                    return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
+                    return message.channel.send("❌ you are not eligible for a padlock. you need atleast $**1,000,000**")
                 }
                 const embed = new MessageEmbed()
                     .setTitle("padlock | " + message.member.user.username)
@@ -54,7 +54,7 @@ module.exports = {
                 } else {
                     remaining = `${seconds}s`
                 }
-                return message.channel.send("❌\nstill on cooldown for " + remaining );
+                return message.channel.send("❌ still on cooldown for " + remaining );
             }
 
             cooldown.set(message.member.user.id, new Date());
@@ -76,7 +76,7 @@ module.exports = {
             }
 
             if (getBalance(message.member) < 1000000) {
-                return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
+                return message.channel.send("❌ you are not eligible for a padlock. you need atleast $**1,000,000**")
             }
 
             const cost = Math.round(getBalance(message.member) * 0.1)
@@ -98,7 +98,7 @@ module.exports = {
                 })
             } else {
                 if (getBalance(message.member) < 1000000) {
-                    return message.channel.send("❌\nyou are not eligible for a padlock. you need atleast $**1,000,000**")
+                    return message.channel.send("❌ you are not eligible for a padlock. you need atleast $**1,000,000**")
                 }
                 const embed = new MessageEmbed()
                     .setTitle("padlock | " + message.member.user.username)

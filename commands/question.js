@@ -29,7 +29,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
         
         let color = getColor(message.member)
@@ -44,7 +44,7 @@ module.exports = {
                     "the emojis used for the reactions will be ✅ and ❌")
                 .addField("examples", "$question this \n$question this | #35adce")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$question <text> | (hex color)"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $question <text> | (hex color)"))
         }
 
         cooldown.set(message.member.id, new Date());

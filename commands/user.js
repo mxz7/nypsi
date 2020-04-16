@@ -8,7 +8,7 @@ module.exports = {
     run: async (message, args) => {
         
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         let member;
@@ -27,7 +27,7 @@ module.exports = {
         }
 
         if (!member) {
-            return message.channel.send("❌ \ninvalid user");
+            return message.channel.send("❌ invalid user");
         }
 
         const color = getColor(member);
@@ -124,7 +124,7 @@ module.exports = {
         }
 
         message.channel.send(embed).catch(() => {
-             return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 };

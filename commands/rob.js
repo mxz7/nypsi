@@ -27,7 +27,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
         
         const color = getColor(message.member);
@@ -42,7 +42,7 @@ module.exports = {
                     "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
                     "you can lose up to **30**% of your balance by failing a robbery")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$rob <user>"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $rob <user>"))
         }
 
         if (!userExists(message.member)) createUser(message.member)
@@ -54,23 +54,23 @@ module.exports = {
         }
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user")
+            return message.channel.send("❌ invalid user")
         }
 
         if (target.user.bot) {
-            return message.channel.send("❌\ninvalid user")
+            return message.channel.send("❌ invalid user")
         }
 
         if (message.member == target) {
-            return message.channel.send("❌\nyou cant rob yourself")
+            return message.channel.send("❌ you cant rob yourself")
         }
 
         if (!userExists(target) || getBalance(target) <= 500) {
-            return message.channel.send("❌\nthis user doesnt have sufficient funds")
+            return message.channel.send("❌ this user doesnt have sufficient funds")
         }
 
         if (getBalance(message.member) < 750) {
-            return message.channel.send("❌\nyou dont have sufficient funds")
+            return message.channel.send("❌ you dont have sufficient funds")
         }
 
         cooldown.set(message.member.user.id, new Date());
@@ -117,7 +117,7 @@ module.exports = {
 
 
             }).catch(() => {
-                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
             });
             return
         }
@@ -193,7 +193,7 @@ module.exports = {
 
 
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 }

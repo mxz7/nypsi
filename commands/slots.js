@@ -27,7 +27,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (!userExists(message.member)) {
@@ -43,7 +43,7 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
                 .addField("usage", "$slots <bet>\n$slots info")
                 .addField("help", "you should know how a slot machine works..")
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board"))
         }
 
         if (args.length == 1 && args[0] == "info") {
@@ -55,12 +55,12 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
             
             return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
             })
         }
 
         if (!args[0]) {
-            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
+            return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
         }
 
         if (args[0] == "all") {
@@ -75,18 +75,18 @@ module.exports = {
             if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
                 args[0] = formatBet(args[0])
             } else {
-                return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
+                return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
             }
         }
 
         const bet = (parseInt(args[0]));
 
         if (bet <= 0) {
-            return message.channel.send("❌\n$slots <bet> | $**slots info** shows the winning board")
+            return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
         }
 
         if (bet > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this bet")
+            return message.channel.send("❌ you cannot afford this bet")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -248,7 +248,7 @@ module.exports = {
 
 
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 }

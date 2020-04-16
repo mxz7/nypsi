@@ -25,7 +25,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         cooldown.set(message.member.id, new Date());
@@ -35,7 +35,7 @@ module.exports = {
         }, 15000);
 
         if (args.length == 0) {
-            return message.channel.send("❌\ninvalid user");
+            return message.channel.send("❌ invalid user");
         }
 
         let target;
@@ -43,25 +43,25 @@ module.exports = {
         target = message.mentions.members.first();
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user - you must tag the user for this command");
+            return message.channel.send("❌ invalid user - you must tag the user for this command");
         }
 
         if (list.includes(message.member.user.id)) {
-            return message.channel.send("❌\nyou have opted out of bot dms, use $optin to be able to use this command");
+            return message.channel.send("❌ you have opted out of bot dms, use $optin to be able to use this command");
         }
 
         if (list.includes(target.user.id)) {
-            return message.channel.send("❌\nthis user has opted out of bot dms");
+            return message.channel.send("❌ this user has opted out of bot dms");
         }
 
         if (banned.includes(target.user.id)) {
-            return message.channel.send("❌\nthis user is banned from the bot");
+            return message.channel.send("❌ this user is banned from the bot");
         }
 
         target.send("**sent by " + message.member.user.tag + " in " + message.guild.name + "** use $optout to optout" + " https://youtu.be/dQw4w9WgXcQ").then( () => {
             message.channel.send("✅\nsuccess");
         }).catch( () => {
-            return message.channel.send("❌\ni cannot message that user");
+            return message.channel.send("❌ i cannot message that user");
         });
 
     }

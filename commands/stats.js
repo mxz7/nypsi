@@ -26,7 +26,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         cooldown.set(message.member.id, new Date());
@@ -86,7 +86,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\n i may be lacking permission: 'EMBED_LINKS'")
+            return message.channel.send("❌  i may be lacking permission: 'EMBED_LINKS'")
         })
     }
 }

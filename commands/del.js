@@ -11,7 +11,7 @@ module.exports = {
         } 
 
         if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send("❌ \ni am lacking permission: 'MANAGE_MESSAGES'");
+            return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -30,11 +30,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining);
+            return message.channel.send("❌ still on cooldown for " + remaining);
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌\n$del <amount>");
+            return message.channel.send("❌ $del <amount>");
         }
 
         let amount = parseInt(args[0])
@@ -54,7 +54,7 @@ module.exports = {
         
         if (amount <= 100) {
             await message.channel.bulkDelete(amount).catch(() => {
-                message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
+                message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
                 return
             })
         } else {
@@ -67,14 +67,14 @@ module.exports = {
             for (let i = 0; i < (amount1 / 100); i++) {
                 if (amount <= 100) {
                     await message.channel.bulkDelete(amount).catch(() => {
-                        message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
+                        message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
                         fail = true
                     })
                     break
                 }
 
                 await message.channel.bulkDelete(100).catch(() => {
-                    message.channel.send("❌\nunable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
+                    message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
                     fail = true
                 })
                 if (fail) {

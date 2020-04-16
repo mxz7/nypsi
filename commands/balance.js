@@ -16,7 +16,7 @@ module.exports = {
             const target = message.mentions.members.first();
 
             if (!target) {
-                return message.channel.send("❌\ninvalid user - you must tag the user for this command");
+                return message.channel.send("❌ invalid user - you must tag the user for this command");
             }
 
             if (isNaN(args[1]) || parseInt(args[1]) < 0) return
@@ -38,7 +38,7 @@ module.exports = {
             }
 
             if (!target) {
-                return message.channel.send("❌\ninvalid user")
+                return message.channel.send("❌ invalid user")
             }
 
             if (!userExists(target)) createUser(target)
@@ -51,7 +51,7 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
             });
 
         }
@@ -64,7 +64,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
 
     }
