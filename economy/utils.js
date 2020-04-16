@@ -42,7 +42,7 @@ setInterval(() => {
 
 setInterval(() => {
     for (user in users) {
-        if (users[user].balance == NaN || users[user].balance == null || users[user].balance == undefined || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == -NaN) {
+        if (users[user].balance == NaN || users[user].balance == null || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == undefined || users[user].balance == -NaN) {
 
             let padlock
 
@@ -58,7 +58,23 @@ setInterval(() => {
             }
             console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
         }
+
+        if (users[user].bank == NaN || users[user].bank == null || users[user].bank == undefined || users[user].bank == -NaN) {
+
+            users[user].bank = 0
+
+            console.log("[" + getTimestamp() + "] " + user + " bank set to 0 because NaN")
+        }
+
+        if (users[user].xp == NaN || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN) {
+
+            users[user].xp = 0
+
+            console.log("[" + getTimestamp() + "] " + user + " xp set to 0 because NaN")
+        }
     }
+
+    
 }, 15000)
 
 module.exports = {
@@ -132,10 +148,43 @@ module.exports = {
 
     updateBalance: function(member, amount) {
         const amount1 = Math.round(amount)
-        users[member.user.id] = {
-            balance: amount1,
-            padlockStatus: hasPadlocklol(member)
+        users[member.user.id].balance = amount1
+    },
+
+    getBankBalance: function(member) {
+        if (!users[member.user.id].bank) {
+            return 0
+        } else {
+            return users[member.user.id].bank
         }
+    },
+
+    updateBankBalance: function(member, amount) {
+        const amount1 = Math.round(amount)
+        users[member.user.id].bank = amount1
+    },
+
+    getXp: function(member) {
+        if (!users[member.user.id].xp) {
+            return 0
+        } else {
+            return users[member.user.id].xp
+        }
+    },
+
+    updateXp: function(member, amount) {
+        const amount1 = Math.round(amount)
+        users[member.user.id].xp = amount1
+    },
+
+    getMaxBankBalance: function(member) {
+        const xp = xpBalance(member)
+        const constant = 500
+        const starting = 50000
+        const bonus = xp * constant
+        const max = bonus + starting
+
+        return max
     },
 
     topAmountGlobal: function(amount) {
@@ -200,6 +249,8 @@ module.exports = {
     createUser: function(member) {
         users[member.user.id] = {
             balance: 100,
+            bank: 1000,
+            xp: 0,
             padlockStatus: false
         }
     },
@@ -273,5 +324,21 @@ function hasPadlocklol(member) {
         return true
     } else {
         return false
+    }
+}
+
+function bankBalance(member) {
+    if (!users[member.user.id].bank) {
+        return 0
+    } else {
+        return users[member.user.id].bank
+    }
+}
+
+function xpBalance(member) {
+    if (!users[member.user.id].xp) {
+        return 0
+    } else {
+        return users[member.user.id].xp
     }
 }

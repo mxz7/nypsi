@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor, getMember } = require("../utils.js")
-const { getBalance, createUser, userExists, updateBalance } = require("../economy/utils.js")
+const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, formatBet } = require("../economy/utils.js")
 
 module.exports = {
     name: "balance",
@@ -19,9 +19,13 @@ module.exports = {
                 return message.channel.send("❌ invalid user - you must tag the user for this command");
             }
 
-            if (isNaN(args[1]) || parseInt(args[1]) < 0) return
+            if (parseInt(args[1])) {
+                args[1] = formatBet(args[1])
+            } else {
+                return
+            }
     
-            let amount = (parseInt(args[1]));
+            const amount = parseInt(args[1])
 
             updateBalance(target, amount)
 
@@ -46,9 +50,10 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor(color)
                 .setTitle(target.user.tag)
-                .setDescription("**balance** $" + getBalance(target).toLocaleString())
+                .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
+                    "💳 $**" + getBankBalance(target) + "** / **" + getMaxBankBalance(target) + "**")
 
-                .setFooter("bot.tekoh.wtf")
+                .setFooter("xp: " + getXp(target).toLocaleString() + " | bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
                 return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
@@ -59,9 +64,10 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(message.member.user.tag)
-            .setDescription("**balance** $" + getBalance(message.member).toLocaleString())
+            .setDescription("💰 $**" + getBalance(message.member).toLocaleString() + "**\n" +
+                    "💳 $**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
 
-            .setFooter("bot.tekoh.wtf")
+            .setFooter("xp: " + getXp(message.member).toLocaleString() + " | bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
