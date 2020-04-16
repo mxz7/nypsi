@@ -1,5 +1,4 @@
 const { MessageEmbed } = require("discord.js");
-const { stripIndents } = require("common-tags");
 const fetch = require("node-fetch");
 const { getColor } = require("../utils.js")
 
@@ -69,17 +68,24 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        let text = `**name** ${account.full_name}`
+
+        if (account.biography.length != 0) {
+            text = text + `\n**bio** ${account.biography}`
+        }
+
+        if (account.external_url != null) {
+            text = text + `\n**link** ${account.external_url}`
+        }
+
+        text = text + `\n**followers** ${account.edge_followed_by.count.toLocaleString()}\n**following** ${account.edge_follow.count.toLocaleString()}`
+
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(title)
             .setURL(`https://instagram.com/${name}`)
             .setThumbnail(account.profile_pic_url_hd)
-            .addField("profile", stripIndents`**name** ${account.full_name}
-            **bio** ${account.biography.length == 0 ? "none" : account.biography}
-            **link** ${account.external_url == null ? "none" : account.external_url}
-            **followers** ${account.edge_followed_by.count.toLocaleString()}
-            **following** ${account.edge_follow.count.toLocaleString()}
-            **posts** ${account.edge_owner_to_timeline_media.count.toLocaleString()}`)
+            .setDescription(text)
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
