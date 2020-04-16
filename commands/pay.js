@@ -103,7 +103,7 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setTitle("processing..")
+            .setTitle("processing payment..")
             .setColor(color)
             
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())

@@ -84,6 +84,10 @@ aliases.set("activity", "presence")
 aliases.set("purge", "delete")
 aliases.set("penis", "pp")
 aliases.set("bj", "blackjack")
+aliases.set("bird", "birb")
+aliases.set("dep", "deposit")
+aliases.set("with", "withdraw")
+aliases.set("bank", "balance")
 
 console.log("\n -- commands -- ");
 
@@ -246,9 +250,18 @@ function getTimeStamp() {
     return timestamp
 }
 
+const { updateXp, getXp } = require("./economy/utils.js")
+const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args);
-    
+
+    if (!xpCooldown.has(message.member.user.id)) {
+        updateXp(message.member, getXp(message.member) + 1)
+
+        xpCooldown.add(message.member.user.id)
+
+        setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
+    }
 }
 
 function getCmdName(cmd) {
