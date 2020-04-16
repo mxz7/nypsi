@@ -1,5 +1,4 @@
 const { MessageEmbed } = require("discord.js");
-const { stripIndents } = require("common-tags");
 const { getMember, formatDate, getColor } = require("../utils.js");
 
 module.exports = {
@@ -66,9 +65,9 @@ module.exports = {
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
             
-            .addField(member.displayName, stripIndents `**username** ${username}
-            **id** ${member.user.id}
-            **status** ${member.presence.status}`, true)
+            .addField(member.displayName, `**username** ${username}` +
+            `\n**id** ${member.user.id}` +
+            `\n**status** ${member.presence.status}`, true)
 
             .addField(member.displayName, "**created** " + created.toString().toLowerCase() + "\n" + 
                 "**joined** " + joined.toString().toLowerCase() + "\n" + 
