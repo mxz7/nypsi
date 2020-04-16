@@ -5,6 +5,11 @@ const pornCache = new Map()
 const bdsmCache = new Map()
 const assCache = new Map()
 const thighsCache = new Map()
+const birbCache = new Map()
+const catCache = new Map()
+const dogCache = new Map()
+const rabbitCache = new Map()
+const snekCache = new Map()
 
 const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?limit=777", "https://www.reddit.com/r/bondage.json?limit=777", "https://www.reddit.com/r/dominated.json?limit=777"]
 const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777",
@@ -41,6 +46,18 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777",
     "https://www.reddit.com/r/cumfetish.json?limit=777",
     "https://www.reddit.com/r/creampies.json?limit=777",
     "https://www.reddit.com/r/throatpies.json?limit=777"]
+const birbLinks = ["https://www.reddit.com/r/birb.json?limit=777", 
+    "https://www.reddit.com/r/budgies.json?limit=777",
+    "https://www.reddit.com/r/parrots.json?limit=777"]
+const catLinks = ["https://www.reddit.com/r/cat.json?limit=777",
+    "https://www.reddit.com/r/kittens.json?limit=777"]
+const dogLinks = ["https://www.reddit.com/r/dog.json?limit=777",
+    "https://www.reddit.com/r/corgi.json?limit=777",
+    "https://www.reddit.com/r/dogpictures.json?limit=777",
+    "https://www.reddit.com/r/goldenretrievers.json?limit=777",
+    "https://www.reddit.com/r/shiba.json?limit=777"]
+const rabbitLinks = ["https://www.reddit.com/r/rabbits.json?limit=777"]
+const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
 
 
 setTimeout( async () => {
@@ -99,16 +116,88 @@ setTimeout( async () => {
     }
     console.log("\x1b[32m[" + getTimestamp() + "] porn cache loaded\x1b[37m")
     exports.pornCache = pornCache
+
+    //BIRB CACHE
+    for (link of birbLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            birbCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] birb cache loaded\x1b[37m")
+    exports.birbCache = birbCache
+
+    //CAT CACHE
+    for (link of catLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            catCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] cat cache loaded\x1b[37m")
+    exports.catCache = catCache
+
+    //DOG CACHE
+    for (link of dogLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            dogCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] dog cache loaded\x1b[37m")
+    exports.dogCache = dogCache
+
+    //RABBIT CACHE
+    for (link of rabbitLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            rabbitCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] rabbit cache loaded\x1b[37m")
+    exports.rabbitCache = rabbitCache
+
+    //SNEK CACHE
+    for (link of snekLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            snekCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] snek cache loaded\x1b[37m")
+    exports.snekCache = snekCache
 }, 5000)
 
 setInterval( async () => {
-    bdsmCache.clear()
-    assCache.clear()
-    thighsCache.clear()
-    pornCache.clear()
-    console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache updating..\x1b[37m")
+    console.log("\x1b[32m[" + getTimestamp() + "] img caches updating..\x1b[37m")
 
     //BDSM CACHE
+    bdsmCache.clear()
     for (link of bdsmLinks) {
         const res = await fetch(link).then(a => a.json())
         
@@ -123,6 +212,7 @@ setInterval( async () => {
     exports.bdsmCache = bdsmCache
 
     //ASS CACHE
+    assCache.clear()
     for (link of assLinks) {
         const res = await fetch(link).then(a => a.json())
         
@@ -137,6 +227,7 @@ setInterval( async () => {
     exports.assCache = assCache
 
     //THIGHS CACHE
+    thighsCache.clear()
     for (link of thighsLinks) {
         const res = await fetch(link).then(a => a.json())
         
@@ -151,6 +242,7 @@ setInterval( async () => {
     exports.thighsCache = thighsCache
 
     //PORN CACHE
+    pornCache.clear()
     for (link of pornLinks) {
         const res = await fetch(link).then(a => a.json())
         
@@ -164,7 +256,85 @@ setInterval( async () => {
     console.log("\x1b[32m[" + getTimestamp() + "] porn cache updated\x1b[37m")
     exports.pornCache = pornCache
 
-    console.log("\x1b[32m[" + getTimestamp() + "] nsfw cache update finished\x1b[37m")
+    //BIRB CACHE
+    birbCache.clear()
+    for (link of birbLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            birbCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] birb cache loaded\x1b[37m")
+    exports.birbCache = birbCache
+
+    //CAT CACHE
+    catCache.clear()
+    for (link of catLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            catCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] cat cache loaded\x1b[37m")
+    exports.catCache = catCache
+
+    //DOG CACHE
+    dogCache.clear()
+    for (link of dogLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            dogCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] dog cache loaded\x1b[37m")
+    exports.dogCache = dogCache
+
+    //RABBIT CACHE
+    rabbitCache.clear()
+    for (link of rabbitLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            rabbitCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] rabbit cache loaded\x1b[37m")
+    exports.rabbitCache = rabbitCache
+
+    //SNEK CACHE
+    snekCache.clear()
+    for (link of snekLinks) {
+        const res = await fetch(link).then(a => a.json())
+        
+        const allowed = res.data.children.filter(post => !post.data.is_self)
+
+        if (allowed) {
+            snekCache.set(link, allowed)
+        } else {
+            console.error("no images @ " + link)
+        }
+    }
+    console.log("\x1b[32m[" + getTimestamp() + "] snek cache loaded\x1b[37m")
+    exports.snekCache = snekCache
 }, 21600000)
 
 module.exports = {
@@ -173,6 +343,11 @@ module.exports = {
     thighsCache,
     pornCache,
     assCache,
+    birbCache,
+    catCache,
+    dogCache,
+    rabbitCache,
+    snekCache,
 
     getColor: function(member) {
         if (member.displayHexColor == "#000000") {
