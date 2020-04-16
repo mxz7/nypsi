@@ -11,8 +11,8 @@ module.exports = {
     category: "money",
     run: async (message, args) => {
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
+        if (cooldown.has(message.member.user.id)) {
+            const init = cooldown.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
             const time = 600 - diff
@@ -73,10 +73,10 @@ module.exports = {
             return message.channel.send("❌\nyou dont have sufficient funds")
         }
 
-        cooldown.set(message.member.id, new Date());
+        cooldown.set(message.member.user.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.id);
+            cooldown.delete(message.member.user.id);
         }, 600000);
 
         const amount = (Math.floor(Math.random() * 45) + 10)
