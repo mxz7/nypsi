@@ -8,25 +8,34 @@ module.exports = {
     run: async (message, args) => {
         const { snipe } = require("../nypsi.js")
 
-        if (!snipe || !snipe.get(message.channel.id)) {
-            return message.channel.send("❌ nothing to snipe")
-        }
+        let channel = message.channel.id
 
-        let content = snipe.get(message.channel.id).content
-
-        if (content) {
-            if (snipe.get(message.channel.id).attachments.url) {
-                content = snipe.get(message.channel.id).attachments.url
+        if (args.length == 1) {
+            channel = message.mentions.channels.first().id
+            if (!channel) {
+                return message.channel.send("❌ invalid channel")
             }
         }
 
-        const created = new Date(snipe.get(message.channel.id).createdTimestamp)
+        if (!snipe || !snipe.get(channel)) {
+            return message.channel.send("❌ nothing to snipe")
+        }
+
+        let content = snipe.get(channel).content
+
+        if (content) {
+            if (snipe.get(channel).attachments.url) {
+                content = snipe.get(channel).attachments.url
+            }
+        }
+
+        const created = new Date(snipe.get(channel).createdTimestamp)
 
         const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle(snipe.get(message.channel.id).member.user.tag)
+            .setTitle(snipe.get(channel).member.user.tag)
             .setDescription(content)
 
             .setFooter(timeSince(created) + " ago")
