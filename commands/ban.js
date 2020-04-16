@@ -47,6 +47,10 @@ module.exports = {
         let count = 0
         let failed = []
 
+        if (args.join(" ").includes("-s")) {
+            message.delete()
+        }
+
         for (member of members.keyArray()) {
             await message.guild.members.ban(member, {
                 days: 1,
