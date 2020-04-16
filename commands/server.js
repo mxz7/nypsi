@@ -36,7 +36,7 @@ module.exports = {
            
         if (args.length == 1 && args[0] == "-m") {
             const embed = new MessageEmbed()
-                .setThumbnail(server.iconURL())
+                .setThumbnail(server.iconURL({format: "png", dynamic: true, size: 128}))
                 .setColor(color)
                 .setTitle(server.name)
 
@@ -56,7 +56,7 @@ module.exports = {
          
 
         const embed = new MessageEmbed()
-            .setThumbnail(server.iconURL())
+            .setThumbnail(server.iconURL({format: "png", dynamic: true, size: 128}))
             .setColor(color)
             .setTitle(server.name)
             
