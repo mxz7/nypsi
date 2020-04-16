@@ -126,7 +126,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
-                .setThumbnail(guild.iconURL())
+                .setThumbnail(guild.iconURL({format: "png", dynamic: true, size: 128}))
                 .setDescription("`" + guild.id + "`")
                 .addField("info", "**owner** " + owner + "\n" + 
                     "**created** " + formatDate(guild.createdAt) + "\n" +
@@ -172,7 +172,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle(guild.name)
                 .setColor("#60d16b")
-                .setThumbnail(guild.iconURL())
+                .setThumbnail(guild.iconURL({format: "png", dynamic: true, size: 128}))
                 .setDescription("`" + guild.id + "`")
                 .addField("info", "**owner** " + owner + "\n" + 
                     "**created** " + formatDate(guild.createdAt) + "\n" +
