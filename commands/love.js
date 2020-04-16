@@ -78,7 +78,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 5000);
 
         let lovePercent = Math.ceil(Math.random() * 101) - 1;
         let loveLevel;
@@ -110,7 +110,7 @@ module.exports = {
         } else if (lovePercent > 25) {
             loveLevel = "uhh..";
             loveEmoji = "❤";
-        } else if (lovePercent > 5) {
+        } else if (lovePercent < 5 && lovePercent != 0) {
             loveLevel = "alone forever";
             loveEmoji = "😭";
         } else if (lovePercent == 0) {
