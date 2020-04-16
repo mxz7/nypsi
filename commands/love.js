@@ -74,20 +74,20 @@ module.exports = {
             return message.channel.send("❌\ninvalid account");
         }
 
-        if (target1 == target2) {
-            return message.channel.send("❌\nlol loner");
-        }
-
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 10000);
 
-        const lovePercent = Math.ceil(Math.random() * 101) - 1;
+        let lovePercent = Math.ceil(Math.random() * 101) - 1;
         let loveLevel;
         let loveEmoji;
         let loveBar = "";
+
+        if (target1 == target2) {
+            lovePercent = 0
+        }
 
         if (lovePercent == 100) {
             loveLevel = "perfect!!";
@@ -110,6 +110,12 @@ module.exports = {
         } else if (lovePercent > 25) {
             loveLevel = "uhh..";
             loveEmoji = "❤";
+        } else if (lovePercent > 5) {
+            loveLevel = "alone forever";
+            loveEmoji = "😭";
+        } else if (lovePercent == 0) {
+            loveLevel = "lol loner";
+            loveEmoji = "😭";
         } else {
             loveLevel = "lets not talk about it..";
             loveEmoji = "💔";
