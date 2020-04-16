@@ -29,7 +29,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (!userExists(message.member)) createUser(message.member)
@@ -51,11 +51,11 @@ module.exports = {
                     "red and black give a **2x** win and green gives a **25**x win")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
         }
 
         if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
         if (args[0] == "red") {
@@ -78,18 +78,18 @@ module.exports = {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             } else {
-                return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+                return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
             }
         }
 
         const bet = parseInt(args[1])
 
         if (bet <= 0) {
-            return message.channel.send("❌\n$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
         if (bet > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this bet")
+            return message.channel.send("❌ you cannot afford this bet")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -183,7 +183,7 @@ module.exports = {
 
 
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 }

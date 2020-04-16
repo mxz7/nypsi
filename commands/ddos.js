@@ -25,11 +25,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$ddos <user>")
+            return message.channel.send("❌ $ddos <user>")
         }
 
         let member;
@@ -45,7 +45,7 @@ module.exports = {
         }
 
         if (!member) {
-            return message.channel.send("❌ \ninvalid user");
+            return message.channel.send("❌ invalid user");
         }
 
         const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
@@ -91,7 +91,7 @@ module.exports = {
                 })
             }, 1000)
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
 
     }

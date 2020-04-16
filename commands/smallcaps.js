@@ -7,7 +7,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$smallcaps <text>");
+            return message.channel.send("❌ $smallcaps <text>");
         }
 
         let lols = "";

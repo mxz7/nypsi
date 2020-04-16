@@ -26,11 +26,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$urban <definition>")
+            return message.channel.send("❌ $urban <definition>")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -40,7 +40,7 @@ module.exports = {
         }, 5000);
 
         const result = await urban(args.join()).catch(() => {
-            return message.channel.send("❌\nunknown definition")
+            return message.channel.send("❌ unknown definition")
         })
 
         if (!result.word) return

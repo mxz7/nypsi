@@ -35,7 +35,7 @@ module.exports = {
                     waiting.delete(message.member.user.id)
     
                     if (getBalance(challenger) < bet || getBalance(message.member) < bet) {
-                        return message.channel.send("❌\nerror placing bets")
+                        return message.channel.send("❌ error placing bets")
                     }
     
                     updateBalance(challenger, getBalance(challenger) - bet)
@@ -98,7 +98,7 @@ module.exports = {
                             })
                         }, 1500)
                     }).catch(() => {
-                        return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                     });
                     return
                 }
@@ -122,7 +122,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length != 2 && args.length != 3) {
@@ -137,7 +137,7 @@ module.exports = {
                 .addField("examples", "$coinflip heads 100\n$coinflip member tails 500")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>"))
         }
 
         if (args.length == 3) {
@@ -149,11 +149,11 @@ module.exports = {
             }
 
             if (!target) {
-                return message.channel.send("❌\ninvalid user");
+                return message.channel.send("❌ invalid user");
             }
 
             if (message.member == target) {
-                return message.channel.send("❌\ninvalid user");
+                return message.channel.send("❌ invalid user");
             }
 
             if (args[1].toLowerCase() == "t") args[1] = "tails"
@@ -161,7 +161,7 @@ module.exports = {
             if (args[1].toLowerCase() == "h") args[1] = "heads"
 
             if (args[1].toLowerCase() != "tails" && args[1].toLowerCase() != "heads") {
-                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
             }
 
             if (args[2] == "all") {
@@ -176,28 +176,28 @@ module.exports = {
                 if (!isNaN(formatBet(args[2]) || !parseInt(formatBet[args[2]]))) {
                     args[2] = formatBet(args[2])
                 } else {
-                    return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                    return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
                 }
             }
 
             const bet = (parseInt(args[2]));
 
             if (bet <= 0) {
-                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
             }
 
             if (bet > getBalance(message.member)) {
-                return message.channel.send("❌\nyou cannot afford this bet")
+                return message.channel.send("❌ you cannot afford this bet")
             }
 
             if (!userExists(target)) createUser(target)
 
             if (bet > getBalance(target)) {
-                return message.channel.send("❌\nthey cannot afford this bet")
+                return message.channel.send("❌ they cannot afford this bet")
             }
 
             if (waiting.get(target.user.id)) {
-                return message.channel.send("❌\nthey have already been invited to a game")
+                return message.channel.send("❌ they have already been invited to a game")
             }
 
             cooldown.set(message.member.id, new Date());
@@ -233,7 +233,7 @@ module.exports = {
         if (args[0].toLowerCase() == "h") args[0] = "heads"
 
         if (args[0].toLowerCase() != "tails" && args[0].toLowerCase() != "heads") {
-            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
 
         if (args[1] == "all") {
@@ -248,18 +248,18 @@ module.exports = {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             } else {
-                return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+                return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
             }
         }
 
         const bet = (parseInt(args[1]));
 
         if (bet <= 0) {
-            return message.channel.send("❌\n$coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
+            return message.channel.send("❌ $coinflip <h/t> <bet> | $coinflip <user> <h/t> <bet>")
         }
 
         if (bet > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this bet")
+            return message.channel.send("❌ you cannot afford this bet")
         }
 
         cooldown.set(message.member.id, new Date())
@@ -335,7 +335,7 @@ module.exports = {
     
     
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 }

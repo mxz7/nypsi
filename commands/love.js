@@ -10,7 +10,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -29,11 +29,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌\n$love <user> (user)");
+            return message.channel.send("❌ $love <user> (user)");
         }
 
         let target1;
@@ -66,12 +66,12 @@ module.exports = {
                 target1 = getMember(message, args[0])
                 target2 = getMember(message, args[1])
             } else {
-                return message.channel.send("❌\n$love <user> (user)");
+                return message.channel.send("❌ $love <user> (user)");
             }
         }
         
         if (!target1 || !target2) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌ invalid account");
         }
 
         cooldown.set(message.member.id, new Date());
@@ -162,7 +162,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
          });
             
 

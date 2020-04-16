@@ -24,7 +24,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (!message.member.hasPermission("MANAGE_CHANNELS")) {
@@ -32,7 +32,7 @@ module.exports = {
         }
 
         if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-            return message.channel.send("❌\ni am lacking permission: 'MANAGE_CHANNELS")
+            return message.channel.send("❌ i am lacking permission: 'MANAGE_CHANNELS")
         }
 
         const color = getColor(message.member);
@@ -52,14 +52,14 @@ module.exports = {
                     "$channel delete #channel1 #channel2 #channel3")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)"))   
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)"))   
         }
 
         
 
         if (args[0] == "create" || args[0] == "c") {
             if (args.length == 1) {
-                return message.channel.send("❌\n$channel **c**reate <name1 name2>\nexample: $channel c channel1 channel2")
+                return message.channel.send("❌ $channel **c**reate <name1 name2>\nexample: $channel c channel1 channel2")
             }
             args.shift()
 
@@ -80,7 +80,7 @@ module.exports = {
 
         if (args[0] == "delete" || args[0] == "del") {
             if (args.length == 1) {
-                return message.channel.send("❌\n$channel **del**ete <channel>")
+                return message.channel.send("❌ $channel **del**ete <channel>")
             }
 
             args.shift()
@@ -90,7 +90,7 @@ module.exports = {
             message.mentions.channels.forEach(async channel => {
                 count++
                 await channel.delete().catch(() => {
-                    return message.channel.send("❌\nunable to delete channel: " + channel.name)
+                    return message.channel.send("❌ unable to delete channel: " + channel.name)
                 })
             })
 
@@ -104,12 +104,12 @@ module.exports = {
 
         if (args[0] == "rename" || args[0] == "r") {
             if (!args.length >= 3) {
-                return message.channel.send("❌\n$channel **r**ename <channel> <name>")
+                return message.channel.send("❌ $channel **r**ename <channel> <name>")
             }
             const channel = message.mentions.channels.first()
 
             if (!channel) {
-                return message.channel.send("❌\ninvalid channel")
+                return message.channel.send("❌ invalid channel")
             }
 
             args.shift()
@@ -119,7 +119,7 @@ module.exports = {
 
             await channel.edit({name: name}).then(() => {
             }).catch(() => {
-                return message.channel.send("❌\nunable to rename channel")
+                return message.channel.send("❌ unable to rename channel")
             })
             const embed = new MessageEmbed()
                 .setTitle("channel | " + message.member.user.username)
@@ -131,13 +131,13 @@ module.exports = {
 
         if (args[0] == "nsfw") {
             if (args.length != 2) {
-                return message.channel.send("❌\n$channel nsfw <channel>")
+                return message.channel.send("❌ $channel nsfw <channel>")
             }
 
             const channel = message.mentions.channels.first()
 
             if (!channel) {
-                return message.channel.send("❌\ninvalid channel")
+                return message.channel.send("❌ invalid channel")
             }
 
             let perms = true
@@ -145,7 +145,7 @@ module.exports = {
             if (!channel.nsfw) {
                 await channel.edit({nsfw: true}).catch(() => {
                     perms = false
-                    return message.channel.send("❌\nunable to edit that channel")
+                    return message.channel.send("❌ unable to edit that channel")
                 })
                 if (!perms) {
                     return
@@ -159,7 +159,7 @@ module.exports = {
             } else {
                 await channel.edit({nsfw: false}).catch(() => {
                     perms = false
-                    return message.channel.send("❌\nunable to edit that channel")
+                    return message.channel.send("❌ unable to edit that channel")
                 })
                 if (!perms) {
                     return
@@ -173,6 +173,6 @@ module.exports = {
             }
         }
 
-        return message.channel.send("❌\n$channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)")
+        return message.channel.send("❌ $channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)")
     }
 }

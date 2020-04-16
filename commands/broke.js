@@ -13,7 +13,7 @@ module.exports = {
         }
 
         if (getBalance(message.member) > 0) {
-            return message.channel.send("❌\nyou have more than $0")
+            return message.channel.send("❌ you have more than $0")
         }
 
         if (cooldown.has(message.member.id)) {
@@ -32,7 +32,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         cooldown.set(message.member.id, new Date());

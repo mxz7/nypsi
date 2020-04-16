@@ -28,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         const color = getColor(message.member);
@@ -41,7 +41,7 @@ module.exports = {
                 .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$pay <user> <amount>"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $pay <user> <amount>"))
         }
 
         let target = message.mentions.members.first();
@@ -51,15 +51,15 @@ module.exports = {
         }
 
         if (!target) {
-            return message.channel.send("❌\ninvalid user")
+            return message.channel.send("❌ invalid user")
         }
 
         if (target.user.bot) {
-            return message.channel.send("❌\ninvalid user")
+            return message.channel.send("❌ invalid user")
         }
 
         if (message.member == target) {
-            return message.channel.send("❌\ninvalid user");
+            return message.channel.send("❌ invalid user");
         }
 
         if (!userExists(target)) createUser(target)
@@ -77,7 +77,7 @@ module.exports = {
         if (parseInt(args[1])) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send("❌\ninvalid amount")
+            return message.channel.send("❌ invalid amount")
         }
 
         let amount = parseInt(args[1]) 
@@ -85,7 +85,7 @@ module.exports = {
         let taxEnabled = false
 
         if (amount > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this payment")
+            return message.channel.send("❌ you cannot afford this payment")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -131,7 +131,7 @@ module.exports = {
                 m.edit(embed)
             }, 1000)
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
 
     }

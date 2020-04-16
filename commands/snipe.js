@@ -9,7 +9,7 @@ module.exports = {
         const { snipe } = require("../nypsi.js")
 
         if (!snipe || !snipe.get(message.channel.id)) {
-            return message.channel.send("❌\nnothing to snipe")
+            return message.channel.send("❌ nothing to snipe")
         }
 
         let content = snipe.get(message.channel.id).content

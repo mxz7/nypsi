@@ -15,7 +15,7 @@ module.exports = {
         }
 
         if (!message.guild.me.hasPermission("MANAGE_CHANNELS") || !message.guild.me.hasPermission("MANAGE_ROLES")) {
-            return message.channel.send("❌\ni am lacking permission: 'MANAGE_CHANNELS' or 'MANAGE_ROLES'")
+            return message.channel.send("❌ i am lacking permission: 'MANAGE_CHANNELS' or 'MANAGE_ROLES'")
         }
 
         if (cooldown.has(message.member.id)) {
@@ -34,7 +34,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         cooldown.set(message.member.id, new Date());

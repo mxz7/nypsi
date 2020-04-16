@@ -27,7 +27,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (!userExists(message.member)) {
@@ -46,14 +46,14 @@ module.exports = {
                     "**2.5**x multiplier for winning")
 
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>"))
         }
 
         let choice = args[0]
         let memberEmoji = ""
 
         if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
-            return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+            return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
         }
 
         if (choice == "r") choice = "rock"
@@ -76,18 +76,18 @@ module.exports = {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             } else {
-                return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+                return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
             }
         }
 
         const bet = (parseInt(args[1]))
 
         if (bet <= 0) {
-            return message.channel.send("❌\n$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+            return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
         }
 
         if (bet > getBalance(message.member)) {
-            return message.channel.send("❌\nyou cannot afford this bet")
+            return message.channel.send("❌ you cannot afford this bet")
         }
 
         cooldown.set(message.member.id, new Date())
@@ -178,7 +178,7 @@ module.exports = {
                 m.edit(embed)
             }, 1500)
         }).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 }

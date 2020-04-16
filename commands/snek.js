@@ -10,7 +10,7 @@ module.exports = {
     category: "fun",
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -31,13 +31,13 @@ module.exports = {
             }
 
 
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         const { snekCache } = require("../utils.js")
 
         if (snekCache.size < 1) {
-            return message.channel.send("❌\nplease wait a couple more seconds..")
+            return message.channel.send("❌ please wait a couple more seconds..")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -57,7 +57,7 @@ module.exports = {
         const a = await redditImage(chosen, allowed)
 
         if (a == "lol") {
-            return message.channel.send("❌\nunable to find snek image")
+            return message.channel.send("❌ unable to find snek image")
         }
 
         const image = a.split("|")[0]
@@ -80,7 +80,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
+            return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
         })
     }
 }

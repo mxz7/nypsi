@@ -24,17 +24,17 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         if (!message.channel.nsfw) {
-            return message.channel.send("❌\nyou must do this in an nsfw channel")
+            return message.channel.send("❌ you must do this in an nsfw channel")
         }
 
         const { bdsmCache } = require("../utils.js")
 
         if (bdsmCache.size <= 2) {
-            return message.channel.send("❌\nplease wait a couple more seconds..")
+            return message.channel.send("❌ please wait a couple more seconds..")
         }
 
         cooldown.set(message.member.id, new Date());
@@ -54,7 +54,7 @@ module.exports = {
         const a = await redditImage(chosen, allowed)
 
         if (a == "lol") {
-            return message.channel.send("❌\nunable to find bdsm image")
+            return message.channel.send("❌ unable to find bdsm image")
         }
 
         const image = a.split("|")[0]
@@ -77,7 +77,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
+            return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
         })
 
     }

@@ -11,7 +11,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
         }
 
         if (cooldown.has(message.member.id)) {
@@ -30,11 +30,11 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌\nstill on cooldown for " + remaining );
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
         
         if (args.length == 0) {
-            return message.channel.send("❌\n$insagram <account>");
+            return message.channel.send("❌ $insagram <account>");
         }
 
         cooldown.set(message.member.id, new Date());
@@ -52,7 +52,7 @@ module.exports = {
         try {
             res = await fetch(url).then(url => url.json());
         } catch (e) {
-            return message.channel.send("❌\ninvalid account");
+            return message.channel.send("❌ invalid account");
         }
 
         const account = res.graphql.user;
@@ -89,7 +89,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 };
