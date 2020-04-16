@@ -34,22 +34,30 @@ module.exports = {
             return message.channel.send("❌\nstill on cooldown for " + remaining );
         }
 
+        const { snekCache } = require("../utils.js")
+
+        if (snekCache.size < 1) {
+            return message.channel.send("❌\nplease wait a couple more seconds..")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const res = await fetch("https://www.reddit.com/r/snek.json?sort=top&t=day").then(a => a.json())
-        
-        const allowed = res.data.children.filter(post => !post.data.is_self)
-        
+        const snekLinks = Array.from(snekCache.keys())
+
+        const subredditChoice = snekLinks[Math.floor(Math.random() * snekLinks.length)]
+
+        const allowed = snekCache.get(subredditChoice)
+
         const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
         const a = await redditImage(chosen, allowed)
 
         if (a == "lol") {
-            return message.channel.send("❌\nunable to find image")
+            return message.channel.send("❌\nunable to find snek image")
         }
 
         const image = a.split("|")[0]
@@ -61,16 +69,18 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
+
         const embed = new MessageEmbed()
-            .setAuthor("u/" + author + " | r/snek")
-            .setTitle(title)
-            .setURL(url)
             .setColor(color)
+            .setTitle(title)
+            .setAuthor("u/" + author + " | r/" + subreddit)
+            .setURL(url)
             .setImage(image)
             .setFooter("bot.tekoh.wtf")
-        
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+
+        message.channel.send(embed).catch(() => {
+            return message.channel.send("❌\ni may be missing permission: 'EMBED_LINKS'")
         })
     }
 }

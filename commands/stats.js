@@ -39,20 +39,35 @@ module.exports = {
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
-        const { bdsmCache, thighsCache, pornCache, assCache } = require("../utils.js")
-        let nsfwCache = 0
+        const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils.js")
+        let imgCache = 0
 
         for (link of Array.from(bdsmCache.keys())) {
-            nsfwCache = nsfwCache + bdsmCache.get(link).length
+            imgCache = imgCache + bdsmCache.get(link).length
         }
         for (link of Array.from(assCache.keys())) {
-            nsfwCache = nsfwCache + assCache.get(link).length
+            imgCache = imgCache + assCache.get(link).length
         }
         for (link of Array.from(thighsCache.keys())) {
-            nsfwCache = nsfwCache + thighsCache.get(link).length
+            imgCache = imgCache + thighsCache.get(link).length
         }
         for (link of Array.from(pornCache.keys())) {
-            nsfwCache = nsfwCache + pornCache.get(link).length
+            imgCache = imgCache + pornCache.get(link).length
+        }
+        for (link of Array.from(birbCache.keys())) {
+            imgCache = imgCache + birbCache.get(link).length
+        }
+        for (link of Array.from(catCache.keys())) {
+            imgCache = imgCache + catCache.get(link).length
+        }
+        for (link of Array.from(dogCache.keys())) {
+            imgCache = imgCache + dogCache.get(link).length
+        }
+        for (link of Array.from(rabbitCache.keys())) {
+            imgCache = imgCache + rabbitCache.get(link).length
+        }
+        for (link of Array.from(snekCache.keys())) {
+            imgCache = imgCache + snekCache.get(link).length
         }
 
         const embed = new MessageEmbed()
@@ -66,7 +81,7 @@ module.exports = {
             .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
                 " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
                 "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
-                "**nsfw imgs** " + nsfwCache.toLocaleString(), true)
+                "**imgs** " + imgCache.toLocaleString(), true)
             .addField("usage", "**memory** " + memUsage + "mb", true)
             .setFooter("bot.tekoh.wtf")
 
