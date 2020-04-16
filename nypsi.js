@@ -82,6 +82,8 @@ aliases.set("ch", "channel")
 aliases.set("colour", "color")
 aliases.set("activity", "presence")
 aliases.set("purge", "delete")
+aliases.set("penis", "pp")
+aliases.set("bj", "blackjack")
 
 console.log("\n -- commands -- ");
 
