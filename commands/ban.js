@@ -3,7 +3,7 @@ const { getColor } = require("../utils.js")
 
 module.exports = {
     name: "ban",
-    description: "generic ban command",
+    description: "ban one or more users",
     category: "moderation",
     run: async (message, args) => {
         
@@ -47,10 +47,6 @@ module.exports = {
         let count = 0
         let failed = []
 
-        if (args.join(" ").includes("-s")) {
-            message.delete()
-        }
-
         for (member of members.keyArray()) {
             await message.guild.members.ban(member, {
                 days: 1,
@@ -60,6 +56,10 @@ module.exports = {
             }).catch(() => {
                 failed.push(members.get(member).user.tag)
             })
+        }
+
+        if (count == 0) {
+            return message.channel.send("❌ i was unable to ban any users")
         }
 
         const embed = new MessageEmbed()
