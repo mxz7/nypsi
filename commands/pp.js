@@ -37,6 +37,12 @@ module.exports = {
         let size = Math.floor(Math.random() * 20)
         let sizeMsg = "8"
 
+        const bigInch = Math.floor(Math.random() * 100)
+
+        if (bigInch == 7) {
+            size = 50
+        }
+
         for (let i = 0; i < size; i++) {
             sizeMsg = sizeMsg + "="
         }
