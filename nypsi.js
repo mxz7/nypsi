@@ -81,7 +81,7 @@ aliases.set("lock", "lockdown")
 aliases.set("ch", "channel")
 aliases.set("colour", "color")
 aliases.set("activity", "presence")
-aliases.set("purge", "delete")
+aliases.set("purge", "del")
 aliases.set("penis", "pp")
 aliases.set("bj", "blackjack")
 aliases.set("bird", "birb")
@@ -254,6 +254,8 @@ const { updateXp, getXp, userExists, createUser } = require("./economy/utils.js"
 const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args);
+
+    if (!message.member) return
 
     if (!xpCooldown.has(message.member.user.id)) {
         if (!userExists(message.member)) createUser(message.member)
