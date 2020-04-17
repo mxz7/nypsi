@@ -40,8 +40,8 @@ module.exports = {
         let amount = parseInt(args[0])
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            if (amount > 15) {
-                amount = 15
+            if (amount > 100) {
+                amount = 100
             }
             cooldown.set(message.member.id, new Date());
 
