@@ -3,7 +3,7 @@ const { getColor } = require("../utils.js")
 
 module.exports = {
     name: "kick",
-    description: "generic kick command",
+    description: "kick one or more users",
     category: "moderation",
     run: async (message, args) => {
 
@@ -53,6 +53,10 @@ module.exports = {
             }).catch(() => {
                 failed.push(members.get(member).user.tag)
             })
+        }
+
+        if (count == 0) {
+            return message.channel.send("❌ i was unable to kick any users")
         }
 
         const embed = new MessageEmbed()
