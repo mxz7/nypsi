@@ -179,6 +179,16 @@ client.on("message", message => {
         return message.channel.send("❌\nplease wait before using commands")
     }
 
+    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return
+
+    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
+        return message.channel.send("❌ i am lacking permission `EMBED_LINKS`")
+    }
+
+    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
+        return message.channel.send("❌ i am lacking permission `MANAGE_MESSAGES`")
+    }
+
     if (banned.includes(message.member.user.id)) {
         cooldown.add(message.member.user.id)
 
@@ -250,21 +260,23 @@ function getTimeStamp() {
     return timestamp
 }
 
-const { updateXp, getXp, userExists, createUser } = require("./economy/utils.js")
+const { updateXp, getXp, userExists } = require("./economy/utils.js")
 const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args);
 
     if (!message.member) return
+    if (!userExists(message.member)) return
 
-    if (!xpCooldown.has(message.member.user.id)) {
-        if (!userExists(message.member)) createUser(message.member)
-        updateXp(message.member, getXp(message.member) + 1)
-
-        xpCooldown.add(message.member.user.id)
-
-        setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
-    }
+    setTimeout(() => {
+        if (!xpCooldown.has(message.member.user.id)) {
+            updateXp(message.member, getXp(message.member) + 1)
+    
+            xpCooldown.add(message.member.user.id)
+    
+            setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
+        }
+    }, 10000)
 }
 
 function getCmdName(cmd) {
