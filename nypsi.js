@@ -208,7 +208,7 @@ client.on("message", message => {
         cooldown.delete(message.member.user.id)
     }, 500)
 
-    const args = message.content.substring(prefix.length).toLowerCase().split(" ");
+    const args = message.content.substring(prefix.length).split(" ");
 
     const cmd = args[0].toLowerCase();
 
