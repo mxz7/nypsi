@@ -17,7 +17,7 @@ module.exports = {
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
 
-            let msg = " - - - "
+            let msg = ""
 
             console.log(" - - - ")
 
@@ -28,8 +28,6 @@ module.exports = {
                     msg = msg + "\n**" + arg + "** ✅"
                 }
             }
-
-            msg = msg + "\n - - - "
 
             console.log(" - - - ")
 
