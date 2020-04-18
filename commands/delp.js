@@ -38,12 +38,19 @@ module.exports = {
 
         let amount = parseInt(args[0])
 
+
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            if (amount > 50) {
-                amount = 50
+            if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+                if (amount > 10) {
+                    amount = 10
+                }
+            } else {
+                if (amount > 50) {
+                    amount = 50
+                }
             }
             cooldown.set(message.member.id, new Date());
-
+    
             setTimeout(() => {
                 cooldown.delete(message.member.id);
             }, 30000);
