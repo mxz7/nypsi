@@ -351,7 +351,7 @@ module.exports = {
 
     getColor: function(member) {
         if (member.displayHexColor == "#000000") {
-           return "#d3d160";
+           return "#f8f8ff";
         } else {
             return member.displayHexColor;
         }
