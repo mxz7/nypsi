@@ -17,7 +17,7 @@ module.exports = {
 
         const color = getColor(message.member)
 
-        if (args.length == 0) {
+        if (args.length == 0 || message.mentions.members.first() == null) {
             const embed = new MessageEmbed()
                 .setTitle("mute help")
                 .setColor(color)
@@ -25,10 +25,6 @@ module.exports = {
                 .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
-        }
-
-        if (message.mentions.members.first() == null || args.length == 0) {
-            return message.channel.send("help")
         }
 
         const members = message.mentions.members

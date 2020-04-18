@@ -16,7 +16,7 @@ module.exports = {
 
         const color = getColor(message.member)
 
-        if (args.length == 0) {
+        if (args.length == 0 || message.mentions.members.first() == null) {
             return message.channel.send("❌ $unmute <@user(s)>")
         }
 
