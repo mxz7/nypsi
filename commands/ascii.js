@@ -3,6 +3,8 @@ const { getColor } = require("../utils.js")
 const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json");
 
+const cooldown = new Map()
+
 module.exports = {
     name: "ascii",
     description: "create ascii text",
@@ -11,6 +13,25 @@ module.exports = {
 
         if (list.includes(message.member.user.id)) {
             return message.channel.send("❌ you have opted out of bot dms, use $optin to enable this command");
+        }
+
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 5 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
         const color = getColor(message.member)
@@ -75,6 +96,12 @@ module.exports = {
                 return message.channel.send("❌ $ascii fonts <page (1/2/3/4/5)>")
             }
         }
+        
+        cooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id)
+        }, 5000)
         
         let font = "Standard"
         let text = ""
