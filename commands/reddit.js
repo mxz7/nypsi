@@ -41,7 +41,7 @@ module.exports = {
         let allowed
 
         try {
-            const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json").then(a => a.json())
+            const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then(a => a.json())
 
             allowed = res.data.children.filter(post => !post.data.is_self)
 
