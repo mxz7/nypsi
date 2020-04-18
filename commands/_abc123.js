@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js")
 const { formatDate } = require("../utils.js")
 const { getPeaks } = require("../guilds/utils.js")
-const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal } = require("../economy/utils.js")
+const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp } = require("../economy/utils.js")
 
 module.exports = {
     name: "_abc123",
@@ -46,7 +46,9 @@ module.exports = {
             if (userExists(user)) {
                 let voted = false
                 if (await getVoteMulti(user) > 0) voted = true
-                embed.addField("economy", "**balance** $" + getBalance(user).toLocaleString() + "\n" +
+                embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
+                    "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
+                    "**xp** " + getXp(user) + "\n" +
                     "**voted** " + voted, true)
             }
             
@@ -88,7 +90,9 @@ module.exports = {
             if (userExists(user)) {
                 let voted = false
                 if (await getVoteMulti(user) > 0) voted = true
-                embed.addField("economy", "**balance** $" + getBalance(user).toLocaleString() + "\n" +
+                embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
+                    "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
+                    "**xp** " + getXp(user) + "\n" +
                     "**voted** " + voted, true)
             }
             
@@ -191,8 +195,6 @@ module.exports = {
 
             let amount = 5
 
-            
-
             if (args.length > 1 && parseInt(args[1])) {
                 amount = parseInt(args[1])
             }
@@ -204,9 +206,9 @@ module.exports = {
             });
 
             const embed = new MessageEmbed()
-                .setTitle("baltop")
+                .setTitle("top " + filtered.length)
                 .setColor("#60d16b")
-                .addField("top " + filtered.length, filtered)
+                .setDescription(filtered)
                 .setFooter("bot.tekoh.wtf")
 
             message.channel.send(embed)
