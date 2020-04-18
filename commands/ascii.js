@@ -96,7 +96,7 @@ module.exports = {
                 asciiString = "```" + data + "```";
             } else {
                 fail = true
-                return message.channel.send("❌ error - maybe an incorrect font")
+                return message.channel.send("❌ error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**")
             }
         });
 
@@ -110,9 +110,9 @@ module.exports = {
                 return message.channel.send("❌ ascii text exceeds discord message size");
             }            message.member.send(asciiString).then( () => {
                 return message.channel.send("✅\n**success - check your dms**");
-            })/*.catch( () => {
+            }).catch( () => {
                 return message.channel.send("❌ unable to send you a dm");
-            });*/
+            });
         }, 500);
         
 
