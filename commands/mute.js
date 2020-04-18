@@ -21,7 +21,7 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("mute help")
                 .setColor(color)
-                .addField("usage", "$mute <@user(s)> (time in minutes)")
+                .addField("usage", "$mute <@user(s)> (time in minutes) [-s]")
                 .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
@@ -67,9 +67,17 @@ module.exports = {
             }
         }
 
+        let fail = false
+
         for (member of members.keyArray()) {
-            await members.get(member).roles.add(muteRole).then(() => count++)
+            await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
+                fail = true
+                return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
+            })
+            if (fail) break
         }
+
+        if (fail) return
 
         if (count == 0) {
             return message.channel.send("❌ i was unable to mute any users")
@@ -86,7 +94,7 @@ module.exports = {
         if (timedMute) {
             setTimeout( async () => {
                 for (member of members.keyArray()) {
-                    await members.get(member).remove(muteRole).catch()
+                    await members.get(member).roles.remove(muteRole).catch()
                 }
             }, time)
         }
@@ -96,6 +104,10 @@ module.exports = {
             .setDescription("✅ **" + count + "** member(s) muted")
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
+
+        if (timedMute) {
+            embed.setDescription("✅ **" + count + "** member(s) muted for **" + reason + "** minutes")
+        }
 
         if (args.join(" ").includes("-s")) {
             message.delete()
