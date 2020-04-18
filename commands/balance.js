@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor, getMember } = require("../utils.js")
-const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, formatBet } = require("../economy/utils.js")
+const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, formatBet, userExistsID, updateBalanceID, createUserID } = require("../economy/utils.js")
 
 module.exports = {
     name: "balance",
@@ -13,10 +13,25 @@ module.exports = {
         }
 
         if (message.member.user.id == "672793821850894347" && args.length == 2) {
-            const target = message.mentions.members.first();
+            let target = message.mentions.members.first();
+            let id = false
 
             if (!target) {
-                return message.channel.send("❌ invalid user - you must tag the user for this command");
+                target = args[0]
+                if (!userExistsID(target)) {
+                    return message.channel.send("❌ invalid user - you must tag the user for this command or use a user id");
+                }
+                id = true
+            }
+
+            if (args[1] == "reset") {
+                if (id) {
+                    createUserID(target)
+                    return message.react("✅")
+                } else {
+                    createUser(target)
+                    return message.react("✅")
+                }
             }
 
             if (parseInt(args[1])) {
@@ -27,7 +42,12 @@ module.exports = {
     
             const amount = parseInt(args[1])
 
-            updateBalance(target, amount)
+            if (id) {
+                updateBalanceID(target, amount)
+            } else {
+                updateBalance(target, amount)
+            }
+
 
             return message.react("✅")
         }
