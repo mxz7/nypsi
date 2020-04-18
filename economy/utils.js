@@ -138,6 +138,14 @@ module.exports = {
         return multiplier[item]
     },
 
+    userExistsID: function(id) {
+        if (users[id]) {
+            return true
+        } else {
+            return false
+        }
+    },
+
     userExists: function(member) {
         if (users[member.user.id]) {
             return true
@@ -149,6 +157,11 @@ module.exports = {
     updateBalance: function(member, amount) {
         const amount1 = Math.round(amount)
         users[member.user.id].balance = amount1
+    },
+
+    updateBalanceID: function(id, amount) {
+        const amount1 = Math.round(amount)
+        users[id].balance = amount1
     },
 
     getBankBalance: function(member) {
@@ -205,7 +218,7 @@ module.exports = {
 
         for (user of users1) {
             if (count >= amount) break
-            if (usersFinal.join().length >= 950) break
+            if (usersFinal.join().length >= 1500) break
 
             if (!users[user].balance == 0) {
                 usersFinal[count] = (count + 1) + " `" + user + "` $" + users[user].balance.toLocaleString()
@@ -236,7 +249,7 @@ module.exports = {
 
         for (user of users1) {
             if (count >= amount) break
-            if (usersFinal.join().length >= 950) break
+            if (usersFinal.join().length >= 1500) break
 
             if (!users[user].balance == 0) {
                 usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].balance.toLocaleString()
@@ -248,6 +261,15 @@ module.exports = {
 
     createUser: function(member) {
         users[member.user.id] = {
+            balance: 100,
+            bank: 1000,
+            xp: 0,
+            padlockStatus: false
+        }
+    },
+
+    createUserID: function(id) {
+        users[id] = {
             balance: 100,
             bank: 1000,
             xp: 0,
