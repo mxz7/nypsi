@@ -11,6 +11,9 @@ module.exports = {
         let channel = message.channel.id
 
         if (args.length == 1) {
+            if (!message.mentions.channels.first()) {
+                return message.channel.send("❌ invalid channel")
+            }
             channel = message.mentions.channels.first().id
             if (!channel) {
                 return message.channel.send("❌ invalid channel")
