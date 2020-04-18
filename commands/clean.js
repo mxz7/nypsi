@@ -40,7 +40,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 15000);
 
-        a.add(message.guild.id)
+        a.add(message.channel.id)
 
         const collected = await message.channel.messages.fetch({limit: 25})
 
@@ -49,8 +49,8 @@ module.exports = {
         for (msg of collecteda.array()) {
             await msg.delete().catch()
         }
-        if (a.has(message.guild.id)) {
-            a.delete(message.guild.id)
+        if (a.has(message.channel.id)) {
+            a.delete(message.channel.id)
         }
         message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete({timeout: 5000}))
     }
