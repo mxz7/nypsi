@@ -60,9 +60,9 @@ module.exports = {
         const color = getColor(message.member);
           
         const embed = new MessageEmbed()
-            .setTitle("richest people in this server")
+            .setTitle("top " + filtered.length)
             .setColor(color)
-            .addField("top " + filtered.length, filtered)
+            .setDescription(filtered)
 
             .setFooter("bot.tekoh.wtf")
 
