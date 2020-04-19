@@ -15,17 +15,17 @@ module.exports = {
 
         let target;
 
-        target = message.mentions.members.first();
+        if (message.mentions.members.first()) {
+            target = message.mentions.members.first().id;
+        } else {
+            target = args[0]
+        }
 
-        if (!target) {
+        if (!banned.includes(target)) {
             return message.react("❌")
         }
 
-        if (!banned.includes(target.user.id)) {
-            return message.react("❌")
-        }
-
-        const index = banned.indexOf(target.user.id);
+        const index = banned.indexOf(target);
 
         if (index > -1) {
             banned.splice(index, 1);
