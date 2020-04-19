@@ -47,7 +47,7 @@ module.exports = {
 
         amount = parseInt(args[0]);
 
-        if (amount > 10 && message.member.user.id != "672793821850894347") amount = 10
+        if (amount > 10 && !message.member.hasPermission("ADMINISTRATOR")) amount = 10
 
         if (amount < 5) amount = 5
 
