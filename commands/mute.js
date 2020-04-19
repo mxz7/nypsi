@@ -39,6 +39,7 @@ module.exports = {
         }
 
         let count = 0
+        let failed = []
 
         let muteRole = message.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
 
@@ -66,10 +67,17 @@ module.exports = {
         let fail = false
 
         for (member of members.keyArray()) {
-            await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
-                fail = true
-                return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
-            })
+            const targetHighestRole = members.get(member).roles.highest
+            const memberHighestRole = message.member.roles.highest
+
+            if (targetHighestRole.position > memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
+                failed.push(members.get(member).user.tag)
+            } else {
+                await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
+                    fail = true
+                    return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
+                })
+            }
             if (fail) break
         }
 
@@ -95,6 +103,10 @@ module.exports = {
             }, time)
         }
 
+        if (count == 0) {
+            return message.channel.send("❌ i was unable to mute any users")
+        }
+
         const embed = new MessageEmbed()
             .setTitle("mute | " + message.member.user.username)
             .setDescription("✅ **" + count + "** member(s) muted")
@@ -103,6 +115,10 @@ module.exports = {
 
         if (timedMute) {
             embed.setDescription("✅ **" + count + "** member(s) muted for **" + reason + "** minutes")
+        }
+
+        if (failed.length != 0) {
+            embed.addField("error", "unable to mute: " + failed.join(", "))
         }
 
         if (args.join(" ").includes("-s")) {
