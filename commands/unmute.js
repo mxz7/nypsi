@@ -45,6 +45,11 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         
-        return message.channel.send(embed)
+        if (args.join(" ").includes("-s")) {
+            message.delete()
+            return message.member.send(embed).catch(() => {})
+        } else {
+            return message.channel.send(embed)
+        }
     }
 }
