@@ -14,17 +14,19 @@ module.exports = {
             message.react("❌")
         }
 
-        const target = message.mentions.members.first();
+        let target;
 
-        if (!target) {
+        if (message.mentions.members.first()) {
+            target = message.mentions.members.first().id;
+        } else {
+            target = args[0]
+        }
+
+        if (banned.includes(target)) {
             return message.react("❌")
         }
 
-        if (banned.includes(target.id)) {
-            return message.react("❌")
-        }
-
-        banned.push(target.id);
+        banned.push(target);
 
         let value = {
             "banned": banned
