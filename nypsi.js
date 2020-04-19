@@ -229,6 +229,19 @@ client.on("message", message => {
     
 });
 
+client.on("channelCreate", async ch => {
+    if (!ch.guild) return
+    const muteRole = ch.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+
+    if (!muteRole) return
+
+    ch.updateOverwrite(muteRole,{
+        SEND_MESSAGES: false,
+        SPEAK: false,
+        ADD_REACTIONS: false
+    }).catch(() => {})
+})
+
 function logCommand(message, args) {
     args.shift();
 
@@ -263,7 +276,7 @@ function getTimeStamp() {
 const { updateXp, getXp, userExists } = require("./economy/utils.js")
 const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
-    commands.get(cmd).run(message, args);
+    commands.get(cmd).run(message, args)
 
     if (!message.member) return
     if (!userExists(message.member)) return
