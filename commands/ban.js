@@ -48,14 +48,21 @@ module.exports = {
         let failed = []
 
         for (member of members.keyArray()) {
-            await message.guild.members.ban(member, {
-                days: 1,
-                reason: reason
-            }).then(() => {
-                count++
-            }).catch(() => {
+            const targetHighestRole = members.get(member).roles.highest
+            const memberHighestRole = message.member.roles.highest
+
+            if (targetHighestRole.position > memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
                 failed.push(members.get(member).user.tag)
-            })
+            } else {
+                await message.guild.members.ban(member, {
+                    days: 1,
+                    reason: reason
+                }).then(() => {
+                    count++
+                }).catch(() => {
+                    failed.push(members.get(member).user.tag)
+                })
+            }
         }
 
         if (count == 0) {
