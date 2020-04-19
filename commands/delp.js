@@ -38,11 +38,10 @@ module.exports = {
 
         let amount = parseInt(args[0])
 
-
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-                if (amount > 10) {
-                    amount = 10
+                if (amount > 7) {
+                    amount = 7
                 }
             } else {
                 if (amount > 50) {
@@ -68,13 +67,18 @@ module.exports = {
 
         await message.delete().catch()
 
-        const collected = await message.channel.messages.fetch({limit: amount})
+        const collected = await message.channel.messages.fetch({limit: 100})
 
         const collecteda = collected.filter(msg => msg.member.user.id == target.user.id)
 
+        let count = 0
+
         for (msg of collecteda.array()) {
+            if (count >= amount) break
             await msg.delete().catch()
+            count++
         }
 
-        message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete({timeout: 5000}))    }
+        message.channel.send("✅ **successfully deleted " + count + " messages**").then(m => m.delete({timeout: 5000}))    
+    }
 }
