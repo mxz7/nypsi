@@ -29,7 +29,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            args[0] = 7
+            args[0] = 5
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
@@ -40,8 +40,8 @@ module.exports = {
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-                if (amount > 7) {
-                    amount = 7
+                if (amount > 10) {
+                    amount = 10
                 }
             } else {
                 if (amount > 50) {
@@ -67,18 +67,40 @@ module.exports = {
 
         await message.delete().catch()
 
-        const collected = await message.channel.messages.fetch({limit: 100})
+        let collected
 
-        const collecteda = collected.filter(msg => msg.member.user.id == target.user.id)
+        if (args.length == 0) {
+            collected = await message.channel.messages.fetch({limit: 3})
+        } else {
+            collected = await message.channel.messages.fetch({limit: 100})
+        }
+        
+        const collecteda = collected.filter(msg => {
+            if (!msg.member) {
+            } else {
+                return msg.member.user.id == target.user.id
+            }
+        })
+
+
+        if (collecteda.size == 0) {
+            return
+        }
 
         let count = 0
 
         for (msg of collecteda.array()) {
-            if (count >= amount) break
-            await msg.delete().catch()
-            count++
+            if (count >= amount) {
+                await collecteda.delete(msg.id)
+            } else {
+                count++
+            }
         }
 
-        message.channel.send("✅ **successfully deleted " + count + " messages**").then(m => m.delete({timeout: 5000}))    
+        amount = collecteda.size
+
+        await message.channel.bulkDelete(collecteda)
+
+        message.channel.send("✅ **successfully deleted " + amount + " messages**").then(m => m.delete({timeout: 5000}))    
     }
 }
