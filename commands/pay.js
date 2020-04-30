@@ -99,7 +99,7 @@ module.exports = {
 
         if (getBalance(message.member) >= 500000 || getBalance(target) >= 500000) {
             taxEnabled = true
-            amount = amount - Math.round(amount * tax)
+            //amount = amount - Math.round(amount * tax)
         }
 
         const embed = new MessageEmbed()
@@ -107,7 +107,7 @@ module.exports = {
             .setColor(color)
             
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
-            .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
+            .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
 
             .setFooter("bot.tekoh.wtf")
 
@@ -123,7 +123,7 @@ module.exports = {
                 .setColor("#5efb8f")
                 .setDescription(message.member.user.toString() + " -> " + target.user.toString())
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
-                .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
+                .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
 
                 .setFooter("bot.tekoh.wtf")
             
