@@ -39,13 +39,15 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("poll help")
                 .setColor(color)
-                .addField("usage", "$poll <text> | (hex color)")
+                .addField("usage", "$poll <title> | (text) | (hex color)")
                 .addField("help", "**<>** required | **()** optional\n" +
                     "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
                     "the emojis used for the reactions will be 🅰 and 🅱")
-                .addField("examples", "$poll this or that\n$poll this or that | #35adce")
+                    .addField("examples", "$poll hello\n" +
+                    "$poll hello | this is a description\n" +
+                    "$poll hello | this is a description | #13c696")
 
-            return message.channel.send(embed).catch(() => message.channel.send("❌ $poll <text> | (hex color)"))
+            return message.channel.send(embed).catch(() => message.channel.send("❌ $poll <title> | (text) | (hex color)"))
         }
 
         cooldown.set(message.member.id, new Date());
@@ -53,20 +55,44 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 10000);
 
-        const question = args.join(" ").split("|")[0]
+        let mode = ""
 
-        if (args.join(" ").includes("|")) {
-            color = args.join(" ").split("|")[1]
+        if (!message.content.includes("|")) {
+            mode = "title_only"
+        } else if (args.join(" ").split("|").length == 2) {
+            mode = "title_desc"
+        } else if (args.join(" ").split("|").length == 3) {
+            mode = "title_desc_color"
+        }
+
+        cooldown.set(message.member.id, new Date());
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 10000);
+
+        const title = args.join(" ").split("|")[0]
+        let description
+        
+        if (mode.includes("desc")) {
+            description = args.join(" ").split("|")[1]
+        } 
+
+        if (mode.includes("color")) {
+            color = args.join(" ").split("|")[2]
         }
 
         const embed = new MessageEmbed()
-            .setTitle(question)
+            .setTitle(title)
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
+        
+        if (mode.includes("desc")) {
+            embed.setDescription(description)
+        }
 
         
         message.channel.send(embed).then(async m => {
-            await message.delete()
+            message.delete()
             await m.react("🅰")
             await m.react("🅱")
         })
