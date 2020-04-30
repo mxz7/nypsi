@@ -18,7 +18,7 @@ module.exports = {
             .setTitle("github")
             .setURL("https://github.com/tekohxd/nypsi")
             .setDescription("this bot is opensource and you can view/use the code for completely free\n" +
-            "click the [here](https://github.com/tekohxd/nypsi) to view the source code on github")
+            "click [here](https://github.com/tekohxd/nypsi) to view the source code on github")
             
             .setFooter("bot.tekoh.wtf")
         
