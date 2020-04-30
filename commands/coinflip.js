@@ -19,7 +19,7 @@ module.exports = {
             createUser(message.member)
         }
 
-        const color = getColor(message.member);
+        let color = getColor(message.member);
 
         if (args.length == 1) {
 
