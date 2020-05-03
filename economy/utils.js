@@ -84,27 +84,31 @@ module.exports = {
     },
 
     getVoteMulti: async function(member) {
-
-        if (voteCache.has(member.user.id)) {
-            if (!voteCache.get(member.user.id)) {
-                voteCache.delete(member.user.id)
+        try {
+            if (voteCache.has(member.user.id)) {
+                if (!voteCache.get(member.user.id)) {
+                    voteCache.delete(member.user.id)
+                    return 0
+                }
+                return 0.2
+            } 
+    
+            const voted = await dbl.hasVoted(member.user.id)
+    
+            if (voted) {
+                voteCache.set(member.user.id, true)
+                setTimeout(() => voteCache.delete(member.user.id), 900000)
+                return 0.2
+            } else {
+                voteCache.set(member.user.id, false)
+                setTimeout(() => voteCache.delete(member.user.id), 60000)
                 return 0
             }
-            return 0.2
-        } 
-
-        const voted = await dbl.hasVoted(member.user.id)
-
-        if (voted) {
-            voteCache.set(member.user.id, true)
-            setTimeout(() => voteCache.delete(member.user.id), 900000)
-            return 0.2
-        } else {
-            voteCache.set(member.user.id, false)
-            setTimeout(() => voteCache.delete(member.user.id), 60000)
+        } catch {
+            console.log("[" + getTimestamp() + "] dbl server error")
             return 0
         }
-
+        
     },
 
     getUserCount: function() {
@@ -195,7 +199,9 @@ module.exports = {
         const constant = 500
         const starting = 50000
         const bonus = xp * constant
-        const max = bonus + starting
+        const xp50 = Math.floor(xp / 50)
+        const bonus2 = xp50 * 50000
+        const max = bonus + starting + bonus2
 
         return max
     },
