@@ -4,6 +4,7 @@ const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
 const cooldown = new Map();
+const playerCooldown = new Set()
 
 module.exports = {
     name: "rob",
@@ -78,6 +79,34 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.user.id);
         }, 600000);
+
+        if (playerCooldown.has(target.user.id)) {
+            const amount = Math.floor(Math.random() * 9) + 1
+            const amountMoney = getBalance(message.member) * (amount / 100)
+
+            updateBalance(target, getBalance(target) + amountMoney)
+            updateBalance(message.member, getBalance(message.member) - amountMoney)
+
+            const embed = new MessageEmbed()
+                .setColor(color)
+                .setTitle("robbery | " + message.member.user.username)
+                .setDescription("robbing " + target.user.toString() + "..")
+                .setFooter("bot.tekoh.wtf")
+
+            target.send("**you were nearly robbed!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name + "** \n" +
+                "since you have been robbed recently, you were protected by a private security team and received $" + amountMoney)
+
+            message.channel.send(embed).then(m => {
+                embed.setColor("#e4334f")
+                embed.addField("**fail!!**", "**" + target.user.tag + "** has been robbed recently and is protected by a private security team\n" +
+                    "you were caught and paid $" + amountMoney.toLocaleString() + " (" + amount + "%)")
+                
+                setTimeout(() => {
+                    m.edit(embed)
+                }, 1000)
+            })
+            return
+        }
 
         const amount = (Math.floor(Math.random() * 45) + 10)
 
@@ -162,6 +191,12 @@ module.exports = {
                 })
             }
 
+            playerCooldown.add(target.user.id)
+
+            setTimeout(() => {
+                playerCooldown.delete(target.user.id)
+            }, 900000)
+
             updateBalance(target, getBalance(target) - robbedAmount)
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
         }
@@ -179,7 +214,7 @@ module.exports = {
                 embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%)")
                 embed.setColor("#5efb8f")
             } else if (caughtByPolice) {
-                embed.setColor("#374F6B")
+                embed.setColor("#e4334f")
                 embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)" +
                     "\nfrom your balance for their troubles")
             } else {
