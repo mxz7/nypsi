@@ -71,7 +71,7 @@ module.exports = {
                 .setColor(color)
                 .setTitle(target.user.tag)
                 .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
-                    "💳 $**" + getBankBalance(target) + "** / **" + getMaxBankBalance(target) + "**")
+                    "💳 $**" + getBankBalance(target).toLocaleString() + "** / **" + getMaxBankBalance(target).toLocaleString() + "**")
 
                 .setFooter("xp: " + getXp(target).toLocaleString() + " | bot.tekoh.wtf")
 
