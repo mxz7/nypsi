@@ -278,18 +278,23 @@ const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
     commands.get(cmd).run(message, args)
 
-    if (!message.member) return
-    if (!userExists(message.member)) return
-
-    setTimeout(() => {
-        if (!xpCooldown.has(message.member.user.id)) {
-            updateXp(message.member, getXp(message.member) + 1)
+    try {
+        if (!message.member) return
+        if (!userExists(message.member)) return
     
-            xpCooldown.add(message.member.user.id)
+        setTimeout(() => {
+            try {
+                if (!xpCooldown.has(message.member.user.id)) {
+                    updateXp(message.member, getXp(message.member) + 1)
+            
+                    xpCooldown.add(message.member.user.id)
+            
+                    setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
+                }
+            } catch {}
+        }, 10000)
+    } catch {}
     
-            setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
-        }
-    }, 10000)
 }
 
 function getCmdName(cmd) {
