@@ -21,8 +21,9 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("mute help")
                 .setColor(color)
-                .addField("usage", "$mute <@user(s)> (time in minutes) [-s]")
-                .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
+                .addField("usage", "$mute <@user(s)> (time) [-s]")
+                .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work\n" +
+                    "time format example: 1h30m")
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
         }
@@ -34,8 +35,7 @@ module.exports = {
             for (let i = 0; i < members.size; i++) {
                 args.shift()
             }
-            reason = args.join(" ")
-            reason = reason.replace(/\D/g,'')
+            reason = args.join(" ").toLowerCase().split(" ")[0]
         }
 
         let count = 0
@@ -70,7 +70,7 @@ module.exports = {
             const targetHighestRole = members.get(member).roles.highest
             const memberHighestRole = message.member.roles.highest
 
-            if (targetHighestRole.position > memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
+            if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
                 failed.push(members.get(member).user.tag)
             } else {
                 await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
@@ -92,8 +92,50 @@ module.exports = {
 
         if (reason != "") {
             timedMute = true
-            time = parseInt(reason) * 60 * 1000
+
+            let time2 = 0
+
+            if (reason.split("h").length > 2 || reason.split("m").length > 2) {
+                return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+            }
+
+            if (!reason.includes("h") && !reason.includes("m")) {
+                time = parseInt(reason) * 60 * 1000
+            } else if (reason.includes("h") && !reason.includes("m")) {
+                if (!parseInt(reason.split("h")[0])) {
+                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+                }
+
+                time2 = parseInt(reason.split("h")[0])
+
+                time = time2 * 60 * 60 * 1000
+            } else if (!reason.includes("h") && reason.includes("m")) {
+                if (!parseInt(reason.split("m")[0])) {
+                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+                }
+
+                time2 = parseInt(reason.split("m")[0])
+
+                time = time2 * 60 * 1000
+            } else if (reason.includes("h") && reason.includes("m")) {
+                if (!parseInt(reason.split("h")[0]) || !parseInt(reason.split("m")[0])) {
+                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+                }
+
+                const hours = parseInt(reason.split("h")[0])
+                const minutes = parseInt(reason.split("h")[1].split("m")[0])
+
+
+                time = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000)
+            } else {
+                if (!parseInt(reason)) {
+                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+                }
+                time = parseInt(reason) * 60 * 1000
+            }
         }
+
+        let mutedLength = ""
 
         if (timedMute) {
             setTimeout( async () => {
@@ -101,6 +143,7 @@ module.exports = {
                     await members.get(member).roles.remove(muteRole).catch()
                 }
             }, time)
+            mutedLength = getTime(time)
         }
 
         if (count == 0) {
@@ -114,7 +157,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         if (timedMute) {
-            embed.setDescription("✅ **" + count + "** member(s) muted for **" + reason + "** minutes")
+            embed.setDescription("✅ **" + count + "** member(s) muted for **" + mutedLength + "**")
         }
 
         if (failed.length != 0) {
@@ -129,4 +172,34 @@ module.exports = {
         }
 
     }
+}
+
+function getTime(ms) {
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    const daysms = ms % (24 * 60 * 60 * 1000)
+    const hours = Math.floor((daysms) / (60*60*1000))
+    const hoursms = ms % (60 * 60 * 1000)
+    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutesms = ms % (60 * 1000)
+    const sec = Math.floor((minutesms) / (1000))
+
+    let output = ""
+
+    if (days > 0) {
+        output = output + days + "d "
+    }
+
+    if (hours > 0) {
+        output = output + hours + "h "
+    }
+
+    if (minutes > 0) {
+        output = output + minutes + "m "
+    }
+
+    if (sec > 0) {
+        output = output + sec + "s"
+    }
+
+    return output
 }
