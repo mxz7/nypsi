@@ -22,7 +22,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 10 - diff
+            const time = 5 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -41,23 +41,46 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 2000);
+        }, 5000);
 
         let username = args[0]
 
-        const url = `https://mc-heads.net/minecraft/profile/${username}`
+        let url = "https://apimon.de/mcuser/" + username
         let invalid = false
+        let oldName = false
+        let res
+        let res2
 
-        const res = await fetch(url).then(url => url.json()).catch(() => {
+        res = await fetch(url).then(url => url.json()).catch(() => {
             invalid = true
-            return message.channel.send("❌ invalid account")
+            url = url + "/old"
         })
         
+        if (invalid) {
+            res2 = await fetch(url).then(url => {
+                oldName = true
+                invalid = false
+                return url.json()
+            }).catch(() => {
+                invalid = true
+                return message.channel.send("❌ invalid account")
+            })
+        }
+
         if (invalid) return
 
-        const uuid = res.id
-        username = res.name
-        const nameHistory = res.name_history
+        let uuid
+        let nameHistory
+
+        if (oldName) {
+            uuid = res2.id
+            nameHistory = res2.history
+            username = res2.name
+        } else {
+            uuid = res.id
+            username = res.name
+            nameHistory = res.history
+        }
 
         const skin = `https://mc-heads.net/avatar/${uuid}/64`
 
@@ -74,8 +97,8 @@ module.exports = {
                     throw BreakException
                 }
     
-                if (item.changedToAt) {
-                    const date = new Date(item.changedToAt)
+                if (item.timestamp) {
+                    const date = new Date(item.timestamp)
     
                     const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
         
@@ -104,6 +127,10 @@ module.exports = {
             .setThumbnail(skin)
             .addField("previous names", names)
             .setFooter("bot.tekoh.wtf")
+
+        if (oldName) {
+            embed.setAuthor("match found as an old username")
+        }
         
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
