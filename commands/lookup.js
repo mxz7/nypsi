@@ -102,7 +102,7 @@ module.exports = {
 
         const res = await fetch(url).then(url => url.json()).catch(() => {
             invalid = true
-            return message.channel.send("❌ invalid ip domain")
+            return message.channel.send("❌ invalid domain")
         })
 
         if (invalid) return
