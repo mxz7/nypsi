@@ -276,7 +276,12 @@ function getTimeStamp() {
 const { updateXp, getXp, userExists } = require("./economy/utils.js")
 const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
-    commands.get(cmd).run(message, args)
+
+    try {
+        commands.get(cmd).run(message, args)
+    } catch(e) {
+        console.log(e)
+    }
 
     try {
         if (!message.member) return
@@ -289,7 +294,11 @@ function runCommand(cmd, message, args) {
             
                     xpCooldown.add(message.member.user.id)
             
-                    setTimeout(() => xpCooldown.delete(message.member.user.id), 45000)
+                    setTimeout(() => {
+                        try {
+                            xpCooldown.delete(message.member.user.id)
+                        } catch {}
+                    }, 45000)
                 }
             } catch {}
         }, 10000)
