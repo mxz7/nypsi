@@ -77,7 +77,9 @@ module.exports = {
         cooldown.set(message.member.user.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.user.id);
+            try {
+                cooldown.delete(message.member.user.id);
+            } catch {}
         }, 600000);
 
         if (playerCooldown.has(target.user.id)) {
