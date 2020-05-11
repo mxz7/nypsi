@@ -74,6 +74,10 @@ module.exports = {
             return message.channel.send("❌ your bank is not big enough for this payment")
         }
 
+        if (amount <= 0) {
+            return message.channel.send("❌ invalid payment")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
