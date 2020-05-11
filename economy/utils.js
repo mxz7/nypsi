@@ -42,7 +42,7 @@ setInterval(() => {
 
 setInterval(() => {
     for (user in users) {
-        if (users[user].balance == NaN || users[user].balance == null || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == undefined || users[user].balance == -NaN) {
+        if (users[user].balance == NaN || users[user].balance == null || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == undefined || users[user].balance == -NaN || users[user].balance < 0) {
 
             let padlock
 
@@ -59,14 +59,14 @@ setInterval(() => {
             console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
         }
 
-        if (users[user].bank == NaN || users[user].bank == null || users[user].bank == undefined || users[user].bank == -NaN) {
+        if (users[user].bank == NaN || users[user].bank == null || users[user].bank == undefined || users[user].bank == -NaN || users[user].bank < 0) {
 
             users[user].bank = 0
 
             console.log("[" + getTimestamp() + "] " + user + " bank set to 0 because NaN")
         }
 
-        if (users[user].xp == NaN || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN) {
+        if (users[user].xp == NaN || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN || users[user].xp < 0) {
 
             users[user].xp = 0
 
@@ -135,7 +135,7 @@ module.exports = {
                 padlockStatus: hasPadlocklol(member)
             }
         }
-        return users[member.user.id].balance
+        return parseInt(users[member.user.id].balance)
     },
 
     getMultiplier: function(item) {
