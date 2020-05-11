@@ -88,6 +88,10 @@ module.exports = {
             return message.channel.send("❌ you cannot afford this payment")
         }
 
+        if (amount <= 0) {
+            return message.channel.send("❌ invalid payment")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
