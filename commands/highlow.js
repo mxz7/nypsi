@@ -89,7 +89,7 @@ module.exports = {
         const bet = parseInt(args[0])
 
         if (bet <= 0) {
-            return message.channel.send("❌ $blackjack <bet>")
+            return message.channel.send("❌ $highlow <bet>")
         }
 
         if (bet > getBalance(message.member)) {
