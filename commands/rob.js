@@ -84,7 +84,7 @@ module.exports = {
 
         if (playerCooldown.has(target.user.id)) {
             const amount = Math.floor(Math.random() * 9) + 1
-            const amountMoney = getBalance(message.member) * (amount / 100)
+            const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
 
             updateBalance(target, getBalance(target) + amountMoney)
             updateBalance(message.member, getBalance(message.member) - amountMoney)
@@ -197,7 +197,7 @@ module.exports = {
 
             setTimeout(() => {
                 playerCooldown.delete(target.user.id)
-            }, 900000)
+            }, 600000)
 
             updateBalance(target, getBalance(target) - robbedAmount)
             updateBalance(message.member, getBalance(message.member) + robbedAmount)
