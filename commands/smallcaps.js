@@ -10,13 +10,9 @@ module.exports = {
             return message.channel.send("❌ $smallcaps <text>");
         }
 
-        let lols = "";
+        const string = args.join(" ").toLowerCase()
 
-        for (let word of args) {
-            lols = lols + " " + word;
-        }
-
-        message.channel.send(smallCaps(lols.toString()));
+        message.channel.send(smallCaps(string.toString()));
 
     }
 };
