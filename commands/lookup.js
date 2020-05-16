@@ -67,15 +67,28 @@ module.exports = {
 
             if (invalid) return
 
-            const ip = res.ip_address
-            const hostname = res.hostname
-            const country = res.country.name.EN
-            const countryCurrency = res.country.currency.name
-            const timezone = "UTC " + res.utc_offset
-            const region = res.region
-            const ispName = res.as.name
-            const ispOrg = res.as.org
-            const ispEmail = res.as.abuse_contacts
+            let ip
+            let hostname
+            let country
+            let countryCurrency
+            let timezone
+            let region
+            let ispName
+            let ispOrg
+            let ispEmail
+            try {
+                ip = res.ip_address
+                hostname = res.hostname
+                country = res.country.name.EN
+                countryCurrency = res.country.currency.name
+                timezone = "UTC " + res.utc_offset
+                region = res.region
+                ispName = res.as.name
+                ispOrg = res.as.org
+                ispEmail = res.as.abuse_contacts
+            } catch {
+                return message.channel.send("❌ invalid ip address")
+            }
 
             const embed = new MessageEmbed()
                 .setTitle(ip)
@@ -107,16 +120,31 @@ module.exports = {
 
         if (invalid) return
 
-        const domain = res.domain
-        const registrarName = res.registrar.name
-        const registrarURL = res.registrar.url
-        const registrarEmail = res.registrar.email
-        const registrantName = res.registrant.name
-        const registrantStreet = res.registrant.street
-        const registrantCity = res.registrant.city
-        const registrantRegion = res.registrant.region
-        const registrantPhone = res.registrant.phone
-        const registrantEmail = res.registrant.email
+        let domain
+        let registrarName
+        let registrarURL
+        let registrarEmail
+        let registrantName
+        let registrantStreet
+        let registrantCity
+        let registrantRegion
+        let registrantPhone
+        let registrantEmail
+
+        try {
+            domain = res.domain
+            registrarName = res.registrar.name
+            registrarURL = res.registrar.url
+            registrarEmail = res.registrar.email
+            registrantName = res.registrant.name
+            registrantStreet = res.registrant.street
+            registrantCity = res.registrant.city
+            registrantRegion = res.registrant.region
+            registrantPhone = res.registrant.phone
+            registrantEmail = res.registrant.email
+        } catch {
+            return message.channel.send("❌ invalid domain")
+        }
         
         const embed = new MessageEmbed()
             .setTitle(domain)
