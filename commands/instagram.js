@@ -54,8 +54,15 @@ module.exports = {
         } catch (e) {
             return message.channel.send("❌ invalid account");
         }
+        
+        let account
 
-        const account = res.graphql.user;
+        try {
+            account = res.graphql.user;
+        } catch {
+            return message.channel.send("❌ invalid account"); 
+        }
+
         let title;
 
         if (account.is_private) {
