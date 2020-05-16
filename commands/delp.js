@@ -36,7 +36,7 @@ module.exports = {
             return message.channel.send("❌ $delp <amount> (@user)");
         }
 
-        let amount = parseInt(args[0])
+        let amount = parseInt(args[0]) + 1
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (!message.member.hasPermission("MANAGE_MESSAGES")) {
@@ -65,12 +65,10 @@ module.exports = {
 
         if (amount > 100) amount = 100
 
-        await message.delete().catch()
-
         let collected
 
-        if (args.length == 0) {
-            collected = await message.channel.messages.fetch({limit: 3})
+        if (amount <= 6) {
+            collected = await message.channel.messages.fetch({limit: 25})
         } else {
             collected = await message.channel.messages.fetch({limit: 100})
         }
@@ -97,10 +95,6 @@ module.exports = {
             }
         }
 
-        amount = collecteda.size
-
         await message.channel.bulkDelete(collecteda)
-
-        message.channel.send("✅ **successfully deleted " + amount + " messages**").then(m => m.delete({timeout: 5000}))    
     }
 }

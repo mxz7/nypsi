@@ -37,7 +37,7 @@ module.exports = {
             return message.channel.send("❌ $del <amount>");
         }
 
-        let amount = parseInt(args[0])
+        let amount = parseInt(args[0]) + 1
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (amount > 100) {
@@ -49,8 +49,6 @@ module.exports = {
                 cooldown.delete(message.member.id);
             }, 30000);
         }
-
-        await message.delete().catch()
         
         if (amount <= 100) {
             await message.channel.bulkDelete(amount).catch(() => {
