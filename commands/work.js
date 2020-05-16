@@ -42,9 +42,11 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 1800000);
 
-        
+        let earnedMax = 14
 
-        const earnedPercent = Math.floor(Math.random() * 14) + 1
+        if (getBalance(message.member) <= 1000000) earnedMax = 24
+
+        const earnedPercent = Math.floor(Math.random() * earnedMax) + 1
         const earned = Math.round((earnedPercent / 100) * getBalance(message.member))
 
         const work = workMessages[Math.floor(Math.random() * workMessages.length)]
