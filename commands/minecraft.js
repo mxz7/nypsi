@@ -82,7 +82,7 @@ module.exports = {
             nameHistory = res.history
         }
 
-        const skin = `https://mc-heads.net/avatar/${uuid}/64`
+        const skin = `https://mc-heads.net/avatar/${uuid}`
 
         const names = []
 
