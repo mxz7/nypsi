@@ -36,12 +36,10 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 15000);
 
-        const collected = await message.channel.messages.fetch({limit: 25})
+        const collected = await message.channel.messages.fetch({limit: 50})
 
         const collecteda = collected.filter(msg => msg.member.user.id == message.client.user.id || msg.content.startsWith(prefix))
 
         await message.channel.bulkDelete(collecteda)
-
-        message.channel.send("✅ **successfully deleted " + collecteda.array().length + " messages**").then(m => m.delete({timeout: 5000}))
     }
 }
