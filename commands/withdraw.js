@@ -85,7 +85,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle("bank withdrawal | processing")
             .setColor(color)
-            .addField("your balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+            .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
             .addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
             .setFooter("bot.tekoh.wtf")
 
@@ -105,7 +105,7 @@ module.exports = {
         const embed1 = new MessageEmbed()
             .setTitle("bank withdrawal | success")
             .setColor("#5efb8f")
-            .addField("your balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+            .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
             .setFooter("bot.tekoh.wtf")
 
         if (taxEnabled) {
