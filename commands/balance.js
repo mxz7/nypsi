@@ -33,12 +33,6 @@ module.exports = {
                     return message.react("✅")
                 }
             }
-
-            if (parseInt(args[1])) {
-                args[1] = formatBet(args[1])
-            } else {
-                return
-            }
     
             const amount = parseInt(args[1])
 

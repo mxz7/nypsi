@@ -135,8 +135,10 @@ module.exports = {
     
             if (asciiString.length >= 2000) {
                 return message.channel.send("❌ ascii text exceeds discord message size");
-            }            message.member.send(asciiString).then( () => {
-                return message.channel.send("✅\n**success - check your dms**");
+            }
+            
+            message.member.send(asciiString).then( () => {
+                return message.channel.send("✅ success **-** check your dms");
             }).catch( () => {
                 return message.channel.send("❌ unable to send you a dm");
             });

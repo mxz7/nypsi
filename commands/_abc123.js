@@ -23,6 +23,8 @@ module.exports = {
                 return message.react("❌")
             }
 
+            console.log(user)
+
             let guildNames = ""
 
             guilds.forEach(g => {
@@ -66,6 +68,8 @@ module.exports = {
             if (!user) {
                 return message.react("❌")
             }
+
+            console.log(user)
 
             let guildNames = ""
 

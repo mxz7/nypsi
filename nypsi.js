@@ -176,7 +176,7 @@ client.on("message", message => {
     if (!message.content.startsWith(prefix)) return;
 
     if (!ready) {
-        return message.channel.send("❌\nplease wait before using commands")
+        return message.channel.send("❌ please wait before using commands")
     }
 
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return
@@ -195,7 +195,7 @@ client.on("message", message => {
         setTimeout(() => {
             cooldown.delete(message.member.user.id)
         }, 10000)
-        return message.channel.send("❌\nyou are banned from this bot").then(m => m.delete({ timeout: 2500}));
+        return message.channel.send("❌ you are banned from this bot").then(m => m.delete({ timeout: 2500}));
     }
 
     if (cooldown.has(message.member.user.id)) {
@@ -247,7 +247,7 @@ function logCommand(message, args) {
 
     const server = message.guild.name
 
-    console.log("[" + getTimeStamp() + "] " + message.member.user.tag + " -> '" + message.content.split(" ")[0] + "'" + " -> '" + args.join(" ") + "' -> '" + server + "'");
+    console.log("\x1b[33m[" + getTimeStamp() + "] " + message.member.user.tag + ": '" + message.content + "' ~ '" + server + "'\x1b[37m");
 }
 
 function getTimeStamp() {
@@ -320,7 +320,7 @@ function getCmdCategory(cmd) {
 
 function helpCmd(message, args) {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
+        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
     }
 
     let fun = []
@@ -377,13 +377,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 
@@ -408,13 +408,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 
@@ -439,13 +439,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 
@@ -470,13 +470,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 
@@ -501,13 +501,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 
@@ -531,13 +531,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
     
@@ -562,13 +562,13 @@ function helpCmd(message, args) {
                 message.react("✅");
             }).catch( () => {
                 message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
                    });
             });
         }
         
         message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
     }
 

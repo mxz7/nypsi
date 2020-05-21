@@ -36,8 +36,6 @@ module.exports = {
             .setColor(color)
             .setImage(avatar)
 
-            .setFooter("bot.tekoh.wtf")
-
         message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
