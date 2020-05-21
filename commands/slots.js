@@ -97,95 +97,50 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) - bet)
 
-        const values = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍋", "🍒", "🍒", "🍒", "🍒"]
+        const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
+        const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒"]
+        const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 
-        let one = shuffle(values)[Math.floor(Math.random() * values.length)]
-        let two = shuffle(values)[Math.floor(Math.random() * values.length)]
-        let three = shuffle(values)[Math.floor(Math.random() * values.length)]
+        let one = reel1[Math.floor(Math.random() * reel1.length)]
+        let two = reel2[Math.floor(Math.random() * reel2.length)]
+        let three = reel3[Math.floor(Math.random() * reel3.length)]
+
+        if (getBalance(message.member) < 1000000) {
+            if (one != two && one != three && two != three) {
+                const chance = Math.floor(Math.random() * 10)
+                if (chance < 5) {
+                    one = two
+                }
+            }
+            if (two == three && one != two) {
+                const chance = Math.floor(Math.random() * 10)
+                if (chance < 4) {
+                    one = two
+                }
+            }
+            if (one == two && one != three) {
+                const chance = Math.floor(Math.random() * 10)
+                if (chance < 3) {
+                    three = two
+                }
+            }
+            if (one == two && one == three && one != "🍒" && one != "🍋") {
+                const chance = Math.floor(Math.random() * 10)
+
+                if (chance < 3) {
+                    one == "🍋"
+                    two == "🍋"
+                    three == "🍋"
+                } else if (chance < 2) {
+                    one == "🍒"
+                    two == "🍒"
+                    three == "🍒"
+                }
+            }
+        }
 
         let win = false
         let winnings = 0
-
-
-        //Start of processing designed to make winning easier, but designed to make winning harder for rich people
-
-        //if no win - balances smaller than 1m have a chance to win
-        if (one != two) {
-            if (getBalance(message.member) < 1000000) {
-                const chanceToWin = Math.floor(Math.random() * 12)
-                if (chanceToWin <= 3) {
-                    one = two
-                }
-                if (chanceToWin <= 1) {
-                    three = two
-                }
-            }
-        }
-
-        //if 1 & 2 are equal
-        //balance over 1t 6/10 to lose
-        //balance over 1b 4/10 to lose
-        //others 1/10 to win
-        if (one == two ** two != three) {
-
-            if (getBalance(message.member) > 1000000000000) {
-                const chanceToWin = Math.floor(Math.random() * 10)
-
-                if (chanceToWin <= 6) {
-                    two = three
-                } 
-            }
-
-            if (getBalance(message.member) > 1000000000) {
-                const chanceToWin = Math.floor(Math.random() * 10)
-
-                if (chanceToWin <= 4) {
-                    two = three
-                } 
-                
-            } else {
-                const chanceToWin = Math.floor(Math.random() * 10)
-
-                if (chanceToWin <= 1) {
-                    three = two
-                }
-            }
-        }
-
-        //if cherry win
-        //balance over 1t -> 7/10 chance melon win
-        //balance over 1b -> 6/10 melon win
-        //others -> 2/10 lemon win
-        if (one == two && two == three && one == "🍒") {
-            
-            if (getBalance(message.member) > 1000000000) {
-                const chanceToLose = Math.floor(Math.random() * 10)
-
-                if (chanceToLose <= 7) {
-                    one = "🍉"
-                    two = "🍉"
-                    three = "🍉"
-                }
-            } else if (getBalance(message.member) > 1000000) {
-                const chanceToLose = Math.floor(Math.random() * 10)
-
-                if (chanceToLose <= 6) {
-                    one = "🍉"
-                    two = "🍉"
-                    three = "🍉"
-                }
-            } else {
-                const chanceToLose = Math.floor(Math.random() * 10)
-
-                if (chanceToLose <= 2) {
-                    one = "🍋"
-                    two = "🍋"
-                    three = "🍋"
-                }
-            }
-        }
-
-        //End of processing
 
         if (one == two && two == three) {
             const multiplier = getMultiplier(one)
@@ -196,7 +151,7 @@ module.exports = {
             updateBalance(message.member, getBalance(message.member) + winnings)
         } else if (one == two) {
             win = true
-            winnings = Math.round(bet * 1.5)
+            winnings = Math.round(bet * 1.2)
 
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
@@ -212,7 +167,7 @@ module.exports = {
             }
 
             if (voted) {
-                updateBalance(message.member, getBalance(message.member), + Math.round(winnings * voteMulti))
+                updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
                 winnings = winnings + Math.round(winnings * voteMulti)
             }
         }
@@ -221,7 +176,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("slots | " + message.member.user.username)
-            .setDescription(one + " | " + two + " | " + three + "\n\n**bet** $" + bet.toLocaleString())
+            .setDescription("---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString())
 
             .setFooter("bot.tekoh.wtf")
         
