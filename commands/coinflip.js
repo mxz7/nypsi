@@ -317,7 +317,7 @@ module.exports = {
             if (win) {
 
                 if (voted) {
-                    embed.addField("**winner!!**", "**you win** $" + ((bet * 2) + ((bet * 2) * voteMulti)).toLocaleString() + "\n" +
+                    embed.addField("**winner!!**", "**you win** $" + Math.round(((bet * 2) + ((bet * 2) * voteMulti))).toLocaleString() + "\n" +
                         "+**" + (voteMulti * 100).toString() + "**% vote bonus")
                 } else {
                     embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())

@@ -14,6 +14,10 @@ module.exports = {
 
         if (!userExists(message.member)) createUser(message.member)
 
+        if (getBalance(message.member) < 1000) {
+            return await message.channel.send("❌ you must have atleast $1k")
+        }
+
         const bankWorth = new Discord.Collection()
 
         bankWorth.set("barclays", Math.round(getBalance(message.member) * 2))
