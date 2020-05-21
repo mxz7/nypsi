@@ -99,25 +99,26 @@ module.exports = {
         }, 10000);
 
         updateBalance(message.member, getBalance(message.member) - amount)
-        updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
 
         if (getBalance(message.member) >= 250000 || getBalance(target) >= 250000 || getBankBalance(message.member) >= 250000 || getBankBalance(target) >= 250000) {
             taxEnabled = true
+            updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
+        } else {
+            updateBalance(target, getBalance(target) + amount)
         }
 
         const embed = new MessageEmbed()
             .setTitle("processing payment..")
             .setColor(color)
-            
             .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
-            .addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
-
             .setFooter("bot.tekoh.wtf")
 
         if (taxEnabled) {
             embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
+            embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
         } else {
             embed.setDescription(message.member.user.toString() + " -> " + target.user.toString())
+            embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
         }
 
         message.channel.send(embed).then(m => {
@@ -126,9 +127,15 @@ module.exports = {
                 .setColor("#5efb8f")
                 .setDescription(message.member.user.toString() + " -> " + target.user.toString())
                 .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
-                .addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
-
                 .setFooter("bot.tekoh.wtf")
+                
+
+            if (taxEnabled) {
+                embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
+            } else {
+                embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
+            }
+
             
             setTimeout(() =>{
                 m.edit(embed)
