@@ -75,9 +75,24 @@ setInterval(() => {
     }
 
     
-}, 15000)
+}, 120000)
+
+function randomOffset() {
+    return parseInt(Math.floor(Math.random() * 25000))
+}
+
+let padlockPrice = 25000 + randomOffset()
+
+setInterval(() => {
+    padlockPrice = 25000 + randomOffset()
+    console.log("[" + getTimestamp() + "] padlock price updated: $" + padlockPrice)
+}, 3600000)
 
 module.exports = {
+
+    getPadlockPrice: function() {
+        return parseInt(padlockPrice)
+    },
 
     getVoteCacheSize: function() {
         return voteCache.size
@@ -128,13 +143,6 @@ module.exports = {
     },
 
     getBalance: function(member) {
-        if (users[member.user.id].balance == NaN || users[member.user.id].balance == null || users[member.user.id].balance == undefined || users[member.user.id].balance == -NaN) {
-            console.log(member.user.id + " set to 0 because NaN")
-            users[member.user.id] = {
-                balance: 0,
-                padlockStatus: hasPadlocklol(member)
-            }
-        }
         return parseInt(users[member.user.id].balance)
     },
 
@@ -199,9 +207,7 @@ module.exports = {
         const constant = 500
         const starting = 50000
         const bonus = xp * constant
-        const xp50 = Math.floor(xp / 50)
-        const bonus2 = xp50 * 50000
-        const max = bonus + starting + bonus2
+        const max = bonus + starting
 
         return max
     },
@@ -267,8 +273,8 @@ module.exports = {
 
     createUser: function(member) {
         users[member.user.id] = {
-            balance: 100,
-            bank: 1000,
+            balance: 500,
+            bank: 4500,
             xp: 0,
             padlockStatus: false
         }
@@ -276,8 +282,8 @@ module.exports = {
 
     createUserID: function(id) {
         users[id] = {
-            balance: 100,
-            bank: 1000,
+            balance: 5000,
+            bank: 4500,
             xp: 0,
             padlockStatus: false
         }

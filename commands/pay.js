@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getMember, getColor } = require("../utils.js")
-const { updateBalance, getBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
+const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
 
 const tax = 0.15
 
@@ -101,9 +101,8 @@ module.exports = {
         updateBalance(message.member, getBalance(message.member) - amount)
         updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
 
-        if (getBalance(message.member) >= 500000 || getBalance(target) >= 500000) {
+        if (getBalance(message.member) >= 250000 || getBalance(target) >= 250000 || getBankBalance(message.member) >= 250000 || getBankBalance(target) >= 250000) {
             taxEnabled = true
-            //amount = amount - Math.round(amount * tax)
         }
 
         const embed = new MessageEmbed()

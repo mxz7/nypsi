@@ -44,10 +44,18 @@ module.exports = {
 
         let earnedMax = 14
 
-        if (getBalance(message.member) <= 1000000) earnedMax = 24
+        if (getBalance(message.member) <= 500000) earnedMax = 24
 
         const earnedPercent = Math.floor(Math.random() * earnedMax) + 1
-        const earned = Math.round((earnedPercent / 100) * getBalance(message.member))
+        let earned = Math.round((earnedPercent / 100) * getBalance(message.member))
+
+        if (getBalance(message.member) >= 2000000) {
+            const base = 25000
+            const bonus = Math.floor(Math.random() * 75000)
+            const total = base + bonus
+
+            earned = total
+        }
 
         const work = workMessages[Math.floor(Math.random() * workMessages.length)]
 
@@ -63,7 +71,13 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(m => {
-            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")
+            
+
+            if (getBalance(message.member) >= 2000000) {
+                embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
+            } else {
+                embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")
+            }
 
             setTimeout(() => {
                 m.edit(embed)

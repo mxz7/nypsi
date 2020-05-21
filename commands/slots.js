@@ -125,7 +125,7 @@ module.exports = {
         //if 1 & 2 are equal
         //balance over 1t 6/10 to lose
         //balance over 1b 4/10 to lose
-        //others 2/10 to win
+        //others 1/10 to win
         if (one == two ** two != three) {
 
             if (getBalance(message.member) > 1000000000000) {
@@ -146,7 +146,7 @@ module.exports = {
             } else {
                 const chanceToWin = Math.floor(Math.random() * 10)
 
-                if (chanceToWin <= 2) {
+                if (chanceToWin <= 1) {
                     three = two
                 }
             }

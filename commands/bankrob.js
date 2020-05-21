@@ -16,12 +16,12 @@ module.exports = {
 
         const bankWorth = new Discord.Collection()
 
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 2.1))
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 2.2))
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 3))
+        bankWorth.set("barclays", Math.round(getBalance(message.member) * 2))
+        bankWorth.set("santander", Math.round(getBalance(message.member) * 1.7))
+        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 2.5))
         bankWorth.set("lloyds", Math.round(getBalance(message.member) * 1.5))
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 2.5))
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.2))
+        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 1.8))
+        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.1))
         bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2))
 
         const color = getColor(message.member);
@@ -33,7 +33,7 @@ module.exports = {
                 bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
             }
 
-            bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
+            bankList = bankList + "the most you can recieve on one robbery is 50% of the bank's balance"
 
             const embed = new MessageEmbed()
                 .setTitle("current bank balances")
@@ -66,10 +66,6 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        if (getBalance(message.member) < 5000) {
-            return message.channel.send("❌ you must have atleast $5k to rob a bank")
-        }
-
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
@@ -88,7 +84,7 @@ module.exports = {
         let percentLost
         let amountLost
 
-        if (caught <= 6) {
+        if (caught <= 10) {
             robberySuccess = false
 
             percentLost = Math.floor(Math.random() * 50) + 10

@@ -50,20 +50,11 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        let member
+
         if (args.length == 0) {
-            const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle("pp predictor 1337")
-                .setDescription(message.member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
-
-                .setFooter("bot.tekoh.wtf")
-        
-            return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            });
+            member = message.member
         } else {
-            let member
-
             if (!message.mentions.members.first()) {
                 member = getMember(message, args[0])
             } else {
@@ -71,28 +62,19 @@ module.exports = {
             }
 
             if (!member) {
-                const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle("pp predictor 5000")
-                .setDescription(message.member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
-
-                .setFooter("bot.tekoh.wtf")
-        
-                return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                });
+                member = message.member
             }
-
-            const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle("pp predictor 5000")
-                .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
-
-                .setFooter("bot.tekoh.wtf")
-        
-            message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            });
         }
+
+        const embed = new MessageEmbed()
+            .setColor(color)
+            .setTitle("pp predictor 1337")
+            .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
+
+            .setFooter("bot.tekoh.wtf")
+        
+        return message.channel.send(embed).catch(() => {
+            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
+        });
     }  
 }

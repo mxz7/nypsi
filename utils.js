@@ -450,7 +450,30 @@ module.exports = {
     formatDate: function(date) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
-    }   
+    },
+
+    getTimestamp: function() {
+        const date = new Date();
+        let hours = date.getHours().toString();
+        let minutes = date.getMinutes().toString();
+        let seconds = date.getSeconds().toString();
+        
+        if (hours.length == 1) {
+            hours = "0" + hours;
+        } 
+        
+        if (minutes.length == 1) {
+            minutes = "0" + minutes;
+        } 
+        
+        if (seconds.length == 1) {
+            seconds = "0" + seconds;
+        }
+        
+        const timestamp = hours + ":" + minutes + ":" + seconds;
+    
+        return timestamp
+    }
 };
 
 function getTimestamp() {
