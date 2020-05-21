@@ -39,7 +39,9 @@ module.exports = {
             embed.setTitle(member.displayHexColor)
         }
 
-        message.channel.send(embed)
+        message.channel.send(embed).catch(() => {
+            message.channel.send("❌ invalid color")
+        })
 
     }
 }
