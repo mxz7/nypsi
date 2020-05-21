@@ -205,7 +205,7 @@ module.exports = {
     getMaxBankBalance: function(member) {
         const xp = xpBalance(member)
         const constant = 500
-        const starting = 50000
+        const starting = 25000
         const bonus = xp * constant
         const max = bonus + starting
 
