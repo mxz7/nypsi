@@ -36,7 +36,7 @@ module.exports = {
             return message.channel.send("❌ $delp <amount> (@user)");
         }
 
-        let amount = parseInt(args[0]) + 1
+        let amount = parseInt(args[0])
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (!message.member.hasPermission("MANAGE_MESSAGES")) {
@@ -60,7 +60,12 @@ module.exports = {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
             if (message.mentions.members.first()) {
                 target = message.mentions.members.first()
+                await message.delete().catch()
+            } else {
+                amount++
             }
+        } else {
+            amount++
         }
 
         if (amount > 100) amount = 100

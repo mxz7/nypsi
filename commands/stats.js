@@ -36,6 +36,8 @@ module.exports = {
         }, 5000);
 
         const { commandsSize, aliasesSize } = require("../nypsi.js")
+        const { snipe } = require("../nypsi.js")
+        const snipedMessages = snipe.size
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -81,6 +83,7 @@ module.exports = {
             .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
                 " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
                 "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
+                "**snipe** " + snipedMessages.toLocaleString() + "\n" +
                 "**imgs** " + imgCache.toLocaleString(), true)
             .addField("usage", "**memory** " + memUsage + "mb", true)
             .setFooter("bot.tekoh.wtf")

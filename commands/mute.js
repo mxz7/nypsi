@@ -12,7 +12,7 @@ module.exports = {
         }
 
         if (!message.guild.me.hasPermission("MANAGE_ROLES") || !message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-            return message.channel.send("❌ i am lacking permissions for this command")
+            return message.channel.send("❌ i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'")
         }
 
         const color = getColor(message.member)
