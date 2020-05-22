@@ -4,10 +4,10 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const fs = require("fs");
 const { list } = require("./optout.json");
-const ascii = require("figlet");
 const { banned } = require("./banned.json");
 const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild } = require("./guilds/utils.js")
+const { table, getBorderCharacters } = require("table")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
@@ -18,7 +18,11 @@ let ready = false
 let commandFiles 
 
 function loadCommands() {
+    console.log("loading commands..")
+    const startTime = new Date().getTime()
+
     commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
+    const failedTable = []
 
     if (commands.size > 0) {
         for (command of commands.keyArray()) {
@@ -41,23 +45,26 @@ function loadCommands() {
 
             if (enabled) {
                 commands.set(command.name, command);
-                console.log(command.name + " ✅");
             } else {
-                console.log(file + " ❌");
+                failedTable.push([file, "❌"])
             }
         } catch (e) {
-            console.log(" - - - - - - - - - - ")
-            console.log(file + " ❌");
-            console.log("type $reload " + file + " to view error")
-            console.log(" - - - - - - - - - - ")
+            failedTable.push([file, "❌"])
         }
-
-        
     }
+
+    const endTime = new Date().getTime()
+    const timeTaken = endTime - startTime
+
+    if (failedTable.length != 0) {
+        console.log(table(failedTable, {border: getBorderCharacters("ramac")}))
+    } else {
+        console.log("all commands loaded without error ✅")
+    }
+
+    console.log("time taken: " + timeTaken + "ms")
 }
 exports.reloadCommands = loadCommands
-
-console.log(" -- commands -- \n");
 
 loadCommands()
 
@@ -89,8 +96,6 @@ aliases.set("dep", "deposit")
 aliases.set("with", "withdraw")
 aliases.set("bank", "balance")
 
-console.log("\n -- commands -- ");
-
 client.once("ready", async () => {
 
     setTimeout(() => {
@@ -111,19 +116,14 @@ client.once("ready", async () => {
         })
     }, 600000)
 
-    console.log("\nserver count: " + client.guilds.cache.size.toLocaleString())
+    console.log("\n--bot summary--")
+    console.log("server count: " + client.guilds.cache.size.toLocaleString())
     console.log("user count: " + client.users.cache.size.toLocaleString())
     console.log("commands count: " + commands.size)
     console.log("users in currency: " + getUserCount())
-    console.log("\n- - -\n");
+    console.log("--bot summary--\n");
 
-    ascii("n y p s i", function(err, data) {
-        if (!err) {
-            console.log(data);
-            console.log("\n\nlogged in as " + client.user.tag + " @ " + getTimeStamp() + "\n");
-            console.log("- - -\n\n")
-        }
-    });
+    console.log("logged in as " + client.user.tag + " @ " + getTimeStamp() + "\n- bot run log starting below -\n");
 });
 
 client.on("guildCreate", guild => {
@@ -611,12 +611,16 @@ exports.aliasesSize = aliases.size
 exports.snipe
 exports.reloadCommand = reloadCommand
 
-client.login(token).then(() => {
-    setTimeout(() => {
-        ready = true
-        runChecks()
-    }, 2000)
-})
+setTimeout(() => {
+    client.login(token).then(() => {
+        setTimeout(() => {
+            ready = true
+            runChecks()
+        }, 2000)
+    })
+}, 1500)
+
+
 
 function runChecks() {
     setInterval(() => {
