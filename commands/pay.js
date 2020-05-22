@@ -98,7 +98,6 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 10000);
 
-        updateBalance(message.member, getBalance(message.member) - amount)
 
         if (getBalance(message.member) >= 250000 || getBalance(target) >= 250000 || getBankBalance(message.member) >= 250000 || getBankBalance(target) >= 250000) {
             taxEnabled = true
@@ -106,6 +105,8 @@ module.exports = {
         } else {
             updateBalance(target, getBalance(target) + amount)
         }
+        
+        updateBalance(message.member, getBalance(message.member) - amount)
 
         const embed = new MessageEmbed()
             .setTitle("processing payment..")
