@@ -10,7 +10,7 @@ module.exports = {
     category: "moderation",
     run: async (message, args) => {
 
-        if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_ROLES")) {
+        if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_MESSAGES")) {
             return 
         }
 
