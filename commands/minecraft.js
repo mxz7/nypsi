@@ -45,19 +45,19 @@ module.exports = {
 
         let username = args[0]
 
-        let url = "https://apimon.de/mcuser/" + username
+        let url1 = "https://mc-heads.net/minecraft/profile/" + username
+        let url2 = "https://apimon.de/mcuser/" + username + "/old"
         let invalid = false
         let oldName = false
         let res
         let res2
 
-        res = await fetch(url).then(url => url.json()).catch(() => {
+        res = await fetch(url1).then(url => url.json()).catch(() => {
             invalid = true
-            url = url + "/old"
         })
         
         if (invalid) {
-            res2 = await fetch(url).then(url => {
+            res2 = await fetch(url2).then(url => {
                 oldName = true
                 invalid = false
                 return url.json()
@@ -79,7 +79,7 @@ module.exports = {
         } else {
             uuid = res.id
             username = res.name
-            nameHistory = res.history
+            nameHistory = res.name_history
         }
 
         const skin = `https://mc-heads.net/avatar/${uuid}`
@@ -96,22 +96,42 @@ module.exports = {
                     names.push(`view more at [namemc](https://namemc.com/profile/${username})`)
                     throw BreakException
                 }
-    
-                if (item.timestamp) {
-                    const date = new Date(item.timestamp)
-    
-                    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+
+                if (oldName) {
+                    if (item.timestamp) {
+                        const date = new Date(item.timestamp)
         
-                    const year = date.getFullYear()
-                    const month = months[date.getMonth()]
-                    const day = date.getDate()
-        
-                    const timestamp = month + " " + day + " " + year
-        
-                    names.push("`" + item.name + "` **|** `" + timestamp + "`")
+                        const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+            
+                        const year = date.getFullYear()
+                        const month = months[date.getMonth()]
+                        const day = date.getDate()
+            
+                        const timestamp = month + " " + day + " " + year
+            
+                        names.push("`" + item.name + "` **|** `" + timestamp + "`")
+                    } else {
+                        names.push("`" + item.name + "`")
+                    }
                 } else {
-                    names.push("`" + item.name + "`")
+                    if (item.changedToAt) {
+                        const date = new Date(item.changedToAt)
+        
+                        const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+            
+                        const year = date.getFullYear()
+                        const month = months[date.getMonth()]
+                        const day = date.getDate()
+            
+                        const timestamp = month + " " + day + " " + year
+            
+                        names.push("`" + item.name + "` **|** `" + timestamp + "`")
+                    } else {
+                        names.push("`" + item.name + "`")
+                    }
                 }
+    
+                
             });
         } catch (e) {
             if (e != BreakException) throw e
