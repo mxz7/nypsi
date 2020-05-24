@@ -167,38 +167,30 @@ module.exports = {
     },
 
     updateBalance: function(member, amount) {
-        const amount1 = Math.round(amount)
+        const amount1 = parseInt(amount)
         users[member.user.id].balance = amount1
     },
 
     updateBalanceID: function(id, amount) {
-        const amount1 = Math.round(amount)
+        const amount1 = parseInt(amount)
         users[id].balance = amount1
     },
 
     getBankBalance: function(member) {
-        if (!users[member.user.id].bank) {
-            return 0
-        } else {
-            return users[member.user.id].bank
-        }
+        return parseInt(users[member.user.id].bank)
     },
 
     updateBankBalance: function(member, amount) {
-        const amount1 = Math.round(amount)
+        const amount1 = parseInt(amount)
         users[member.user.id].bank = amount1
     },
 
     getXp: function(member) {
-        if (!users[member.user.id].xp) {
-            return 0
-        } else {
-            return users[member.user.id].xp
-        }
+        return parseInt(users[member.user.id].xp)
     },
 
     updateXp: function(member, amount) {
-        const amount1 = Math.round(amount)
+        const amount1 = parseInt(amount)
         users[member.user.id].xp = amount1
     },
 
