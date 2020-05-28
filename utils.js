@@ -350,7 +350,7 @@ module.exports = {
     snekCache,
 
     getColor: function(member) {
-        if (member.displayHexColor == "#000000") {
+        if (member.displayHexColor == "#ffffff") {
            return "#f8f8ff";
         } else {
             return member.displayHexColor;
