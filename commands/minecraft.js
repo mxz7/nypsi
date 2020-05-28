@@ -84,7 +84,7 @@ module.exports = {
 
         const skin = `https://mc-heads.net/avatar/${uuid}`
 
-        const names = []
+        const names = new Map()
 
         nameHistory.reverse()
 
@@ -92,46 +92,50 @@ module.exports = {
 
         try {
             nameHistory.forEach(item => {
-                if (names.join().length >= 800) {
-                    names.push(`view more at [namemc](https://namemc.com/profile/${username})`)
-                    throw BreakException
+
+                if (item.timestamp) {
+                    const date = new Date(item.timestamp)
+
+                    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+        
+                    const year = date.getFullYear()
+                    const month = months[date.getMonth()]
+                    const day = date.getDate()
+        
+                    const timestamp = month + " " + day + " " + year
+
+                    value = "`" + item.name + "` | `" + timestamp + "`"
+                } else if (item.changedToAt) {
+                    const date = new Date(item.changedToAt)
+
+                    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
+        
+                    const year = date.getFullYear()
+                    const month = months[date.getMonth()]
+                    const day = date.getDate()
+        
+                    const timestamp = month + " " + day + " " + year
+
+                    value = "`" + item.name + "` | `" + timestamp + "`"
+                } else {
+                    value = "`" + item.name + "`"
                 }
 
-                if (oldName) {
-                    if (item.timestamp) {
-                        const date = new Date(item.timestamp)
-        
-                        const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
-            
-                        const year = date.getFullYear()
-                        const month = months[date.getMonth()]
-                        const day = date.getDate()
-            
-                        const timestamp = month + " " + day + " " + year
-            
-                        names.push("`" + item.name + "` **|** `" + timestamp + "`")
-                    } else {
-                        names.push("`" + item.name + "`")
-                    }
+                if (names.size == 0) {
+                    const value1 = []
+                    value1.push(value)
+                    names.set(1, value1)
                 } else {
-                    if (item.changedToAt) {
-                        const date = new Date(item.changedToAt)
-        
-                        const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
-            
-                        const year = date.getFullYear()
-                        const month = months[date.getMonth()]
-                        const day = date.getDate()
-            
-                        const timestamp = month + " " + day + " " + year
-            
-                        names.push("`" + item.name + "` **|** `" + timestamp + "`")
+                    const lastPage = names.size
+
+                    if (names.get(lastPage).length >= 10) {
+                        const value1 = []
+                        value1.push(value)
+                        names.set(lastPage + 1, value1)
                     } else {
-                        names.push("`" + item.name + "`")
+                        names.get(lastPage).push(value)
                     }
                 }
-    
-                
             });
         } catch (e) {
             if (e != BreakException) throw e
@@ -142,18 +146,63 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle(username)
             .setURL("https://namemc.com/profile/" + username)
-            .setDescription(`[skin](https://mc-heads.net/download/${uuid})`)
+            .setDescription(names.get(1).join("\n"))
             .setColor(color)
             .setThumbnail(skin)
-            .addField("previous names", names)
             .setFooter("bot.tekoh.wtf")
 
         if (oldName) {
             embed.setAuthor("match found as an old username")
         }
         
-        return message.channel.send(embed).catch(() => {
+        const msg = await message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         })
+
+        if (names.size >= 2) {
+            await msg.react("⬅")
+            await msg.react("➡")
+
+            let currentPage = 1
+            const lastPage = names.size
+
+            const filter = (reaction, user) => {
+                return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+            }
+
+            async function pageManager() {
+                const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                    .then(collected => {
+                        return collected.first().emoji.name
+                    }).catch(async () => {
+                        await msg.reactions.removeAll()
+                    })
+                
+                if (!reaction) return
+        
+                if (reaction == "⬅") {
+                    if (currentPage <= 1) {
+                        return pageManager()
+                    } else {
+                        currentPage--
+                        embed.setDescription(names.get(currentPage).join("\n"))
+                        embed.setFooter("page " + currentPage)
+                        await msg.edit(embed)
+                        return pageManager()
+                    }
+                } else if (reaction == "➡") {
+                    if (currentPage >= lastPage) {
+                        return pageManager()
+                    } else {
+                        currentPage++
+                        embed.setDescription(names.get(currentPage).join("\n"))
+                        embed.setFooter("page " + currentPage)
+                        await msg.edit(embed)
+                        return pageManager()
+                    }
+                }
+            }
+            return pageManager()
+        }
     }
 }
