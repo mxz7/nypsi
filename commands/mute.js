@@ -64,29 +64,6 @@ module.exports = {
             }
         }
 
-        let fail = false
-
-        for (member of members.keyArray()) {
-            const targetHighestRole = members.get(member).roles.highest
-            const memberHighestRole = message.member.roles.highest
-
-            if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
-                failed.push(members.get(member).user.tag)
-            } else {
-                await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
-                    fail = true
-                    return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
-                })
-            }
-            if (fail) break
-        }
-
-        if (fail) return
-
-        if (count == 0) {
-            return message.channel.send("❌ i was unable to mute any users")
-        }
-
         let timedMute = false
         let time = 0
 
@@ -96,6 +73,10 @@ module.exports = {
             let time2 = 0
 
             if (reason.split("h").length > 2 || reason.split("m").length > 2) {
+                return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
+            }
+
+            if (!parseInt(reason.split("h").join().split("m").join())) {
                 return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
             }
 
@@ -131,9 +112,27 @@ module.exports = {
                 if (!parseInt(reason)) {
                     return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
                 }
-                time = parseInt(reason) * 60 * 1000
             }
         }
+
+        let fail = false
+
+        for (member of members.keyArray()) {
+            const targetHighestRole = members.get(member).roles.highest
+            const memberHighestRole = message.member.roles.highest
+
+            if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
+                failed.push(members.get(member).user.tag)
+            } else {
+                await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
+                    fail = true
+                    return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
+                })
+            }
+            if (fail) break
+        }
+
+        if (fail) return
 
         let mutedLength = ""
 
