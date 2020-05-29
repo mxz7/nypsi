@@ -1,4 +1,6 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../economy/utils.js")
+const { getColor } = require("../utils.js")
+const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map();
 
@@ -37,6 +39,19 @@ module.exports = {
 
         updateBalance(message.member, getBalance(message.member) + 1000)
 
-        message.react("✅")
+        const color = getColor(message.member)
+
+        const embed = new MessageEmbed()
+            .setTitle("freemoney | " + message.member.user.username)
+            .setDescription("+$**1,000**")
+            .setFooter("bot.tekoh.wtf")
+            .setColor(color)
+
+        message.channel.send(embed).then(msg => {
+            embed.setDescription("+$**1,000**\nnew balance: $**" + getBalance(message.member).toLocaleString() + "**")
+            setTimeout(() => {
+                msg.edit(embed)
+            }, 1000)
+        })
     }
 }
