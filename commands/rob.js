@@ -8,7 +8,7 @@ const playerCooldown = new Set()
 
 module.exports = {
     name: "rob",
-    description: "rob other players",
+    description: "rob other server members",
     category: "money",
     run: async (message, args) => {
 
