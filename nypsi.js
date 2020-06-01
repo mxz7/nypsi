@@ -139,8 +139,10 @@ client.on("guildDelete", guild => {
     console.log("\x1b[36m[" + getTimeStamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
 })
 
-client.on("rateLimit", () => {
-    console.log("\x1b[31m[" + getTimeStamp() + "] BEING RATE LIMITED!!\x1b[37m")
+client.on("rateLimit", rate => {
+    const a = rate.route.split("/")
+    const reason = a[a.length - 1]
+    console.log("\x1b[31m[" + getTimeStamp() + "] rate limit: " + reason + "\x1b[37m")
 })
 
 client.on("guildMemberAdd", member => {
@@ -164,14 +166,8 @@ const { isLocked } = require("./commands/softlock.js")
 client.on("message", message => {
 
     if (!cooldown.has(message.channel.id) && isLocked(message.channel.id) && message.content.length > 250 && !message.content.startsWith("$softlock")) {
-        message.delete().catch()
+        return message.delete().catch()
     }
-
-    cooldown.add(message.channel.id)
-        
-    setTimeout(() => {
-        cooldown.delete(message.channel.id)
-    }, 5000)
 
     if (message.author.bot) return;
     if (!message.guild) return;
@@ -190,6 +186,12 @@ client.on("message", message => {
     if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
         return message.channel.send("❌ i am lacking permission `MANAGE_MESSAGES`")
     }
+
+    cooldown.add(message.channel.id)
+        
+    setTimeout(() => {
+        cooldown.delete(message.channel.id)
+    }, 500)
 
     if (banned.includes(message.member.user.id)) {
         cooldown.add(message.member.user.id)
@@ -640,5 +642,5 @@ function runChecks() {
                 runCheck(guild)
             }
         })
-    }, 45000)
+    }, 60000)
 }
