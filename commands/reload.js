@@ -5,31 +5,19 @@ module.exports = {
     description: "reload commands",
     category: "none",
     run: async (message, args) => {
-        const { reloadCommands, reloadCommand } = require("../nypsi.js")
         if (message.member.user.id != "672793821850894347") return
+        const { reloadCommands, reloadCommand } = require("../nypsi.js")
 
         if (args.length == 0) {
-            console.log(" -- commands -- \n");
             reloadCommands()
-            console.log("\n -- commands -- \n");
-    
             message.react("✅")
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
 
-            let msg = ""
+            let msg = reloadCommand(args).split("✔")
+            msg = "```\n" + msg + "```"
 
-            console.log(" - - - ")
-
-            for (arg of args) {
-                if (!reloadCommand(arg)) {
-                    msg = msg + "\n**" + arg + "** ❌"
-                } else {
-                    msg = msg + "\n**" + arg + "** ✅"
-                }
-            }
-
-            console.log(" - - - ")
+            console.log(msg)
 
             const embed = new MessageEmbed()
                 .setTitle("reload")

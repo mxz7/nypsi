@@ -47,9 +47,11 @@ function loadCommands() {
                 commands.set(command.name, command);
             } else {
                 failedTable.push([file, "❌"])
+                console.log(file + " missing name, description, category or run")
             }
         } catch (e) {
             failedTable.push([file, "❌"])
+            console.log(e)
         }
     }
 
@@ -574,36 +576,43 @@ function helpCmd(message, args) {
 
 }
 
-function reloadCommand(command) {
+function reloadCommand(commandsArray) {
     commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
-    try {
-        commands.delete(command)
+
+    const reloadTable = []
+
+    for (cmd of commandsArray) {
         try {
-            delete require.cache[require.resolve(`./commands/${command}`)]
-        } catch (e) {}
+            commands.delete(cmd)
+            try {
+                delete require.cache[require.resolve(`./commands/${cmd}`)]
+            } catch (e) {
+                return console.log("error deleting from cache")
+            }
+            
+            const commandData = require(`./commands/${cmd}`);
         
-        const commandData = require(`./commands/${command}`);
-    
-        let enabled = true;
-        
-        if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
-            enabled = false;
+            let enabled = true;
+            
+            if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
+                enabled = false;
+            }
+            
+            if (enabled) {
+                commands.set(commandData.name, commandData);
+                reloadTable.push([commandData.name, "✅"])
+                exports.commandsSize = commands.size
+            } else {
+                reloadTable.push([cmd, "❌"])
+                exports.commandsSize = commands.size
+            }
+        } catch (e) {
+            reloadTable.push([cmd, "❌"])
+            console.log(e)
         }
-        
-        if (enabled) {
-            commands.set(commandData.name, commandData);
-            console.log(commandData.name + " ✅");
-            exports.commandsSize = commands.size
-            return true
-        } else {
-            console.log(command + " ❌");
-            exports.commandsSize = commands.size
-            return false
-        }
-    } catch (e) {
-        console.log(e)
-        return false
     }
+    console.log(table(reloadTable, {border: getBorderCharacters("ramac")}))
+    return table(reloadTable, {border: getBorderCharacters("ramac")})
 }
 
 exports.commandsSize = commands.size
