@@ -6,7 +6,7 @@ const bonusCooldown = new Map()
 
 module.exports = {
     name: "vote",
-    description: "vote every 12 hours to get a 20% bonus on gambling wins as well as a $10k reward",
+    description: "vote every 12 hours to get a 20% bonus on gambling wins as well as a $15k reward",
     category: "money",
     run: async (message, args) => {
 
@@ -33,7 +33,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5);
+        }, 10000);
 
         const voted = await getVoteMulti(message.member) > 0
 
@@ -47,8 +47,8 @@ module.exports = {
             if (!bonusCooldown.has(message.member.id)) {
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou have been rewarded with $**10,000** for voting")
-                updateBalance(message.member, getBalance(message.member) + 10000)
+                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou have been rewarded with $**15,000** for voting")
+                updateBalance(message.member, getBalance(message.member) + 15000)
                 bonusCooldown.set(message.member.id, new Date())
                 setTimeout(() => {
                     bonusCooldown.delete(message.member.id)
@@ -62,12 +62,12 @@ module.exports = {
 
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou can receive a $**10,000** bonus in: " + remaining)
+                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou can receive a $**15,000** bonus in: " + remaining)
             }
         } else {
             embed.setTitle("vote ❌ | " + message.member.user.username)
             embed.setColor("#e4334f")
-            embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins")
+            embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins as well as a $**15,000** reward")
         }
 
         message.channel.send(embed).catch(() => {
