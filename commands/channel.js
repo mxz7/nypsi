@@ -37,6 +37,8 @@ module.exports = {
 
         const color = getColor(message.member);
 
+        let fail = false
+
         if (args.length == 0) {
 
             const embed = new MessageEmbed()
@@ -55,8 +57,6 @@ module.exports = {
             return message.channel.send(embed).catch(() => message.channel.send("❌ $channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)"))   
         }
 
-        
-
         if (args[0] == "create" || args[0] == "c") {
             if (args.length == 1) {
                 return message.channel.send("❌ $channel **c**reate <name1 name2>\nexample: $channel c channel1 channel2")
@@ -66,8 +66,13 @@ module.exports = {
             let channels = ""
 
             for (arg of args) {
-                const newChannel = await message.guild.channels.create(arg)
+                const newChannel = await message.guild.channels.create(arg).catch(() => fail = true)
+                if (fail) break
                 channels = channels + "**" + newChannel.toString() + "** ✅\n"
+            }
+
+            if (fail) {
+                return message.channel.send("❌ error creating channel(s)")
             }
 
             const embed = new MessageEmbed()
@@ -90,9 +95,12 @@ module.exports = {
             message.mentions.channels.forEach(async channel => {
                 count++
                 await channel.delete().catch(() => {
+                    fail = true
                     return message.channel.send("❌ unable to delete channel: " + channel.name)
                 })
             })
+
+            if (fail) return
 
             const embed = new MessageEmbed()
                 .setTitle("channel | " + message.member.user.username)
@@ -119,8 +127,12 @@ module.exports = {
 
             await channel.edit({name: name}).then(() => {
             }).catch(() => {
+                fail = true
                 return message.channel.send("❌ unable to rename channel")
             })
+
+            if (fail) return
+
             const embed = new MessageEmbed()
                 .setTitle("channel | " + message.member.user.username)
                 .setDescription("✅ channel renamed to " + name)
