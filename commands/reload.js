@@ -17,8 +17,6 @@ module.exports = {
             let msg = reloadCommand(args).split("✔")
             msg = "```\n" + msg + "```"
 
-            console.log(msg)
-
             const embed = new MessageEmbed()
                 .setTitle("reload")
                 .setDescription(msg)
