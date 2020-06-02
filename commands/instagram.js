@@ -52,7 +52,8 @@ module.exports = {
         try {
             res = await fetch(url).then(url => url.json());
         } catch (e) {
-            return message.channel.send("❌ invalid account");
+            console.log(e)
+            return await message.channel.send("sorry. this command is currently unavailable due to a change with how instagram handles requests")
         }
         
         let account
