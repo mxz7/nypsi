@@ -52,12 +52,12 @@ module.exports = {
         
         if (amount <= 100) {
             await message.channel.bulkDelete(amount).catch(() => {
-                message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
-                return
+                return message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
             })
         } else {
             const amount1 = amount
             let fail = false
+            let counter = 0
             if (amount > 10000) {
                 amount = 10000
             }
@@ -69,6 +69,13 @@ module.exports = {
                         fail = true
                     })
                     break
+                }
+
+                if (counter >= 3) {
+                    const m = await message.channel.messages.fetch({limit: 100})
+                    return await message.channel.bulkDelete(m)
+                } else {
+                    counter++
                 }
 
                 await message.channel.bulkDelete(100).catch(() => {
