@@ -71,7 +71,7 @@ module.exports = {
         }
 
         if (getBalance(message.member) < 750) {
-            return message.channel.send("❌ you dont have sufficient funds")
+            return message.channel.send("❌ you need $1k in your wallet to rob someone")
         }
 
         cooldown.set(message.member.user.id, new Date());
