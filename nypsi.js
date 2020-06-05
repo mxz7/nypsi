@@ -45,7 +45,6 @@ function loadCommands() {
 
             if (enabled) {
                 commands.set(command.name, command);
-                console.log("* $**" + command.name + "** *" + command.description + "*")
             } else {
                 failedTable.push([file, "❌"])
                 console.log(file + " missing name, description, category or run")
