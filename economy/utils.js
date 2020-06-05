@@ -41,6 +41,13 @@ setInterval(() => {
 }, 60000)
 
 setInterval(() => {
+    let date = new Date()
+    date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
+    fs.writeFileSync('./economy/backup/' + date + '.json', JSON.stringify(users))
+    console.log("\x1b[32m[" + getTimestamp() + "] data backup complete\x1b[37m")
+}, 43200000)
+
+setInterval(() => {
     for (user in users) {
         if (users[user].balance == NaN || users[user].balance == null || users[user].padlockStatus == NaN || users[user].padlockStatus == null || users[user].padlockStatus == undefined || users[user].balance == undefined || users[user].balance == -NaN || users[user].balance < 0) {
 
