@@ -20,13 +20,23 @@ module.exports = {
 
         const bankWorth = new Discord.Collection()
 
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 2))
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 1.7))
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 2.5))
-        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 1.5))
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 1.8))
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.1))
-        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2))
+        if (getBalance(message.member) > 500000) {
+            bankWorth.set("barclays", Math.round(getBalance(message.member) * 1))
+            bankWorth.set("santander", Math.round(getBalance(message.member) * 0.8))
+            bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 1.25))
+            bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.75))
+            bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.9))
+            bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.5))
+            bankWorth.set("mazebank", Math.round(getBalance(message.member) * 1))
+        } else {
+            bankWorth.set("barclays", Math.round(getBalance(message.member) * 2))
+            bankWorth.set("santander", Math.round(getBalance(message.member) * 1.7))
+            bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 2.5))
+            bankWorth.set("lloyds", Math.round(getBalance(message.member) * 1.5))
+            bankWorth.set("hsbc", Math.round(getBalance(message.member) * 1.8))
+            bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.1))
+            bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2))
+        }
 
         const color = getColor(message.member);
 
