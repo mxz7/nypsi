@@ -74,7 +74,9 @@ module.exports = {
                 .setDescription("✅ lockdown enabled for channel **" + message.channel.name + "**")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed)
+            return message.channel.send(embed).catch(() => {
+                return message.member.send(embed).catch()
+            })
         } else {
             await message.channel.updateOverwrite(role, {
                 SEND_MESSAGES: null
@@ -85,7 +87,9 @@ module.exports = {
                 .setDescription("✅ lockdown disabled for channel **" + message.channel.name + "**")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed)
+            return message.channel.send(embed).catch(() => {
+                return message.member.send(embed).catch()
+            })
         }
 
     }
