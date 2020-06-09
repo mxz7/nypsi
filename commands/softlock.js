@@ -79,7 +79,9 @@ module.exports = {
                 .setDescription("✅ soft lock enabled for channel **" + message.channel.name + "**")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed)
+            return message.channel.send(embed).catch(() => {
+                return message.member.send(embed).catch()
+            })
         } else {
             await message.channel.updateOverwrite(role, {
                 EMBED_LINKS: null,
@@ -96,7 +98,9 @@ module.exports = {
                 .setDescription("✅ soft lock disabled for channel **" + message.channel.name + "**")
                 .setFooter("bot.tekoh.wtf")
 
-            return message.channel.send(embed)
+            return message.channel.send(embed).catch(() => {
+                return message.member.send(embed).catch()
+            })
         }
 
     },
