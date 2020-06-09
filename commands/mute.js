@@ -22,8 +22,8 @@ module.exports = {
                 .setTitle("mute help")
                 .setColor(color)
                 .addField("usage", "$mute <@user(s)> (time) [-s]")
-                .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work\n" +
-                    "time format example: 1h30m")
+                .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
+                .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
         }
@@ -70,48 +70,15 @@ module.exports = {
         if (reason != "") {
             timedMute = true
 
-            let time2 = 0
+            time = getDuration(reason)
 
-            if (reason.split("h").length > 2 || reason.split("m").length > 2) {
-                return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-            }
-
-            if (!parseInt(reason.split("h").join().split("m").join())) {
-                return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-            }
-
-            if (!reason.includes("h") && !reason.includes("m")) {
-                time = parseInt(reason) * 60 * 1000
-            } else if (reason.includes("h") && !reason.includes("m")) {
-                if (!parseInt(reason.split("h")[0])) {
-                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-                }
-
-                time2 = parseInt(reason.split("h")[0])
-
-                time = time2 * 60 * 60 * 1000
-            } else if (!reason.includes("h") && reason.includes("m")) {
-                if (!parseInt(reason.split("m")[0])) {
-                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-                }
-
-                time2 = parseInt(reason.split("m")[0])
-
-                time = time2 * 60 * 1000
-            } else if (reason.includes("h") && reason.includes("m")) {
-                if (!parseInt(reason.split("h")[0]) || !parseInt(reason.split("m")[0])) {
-                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-                }
-
-                const hours = parseInt(reason.split("h")[0])
-                const minutes = parseInt(reason.split("h")[1].split("m")[0])
-
-
-                time = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000)
-            } else {
-                if (!parseInt(reason)) {
-                    return message.channel.send("❌ invalid time format - example: $mute @user 1h30m")
-                }
+            if (!time) {
+                const embed = new MessageEmbed()
+                    .setTitle("invalid time format")
+                    .setColor(color)
+                    .setDescription("time format examples: \n**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
+                    .setFooter("bot.tekoh.wtf")
+                return message.channel.send(embed)
             }
         }
 
@@ -122,6 +89,13 @@ module.exports = {
             const memberHighestRole = message.member.roles.highest
 
             if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
+                failed.push(members.get(member).user.tag)
+            } else if (members.get(member).roles.cache.find(r => r.id == muteRole.id)) {
+
+                if (members.keyArray().length == 1) {
+                    return message.channel.send("❌ that user is already muted")
+                }
+
                 failed.push(members.get(member).user.tag)
             } else {
                 await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
@@ -141,8 +115,8 @@ module.exports = {
                 for (member of members.keyArray()) {
                     await members.get(member).roles.remove(muteRole).catch()
                 }
-            }, time)
-            mutedLength = getTime(time)
+            }, time * 1000)
+            mutedLength = getTime(time * 1000)
         }
 
         if (count == 0) {
@@ -170,6 +144,36 @@ module.exports = {
             return message.channel.send(embed)
         }
 
+    }
+}
+
+function getDuration(duration) {
+    duration.toLowerCase()
+
+    if (duration.includes("d")) {
+        if (!parseInt(duration.split("d")[0])) return undefined
+
+        const num = duration.split("d")[0]
+
+        return num * 86400
+    } else if (duration.includes("h")) {
+        if (!parseInt(duration.split("h")[0])) return undefined
+
+        const num = duration.split("h")[0]
+
+        return num * 3600
+    } else if (duration.includes("m")) {
+        if (!parseInt(duration.split("m")[0])) return undefined
+
+        const num = duration.split("m")[0]
+
+        return num * 60
+    } else if (duration.includes("s")) {
+        if (!parseInt(duration.split("s")[0])) return undefined
+
+        const num = duration.split("s")[0]
+
+        return num
     }
 }
 
