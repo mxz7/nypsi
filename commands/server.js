@@ -53,8 +53,6 @@ module.exports = {
             });
         }
 
-         
-
         const embed = new MessageEmbed()
             .setThumbnail(server.iconURL({format: "png", dynamic: true, size: 128}))
             .setColor(color)

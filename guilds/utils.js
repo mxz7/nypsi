@@ -31,6 +31,10 @@ setInterval(() => {
 }, 120000)
 
 module.exports = {
+    /**
+     * 
+     * @param {*} guild run check for guild
+     */
     runCheck: function(guild) {
         const currentMembersPeak = guilds[guild.id].members
         const currentOnlinesPeak = guilds[guild.id].onlines
@@ -55,6 +59,10 @@ module.exports = {
         }
     },
 
+    /**
+     * @returns {boolean}
+     * @param {*} guild check if guild is stored
+     */
     hasGuild: function(guild) {
         if (guilds[guild.id]) {
             return true
@@ -63,10 +71,18 @@ module.exports = {
         }
     },
 
+    /**
+     * @returns {JSON} members / onlines
+     * @param {*} guild guild to get peaks of
+     */
     getPeaks: function(guild) {
         return guilds[guild.id]
     },
 
+    /**
+     * 
+     * @param {*} guild create guild profile
+     */
     createGuild: function(guild) {
 
         const members = guild.members.cache.filter(member => !member.user.bot)
