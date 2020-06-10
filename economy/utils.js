@@ -97,6 +97,7 @@ setInterval(() => {
 
 module.exports = {
 
+    
     getPadlockPrice: function() {
         return parseInt(padlockPrice)
     },
@@ -105,6 +106,9 @@ module.exports = {
         return voteCache.size
     },
 
+    /**
+     * @param member {Object} member - give the member object to receive their vote multiplier
+     */
     getVoteMulti: async function(member) {
         try {
             if (voteCache.has(member.user.id)) {
@@ -137,6 +141,9 @@ module.exports = {
         return Object.keys(users).length
     },
 
+    /**
+     * @param guild {Object} guild - guild object to get economy user count of
+     */
     getUserCountGuild: function(guild) {
         let count = 0
 
@@ -149,14 +156,27 @@ module.exports = {
         return count
     },
 
+    /**
+     * 
+     * @param member {Object} member - get balance
+     */
     getBalance: function(member) {
         return parseInt(users[member.user.id].balance)
     },
 
+    /**
+     * @param item {string} item - get the slots multiplier of an item
+     * @returns {number} multiplier of item
+     */
     getMultiplier: function(item) {
         return multiplier[item]
     },
 
+    /**
+     * 
+     * @param id {string} id of user in question
+     * @returns {boolean}
+     */
     userExistsID: function(id) {
         if (users[id]) {
             return true
@@ -165,6 +185,11 @@ module.exports = {
         }
     },
 
+    /**
+     * 
+     * @param member {Object} id of user in question
+     * @returns {boolean}
+     */
     userExists: function(member) {
         if (users[member.user.id]) {
             return true
@@ -173,34 +198,64 @@ module.exports = {
         }
     },
 
+    /**
+     * @param member {Object} user to modify balance of
+     * @param amount {number} amount to update balance to 
+     */
     updateBalance: function(member, amount) {
         const amount1 = parseInt(amount)
         users[member.user.id].balance = amount1
     },
 
+    /**
+     * @param id {string} id of user to modify balance of
+     * @param amount {number} amount to update balance to
+     */
     updateBalanceID: function(id, amount) {
         const amount1 = parseInt(amount)
         users[id].balance = amount1
     },
 
+    /**
+     * @returns {number} bank balance of user
+     * @param member {Object} user to get bank balance of
+     */
     getBankBalance: function(member) {
         return parseInt(users[member.user.id].bank)
     },
 
+    /**
+     * 
+     * @param member {Object} member to modify balance of 
+     * @param amount {number} amount to update balance to
+     */
     updateBankBalance: function(member, amount) {
         const amount1 = parseInt(amount)
         users[member.user.id].bank = amount1
     },
 
+    /**
+     * @returns {number} xp of user
+     * @param member {Object} member to get xp of
+     */
     getXp: function(member) {
         return parseInt(users[member.user.id].xp)
     },
 
+    /**
+     * 
+     * @param member {Object} member to modify xp of 
+     * @param amount {number} amount to update xp to
+     */
     updateXp: function(member, amount) {
         const amount1 = parseInt(amount)
         users[member.user.id].xp = amount1
     },
 
+    /**
+     * @returns {number} max balance of user
+     * @param member {Object} member to get max balance of
+     */
     getMaxBankBalance: function(member) {
         const xp = xpBalance(member)
         const constant = 500
@@ -211,6 +266,10 @@ module.exports = {
         return max
     },
 
+    /**
+     * @returns {Array} global bal top
+     * @param amount {number} amount of people to pull
+     */
     topAmountGlobal: function(amount) {
 
         const users1 = []
@@ -240,6 +299,11 @@ module.exports = {
 
     },
 
+    /**
+     * @returns {Array}
+     * @param guild {Object} guild to pull data from
+     * @param amount {number} amount of users to return with
+     */
     topAmount: function(guild, amount) {
     
         const users1 = []
@@ -270,6 +334,10 @@ module.exports = {
         return usersFinal
     },
 
+    /**
+     * 
+     * @param member {Object} member to create profile for
+     */
     createUser: function(member) {
         users[member.user.id] = {
             balance: 500,
@@ -279,6 +347,10 @@ module.exports = {
         }
     },
 
+    /**
+     * 
+     * @param member {string} user id of member to create profile for
+     */
     createUserID: function(id) {
         users[id] = {
             balance: 5000,
@@ -288,6 +360,9 @@ module.exports = {
         }
     },
 
+    /**
+     * @returns {string} 
+     */
     winBoard: function() {
 
         lol = ""
@@ -299,6 +374,10 @@ module.exports = {
         return lol
     },
 
+    /**
+     * @returns {number} formatted bet
+     * @param number {string} bet to format
+     */
     formatBet: function(number) {
         let a = number.toString().toLowerCase().replace("t", "000000000000")
         a = a.replace("b", "000000000")
@@ -308,6 +387,10 @@ module.exports = {
         return a
     },
 
+    /**
+     * @returns {boolean}
+     * @param member {Object} member to check
+     */
     hasPadlock: function(member) {
         if (users[member.user.id].padlockStatus) {
             return true
@@ -316,6 +399,11 @@ module.exports = {
         }
     },
 
+    /**
+     * 
+     * @param member {Object} member to update padlock setting of
+     * @param setting {boolean} set padlock to true or false
+     */
     setPadlock: function(member, setting) {
         users[member.user.id].padlockStatus = setting
     }

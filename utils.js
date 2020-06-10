@@ -346,6 +346,10 @@ module.exports = {
     rabbitCache,
     snekCache,
 
+    /**
+     * @returns {string}
+     * @param {*} member member to get color of
+     */
     getColor: function(member) {
         if (member.displayHexColor == "#ffffff") {
            return "#f8f8ff";
@@ -354,6 +358,11 @@ module.exports = {
         }
     },
 
+    /**
+     * @returns {string}
+     * @param post {JSON}
+     * @param allowed {Array}
+     */
     redditImage: async function(post, allowed)  {
         let image = post.data.url 
 
@@ -421,6 +430,11 @@ module.exports = {
         return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
     },
 
+    /**
+     * @returns {Object} member object
+     * @param {*} message
+     * @param {string} memberName name of member
+     */
     getMember: function(message, memberName) {
         if (!message.guild) return null
         let target = message.guild.members.cache.find(member => {
@@ -444,11 +458,18 @@ module.exports = {
         return target;
     },
     
+    /**
+     * @returns {string}
+     * @param {Date} date 
+     */
     formatDate: function(date) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Intl.DateTimeFormat("en-US", options).format(date);
     },
 
+    /**
+     * @returns {string}
+     */
     getTimestamp: function() {
         const date = new Date();
         let hours = date.getHours().toString();
