@@ -5,7 +5,7 @@ const cooldown = new Map();
 
 module.exports = {
     name: "poll",
-    description: "create a poll",
+    description: "create a poll with alot of customisation",
     category: "info",
     run: async (message, args) => {
 
@@ -93,11 +93,6 @@ module.exports = {
         } else if (args.join(" ").split("|").length == 3) {
             mode = "title_desc_color"
         }
-
-        cooldown.set(message.member.id, new Date());
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 10000);
 
         const title = args.join(" ").split("|")[0]
         let description
