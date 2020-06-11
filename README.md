@@ -49,7 +49,6 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**porn** *get a random porn image*
 * $**pp** *accurate prediction of your pp size*
 * $**presence** *view active presences for a user*
-* $**question** *create a question*
 * $**rabbit** *get a random picture of a rabbit*
 * $**reddit** *get a random image from any subreddit*
 * $**reload** *reload commands*
