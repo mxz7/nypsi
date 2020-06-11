@@ -12,6 +12,7 @@ const { table, getBorderCharacters } = require("table")
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const cooldown = new Set()
+const dmCooldown = new Set()
 const snipe = new Map()
 let ready = false
 
@@ -163,14 +164,51 @@ client.on("messageDelete", message => {
 })
 
 const { isLocked } = require("./commands/softlock.js")
-client.on("message", message => {
+client.on("message", async message => {
 
     if (!cooldown.has(message.channel.id) && isLocked(message.channel.id) && message.content.length > 250 && !message.content.startsWith("$softlock")) {
         return message.delete().catch()
     }
 
     if (message.author.bot) return;
-    if (!message.guild) return;
+
+    if (!message.guild) {
+
+        console.log("[" + getTimeStamp() + "] message in DM: '" + message.content + "'")
+
+        if (dmCooldown.has(message.author.id)) return
+
+        dmCooldown.add(message.author.id)
+
+        setTimeout(() => {
+            dmCooldown.delete(message.author.id)
+        }, 1500)
+
+        if (!message.content.toLowerCase().startsWith("$support ")) {
+            const embed = new MessageEmbed()
+                .setTitle("support")
+                .setColor("#36393f")
+                .setDescription("if you need support you can do one of the following:\n - add `max#0777` as a friend on discord\n\n - type `$support <support request>` and you will receive a reply soon")
+                .setFooter("bot.tekoh.wtf")
+            return await message.channel.send(embed)
+        } else {
+            const embed = new MessageEmbed()
+                .setAuthor("support request")
+                .setTitle(message.author.username + "#" + message.author.discriminator + " (" + message.author.id + ")")
+                .setDescription(message.content.split("$support ").join(""))
+            const TEKOHLOL = message.client.users.cache.find(m => m.id == "672793821850894347")
+            if (!TEKOHLOL) {
+                return await message.channel.send("❌ error sending message - please contact `max#0777`")
+            } else {
+                return await TEKOHLOL.send(embed).then(() => {
+                    return message.channel.send("✅ support request sent - please be patient")
+                }).catch(() => {
+                    return message.channel.send("❌ error sending message - please contact `max#0777`")
+                })
+            }
+        }
+    }
+
     if (!message.content.startsWith(prefix)) return;
 
     if (!ready) {
