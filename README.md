@@ -29,6 +29,7 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**deposit** *deposit money into your bank*
 * $**dog** *get a random picture of a dog*
 * $**embed** *create an embed message*
+* $**ezpoll** *simple poll builder*
 * $**fact** *get a random fact*
 * $**flip** *flip a coin*
 * $**freemoney** *get $1k every 5 minutes*
