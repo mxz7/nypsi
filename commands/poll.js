@@ -9,15 +9,15 @@ module.exports = {
     category: "info",
     run: async (message, args) => {
 
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-            return 
-        } 
-
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 10 - diff
+            let time = 10 - diff
+
+            if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+                time = 60 - diff
+            }
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -39,21 +39,50 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("poll help")
                 .setColor(color)
-                .addField("usage", "$poll <title> | (text) | (hex color)")
+                .addField("usage", "$poll (choices) <title> | (text) | (hex color)")
                 .addField("help", "**<>** required | **()** optional\n" +
                     "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
-                    "the emojis used for the reactions will be 🅰 and 🅱")
-                    .addField("examples", "$poll hello\n" +
-                    "$poll hello | this is a description\n" +
-                    "$poll hello | this is a description | #13c696")
+                    "if a number isnt found for choices then 👍👎 emojis will be used\n" +
+                    "largest number of choices is 10, and 1 is minimum")
+                    .addField("examples", "$poll question?\n" +
+                    "$poll 2 title | this is a description\n" +
+                    "$poll 9 hello | this is a description | #13c696")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $poll <title> | (text) | (hex color)"))
         }
 
-        cooldown.set(message.member.id, new Date());
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 10000);
+        if (message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
+            cooldown.set(message.member.id, new Date());
+            setTimeout(() => {
+                cooldown.delete(message.member.id);
+            }, 10000);
+        }
+
+        if (!message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
+            cooldown.set(message.member.id, new Date());
+            setTimeout(() => {
+                cooldown.delete(message.member.id);
+            }, 60000)
+        }
+
+        let choices = 0
+
+        if (parseInt(args[0])) {
+            const num = parseInt(args[0])
+
+            if (num < 2) {
+                choices = 0
+            } else if (num > 10) {
+                choices = 10
+            } else {
+                choices = num
+            }
+
+            if (!message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR") && num > 2) {
+                choices = 2
+            }
+            args.shift()
+        }
 
         let mode = ""
 
@@ -90,11 +119,30 @@ module.exports = {
             embed.setDescription(description)
         }
 
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            embed.setAuthor(message.member.user.tag)
+        }
         
         message.channel.send(embed).then(async m => {
-            message.delete()
-            await m.react("🅰")
-            await m.react("🅱")
+            await message.delete().catch()
+            
+            if (choices == 0) {
+                await m.react("👍")
+                await m.react("👎")
+            } else if (choices >= 2) {
+                await m.react("1️⃣")
+                await m.react("2️⃣")
+            }
+
+            if (choices >= 3) await m.react("3️⃣")
+            if (choices >= 4) await m.react("4️⃣")
+            if (choices >= 5) await m.react("5️⃣")
+            if (choices >= 6) await m.react("6️⃣")
+            if (choices >= 7) await m.react("7️⃣")
+            if (choices >= 8) await m.react("8️⃣")
+            if (choices >= 9) await m.react("9️⃣")
+            if (choices == 10) await m.react("🔟")
+
         })
 
     }
