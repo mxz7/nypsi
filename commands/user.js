@@ -40,7 +40,24 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed)
         }
+
+        const members = message.guild.members.cache
+        let membersSorted = []
+
+        members.forEach(m => {
+            if (m.joinedTimestamp) {
+                membersSorted.push(m.id)
+            }
+        })
+
+        membersSorted.sort(function(a, b) {
+            return members.find(m => m.id == a).joinedAt - members.find(m => m.id == b).joinedAt
+        })
         
+        let joinPos = membersSorted.indexOf(member.id) + 1
+
+        if (joinPos == 0) joinPos = "invalid"
+
         const joined = formatDate(member.joinedAt);
         const created = formatDate(member.user.createdAt);
         const roles = member.roles._roles
@@ -71,12 +88,12 @@ module.exports = {
 
             .addField(member.displayName, "**created** " + created.toString().toLowerCase() + "\n" + 
                 "**joined** " + joined.toString().toLowerCase() + "\n" + 
-                "**roles** " + member._roles.length, true)
+                "**join pos** " + joinPos, true)
 
             .setFooter("bot.tekoh.wtf")
         
         if (rolesText != " ") {
-            embed.addField("roles", rolesText)
+            embed.addField("roles [" + member._roles.length + "]", rolesText)
         }
 
         if (member.presence.activities.length > 0) {
