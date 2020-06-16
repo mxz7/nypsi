@@ -36,6 +36,7 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**github** *view code for the bot on github*
 * $**highlow** *higher or lower game*
 * $**instagram** *view stats for an instagram account*
+* $**invite** *generate an invite link for the bot*
 * $**kick** *kick one or more users*
 * $**lockdown** *lockdown a channel (will only work if permissions are setup correctly)*
 * $**lookup** *lookup ip addresses and domains*
