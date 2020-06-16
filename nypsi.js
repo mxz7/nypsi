@@ -98,6 +98,7 @@ aliases.set("bird", "birb")
 aliases.set("dep", "deposit")
 aliases.set("with", "withdraw")
 aliases.set("bank", "balance")
+aliases.set("bot", "invite")
 
 client.once("ready", async () => {
 
@@ -143,7 +144,7 @@ client.on("guildDelete", guild => {
 client.on("rateLimit", rate => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
-    console.log("\x1b[31m[" + getTimeStamp() + "] rate limit: " + rate.route + "\x1b[37m")
+    console.log("\x1b[31m[" + getTimeStamp() + "] rate limit: " + reason + "\x1b[37m")
 })
 
 client.on("guildMemberAdd", member => {
