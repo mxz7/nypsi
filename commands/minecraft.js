@@ -186,7 +186,7 @@ module.exports = {
                     } else {
                         currentPage--
                         embed.setDescription(names.get(currentPage).join("\n"))
-                        embed.setFooter("page " + currentPage)
+                        embed.setFooter("bot.tekoh.wtf | page " + currentPage + "/" + lastPage)
                         await msg.edit(embed)
                         return pageManager()
                     }
@@ -196,7 +196,7 @@ module.exports = {
                     } else {
                         currentPage++
                         embed.setDescription(names.get(currentPage).join("\n"))
-                        embed.setFooter("page " + currentPage)
+                        embed.setFooter("bot.tekoh.wtf | page " + currentPage + "/" + lastPage)
                         await msg.edit(embed)
                         return pageManager()
                     }
