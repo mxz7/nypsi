@@ -44,7 +44,7 @@ module.exports = {
                     "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
                     "if a number isnt found for choices then 👍👎 emojis will be used\n" +
                     "largest number of choices is 10, and 1 is minimum")
-                    .addField("examples", "$poll question?\n" +
+                .addField("examples", "$poll question?\n" +
                     "$poll 2 title | this is a description\n" +
                     "$poll 9 hello | this is a description | #13c696")
 
