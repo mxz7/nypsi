@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const { getColor } = require("../utils.js")
 
 const cooldown = new Map()
+const cache = new Map()
 
 module.exports = {
     name: "minecraft",
@@ -52,22 +53,54 @@ module.exports = {
         let res
         let res2
 
-        res = await fetch(url1).then(url => url.json()).catch(() => {
-            invalid = true
-        })
-        
-        if (invalid) {
-            res2 = await fetch(url2).then(url => {
-                oldName = true
-                invalid = false
-                return url.json()
-            }).catch(() => {
-                invalid = true
+        if (cache.has(username.toLowerCase())) {
+            if (cache.get(username.toLowerCase()).invalid) {
                 return message.channel.send("❌ invalid account")
+            }
+            if (cache.get(username.toLowerCase()).oldName) {
+                res2 = cache.get(username.toLowerCase()).response
+                oldName = true
+                res2.history.reverse()
+            } else {
+                res = cache.get(username.toLowerCase()).response
+                res.name_history.reverse()
+            }
+        } else {
+            res = await fetch(url1).then(url => url.json()).catch(() => {
+                invalid = true
             })
-        }
+            
+            if (invalid) {
+                res2 = await fetch(url2).then(url => {
+                    oldName = true
+                    invalid = false
+                    return url.json()
+                }).catch(() => {
+                    invalid = true
+                    return message.channel.send("❌ invalid account")
+                })
+            }
 
-        if (invalid) return
+            if (!oldName) {
+                cache.set(username.toLowerCase(), {
+                    invalid: invalid,
+                    oldName: false,
+                    response: res
+                })
+            } else {
+                cache.set(username.toLowerCase(), {
+                    invalid: invalid,
+                    oldName: true,
+                    response: res2
+                })
+            }
+
+            setTimeout(() => {
+                cache.delete(username)
+            }, 600000)
+    
+            if (invalid) return
+        }
 
         let uuid
         let nameHistory
