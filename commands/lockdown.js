@@ -10,7 +10,17 @@ module.exports = {
     category: "moderation",
     run: async (message, args) => {
 
+        const color = getColor(message.member);
+        
         if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_MESSAGES")) {
+            if (message.member.hasPermission("MANAGE_MESSAGES")) {
+                const embed = new MessageEmbed()
+                    .setTitle("lockdown")
+                    .setDescription("❌ requires permission: *MANAGE_CHANNELS* and *MANAGE_MESSAGES*")
+                    .setFooter("bot.tekoh.wtf")
+                    .setColor(color)
+                return message.channel.send(embed)
+            }
             return 
         }
 
@@ -41,8 +51,6 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 3000);
-
-        const color = getColor(message.member);
 
         let locked = false
 
