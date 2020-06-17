@@ -65,7 +65,7 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**smallcaps** *change any text to small caps*
 * $**snek** *get a random picture of a snek*
 * $**snipe** *snipe the most recently deleted message*
-* $**softlock** *softlock a channel - make chat more readable when active*
+* $**snipefilter** *modify the snipe filter for the current server*
 * $**stats** *view stats for the bot*
 * $**thighs** *get a random thighs image*
 * $**unmute** *unmute one or more users*
