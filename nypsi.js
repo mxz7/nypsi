@@ -6,13 +6,15 @@ const fs = require("fs");
 const { list } = require("./optout.json");
 const { banned } = require("./banned.json");
 const { getUserCount } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter } = require("./guilds/utils.js")
 const { table, getBorderCharacters } = require("table")
+const { updateXp, getXp, userExists } = require("./economy/utils.js")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const cooldown = new Set()
 const dmCooldown = new Set()
+const xpCooldown = new Set()
 const snipe = new Map()
 let ready = false
 
@@ -99,6 +101,7 @@ aliases.set("dep", "deposit")
 aliases.set("with", "withdraw")
 aliases.set("bank", "balance")
 aliases.set("bot", "invite")
+aliases.set("sf", "snipefilter")
 
 client.once("ready", async () => {
 
@@ -157,19 +160,22 @@ client.on("messageDelete", message => {
 
     if (!message.member) return
 
+
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
+
+        const filter = getSnipeFilter(message.guild)
+
+        for (word of filter) {
+            if (message.content.includes(word)) return
+        }
+
         snipe.set(message.channel.id, message)
 
         exports.snipe = snipe
     }
 })
 
-const { isLocked } = require("./commands/softlock.js")
 client.on("message", async message => {
-
-    if (!cooldown.has(message.channel.id) && isLocked(message.channel.id) && message.content.length > 250 && !message.content.startsWith("$softlock")) {
-        return message.delete().catch()
-    }
 
     if (message.author.bot) return;
 
@@ -316,8 +322,6 @@ function getTimeStamp() {
     return timestamp
 }
 
-const { updateXp, getXp, userExists } = require("./economy/utils.js")
-const xpCooldown = new Set()
 function runCommand(cmd, message, args) {
 
     try {
@@ -681,5 +685,5 @@ function runChecks() {
                 runCheck(guild)
             }
         })
-    }, 60000)
+    }, 10000)
 }
