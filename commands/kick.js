@@ -7,15 +7,23 @@ module.exports = {
     category: "moderation",
     run: async (message, args) => {
 
+        const color = getColor(message.member);
+        
         if (!message.member.hasPermission("KICK_MEMBERS")) {
+            if (message.member.hasPermission("MANAGE_MESSAGES")) {
+                const embed = new MessageEmbed()
+                    .setTitle("kick")
+                    .setDescription("❌ requires permission: *KICK_MEMBERS*")
+                    .setFooter("bot.tekoh.wtf")
+                    .setColor(color)
+                return message.channel.send(embed)
+            }
             return 
         }
 
         if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
             return message.channel.send("❌ i am lacking permission: 'KICK_MEMBERS'");
         }
-
-        const color = getColor(message.member);
 
         if (message.mentions.members.first() == null || args.length == 0) {
 
