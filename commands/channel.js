@@ -27,15 +27,23 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
+        const color = getColor(message.member);
+
         if (!message.member.hasPermission("MANAGE_CHANNELS")) {
+            if (message.member.hasPermission("MANAGE_MESSAGES")) {
+                const embed = new MessageEmbed()
+                    .setTitle("channel")
+                    .setDescription("❌ requires permission: *MANAGE_CHANNELS*")
+                    .setFooter("bot.tekoh.wtf")
+                    .setColor(color)
+                return message.channel.send(embed)
+            }
             return
         }
 
         if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
             return message.channel.send("❌ i am lacking permission: 'MANAGE_CHANNELS")
         }
-
-        const color = getColor(message.member);
 
         let fail = false
 
