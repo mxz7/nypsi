@@ -4,6 +4,7 @@ const { getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 const cache = new Map()
+const serverCache = new Map()
 
 module.exports = {
     name: "minecraft",
@@ -43,6 +44,41 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
+        
+        const color = getColor(message.member);
+
+        if (args[0].includes(".")) {
+            const serverIP = args[0]
+            const url = "https://api.mcsrvstat.us/2/" + serverIP.toLowerCase()
+            let res
+            let invalid = false
+
+            if (serverCache.has(serverIP.toLowerCase())) {
+                res = serverCache.get(serverIP.toLowerCase())
+            } else {
+                res = await fetch(url).then(url => url.json()).catch(() => {
+                    invalid = true
+                })
+                if (!invalid) {
+                    serverCache.set(serverIP.toLowerCase(), res)
+                    setTimeout(() => {
+                        serverCache.delete(serverIP.toLowerCase())
+                    }, 600000)
+                } else {
+                    return message.channel.send("❌ invalid ip address")
+                }
+            }
+
+            const embed = new MessageEmbed()
+                .setTitle(args[0])
+                .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
+                .addField("version", res.version, true)
+                .addField("motd", res.motd.clean)
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed)
+        }
 
         let username = args[0]
 
@@ -96,7 +132,7 @@ module.exports = {
             }
 
             setTimeout(() => {
-                cache.delete(username)
+                cache.delete(username.toLowerCase())
             }, 600000)
     
             if (invalid) return
@@ -173,8 +209,6 @@ module.exports = {
         } catch (e) {
             if (e != BreakException) throw e
         }
-        
-        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle(username)
