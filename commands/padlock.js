@@ -1,5 +1,5 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
-const { getTimestamp } = require("../utils.js")
+const { getTimestamp } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()

@@ -1,4 +1,4 @@
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")

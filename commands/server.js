@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js");;
-const { formatDate, getColor } = require("../utils.js");
+const { formatDate, getColor } = require("../utils/utils");
 const { getPeaks } = require("../guilds/utils.js")
 
 module.exports = {

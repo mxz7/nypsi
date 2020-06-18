@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { formatDate } = require("../utils.js")
+const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp } = require("../economy/utils.js")
 

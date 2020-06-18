@@ -1,5 +1,5 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../economy/utils.js")
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map();

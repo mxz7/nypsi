@@ -1,5 +1,5 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()

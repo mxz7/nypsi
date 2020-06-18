@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils")
+const { getColor } = require("../utils/utils.js")
 
 const answers = ["as i see it, yes",
     "ask again later",

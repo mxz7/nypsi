@@ -1,5 +1,5 @@
 const { workMessages } = require("../lists.json")
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 const { getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 

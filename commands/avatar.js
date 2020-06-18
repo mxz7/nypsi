@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js");
-const { getMember, getColor } = require("../utils");
+const { getMember, getColor } = require("../utils/utils");
 
 module.exports = {
     name: "avatar",

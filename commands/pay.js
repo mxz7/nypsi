@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getMember, getColor } = require("../utils.js")
+const { getMember, getColor } = require("../utils/utils")
 const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
 
 const tax = 0.15

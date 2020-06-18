@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const fetch = require("node-fetch")
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 
