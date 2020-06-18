@@ -5,6 +5,7 @@ const { prefix, token } = require("./config.json");
 const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter } = require("./guilds/utils.js")
 const { runCommand, helpCmd, commandExists, loadCommands } = require("./utils/commandhandler")
+const { updateCache } = require("./utils/imghandler")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
@@ -220,6 +221,7 @@ setTimeout(() => {
         setTimeout(() => {
             ready = true
             runChecks()
+            updateCache()
         }, 2000)
     })
 }, 1500)
