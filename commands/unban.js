@@ -31,7 +31,7 @@ module.exports = {
                 .addField("usage", "$unban <user(s)> [-s]")
                 .addField("help", "**<>** required | **[]** parameter\n" + "**<users>** you can unban one or more members in one command\n" +
                     "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
-                .addField("examples", "$unban 123456789012345678\n$unban 123456789012345678 123456789012345678 -s")
+                .addField("examples", "$unban user#1234 **(only works if members are in cache)**\n$unban 123456789012345678\n$unban 123456789012345678 123456789012345678 -s")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $unban <user(s)> [-s]"))
