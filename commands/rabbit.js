@@ -32,7 +32,7 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        const { rabbitCache } = require("../utils/utils")
+        const { rabbitCache } = require("../utils/imghandler")
 
         if (rabbitCache.size < 1) {
             return message.channel.send("❌ please wait a couple more seconds..")
