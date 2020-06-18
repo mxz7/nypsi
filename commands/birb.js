@@ -34,7 +34,7 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        const { birbCache } = require("../utils/utils")
+        const { birbCache } = require("../utils/imghandler")
 
         if (birbCache.size < 1) {
             return message.channel.send("❌ please wait a couple more seconds..")

@@ -32,7 +32,7 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        const { catCache } = require("../utils/utils")
+        const { catCache } = require("../utils/imghandler")
 
         if (catCache.size < 1) {
             return message.channel.send("❌ please wait a couple more seconds..")

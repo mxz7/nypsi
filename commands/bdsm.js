@@ -31,7 +31,7 @@ module.exports = {
             return message.channel.send("❌ you must do this in an nsfw channel")
         }
 
-        const { bdsmCache } = require("../utils/utils")
+        const { bdsmCache } = require("../utils/imghandler")
 
         if (bdsmCache.size <= 2) {
             return message.channel.send("❌ please wait a couple more seconds..")
