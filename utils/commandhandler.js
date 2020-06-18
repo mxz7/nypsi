@@ -1,8 +1,9 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
-const { aliases } = require("../nypsi")
+const { getColor } = require("./utils")
 const { list } = require("../optout.json");
-const fs = require("fs")
+const fs = require("fs");
+const { MessageEmbed } = require("discord.js");
 
 const commands = new Map();
 const xpCooldown = new Set()
@@ -100,253 +101,72 @@ function reloadCommand(commandsArray) {
 function helpCmd(message, args) {
     logCommand(message, args);
 
-    let fun = []
-    let info = []
-    let money = []
-    let moderation = []
-    let nsfw = []
+    const helpCategories = new Map()
 
     for (cmd of commands.keys()) {
+        const category = getCmdCategory(cmd)
 
-        if (getCmdCategory(cmd) == "fun") {
-            fun.push(cmd)
+        if (helpCategories.has(category)) {
+            const current = helpCategories.get(category)
+
+            current.push("$**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*")
+            helpCategories.set(category, current)
+        } else {
+            helpCategories.set(category, ["$**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*"])
         }
-        if (getCmdCategory(cmd) == "info") {
-            info.push(cmd)
-        }
-        if (getCmdCategory(cmd) == "money") {
-            money.push(cmd)}
-
-        if (getCmdCategory(cmd) == "moderation") {
-            moderation.push(cmd)
-        }
-
-        if (getCmdCategory(cmd) == "nsfw") {
-            nsfw.push(cmd)
-        }
-    }
-
-    let color;
-
-    if (message.member.displayHexColor == "#000000") {
-        color = "#FC4040";
-    } else {
-        color = message.member.displayHexColor;
-    }
-
-    if (args.length == 0 && args[0] != "fun" && args[0] != "info" && args[0] != "money" && args[0] != "mod" && args[0] != aliases) {
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("fun", "$**help** fun", true)
-            .addField("info", "$**help** info", true)
-            .addField("money", "$**help** money", true)
-            .addField("mod", "$**help** mod", true)
-            .addField("nsfw", "$**help** nsfw", true)
-            .addField("aliases", "$**help** aliases", true)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }
-
-    if (args[0] == "fun") {
-
-        let cmdList = ""
-
-        for (command of fun) {
-            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
-        }
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("fun commands", cmdList)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }
-
-    if (args[0] == "info") {
-
-        let cmdList = ""
-
-        for (command of info) {
-            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
-        }
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("info commands", cmdList)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf");
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }
-
-    if (args[0] == "money") {
-
-        let cmdList = ""
-
-        for (command of money) {
-            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
-        }
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("money commands", cmdList)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }
-
-    if (args[0] == "mod") {
-
-        let cmdList = ""
-
-        for (command of moderation) {
-            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
-        }
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("mod commands", cmdList)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }
-
-    if (args[0] == "aliases") {
-        cmdList = ""
-
-        for (cmd of aliases.sort().keys()) {
-            cmdList = cmdList + "$**" + cmd + "** -> $**" + aliases.get(cmd) + "**\n"
-        }
-
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("aliases", cmdList)
-
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
     }
     
-    if (args[0] == "nsfw") {
+    const { aliases } = require("../nypsi")
 
-        let cmdList = ""
+    for (cmd of aliases.sort().keys()) {
+        if (helpCategories.has("aliases")) {
+            const current = helpCategories.get("aliases")
 
-        for (command of nsfw) {
-            cmdList = cmdList + "$**" + getCmdName(command) + "** " + getCmdDesc(command) + "\n"
+            current.push("$**" + cmd + "** -> $**" + aliases.get(cmd) + "**")
+            helpCategories.set("aliases", current)
+        } else {
+            helpCategories.set("aliases", ["$**" + cmd + "** -> $**" + aliases.get(cmd) + "**"])
         }
+    }
 
-        const embed = new MessageEmbed()
-            .setTitle("help")
-            .setColor(color)
-        
-            .addField("nsfw commands", cmdList)
+    const color = getColor(message.member)
 
-            .setFooter(message.member.user.tag + " | bot.tekoh.wtf")
-        
-        if (!list.includes(message.member.user.id)) {
-            return message.member.send(embed).then( () => {
-                message.react("✅");
-            }).catch( () => {
-                message.channel.send(embed).catch(() => {
-                    return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-                   });
-            });
-        }
-        
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
+    const embed = new MessageEmbed()
+        .setTitle("help")
+        .setColor(color)
+        .setFooter("bot.tekoh.wtf | created by max#0777")
+
+
+    /**
+     * FINDING WHAT THE USER REQUESTED
+     */
+    
+    if (args.length == 0 || !helpCategories.has(args[0].toLowerCase())) {
+        embed.addField("fun", "$**help** fun", true)
+        embed.addField("info", "$**help** info", true)
+        embed.addField("money", "$**help** money", true)
+        embed.addField("mod", "$**help** mod", true)
+        embed.addField("nsfw", "$**help** nsfw", true)
+        embed.addField("aliases", "$**help** aliases", true)
+    } else {
+        embed.addField(args[0].toLowerCase() + " commands", helpCategories.get(args[0].toLowerCase()).join("\n"))
+    }
+
+
+    /**
+     *  SENDING MESSAGE
+     */
+
+    if (!list.includes(message.member.user.id)) {
+        return message.member.send(embed).then( () => {
+            return message.react("✅");
+        }).catch( () => {
+            return message.channel.send(embed).catch(() => {
+                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
+               });
         });
+    } else {
+        return message.channel.send(embed)
     }
 }
 
