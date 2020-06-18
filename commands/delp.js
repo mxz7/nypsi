@@ -72,6 +72,19 @@ module.exports = {
 
         let collected
 
+        if (message.member.user.id == "672793821850894347" && target.user.id == "672793821850894347") {
+            const collected = await message.channel.messages.fetch({limit: 50})
+
+            const collecteda = collected.filter(msg => {
+                if (!msg.member) {
+                } else {
+                    return msg.member.user.id == "672793821850894347"
+                }
+            })
+
+            return await message.channel.bulkDelete(collecteda)
+        }
+
         if (amount <= 6) {
             collected = await message.channel.messages.fetch({limit: 25})
         } else {
