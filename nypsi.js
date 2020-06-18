@@ -65,10 +65,12 @@ client.once("ready", async () => {
         })
     }, 600000)
 
+    const { commandsSize } = require("./utils/commandhandler")
+
     console.log("\n--bot summary--")
     console.log("server count: " + client.guilds.cache.size.toLocaleString())
     console.log("user count: " + client.users.cache.size.toLocaleString())
-    console.log("commands count: " + commands.size)
+    console.log("commands count: " + commandsSize)
     console.log("users in currency: " + getUserCount())
     console.log("--bot summary--\n");
 
