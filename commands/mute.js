@@ -130,7 +130,17 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         if (timedMute) {
-            embed.setDescription("✅ **" + count + "** member(s) muted for **" + mutedLength + "**")
+            if (count == 1) {
+                embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**")
+            } else {
+                embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**")
+            }
+        } else {
+            if (count == 1) {
+                embed.setDescription("✅ `" + members.first().user.tag + "` has been muted")
+            } else {
+                embed.setDescription("✅ **" + count + "** members muted")
+            }
         }
 
         if (failed.length != 0) {
