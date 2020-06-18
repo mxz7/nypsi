@@ -49,10 +49,10 @@ module.exports = {
         if (joinPos == 0) joinPos = "invalid"
 
         const embed = new MessageEmbed()
-            .setTitle("join")
+            .setTitle(member.user.tag)
             .setDescription("joined on **" + joinedServer + "**\n" +
                 " - **" + daysAgo + "** days ago\n" +
-                "your join position is **" + joinPos + "**")
+                "join position is **" + joinPos + "**")
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
             .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
