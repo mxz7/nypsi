@@ -32,7 +32,7 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        const { dogCache } = require("../utils/utils")
+        const { dogCache } = require("../utils/imghandler")
 
         if (dogCache.size < 1) {
             return message.channel.send("❌ please wait a couple more seconds..")
