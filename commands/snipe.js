@@ -79,4 +79,4 @@ function timeSince(date) {
     }
 
     return output
-  }
+}
