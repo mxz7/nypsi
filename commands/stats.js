@@ -35,7 +35,8 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const { commandsSize, aliasesSize } = require("../nypsi.js")
+        const { aliasesSize } = require("../nypsi.js")
+        const { commandsSize } = require("../utils/commandhandler")
         const { snipe } = require("../nypsi.js")
         const snipedMessages = snipe.size
         const color = getColor(message.member);

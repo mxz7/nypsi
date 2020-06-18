@@ -6,10 +6,10 @@ module.exports = {
     category: "none",
     run: async (message, args) => {
         if (message.member.user.id != "672793821850894347") return
-        const { reloadCommands, reloadCommand } = require("../nypsi.js")
+        const { loadCommands, reloadCommand } = require("../utils/commandhandler")
 
         if (args.length == 0) {
-            reloadCommands()
+            loadCommands()
             message.react("✅")
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
