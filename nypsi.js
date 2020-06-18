@@ -6,6 +6,7 @@ const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter } = require("./guilds/utils.js")
 const { runCommand, helpCmd, commandExists, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
+const { getTimestamp } = require("./utils/utils")
 
 const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
@@ -74,7 +75,7 @@ client.once("ready", async () => {
     console.log("users in currency: " + getUserCount())
     console.log("--bot summary--\n");
 
-    console.log("logged in as " + client.user.tag + " @ " + getTimeStamp() + "\n- bot run log starting below -\n");
+    console.log("logged in as " + client.user.tag + " @ " + getTimestamp() + "\n- bot run log starting below -\n");
 });
 
 client.on("guildCreate", guild => {
@@ -191,29 +192,6 @@ client.on("channelCreate", async ch => {
         ADD_REACTIONS: false
     }).catch(() => {})
 })
-
-function getTimeStamp() {
-    const date = new Date();
-    let hours = date.getHours().toString();
-    let minutes = date.getMinutes().toString();
-    let seconds = date.getSeconds().toString();
-
-    if (hours.length == 1) {
-        hours = "0" + hours;
-    } 
-
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    } 
-
-    if (seconds.length == 1) {
-        seconds = "0" + seconds;
-    }
-
-    const timestamp = hours + ":" + minutes + ":" + seconds;
-
-    return timestamp
-}
 
 exports.aliasesSize = aliases.size
 exports.snipe

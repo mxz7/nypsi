@@ -338,7 +338,11 @@ async function guildInfo(guild) {
         owner = "`" + guild.ownerID + "`"
     }
 
-    const invites = (await guild.fetchInvites().catch()).keyArray()
+    let invites
+
+    try {
+        invites = (await guild.fetchInvites().catch()).keyArray()
+    } catch {}
 
     const embed = new MessageEmbed()
         .setTitle(guild.name)
