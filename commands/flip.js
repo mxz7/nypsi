@@ -14,7 +14,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setDescription("**" + answer + "**")
+            .setDescription("💸 you threw **" + answer + "**")
 
         return message.channel.send(embed)
     }
