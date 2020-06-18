@@ -44,7 +44,10 @@ module.exports = {
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
 
-        
+        if (count == 1) {
+            embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted")
+        }
+
         if (args.join(" ").includes("-s")) {
             message.delete()
             return message.member.send(embed).catch(() => {})

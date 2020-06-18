@@ -79,16 +79,20 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("ban | " + message.member.user.username)
-            .setDescription("✅ **" + count + "** member(s) banned for: " + reason.split("| | ")[1])
+            .setDescription("✅ **" + count + "** members banned for: " + reason.split("| | ")[1])
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
+        
+        if (count == 1) {
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split("| | ")[1])
+        }
 
         if (failed.length != 0) {
             embed.addField("error", "unable to ban: " + failed.join(", "))
         }
 
         if (args.join(" ").includes("-s")) {
-            message.delete()
+            await message.delete()
             return message.member.send(embed).catch()
         } else {
             return message.channel.send(embed)
