@@ -1,4 +1,5 @@
-const shuffle = require("shuffle-array")
+const { getColor } = require("../utils/utils")
+const { MessageEmbed } = require("discord.js")
 
 module.exports = {
     name: "flip",
@@ -7,8 +8,14 @@ module.exports = {
     run: async (message, args) => {
         const headTails = ["heads", "tails"];
 
-        const answer = shuffle(headTails)[Math.floor(Math.random() * headTails.length)];
+        const answer = headTails[Math.floor(Math.random() * headTails.length)]
 
-        message.channel.send("**" + answer + "!**");
+        const color = getColor(message.member)
+
+        const embed = new MessageEmbed()
+            .setColor(color)
+            .setDescription("**" + answer + "**")
+
+        return message.channel.send(embed)
     }
 };

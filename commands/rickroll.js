@@ -35,7 +35,7 @@ module.exports = {
         }, 15000);
 
         if (args.length == 0) {
-            return message.channel.send("❌ invalid user");
+            return message.channel.send("❌ you must tag a user for this command");
         }
 
         let target;
@@ -59,7 +59,7 @@ module.exports = {
         }
 
         target.send("**sent by " + message.member.user.tag + " in " + message.guild.name + "** use $optout to optout" + " https://youtu.be/dQw4w9WgXcQ").then( () => {
-            message.channel.send("✅\nsuccess");
+            message.channel.send("✅ success");
         }).catch( () => {
             return message.channel.send("❌ i cannot message that user");
         });
