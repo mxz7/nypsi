@@ -42,7 +42,7 @@ module.exports = {
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
-        const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/utils")
+        const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")
         let imgCache = 0
 
         for (link of Array.from(bdsmCache.keys())) {
