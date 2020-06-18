@@ -1,5 +1,4 @@
 const { list } = require("../optout.json");
-const { banned } = require("../banned.json");
 
 const cooldown = new Map();
 
@@ -52,10 +51,6 @@ module.exports = {
 
         if (list.includes(target.user.id)) {
             return message.channel.send("❌ this user has opted out of bot dms");
-        }
-
-        if (banned.includes(target.user.id)) {
-            return message.channel.send("❌ this user is banned from the bot");
         }
 
         target.send("**sent by " + message.member.user.tag + " in " + message.guild.name + "** use $optout to optout" + " https://youtu.be/dQw4w9WgXcQ").then( () => {
