@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js");
-const { getColor } = require("../utils.js");
+const { getColor } = require("../utils/utils");
 const { wholesome } = require("../lists.json")
 
 const cooldown = new Map();

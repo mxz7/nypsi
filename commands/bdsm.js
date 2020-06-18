@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage, getColor } = require("../utils.js")
+const { redditImage, getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 
@@ -31,7 +31,7 @@ module.exports = {
             return message.channel.send("❌ you must do this in an nsfw channel")
         }
 
-        const { bdsmCache } = require("../utils.js")
+        const { bdsmCache } = require("../utils/utils")
 
         if (bdsmCache.size <= 2) {
             return message.channel.send("❌ please wait a couple more seconds..")
