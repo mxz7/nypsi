@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { redditImage, getColor } = require("../utils.js")
+const { redditImage, getColor } = require("../utils/utils")
 const fetch = require("node-fetch")
 
 const cooldown = new Map()
@@ -34,7 +34,7 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
-        const { birbCache } = require("../utils.js")
+        const { birbCache } = require("../utils/utils")
 
         if (birbCache.size < 1) {
             return message.channel.send("❌ please wait a couple more seconds..")

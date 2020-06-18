@@ -1,4 +1,4 @@
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 const { topAmount } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 

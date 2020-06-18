@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getSnipeFilter, updateFilter } = require("../guilds/utils.js")
-const { getColor } = require("../utils.js")
+const { getColor } = require("../utils/utils")
 
 module.exports = {
     name: "snipefilter",
