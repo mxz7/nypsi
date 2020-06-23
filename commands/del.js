@@ -1,3 +1,5 @@
+const { MessageFlags } = require("discord.js");
+
 const cooldown = new Map();
 
 module.exports = {
@@ -51,43 +53,56 @@ module.exports = {
         }
         
         if (amount <= 100) {
-            await message.channel.bulkDelete(amount).catch(() => {
-                return message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
-            })
+            await message.channel.bulkDelete(amount, true).catch()
         } else {
             const amount1 = amount
             let fail = false
-            let counter = 0
             if (amount > 10000) {
                 amount = 10000
             }
 
+            console.log("performing mass delete on " + amount + messages)
             for (let i = 0; i < (amount1 / 100); i++) {
+                console.log("remaining: " + amount)
+
+                if (amount < 10) return
+                
                 if (amount <= 100) {
-                    await message.channel.bulkDelete(amount).catch(() => {
-                        message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
-                        fail = true
+                    let messages = await message.channel.messages.fetch({limit: amount})
+
+                    messages = messages.filter(m => {
+                        return timeSince(new Date(m.createdTimestamp)) < 14
                     })
-                    break
+
+                    return await message.channel.bulkDelete(messages).catch()
                 }
 
-                if (counter >= 3) {
-                    const m = await message.channel.messages.fetch({limit: 100})
-                    return await message.channel.bulkDelete(m)
-                } else {
-                    counter++
-                }
+                let messages = await message.channel.messages.fetch({limit: 100})
 
-                await message.channel.bulkDelete(100).catch(() => {
-                    message.channel.send("❌ unable to delete " + amount + " messages").then(m => m.delete({timeout: 5000}))
+                messages = messages.filter(m => {
+                    return timeSince(new Date(m.createdTimestamp)) < 14
+                }) 
+
+                await message.channel.bulkDelete(messages).catch(() => {
                     fail = true
                 })
+
                 if (fail) {
-                    break
+                    return console.log("failed")
                 }
+                
                 amount = amount - 100
             }
         }
 
     }
+}
+
+function timeSince(date) {
+
+    const ms = Math.floor((new Date() - date));
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+
+    return days
 }
