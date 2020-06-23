@@ -47,6 +47,27 @@ module.exports = {
         
         const color = getColor(message.member);
 
+        if (args[0] == "-cache") {
+            if (cache.size > 100) {
+                return message.channel.send("more than 100 items in cache")
+            } else {
+                const names = cache.keys()
+                const names1 = []
+
+                for (n of names) {
+                    names1.push(n)
+                }
+
+                const embed = new MessageEmbed()
+                    .setTitle("minecraft cache")
+                    .setColor(color)
+                    .setFooter("bot.tekoh.wtf")
+                    .setDescription("`" + names1.join("`\n`") + "`")
+
+                return message.channel.send(embed)
+            }
+        }
+
         if (args[0].includes(".")) {
             const serverIP = args[0]
             const url = "https://api.mcsrvstat.us/2/" + serverIP.toLowerCase()
