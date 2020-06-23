@@ -36,7 +36,7 @@ module.exports = {
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌ $del <amount>");
+            return message.channel.send("❌ $del <amount> (@user)");
         }
 
         let amount = parseInt(args[0]) + 1
@@ -52,6 +52,36 @@ module.exports = {
             }, 30000);
         }
         
+        if (message.mentions.members.first()) {
+            await message.delete()
+            const target = message.mentions.members.first()
+
+            const collected = await message.channel.messages.fetch({limit: 100})
+
+            const collecteda = collected.filter(msg => {
+                if (!msg.member) {
+                } else {
+                    return msg.member.user.id == target.user.id
+                }
+            })
+
+            if (collecteda.size == 0) {
+                return
+            }
+    
+            let count = 0
+    
+            for (msg of collecteda.array()) {
+                if (count >= amount) {
+                    await collecteda.delete(msg.id)
+                } else {
+                    count++
+                }
+            }
+
+            return await message.channel.bulkDelete(collecteda)
+        }
+        
         if (amount <= 100) {
             await message.channel.bulkDelete(amount, true).catch()
         } else {
@@ -61,7 +91,7 @@ module.exports = {
                 amount = 10000
             }
 
-            console.log("performing mass delete on " + amount + messages)
+            console.log("performing mass delete on " + amount)
             for (let i = 0; i < (amount1 / 100); i++) {
                 console.log("remaining: " + amount)
 
