@@ -81,7 +81,9 @@ module.exports = {
 
                 messages = messages.filter(m => {
                     return timeSince(new Date(m.createdTimestamp)) < 14
-                }) 
+                })
+
+                if (messages.size < 100) amount = messages.size
 
                 await message.channel.bulkDelete(messages).catch(() => {
                     fail = true
