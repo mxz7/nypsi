@@ -17,9 +17,6 @@ module.exports = {
             } else {
                 member = message.mentions.members.first();
             }
-            if (args[0] == "-id") {
-                member = message.member
-            }
         }
 
         if (!member) {
@@ -51,7 +48,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle(member.user.tag)
             .setDescription("joined on **" + joinedServer + "**\n" +
-                " - **" + daysAgo + "** days ago\n" +
+                " - **" + daysAgo.toLocaleString() + "** days ago\n" +
                 "join position is **" + joinPos + "**")
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
