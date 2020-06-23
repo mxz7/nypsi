@@ -59,6 +59,7 @@ module.exports = {
         if (joinPos == 0) joinPos = "invalid"
 
         const joined = formatDate(member.joinedAt);
+        const daysAgo = timeSince(new Date(member.joinedAt))
         const created = formatDate(member.user.createdAt);
         const roles = member.roles._roles
 
@@ -82,18 +83,18 @@ module.exports = {
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
             
-            .addField(member.displayName, `**username** ${username}` +
+            .addField("account", `**username** ${username}` +
             `\n**id** ${member.user.id}` +
-            `\n**status** ${member.presence.status}`, true)
+            `\n**created** ${created.toString().toLowerCase()}`, true)
 
-            .addField(member.displayName, "**created** " + created.toString().toLowerCase() + "\n" + 
-                "**joined** " + joined.toString().toLowerCase() + "\n" + 
+            .addField("server", "**joined** " + joined.toString().toLowerCase() + "\n" +
+                " - **" + daysAgo.toLocaleString() + "** days ago\n" +
                 "**join pos** " + joinPos, true)
 
             .setFooter("bot.tekoh.wtf")
         
         if (rolesText != " ") {
-            embed.addField("roles [" + member._roles.length + "]", rolesText)
+            embed.addField("roles [" + member._roles.length + "]", rolesText,)
         }
 
         if (member.presence.activities.length > 0) {
@@ -145,3 +146,12 @@ module.exports = {
         });
     }
 };
+
+function timeSince(date) {
+
+    const ms = Math.floor((new Date() - date));
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+
+    return days
+}

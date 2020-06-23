@@ -31,7 +31,6 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(member.user.tag)
-            .setDescription(member.user.toString())
             .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
             .setFooter("bot.tekoh.wtf")
 
@@ -75,7 +74,7 @@ module.exports = {
                 status1 = status1 + game
             }
             if (hasStatus || hasSpotify || hasGame) {
-                embed.addField("status", status1)
+                embed.setDescription(status1)
             } else {
                 return message.channel.send("❌ this user has no active presence")
             }
