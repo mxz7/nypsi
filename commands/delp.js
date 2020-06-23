@@ -33,7 +33,7 @@ module.exports = {
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-            return message.channel.send("❌ $delp <amount> (@user)");
+            return message.channel.send("❌ $delp <amount>");
         }
 
         let amount = parseInt(args[0])
@@ -55,24 +55,11 @@ module.exports = {
             }, 30000);
         }
 
-        let target = message.member
-
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            if (message.mentions.members.first()) {
-                target = message.mentions.members.first()
-                await message.delete().catch()
-            } else {
-                amount++
-            }
-        } else {
-            amount++
-        }
-
         if (amount > 100) amount = 100
 
         let collected
 
-        if (message.member.user.id == "672793821850894347" && target.user.id == "672793821850894347") {
+        if (message.member.user.id == "672793821850894347") {
             const collected = await message.channel.messages.fetch({limit: 50})
 
             const collecteda = collected.filter(msg => {
@@ -94,7 +81,7 @@ module.exports = {
         const collecteda = collected.filter(msg => {
             if (!msg.member) {
             } else {
-                return msg.member.user.id == target.user.id
+                return msg.member.user.id == message.member.user.id
             }
         })
 
