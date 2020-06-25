@@ -16,7 +16,8 @@ module.exports = {
         }
 
         const created = formatDate(server.createdAt).toLowerCase();
-        const members = server.members.cache
+        let members = await server.members.fetch()
+        members = server.members.cache
         const users = members.filter(member => !member.user.bot)
         const bots = members.filter(member => member.user.bot)
         const online = users.filter(member => member.presence.status != "offline")

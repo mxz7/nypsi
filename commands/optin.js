@@ -10,7 +10,7 @@ module.exports = {
 
         if (cooldown.has(message.member.id)) {
             message.delete().catch();
-            return message.channel.send("❌ still on cooldown").then(m => m.delete(1000));
+            return message.channel.send("❌ still on cooldown")
         }
 
         cooldown.add(message.member.id);
