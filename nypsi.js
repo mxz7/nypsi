@@ -95,7 +95,7 @@ client.on("message", async message => {
 
     if (!message.guild) {
 
-        console.log("[" + getTimestamp() + "] message in DM: " + message.member.user.tag + ": '" + message.content + "'")
+        console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
 
         if (dmCooldown.has(message.author.id)) return
 
