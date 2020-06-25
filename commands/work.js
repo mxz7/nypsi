@@ -39,7 +39,9 @@ module.exports = {
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.id);
+            try {
+                cooldown.delete(message.member.user.id);
+            } catch {}
         }, 1800000);
 
         let earnedMax = 14
