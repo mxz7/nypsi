@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter } = require("./guilds/utils.js")
-const { runCommand, helpCmd, commandExists, loadCommands } = require("./utils/commandhandler")
+const { runCommand, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils")
 
@@ -14,33 +14,6 @@ const snipe = new Map()
 let ready = false
 
 loadCommands()
-aliases.set("ig", "instagram")
-aliases.set("av", "avatar")
-aliases.set("whois", "user")
-aliases.set("who", "user")
-aliases.set("serverinfo", "server")
-aliases.set("git", "github")
-aliases.set("bal", "balance")
-aliases.set("top", "baltop")
-aliases.set("cf", "coinflip")
-aliases.set("r", "roulette")
-aliases.set("steal", "rob")
-aliases.set("rps", "rockpaperscissors")
-aliases.set("mc", "minecraft")
-aliases.set("bunny", "rabbit")
-aliases.set("lock", "lockdown")
-aliases.set("ch", "channel")
-aliases.set("colour", "color")
-aliases.set("activity", "presence")
-aliases.set("purge", "del")
-aliases.set("penis", "pp")
-aliases.set("bj", "blackjack")
-aliases.set("bird", "birb")
-aliases.set("dep", "deposit")
-aliases.set("with", "withdraw")
-aliases.set("bot", "invite")
-aliases.set("sf", "snipefilter")
-exports.aliases = aliases
 
 client.once("ready", async () => {
 
@@ -75,20 +48,20 @@ client.once("ready", async () => {
 });
 
 client.on("guildCreate", guild => {
-    console.log("\x1b[36m[" + getTimeStamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
+    console.log("\x1b[36m[" + getTimestamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
     if (!hasGuild(guild)) {
         createGuild(guild)
     }
 })
 
 client.on("guildDelete", guild => {
-    console.log("\x1b[36m[" + getTimeStamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
+    console.log("\x1b[36m[" + getTimestamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
 })
 
 client.on("rateLimit", rate => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
-    console.log("\x1b[31m[" + getTimeStamp() + "] rate limit: " + reason + "\x1b[37m")
+    console.log("\x1b[31m[" + getTimestamp() + "] rate limit: " + reason + "\x1b[37m")
 })
 
 client.on("guildMemberAdd", member => {
@@ -122,7 +95,7 @@ client.on("message", async message => {
 
     if (!message.guild) {
 
-        console.log("[" + getTimeStamp() + "] message in DM: " + message.member.user.tag + ": '" + message.content + "'")
+        console.log("[" + getTimestamp() + "] message in DM: " + message.member.user.tag + ": '" + message.content + "'")
 
         if (dmCooldown.has(message.author.id)) return
 
@@ -165,15 +138,7 @@ client.on("message", async message => {
 
     const cmd = args[0].toLowerCase();
 
-    if (cmd == "help") {
-        return helpCmd(message, args);
-    }
-
-    if (aliases.get(cmd)) {
-        return runCommand(aliases.get(cmd), message, args);
-    } else if (commandExists(cmd)) {
-        return runCommand(cmd, message, args);
-    } 
+    return runCommand(cmd, message, args);
 });
 
 client.on("channelCreate", async ch => {
@@ -189,7 +154,6 @@ client.on("channelCreate", async ch => {
     }).catch(() => {})
 })
 
-exports.aliasesSize = aliases.size
 exports.snipe
 
 setTimeout(() => {
@@ -200,7 +164,7 @@ setTimeout(() => {
             updateCache()
         }, 2000)
     })
-}, 1500)
+}, 2000)
 
 function runChecks() {
     setInterval(() => {

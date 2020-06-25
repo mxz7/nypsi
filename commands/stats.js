@@ -35,8 +35,7 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        const { aliasesSize } = require("../nypsi.js")
-        const { commandsSize } = require("../utils/commandhandler")
+        const { commandsSize, aliasesSize } = require("../utils/commandhandler")
         const { snipe } = require("../nypsi.js")
         const snipedMessages = snipe.size
         const color = getColor(message.member);
@@ -79,7 +78,7 @@ module.exports = {
             .addField("bot", "**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" +
                 "**user count** " + message.client.users.cache.size.toLocaleString() + "\n" +
                 "**total commands** " + commandsSize + "\n" +
-                "**command aliases** " + aliasesSize + "\n" +
+                "**total aliases** " + aliasesSize + "\n" +
                 "**uptime** " + uptime, true)
             .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
                 " -- **this server** " + getUserCountGuild(message.guild) + "\n" +

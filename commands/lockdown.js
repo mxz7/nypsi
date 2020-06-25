@@ -8,6 +8,7 @@ module.exports = {
     name: "lockdown",
     description: "lockdown a channel (will only work if permissions are setup correctly)",
     category: "moderation",
+    aliases: ["lock"],
     run: async (message, args) => {
 
         const color = getColor(message.member);

@@ -8,6 +8,7 @@ module.exports = {
     name: "deposit",
     description: "deposit money into your bank",
     category: "money",
+    aliases: ["dep"],
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)

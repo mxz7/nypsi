@@ -5,7 +5,8 @@ const { list } = require("../optout.json");
 const fs = require("fs");
 const { MessageEmbed } = require("discord.js");
 
-const commands = new Map();
+const commands = new Map()
+const aliases = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 
@@ -37,6 +38,11 @@ function loadCommands() {
 
             if (enabled) {
                 commands.set(command.name, command);
+                if (command.aliases) {
+                    for (a of command.aliases) {
+                        aliases.set(a, command.name)
+                    }
+                }
             } else {
                 failedTable.push([file, "❌"])
                 console.log(file + " missing name, description, category or run")
@@ -46,7 +52,9 @@ function loadCommands() {
             console.log(e)
         }
     }
-
+    exports.aliasesSize = aliases.size
+    exports.commandsSize = commands.size
+    
     const endTime = new Date().getTime()
     const timeTaken = endTime - startTime
 
@@ -55,9 +63,7 @@ function loadCommands() {
     } else {
         console.log("all commands loaded without error ✅")
     }
-
     console.log("time taken: " + timeTaken + "ms")
-    exports.commandsSize = commands.size
 }
 
 function reloadCommand(commandsArray) {
@@ -66,6 +72,9 @@ function reloadCommand(commandsArray) {
     for (cmd of commandsArray) {
         try {
             commands.delete(cmd)
+            if (aliases.has(cmd)) {
+                aliases.delete(cmd)
+            }
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)]
             } catch (e) {
@@ -82,6 +91,11 @@ function reloadCommand(commandsArray) {
             
             if (enabled) {
                 commands.set(commandData.name, commandData);
+                if (command.aliases) {
+                    for (a of command.aliases) {
+                        aliases.set(a, command.name)
+                    }
+                }
                 reloadTable.push([commandData.name, "✅"])
                 exports.commandsSize = commands.size
             } else {
@@ -93,6 +107,7 @@ function reloadCommand(commandsArray) {
             console.log(e)
         }
     }
+    exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
     console.log(table(reloadTable, {border: getBorderCharacters("ramac")}))
     return table(reloadTable, {border: getBorderCharacters("ramac")})
@@ -173,7 +188,18 @@ function helpCmd(message, args) {
 }
 
 function runCommand(cmd, message, args) {
-    if (!commandExists(cmd)) return
+    if (cmd == "help") {
+        return helpCmd(message, args)
+    }
+
+    let alias = false
+    if (!commandExists(cmd)) {
+        if (!aliases.has(cmd)) {
+            return
+        } else {
+            alias = true
+        }
+    }
 
     if (cooldown.has(message.member.user.id)) return
 
@@ -195,7 +221,11 @@ function runCommand(cmd, message, args) {
 
     try {
         logCommand(message, args)
-        commands.get(cmd).run(message, args)
+        if (alias) {
+            commands.get(aliases.get(cmd)).run(message, args)
+        } else {
+            commands.get(cmd).run(message, args)
+        }
     } catch(e) {
         console.log(e)
     }
