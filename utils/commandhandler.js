@@ -141,6 +141,8 @@ function helpCmd(message, args) {
      * FINDING WHAT THE USER REQUESTED
      */
     
+    if (args[0].toLowerCase() == "mod") args[0] = "moderation"
+
     if (args.length == 0 || !helpCategories.has(args[0].toLowerCase())) {
         embed.addField("fun", "$**help** fun", true)
         embed.addField("info", "$**help** info", true)
