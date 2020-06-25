@@ -8,11 +8,11 @@ const cooldown = new Map();
 
 const waiting = new Discord.Collection();
 
-
 module.exports = {
     name: "coinflip",
     description: "flip a coin, double or nothing",
     category: "money",
+    aliases: ["cf"],
     run: async (message, args) => {
 
         if (!userExists(message.member)) {

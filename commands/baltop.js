@@ -8,6 +8,7 @@ module.exports = {
     name: "baltop",
     description: "view top users",
     category: "money",
+    aliases: ["top"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

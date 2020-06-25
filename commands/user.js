@@ -5,6 +5,7 @@ module.exports = {
     name: "user",
     description: "view info about a user",
     category: "info",
+    aliases: ["whois", "who"],
     run: async (message, args) => {
         
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

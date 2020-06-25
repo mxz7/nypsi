@@ -6,6 +6,7 @@ module.exports = {
     name: "balance",
     description: "check your balance",
     category: "money",
+    aliases: ["bal", "money"],
     run: async (message, args) => {
         
         if (!userExists(message.member)) {

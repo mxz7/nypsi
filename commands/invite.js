@@ -5,6 +5,7 @@ module.exports = {
     name: "invite",
     description: "generate an invite link for the bot",
     category: "info",
+    aliases: ["bot"],
     run: async (message, args) => {
         const color = getColor(message.member)
 

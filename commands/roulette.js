@@ -11,6 +11,7 @@ module.exports = {
     name: "roulette",
     description: "play roulette",
     category: "money",
+    aliases: ["r"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

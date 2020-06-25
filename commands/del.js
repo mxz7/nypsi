@@ -6,6 +6,7 @@ module.exports = {
     name: "del",
     description: "bulk delete/purge messages",
     category: "moderation",
+    aliases: ["purge"],
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {

@@ -10,6 +10,7 @@ module.exports = {
     name: "withdraw",
     description: "withdraw money from your bank",
     category: "money",
+    aliases: ["with"],
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)
@@ -97,7 +98,7 @@ module.exports = {
 
         if (amount >= 100000) {
             taxEnabled = true
-            amount = amount - (amount * 0.05)
+            amount = amount - (amount * tax)
         }
 
         updateBalance(message.member, getBalance(message.member) + amount)

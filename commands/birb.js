@@ -8,6 +8,7 @@ module.exports = {
     name: "birb",
     description: "get a random picture of a birb",
     category: "fun",
+    aliases: ["bird"],
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");

@@ -8,6 +8,7 @@ module.exports = {
     name: "instagram",
     description: "view stats for an instagram account",
     category: "info",
+    aliases: ["ig"],
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

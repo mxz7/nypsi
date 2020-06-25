@@ -5,6 +5,7 @@ module.exports = {
     name: "avatar",
     description: "get a person's avatar",
     category: "info",
+    aliases: ["av"],
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
