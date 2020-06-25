@@ -9,6 +9,7 @@ module.exports = {
     name: "rockpaperscissors",
     description: "play rock paper scissors",
     category: "money",
+    aliases: ["rps"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

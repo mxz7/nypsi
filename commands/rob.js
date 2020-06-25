@@ -10,6 +10,7 @@ module.exports = {
     name: "rob",
     description: "rob other server members",
     category: "money",
+    aliases: ["steal"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.user.id)) {

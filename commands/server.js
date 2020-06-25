@@ -6,6 +6,7 @@ module.exports = {
     name: "server",
     description: "view information about current server",
     category: "info",
+    aliases: ["serverinfo"],
     run: async (message, args) => {
 
         const server = message.guild;

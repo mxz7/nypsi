@@ -5,6 +5,7 @@ module.exports = {
     name: "color",
     description: "get a random hex color code",
     category: "info",
+    aliases: ["colour"],
     run: async (message, args) => {
 
         let color

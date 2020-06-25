@@ -10,6 +10,7 @@ module.exports = {
     name: "blackjack",
     description: "play blackjack",
     category: "money",
+    aliases: ["blackjack"],
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

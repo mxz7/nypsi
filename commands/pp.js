@@ -7,6 +7,7 @@ module.exports = {
     name: "pp",
     description: "accurate prediction of your pp size",
     category: "fun",
+    aliases: ["penis"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

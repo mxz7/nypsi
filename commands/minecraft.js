@@ -10,6 +10,7 @@ module.exports = {
     name: "minecraft",
     description: "view information about a minecraft account",
     category: "info",
+    aliases: ["mc"],
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
