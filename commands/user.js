@@ -71,24 +71,16 @@ module.exports = {
 
         rolesText = rolesText.split("@everyone").join("")
 
-        let username = member.user.tag
-
-        if (username.includes("*")) {
-            username = "`" + member.user.tag + "`"
-        }
-
         const embed = new MessageEmbed()
             .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
             .setColor(color)
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
             
-            .addField("account", `**username** ${username}` +
-            `\n**id** ${member.user.id}` +
+            .addField("account", `**id** ${member.user.id}` +
             `\n**created** ${created.toString().toLowerCase()}`, true)
 
             .addField("server", "**joined** " + joined.toString().toLowerCase() + "\n" +
-                " - **" + daysAgo.toLocaleString() + "** days ago\n" +
                 "**join pos** " + joinPos, true)
 
             .setFooter("bot.tekoh.wtf")
@@ -121,8 +113,11 @@ module.exports = {
                 }
 
                 if (!hasGame && activity.name.toLowerCase() != "custom status" && activity.name.toLowerCase() != "spotify") {
-                    game = "**currently playing** " + activity.name
+                    game = "**playing** " + activity.name
                     hasGame = true
+                    if (activity.details) {
+                        game = game + " **-** " + activity.details
+                    }
                 }
             }
 
