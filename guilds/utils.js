@@ -87,7 +87,13 @@ module.exports = {
         guilds[guild.id] = {
             members: members.size,
             onlines: onlines.size,
-            snipeFilter: ["discord.gg", "/invite/"]
+            snipeFilter: ["discord.gg", "/invite/"],
+            stats: {
+                enabled: false,
+                format: "members: %count%",
+                filterBots: true,
+                channel: "none"
+            }
         }
     },
 
@@ -107,6 +113,63 @@ module.exports = {
      */
     updateFilter: function(guild, array) {
         guilds[guild.id].snipeFilter = array
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to check if stats are enabled
+     * @returns {Boolean}
+     */
+    hasStatsEnabled: function(guild) {
+        if (guilds[guild.id].stats.enabled == true) {
+            return true
+        } else {
+            return false
+        }
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to check if stats profile exists
+     * @returns {Boolean}
+     */
+    hasStatsProfile: function(guild) {
+        if (guilds[guild.id].stats) {
+            return true
+        } else {
+            return false
+        }
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to create default stats profile for
+     */
+    createDefaultStatsProfile: function(guild) {
+        guilds[guild.id].stats = {
+            enabled: false,
+            format: "members: %count%",
+            filterBots: true,
+            channel: "none"
+        }
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to get stats profile of
+     * @returns {JSON} profile 
+     */
+    getStatsProfile: function(guild) {
+        return guilds[guild.id].stats
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to set stats profile of
+     * @param {JSON} profile profile to set
+     */
+    setStatsProfile: function(guild, profile) {
+        guilds[guild.id].stats = profile
     }
 }
 
@@ -148,6 +211,12 @@ function createGuild1(guild) {
     guilds[guild.id] = {
         members: members.size,
         onlines: onlines.size,
-        snipeFilter: ["discord.gg", "/invite/"]
+        snipeFilter: ["discord.gg", "/invite/"],
+        stats: {
+            enabled: false,
+            format: "members: %count%",
+            filterBots: true,
+            channel: "none"
+        }
     }
 }
