@@ -145,6 +145,10 @@ module.exports = {
                 return message.channel.send("❌ format must include %count% or %peak% or both")
             }
 
+            if (newFormat.length > 30) {
+                return message.channel.send("❌ cannot be longer than 30 characers")
+            }
+
             profile.format = newFormat
 
             setStatsProfile(message.guild, profile)
