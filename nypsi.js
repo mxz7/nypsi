@@ -14,15 +14,13 @@ const snipe = new Map()
 let ready = false
 
 loadCommands()
-aliases.set("ig", "instagram");
-aliases.set("av", "avatar");
-aliases.set("whois", "user");
-aliases.set("who", "user");
-aliases.set("serverinfo", "server");
-aliases.set("ws", "wholesome");
-aliases.set("rick", "rickroll");
-aliases.set("git", "github");
-aliases.set("bal", "balance");
+aliases.set("ig", "instagram")
+aliases.set("av", "avatar")
+aliases.set("whois", "user")
+aliases.set("who", "user")
+aliases.set("serverinfo", "server")
+aliases.set("git", "github")
+aliases.set("bal", "balance")
 aliases.set("top", "baltop")
 aliases.set("cf", "coinflip")
 aliases.set("r", "roulette")
@@ -40,7 +38,6 @@ aliases.set("bj", "blackjack")
 aliases.set("bird", "birb")
 aliases.set("dep", "deposit")
 aliases.set("with", "withdraw")
-aliases.set("bank", "balance")
 aliases.set("bot", "invite")
 aliases.set("sf", "snipefilter")
 exports.aliases = aliases
