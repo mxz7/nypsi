@@ -11,7 +11,11 @@ module.exports = {
 
         if (args.length != 0) {
             if (parseInt(args[0])) {
-                range = parseInt(args[0])
+                if (parseInt(args[0]) < 2) {
+                    return message.channel.send("❌ invalid range")
+                } else {
+                    range = parseInt(args[0])
+                }
             }
         }
 
