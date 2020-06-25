@@ -3,7 +3,7 @@ const cooldown = new Map()
 module.exports = {
     name: "delp",
     description: "bulk delete/purge your own messages",
-    category: "info",
+    category: "moderation",
     run: async (message, args) => {
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
