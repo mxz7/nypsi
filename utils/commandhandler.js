@@ -54,7 +54,7 @@ function loadCommands() {
     }
     exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
-    
+
     const endTime = new Date().getTime()
     const timeTaken = endTime - startTime
 
@@ -91,9 +91,9 @@ function reloadCommand(commandsArray) {
             
             if (enabled) {
                 commands.set(commandData.name, commandData);
-                if (command.aliases) {
-                    for (a of command.aliases) {
-                        aliases.set(a, command.name)
+                if (commandData.aliases) {
+                    for (a of commandData.aliases) {
+                        aliases.set(a, commandData.name)
                     }
                 }
                 reloadTable.push([commandData.name, "✅"])
@@ -130,19 +130,6 @@ function helpCmd(message, args) {
             helpCategories.set(category, ["$**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*"])
         }
     }
-    
-    const { aliases } = require("../nypsi")
-
-    for (cmd of aliases.sort().keys()) {
-        if (helpCategories.has("aliases")) {
-            const current = helpCategories.get("aliases")
-
-            current.push("$**" + cmd + "** -> $**" + aliases.get(cmd) + "**")
-            helpCategories.set("aliases", current)
-        } else {
-            helpCategories.set("aliases", ["$**" + cmd + "** -> $**" + aliases.get(cmd) + "**"])
-        }
-    }
 
     const color = getColor(message.member)
 
@@ -155,20 +142,47 @@ function helpCmd(message, args) {
     /**
      * FINDING WHAT THE USER REQUESTED
      */
-    
-    if (args[0].toLowerCase() == "mod") args[0] = "moderation"
 
-    if (args.length == 0 || !helpCategories.has(args[0].toLowerCase())) {
+    if (args.length == 0) {
         embed.addField("fun", "$**help** fun", true)
         embed.addField("info", "$**help** info", true)
         embed.addField("money", "$**help** money", true)
         embed.addField("mod", "$**help** mod", true)
         embed.addField("nsfw", "$**help** nsfw", true)
-        embed.addField("aliases", "$**help** aliases", true)
+        embed.addField("command info", "you can do $**help <command name>**\nto view information about a command", true)
     } else {
-        embed.addField(args[0].toLowerCase() + " commands", helpCategories.get(args[0].toLowerCase()).join("\n"))
-    }
+        if (args[0].toLowerCase() == "mod") args[0] = "moderation"
+        if (helpCategories.has(args[0].toLowerCase())) {
+            embed.addField(args[0].toLowerCase() + " commands", helpCategories.get(args[0].toLowerCase()).join("\n"))
+        } else if (commands.has(args[0].toLowerCase())) {
+            const cmd = commands.get(args[0].toLowerCase())
+            if (cmd.aliases) {
+                embed.setDescription("**name** " + cmd.name + "\n" +
+                    "**description** " + cmd.description + "\n" +
+                    "**category** " + cmd.category + "\n" +
+                    "**aliases** `$" + cmd.aliases.join("`, `$") + "`")
+            } else {
+                embed.setDescription("**name** " + cmd.name + "\n" +
+                    "**description** " + cmd.description + "\n" +
+                    "**category** " + cmd.category + "\n" +
+                    "**aliases** none")
+            }
+        } else if (aliases.has(args[0].toLowerCase())) {
+            const cmd = commands.get(aliases.get(args[0].toLowerCase()))
 
+            if (cmd.aliases) {
+                embed.setDescription("**name** " + cmd.name + "\n" +
+                    "**description** " + cmd.description + "\n" +
+                    "**category** " + cmd.category + "\n" +
+                    "**aliases** `$" + cmd.aliases.join("`, `$") + "`")
+            } else {
+                embed.setDescription("**name** " + cmd.name + "\n" +
+                    "**description** " + cmd.description + "\n" +
+                    "**category** " + cmd.category + "\n" +
+                    "**aliases** none")
+            }
+        }
+    }
 
     /**
      *  SENDING MESSAGE
