@@ -8,7 +8,6 @@ const { runCommand, helpCmd, commandExists, loadCommands } = require("./utils/co
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils")
 
-const commands = new Discord.Collection();
 const aliases = new Discord.Collection();
 const dmCooldown = new Set()
 const snipe = new Map()
