@@ -28,6 +28,7 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**delp** *bulk delete/purge your own messages*
 * $**deposit** *deposit money into your bank*
 * $**dog** *get a random picture of a dog*
+* $**double** *roll two dice and bet on them being the same*
 * $**embed** *create an embed message*
 * $**ezpoll** *simple poll builder*
 * $**fact** *get a random fact*
@@ -42,13 +43,14 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**lockdown** *lockdown a channel (will only work if permissions are setup correctly)*
 * $**lookup** *lookup ip addresses and domains*
 * $**love** *calculate your love with another person*
+* $**membercount** *create an updating member count channel for your server*
 * $**minecraft** *view information about a minecraft account*
 * $**mute** *mute one or more users*
 * $**optin** *optin to dms from the bot*
 * $**optout** *optout of dms from the bot*
 * $**padlock** *buy a padlock to protect your wallet*
 * $**pay** *give other users money*
-* $**poll** *create a poll*
+* $**poll** *create a poll with alot of customisation*
 * $**porn** *get a random porn image*
 * $**pp** *accurate prediction of your pp size*
 * $**presence** *view active presences for a user*
@@ -69,11 +71,10 @@ i'm not gonna help with installation if you want to clone the code and make it f
 * $**snipefilter** *modify the snipe filter for the current server*
 * $**stats** *view stats for the bot*
 * $**thighs** *get a random thighs image*
+* $**unban** *unban one or more users*
 * $**unmute** *unmute one or more users*
 * $**urban** *get a definition from urban dictionary*
 * $**user** *view info about a user*
-* $**userban** *ban a user from the bot*
-* $**userunban** *unban a user from the bot*
 * $**vote** *vote every 12 hours to get a 20% bonus on gambling wins as well as a $15k reward*
 * $**wholesome** *get a random wholesome picture*
 * $**withdraw** *withdraw money from your bank*
