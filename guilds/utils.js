@@ -211,7 +211,7 @@ module.exports = {
         if (channel.name != format) {
             const old = channel.name
 
-            await channel.edit({name: format})
+            await channel.edit({name: format}).catch()
 
             console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
         }
