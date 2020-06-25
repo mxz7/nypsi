@@ -37,7 +37,7 @@ module.exports = {
         if (args.length == 1 && args[0].toLowerCase() == "odds") {
             return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
                 "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
-                "🟢 1/" + values.length + " win **25**x")
+                "🟢 1/" + values.length + " win **17**x")
         }
 
         const color = getColor(message.member);
@@ -48,7 +48,7 @@ module.exports = {
                 .setColor(color)
                 .addField("usage", "$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n$roulette odds")
                 .addField("help", "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
-                    "red and black give a **2x** win and green gives a **25**x win")
+                    "red and black give a **2x** win and green gives a **17**x win")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
@@ -110,7 +110,7 @@ module.exports = {
         if (colorBet == roll) {
             win = true
             if (roll == "g") {
-                winnings = Math.round(bet * 25)
+                winnings = Math.round(bet * 17)
             } else {
                 winnings = Math.round(bet * 2)
             }

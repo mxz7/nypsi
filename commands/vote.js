@@ -51,7 +51,9 @@ module.exports = {
                 updateBalance(message.member, getBalance(message.member) + 15000)
                 bonusCooldown.set(message.member.id, new Date())
                 setTimeout(() => {
-                    bonusCooldown.delete(message.member.id)
+                    try {
+                        bonusCooldown.delete(message.member.user.id)
+                    } catch {}
                 }, 21600000)
             } else {
                 const init = bonusCooldown.get(message.member.id)

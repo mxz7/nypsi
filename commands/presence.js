@@ -58,8 +58,11 @@ module.exports = {
                 }
 
                 if (!hasGame && activity.name.toLowerCase() != "custom status" && activity.name.toLowerCase() != "spotify") {
-                    game = "**currently playing** " + activity.name
+                    game = "**playing** " + activity.name
                     hasGame = true
+                    if (activity.details) {
+                        game = game + " **-** " + activity.details
+                    }
                 }
             }
 
