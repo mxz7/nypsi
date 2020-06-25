@@ -90,7 +90,7 @@ module.exports = {
             snipeFilter: ["discord.gg", "/invite/"],
             stats: {
                 enabled: false,
-                format: "members: %count%",
+                format: "members: %count% (%peak%)",
                 filterBots: true,
                 channel: "none"
             }
@@ -148,7 +148,7 @@ module.exports = {
     createDefaultStatsProfile: function(guild) {
         guilds[guild.id].stats = {
             enabled: false,
-            format: "members: %count%",
+            format: "members: %count% (%peak%)",
             filterBots: true,
             channel: "none"
         }
@@ -170,6 +170,51 @@ module.exports = {
      */
     setStatsProfile: function(guild, profile) {
         guilds[guild.id].stats = profile
+    },
+
+    /**
+     * @returns {Array}
+     */
+    getGuilds: function() {
+        const guilds1 = []
+
+        for (g in guilds) {
+            guilds1.push(g)
+        }
+        return guilds1
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to check stats of
+     */
+    checkStats: async function(guild) {
+
+        let memberCount = await guild.members.fetch()
+        const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].stats.channel)
+
+        if (!channel) {
+            guilds[guild.id].stats.enabled = false
+            guilds[guild.id].stats.channel = "none"
+            return
+        }
+
+        if (guilds[guild.id].stats.filterBots) {
+            memberCount = memberCount.filter(m => !m.user.bot)
+        }
+
+        let format = ""
+
+        format = guilds[guild.id].stats.format.split("%count%").join(memberCount.size.toLocaleString())
+        format = format.split("%peak%").join(guilds[guild.id].members)
+
+        if (channel.name != format) {
+            const old = channel.name
+
+            await channel.edit({name: format})
+
+            console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
+        }
     }
 }
 
@@ -214,7 +259,7 @@ function createGuild1(guild) {
         snipeFilter: ["discord.gg", "/invite/"],
         stats: {
             enabled: false,
-            format: "members: %count%",
+            format: "members: %count% (%peak%)",
             filterBots: true,
             channel: "none"
         }
