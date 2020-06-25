@@ -44,9 +44,7 @@ module.exports = {
                     "**format** `" + profile.format + "`")
 
             return message.channel.send(embed)
-        }
-
-        if (args[0].toLowerCase() == "help") {
+        } else if (args[0].toLowerCase() == "help") {
             const embed = new MessageEmbed()
                 .setTitle("member count")
                 .setColor(color)
@@ -57,9 +55,7 @@ module.exports = {
                     "$**counter filterbots** *view/change the setting to filter bots*")
             
             return message.channel.send(embed)
-        }
-
-        if (args[0].toLowerCase() == "enable") {
+        } else if (args[0].toLowerCase() == "enable") {
 
             if (profile.enabled) {
                 return message.channel.send("❌ already enabled")
@@ -102,9 +98,7 @@ module.exports = {
                 .setFooter("channel will update every 10 minutes")
 
             return message.channel.send(embed)
-        }
-
-        if (args[0].toLowerCase() == "disable") {
+        } else if (args[0].toLowerCase() == "disable") {
 
             if (!profile.enabled) {
                 return message.channel.send("❌ already disabled")
@@ -122,9 +116,7 @@ module.exports = {
                 .setColor(color)
 
             return message.channel.send(embed)
-        }
-
-        if (args[0].toLowerCase() == "format") {
+        } else if (args[0].toLowerCase() == "format") {
             if (args.length == 1) {
                 const embed = new MessageEmbed()
                     .setTitle("member count")
@@ -161,9 +153,7 @@ module.exports = {
                 .addField("new format", "`" + newFormat + "`")
 
             return message.channel.send(embed)
-        }
-
-        if (args[0].toLowerCase() == "filterbots") {
+        } else if (args[0].toLowerCase() == "filterbots") {
             if (args.length == 1) {
                 const embed = new MessageEmbed()
                     .setTitle("member count")
@@ -194,7 +184,17 @@ module.exports = {
                 .addField("new value", "`" + profile.filterBots + "`")
 
             return message.channel.send(embed)
+        } else {
+            const embed = new MessageEmbed()
+                .setTitle("member count")
+                .setColor(color)
+                .setFooter("member count will be updated every 10 minutes")
+                .setDescription("$**counter enable** *enables the counter and creates a channel with the current format*\n" +
+                    "$**counter disable** *disables the counter and does NOT delete the channel*\n" +
+                    "$**counter format** *view/change the current channel format*\n" +
+                    "$**counter filterbots** *view/change the setting to filter bots*")
+            
+            return message.channel.send(embed)
         }
-
     }
 }
