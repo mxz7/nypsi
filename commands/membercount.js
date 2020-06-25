@@ -129,7 +129,7 @@ module.exports = {
                 const embed = new MessageEmbed()
                     .setTitle("member count")
                     .setDescription("this is how your channel will appear\n %count% is replaced with the member count\n%peak% is replaced with the member peak")
-                    .addField("current format", profile.format)
+                    .addField("current format", "`" + profile.format + "`")
                     .addField("help", "to change this format, do $**counter format <new format>**")
                     .setFooter("bot.tekoh.wtf")
                     .setColor(color)
@@ -157,8 +157,8 @@ module.exports = {
                 .setTitle("member count")
                 .setColor(color)
                 .setFooter("bot.tekoh.wtf")
-                .setDescription("✅ format updated")
-                .addField("new format", newFormat)
+                .setDescription("✅ format updated - will update channel on next interval")
+                .addField("new format", "`" + newFormat + "`")
 
             return message.channel.send(embed)
         }
@@ -190,7 +190,7 @@ module.exports = {
                 .setTitle("member count")
                 .setColor(color)
                 .setFooter("bot.tekoh.wtf")
-                .setDescription("✅ value updated")
+                .setDescription("✅ value updated - will update channel on next interval")
                 .addField("new value", "`" + profile.filterBots + "`")
 
             return message.channel.send(embed)
