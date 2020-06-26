@@ -5,6 +5,7 @@ module.exports = {
     name: "unmute",
     description: "unmute one or more users",
     category: "moderation",
+    permissions: ["MANAGE_MESSAGES"],
     run: async (message, args) => {
         if (!message.member.hasPermission("MANAGE_MESSAGES")) {
             return
