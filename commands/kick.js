@@ -5,6 +5,7 @@ module.exports = {
     name: "kick",
     description: "kick one or more users",
     category: "moderation",
+    permissions: ["KICK_MEMBERS"],
     run: async (message, args) => {
 
         const color = getColor(message.member);

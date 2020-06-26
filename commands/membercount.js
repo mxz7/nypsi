@@ -7,6 +7,7 @@ module.exports = {
     description: "create an updating member count channel for your server",
     category: "moderation",
     aliases: ["counter"],
+    permissions: ["MANAGE_SERVER"],
     run: async (message, args) => {
 
         const color = getColor(message.member)

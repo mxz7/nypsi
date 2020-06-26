@@ -4,6 +4,7 @@ module.exports = {
     name: "reload",
     description: "reload commands",
     category: "none",
+    permissions: ["bot owner"],
     run: async (message, args) => {
         if (message.member.user.id != "672793821850894347") return
         const { loadCommands, reloadCommand } = require("../utils/commandhandler")

@@ -154,34 +154,28 @@ function helpCmd(message, args) {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (helpCategories.has(args[0].toLowerCase())) {
             embed.addField(args[0].toLowerCase() + " commands", helpCategories.get(args[0].toLowerCase()).join("\n"))
-        } else if (commands.has(args[0].toLowerCase())) {
-            const cmd = commands.get(args[0].toLowerCase())
-            if (cmd.aliases) {
-                embed.setDescription("**name** " + cmd.name + "\n" +
-                    "**description** " + cmd.description + "\n" +
-                    "**category** " + cmd.category + "\n" +
-                    "**aliases** `$" + cmd.aliases.join("`, `$") + "`")
+        } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
+            let cmd
+
+            if (aliases.has(args[0].toLowerCase())) {
+                cmd = commands.get(aliases.get(args[0].toLowerCase()))
             } else {
-                embed.setDescription("**name** " + cmd.name + "\n" +
-                    "**description** " + cmd.description + "\n" +
-                    "**category** " + cmd.category + "\n" +
-                    "**aliases** none")
+                cmd = commands.get(args[0].toLowerCase())
             }
-        } else if (aliases.has(args[0].toLowerCase())) {
-            const cmd = commands.get(aliases.get(args[0].toLowerCase()))
+
+            let desc = "**name** " + cmd.name + "\n" +
+                "**description** " + cmd.description + "\n" +
+                "**category** " + cmd.category
+
+            if (cmd.permissions) {
+                desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`"
+            }
 
             if (cmd.aliases) {
-                embed.setDescription("**name** " + cmd.name + "\n" +
-                    "**description** " + cmd.description + "\n" +
-                    "**category** " + cmd.category + "\n" +
-                    "**aliases** `$" + cmd.aliases.join("`, `$") + "`")
-            } else {
-                embed.setDescription("**name** " + cmd.name + "\n" +
-                    "**description** " + cmd.description + "\n" +
-                    "**category** " + cmd.category + "\n" +
-                    "**aliases** none")
+                desc = desc + "\n**aliases** $`" + cmd.aliases.join("`, `$") + "`"
             }
-        }
+            embed.setDescription(desc)
+        } 
     }
 
     /**

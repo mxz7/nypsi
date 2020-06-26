@@ -5,6 +5,7 @@ module.exports = {
     name: "join",
     description: "information about when you joined the server",
     category: "info",
+    aliases: ["joined"],
     run: async (message, args) => {
 
         let member;

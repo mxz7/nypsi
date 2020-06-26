@@ -5,6 +5,7 @@ module.exports = {
     name: "clean",
     description: "clean up bot commands and responses",
     category: "moderation",
+    permissions: ["MANAGE_MESSAGES"],
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return

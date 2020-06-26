@@ -5,6 +5,7 @@ module.exports = {
     name: "ban",
     description: "ban one or more users",
     category: "moderation",
+    permissions: ["BAN_MEMBERS"],
     run: async (message, args) => {
         
         const color = getColor(message.member);
