@@ -8,6 +8,7 @@ module.exports = {
     description: "create, delete and modify channels",
     category: "moderation",
     aliases: ["ch"],
+    permissions: ["MANAGE_CHANNELS"],
     run: async (message, args) => {
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)

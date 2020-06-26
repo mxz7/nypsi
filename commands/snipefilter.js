@@ -7,6 +7,7 @@ module.exports = {
     description: "modify the snipe filter for the current server",
     category: "moderation",
     aliases: ["sf", "filter"],
+    permissions: ["MANAGE_SERVER"],
     run: async (message, args) => {
 
         const color = getColor(message.member)

@@ -5,7 +5,7 @@ module.exports = {
     name: "presence",
     description: "view active presences for a user",
     category: "info",
-    aliases: ["activity"],
+    aliases: ["activity", "game"],
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
