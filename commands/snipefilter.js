@@ -38,7 +38,7 @@ module.exports = {
 
         if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
             if (args.length == 1) {
-                return message.channel.send("❌ $sf add/+ <word>")
+                return message.channel.send("❌ $sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way")
             }
 
             if (filter.indexOf(args[1].toString()) > -1) {
