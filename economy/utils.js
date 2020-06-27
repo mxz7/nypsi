@@ -17,7 +17,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err);
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] data saved\x1b[37m")
+            console.log("\x1b[32m[" + getTimestamp() + "] user data saved\x1b[37m")
         })
 
         timer = 0
@@ -28,13 +28,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
-        console.log("\x1b[32m[" + getTimestamp() + "] data refreshed\x1b[37m")
+        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
-        console.log("\x1b[32m[" + getTimestamp() + "] data refreshed\x1b[37m")
+        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
         timer = 0
     }
 
@@ -44,7 +44,7 @@ setInterval(() => {
     let date = new Date()
     date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
     fs.writeFileSync('./economy/backup/' + date + '.json', JSON.stringify(users))
-    console.log("\x1b[32m[" + getTimestamp() + "] data backup complete\x1b[37m")
+    console.log("\x1b[32m[" + getTimestamp() + "] user data backup complete\x1b[37m")
 }, 43200000)
 
 setInterval(() => {
