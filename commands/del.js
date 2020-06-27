@@ -1,4 +1,5 @@
-const { MessageFlags } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
+const { getColor } = require("../utils/utils")
 
 const cooldown = new Map();
 
@@ -87,46 +88,75 @@ module.exports = {
         if (amount <= 100) {
             await message.channel.bulkDelete(amount, true).catch()
         } else {
+            amount = amount - 1
+
             const amount1 = amount
             let fail = false
+            let counter = 0
+
             if (amount > 10000) {
                 amount = 10000
             }
 
-            console.log("performing mass delete on " + amount)
-            for (let i = 0; i < (amount1 / 100); i++) {
-                console.log("remaining: " + amount)
+            const color = getColor(message.member)
 
-                if (amount < 10) return
+            const embed = new MessageEmbed()
+                .setTitle("delete | " + message.member.user.tag)
+                .setDescription("deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+
+            const m = await message.channel.send(embed)
+            for (let i = 0; i < (amount1 / 100); i++) {
+                if (m.deleted) {
+                    embed.setDescription("✅ operation cancelled")
+                    return await message.channel.send(embed)
+                }
+
+                if (amount < 10) return await m.delete().catch()
                 
                 if (amount <= 100) {
-                    let messages = await message.channel.messages.fetch({limit: amount})
+                    let messages = await message.channel.messages.fetch({limit: amount, before: m.id})
 
                     messages = messages.filter(m => {
                         return timeSince(new Date(m.createdTimestamp)) < 14
                     })
 
-                    return await message.channel.bulkDelete(messages).catch()
+                    await message.channel.bulkDelete(messages).catch()
+                    return await m.delete().catch()
                 }
 
-                let messages = await message.channel.messages.fetch({limit: 100})
+                let messages = await message.channel.messages.fetch({limit: 100, before: m.id})
 
                 messages = messages.filter(m => {
                     return timeSince(new Date(m.createdTimestamp)) < 14
                 })
 
-                if (messages.size < 100) amount = messages.size
+                if (messages.size < 100) {
+                    amount = messages.size
+                    counter = 0
+                    embed.setDescription("deleting `" + amount + " / " + amount1 + "` messages..\n - if you'd like to cancel this operation, delete this message")
+                    await m.edit(embed)
+                }
 
                 await message.channel.bulkDelete(messages).catch(() => {
                     fail = true
                 })
 
                 if (fail) {
-                    return console.log("failed")
+                    return
                 }
                 
                 amount = amount - 100
+                counter++
+
+                if (counter >= 2) {
+                    counter = 0
+                    embed.setDescription("deleting `" + amount + " / " + amount1 + "` messages..\n - if you'd like to cancel this operation, delete this message")
+                    await m.edit(embed)
+                }
             }
+            return m.delete().catch()
         }
 
     }
