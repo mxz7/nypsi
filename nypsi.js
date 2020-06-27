@@ -74,13 +74,12 @@ client.on("messageDelete", message => {
 
     if (!message.member) return
 
-
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
 
         const filter = getSnipeFilter(message.guild)
 
         for (word of filter) {
-            if (message.content.includes(word)) return
+            if (message.content.toLowerCase().includes(word.toLowerCase())) return
         }
 
         snipe.set(message.channel.id, message)
