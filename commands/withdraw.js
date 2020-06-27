@@ -110,7 +110,7 @@ module.exports = {
             .setFooter("bot.tekoh.wtf")
 
         if (taxEnabled) {
-            embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "** (**5**% taxxed)")
+            embed1.addField("transaction amount", "-$**" + Math.round(amount.toLocaleString()) + "** (**5**% taxxed)")
         } else {
             embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
         }
