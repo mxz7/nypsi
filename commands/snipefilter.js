@@ -41,7 +41,7 @@ module.exports = {
                 return message.channel.send("❌ $sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way")
             }
 
-            if (filter.indexOf(args[1].toString()) > -1) {
+            if (filter.indexOf(args[1].toString().toLowerCase()) > -1) {
                 const embed = new MessageEmbed()
                     .setTitle("snipe filter")
                     .setDescription("❌ `" + args[1] + "` already exists in the filter")
