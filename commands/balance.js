@@ -8,10 +8,6 @@ module.exports = {
     category: "money",
     aliases: ["bal", "money"],
     run: async (message, args) => {
-        
-        if (!userExists(message.member)) {
-            createUser(message.member)
-        }
 
         if (message.member.user.id == "672793821850894347" && args.length == 2) {
             let target = message.mentions.members.first();
@@ -49,8 +45,10 @@ module.exports = {
 
         const color = getColor(message.member);
 
-        if (args.length >= 1) {
-            let target = message.mentions.members.first();
+        let target = message.member
+
+        if (args.length >= 1) { 
+            target = message.mentions.members.first();
 
             if (!target) {
                 target = getMember(message, args[0])
@@ -59,32 +57,18 @@ module.exports = {
             if (!target) {
                 return message.channel.send("❌ invalid user")
             }
-
-            if (!userExists(target)) createUser(target)
-
-            const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle(target.user.tag)
-                .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
-                    "💳 $**" + getBankBalance(target).toLocaleString() + "** / **" + getMaxBankBalance(target).toLocaleString() + "**")
-
-                .setFooter("xp: " + getXp(target).toLocaleString() + " | bot.tekoh.wtf")
-
-            return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            });
-
         }
+
+        if (!userExists(target)) createUser(target)
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle(message.member.user.tag)
-            .setDescription("💰 $**" + getBalance(message.member).toLocaleString() + "**\n" +
-                    "💳 $**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+            .setTitle(target.user.tag)
+            .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
+                "💳 $**" + getBankBalance(target).toLocaleString() + "** / $**" + getMaxBankBalance(target).toLocaleString() + "**")
+            .setFooter("xp: " + getXp(target).toLocaleString() + " | bot.tekoh.wtf")
 
-            .setFooter("xp: " + getXp(message.member).toLocaleString() + " | bot.tekoh.wtf")
-
-        message.channel.send(embed).catch(() => {
+        return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
 
