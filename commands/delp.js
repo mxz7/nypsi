@@ -4,6 +4,7 @@ module.exports = {
     name: "delp",
     description: "bulk delete/purge your own messages",
     category: "moderation",
+    aliases: ["dp"],
     run: async (message, args) => {
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
