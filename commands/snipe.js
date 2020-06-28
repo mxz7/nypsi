@@ -5,6 +5,7 @@ module.exports = {
     name: "snipe",
     description: "snipe the most recently deleted message",
     category: "fun",
+    aliases: ["s"],
     run: async (message, args) => {
         const { snipe } = require("../nypsi.js")
 
