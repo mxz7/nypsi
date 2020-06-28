@@ -4,33 +4,34 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsProfile, hasStatsEnabled, createDefaultStatsProfile } = require("./guilds/utils.js")
-const { runCommand, loadCommands } = require("./utils/commandhandler")
+const { runCommand, loadCommands, helpCmd } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils")
 
-const aliases = new Discord.Collection();
 const dmCooldown = new Set()
 const snipe = new Map()
+const eSnipe = new Map()
 let ready = false
 
 loadCommands()
 
 client.once("ready", async () => {
+    const domains = ["lonely.lol", "tekoh.wtf", "racist.wtf", "tekoh.xyz"]
 
     setTimeout(() => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: "tekoh.wtf | $help | " + client.guilds.cache.size
+                name: domains[Math.floor(Math.random() * domains.length)] + " | $help"
             }
-        });
+        })
     }, 5000)
 
     setInterval(() => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: "tekoh.wtf | $help | " + client.guilds.cache.size
+                name: domains[Math.floor(Math.random() * domains.length)] + " | $help"
             }
         })
     }, 600000)
@@ -85,6 +86,25 @@ client.on("messageDelete", message => {
         snipe.set(message.channel.id, message)
 
         exports.snipe = snipe
+    }
+})
+
+client.on("messageUpdate", message => {
+    if (!message) return
+
+    if (!message.member) return
+
+    if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
+
+        const filter = getSnipeFilter(message.guild)
+
+        for (word of filter) {
+            if (message.content.toLowerCase().includes(word.toLowerCase())) return
+        }
+
+        eSnipe.set(message.channel.id, message)
+
+        exports.eSnipe = eSnipe
     }
 })
 
