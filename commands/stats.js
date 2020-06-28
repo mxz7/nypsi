@@ -36,8 +36,8 @@ module.exports = {
         }, 5000);
 
         const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-        const { snipe } = require("../nypsi.js")
-        const snipedMessages = snipe.size
+        const { snipe, eSnipe } = require("../nypsi.js")
+        const snipedMessages = snipe.size + eSnipe.size
         const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
