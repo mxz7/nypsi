@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const { getUserCount } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsProfile, hasStatsEnabled, createDefaultStatsProfile } = require("./guilds/utils.js")
-const { runCommand, loadCommands, helpCmd } = require("./utils/commandhandler")
+const { runCommand, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils")
 
@@ -188,26 +188,14 @@ setTimeout(() => {
 function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
-            if (!hasGuild(guild)) {
-                createGuild(guild)
-            } else {
-                runCheck(guild)
-            }
+            runCheck(guild)
         })
     }, 30000)
 
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
-            if (!hasGuild(guild)) {
-                createGuild(guild)
-            }
-
-            if (!hasStatsProfile(guild)) {
-                createDefaultStatsProfile(guild)
-            } else {
-                if (hasStatsEnabled(guild)) {
-                    checkStats(guild)
-                }
+            if (hasStatsEnabled(guild)) {
+                checkStats(guild)
             }
         })
     }, 600000)

@@ -27,7 +27,6 @@ setInterval(() => {
         timerCheck = true
         timer = 0
     }
-
 }, 120000)
 
 module.exports = {
