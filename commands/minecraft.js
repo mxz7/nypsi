@@ -18,7 +18,7 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send("❌ $minecraft <name>");
+            return message.channel.send("❌ $minecraft <name/server IP>");
         }
 
         if (cooldown.has(message.member.id)) {
