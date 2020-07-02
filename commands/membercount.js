@@ -1,5 +1,5 @@
-const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils/utils")
+const { MessageEmbed, Message } = require("discord.js")
+const { getColor, getTimestamp } = require("../utils/utils")
 const { hasStatsProfile, createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks } = require("../guilds/utils")
 
 module.exports = {
@@ -53,7 +53,8 @@ module.exports = {
                 .setDescription("$**counter enable** *enables the counter and creates a channel with the current format*\n" +
                     "$**counter disable** *disables the counter and does NOT delete the channel*\n" +
                     "$**counter format** *view/change the current channel format*\n" +
-                    "$**counter filterbots** *view/change the setting to filter bots*")
+                    "$**counter filterbots** *view/change the setting to filter bots*\n" +
+                    "$**counter channel** *set a channel as the channel to be used*")
             
             return message.channel.send(embed)
         } else if (args[0].toLowerCase() == "enable") {
@@ -183,6 +184,79 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
                 .setDescription("✅ value updated - will update channel on next interval")
                 .addField("new value", "`" + profile.filterBots + "`")
+
+            return message.channel.send(embed)
+        } else if (args[0].toLowerCase() == "channel") { 
+            if (args.length == 1) {
+                const embed = new MessageEmbed()
+                    .setTitle("member count")
+                    .setColor(color)
+                    .setFooter("bot.tekoh.wtf")
+                    .setDescription("by setting the channel it will change the channel that is used to display the counter")
+                    .addField("current value", "`" + profile.channel + "`")
+                    .addField("help", "to change this value, do $**counter channel <channel id>**")
+
+                return message.channel.send(embed)
+            }
+
+            let channel 
+
+            if (args[1].length != 18) {
+                if (message.mentions.channels.first()) {
+                    channel = message.mentions.channels.first()
+                } else {
+                    return message.channel.send("❌ invalid channel")
+                }
+            } else {
+                const c = message.guild.channels.find(c => c.id == args[1])
+
+                if (!c) {
+                    return message.channel.send("❌ invalid channel")
+                } else {
+                    channel = c
+                }
+            }
+
+            if (profile.channel == channel.id) {
+                return message.channel.send("❌ channel must be different to current channel")
+            }
+
+            profile.channel = channel.id
+
+            let memberCount = await message.guild.members.fetch()
+
+            if (profile.filterBots) {
+                memberCount = memberCount.filter(m => !m.user.bot)
+            }
+
+            let format = ""
+
+            format = profile.format.split("%count%").join(memberCount.size.toLocaleString())
+            format = format.split("%peak%").join(getPeaks(message.guild).members)
+
+            const old = channel.name
+
+            let fail = false
+
+            await channel.edit({name: format}).then(() => {
+                console.log("[" + getTimestamp() + "] counter updated for '" + message.guild.name + "' ~ '" + old + "' -> '" + format + "'")
+            }).catch(() => {
+                console.log("[" + getTimestamp() + "] error updating counter in " + message.guild.name)
+                fail = true
+            })
+
+            if (fail) {
+                profile.enabled = false
+                profile.channel = "none"
+                return message.channel.send("❌ error updating channel")
+            }
+
+            const embed = new MessageEmbed()
+                .setTitle("member count")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+                .setDescription("✅ channel updated")
+                .addField("new value", "`" + profile.channel + "`")
 
             return message.channel.send(embed)
         } else {
