@@ -80,7 +80,12 @@ client.on("messageDelete", message => {
         const filter = getSnipeFilter(message.guild)
 
         for (word of filter) {
-            if (message.content.toLowerCase().includes(word.toLowerCase())) return
+            const a = message.content.toLowerCase().split("`").join("")
+            const b = a.split("*").join("")
+            const c = b.split("|").join("")
+            const d = c.split("_").join("")
+
+            if (d.includes(word.toLowerCase())) return
         }
 
         snipe.set(message.channel.id, message)
@@ -99,7 +104,12 @@ client.on("messageUpdate", message => {
         const filter = getSnipeFilter(message.guild)
 
         for (word of filter) {
-            if (message.content.toLowerCase().includes(word.toLowerCase())) return
+            const a = message.content.toLowerCase().split("`").join("")
+            const b = a.split("*").join("")
+            const c = b.split("|").join("")
+            const d = c.split("_").join("")
+
+            if (d.includes(word.toLowerCase())) return
         }
 
         eSnipe.set(message.channel.id, message)
