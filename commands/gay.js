@@ -1,13 +1,13 @@
 const { MessageEmbed } = require("discord.js")
-const { getMember, getColor } = require("../utils/utils")
+const {  getMember, getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 
 module.exports = {
-    name: "pp",
-    description: "accurate prediction of your pp size",
+    name: "gay",
+    description: "gay calculator",
     category: "fun",
-    aliases: ["penis"],
+    aliases: ["howgay"],
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {
@@ -35,19 +35,24 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 3000);
 
-        let size = Math.floor(Math.random() * 15)
-        let sizeMsg = "8"
 
-        const bigInch = Math.floor(Math.random() * 40)
+        const gayAmount = Math.ceil(Math.random() * 101) - 1
+        let gayText = ""
+        let gayEmoji = ""
 
-        if (bigInch == 7) {
-            size = Math.floor(Math.random() * 30) + 15
+        if (gayAmount >= 70) {
+            gayEmoji = ":rainbow_flag:"
+            gayText = "dam hmu 😏"
+        } else if (gayAmount >= 45) {
+            gayEmoji = "🌈"
+            gayText = "good enough 😉"
+        } else if (gayAmount >= 20) {
+            gayEmoji = "👫"
+            gayText = "kinda straight 😐"
+        } else {
+            gayEmoji = "📏"
+            gayText = "thought we coulda had smth 🙄"
         }
-
-        for (let i = 0; i < size; i++) {
-            sizeMsg = sizeMsg + "="
-        }
-        sizeMsg = sizeMsg + "D"
 
         let member
 
@@ -68,14 +73,11 @@ module.exports = {
         let color = getColor(member);
 
         const embed = new MessageEmbed()
+            .setTitle("gay calculator")
             .setColor(color)
-            .setTitle("pp predictor 1337")
-            .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
-
             .setFooter("bot.tekoh.wtf")
-        
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
-    }  
+            .setDescription(member.user.toString() + "\n" + "**" + gayAmount + "**% gay " + gayEmoji + "\n" + gayText)
+
+        return await message.channel.send(embed)
+    }
 }
