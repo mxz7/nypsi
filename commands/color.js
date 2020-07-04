@@ -31,9 +31,8 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setTitle("#" + color)
+            .setDescription("**#" + color + "**")
             .setColor(color)
-            .setFooter("bot.tekoh.wtf")
         
         if (member) {
             embed.setDescription(member.user.toString())
