@@ -69,17 +69,10 @@ module.exports = {
         let time = 0
 
         if (reason != "") {
-            timedMute = true
-
             time = getDuration(reason)
 
-            if (!time) {
-                const embed = new MessageEmbed()
-                    .setTitle("invalid time format")
-                    .setColor(color)
-                    .setDescription("time format examples: \n**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
-                    .setFooter("bot.tekoh.wtf")
-                return message.channel.send(embed)
+            if (time) {
+                timedMute = true
             }
         }
 
