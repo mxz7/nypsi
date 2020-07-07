@@ -16,7 +16,7 @@ let ready = false
 loadCommands()
 
 client.once("ready", async () => {
-    const domains = ["lonely.lol", "tekoh.wtf", "racist.wtf", "tekoh.xyz"]
+    const domains = ["lonely.lol", "tekoh.wtf", "tekoh.xyz"]
 
     setTimeout(() => {
         client.user.setPresence({
