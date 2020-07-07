@@ -202,7 +202,9 @@ module.exports = {
         } else if (args[0] == "gname") {
             if (args.length == 1) return
 
-            const guild = message.client.guilds.cache.find(g => g.name.toLowerCase().includes(args[1]))
+            args.shift()
+
+            const guild = message.client.guilds.cache.find(g => g.name.toLowerCase().includes(args.join(" ").replace("-m", "")))
 
             if (!guild) {
                 return message.react("❌")
