@@ -20,6 +20,8 @@ module.exports = {
         if (args.length == 0) {
             return message.channel.send("❌ $minecraft <name/server IP>");
         }
+        
+        const color = getColor(message.member);
 
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
@@ -37,7 +39,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());
@@ -45,8 +47,6 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 5000);
-        
-        const color = getColor(message.member);
 
         if (args[0] == "-cache") {
             if (cache.size > 100) {

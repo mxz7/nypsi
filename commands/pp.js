@@ -10,6 +10,8 @@ module.exports = {
     aliases: ["penis"],
     run: async (message, args) => {
 
+        let color = getColor(message.member);
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -26,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());
@@ -65,7 +67,7 @@ module.exports = {
             }
         }
 
-        let color = getColor(member);
+        color = getColor(member);
 
         const embed = new MessageEmbed()
             .setColor(color)

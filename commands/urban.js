@@ -9,6 +9,8 @@ module.exports = {
     description: "get a definition from urban dictionary",
     category: "info",
     run: async (message, args) => {
+
+        const color = getColor(message.member);
         
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
@@ -26,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         if (args.length == 0) {
@@ -44,8 +46,6 @@ module.exports = {
         })
 
         if (!result.word) return
-
-        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle(result.word)

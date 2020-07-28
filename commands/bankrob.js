@@ -15,7 +15,7 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
 
         if (getBalance(message.member) < 1000) {
-            return await message.channel.send("❌ you must have atleast $1k")
+            return await message.channel.send("❌ you must have atleast $1k in your wallet to rob a bank")
         }
 
         if (getBalance(message.member) > 500000) {
@@ -81,7 +81,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());

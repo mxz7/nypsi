@@ -9,6 +9,8 @@ module.exports = {
     category: "fun",
     run: async (message, args) => {
 
+        const color = getColor(message.member);
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -25,7 +27,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         if (args.length == 0) {
@@ -51,7 +53,11 @@ module.exports = {
         const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
         const port = `${randPort()}`
 
-        const color = getColor(message.member);
+        cooldown.set(message.member.id, new Date());
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 5000);
 
         const embed = new MessageEmbed()
             .setTitle("ddos tool | " + message.member.user.username)

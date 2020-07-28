@@ -10,6 +10,9 @@ module.exports = {
     aliases: ["ch"],
     permissions: ["MANAGE_CHANNELS"],
     run: async (message, args) => {
+
+        const color = getColor(message.member);
+        
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -26,10 +29,8 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
-
-        const color = getColor(message.member);
 
         if (!message.member.hasPermission("MANAGE_CHANNELS")) {
             if (message.member.hasPermission("MANAGE_MESSAGES")) {

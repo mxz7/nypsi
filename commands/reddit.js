@@ -9,6 +9,9 @@ module.exports = {
     description: "get a random image from any subreddit",
     category: "info",
     run: async (message, args) => {
+
+        const color = getColor(message.member);
+        
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -25,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));1
         }
 
         if (args.length == 0) {
@@ -71,8 +74,6 @@ module.exports = {
         if (image == "lol") {
             return message.channel.send("❌ unable to find image")
         }
-
-        const color = getColor(message.member);
 
         const subreddit = args[0]
 
