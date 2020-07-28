@@ -107,6 +107,16 @@ module.exports = {
     },
 
     /**
+     * 
+     * @param {*} member {Object} member - give the member object to remove from cache
+     */
+    removeFromVoteCache: function (member) {
+        if (voteCache.has(member.user.id)) {
+            voteCache.delete(member.user.id)
+        }
+    },
+
+    /**
      * @param member {Object} member - give the member object to receive their vote multiplier
      */
     getVoteMulti: async function(member) {
@@ -123,11 +133,19 @@ module.exports = {
     
             if (voted) {
                 voteCache.set(member.user.id, true)
-                setTimeout(() => voteCache.delete(member.user.id), 900000)
+                setTimeout(() => {
+                    if (voteCache.has(member.user.id)) {
+                        voteCache.delete(member.user.id)
+                    }
+                }, 900000)
                 return 0.2
             } else {
                 voteCache.set(member.user.id, false)
-                setTimeout(() => voteCache.delete(member.user.id), 60000)
+                setTimeout(() => {
+                    if (voteCache.has(member.user.id)) {
+                        voteCache.delete(member.user.id)
+                    }
+                }, 60000)
                 return 0
             }
         } catch {
