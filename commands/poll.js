@@ -108,7 +108,6 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle(title)
             .setColor(color)
-            .setFooter("bot.tekoh.wtf")
         
         if (mode.includes("desc")) {
             embed.setDescription(description)
