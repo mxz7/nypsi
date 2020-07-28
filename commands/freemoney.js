@@ -29,6 +29,10 @@ module.exports = {
             return message.channel.send("❌ still on cooldown for " + remaining );
         }
 
+        if (getBalance(message.member) > 100000) {
+            return message.channel.send("❌ you're too rich for this command bro")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
