@@ -1,4 +1,5 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
+const { getColor } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()
