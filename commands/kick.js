@@ -60,7 +60,7 @@ module.exports = {
             const targetHighestRole = members.get(member).roles.highest
             const memberHighestRole = message.member.roles.highest
 
-            if (targetHighestRole.position > memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
+            if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
                 failed.push(members.get(member).user.tag)
             } else {
                 await members.get(member).kick(reason).then(() => {
