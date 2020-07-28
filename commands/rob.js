@@ -12,6 +12,8 @@ module.exports = {
     category: "money",
     aliases: ["steal"],
     run: async (message, args) => {
+        
+        const color = getColor(message.member);
 
         if (cooldown.has(message.member.user.id)) {
             const init = cooldown.get(message.member.user.id)
@@ -29,10 +31,8 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
-        
-        const color = getColor(message.member);
 
         if (args.length == 0) {
             const embed = new MessageEmbed()
@@ -72,7 +72,7 @@ module.exports = {
         }
 
         if (getBalance(message.member) < 750) {
-            return message.channel.send("❌ you need $1k in your wallet to rob someone")
+            return message.channel.send("❌ you need $750 in your wallet to rob someone")
         }
 
         cooldown.set(message.member.user.id, new Date());

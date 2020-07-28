@@ -10,6 +10,8 @@ module.exports = {
     category: "fun",
     run: async (message, args) => {
 
+        const color = getColor(message.member);
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -26,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());
@@ -36,8 +38,6 @@ module.exports = {
         }, 5000);
         
         const fact = facts[Math.floor(Math.random() * facts.length)];
-
-        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)

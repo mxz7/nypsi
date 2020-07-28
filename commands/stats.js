@@ -9,6 +9,8 @@ module.exports = {
     description: "view stats for the bot",
     category: "info",
     run: async (message, args) => {
+        
+        const color = getColor(message.member);
 
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
@@ -26,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());
@@ -38,7 +40,6 @@ module.exports = {
         const { commandsSize, aliasesSize } = require("../utils/commandhandler")
         const { snipe, eSnipe } = require("../nypsi.js")
         const snipedMessages = snipe.size + eSnipe.size
-        const color = getColor(message.member);
         const uptime = getUptime(message.client.uptime)
         const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
         const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")

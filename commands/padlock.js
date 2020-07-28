@@ -1,5 +1,4 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
-const { getTimestamp } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 
 const cooldown = new Map()
@@ -11,6 +10,8 @@ module.exports = {
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)
+
+        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setTitle("padlock | " + message.member.user.username)
@@ -45,7 +46,7 @@ module.exports = {
                 } else {
                     remaining = `${seconds}s`
                 }
-                return message.channel.send("❌ still on cooldown for " + remaining );
+                return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
             }
 
             cooldown.set(message.member.user.id, new Date());

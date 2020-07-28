@@ -9,6 +9,8 @@ module.exports = {
     category: "fun",
     run: async (message, args) => {
 
+        const color = getColor(chosen)
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -25,7 +27,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         let members = []
@@ -71,8 +73,6 @@ module.exports = {
         let chosen = members[Math.floor(Math.random() * members.length)]
 
         chosen = await message.guild.members.fetch(chosen)
-
-        const color = getColor(chosen)
 
         const embed = new MessageEmbed()
             .setTitle("raffle by " + message.member.user.tag)

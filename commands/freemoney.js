@@ -10,6 +10,8 @@ module.exports = {
     category: "money",
     run: async (message, args) => {
 
+        const color = getColor(message.member)
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -26,7 +28,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         if (getBalance(message.member) > 100000) {
@@ -42,8 +44,6 @@ module.exports = {
         if (!userExists(message.member)) createUser(message.member)
 
         updateBalance(message.member, getBalance(message.member) + 1000)
-
-        const color = getColor(message.member)
 
         const embed = new MessageEmbed()
             .setTitle("freemoney | " + message.member.user.username)
