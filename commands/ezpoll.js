@@ -88,7 +88,6 @@ module.exports = {
             .setTitle("poll by " + message.member.user.username)
             .setColor(color)
             .setDescription(choices)
-            .setFooter("bot.tekoh.wtf")
         
         message.channel.send(embed).then(async m => {
             await message.delete().catch()
