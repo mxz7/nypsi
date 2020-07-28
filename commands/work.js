@@ -36,6 +36,10 @@ module.exports = {
             return message.channel.send("❌ you need money to work")
         }
 
+        if (getBalance(message.member) > 750000) {
+            return message.channel.send("❌ you're too rich for this command bro")
+        }
+
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
@@ -46,7 +50,11 @@ module.exports = {
 
         let earnedMax = 14
 
-        if (getBalance(message.member) <= 500000) earnedMax = 24
+        if (getBalance(message.member) <= 100000) {
+            earnedMax = 24
+        } else if (getBalance(message.member) >= 250000) {
+            earnedMax = 5
+        }
 
         const earnedPercent = Math.floor(Math.random() * earnedMax) + 1
         let earned = Math.round((earnedPercent / 100) * getBalance(message.member))

@@ -62,6 +62,10 @@ module.exports = {
             role.members.forEach(m => {
                 members.push(m.user.id)
             })
+
+            if (members.length == 0) {
+                return message.channel.send("❌ there is nobody in that role")
+            }
         }
 
         let chosen = members[Math.floor(Math.random() * members.length)]
@@ -74,7 +78,7 @@ module.exports = {
             .setTitle("raffle by " + message.member.user.tag)
             .setColor(color)
             .setDescription("**" + chosen.user.tag + "**")
-            .setFooter(chosen.user.id)
+            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed)
     }

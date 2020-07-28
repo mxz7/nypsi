@@ -96,6 +96,10 @@ module.exports = {
             return message.channel.send("❌ you cannot afford this bet")
         }
 
+        if (bet > 100000) {
+            return message.channel.send("❌ maximum bet is $**100k**")
+        }
+
         if (games.has(message.member.user.id)) {
             return message.channel.send("❌ you are already playing highlow")
         }

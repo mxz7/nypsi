@@ -129,6 +129,10 @@ module.exports = {
             return message.channel.send("❌ you cannot afford this bet")
         }
 
+        if (bet > 500000) {
+            return message.channel.send("❌ maximum bet is $**500k**")
+        }
+
         cooldown.set(message.member.id, new Date())
 
         setTimeout(() => {

@@ -15,7 +15,7 @@ module.exports = {
             console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
         } else {
 
-            let msg = reloadCommand(args)
+            let msg = reloadCommand(args).split("✔")
             msg = "```\n" + msg + "```"
 
             const embed = new MessageEmbed()
