@@ -19,6 +19,8 @@ module.exports = {
             return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
         }
 
+        const color = getColor(message.member)
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -35,7 +37,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining);
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
@@ -97,8 +99,6 @@ module.exports = {
             if (amount > 10000) {
                 amount = 10000
             }
-
-            const color = getColor(message.member)
 
             const embed = new MessageEmbed()
                 .setTitle("delete | " + message.member.user.tag)

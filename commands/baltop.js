@@ -11,6 +11,8 @@ module.exports = {
     aliases: ["top"],
     run: async (message, args) => {
 
+        const color = getColor(message.member);
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -27,7 +29,7 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         cooldown.set(message.member.id, new Date());
@@ -57,8 +59,6 @@ module.exports = {
         let filtered = balTop.filter(function (el) {
             return el != null;
         });
-
-        const color = getColor(message.member);
           
         const embed = new MessageEmbed()
             .setTitle("top " + filtered.length)

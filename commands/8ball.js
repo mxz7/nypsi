@@ -29,6 +29,9 @@ module.exports = {
     description: "ask the 8ball a question",
     category: "fun",
     run: async (message, args) => {
+
+        const color = getColor(message.member);
+
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
@@ -45,7 +48,9 @@ module.exports = {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send("❌ still on cooldown for " + remaining );
+
+            
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
         if (args.length == 0) {
@@ -59,8 +64,6 @@ module.exports = {
         }, 5000);
 
         const question = args.join(" ")
-
-        const color = getColor(message.member);
 
         const embed = new MessageEmbed()
             .setColor(color)
