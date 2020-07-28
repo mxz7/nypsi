@@ -42,7 +42,7 @@ module.exports = {
         }
 
         const members = message.mentions.members
-        let reason = message.member.user.tag + " | | "
+        let reason = message.member.user.tag + ": "
 
         if (args.length != members.size) {
             for (let i = 0; i < members.size; i++) {
