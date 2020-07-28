@@ -212,7 +212,11 @@ module.exports = {
 
             await channel.edit({name: format}).then(() => {
                 console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
-            }).catch(() => console.log("[" + getTimestamp() + "] error updating counter in " + guild.name))
+            }).catch(() => {
+                console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
+                guilds[guild.id].stats.enabled = false
+                guilds[guild.id].stats.channel = "none"
+            })
         }
     }
 }
