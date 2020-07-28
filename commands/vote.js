@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getVoteMulti, getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
+const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache } = require("../economy/utils.js")
 
 const cooldown = new Map()
 const bonusCooldown = new Map()
@@ -72,6 +72,7 @@ module.exports = {
             embed.setTitle("vote ❌ | " + message.member.user.username)
             embed.setColor("#e4334f")
             embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins as well as a $**15,000** reward")
+            removeFromVoteCache(message.member)
         }
 
         message.channel.send(embed).catch(() => {
