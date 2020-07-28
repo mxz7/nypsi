@@ -18,6 +18,10 @@ module.exports = {
             return await message.channel.send("❌ you must have atleast $1k")
         }
 
+        if (getBalance(message.member) > 500000) {
+            return await message.channel.send("❌ you have too much money to rob a bank")
+        }
+
         const bankWorth = new Discord.Collection()
 
         if (getBalance(message.member) > 500000) {

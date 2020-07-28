@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js")
-const { getVoteMulti, getBalance, updateBalance } = require("../economy/utils.js")
+const { getVoteMulti, getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
 
 const cooldown = new Map()
 const bonusCooldown = new Map()
@@ -34,6 +34,8 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 10000);
+
+        if (!userExists(message.member)) createUser(message.member)
 
         const voted = await getVoteMulti(message.member) > 0
 
