@@ -266,6 +266,7 @@ module.exports = {
      * @param amount {number} amount to update xp to
      */
     updateXp: function(member, amount) {
+        if (users[member.user.id].xp >= 694200) return
         const amount1 = parseInt(amount)
         users[member.user.id].xp = amount1
     },
