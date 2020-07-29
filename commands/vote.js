@@ -52,7 +52,7 @@ module.exports = {
             if (!bonusCooldown.has(message.member.id)) {
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("rewards", "✓ **20**% gambling bonus\n✓ $**15,000** added to your balance")
+                embed.addField("rewards", "✓ **20**% gambling bonus\n✓ **xp** gambling bonus\n✓ $**15,000** added to your balance")
                 embed.setFooter("you can claim another $15,000 in 6 hours")
                 updateBalance(message.member, getBalance(message.member) + 15000)
                 bonusCooldown.set(message.member.id, new Date())
@@ -70,12 +70,12 @@ module.exports = {
 
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("rewards", "✓ **20**% gambling bonus\n- $**15,000** available in: " + remaining)
+                embed.addField("rewards", "✓ **20**% gambling bonus\n✓ **xp** gambling bonus\n- $**15,000** available in: " + remaining)
             }
         } else {
             embed.setTitle("vote ❌ | " + message.member.user.username)
             embed.setColor("#e4334f")
-            embed.addField("rewards", "× **20**% gambling bonus\n× $**15,000** reward")
+            embed.addField("rewards", "× **20**% gambling bonus\n× **xp** gambling bonus\n× $**15,000** reward")
             embed.setFooter("you must run $vote to redeem $15,000")
             removeFromVoteCache(message.member)
         }
