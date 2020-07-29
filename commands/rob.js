@@ -134,13 +134,13 @@ module.exports = {
                 robberySuccess = true
 
                 const amount = (Math.floor(Math.random() * 35) + 5)
-                const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
+                const amountMoney = Math.round(getBalance(target) * (amount / 100))
 
                 updateBalance(target, getBalance(target) - amountMoney)
                 updateBalance(message.member, getBalance(message.member) + amountMoney)
 
                 embed2.setColor("#5efb8f")
-                embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**")
+                embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
 
                 embed3.setTitle("you have been robbed")
                 embed3.setColor("#e4334f")
@@ -162,7 +162,7 @@ module.exports = {
                 updateBalance(message.member, getBalance(message.member) - amountMoney)
 
                 embed2.setColor("#e4334f")
-                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**")
+                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
 
                 embed3.setTitle("you were nearly robbed")
                 embed3.setColor("#5efb8f")
