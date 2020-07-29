@@ -51,7 +51,7 @@ module.exports = {
                 bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
             }
 
-            bankList = bankList + "the most you can recieve on one robbery is 50% of the bank's balance"
+            bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
 
             const embed = new MessageEmbed()
                 .setTitle("current bank balances")
