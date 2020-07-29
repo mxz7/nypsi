@@ -9,7 +9,7 @@ module.exports = {
     category: "fun",
     run: async (message, args) => {
 
-        const color = getColor(chosen)
+        let color = getColor(message.member)
 
         if (cooldown.has(message.member.id)) {
             const init = cooldown.get(message.member.id)
@@ -73,6 +73,8 @@ module.exports = {
         let chosen = members[Math.floor(Math.random() * members.length)]
 
         chosen = await message.guild.members.fetch(chosen)
+
+        color = getColor(chosen)
 
         const embed = new MessageEmbed()
             .setTitle("raffle by " + message.member.user.tag)
