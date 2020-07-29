@@ -322,12 +322,14 @@ module.exports = {
      * @param guild {Object} guild to pull data from
      * @param amount {number} amount of users to return with
      */
-    topAmount: function(guild, amount) {
+    topAmount: async function(guild, amount) {
+
+        const members = await guild.members.fetch()
     
         const users1 = []
 
         for (user in users) {
-            if (guild.members.cache.find(member => member.user.id == user) && users[user].balance != 0) {
+            if (members.find(member => member.user.id == user) && users[user].balance != 0) {
                 users1.push(user)
             }
         }
