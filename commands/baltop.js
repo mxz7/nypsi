@@ -17,7 +17,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+            const time = 10 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -36,7 +36,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5000);
+        }, 10000);
 
         let amount
 
@@ -54,7 +54,7 @@ module.exports = {
 
         if (amount < 5) amount = 5
 
-        const balTop = topAmount(message.guild, amount)
+        const balTop = await topAmount(message.guild, amount)
 
         let filtered = balTop.filter(function (el) {
             return el != null;
