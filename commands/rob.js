@@ -182,7 +182,7 @@ module.exports = {
                         target.send("you were nearly robbed!!", embed3)
                     }
                 }
-            }, 1000)
+            }, 1500)
         })
     }
 }
