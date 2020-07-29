@@ -39,10 +39,10 @@ module.exports = {
                 .setTitle("rob help")
                 .setColor(color)
                 .setFooter("bot.tekoh.wtf")
-                .addField("usage", "$rob <user>")
-                .addField("help", "robbing a user is a useful way for you to make money\nyou can rob a maximum of **45**% of their balance\n" +
+                .addField("usage", "$rob <@user>")
+                .addField("help", "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
                     "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
-                    "you can lose up to **30**% of your balance by failing a robbery")
+                    "you can lose up to **25**% of your balance by failing a robbery")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $rob <user>"))
         }
@@ -83,6 +83,22 @@ module.exports = {
             } catch {}
         }, 600000);
 
+        const embed = new MessageEmbed()
+            .setTitle("robbery | " + message.member.user.username)
+            .setColor(color)
+            .setDescription("robbing " + target.user.toString() + "..")
+            .setFooter("bot.tekoh.wtf")
+
+        const embed2 = new MessageEmbed()
+            .setTitle("robbery | " + message.member.user.username)
+            .setDescription("robbing " + target.user.toString() + "..")
+            .setFooter("bot.tekoh.wtf")
+        
+        const embed3 = new MessageEmbed()
+            .setFooter("use $optout to optout of bot dms")
+
+        let robberySuccess = false
+
         if (playerCooldown.has(target.user.id)) {
             const amount = Math.floor(Math.random() * 9) + 1
             const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
@@ -90,150 +106,83 @@ module.exports = {
             updateBalance(target, getBalance(target) + amountMoney)
             updateBalance(message.member, getBalance(message.member) - amountMoney)
 
-            const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle("robbery | " + message.member.user.username)
-                .setDescription("robbing " + target.user.toString() + "..")
-                .setFooter("bot.tekoh.wtf")
+            embed2.setColor("#e4334f")
+            embed2.addField("**fail!!**", "**" + target.user.tag + "** has been robbed recently and is protected by a private security team\n" +
+                "you were caught and paid $" + amountMoney.toLocaleString() + " (" + amount + "%)")
 
-            target.send("**you were nearly robbed!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name + "** \n" +
-                "since you have been robbed recently, you were protected by a private security team and received $" + amountMoney)
-
-            message.channel.send(embed).then(m => {
-                embed.setColor("#e4334f")
-                embed.addField("**fail!!**", "**" + target.user.tag + "** has been robbed recently and is protected by a private security team\n" +
-                    "you were caught and paid $" + amountMoney.toLocaleString() + " (" + amount + "%)")
-                
-                setTimeout(() => {
-                    m.edit(embed)
-                }, 1000)
-            })
-            return
-        }
-
-        const amount = (Math.floor(Math.random() * 45) + 10)
-
-        const caught = Math.floor(Math.random() * 15)
-
-        let robberySuccess = true
-        let robbedAmount = Math.round((amount / 100) * getBalance(target))
-
-        let caughtByPolice = false
-        let percentReturned
-        let amountReturned
-
-        if (hasPadlock(target)) {
+            embed3.setTitle("you were nearly robbed")
+            embed3.setColor("#5efb8f")
+            embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
+                    "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" + amountMoney + "**")
+        } else if (hasPadlock(target)) {
             setPadlock(target, false)
 
-            if (!list.includes(target.user.id)) {
-                target.send("**your padlock has saved you from a robbery!!**\nyou were nearly robbed by **" + message.member.user.tag + "** in **" + message.guild.name +"**\nthey would have stolen a total of $**" + robbedAmount.toLocaleString() + "**\n*your padlock is now broken*").catch(() => {
-                    
-                })
-            }
+            const amount = (Math.floor(Math.random() * 35) + 5)
+            const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
 
-            const embed = new MessageEmbed()
-                .setColor(color)
-                .setTitle("robbery | " + message.member.user.username)
-                .setDescription("robbing " + target.user.toString() + "..")
+            embed2.setColor("#e4334f")
+            embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken")
 
-                .setFooter("bot.tekoh.wtf")
+            embed3.setTitle("you were nearly robbed")
+            embed3.setColor("#5efb8f")
+            embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
+                "your padlock has saved you from a robbery, but it has been broken\nthey would have stolen $**" + amountMoney.toLocaleString() + "**")
+        } else {
+            const chance = Math.floor(Math.random() * 20)
+
+            if (chance > 8) {
+                robberySuccess = true
+
+                const amount = (Math.floor(Math.random() * 35) + 5)
+                const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
+
+                updateBalance(target, getBalance(target) - amountMoney)
+                updateBalance(message.member, getBalance(message.member) + amountMoney)
+
+                embed2.setColor("#5efb8f")
+                embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**")
+
+                embed3.setTitle("you have been robbed")
+                embed3.setColor("#e4334f")
+                embed3.setDescription("**" + message.member.user.tag + "** has robbed you in **" + message.guild.name + "**\n" +
+                    "they stole a total of $**" + amountMoney.toLocaleString() + "**")
+                
+                playerCooldown.add(target.user.id)
+
+                const length = Math.floor(Math.random() * 8) + 2
         
-            message.channel.send(embed).then(m => {
-
-                embed.setColor("#e4334f")
-                embed.addField("**fail!!**", "**" + target.user.tag + "** had a padlock, which has now been broken")
-
                 setTimeout(() => {
-                    m.edit(embed)
-                }, 1000)
-
-
-            }).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            });
-            return
-        }
-
-        if (caught <= 3) {
-            caughtByPolice = true
-            robberySuccess = false
-
-            percentReturned = (Math.floor(Math.random() * 20) + 10)
-
-            amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
-
-            if (!list.includes(target.user.id)) {
-                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +"** but they were caught by the police\nthe police have given you $**" + amountReturned.toLocaleString() + "** for your troubles\n*use $optout to optout of bot dms*").catch(() => {
-                })
-            }
-
-            updateBalance(target, getBalance(target) + amountReturned)
-            updateBalance(message.member, getBalance(message.member) - amountReturned)
-        } else if (amount >= 45) {
-            robberySuccess = false
-
-            percentReturned = (Math.floor(Math.random() * 10) + 5)
-
-            amountReturned = Math.round((percentReturned / 100) * getBalance(message.member))
-
-            if (!list.includes(target.user.id)) {
-                target.send("**you were nearly robbed!!**\n**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name +"** but they failed\nyou have been given $**" + amountReturned.toLocaleString() + "** from their balance\n*use $optout to optout of bot dms*").catch(() => {
-                })
-            }
-
-            updateBalance(message.member, getBalance(message.member) - amountReturned)
-            updateBalance(target, getBalance(target) + amountReturned)
-        }
-
-        if (robberySuccess) {
-            robbedAmount = Math.round((amount / 100) * getBalance(target))
-
-            if (!list.includes(target.user.id)) {
-                target.send("**you have been robbed!!**\nyou were robbed by **" + message.member.user.tag + "** in **" + message.guild.name + "**\nthey stole a total of $**" + robbedAmount.toLocaleString() + "**\n*use $optout to optout of bot dms*").catch(() => {
-
-                })
-            }
-
-            playerCooldown.add(target.user.id)
-
-            const length = Math.floor(Math.random() * 8) + 2
-
-            setTimeout(() => {
-                playerCooldown.delete(target.user.id)
-            }, length * 60 * 1000)
-
-            updateBalance(target, getBalance(target) - robbedAmount)
-            updateBalance(message.member, getBalance(message.member) + robbedAmount)
-        }
-
-        let embed = new MessageEmbed()
-            .setColor(color)
-            .setTitle("robbery | " + message.member.user.username)
-            .setDescription("robbing " + target.user.toString() + "..")
-
-            .setFooter("bot.tekoh.wtf")
-        
-        message.channel.send(embed).then(m => {
-            
-            if (robberySuccess && !caughtByPolice) {
-                embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%)")
-                embed.setColor("#5efb8f")
-            } else if (caughtByPolice) {
-                embed.setColor("#e4334f")
-                embed.addField("**you were caught by the police!!**", "**" + target.user.tag + "** was given $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)" +
-                    "\nfrom your balance for their troubles")
+                    playerCooldown.delete(target.user.id)
+                }, length * 60 * 1000)
             } else {
-                embed.addField("**fail!!**", "**you lost** $" + amountReturned.toLocaleString() + " (" + percentReturned + "%)")
-                embed.setColor("#e4334f")
+                const amount = (Math.floor(Math.random() * 20) + 5)
+                const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
+
+                updateBalance(target, getBalance(target) + amountMoney)
+                updateBalance(message.member, getBalance(message.member) - amountMoney)
+
+                embed2.setColor("#e4334f")
+                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**")
+
+                embed3.setTitle("you were nearly robbed")
+                embed3.setColor("#5efb8f")
+                embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
+                    "they were caught by the police and you received $**" + amountMoney.toLocaleString() + "**")
             }
+        }
 
-            setTimeout(() => {
-                m.edit(embed)
+        message.channel.send(embed).then(async (m) => {
+            setTimeout(async () => {
+                await m.edit(embed2)
+
+                if (!list.includes(target.user.id)) {
+                    if (robberySuccess) {
+                        target.send("you have been robbed!!", embed3)
+                    } else {
+                        target.send("you were nearly robbed!!", embed3)
+                    }
+                }
             }, 1000)
-
-
-        }).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
+        })
     }
 }
