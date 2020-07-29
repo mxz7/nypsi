@@ -1,5 +1,5 @@
 const { getMember, getColor } = require("../utils/utils")
-const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti } = require("../economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
@@ -323,6 +323,12 @@ module.exports = {
                 if (voted) {
                     embed.addField("**winner!!**", "**you win** $" + Math.round(((bet * 2) + ((bet * 2) * voteMulti))).toLocaleString() + "\n" +
                         "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                    
+                    if (bet >= 1000) {
+                        const xpBonus = Math.floor(Math.random() * 2) + 1
+                        updateXp(message.member, getXp(message.member) + xpBonus)
+                        embed.setFooter("+" + xpBonus + "xp")
+                    }
                 } else {
                     embed.addField("**winner!!**", "**you win** $" + (bet * 2).toLocaleString())
                 }

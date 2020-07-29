@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils/utils")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti } = require("../economy/utils.js")
+const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -227,6 +227,13 @@ async function playGame(message, m) {
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
+
+            if (bet >= 1000) {
+                const xpBonus = Math.floor(Math.random() * 2) + 1
+                updateXp(message.member, getXp(message.member) + xpBonus)
+                newEmbed.setFooter("+" + xpBonus + "xp")
+            }
+
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
             "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
