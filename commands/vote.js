@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache } = require("../economy/utils.js")
+const { getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 const bonusCooldown = new Map()
@@ -16,7 +17,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 10 - diff
+            const time = 5 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -35,7 +36,7 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 10000);
+        }, 5000);
 
         if (!userExists(message.member)) createUser(message.member)
 
@@ -51,7 +52,8 @@ module.exports = {
             if (!bonusCooldown.has(message.member.id)) {
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou have been rewarded with $**15,000** for voting")
+                embed.addField("rewards", "✓ **20**% gambling bonus\n✓ $**15,000** added to your balance")
+                embed.setFooter("you can claim another $15,000 in 6 hours")
                 updateBalance(message.member, getBalance(message.member) + 15000)
                 bonusCooldown.set(message.member.id, new Date())
                 setTimeout(() => {
@@ -68,12 +70,13 @@ module.exports = {
 
                 embed.setTitle("vote ✅ | " + message.member.user.username)
                 embed.setColor("#5efb8f")
-                embed.addField("status", "you currently have a 20% bonus on all gambling wins\nyou can receive a $**15,000** bonus in: " + remaining)
+                embed.addField("rewards", "✓ **20**% gambling bonus\n- $**15,000** available in: " + remaining)
             }
         } else {
             embed.setTitle("vote ❌ | " + message.member.user.username)
             embed.setColor("#e4334f")
-            embed.addField("status", "by voting you can gain a 20% bonus on all gambling wins as well as a $**15,000** reward")
+            embed.addField("rewards", "× **20**% gambling bonus\n× $**15,000** reward")
+            embed.setFooter("you must run $vote to redeem $15,000")
             removeFromVoteCache(message.member)
         }
 
