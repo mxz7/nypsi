@@ -253,7 +253,7 @@ function runCommand(cmd, message, args) {
                         try {
                             xpCooldown.delete(message.member.user.id)
                         } catch {}
-                    }, 90000)
+                    }, 120000)
                 }
             } catch {}
         }, 10000)
