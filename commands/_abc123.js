@@ -327,7 +327,7 @@ async function guildInfo(guild) {
     const bots = members.filter(member => member.user.bot)
     const online = users.filter(member => member.presence.status != "offline")
 
-    const balTop = topAmount(guild, 5)
+    const balTop = await topAmount(guild, 5)
 
     const filtered = balTop.filter(function (el) {
         return el != null;
