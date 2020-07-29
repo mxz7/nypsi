@@ -40,6 +40,6 @@ module.exports = {
             if (err) console.log(err);
         });
 
-        message.channel.send("✅\nyou will now recieve bot dms");
+        message.channel.send("✅ you will now recieve bot dms");
     }
 };
