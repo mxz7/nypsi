@@ -138,6 +138,8 @@ module.exports = {
             return message.channel.send(embed)
         } else {
 
+            if (!profileExists(message.member)) createProfile(message.member)
+
             if (args[0].toLowerCase() == "help" || args.length < 3 || 
                 (args[0].toLowerCase() != "youtube" 
                     && args[0].toLowerCase() != "twitter" 
