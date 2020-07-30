@@ -1,5 +1,5 @@
 const { getColor, getMember } = require("../utils/utils")
-const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock } = require("../economy/utils.js")
+const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const { MessageEmbed } = require("discord.js")
 const { list } = require("../optout.json")
 
@@ -141,6 +141,13 @@ module.exports = {
 
                 embed2.setColor("#5efb8f")
                 embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
+
+                const voted = await getVoteMulti(message.member)
+
+                if (voted > 0) {
+                    updateXp(message.member, getXp(message.member) + 1)
+                    embed2.setFooter("+1xp")
+                }
 
                 embed3.setTitle("you have been robbed")
                 embed3.setColor("#e4334f")
