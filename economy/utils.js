@@ -17,7 +17,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err);
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] user data saved\x1b[37m")
+            console.log("\x1b[32m[" + getTimestamp() + "] economy data saved\x1b[37m")
         })
 
         timer = 0
@@ -28,13 +28,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
-        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
+        console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"));
-        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
+        console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
         timer = 0
     }
 
@@ -97,7 +97,6 @@ setInterval(() => {
 
 module.exports = {
 
-    
     getPadlockPrice: function() {
         return parseInt(padlockPrice)
     },
@@ -130,6 +129,8 @@ module.exports = {
             } 
     
             const voted = await dbl.hasVoted(member.user.id)
+
+            console.log(voted)
     
             if (voted) {
                 voteCache.set(member.user.id, true)
@@ -427,6 +428,14 @@ module.exports = {
      */
     setPadlock: function(member, setting) {
         users[member.user.id].padlockStatus = setting
+    },
+
+    /**
+     * 
+     * @param {Integer} guildCount guild count
+     */
+    updateStats: async function(guildCount) {
+        return await dbl.postStats(guildCount)
     }
 }
 
@@ -459,22 +468,6 @@ function getMemberID(guild, id) {
     })
 
     return target
-}
-
-function hasPadlocklol(member) {
-    if (users[member.user.id].padlockStatus) {
-        return true
-    } else {
-        return false
-    }
-}
-
-function bankBalance(member) {
-    if (!users[member.user.id].bank) {
-        return 0
-    } else {
-        return users[member.user.id].bank
-    }
 }
 
 function xpBalance(member) {

@@ -2,8 +2,8 @@ const Discord = require("discord.js");
 const { MessageEmbed } = require("discord.js");
 const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
-const { getUserCount } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsProfile, hasStatsEnabled, createDefaultStatsProfile } = require("./guilds/utils.js")
+const { getUserCount, updateStats } = require("./economy/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled } = require("./guilds/utils.js")
 const { runCommand, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils")
@@ -199,7 +199,7 @@ setTimeout(() => {
     })
 }, 2000)
 
-function runChecks() {
+async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
             runCheck(guild)
@@ -213,4 +213,14 @@ function runChecks() {
             }
         })
     }, 600000)
+
+    if (client.user.username.includes("beta")) return
+
+    setInterval(async () => {
+        await updateStats(client.guilds.cache.size)
+        console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
+    }, 3600000)
+
+    await updateStats(client.guilds.cache.size)
+    console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
 }
