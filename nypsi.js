@@ -122,6 +122,10 @@ client.on("message", async message => {
 
     if (message.author.bot) return;
 
+    if (message.content.toLowerCase().includes("swat") || message.content.toLowerCase().includes("sim swap") || message.content.toLowerCase().includes("sim") || message.content.toLowerCase().includes("dox")) {
+        console.log("[" + getTimestamp() + "] " + message.author.tag + ": " + message.content)
+    }
+
     if (!message.guild) {
 
         console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
