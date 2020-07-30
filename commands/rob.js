@@ -130,7 +130,7 @@ module.exports = {
         } else {
             const chance = Math.floor(Math.random() * 20)
 
-            if (chance > 7) {
+            if (chance > 8) {
                 robberySuccess = true
 
                 const amount = (Math.floor(Math.random() * 35) + 5)
