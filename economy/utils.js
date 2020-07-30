@@ -129,8 +129,6 @@ module.exports = {
             } 
     
             const voted = await dbl.hasVoted(member.user.id)
-
-            console.log(voted)
     
             if (voted) {
                 voteCache.set(member.user.id, true)
