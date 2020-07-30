@@ -113,7 +113,7 @@ module.exports = {
             embed3.setTitle("you were nearly robbed")
             embed3.setColor("#5efb8f")
             embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
-                    "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" + amountMoney + "**")
+                    "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" + amountMoney.toLocaleString() + "**")
         } else if (hasPadlock(target)) {
             setPadlock(target, false)
 
