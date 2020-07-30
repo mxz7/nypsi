@@ -38,7 +38,12 @@ module.exports = {
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.id);
+            try {
+                cooldown.delete(message.member.id);
+            } catch {
+                console.log(message)
+                cooldown.clear()
+            }
         }, 300000);
 
         if (!userExists(message.member)) createUser(message.member)
