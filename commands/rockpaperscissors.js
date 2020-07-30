@@ -44,7 +44,7 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
                 .addField("usage", "$rps <**r**ock/**p**aper/**s**cissors> <bet>")
                 .addField("help", "rock paper scissors works exactly how this game does in real life\n" +
-                    "**2.5**x multiplier for winning")
+                    "**2**x multiplier for winning")
 
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>"))
@@ -124,17 +124,17 @@ module.exports = {
         if (choice == "rock" && winning == "scissors") {
             win = true
 
-            winnings = Math.round(bet * 2.5)
+            winnings = Math.round(bet * 2)
             updateBalance(message.member, getBalance(message.member) + winnings)
         } else if (choice == "paper" && winning == "rock") {
             win = true
 
-            winnings = Math.round(bet * 2.5)
+            winnings = Math.round(bet * 2)
             updateBalance(message.member, getBalance(message.member) + winnings)
         } else if (choice == "scissors" && winning == "paper") {
             win = true
 
-            winnings = Math.round(bet * 2.5)
+            winnings = Math.round(bet * 2)
             updateBalance(message.member, getBalance(message.member) + winnings)
         }
 
