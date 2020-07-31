@@ -83,6 +83,10 @@ module.exports = {
 
         const bet = (parseInt(args[1]))
 
+        if (!bet) {
+            return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
+        }
+
         if (bet <= 0) {
             return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
         }
