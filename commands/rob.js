@@ -184,9 +184,9 @@ module.exports = {
 
                 if (!list.includes(target.user.id)) {
                     if (robberySuccess) {
-                        target.send("you have been robbed!!", embed3)
+                        target.send("you have been robbed!!", embed3).catch(() => {})
                     } else {
-                        target.send("you were nearly robbed!!", embed3)
+                        target.send("you were nearly robbed!!", embed3).catch(() => {})
                     }
                 }
             }, 1500)
