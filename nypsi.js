@@ -122,7 +122,7 @@ client.on("message", async message => {
 
     if (message.author.bot) return;
 
-    if (message.content.toLowerCase().includes("swat") || message.content.toLowerCase().includes("sim swap") || message.content.toLowerCase().includes("sim") || message.content.toLowerCase().includes("dox")) {
+    if (message.content.toLowerCase().includes("swat") || message.content.toLowerCase().includes("sim") || message.content.toLowerCase().includes("dox")) {
         console.log("[" + getTimestamp() + "] (FLAGGED) (" + message.guild.id + ") " + message.author.tag + ": " + message.content)
     }
 
