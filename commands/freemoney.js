@@ -31,6 +31,8 @@ module.exports = {
             return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
+        if (!userExists(message.member)) createUser(message.member)
+
         if (getBalance(message.member) > 100000) {
             return message.channel.send("❌ you're too rich for this command bro")
         }
@@ -45,8 +47,6 @@ module.exports = {
                 cooldown.clear()
             }
         }, 300000);
-
-        if (!userExists(message.member)) createUser(message.member)
 
         updateBalance(message.member, getBalance(message.member) + 1000)
 
