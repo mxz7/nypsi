@@ -39,7 +39,7 @@ module.exports = {
 
         setTimeout(() => {
             try {
-                cooldown.delete(message.member.id);
+                cooldown.delete(message.author.id);
             } catch {
                 console.log(message)
                 cooldown.clear()
