@@ -77,7 +77,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("kick | " + message.member.user.username)
-            .setDescription("✅ **" + count + "** members kicked for: " + reason.split("| | ")[1])
+            .setDescription("✅ **" + count + "** members kicked for: " + reason.split(": ")[1])
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
 
@@ -86,7 +86,7 @@ module.exports = {
         }
 
         if (count == 1) {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split("| | ")[1])
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1])
         }
 
         if (args.join(" ").includes("-s")) {
