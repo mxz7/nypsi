@@ -53,7 +53,7 @@ module.exports = {
             cooldown.set(message.member.user.id, new Date());
 
             setTimeout(() => {
-                cooldown.delete(message.member.user.id);
+                cooldown.delete(message.author.id);
             }, 60000);
 
             updateBalance(message.member, getBalance(message.member) - padlockPrice)

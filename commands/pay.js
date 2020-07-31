@@ -95,7 +95,7 @@ module.exports = {
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.id);
+            cooldown.delete(message.author.id);
         }, 10000);
 
 
@@ -140,7 +140,7 @@ module.exports = {
             
             setTimeout(() =>{
                 m.edit(embed)
-            }, 1000)
+            }, 1500)
         }).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
