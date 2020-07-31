@@ -80,12 +80,12 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("ban | " + message.member.user.username)
-            .setDescription("✅ **" + count + "** members banned for: " + reason.split("| | ")[1])
+            .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
         
         if (count == 1) {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split("| | ")[1])
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split(": ")[1])
         }
 
         if (failed.length != 0) {
