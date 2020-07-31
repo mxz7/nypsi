@@ -89,6 +89,10 @@ module.exports = {
             return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
         }
 
+        if (!bet) {
+            return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+        }
+
         if (bet > getBalance(message.member)) {
             return message.channel.send("❌ you cannot afford this bet")
         }
