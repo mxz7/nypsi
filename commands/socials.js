@@ -37,7 +37,7 @@ module.exports = {
             cooldown.delete(message.member.user.id);
         }, 3000);
 
-        if (args.length <= 1) {
+        if (args.length <= 1 && args[0] != "help") {
             let member = message.member
 
             if (args.length == 1) {
@@ -209,8 +209,8 @@ module.exports = {
                 const username = args[2]
                 let url
 
-                if (username.length > 16) {
-                    return message.channel.send("❌ username cannot be longer than 16 characters")
+                if (username.length > 21) {
+                    return message.channel.send("❌ username cannot be longer than 21 characters")
                 }
 
                 if (args[0].toLowerCase() == "youtube") {
