@@ -173,11 +173,11 @@ module.exports = {
                         if (args.length != 4) {
                             return message.channel.send("❌ you must include a URL with youtube: $socials youtube add <username> <url>")
                         } else {
-                            if (!args[3].toLowerCase().includes("https://youtube.com/")) {
+                            if (!args[3].toLowerCase().includes("https://youtube.com/") && !args[3].toLowerCase().includes("https://www.youtube.com")) {
                                 return message.channel.send("❌ invalid youtube url")
                             }
                         
-                            if (args[3].toLowerCase().includes("https://youtube.com/logout")) {
+                            if (args[3].toLowerCase().includes(".com/logout")) {
                                 return message.channel.send("❌ invalid youtube url")
                             }
                         }
