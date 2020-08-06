@@ -39,7 +39,7 @@ module.exports = {
 
         const collected = await message.channel.messages.fetch({limit: 50})
 
-        const collecteda = collected.filter(msg => msg.member.user.id == message.client.user.id || msg.content.startsWith(prefix))
+        const collecteda = collected.filter(msg => msg.author.id == message.client.user.id || msg.content.startsWith(prefix))
 
         await message.channel.bulkDelete(collecteda)
     }
