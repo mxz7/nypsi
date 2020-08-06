@@ -35,7 +35,7 @@ module.exports = {
         cooldown.set(message.member.id, new Date());
 
         setTimeout(() => {
-            cooldown.delete(message.member.id);
+            cooldown.delete(message.author.id);
         }, 10000);
 
         let amount
