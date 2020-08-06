@@ -92,7 +92,7 @@ module.exports = {
             }
 
             const embed = new MessageEmbed()
-                .setTitle(args[0])
+                .setTitle(args[0] + " | " + res.ip + ":" + res.port)
                 .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
                 .addField("version", res.version, true)
                 .addField("motd", res.motd.clean)
