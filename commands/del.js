@@ -44,7 +44,9 @@ module.exports = {
             return message.channel.send("❌ $del <amount> (@user)");
         }
 
-        let amount = parseInt(args[0]) + 1
+        let amount = parseInt(args[0])
+
+        if (amount < 60) amount++
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             if (amount > 100) {
