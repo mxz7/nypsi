@@ -28,7 +28,7 @@ module.exports = {
             return message.channel.send("❌ invalid user");
         }
 
-        let avatar = member.user.avatarURL({ format: "png", dynamic: true, size: 256 })
+        let avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
 
         const color = getColor(member);
 
