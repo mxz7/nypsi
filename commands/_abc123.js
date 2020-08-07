@@ -41,7 +41,7 @@ module.exports = {
                 .setTitle(user.user.tag)
                 .setColor("#60d16b")
                 .setDescription("`" + user.id + "`")
-                .setThumbnail(user.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
+                .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
                 .addField("user info", "**tag** " + user.user.tag + "\n" +
                     "**created** " + formatDate(user.user.createdAt), true)
                 .setFooter("bot.tekoh.wtf")
@@ -87,7 +87,7 @@ module.exports = {
                 .setTitle(user.user.tag)
                 .setColor("#60d16b")
                 .setDescription("`" + user.id + "`")
-                .setThumbnail(user.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
+                .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
                 .addField("user info", "**tag** " + user.user.tag + "\n" +
                     "**created** " + formatDate(user.user.createdAt), true)
                 .setFooter("bot.tekoh.wtf")

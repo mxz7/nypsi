@@ -53,7 +53,7 @@ module.exports = {
                 "join position is **" + joinPos + "**")
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
-            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
+            .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
         return message.channel.send(embed)
     }
 }

@@ -32,7 +32,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle(member.user.tag)
-            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
+            .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
             .setFooter("bot.tekoh.wtf")
 
         if (member.presence.activities.length > 0) {

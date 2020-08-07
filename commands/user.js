@@ -73,7 +73,7 @@ module.exports = {
         rolesText = rolesText.split("@everyone").join("")
 
         const embed = new MessageEmbed()
-            .setThumbnail(member.user.avatarURL({ format: "png", dynamic: true, size: 128 }))
+            .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
             .setColor(color)
             .setTitle(member.user.tag)
             .setDescription(member.user.toString())
