@@ -1,4 +1,6 @@
 const fs = require("fs");
+const { setTimeout } = require("timers");
+const { Message } = require("discord.js");
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
 
 let timer = 0
@@ -28,6 +30,8 @@ setInterval(() => {
         timer = 0
     }
 }, 120000)
+
+const fetchCooldown = new Set()
 
 module.exports = {
     /**
@@ -189,7 +193,22 @@ module.exports = {
      */
     checkStats: async function(guild) {
 
-        let memberCount = await guild.members.fetch()
+        let memberCount
+
+        if (fetchCooldown.has(guild.id)) {
+            memberCount = guild.members.cache
+        } else {
+            memberCount = await guild.members.fetch()
+            
+            fetchCooldown.add(guild.id)
+
+            setTimeout(() => {
+                fetchCooldown.delete(guild.id)
+            }, 3600)
+        }
+
+        if (!memberCount) memberCount = guild.members.cache
+
         const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].stats.channel)
 
         if (!channel) {
@@ -217,6 +236,31 @@ module.exports = {
                 guilds[guild.id].stats.enabled = false
                 guilds[guild.id].stats.channel = "none"
             })
+        }
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to add to cooldown
+     * @param {*} seconds seconds to remove after
+     */
+    addCooldown: function(guild, seconds) {
+        fetchCooldown.add(guild.id)
+
+        setTimeout(() => {
+            fetchCooldown.delete(guild.id)
+        }, seconds * 1000)
+    },
+
+    /**
+     * @returns {Boolean}
+     * @param {*} guild guild to check if added to cooldown
+     */
+    inCooldown: function(guild) {
+        if (fetchCooldown.has(guild.id)) {
+            return true
+        } else {
+            return false
         }
     }
 }

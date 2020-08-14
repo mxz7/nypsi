@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");;
 const { formatDate, getColor } = require("../utils/utils");
-const { getPeaks } = require("../guilds/utils.js")
+const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js")
 
 module.exports = {
     name: "server",
@@ -16,8 +16,17 @@ module.exports = {
         }
 
         const created = formatDate(server.createdAt).toLowerCase();
-        let members = await server.members.fetch()
-        members = server.members.cache
+
+        let members 
+
+        if (inCooldown(server)) {
+            members = server.members.cache
+        } else {
+            members = server.members.fetch()
+
+            addCooldown(server, 3600)
+        }
+
         const users = members.filter(member => !member.user.bot)
         const bots = members.filter(member => member.user.bot)
         const online = users.filter(member => member.presence.status != "offline")
