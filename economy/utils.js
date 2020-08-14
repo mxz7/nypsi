@@ -2,7 +2,8 @@ const fs = require("fs");
 let users = JSON.parse(fs.readFileSync("./economy/users.json"));
 const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const { topgg } = require("../config.json")
-const DBL = require("dblapi.js")
+const DBL = require("dblapi.js");
+const { inCooldown, addCooldown } = require("../guilds/utils");
 const dbl = new DBL(topgg)
 const voteCache = new Map()
 
@@ -324,7 +325,17 @@ module.exports = {
      */
     topAmount: async function(guild, amount) {
 
-        const members = await guild.members.fetch()
+        let members
+
+        if (inCooldown(guild)) {
+            members = guild.members.cache
+        } else {
+            members = await guild.members.fetch()
+
+            addCooldown(guild, 3600)
+        }
+
+        if (!members) members = guild.members.cache
     
         const users1 = []
 
