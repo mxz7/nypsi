@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils/utils")
+const { getColor } = require("../utils/utils");
+const { profileExists, createProfile, newCase } = require("../moderation/utils");
 
 module.exports = {
     name: "unban",
@@ -41,10 +42,13 @@ module.exports = {
         const members = []
         const failed = []
 
+        if (!profileExists(message.guild)) createProfile(message.guild)
+
         for (arg of args) {
             if (arg.length == 18) {
                 await message.guild.members.unban(arg, message.member.user.tag).then(user => {
                     members.push(user.username + "#" + user.discriminator)
+                    newCase(message.guild, "unban", arg, message.member.user.tag, message.content)
                 }).catch(() => {
                     failed.push(arg)
                 })
@@ -58,6 +62,7 @@ module.exports = {
                         const id = findingMember.id
                         await message.guild.members.unban(id, message.member.user.tag).then(user => {
                             members.push(user.username + "#" + user.discriminator)
+                            newCase(message.guild, "unban", id, message.member.user.tag, message.content)
                         }).catch(() => {
                             failed.push(arg)
                         })

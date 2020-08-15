@@ -22,7 +22,7 @@ module.exports = {
         if (inCooldown(server)) {
             members = server.members.cache
         } else {
-            members = server.members.fetch()
+            members = await server.members.fetch()
 
             addCooldown(server, 3600)
         }

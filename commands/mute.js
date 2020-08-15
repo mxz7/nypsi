@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils/utils")
+const { profileExists, createProfile, newCase } = require("../moderation/utils")
 
 module.exports = {
     name: "mute",
@@ -36,7 +37,7 @@ module.exports = {
             for (let i = 0; i < members.size; i++) {
                 args.shift()
             }
-            reason = args.join(" ").toLowerCase().split(" ")[0]
+            reason = args.join(" ")
         }
 
         let count = 0
@@ -69,7 +70,7 @@ module.exports = {
         let time = 0
 
         if (reason != "") {
-            time = getDuration(reason)
+            time = getDuration(reason.split(" ")[0])
 
             if (time) {
                 timedMute = true
@@ -142,10 +143,24 @@ module.exports = {
         }
 
         if (args.join(" ").includes("-s")) {
-            message.delete()
-            return message.member.send(embed).catch()
+            await message.delete()
+            await message.member.send(embed).catch()
         } else {
-            return message.channel.send(embed)
+            await message.channel.send(embed)
+        }
+
+        if (!profileExists(message.guild)) createProfile(message.guild)
+
+        for (member of members.keyArray()) {
+            const m = members.get(member)
+            if (failed.indexOf(m.user.tag) == -1) {
+                newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, message.content)
+                if (!timedMute) {
+                    await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "` (permanent)").catch()
+                } else {
+                    await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "`").catch()
+                }
+            }
         }
 
     }

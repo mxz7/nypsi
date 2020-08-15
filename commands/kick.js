@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils/utils")
+const { getColor } = require("../utils/utils");
+const { profileExists, createProfile, newCase } = require("../moderation/utils");
 
 module.exports = {
     name: "kick",
@@ -90,10 +91,21 @@ module.exports = {
         }
 
         if (args.join(" ").includes("-s")) {
-            message.delete()
-            return message.member.send(embed).catch()
+            await message.delete()
+            await message.member.send(embed).catch()
         } else {
-            return message.channel.send(embed)
+            await message.channel.send(embed)
+        }
+
+        if (!profileExists(message.guild)) createProfile(message.guild)
+
+        for (member of members.keyArray()) {
+            const m = members.get(member)
+            if (failed.indexOf(m.user.tag) == -1) {
+                newCase(message.guild, "kick", m.user.id, message.member.user.tag, message.content)
+
+                await m.send("you have been kicked in **" + message.guild.name + "** for `" + reason + "`").catch()
+            }
         }
     }
 }
