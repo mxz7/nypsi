@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js")
-const { getColor } = require("../utils/utils")
+const { getColor } = require("../utils/utils");
+const { newCase, profileExists, createProfile } = require("../moderation/utils");
 
 module.exports = {
     name: "ban",
@@ -94,9 +95,20 @@ module.exports = {
 
         if (args.join(" ").includes("-s")) {
             await message.delete()
-            return message.member.send(embed).catch()
+            await message.member.send(embed).catch()
         } else {
-            return message.channel.send(embed)
+            await message.channel.send(embed)
+        }
+
+        if (!profileExists(message.guild)) createProfile(message.guild)
+
+        for (member of members.keyArray()) {
+            const m = members.get(member)
+            if (failed.indexOf(m.user.tag) == -1) {
+                newCase(message.guild, "ban", m.user.id, message.member.user.tag, message.content)
+
+                await m.send("you have been banned in **" + message.guild.name + "** for `" + reason.split(": ")[1] + "`").catch()
+            }
         }
     }
 };
