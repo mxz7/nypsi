@@ -154,7 +154,7 @@ module.exports = {
         for (member of members.keyArray()) {
             const m = members.get(member)
             if (failed.indexOf(m.user.tag) == -1) {
-                newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, message.content)
+                newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, reason)
                 if (!timedMute) {
                     await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "` (permanent)").catch()
                 } else {

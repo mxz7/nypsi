@@ -102,9 +102,9 @@ module.exports = {
         for (member of members.keyArray()) {
             const m = members.get(member)
             if (failed.indexOf(m.user.tag) == -1) {
-                newCase(message.guild, "kick", m.user.id, message.member.user.tag, message.content)
+                newCase(message.guild, "kick", m.user.id, message.member.user.tag, reason.split(": ")[1])
 
-                await m.send("you have been kicked in **" + message.guild.name + "** for `" + reason + "`").catch()
+                await m.send("you have been kicked in **" + message.guild.name + "** for `" + reason.split(": ")[1] + "`").catch()
             }
         }
     }
