@@ -45,39 +45,49 @@ module.exports = {
         const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")
         let imgCache = 0
 
-        for (link of Array.from(bdsmCache.keys())) {
-            imgCache = imgCache + bdsmCache.get(link).length
-        }
-        for (link of Array.from(assCache.keys())) {
-            imgCache = imgCache + assCache.get(link).length
-        }
-        for (link of Array.from(thighsCache.keys())) {
-            imgCache = imgCache + thighsCache.get(link).length
-        }
-        for (link of Array.from(pornCache.keys())) {
-            imgCache = imgCache + pornCache.get(link).length
-        }
-        for (link of Array.from(birbCache.keys())) {
-            imgCache = imgCache + birbCache.get(link).length
-        }
-        for (link of Array.from(catCache.keys())) {
-            imgCache = imgCache + catCache.get(link).length
-        }
-        for (link of Array.from(dogCache.keys())) {
-            imgCache = imgCache + dogCache.get(link).length
-        }
-        for (link of Array.from(rabbitCache.keys())) {
-            imgCache = imgCache + rabbitCache.get(link).length
-        }
-        for (link of Array.from(snekCache.keys())) {
-            imgCache = imgCache + snekCache.get(link).length
-        }
+        try {
+            for (link of Array.from(bdsmCache.keys())) {
+                imgCache = imgCache + bdsmCache.get(link).length
+            }
+            for (link of Array.from(assCache.keys())) {
+                imgCache = imgCache + assCache.get(link).length
+            }
+            for (link of Array.from(thighsCache.keys())) {
+                imgCache = imgCache + thighsCache.get(link).length
+            }
+            for (link of Array.from(pornCache.keys())) {
+                imgCache = imgCache + pornCache.get(link).length
+            }
+            for (link of Array.from(birbCache.keys())) {
+                imgCache = imgCache + birbCache.get(link).length
+            }
+            for (link of Array.from(catCache.keys())) {
+                imgCache = imgCache + catCache.get(link).length
+            }
+            for (link of Array.from(dogCache.keys())) {
+                imgCache = imgCache + dogCache.get(link).length
+            }
+            for (link of Array.from(rabbitCache.keys())) {
+                imgCache = imgCache + rabbitCache.get(link).length
+            }
+            for (link of Array.from(snekCache.keys())) {
+                imgCache = imgCache + snekCache.get(link).length
+            }
+        } catch {}
+
+
+        let memberCount = 0
+
+        const guilds = message.client.guilds.cache
+        await guilds.forEach(g => {
+            memberCount = memberCount + g.memberCount
+        })
 
         const embed = new MessageEmbed()
             .setTitle("stats")
             .setColor(color)
-            .addField("bot", "**server count** " + message.client.guilds.cache.size.toLocaleString() + "\n" +
-                "**user count** " + message.client.users.cache.size.toLocaleString() + "\n" +
+            .addField("bot", "**server count** " + guilds.size.toLocaleString() + "\n" +
+                "**user count** " + memberCount.toLocaleString() + "\n" +
                 "**total commands** " + commandsSize + "\n" +
                 "**total aliases** " + aliasesSize + "\n" +
                 "**uptime** " + uptime, true)
