@@ -1,6 +1,6 @@
 const { getColor } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
-const { deleteServer } = require("../moderation/utils")
+const { deleteServer, profileExists } = require("../moderation/utils")
 
 module.exports = {
     name: "deleteallcases",
@@ -23,10 +23,12 @@ module.exports = {
             return message.channel.send(embed)
         }
 
+        if (!profileExists(message.guild)) return await message.channel.send("❌ there are no cases to delete")
+
         const embed = new MessageEmbed()
             .setTitle("confirmation")
             .setColor(color)
-            .setDescription("react with ✅ to confirm your decision")
+            .setDescription("react with ✅ to delet all punishment/moderation cases")
             .setFooter("this cannot be reversed")
 
         const msg = await message.channel.send(embed)
