@@ -44,7 +44,7 @@ module.exports = {
             .addField("moderator", case0.moderator, true)
             .addField("date/time", date, true)
             .addField("user", "`" + case0.user + "`", true)
-            .addField("command", case0.command, true)
+            .addField("reason", case0.command, true)
             .addField("deleted", case0.deleted, true)
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
@@ -74,7 +74,7 @@ module.exports = {
             deleteCase(message.guild, case0.id)
 
             const newEmbed = new MessageEmbed()
-                .setDescription("✅ case `" + case0.id +  "` deleted by " + message.member.toString())
+                .setDescription("✅ case `" + case0.id +  "` successfully deleted by " + message.member.toString())
                 .setColor(color)
 
             await msg.edit(newEmbed)
