@@ -38,9 +38,18 @@ client.once("ready", async () => {
 
     const { commandsSize } = require("./utils/commandhandler")
 
+    let memberCount = 0
+
+    await client.guilds.cache.forEach(g => {
+        memberCount = memberCount + g.memberCount
+    })
+
+    console.log("\n ~~ tekoh.wtf ~~")
+    console.log(" ~~ max#0777 ~~ ")
+
     console.log("\n--bot summary--")
     console.log("server count: " + client.guilds.cache.size.toLocaleString())
-    console.log("user count: " + client.users.cache.size.toLocaleString())
+    console.log("user count: " + memberCount.toLocaleString())
     console.log("commands count: " + commandsSize)
     console.log("users in currency: " + getUserCount())
     console.log("--bot summary--\n");
@@ -121,10 +130,6 @@ client.on("messageUpdate", message => {
 client.on("message", async message => {
 
     if (message.author.bot) return;
-
-    if (message.content.toLowerCase().includes("swat") || message.content.toLowerCase().includes("sim") || message.content.toLowerCase().includes("dox")) {
-        console.log("[" + getTimestamp() + "] (FLAGGED) (" + message.guild.id + ") " + message.author.tag + ": " + message.content)
-    }
 
     if (!message.guild) {
 
