@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils/utils")
-const { profileExists, createProfile, newCase } = require("../moderation/utils")
+const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils")
 
 module.exports = {
     name: "unmute",
@@ -51,10 +51,12 @@ module.exports = {
         if (!profileExists(message.guild)) createProfile(message.guild)
 
         for (member of message.mentions.members.keyArray()) {
-            const m = message.mentions.members.get(member)
-
             if (failed.indexOf(message.mentions.members.get(member).user.tag) == -1) {
                 newCase(message.guild, "unmute", message.mentions.members.get(member).user.id, message.member.user.tag, message.content)
+
+                if (isMuted(message.guild, message.mentions.members.get(member))) {
+                    deleteMute(message.guild, message.mentions.members.get(member))
+                }
             }
         }
 
