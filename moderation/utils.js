@@ -1,5 +1,6 @@
 const fs = require("fs")
 const { getTimestamp } = require("../utils/utils")
+const { inCooldown, addCooldown } = require("../guilds/utils")
 let data = JSON.parse(fs.readFileSync("./moderation/data.json"))
 
 let timer = 0
@@ -43,7 +44,8 @@ module.exports = {
     createProfile: function(guild) {
         data[guild.id] = {
             caseCount: 0,
-            cases: []
+            cases: [],
+            mutes: []
         }
     },
 
@@ -140,5 +142,101 @@ module.exports = {
      */
     getCase: function(guild, caseID) {
         return data[guild.id].cases[caseID]
+    },
+
+    newMute: function(guild, member, date) {
+        const currentMutes = data[guild.id].mutes
+
+        const d = {
+            user: member.user.id,
+            unmuteTime: date
+        }
+
+        currentMutes.push(d)
+
+        data[guild.id].mutes = currentMutes
+    },
+
+    deleteMute: function(guild, member) {
+        deleteMute(guild, member)
+    },
+
+    isMuted: function(guild, member) {
+        const currentMutes = data[guild.id].mutes
+
+        for (mute of currentMutes) {
+            if (mute.user == member.user.id) {
+                return true
+            }
+        }
+
+        return false
+    },
+
+    runUnmuteChecks: function(client) {
+        setInterval(() => {
+            const date = new Date().getTime()
+        
+            for (guild in data) {
+                const mutes = data[guild].mutes
+        
+                if (mutes.length > 0) {
+                    for (mute of mutes) {
+                        if (mute.unmuteTime <= date) {
+                            requestUnmute(guild, mute.user, client)
+                        }
+                    }
+                }
+            }
+        
+        }, 120000)
+    },
+
+    setReason: function(guild, caseID, reason) {
+        const currentCase = data[guild.id].cases[caseID]
+
+        currentCase.command = reason
+
+        data[guild.id].cases[caseID] = currentCase
     }
+}
+
+function deleteMute(guild, member) {
+    const currentMutes = data[guild.id].mutes
+
+    for (mute of currentMutes) {
+        if (mute.user == member.user.id) {
+            currentMutes.splice(currentMutes.indexOf(mute), 1)
+        }
+    }
+
+    data[guild.id].mutes = currentMutes
+}
+
+async function requestUnmute(guild, member, client) {
+    guild = client.guilds.cache.find(g => g.id == guild)
+
+    if (!guild) return 
+
+    let members
+
+    if (inCooldown(guild)) {
+        members = guild.members.cache
+    } else {
+        members = await guild.members.fetch()
+
+        addCooldown(guild, 3600)
+    }
+
+    member = members.find(m => m.id == member)
+
+    if (!member) return
+
+    const muteRole = guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+
+    if (!muteRole) return deleteMute(guild, member)
+
+    deleteMute(guild, member)
+
+    return await member.roles.remove(muteRole).catch()
 }

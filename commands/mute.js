@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils/utils")
-const { profileExists, createProfile, newCase } = require("../moderation/utils")
+const { profileExists, createProfile, newCase, newMute, isMuted, deleteMute } = require("../moderation/utils")
+const { inCooldown, addCooldown } = require("../guilds/utils");
 
 module.exports = {
     name: "mute",
@@ -19,7 +20,7 @@ module.exports = {
 
         const color = getColor(message.member)
 
-        if (args.length == 0 || message.mentions.members.first() == null) {
+        if (args.length == 0 && (args[0].length != 18 && message.mentions.members.first() == null)) {
             const embed = new MessageEmbed()
                 .setTitle("mute help")
                 .setColor(color)
@@ -28,6 +29,25 @@ module.exports = {
                 .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
                 .setFooter("bot.tekoh.wtf")
             return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
+        }
+
+        if (args[0].length == 18 && message.mentions.members.first() == null) {
+            let members
+
+            if (inCooldown(message.guild)) {
+                members = message.guild.members.cache
+            } else {
+                members = await message.guild.members.fetch()
+                addCooldown(message.guild, 3600)
+            }
+
+            const member = members.find(m => m.id == args[0])
+
+            if (!member) {
+                return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+            }
+            
+            message.mentions.members.set(member.user.id, member)
         }
 
         const members = message.mentions.members
@@ -67,10 +87,12 @@ module.exports = {
         }
 
         let timedMute = false
+        let unmuteDate
         let time = 0
 
         if (reason != "") {
             time = getDuration(reason.split(" ")[0])
+            unmuteDate = new Date().getTime() + (time * 1000)
 
             if (time) {
                 timedMute = true
@@ -105,12 +127,15 @@ module.exports = {
 
         let mutedLength = ""
 
-        if (timedMute) {
+        if (timedMute && time < 3600) {
             setTimeout( async () => {
                 for (member of members.keyArray()) {
                     await members.get(member).roles.remove(muteRole).catch()
                 }
             }, time * 1000)
+        }
+
+        if (timedMute) {
             mutedLength = getTime(time * 1000)
         }
 
@@ -155,6 +180,16 @@ module.exports = {
             const m = members.get(member)
             if (failed.indexOf(m.user.tag) == -1) {
                 newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, reason)
+
+                if (time >= 3600) {
+                    if (isMuted(message.guild, members.get(member))) {
+                        deleteMute(message.guild, members.get(member))
+                    }
+    
+                    newMute(message.guild, members.get(member), unmuteDate)
+                }
+
+                
                 if (!timedMute) {
                     await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "` (permanent)").catch()
                 } else {

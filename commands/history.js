@@ -77,7 +77,7 @@ module.exports = {
             }
         }
 
-        if (count != 0 && count != 5) {
+        if (count != 0) {
             pages.push(page)
         }
 

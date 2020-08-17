@@ -3,15 +3,19 @@ const { MessageEmbed } = require("discord.js");
 const client = new Discord.Client();
 const { prefix, token } = require("./config.json");
 const { getUserCount, updateStats } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, } = require("./guilds/utils.js")
 const { runCommand, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { getTimestamp } = require("./utils/utils")
+const { getTimestamp } = require("./utils/utils");
+const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils");
 
 const dmCooldown = new Set()
 const snipe = new Map()
 const eSnipe = new Map()
 let ready = false
+
+exports.eSnipe
+exports.snipe
 
 loadCommands()
 
@@ -76,6 +80,16 @@ client.on("rateLimit", rate => {
 
 client.on("guildMemberAdd", member => {
     runCheck(member.guild)
+
+    if (!profileExists(member.guild)) return
+
+    if (isMuted(member.guild, member)) {
+        const muteRole = member.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+
+        if (!muteRole) return deleteMute(guild, member)
+
+        member.roles.add(muteRole)
+    }
 })
 
 client.on("messageDelete", message => {
@@ -192,18 +206,6 @@ client.on("channelCreate", async ch => {
     }).catch(() => {})
 })
 
-exports.snipe
-
-setTimeout(() => {
-    client.login(token).then(() => {
-        setTimeout(() => {
-            ready = true
-            runChecks()
-            updateCache()
-        }, 2000)
-    })
-}, 2000)
-
 async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
@@ -229,3 +231,14 @@ async function runChecks() {
     await updateStats(client.guilds.cache.size)
     console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
 }
+
+setTimeout(() => {
+    client.login(token).then(() => {
+        setTimeout(() => {
+            ready = true
+            runChecks()
+            updateCache()
+            runUnmuteChecks(client)
+        }, 2000)
+    })
+}, 2000)

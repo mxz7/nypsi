@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js")
 const { getColor } = require("../utils/utils");
 const { newCase, profileExists, createProfile } = require("../moderation/utils");
+const { inCooldown, addCooldown } = require("../guilds/utils");
 
 module.exports = {
     name: "ban",
@@ -27,7 +28,7 @@ module.exports = {
             return message.channel.send("❌ i am lacking permission: 'BAN_MEMBERS'");
         }
 
-        if (message.mentions.members.first() == null || args.length == 0) {
+        if (args.length == 0 && (args[0].length != 18 && message.mentions.members.first() == null)) {
 
             const embed = new MessageEmbed()
                 .setTitle("ban help")
@@ -40,6 +41,25 @@ module.exports = {
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $ban <@user(s)> (reason) [-s]"))
+        }
+
+        if (args[0].length == 18 && message.mentions.members.first() == null) {
+            let members
+
+            if (inCooldown(message.guild)) {
+                members = message.guild.members.cache
+            } else {
+                members = await message.guild.members.fetch()
+                addCooldown(message.guild, 3600)
+            }
+
+            const member = members.find(m => m.id == args[0])
+
+            if (!member) {
+                return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+            }
+
+            message.mentions.members.set(member.user.id, member)
         }
 
         const members = message.mentions.members
