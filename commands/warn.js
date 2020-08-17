@@ -14,7 +14,7 @@ module.exports = {
         
         const color = getColor(message.member)
 
-        if (args.length == 0 && (args[0].length != 18 && message.mentions.members.first() == null)) {
+        if (args.length == 0 && message.mentions.members.first() == null) {
             const embed = new MessageEmbed()
                 .setTitle("warn help")
                 .setColor(color)
@@ -46,6 +46,8 @@ module.exports = {
             }
             
             message.mentions.members.set(member.user.id, member)
+        } else if (message.mentions.members.first() == null) {
+            return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
         }
 
         const members = message.mentions.members
