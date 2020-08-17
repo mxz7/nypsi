@@ -1,7 +1,6 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const { getColor } = require("./utils")
-const { list } = require("../optout.json");
 const fs = require("fs");
 const { MessageEmbed } = require("discord.js");
 
@@ -177,22 +176,8 @@ function helpCmd(message, args) {
             embed.setDescription(desc)
         } 
     }
-
-    /**
-     *  SENDING MESSAGE
-     */
-
-    if (!list.includes(message.member.user.id)) {
-        return message.member.send(embed).then( () => {
-            return message.react("✅");
-        }).catch( () => {
-            return message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-               });
-        });
-    } else {
-        return message.channel.send(embed)
-    }
+    
+    return message.channel.send(embed)
 }
 
 function runCommand(cmd, message, args) {
