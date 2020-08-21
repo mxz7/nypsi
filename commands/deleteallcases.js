@@ -28,7 +28,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setTitle("confirmation")
             .setColor(color)
-            .setDescription("react with ✅ to delet all punishment/moderation cases")
+            .setDescription("react with ✅ to delete all punishment/moderation cases")
             .setFooter("this cannot be reversed")
 
         const msg = await message.channel.send(embed)
