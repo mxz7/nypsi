@@ -177,6 +177,12 @@ module.exports = {
 
         const names = new Map()
 
+        if (!nameHistory) {
+            await message.channel.send("❌ error fetching data")
+            console.log("error fetching data")
+            console.log(res)
+        }
+
         nameHistory.reverse()
 
         const BreakException = {}

@@ -194,6 +194,7 @@ module.exports = {
                 
                 if (!timedMute) {
                     await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "` (permanent)").catch()
+                    newMute(message.guild, members.get(member), 9999999999999)
                 } else {
                     await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "`").catch()
                 }
