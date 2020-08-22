@@ -53,7 +53,7 @@ module.exports = {
                     "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
                     "⬆ **higher** the next card will be higher in value than your current card\n" +
                     "⬇ **lower** the next card will be lower in value than your current card\n" +
-                    "💰 **cash out** end the game and receive the current win\nmax win **26**x")
+                    "💰 **cash out** end the game and receive the current win\nmax win **15**x")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => message.channel.send("❌ $highlow <bet>"))
@@ -130,13 +130,6 @@ module.exports = {
             id: id,
             voted: voteMulti
         })
-
-        setTimeout(() => {
-            if (games.has(message.member.user.id) && games.get(message.member.user.id).id == id) {
-                games.delete(message.member.user.id)
-                return message.channel.send(message.member.user.toString() + " game expired")
-            }
-        }, 300000)
 
         newCard(message.member)
 
@@ -235,12 +228,12 @@ async function playGame(message, m) {
             }
 
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-            "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
+                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
                 "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% vote bonus")
         } else {
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-            "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
+                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
         }
         newEmbed.addField("card", "| " + card + " |")
@@ -260,7 +253,7 @@ async function playGame(message, m) {
         return m.reactions.removeAll()
     }
 
-    if (win == 26) {
+    if (win == 15) {
         return win1()
     }
 
@@ -268,9 +261,17 @@ async function playGame(message, m) {
         return ["⬆", "⬇", "💰"].includes(reaction.emoji.name) && user.id == message.member.user.id
     }
 
-    const reaction = await m.awaitReactions(filter, { max: 1, time: 300000, errors: ["time"] }).then(collected => {
+    let fail = false
+
+    const reaction = await m.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] }).then(collected => {
         return collected.first().emoji.name
-    }).catch()
+    }).catch(() => {
+        fail = true
+        games.delete(message.author.id)
+        return message.channel.send(message.author.toString() + " highlow game expired")
+    })
+
+    if (fail) return
 
     if (reaction == "⬆") {
 
