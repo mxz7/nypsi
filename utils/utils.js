@@ -84,7 +84,28 @@ module.exports = {
                 }
             }
         }
-        return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
+
+        let title = post.data.title
+
+        if (title.length >= 150) {
+            const a = title.split("")
+            let newTitle = ""
+            let count = 0
+
+            for (char of a) {
+                if (count == 145) {
+                    newTitle = newTitle + "..."
+                    break
+                } else {
+                    count++
+                    newTitle = newTitle + char
+                }
+            }
+
+            title = newTitle
+        }
+
+        return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author
     },
 
     /**
