@@ -100,6 +100,8 @@ client.on("messageDelete", message => {
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
 
+        if (!hasGuild(message.guild)) createGuild(message.guild)
+
         const filter = getSnipeFilter(message.guild)
 
         for (word of filter) {
@@ -123,6 +125,8 @@ client.on("messageUpdate", message => {
     if (!message.member) return
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
+
+        if (!hasGuild(message.guild)) createGuild(message.guild)
 
         const filter = getSnipeFilter(message.guild)
 
@@ -209,9 +213,9 @@ client.on("channelCreate", async ch => {
 async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
-            runCheck(guild)
+            await runCheck(guild)
         })
-    }, 30000)
+    }, 180000)
 
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
