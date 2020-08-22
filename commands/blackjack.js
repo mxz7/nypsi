@@ -162,13 +162,6 @@ module.exports = {
             voted: voteMulti
         })
 
-        setTimeout(() => {
-            if (games.has(message.member.user.id) && games.get(message.member.user.id).id == id) {
-                games.delete(message.member.user.id)
-                return message.channel.send(message.member.user.toString() + " blackjack expired")
-            }
-        }, 120000)
-
         newDealerCard(message.member)
         newCard(message.member)
         newDealerCard(message.member)
@@ -492,10 +485,18 @@ async function playGame(message, m) {
             }
         }
 
-        const reaction = await m.awaitReactions(filter, { max: 1, time: 240000, errors: ["time"] })
+        let fail = false
+
+        const reaction = await m.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
             .then(collected => {
                 return collected.first().emoji.name
-            }).catch()
+            }).catch(() => {
+                fail = true
+                games.delete(message.author.id)
+                return message.channel.send(message.author.toString() + " blackjack game expired")
+            })
+
+        if (fail) return
 
         if (reaction == "1️⃣") {
             newCard(message.member)
