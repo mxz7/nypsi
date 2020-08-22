@@ -171,7 +171,7 @@ function helpCmd(message, args) {
             }
 
             if (cmd.aliases) {
-                desc = desc + "\n**aliases** $`" + cmd.aliases.join("`, `$") + "`"
+                desc = desc + "\n**aliases** `$" + cmd.aliases.join("`, `$") + "`"
             }
             embed.setDescription(desc)
         } 
