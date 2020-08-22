@@ -39,7 +39,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor(color)
-            .setTitle(snipe.get(channel.id).member.user.tag)
+            .setTitle(snipe.get(channel.id).author.tag)
             .setDescription(content)
 
             .setFooter(timeSince(created) + " ago")
