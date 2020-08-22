@@ -1,6 +1,4 @@
 const fs = require("fs");
-const { setTimeout } = require("timers");
-const { Message } = require("discord.js");
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
 
 let timer = 0
@@ -32,20 +30,43 @@ setInterval(() => {
 }, 120000)
 
 const fetchCooldown = new Set()
+const checkCooldown = new Set()
 
 module.exports = {
     /**
      * 
      * @param {*} guild run check for guild
      */
-    runCheck: function(guild) {
+    runCheck: async function(guild) {
+
+        if (checkCooldown.has(guild.id)) return
+
+        checkCooldown.add(guild.id)
+
+        setTimeout(() => {
+            checkCooldown.delete(guild.id)
+        }, 60 * 1000);
 
         if (!hasGuild1(guild)) createGuild1(guild)
 
         const currentMembersPeak = guilds[guild.id].members
         const currentOnlinesPeak = guilds[guild.id].onlines
 
-        const currentMembers = guild.members.cache.filter(member => !member.user.bot)
+        let members
+
+        if (fetchCooldown.has(guild.id)) {
+            members = guild.members.cache
+        } else {
+            members = await guild.members.fetch()
+            
+            fetchCooldown.add(guild.id)
+
+            setTimeout(() => {
+                fetchCooldown.delete(guild.id)
+            }, 3600 * 1000);
+        }
+
+        const currentMembers = members.filter(member => !member.user.bot)
         const currentOnlines = currentMembers.filter(member => member.presence.status != "offline")
 
         if (currentMembers.size > currentMembersPeak) {
