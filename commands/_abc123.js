@@ -5,7 +5,7 @@ const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBan
 
 module.exports = {
     name: "_abc123",
-    description: "classified",
+    description: "~",
     category: "none",
     permissions: ["bot owner"],
     run: async (message, args) => {
