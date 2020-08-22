@@ -17,7 +17,7 @@ abcde.set("e", 4)
 module.exports = {
     name: "minesweeper",
     description: "play minesweeper",
-    category: "gambling",
+    category: "money",
     aliases: ["sweeper", "ms"],
     run: async (message, args) => {
         
