@@ -5,7 +5,7 @@ module.exports = {
     name: "ping",
     description: "get the ping",
     category: "info",
-    aliases: ["latency", "ms"],
+    aliases: ["latency"],
     run: async (message, args) => {
         const msg = await message.channel.send("pinging..")
 
