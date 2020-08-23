@@ -150,40 +150,14 @@ client.on("message", async message => {
     if (message.author.bot) return;
 
     if (!message.guild) {
-
         console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
 
-        if (dmCooldown.has(message.author.id)) return
-
-        dmCooldown.add(message.author.id)
-
-        setTimeout(() => {
-            dmCooldown.delete(message.author.id)
-        }, 1500)
-
-        if (!message.content.toLowerCase().startsWith("$support ")) {
-            const embed = new MessageEmbed()
+        const embed = new MessageEmbed()
                 .setTitle("support")
                 .setColor("#36393f")
-                .setDescription("if you need support you can do one of the following:\n - add `max#0777` as a friend on discord\n\n - type `$support <support request>` and you will receive a reply soon")
+                .setDescription("support server: https://discord.gg/hJTDNST")
                 .setFooter("bot.tekoh.wtf")
-            return await message.channel.send(embed)
-        } else {
-            const embed = new MessageEmbed()
-                .setAuthor("support request")
-                .setTitle(message.author.username + "#" + message.author.discriminator + " (" + message.author.id + ")")
-                .setDescription(message.content.split("$support ").join(""))
-            const TEKOHLOL = message.client.users.cache.find(m => m.id == "672793821850894347")
-            if (!TEKOHLOL) {
-                return await message.channel.send("❌ error sending message - please contact `max#0777`")
-            } else {
-                return await TEKOHLOL.send(embed).then(() => {
-                    return message.channel.send("✅ support request sent - please be patient")
-                }).catch(() => {
-                    return message.channel.send("❌ error sending message - please contact `max#0777`")
-                })
-            }
-        }
+        return await message.channel.send(embed)
     }
 
     if (!message.content.startsWith(prefix)) return;
