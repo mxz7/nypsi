@@ -77,9 +77,7 @@ module.exports = {
             .setImage(image)
             .setFooter("bot.tekoh.wtf")
 
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
-        })
+        message.channel.send(embed).catch()
 
     }
 }
