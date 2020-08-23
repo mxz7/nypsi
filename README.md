@@ -7,7 +7,7 @@ invite link can be found at: [bot.tekoh.wtf](http://bot.tekoh.wtf)
 top.gg url: https://top.gg/bot/678711738845102087
 
 ### 🌴 support
-you can add me on discord `[max#0777]` or dm the bot with your request `[$support]`
+join the support server: https://discord.gg/hJTDNST or add me `[max#0777]`
 
 ### 🌵 features
 
