@@ -26,7 +26,7 @@ client.once("ready", async () => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: domains[Math.floor(Math.random() * domains.length)] + " | $help"
+                name: "$help | " + domains[Math.floor(Math.random() * domains.length)]
             }
         })
     }, 5000)
@@ -35,7 +35,7 @@ client.once("ready", async () => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: domains[Math.floor(Math.random() * domains.length)] + " | $help"
+                name: "$help | " + domains[Math.floor(Math.random() * domains.length)]
             }
         })
     }, 600000)
