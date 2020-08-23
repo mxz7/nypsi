@@ -103,7 +103,7 @@ module.exports = {
 
         const grid = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]
 
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 5; i++) {
             const num = Math.floor(Math.random() * 25)
 
             if (grid[num] != "b") {
