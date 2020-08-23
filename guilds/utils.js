@@ -54,7 +54,7 @@ module.exports = {
 
         let members
 
-        if (fetchCooldown.has(guild.id)) {
+        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size) {
             members = guild.members.cache
         } else {
             members = await guild.members.fetch()
