@@ -68,7 +68,7 @@ module.exports = {
         const embed = new MessageEmbed()
             .setColor(color)
             .setTitle("8ball")
-            .setDescription("\n**" + question + "** - " + message.member.user.toString() + "\n\n" + answers[Math.floor(Math.random() * answers.length)])
+            .setDescription("\n**" + question + "** - " + message.member.user.toString() + "\n\n🎱 " + answers[Math.floor(Math.random() * answers.length)])
             .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed).catch(() => {
