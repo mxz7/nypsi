@@ -34,7 +34,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 3 - diff
+            const time = 2 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -49,16 +49,22 @@ module.exports = {
             return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
         }
 
+        let channel = message.channel
+
+        if (message.mentions.channels.first()) {
+            channel = message.mentions.channels.first()
+        }
+
         cooldown.set(message.member.id, new Date());
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 3000);
+        }, 1500);
 
         let locked = false
 
         const role = message.guild.roles.cache.find(role => role.name == "@everyone")
 
-        const a = message.channel.permissionOverwrites.get(role.id)
+        const a = channel.permissionOverwrites.get(role.id)
 
         if (!a) {
             locked = false
@@ -74,27 +80,27 @@ module.exports = {
         }
         
         if (!locked) {
-            await message.channel.updateOverwrite(role, {
+            await channel.updateOverwrite(role, {
                 SEND_MESSAGES: false
             })
 
             const embed = new MessageEmbed()
                 .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
-                .setDescription("✅ lockdown enabled for channel **" + message.channel.name + "**")
+                .setDescription("✅ " + channel.toString() + " has been locked")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
                 return message.member.send(embed).catch()
             })
         } else {
-            await message.channel.updateOverwrite(role, {
+            await channel.updateOverwrite(role, {
                 SEND_MESSAGES: null
             })
             const embed = new MessageEmbed()
                 .setTitle("lockdown | " + message.member.user.username)
                 .setColor(color)
-                .setDescription("✅ lockdown disabled for channel **" + message.channel.name + "**")
+                .setDescription("✅ " + channel.toString() + " has been unlocked")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed).catch(() => {
