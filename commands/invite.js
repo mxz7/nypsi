@@ -11,7 +11,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("nypsi")
-            .setDescription("bot invite: [bot.tekoh.wtf](http://bot.tekoh.wtf)")
+            .setDescription("bot invite: [bot.tekoh.wtf](http://bot.tekoh.wtf)\nsupport server: https://discord.gg/hJTDNST")
             .setColor(color)
             .setFooter("made by max#0777 | tekoh.wtf | racist.wtf")
 

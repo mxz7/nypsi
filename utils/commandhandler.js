@@ -135,7 +135,7 @@ function helpCmd(message, args) {
     const embed = new MessageEmbed()
         .setTitle("help")
         .setColor(color)
-        .setFooter("bot.tekoh.wtf | created by max#0777")
+        .setFooter("$help <command> | get more info about a command")
 
 
     /**
@@ -148,7 +148,7 @@ function helpCmd(message, args) {
         embed.addField("money", "$**help** money", true)
         embed.addField("mod", "$**help** mod", true)
         embed.addField("nsfw", "$**help** nsfw", true)
-        embed.addField("command info", "you can do $**help <command name>**\nto view information about a command", true)
+        embed.addField("support", "https://discord.gg/hJTDNST", true)
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (helpCategories.has(args[0].toLowerCase())) {
