@@ -145,10 +145,10 @@ function getFront(grid) {
     for (item of grid) {
         switch (item){
             case "a":
-                gridFront.push(":white_medium_square:")
+                gridFront.push(":white_large_square:")
                 break
             case "b":
-                gridFront.push(":white_medium_square:")
+                gridFront.push(":white_large_square:")
                 break
             case "c":
                 gridFront.push(":blue_square:")
