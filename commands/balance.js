@@ -66,7 +66,7 @@ module.exports = {
             .setTitle(target.user.tag)
             .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
                 "💳 $**" + getBankBalance(target).toLocaleString() + "** / $**" + getMaxBankBalance(target).toLocaleString() + "**")
-            .setFooter("xp: " + getXp(target).toLocaleString() + " | bot.tekoh.wtf")
+            .setFooter("xp: " + getXp(target).toLocaleString())
 
         return message.channel.send(embed).catch(() => {
             return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
