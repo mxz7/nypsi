@@ -19,7 +19,7 @@ module.exports = {
                 .setColor(color)
                 .addField("usage", "$case <caseID>")
                 .addField("help", "to delete a case, react with ❌ after running the command\n" +
-                    "to delete data for the server, run $**deleteallcases**")
+                    "to delete data for the server, run $**deleteallcases**\nto delete a case you need the **MANAGE_SERVER** permission")
                 .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
@@ -56,6 +56,8 @@ module.exports = {
         const msg = await message.channel.send(embed)
 
         if (case0.deleted) return
+
+        if (!message.member.hasPermission("MANAGE_GUILD")) return
 
         await msg.react("❌")
 
