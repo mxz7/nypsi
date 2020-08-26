@@ -38,13 +38,19 @@ module.exports = {
         const members = message.guild.members.cache
         const target = members.find(m => m.user.id == case0.user)
 
+        let reason = case0.command
+
+        if (reason == "") {
+            reason = "no reason specified"
+        }
+
         const embed = new MessageEmbed()
             .setTitle("case " + case0.id + " | " + message.member.user.username)
             .addField("type", "`" + case0.type + "`", true)
             .addField("moderator", case0.moderator, true)
             .addField("date/time", date, true)
             .addField("user", "`" + case0.user + "`", true)
-            .addField("reason", case0.command, true)
+            .addField("reason", reason, true)
             .addField("deleted", case0.deleted, true)
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
