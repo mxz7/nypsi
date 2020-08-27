@@ -152,7 +152,7 @@ function helpCmd(message, args) {
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (helpCategories.has(args[0].toLowerCase())) {
-            embed.addField(args[0].toLowerCase() + " commands", helpCategories.get(args[0].toLowerCase()).join("\n"))
+            embed.setDescription(helpCategories.get(args[0].toLowerCase()).join("\n"))
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd
 
