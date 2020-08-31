@@ -33,10 +33,11 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setTitle("ban help")
                 .setColor(color)
-                .addField("usage", "$ban <@user(s)> (reason) [-s]")
+                .addField("usage", "$ban <@user(s)> (reason) [-s] [-k]")
                 .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can ban one or more members in one command (must tag them)\n" +
                     "**(reason)** reason for the ban, will be given to all banned members\n" +
-                    "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
+                    "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
+                    "**[-k]** if used, messages from banned members wont be deleted")
                 .addField("examples", "$ban @member hacking\n$ban @member @member2 @member3 hacking\n$ban @member hacking -s")
                 .setFooter("bot.tekoh.wtf")
 
@@ -66,6 +67,7 @@ module.exports = {
 
         const members = message.mentions.members
         let reason = message.member.user.tag + ": "
+        let days = 1
 
         if (args.length != members.size) {
             for (let i = 0; i < members.size; i++) {
@@ -74,6 +76,10 @@ module.exports = {
             reason = reason + args.join(" ")
         } else {
             reason = reason + "no reason specified"
+        }
+
+        if (reason.includes("-k")) {
+            days = 0
         }
 
         let count = 0
@@ -87,7 +93,7 @@ module.exports = {
                 failed.push(members.get(member).user.tag)
             } else {
                 await message.guild.members.ban(member, {
-                    days: 1,
+                    days: days,
                     reason: reason
                 }).then(() => {
                     count++
