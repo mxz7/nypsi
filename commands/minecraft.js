@@ -112,16 +112,23 @@ module.exports = {
         let res2
 
         if (cache.has(username.toLowerCase())) {
-            if (cache.get(username.toLowerCase()).invalid) {
-                return message.channel.send("❌ invalid account")
-            }
-            if (cache.get(username.toLowerCase()).oldName) {
-                res2 = cache.get(username.toLowerCase()).response
-                oldName = true
-                res2.history.reverse()
-            } else {
-                res = cache.get(username.toLowerCase()).response
-                res.name_history.reverse()
+            try {
+                if (cache.get(username.toLowerCase()).invalid) {
+                    return message.channel.send("❌ invalid account")
+                }
+                if (cache.get(username.toLowerCase()).oldName) {
+                    res2 = cache.get(username.toLowerCase()).response
+                    oldName = true
+                    res2.history.reverse()
+                } else {
+                    res = cache.get(username.toLowerCase()).response
+                    res.name_history.reverse()
+                }
+            } catch {
+                console.log(username)
+                console.log(cache.get(username.toLowerCase()))
+                cache.delete(username.toLowerCase())
+                return await message.channel.send("❌ error fetching from cache")
             }
         } else {
             res = await fetch(url1).then(url => url.json()).catch(() => {
@@ -154,7 +161,11 @@ module.exports = {
             }
 
             setTimeout(() => {
-                cache.delete(username.toLowerCase())
+                try {
+                    cache.delete(username.toLowerCase())
+                } catch {
+                    cache.clear()
+                }
             }, 600000)
     
             if (invalid) return
