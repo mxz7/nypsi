@@ -78,9 +78,7 @@ module.exports = {
         cooldown.set(message.member.user.id, new Date());
 
         setTimeout(() => {
-            try {
-                cooldown.delete(message.member.user.id);
-            } catch {}
+            cooldown.delete(message.author.id);
         }, 600000);
 
         const embed = new MessageEmbed()
