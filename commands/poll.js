@@ -61,7 +61,7 @@ module.exports = {
         if (!message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
             cooldown.set(message.member.id, new Date());
             setTimeout(() => {
-                cooldown.delete(message.member.id);
+                cooldown.delete(message.author.id);
             }, 60000)
         }
 
