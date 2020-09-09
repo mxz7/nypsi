@@ -149,7 +149,11 @@ module.exports = {
                 return 0
             }
         } catch {
-            console.log("[" + getTimestamp() + "] dbl server error")
+            voteCache.set(member.user.id, false)
+            setTimeout(() => {
+                voteCache.delete(member.user.id)
+            }, 600000)
+            console.log("[" + getTimestamp() + "] dbl server error - 10 minute cache for " + member.user.id)
             return 0
         }
         
