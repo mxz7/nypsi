@@ -27,7 +27,7 @@ module.exports = {
     run: async (message, args) => {
 
         if (args.length == 0) {
-            return message.channel.send("❌ $h <username> (sw/bw)");
+            return message.channel.send("❌ $h <username>");
         }
 
         const color = getColor(message.member)
