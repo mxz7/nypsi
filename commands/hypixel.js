@@ -118,8 +118,22 @@ module.exports = {
 
         if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
 
-        const streak = hypixelData.player.rewardStreak.toLocaleString()
-        const topStreak = hypixelData.player.rewardHighScore.toLocaleString()
+        let streak = hypixelData.player.rewardStreak
+
+        if (!streak) {
+            streak = 0
+        } else {
+            streak = streak.toLocaleString()
+        }
+
+        let topStreak = hypixelData.player.rewardHighScore.
+
+        if (!topStreak) {
+            topStreak = 0
+        } else {
+            topStreak = topStreak.toLocaleString()
+        }
+
         const karma = hypixelData.player.karma.toLocaleString()
 
         let challenges = hypixelData.player.challenges.all_time
