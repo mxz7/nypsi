@@ -147,7 +147,14 @@ module.exports = {
         })
 
         challenges = challenges.toLocaleString()
-        const quests = hypixelData.player.achievements.general_quest_master.toLocaleString()
+
+        let quests = hypixelData.player.achievements.general_quest_master
+
+        if (!quests) {
+            quests = 0
+        } else {
+            quests = quests.toLocaleString()
+        }
 
         const embed = new MessageEmbed()
             .setTitle("[" + rank + "] " + uuid.name)
