@@ -126,7 +126,7 @@ module.exports = {
             streak = streak.toLocaleString()
         }
 
-        let topStreak = hypixelData.player.rewardHighScore.
+        let topStreak = hypixelData.player.rewardHighScore
 
         if (!topStreak) {
             topStreak = 0
