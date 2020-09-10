@@ -119,6 +119,7 @@ module.exports = {
         if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
 
         const streak = hypixelData.player.rewardStreak.toLocaleString()
+        const topStreak = hypixelData.player.rewardHighScore.toLocaleString()
         const karma = hypixelData.player.karma.toLocaleString()
 
         let challenges = hypixelData.player.challenges.all_time
@@ -138,7 +139,7 @@ module.exports = {
             .setTitle("[" + rank + "] " + uuid.name)
             .addField("first login date", "`" + firstLog + "`", true)
             .addField("logged in", "`" + lastLog, true)
-            .addField("streak", "`" + streak + "`", true)
+            .addField("streak ~ highest", "`" + streak + " ~ " + topStreak + "`", true)
             .addField("level", "`" + level.toLocaleString() + "`", true)
             .addField("karma", "`" + karma + "`", true)
             .addField("quests ~ challenges", "`" + quests + " ~ " + challenges + "`", true)
