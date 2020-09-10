@@ -1,8 +1,23 @@
 const { MessageEmbed } = require("discord.js");
 const fetch = require("node-fetch")
 const { getColor } = require("../utils/utils");
+const { hypixel } = require("../config.json")
 
 const cooldown = new Map()
+const cache = new Map()
+
+const BASE = 10_000
+const GROWTH = 2_500
+const REVERSE_PQ_PREFIX = -(BASE - 0.5 * GROWTH) / GROWTH;
+const REVERSE_CONST = REVERSE_PQ_PREFIX * REVERSE_PQ_PREFIX
+const GROWTH_DIVIDES_2 = 2 / GROWTH
+
+const ranks = new Map()
+
+ranks.set("MVP_PLUS", "MVP+")
+ranks.set("MVP", "MVP")
+ranks.set("VIP_PLUS", "VIP+")
+ranks.set("VIP", "VIP")
 
 module.exports = {
     name: "hypixel",
@@ -21,7 +36,7 @@ module.exports = {
             const init = cooldown.get(message.member.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+            const time = 10 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -40,43 +55,110 @@ module.exports = {
 
         setTimeout(() => {
             cooldown.delete(message.member.id);
-        }, 5000);
+        }, 10000);
 
         const username = args[0]
-
-        const uuidURL = "https://api.mojang.com/users/profiles/minecraft/" + username
+        
         let uuid
+        let hypixelData
 
-        try {
-            uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
-        } catch (e) {
-            console.log(e)
-            return message.channel.send("❌ invalid account");
-        }
-
-        let img = "https://hypixel.paniek.de/signature/" + uuid.id
-        let url = "https://plancke.io/hypixel/player/stats/" + uuid.id
-
-        if (args.length == 1) {
-            img = img + "/general"
-        } else if (args[1].toLowerCase() == "sw" || args[1].toLowerCase() == "skywars") {
-            img = img + "/skywars"
-            url = url + "#SkyWars"
-        } else if (args[1].toLowerCase() == "bw" || args[1].toLowerCase() == "bedwars") {
-            img = img + "/bedwars"
-            url = url + "#BedWars"
+        if (cache.has(username.toLowerCase())) {
+            hypixelData = cache.get(username.toLowerCase()).hypixel
+            uuid = cache.get(username.toLowerCase()).mojang
         } else {
-            return await message.channel.send("❌ invalid option - currently only bw/bedwars and sw/skywars are supported")
+            const uuidURL = "https://api.mojang.com/users/profiles/minecraft/" + username
+    
+            try {
+                uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
+            } catch (e) {
+                console.log(e)
+                return message.channel.send("❌ invalid account");
+            }
+    
+            const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
+    
+            try {
+                hypixelData = await fetch(hypixelURL).then(hypixelData => hypixelData.json())
+            } catch {
+                console.log(e)
+                return await message.channel.send("❌ error fetching data")
+            }
+    
+            if (!hypixelData.success) {
+                return await message.channel.send("❌ error fetching data")
+            }
+
+            cache.set(username.toLowerCase(), {
+                hypixel: hypixelData,
+                mojang: uuid
+            })
+
+            setTimeout(() => {
+                cache.delete(username.toLowerCase())
+            }, 1800000)
         }
+
+        const url = "https://plancke.io/hypixel/player/stats/" + uuid.id
+        const skin = `https://mc-heads.net/avatar/${uuid.id}`
+
+        let lastLog = timeSince(new Date(hypixelData.player.lastLogin))
+
+        if (lastLog == 0) {
+            lastLog = "today`"
+        } else {
+            lastLog = lastLog + "` days ago"
+        }
+
+        const firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0]
+        const level = getLevel(hypixelData.player.networkExp)
+
+        let rank = ranks.get(hypixelData.player.newPackageRank)
+
+        if (!rank) rank = "Default"
+
+        if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
+
+        const streak = hypixelData.player.rewardStreak.toLocaleString()
+        const karma = hypixelData.player.karma.toLocaleString()
+
+        let challenges = hypixelData.player.challenges.all_time
+
+        await Object.entries(challenges).forEach(c => {
+            if (!parseInt(challenges)) {
+                challenges = 0
+            }
+
+            challenges = challenges + c[1]
+        })
+
+        challenges = challenges.toLocaleString()
+        const quests = hypixelData.player.achievements.general_quest_master.toLocaleString()
 
         const embed = new MessageEmbed()
-            .setTitle(uuid.name)
+            .setTitle("[" + rank + "] " + uuid.name)
+            .addField("first login date", "`" + firstLog + "`", true)
+            .addField("logged in", "`" + lastLog, true)
+            .addField("streak", "`" + streak + "`", true)
+            .addField("level", "`" + level.toLocaleString() + "`", true)
+            .addField("karma", "`" + karma + "`", true)
+            .addField("quests ~ challenges", "`" + quests + " ~ " + challenges + "`", true)
             .setURL(url)
             .setColor(color)
-            .setImage(img)
             .setFooter("bot.tekoh.wtf")
+            .setThumbnail(skin)
 
         return await message.channel.send(embed)
-
     }
+}
+
+function getLevel(exp) {
+    return exp < 0 ? 1 : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp))
+}
+
+function timeSince(date) {
+    const ms = Math.floor((new Date() - date));
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+
+    return days
 }
