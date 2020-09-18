@@ -160,7 +160,9 @@ client.on("message", async message => {
         return await message.channel.send(embed)
     }
 
-    const prefix = getPrefix(message.guild)
+    let prefix = getPrefix(message.guild)
+
+    if (client.user.id == "685193083570094101") prefix = "£"
 
     if (!message.content.startsWith(prefix)) return;
 
