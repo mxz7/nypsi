@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js")
 const { getMember, getColor } = require("../utils/utils")
 
+const cache = new Map()
 const cooldown = new Map()
 
 module.exports = {
@@ -37,13 +38,24 @@ module.exports = {
             cooldown.delete(message.author.id);
         }, 3000);
 
-        let size = Math.floor(Math.random() * 15)
+        let size
         let sizeMsg = "8"
 
-        const bigInch = Math.floor(Math.random() * 40)
+        if (cache.has(message.author.id)) {
+            size = cache.get(message.author.id)
+        } else {
+            size = Math.floor(Math.random() * 15)
+    
+            const bigInch = Math.floor(Math.random() * 40)
+    
+            if (bigInch == 7) {
+                size = Math.floor(Math.random() * 30) + 15
+            }
+            cache.set(message.author.id, size)
 
-        if (bigInch == 7) {
-            size = Math.floor(Math.random() * 30) + 15
+            setTimeout(() => {
+                cache.delete(message.author.id)
+            }, 120000)
         }
 
         for (let i = 0; i < size; i++) {

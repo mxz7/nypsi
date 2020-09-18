@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const { getMember, getColor } = require("../utils/utils");
 
+const cache = new Map()
 const cooldown = new Map();
 
 module.exports = {
@@ -82,7 +83,22 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 5000);
 
-        let lovePercent = Math.ceil(Math.random() * 101) - 1;
+        const combo = (parseInt(target1.user.id) + parseInt(target2.user.id)).toString()
+
+        let lovePercent
+
+        if (cache.has(combo)) {
+            lovePercent = cache.get(combo)
+        } else {
+            lovePercent = Math.ceil(Math.random() * 101) - 1;
+
+            cache.set(combo, lovePercent)
+
+            setTimeout(() => {
+                cache.delete(combo)
+            }, 120000)
+        }
+
         let loveLevel;
         let loveEmoji;
         let loveBar = "";
