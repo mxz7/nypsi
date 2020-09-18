@@ -1,6 +1,7 @@
 const { MessageEmbed } = require("discord.js")
 const {  getMember, getColor } = require("../utils/utils")
 
+const cache = new Map()
 const cooldown = new Map()
 
 module.exports = {
@@ -37,8 +38,20 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 3000);
 
+        let gayAmount
 
-        const gayAmount = Math.ceil(Math.random() * 101) - 1
+        if (cache.has(message.author.id)) {
+            gayAmount = cache.get(message.author.id)
+        } else {
+            gayAmount = Math.ceil(Math.random() * 101) - 1
+
+            cache.set(message.author.id, gayAmount)
+
+            setTimeout(() => {
+                cache.delete(message.author.id)
+            }, 120000);
+        }
+        
         let gayText = ""
         let gayEmoji = ""
 
