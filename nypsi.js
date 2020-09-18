@@ -104,12 +104,12 @@ client.on("messageDelete", message => {
 
         const filter = getSnipeFilter(message.guild)
 
-        for (word of filter) {
-            const a = message.content.toLowerCase().split("`").join("")
-            const b = a.split("*").join("")
-            const c = b.split("|").join("")
-            const d = c.split("_").join("")
+        const a = message.content.toLowerCase().split("`").join("")
+        const b = a.split("*").join("")
+        const c = b.split("|").join("")
+        const d = c.split("_").join("")
 
+        for (word of filter) {
             if (d.includes(word.toLowerCase())) return
         }
 
@@ -130,12 +130,12 @@ client.on("messageUpdate", message => {
 
         const filter = getSnipeFilter(message.guild)
 
-        for (word of filter) {
-            const a = message.content.toLowerCase().split("`").join("")
-            const b = a.split("*").join("")
-            const c = b.split("|").join("")
-            const d = c.split("_").join("")
+        const a = message.content.toLowerCase().split("`").join("")
+        const b = a.split("*").join("")
+        const c = b.split("|").join("")
+        const d = c.split("_").join("")
 
+        for (word of filter) {
             if (d.includes(word.toLowerCase())) return
         }
 
