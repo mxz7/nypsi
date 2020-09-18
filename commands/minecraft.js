@@ -184,7 +184,7 @@ module.exports = {
             nameHistory = res.name_history
         }
 
-        const skin = `https://mc-heads.net/avatar/${uuid}`
+        const skin = `https://mc-heads.net/avatar/${uuid}/256`
 
         const names = new Map()
 
