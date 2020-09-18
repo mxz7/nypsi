@@ -1,5 +1,6 @@
+const { getPrefix } = require("../guilds/utils");
+
 const cooldown = new Map();
-const { prefix } = require("../config.json")
 
 module.exports = {
     name: "clean",
@@ -36,6 +37,8 @@ module.exports = {
         setTimeout(() => {
             cooldown.delete(message.member.id);
         }, 15000);
+
+        const prefix = getPrefix(message.guild)
 
         const collected = await message.channel.messages.fetch({limit: 50})
 
