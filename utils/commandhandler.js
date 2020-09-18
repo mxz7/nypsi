@@ -194,12 +194,12 @@ function runCommand(cmd, message, args) {
         }
     }
 
-    if (cooldown.has(message.member.user.id)) return
+    if (cooldown.has(message.author.id)) return
 
-    cooldown.add(message.member.user.id)
+    cooldown.add(message.author.id)
 
     setTimeout(() => {
-        cooldown.delete(message.member.user.id)
+        cooldown.delete(message.author.id)
     }, 500)
 
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return
