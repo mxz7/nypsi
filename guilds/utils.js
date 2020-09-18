@@ -117,7 +117,8 @@ module.exports = {
                 format: "members: %count% (%peak%)",
                 filterBots: true,
                 channel: "none"
-            }
+            },
+            prefix: "$"
         }
     },
 
@@ -283,6 +284,28 @@ module.exports = {
         } else {
             return false
         }
+    },
+
+    /**
+     * @returns {String}
+     * @param {*} guild guild to get prefi of
+     */
+    getPrefix: function(guild) {
+        try {
+            return guilds[guild.id].prefix
+        } catch (e) {
+            console.log("[" + getTimestamp() + "] couldn't fetch prefix for server " + guild.id)
+            return "$"
+        }
+    },
+
+    /**
+     * 
+     * @param {*} guild guild to set prefix
+     * @param {*} prefix prefix to be used
+     */
+    setPrefix: function(guild, prefix) {
+        guilds[guild.id].prefix = prefix
     }
 }
 
@@ -330,6 +353,7 @@ function createGuild1(guild) {
             format: "members: %count% (%peak%)",
             filterBots: true,
             channel: "none"
-        }
+        },
+        prefix: "$"
     }
 }

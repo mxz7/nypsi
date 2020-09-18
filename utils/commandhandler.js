@@ -3,6 +3,7 @@ const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const { getColor } = require("./utils")
 const fs = require("fs");
 const { MessageEmbed } = require("discord.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const commands = new Map()
 const aliases = new Map()
@@ -117,16 +118,18 @@ function helpCmd(message, args) {
 
     const helpCategories = new Map()
 
+    const prefix = getPrefix(message.guild)
+
     for (cmd of commands.keys()) {
         const category = getCmdCategory(cmd)
 
         if (helpCategories.has(category)) {
             const current = helpCategories.get(category)
 
-            current.push("$**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*")
+            current.push(prefix + "**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*")
             helpCategories.set(category, current)
         } else {
-            helpCategories.set(category, ["$**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*"])
+            helpCategories.set(category, [prefix + "**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*"])
         }
     }
 
@@ -135,7 +138,7 @@ function helpCmd(message, args) {
     const embed = new MessageEmbed()
         .setTitle("help")
         .setColor(color)
-        .setFooter("$help <command> | get more info about a command")
+        .setFooter(prefix + "help <command> | get more info about a command")
 
 
     /**
@@ -143,11 +146,11 @@ function helpCmd(message, args) {
      */
 
     if (args.length == 0) {
-        embed.addField("fun", "$**help** fun", true)
-        embed.addField("info", "$**help** info", true)
-        embed.addField("money", "$**help** money", true)
-        embed.addField("mod", "$**help** mod", true)
-        embed.addField("nsfw", "$**help** nsfw", true)
+        embed.addField("fun", prefix + "**help** fun", true)
+        embed.addField("info", prefix + "**help** info", true)
+        embed.addField("money", prefix + "**help** money", true)
+        embed.addField("mod", prefix + "**help** mod", true)
+        embed.addField("nsfw", prefix + "**help** nsfw", true)
         embed.addField("support", "https://discord.gg/hJTDNST", true)
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
@@ -171,7 +174,7 @@ function helpCmd(message, args) {
             }
 
             if (cmd.aliases) {
-                desc = desc + "\n**aliases** `$" + cmd.aliases.join("`, `$") + "`"
+                desc = desc + "\n**aliases** `" + prefix + cmd.aliases.join("`, `" + prefix) + "`"
             }
             embed.setDescription(desc)
         } 
