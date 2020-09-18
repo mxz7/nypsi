@@ -18,7 +18,7 @@ module.exports = {
             member = message.member;
         } else {
             if (!message.mentions.members.first()) {
-                member = getMember(message, args[0]);
+                member = getMember(message, args.join(" "));
             } else {
                 member = message.mentions.members.first();
             }
