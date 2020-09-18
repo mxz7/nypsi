@@ -1,9 +1,9 @@
 const Discord = require("discord.js");
 const { MessageEmbed } = require("discord.js");
 const client = new Discord.Client();
-const { prefix, token } = require("./config.json");
+const { token } = require("./config.json");
 const { getUserCount, updateStats } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, } = require("./guilds/utils.js")
 const { runCommand, loadCommands } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils");
@@ -159,6 +159,8 @@ client.on("message", async message => {
                 .setFooter("bot.tekoh.wtf")
         return await message.channel.send(embed)
     }
+
+    const prefix = getPrefix(message.guild)
 
     if (!message.content.startsWith(prefix)) return;
 
