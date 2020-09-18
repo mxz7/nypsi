@@ -26,7 +26,13 @@ module.exports = {
         }
 
         if (args.length == 0) {
-            return message.channel.send(prefix + "prefix <new prefix>")
+            const embed = new MessageEmbed()
+                .setTitle("prefix")
+                .setDescription("current prefix: `" + prefix + "`\n\nuse " + prefix + "**prefix** <new prefix> to change the current prefix")
+                .setColor(color)
+                .setFooter("bot.tekoh.wtf")
+
+            return message.channel.send(embed)
         }
 
         if (args.join(" ").length > 3) {
