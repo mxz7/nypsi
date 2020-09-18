@@ -134,9 +134,19 @@ module.exports = {
             topStreak = topStreak.toLocaleString()
         }
 
-        const karma = hypixelData.player.karma.toLocaleString()
+        let karma = hypixelData.player.karma
 
-        let challenges = hypixelData.player.challenges.all_time
+        if (!karma) karma = 0
+
+        karma = karma.toLocaleString()
+
+        let challenges = hypixelData.player.challenges
+
+        if (!challenges) {
+            challenges = 0
+        } else {
+            challenges = hypixelData.player.challenges.all_time
+        }
 
         await Object.entries(challenges).forEach(c => {
             if (!parseInt(challenges)) {
