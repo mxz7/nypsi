@@ -61,6 +61,7 @@ module.exports = {
         for (let i = 0; i < size; i++) {
             sizeMsg = sizeMsg + "="
         }
+        
         sizeMsg = sizeMsg + "D"
 
         let member
