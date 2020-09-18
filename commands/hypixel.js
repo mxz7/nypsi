@@ -99,7 +99,7 @@ module.exports = {
         }
 
         const url = "https://plancke.io/hypixel/player/stats/" + uuid.id
-        const skin = `https://mc-heads.net/avatar/${uuid.id}`
+        const skin = `https://mc-heads.net/avatar/${uuid.id}/256`
 
         let lastLog = timeSince(new Date(hypixelData.player.lastLogin))
 
