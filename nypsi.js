@@ -86,7 +86,7 @@ client.on("guildMemberAdd", member => {
     if (isMuted(member.guild, member)) {
         const muteRole = member.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
 
-        if (!muteRole) return deleteMute(guild, member)
+        if (!muteRole) return deleteMute(member.guild, member)
 
         member.roles.add(muteRole)
     }
