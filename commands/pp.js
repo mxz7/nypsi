@@ -71,7 +71,7 @@ module.exports = {
 
             setTimeout(() => {
                 cache.delete(member.user.id)
-            }, 120000)
+            }, 60000)
         }
 
         for (let i = 0; i < size; i++) {

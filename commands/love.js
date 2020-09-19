@@ -96,7 +96,7 @@ module.exports = {
 
             setTimeout(() => {
                 cache.delete(combo)
-            }, 120000)
+            }, 60000)
         }
 
         let loveLevel;

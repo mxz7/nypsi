@@ -65,7 +65,7 @@ module.exports = {
 
             setTimeout(() => {
                 cache.delete(member.user.id)
-            }, 120000);
+            }, 60000);
         }
         
         let gayText = ""
