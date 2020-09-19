@@ -331,7 +331,7 @@ module.exports = {
 
         let members
 
-        if (inCooldown(guild)) {
+        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250) {
             members = guild.members.cache
         } else {
             members = await guild.members.fetch()
