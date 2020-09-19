@@ -19,7 +19,7 @@ module.exports = {
 
         let members 
 
-        if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size) {
+        if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size || message.guild.memberCount <= 250) {
             members = server.members.cache
         } else {
             members = await server.members.fetch()
