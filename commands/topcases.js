@@ -109,7 +109,7 @@ module.exports = {
             count = 0
 
             for (m of members) {
-                if (count >= 4) break
+                if (count >= 5) break
 
                 let username = await message.guild.members.cache.find(mem => mem.id == m)
 
