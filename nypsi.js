@@ -9,7 +9,6 @@ const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils");
 const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils");
 
-const dmCooldown = new Set()
 const snipe = new Map()
 const eSnipe = new Map()
 let ready = false
