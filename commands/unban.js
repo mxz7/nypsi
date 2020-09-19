@@ -28,7 +28,7 @@ module.exports = {
 
         if (args.length == 0) {
             const embed = new MessageEmbed()
-                .setTitle("ban help")
+                .setTitle("unban help")
                 .setColor(color)
                 .addField("usage", "$unban <user(s)> [-s]")
                 .addField("help", "**<>** required | **[]** parameter\n" + "**<users>** you can unban one or more members in one command\n" +
@@ -76,7 +76,7 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setTitle("unban")
+            .setTitle(`unban | ${message.member.user.username}`)
             .setColor(color)
             .setFooter("bot.tekoh.wtf")
 
