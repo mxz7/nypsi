@@ -99,7 +99,7 @@ module.exports = {
             let count = 0
 
             for (s of staff) {
-                if (count >= 4) break
+                if (count >= 5) break
 
                 staffText[count] = (count + 1) + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
 
@@ -201,6 +201,8 @@ module.exports = {
                     }
                 }
             }
+
+            embed.setDescription(member.user.toString())
 
             if (punished > 5) {
                 embed.addField("moderator stats", "cases `" + punished.toLocaleString() + 
