@@ -38,17 +38,33 @@ module.exports = {
             cooldown.delete(message.member.id);
         }, 3000);
 
+        let member
+
+        if (args.length == 0) {
+            member = message.member
+        } else {
+            if (!message.mentions.members.first()) {
+                member = getMember(message, args[0])
+            } else {
+                member = message.mentions.members.first()
+            }
+
+            if (!member) {
+                member = message.member
+            }
+        }
+
         let gayAmount
 
-        if (cache.has(message.author.id)) {
-            gayAmount = cache.get(message.author.id)
+        if (cache.has(member.user.id)) {
+            gayAmount = cache.get(member.user.id)
         } else {
             gayAmount = Math.ceil(Math.random() * 101) - 1
 
-            cache.set(message.author.id, gayAmount)
+            cache.set(member.user.id, gayAmount)
 
             setTimeout(() => {
-                cache.delete(message.author.id)
+                cache.delete(member.user.id)
             }, 120000);
         }
         
@@ -69,21 +85,7 @@ module.exports = {
             gayText = "thought we coulda had smth 🙄"
         }
 
-        let member
-
-        if (args.length == 0) {
-            member = message.member
-        } else {
-            if (!message.mentions.members.first()) {
-                member = getMember(message, args[0])
-            } else {
-                member = message.mentions.members.first()
-            }
-
-            if (!member) {
-                member = message.member
-            }
-        }
+        
 
         color = getColor(member);
 
