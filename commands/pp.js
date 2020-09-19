@@ -38,32 +38,6 @@ module.exports = {
             cooldown.delete(message.author.id);
         }, 3000);
 
-        let size
-        let sizeMsg = "8"
-
-        if (cache.has(message.author.id)) {
-            size = cache.get(message.author.id)
-        } else {
-            size = Math.floor(Math.random() * 15)
-    
-            const bigInch = Math.floor(Math.random() * 40)
-    
-            if (bigInch == 7) {
-                size = Math.floor(Math.random() * 30) + 15
-            }
-            cache.set(message.author.id, size)
-
-            setTimeout(() => {
-                cache.delete(message.author.id)
-            }, 120000)
-        }
-
-        for (let i = 0; i < size; i++) {
-            sizeMsg = sizeMsg + "="
-        }
-        
-        sizeMsg = sizeMsg + "D"
-
         let member
 
         if (args.length == 0) {
@@ -79,6 +53,32 @@ module.exports = {
                 member = message.member
             }
         }
+
+        let size
+        let sizeMsg = "8"
+
+        if (cache.has(member.user.id)) {
+            size = cache.get(member.user.id)
+        } else {
+            size = Math.floor(Math.random() * 15)
+    
+            const bigInch = Math.floor(Math.random() * 40)
+    
+            if (bigInch == 7) {
+                size = Math.floor(Math.random() * 30) + 15
+            }
+            cache.set(member.user.id, size)
+
+            setTimeout(() => {
+                cache.delete(member.user.id)
+            }, 120000)
+        }
+
+        for (let i = 0; i < size; i++) {
+            sizeMsg = sizeMsg + "="
+        }
+        
+        sizeMsg = sizeMsg + "D"
 
         color = getColor(member);
 
