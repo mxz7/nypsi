@@ -136,6 +136,14 @@ module.exports = {
     },
 
     /**
+     * @returns {Object}
+     * @param {*} guild guild to get cases of
+     */
+    getAllCases: function(guild) {
+        return data[guild.id].cases
+    },
+
+    /**
      * @returns {*} case
      * @param {*} guild guild to search for case in
      * @param {*} caseID case to fetch
