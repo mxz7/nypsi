@@ -74,7 +74,7 @@ module.exports = {
         }
         
         if (!target1 || !target2) {
-            return message.channel.send("❌ invalid account");
+            return message.channel.send("❌ invalid user(s)");
         }
 
         cooldown.set(message.member.id, new Date());

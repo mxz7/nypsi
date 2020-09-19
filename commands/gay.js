@@ -50,7 +50,7 @@ module.exports = {
             }
 
             if (!member) {
-                member = message.member
+                return message.channel.send("❌ invalid user");
             }
         }
 
