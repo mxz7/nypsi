@@ -2,6 +2,8 @@ const { getColor, getMember } = require("../utils/utils")
 const { MessageEmbed } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../moderation/utils")
 
+const cooldown = new Map()
+
 module.exports = {
     name: "history",
     description: "view punishment history for a given user",
@@ -13,6 +15,25 @@ module.exports = {
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
         const color = getColor(message.member)
+
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 5 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        }
 
         if (args.length == 0) {
             const embed = new MessageEmbed()
@@ -42,7 +63,7 @@ module.exports = {
                     member = args[0]
                 }
             } else {
-                member = getMember(message, args[0])
+                member = getMember(message, args.join(" "))
 
                 if (!member) {
                     return message.channel.send("❌ can't find `" + args[0] + "` - please use a user ID if they are no longer in the server")
@@ -62,6 +83,12 @@ module.exports = {
         if (cases.length == 0) {
             return message.channel.send("❌ no history to display")
         }
+
+        cooldown.set(message.author.id, new Date())
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, 5000);
+
 
         let count = 0
         let page = []
