@@ -113,7 +113,7 @@ function reloadCommand(commandsArray) {
     return table(reloadTable, {border: getBorderCharacters("ramac")})
 }
 
-function helpCmd(message, args) {
+async function helpCmd(message, args) {
     logCommand(message, args);
 
     const helpCategories = new Map()
@@ -125,11 +125,26 @@ function helpCmd(message, args) {
 
         if (helpCategories.has(category)) {
             const current = helpCategories.get(category)
+            const lastPage = current.get(current.size)
 
-            current.push(prefix + "**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*")
+            if (lastPage.length == 10) {
+                const newPage = []
+
+                newPage.push(`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`)
+                current.set(current.size + 1, newPage)
+            } else {
+                const page = current.get(current.size)
+                page.push(`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`)
+                current.set(current.size, page)
+            }
+
             helpCategories.set(category, current)
         } else {
-            helpCategories.set(category, [prefix + "**" + getCmdName(cmd) + "** *" + getCmdDesc(cmd) + "*"])
+            const pages = new Map()
+
+            pages.set(1, [`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`])
+
+            helpCategories.set(category, pages)
         }
     }
 
@@ -143,7 +158,9 @@ function helpCmd(message, args) {
 
     /**
      * FINDING WHAT THE USER REQUESTED
-     */
+    */
+
+    let pageSystemNeeded = false
 
     if (args.length == 0) {
         embed.addField("fun", prefix + "**help** fun", true)
@@ -155,7 +172,15 @@ function helpCmd(message, args) {
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (helpCategories.has(args[0].toLowerCase())) {
-            embed.setDescription(helpCategories.get(args[0].toLowerCase()).join("\n"))
+            const pages = helpCategories.get(args[0].toLowerCase())
+
+            if (pages.size > 1) {
+                pageSystemNeeded = true
+            }
+
+            embed.setDescription(pages.get(1))
+            embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
+
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd
 
@@ -180,7 +205,56 @@ function helpCmd(message, args) {
         } 
     }
     
-    return message.channel.send(embed)
+    const msg = await message.channel.send(embed)
+
+    if (!pageSystemNeeded) return
+
+    const pages = helpCategories.get(args[0].toLowerCase())
+
+    await msg.react("⬅")
+    await msg.react("➡")
+
+    let currentPage = 1
+    const lastPage = pages.size
+
+    const filter = (reaction, user) => {
+        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+    }
+
+    async function pageManager() {
+        const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .then(collected => {
+                return collected.first().emoji.name
+            }).catch(async () => {
+                await msg.reactions.removeAll()
+            })
+
+        if (!reaction) return
+
+        if (reaction == "⬅") {
+            if (currentPage <= 1) {
+                return pageManager()
+            } else {
+                currentPage--
+                embed.setDescription(pages.get(currentPage).join("\n"))
+                embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
+                await msg.edit(embed)
+                return pageManager()
+            }
+        } else if (reaction == "➡") {
+            if (currentPage >= lastPage) {
+                return pageManager()
+            } else {
+                currentPage++
+                embed.setDescription(pages.get(currentPage).join("\n"))
+                embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
+                await msg.edit(embed)
+                return pageManager()
+            }
+        }
+    }
+
+    return pageManager()
 }
 
 function runCommand(cmd, message, args) {
