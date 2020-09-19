@@ -4,7 +4,7 @@ const { getColor } = require("../utils/utils")
 
 module.exports = {
     name: "snipefilter",
-    description: "modify the snipe filter for the current server",
+    description: "change the snipe filter for your server",
     category: "moderation",
     aliases: ["sf", "filter"],
     permissions: ["MANAGE_SERVER"],
