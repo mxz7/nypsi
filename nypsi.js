@@ -14,8 +14,8 @@ const snipe = new Map()
 const eSnipe = new Map()
 let ready = false
 
-exports.eSnipe
-exports.snipe
+exports.eSnipe = eSnipe
+exports.snipe = snipe
 
 loadCommands()
 

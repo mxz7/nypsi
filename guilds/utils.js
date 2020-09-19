@@ -29,6 +29,42 @@ setInterval(() => {
     }
 }, 120000)
 
+setInterval(() => {
+    const { snipe, eSnipe } = require("../nypsi")
+
+    const now = new Date().getTime()
+
+    let snipeCount = 0
+    let eSnipeCount = 0
+
+    snipe.forEach(msg => {
+        const diff = now - msg.createdTimestamp
+
+        if (diff >= 86400000) {
+            snipe.delete(msg.channel.id)
+            snipeCount++
+        }
+    })
+
+    eSnipe.forEach(msg => {
+        const diff = now - msg.createdTimestamp
+
+        if (diff >= 86400000) {
+            eSnipe.delete(msg.channel.id)
+            eSnipeCount++
+        }
+    })
+
+    if (snipeCount > 0) {
+        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages")
+    }
+
+    if (eSnipeCount > 0) {
+        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " edit sniped messages")
+    }
+
+}, 3600000)
+
 const fetchCooldown = new Set()
 const checkCooldown = new Set()
 
