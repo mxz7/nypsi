@@ -43,7 +43,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setTitle("prefix")
-            .setDescription("✅ prefix updated to `" + args.join(" ") + "`")
+            .setDescription("✅ prefix changed to `" + args.join(" ") + "`")
             .setFooter("bot.tekoh.wtf")
             .setColor(color)
 
