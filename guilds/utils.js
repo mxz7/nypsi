@@ -90,7 +90,7 @@ module.exports = {
 
         let members
 
-        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250) {
+        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
             members = guild.members.cache
         } else {
             members = await guild.members.fetch()
@@ -253,7 +253,7 @@ module.exports = {
 
         let memberCount
 
-        if (fetchCooldown.has(guild.id)) {
+        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
             memberCount = guild.members.cache
         } else {
             memberCount = await guild.members.fetch()
@@ -281,8 +281,14 @@ module.exports = {
 
         let format = ""
 
-        format = guilds[guild.id].stats.format.split("%count%").join(memberCount.size.toLocaleString())
-        format = format.split("%peak%").join(guilds[guild.id].members)
+        if (guild.memberCount >= 25000) {
+            format = guilds[guild.id].stats.format.split("%count%").join(guild.memberCount.toLocaleString())
+            format = format.split("%peak%").join(guilds[guild.id].members)
+            guilds[guild.id].stats.filterBots = false
+        } else {
+            format = guilds[guild.id].stats.format.split("%count%").join(memberCount.size.toLocaleString())
+            format = format.split("%peak%").join(guilds[guild.id].members)
+        }
 
         if (channel.name != format) {
             const old = channel.name
@@ -315,6 +321,9 @@ module.exports = {
      * @param {*} guild guild to check if added to cooldown
      */
     inCooldown: function(guild) {
+
+        if (guild.memberCount <= 250 || guild.memberCount >= 25000) return true
+
         if (fetchCooldown.has(guild.id)) {
             return true
         } else {

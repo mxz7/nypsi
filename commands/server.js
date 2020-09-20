@@ -85,6 +85,10 @@ module.exports = {
 
             .setFooter("bot.tekoh.wtf")
 
+        if (server.memberCount >= 25000) {
+            embed.setFooter(`real member count: ${server.memberCount} | stats are inaccurate to optimise with large servers`)
+        }
+
         message.channel.send(embed).catch(() => {
              return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
         });
