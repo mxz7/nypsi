@@ -18,11 +18,20 @@ module.exports = {
             member = message.member;
         } else {
             if (!message.mentions.members.first()) {
-                member = getMember(message, args.join(" "));
+
+                let username = args.join(" ")
+
+                if (username.includes(" -id")) {
+                    username = username.split(" -id").join("")
+                } else if (username.includes("-id ")) {
+                    username = username.split("-id ").join("")
+                }
+
+                member = getMember(message, username);
             } else {
                 member = message.mentions.members.first();
             }
-            if (args[0] == "-id") {
+            if (args[0] == "-id" && args.length == 1) {
                 member = message.member
             }
         }
