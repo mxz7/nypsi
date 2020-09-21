@@ -29,7 +29,7 @@ setInterval(() => {
     }
 }, 120000)
 
-setInterval(() => {
+setInterval(async () => {
     const { snipe, eSnipe } = require("../nypsi")
 
     const now = new Date().getTime()
@@ -37,7 +37,7 @@ setInterval(() => {
     let snipeCount = 0
     let eSnipeCount = 0
 
-    snipe.forEach(msg => {
+    await snipe.forEach(msg => {
         const diff = now - msg.createdTimestamp
 
         if (diff >= 86400000) {
@@ -46,7 +46,11 @@ setInterval(() => {
         }
     })
 
-    eSnipe.forEach(msg => {
+    if (snipeCount > 0) {
+        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages")
+    }
+
+    await eSnipe.forEach(msg => {
         const diff = now - msg.createdTimestamp
 
         if (diff >= 86400000) {
@@ -55,12 +59,8 @@ setInterval(() => {
         }
     })
 
-    if (snipeCount > 0) {
-        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages")
-    }
-
     if (eSnipeCount > 0) {
-        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " edit sniped messages")
+        console.log("[" + getTimestamp() + "] deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
     }
 
 }, 3600000)
