@@ -87,7 +87,7 @@ module.exports = {
         }
 
         if (failed.length != 0) {
-            embed.addField("error", "unable to ban: " + failed.join(", "))
+            embed.addField("error", "unable to unban: " + failed.join(", "))
         }
 
         if (args.join(" ").includes("-s")) {
