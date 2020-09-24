@@ -98,7 +98,7 @@ module.exports = {
 
         const msg = await message.channel.send(embed)
 
-        if (!memberList.size > 1) return
+        if (memberList.size < 1) return
 
         await msg.react("⬅")
         await msg.react("➡")
