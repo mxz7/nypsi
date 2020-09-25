@@ -70,7 +70,9 @@ function getTime(ms) {
     const hoursms = ms % (60 * 60 * 1000)
     const minutes = Math.floor((hoursms) / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    let sec = Math.floor((minutesms) / (1000))
+
+    if (sec.toString().length == 1) sec = `0${sec}`
 
     output = `${minutes}:${sec}`
 
