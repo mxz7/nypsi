@@ -101,69 +101,71 @@ module.exports = {
         const url = "https://plancke.io/hypixel/player/stats/" + uuid.id
         const skin = `https://mc-heads.net/avatar/${uuid.id}/256`
 
-        let lastLog = timeSince(new Date(hypixelData.player.lastLogin))
+        let lastLog, firstLog, level, rank, streak, topStreak, karma, challenges, quests
 
-        if (lastLog == 0) {
-            lastLog = "today`"
-        } else {
-            lastLog = lastLog + "` days ago"
-        }
+        try {
+            lastLog = timeSince(new Date(hypixelData.player.lastLogin))
+            firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0]
+            level = getLevel(hypixelData.player.networkExp)
+            rank = ranks.get(hypixelData.player.newPackageRank)
+            streak = hypixelData.player.rewardStreak
+            topStreak = hypixelData.player.rewardHighScore
+            karma = hypixelData.player.karma
+            challenges = hypixelData.player.challenges
+            quests = hypixelData.player.achievements.general_quest_master
 
-        const firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0]
-        const level = getLevel(hypixelData.player.networkExp)
-
-        let rank = ranks.get(hypixelData.player.newPackageRank)
-
-        if (!rank) rank = "Default"
-
-        if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
-
-        let streak = hypixelData.player.rewardStreak
-
-        if (!streak) {
-            streak = 0
-        } else {
-            streak = streak.toLocaleString()
-        }
-
-        let topStreak = hypixelData.player.rewardHighScore
-
-        if (!topStreak) {
-            topStreak = 0
-        } else {
-            topStreak = topStreak.toLocaleString()
-        }
-
-        let karma = hypixelData.player.karma
-
-        if (!karma) karma = 0
-
-        karma = karma.toLocaleString()
-
-        let challenges = hypixelData.player.challenges
-
-        if (!challenges) {
-            challenges = 0
-        } else {
-            challenges = hypixelData.player.challenges.all_time
-        }
-
-        await Object.entries(challenges).forEach(c => {
-            if (!parseInt(challenges)) {
-                challenges = 0
+            if (lastLog == 0) {
+                lastLog = "today`"
+            } else {
+                lastLog = lastLog + "` days ago"
             }
-
-            challenges = challenges + c[1]
-        })
-
-        challenges = challenges.toLocaleString()
-
-        let quests = hypixelData.player.achievements.general_quest_master
-
-        if (!quests) {
-            quests = 0
-        } else {
-            quests = quests.toLocaleString()
+    
+            if (!rank) rank = "Default"
+    
+            if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
+    
+            if (!streak) {
+                streak = 0
+            } else {
+                streak = streak.toLocaleString()
+            }
+    
+            if (!topStreak) {
+                topStreak = 0
+            } else {
+                topStreak = topStreak.toLocaleString()
+            }
+    
+            if (!karma) karma = 0
+    
+            karma = karma.toLocaleString()
+    
+            if (!challenges) {
+                challenges = 0
+            } else {
+                challenges = hypixelData.player.challenges.all_time
+            }
+    
+            await Object.entries(challenges).forEach(c => {
+                if (!parseInt(challenges)) {
+                    challenges = 0
+                }
+    
+                challenges = challenges + c[1]
+            })
+    
+            challenges = challenges.toLocaleString()
+    
+            if (!quests) {
+                quests = 0
+            } else {
+                quests = quests.toLocaleString()
+            }
+        } catch {
+            if (cache.has(username.toLowerCase())) {
+                cache.delete(username.toLowerCase())
+            }
+            return message.channel.send(new MessageEmbed().setTitle(`hypixel | ${message.member.user.username}`).setDescription("❌ error reading hypixel data").setColor(color).setFooter("bot.tekoh.wtf"))
         }
 
         const embed = new MessageEmbed()
