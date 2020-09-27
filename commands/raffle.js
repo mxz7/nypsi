@@ -1,91 +1,94 @@
 const { MessageEmbed, MessageAttachment } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { getColor } = require("../utils/utils")
 
 const cooldown = new Map()
 
-module.exports = {
-    name: "raffle",
-    description: "select a random user from current online members or a specific role",
-    category: "fun",
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
+const cmd = new Command("raffle", "select a random user from current online members or a specific role", categories.FUN)
 
-        let color = getColor(message.member)
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 3 - diff
+    let color = getColor(message.member)
 
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 3 - diff
 
-            let remaining
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
 
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
-        }
+        let remaining
 
-        let members = []
-
-        if (args.length == 0) {
-            cooldown.set(message.member.id, new Date());
-
-            setTimeout(() => {
-                cooldown.delete(message.member.id);
-            }, 3000);
-
-            const members1 = message.guild.members.cache
-
-            members1.forEach(m => {
-                if (!m.user.bot && m.presence.status != "offline") {
-                    if (members.indexOf(m.user.id) == -1) {
-                        members.push(m.user.id)
-                    }
-                }
-            })
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
         } else {
-            const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ")))
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+    }
 
-            if (!role) {
-                return await message.channel.send("❌ i wasn't able to find that role")
+    let members = []
+
+    if (args.length == 0) {
+        cooldown.set(message.member.id, new Date());
+
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 3000);
+
+        const members1 = message.guild.members.cache
+
+        members1.forEach(m => {
+            if (!m.user.bot && m.presence.status != "offline") {
+                if (members.indexOf(m.user.id) == -1) {
+                    members.push(m.user.id)
+                }
             }
+        })
+    } else {
+        const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ")))
 
-            cooldown.set(message.member.id, new Date());
-
-            setTimeout(() => {
-                cooldown.delete(message.member.id);
-            }, 3000);
-
-            role.members.forEach(m => {
-                members.push(m.user.id)
-            })
-
-            if (members.length == 0) {
-                return message.channel.send("❌ there is nobody in that role")
-            }
+        if (!role) {
+            return await message.channel.send("❌ i wasn't able to find that role")
         }
 
-        let chosen = members[Math.floor(Math.random() * members.length)]
+        cooldown.set(message.member.id, new Date());
 
-        chosen = await message.guild.members.fetch(chosen)
+        setTimeout(() => {
+            cooldown.delete(message.member.id);
+        }, 3000);
 
-        color = getColor(chosen)
+        role.members.forEach(m => {
+            members.push(m.user.id)
+        })
 
-        const embed = new MessageEmbed()
-            .setTitle("raffle by " + message.member.user.tag)
-            .setColor(color)
-            .setDescription("**" + chosen.user.tag + "**")
-            .setFooter("bot.tekoh.wtf")
-
-        return message.channel.send(embed)
+        if (members.length == 0) {
+            return message.channel.send("❌ there is nobody in that role")
+        }
     }
+
+    let chosen = members[Math.floor(Math.random() * members.length)]
+
+    chosen = await message.guild.members.fetch(chosen)
+
+    color = getColor(chosen)
+
+    const embed = new MessageEmbed()
+        .setTitle("raffle by " + message.member.user.tag)
+        .setColor(color)
+        .setDescription("**" + chosen.user.tag + "**")
+        .setFooter("bot.tekoh.wtf")
+
+    return message.channel.send(embed)
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd

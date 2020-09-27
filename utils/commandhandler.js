@@ -4,11 +4,23 @@ const { getColor } = require("./utils")
 const fs = require("fs");
 const { MessageEmbed, Message } = require("discord.js");;
 const { getPrefix } = require("../guilds/utils.js");
+const { Command, categories } = require("./classes/Command")
 
 const commands = new Map()
 const aliases = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
+
+
+/**
+ * 
+ * @param {Command} command 
+ */
+exports.registerCommand = function(command) {
+    if (command instanceof Command) {
+        console.log(true)
+    }
+}
 
 function loadCommands() {
     console.log("loading commands..")

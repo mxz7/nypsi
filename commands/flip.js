@@ -1,25 +1,29 @@
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
 
-module.exports = {
-    name: "flip",
-    description: "flip a coin",
-    category: "fun",
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
-        const headTails = ["heads", "tails"];
+const cmd = new Command("flip", "flip a coin", categories.FUN)
 
-        const answer = headTails[Math.floor(Math.random() * headTails.length)]
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        const color = getColor(message.member)
+    const headTails = ["heads", "tails"];
 
-        const embed = new MessageEmbed()
-            .setColor(color)
-            .setDescription("💸 you threw **" + answer + "**")
+    const answer = headTails[Math.floor(Math.random() * headTails.length)]
 
-        return message.channel.send(embed)
-    }
-};
+    const color = getColor(message.member)
+
+    const embed = new MessageEmbed()
+        .setColor(color)
+        .setDescription("💸 you threw **" + answer + "**")
+
+    return message.channel.send(embed)
+
+}
+
+cmd.setRun(run)
+
+module.exports = cmd
