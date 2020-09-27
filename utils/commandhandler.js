@@ -2,7 +2,7 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const { getColor } = require("./utils")
 const fs = require("fs");
-const { MessageEmbed, Message, Message } = require("discord.js");;
+const { MessageEmbed, Message } = require("discord.js");;
 const { getPrefix } = require("../guilds/utils.js");
 
 const commands = new Map()
