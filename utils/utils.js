@@ -1,11 +1,12 @@
+const { GuildMember, Message } = require('discord.js');
 const isImageUrl = require('is-image-url');
 const fetch = require("node-fetch")
 
 module.exports = {
 
     /**
-     * @returns {string}
-     * @param {*} member member to get color of
+     * @returns {String}
+     * @param {GuildMember} member member to get color of
      */
     getColor: function(member) {
         if (member.displayHexColor == "#ffffff") {
@@ -17,8 +18,8 @@ module.exports = {
 
     /**
      * @returns {string}
-     * @param post {JSON}
-     * @param allowed {Array}
+     * @param {JSON} post
+     * @param {Array} allowed
      */
     redditImage: async function(post, allowed)  {
         let image = post.data.url 
@@ -109,9 +110,9 @@ module.exports = {
     },
 
     /**
-     * @returns {Object} member object
-     * @param {*} message
-     * @param {string} memberName name of member
+     * @returns {GuildMember} member object
+     * @param {Message} message
+     * @param {String} memberName name of member
      */
     getMember: function(message, memberName) {
         if (!message.guild) return null
@@ -137,7 +138,7 @@ module.exports = {
     },
     
     /**
-     * @returns {string}
+     * @returns {String}
      * @param {Date} date 
      */
     formatDate: function(date) {
@@ -146,7 +147,7 @@ module.exports = {
     },
 
     /**
-     * @returns {string}
+     * @returns {String}
      */
     getTimestamp: function() {
         const date = new Date();

@@ -1,3 +1,4 @@
+const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { getTimestamp } = require("../utils/utils")
 let users = JSON.parse(fs.readFileSync("./socials/users.json"))
@@ -37,8 +38,8 @@ setInterval(() => {
 module.exports = {
     /**
      * 
-     * @param {*} member member to check
-     * @returns {boolean}
+     * @param {GuildMember} member member to check
+     * @returns {Boolean}
      */
     profileExists: function(member) {
         if (users[member.user.id]) {
@@ -50,8 +51,8 @@ module.exports = {
 
     /**
      * 
-     * @param {string} id member id to check
-     * @returns {boolean}
+     * @param {String} id member id to check
+     * @returns {Boolean}
      */
     profileExistsID: function(id) {
         if (users[id]) {
@@ -63,7 +64,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} member member to create profile for
+     * @param {GuildMember} member member to create profile for
      */
     createProfile: function(member) {
         users[member.user.id] = {
@@ -77,7 +78,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} member member to get profile of
+     * @param {GuildMember} member member to get profile of
      * @returns {JSON}
      */
     getProfile: function(member) {
@@ -86,7 +87,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} id member id to get profile of
+     * @param {String} id member id to get profile of
      * @returns {JSON}
      */
     getProfileID: function(id) {
@@ -95,8 +96,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} member member of profile to update
-     * @param {*} profile new profile
+     * @param {GuildMember} member member of profile to update
+     * @param {JSON} profile new profile
      */
     updateProfile: function(member, profile) {
         users[member.user.id] = profile
