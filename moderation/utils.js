@@ -1,6 +1,7 @@
 const fs = require("fs")
 const { getTimestamp } = require("../utils/utils")
 const { inCooldown, addCooldown } = require("../guilds/utils")
+const { Guild, Message, GuildMember, Client } = require("discord.js")
 let data = JSON.parse(fs.readFileSync("./moderation/data.json"))
 
 let timer = 0
@@ -39,7 +40,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to create profile for
+     * @param {Guild} guild guild to create profile for
      */
     createProfile: function(guild) {
         data[guild.id] = {
@@ -51,7 +52,7 @@ module.exports = {
 
     /**
      * @returns {Boolean}
-     * @param {*} guild check if profile exists for this guild
+     * @param {Guild} guild check if profile exists for this guild
      */
     profileExists: function(guild) {
         if (data[guild.id]) {
@@ -63,7 +64,7 @@ module.exports = {
 
     /**
      * @returns {Number}
-     * @param {*} guild guild to get case count of
+     * @param {Guild} guild guild to get case count of
      */
     getCaseCount: function(guild) {
         return data[guild.id].caseCount
@@ -71,11 +72,11 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to create new case in
-     * @param {*} caseType mute, unmute, kick, warn, ban, unban
-     * @param {*} userID id of user being punished
-     * @param {*} moderator moderator issuing punishment
-     * @param {*} command entire message
+     * @param {Number} guild guild to create new case in
+     * @param {String} caseType mute, unmute, kick, warn, ban, unban
+     * @param {String} userID id of user being punished
+     * @param {String} moderator moderator issuing punishment
+     * @param {Message} command entire message
      */
     newCase: function(guild, caseType, userID, moderator, command) {
         const currentCases = data[guild.id].cases
@@ -99,8 +100,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to delete case in
-     * @param {*} caseID case to delete
+     * @param {Guild} guild guild to delete case in
+     * @param {String} caseID case to delete
      */
     deleteCase: function(guild, caseID) {
         const caseInfo = data[guild.id].cases[caseID]
@@ -112,7 +113,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to delete data for
+     * @param {Guild} guild guild to delete data for
      */
     deleteServer: function(guild) {
         delete data[guild.id]
@@ -120,7 +121,7 @@ module.exports = {
 
     /**
      * @returns {Array}
-     * @param {*} guild guild to get cases of
+     * @param {Guild} guild guild to get cases of
      * @param {String} userID user to get cases of
      */
     getCases: function(guild, userID) {
@@ -137,21 +138,27 @@ module.exports = {
 
     /**
      * @returns {Object}
-     * @param {*} guild guild to get cases of
+     * @param {Guild} guild guild to get cases of
      */
     getAllCases: function(guild) {
         return data[guild.id].cases
     },
 
     /**
-     * @returns {*} case
-     * @param {*} guild guild to search for case in
-     * @param {*} caseID case to fetch
+     * @returns {JSON} case
+     * @param {Guild} guild guild to search for case in
+     * @param {Number} caseID case to fetch
      */
     getCase: function(guild, caseID) {
         return data[guild.id].cases[caseID]
     },
 
+    /**
+     * 
+     * @param {Guild} guild 
+     * @param {GuildMember} member 
+     * @param {Date} date 
+     */
     newMute: function(guild, member, date) {
         const currentMutes = data[guild.id].mutes
 
@@ -165,10 +172,20 @@ module.exports = {
         data[guild.id].mutes = currentMutes
     },
 
+    /**
+     * 
+     * @param {Guild} guild 
+     * @param {Guildmember} member 
+     */
     deleteMute: function(guild, member) {
         deleteMute(guild, member)
     },
 
+    /**
+     * @returns {Boolean}
+     * @param {Guild} guild 
+     * @param {GuildMember} member 
+     */
     isMuted: function(guild, member) {
         const currentMutes = data[guild.id].mutes
 
@@ -181,6 +198,10 @@ module.exports = {
         return false
     },
 
+    /**
+     * 
+     * @param {Client} client
+     */
     runUnmuteChecks: function(client) {
         setInterval(() => {
             const date = new Date().getTime()
@@ -200,6 +221,12 @@ module.exports = {
         }, 120000)
     },
 
+    /**
+     * 
+     * @param {Guild} guild 
+     * @param {Number} caseID 
+     * @param {String} reason 
+     */
     setReason: function(guild, caseID, reason) {
         const currentCase = data[guild.id].cases[caseID]
 
