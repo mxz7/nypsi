@@ -8,7 +8,7 @@ module.exports = {
     aliases: ["latency"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
         const msg = await message.channel.send("pinging..")

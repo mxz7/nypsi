@@ -7,7 +7,7 @@ module.exports = {
     category: "info",
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

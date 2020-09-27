@@ -10,7 +10,7 @@ module.exports = {
     permissions: ["bot owner"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

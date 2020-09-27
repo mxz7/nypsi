@@ -37,7 +37,7 @@ client.once("ready", async () => {
                 name: "$help | " + domains[Math.floor(Math.random() * domains.length)]
             }
         })
-    }, 600000)
+    }, 30 * 60 * 1000)
 
     const { commandsSize } = require("./utils/commandhandler")
 

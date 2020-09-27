@@ -11,7 +11,7 @@ module.exports = {
     aliases: ["ig"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

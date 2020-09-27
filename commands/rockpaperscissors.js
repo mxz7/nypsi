@@ -12,7 +12,7 @@ module.exports = {
     aliases: ["rps"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 
