@@ -12,7 +12,7 @@ module.exports = {
     permissions: ["MANAGE_CHANNELS", "MANAGE_MESSAGES"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

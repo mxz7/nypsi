@@ -26,7 +26,7 @@ module.exports = {
     aliases: ["h"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

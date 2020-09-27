@@ -120,7 +120,7 @@ function reloadCommand(commandsArray) {
 /**
  * 
  * @param {Message} message 
- * @param {Array} args 
+ * @param {Array<String>} args 
  */
 async function helpCmd(message, args) {
     logCommand(message, args);
@@ -270,7 +270,7 @@ async function helpCmd(message, args) {
  * 
  * @param {String} cmd 
  * @param {Message} message 
- * @param {Array} args 
+ * @param {Array<String>} args 
  */
 function runCommand(cmd, message, args) {
     if (cmd == "help") {

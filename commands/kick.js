@@ -10,7 +10,7 @@ module.exports = {
     permissions: ["KICK_MEMBERS"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 

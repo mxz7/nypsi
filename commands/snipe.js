@@ -8,7 +8,7 @@ module.exports = {
     aliases: ["s"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
         const { snipe } = require("../nypsi.js")

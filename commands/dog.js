@@ -9,7 +9,7 @@ module.exports = {
     category: "fun",
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
