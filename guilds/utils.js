@@ -1,3 +1,4 @@
+const { Guild } = require("discord.js");
 const fs = require("fs");
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
 
@@ -71,7 +72,7 @@ const checkCooldown = new Set()
 module.exports = {
     /**
      * 
-     * @param {*} guild run check for guild
+     * @param {Guild} guild run check for guild
      */
     runCheck: async function(guild) {
 
@@ -117,8 +118,8 @@ module.exports = {
     },
 
     /**
-     * @returns {boolean}
-     * @param {*} guild check if guild is stored
+     * @returns {Boolean}
+     * @param {Guild} guild check if guild is stored
      */
     hasGuild: function(guild) {
         if (guilds[guild.id]) {
@@ -130,7 +131,7 @@ module.exports = {
 
     /**
      * @returns {JSON} members / onlines
-     * @param {*} guild guild to get peaks of
+     * @param {Guild} guild guild to get peaks of
      */
     getPeaks: function(guild) {
         return guilds[guild.id]
@@ -138,7 +139,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild create guild profile
+     * @param {Guild} guild create guild profile
      */
     createGuild: function(guild) {
         const members = guild.members.cache.filter(member => !member.user.bot)
@@ -160,8 +161,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild get snipe filter
-     * @returns {Array}
+     * @param {Guild} guild get snipe filter
+     * @returns {Array<String>}
      */
     getSnipeFilter: function(guild) {
         return guilds[guild.id].snipeFilter
@@ -169,8 +170,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to change filter of
-     * @param {*} array array to change filter to
+     * @param {Guild} guild guild to change filter of
+     * @param {Array<String>} array array to change filter to
      */
     updateFilter: function(guild, array) {
         guilds[guild.id].snipeFilter = array
@@ -178,7 +179,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to check if stats are enabled
+     * @param {Guild} guild guild to check if stats are enabled
      * @returns {Boolean}
      */
     hasStatsEnabled: function(guild) {
@@ -191,7 +192,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to check if stats profile exists
+     * @param {Guild} guild guild to check if stats profile exists
      * @returns {Boolean}
      */
     hasStatsProfile: function(guild) {
@@ -204,7 +205,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to create default stats profile for
+     * @param {Guild} guild guild to create default stats profile for
      */
     createDefaultStatsProfile: function(guild) {
         guilds[guild.id].stats = {
@@ -217,7 +218,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to get stats profile of
+     * @param {Guild} guild guild to get stats profile of
      * @returns {JSON} profile 
      */
     getStatsProfile: function(guild) {
@@ -226,7 +227,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to set stats profile of
+     * @param {Guild} guild guild to set stats profile of
      * @param {JSON} profile profile to set
      */
     setStatsProfile: function(guild, profile) {
@@ -234,7 +235,7 @@ module.exports = {
     },
 
     /**
-     * @returns {Array}
+     * @returns {Array<JSON>}
      */
     getGuilds: function() {
         const guilds1 = []
@@ -247,7 +248,7 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to check stats of
+     * @param {Guild} guild guild to check stats of
      */
     checkStats: async function(guild) {
 
@@ -305,8 +306,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to add to cooldown
-     * @param {*} seconds seconds to remove after
+     * @param {Guild} guild guild to add to cooldown
+     * @param {Number} seconds seconds to remove after
      */
     addCooldown: function(guild, seconds) {
         fetchCooldown.add(guild.id)
@@ -318,7 +319,7 @@ module.exports = {
 
     /**
      * @returns {Boolean}
-     * @param {*} guild guild to check if added to cooldown
+     * @param {Guild} guild guild to check if added to cooldown
      */
     inCooldown: function(guild) {
 
@@ -333,7 +334,7 @@ module.exports = {
 
     /**
      * @returns {String}
-     * @param {*} guild guild to get prefi of
+     * @param {Guild} guild guild to get prefi of
      */
     getPrefix: function(guild) {
         try {
@@ -346,8 +347,8 @@ module.exports = {
 
     /**
      * 
-     * @param {*} guild guild to set prefix
-     * @param {*} prefix prefix to be used
+     * @param {Guild} guild guild to set prefix
+     * @param {String} prefix prefix to be used
      */
     setPrefix: function(guild, prefix) {
         guilds[guild.id].prefix = prefix
