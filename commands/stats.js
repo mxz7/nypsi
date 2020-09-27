@@ -1,113 +1,116 @@
 const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
-const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js")
+const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js");
+const { Command, categories } = require("../utils/classes/Command");
 
 const cooldown = new Map()
 
-module.exports = {
-    name: "stats",
-    description: "view stats for the bot",
-    category: "info",
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
-        
-        const color = getColor(message.member);
+const cmd = new Command("stats", "view stats for the bot", categories.INFO)
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
+    const color = getColor(message.member);
 
-            let remaining
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 5 - diff
 
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
         }
-
-        cooldown.set(message.member.id, new Date());
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
-        const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-        const { snipe, eSnipe } = require("../nypsi.js")
-        const snipedMessages = snipe.size + eSnipe.size
-        const uptime = getUptime(message.client.uptime)
-        const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
-        const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")
-        let imgCache = 0
-
-        try {
-            for (link of Array.from(bdsmCache.keys())) {
-                imgCache = imgCache + bdsmCache.get(link).length
-            }
-            for (link of Array.from(assCache.keys())) {
-                imgCache = imgCache + assCache.get(link).length
-            }
-            for (link of Array.from(thighsCache.keys())) {
-                imgCache = imgCache + thighsCache.get(link).length
-            }
-            for (link of Array.from(pornCache.keys())) {
-                imgCache = imgCache + pornCache.get(link).length
-            }
-            for (link of Array.from(birbCache.keys())) {
-                imgCache = imgCache + birbCache.get(link).length
-            }
-            for (link of Array.from(catCache.keys())) {
-                imgCache = imgCache + catCache.get(link).length
-            }
-            for (link of Array.from(dogCache.keys())) {
-                imgCache = imgCache + dogCache.get(link).length
-            }
-            for (link of Array.from(rabbitCache.keys())) {
-                imgCache = imgCache + rabbitCache.get(link).length
-            }
-            for (link of Array.from(snekCache.keys())) {
-                imgCache = imgCache + snekCache.get(link).length
-            }
-        } catch {}
-
-
-        let memberCount = 0
-
-        const guilds = message.client.guilds.cache
-        await guilds.forEach(g => {
-            memberCount = memberCount + g.memberCount
-        })
-
-        const embed = new MessageEmbed()
-            .setTitle("stats")
-            .setColor(color)
-            .addField("bot", "**server count** " + guilds.size.toLocaleString() + "\n" +
-                "**user count** " + memberCount.toLocaleString() + "\n" +
-                "**total commands** " + commandsSize + "\n" +
-                "**total aliases** " + aliasesSize + "\n" +
-                "**uptime** " + uptime, true)
-            .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
-                " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
-                "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
-                "**snipe** " + snipedMessages.toLocaleString() + "\n" +
-                "**imgs** " + imgCache.toLocaleString(), true)
-            .addField("usage", "**memory** " + memUsage + "mb", true)
-            .setFooter("bot.tekoh.wtf")
-
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌  i may be lacking permission: 'EMBED_LINKS'")
-        })
+        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
     }
+
+    cooldown.set(message.member.id, new Date());
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id);
+    }, 5000);
+
+    const { commandsSize, aliasesSize } = require("../utils/commandhandler")
+    const { snipe, eSnipe } = require("../nypsi.js")
+    const snipedMessages = snipe.size + eSnipe.size
+    const uptime = getUptime(message.client.uptime)
+    const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
+    const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")
+    let imgCache = 0
+
+    try {
+        for (link of Array.from(bdsmCache.keys())) {
+            imgCache = imgCache + bdsmCache.get(link).length
+        }
+        for (link of Array.from(assCache.keys())) {
+            imgCache = imgCache + assCache.get(link).length
+        }
+        for (link of Array.from(thighsCache.keys())) {
+            imgCache = imgCache + thighsCache.get(link).length
+        }
+        for (link of Array.from(pornCache.keys())) {
+            imgCache = imgCache + pornCache.get(link).length
+        }
+        for (link of Array.from(birbCache.keys())) {
+            imgCache = imgCache + birbCache.get(link).length
+        }
+        for (link of Array.from(catCache.keys())) {
+            imgCache = imgCache + catCache.get(link).length
+        }
+        for (link of Array.from(dogCache.keys())) {
+            imgCache = imgCache + dogCache.get(link).length
+        }
+        for (link of Array.from(rabbitCache.keys())) {
+            imgCache = imgCache + rabbitCache.get(link).length
+        }
+        for (link of Array.from(snekCache.keys())) {
+            imgCache = imgCache + snekCache.get(link).length
+        }
+    } catch {}
+
+
+    let memberCount = 0
+
+    const guilds = message.client.guilds.cache
+    await guilds.forEach(g => {
+        memberCount = memberCount + g.memberCount
+    })
+
+    const embed = new MessageEmbed()
+        .setTitle("stats")
+        .setColor(color)
+        .addField("bot", "**server count** " + guilds.size.toLocaleString() + "\n" +
+            "**user count** " + memberCount.toLocaleString() + "\n" +
+            "**total commands** " + commandsSize + "\n" +
+            "**total aliases** " + aliasesSize + "\n" +
+            "**uptime** " + uptime, true)
+        .addField("cache", "**users (econ)** " + getUserCount().toLocaleString() + "\n" +
+            " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
+            "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
+            "**snipe** " + snipedMessages.toLocaleString() + "\n" +
+            "**imgs** " + imgCache.toLocaleString(), true)
+        .addField("usage", "**memory** " + memUsage + "mb", true)
+        .setFooter("bot.tekoh.wtf")
+
+    message.channel.send(embed).catch(() => {
+        return message.channel.send("❌  i may be lacking permission: 'EMBED_LINKS'")
+    })
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
 
 function getUptime(ms) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))

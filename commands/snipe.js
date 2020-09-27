@@ -1,57 +1,59 @@
 const { MessageEmbed, Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
 const { getColor } = require("../utils/utils")
 
-module.exports = {
-    name: "snipe",
-    description: "snipe the most recently deleted message",
-    category: "fun",
-    aliases: ["s"],
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
-        const { snipe } = require("../nypsi.js")
+const cmd = new Command("snipe", "snipe the most recently deleted message", categories.FUN).setAliases(["s"])
 
-        let channel = message.channel
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        if (args.length == 1) {
-            if (!message.mentions.channels.first()) {
-                return message.channel.send("❌ invalid channel")
-            }
-            channel = message.mentions.channels.first()
-            if (!channel) {
-                return message.channel.send("❌ invalid channel")
-            }
+    const { snipe } = require("../nypsi.js")
+
+    let channel = message.channel
+
+    if (args.length == 1) {
+        if (!message.mentions.channels.first()) {
+            return message.channel.send("❌ invalid channel")
         }
-
-        if (!snipe || !snipe.get(channel.id)) {
-            return message.channel.send("❌ nothing to snipe in " + channel.toString())
+        channel = message.mentions.channels.first()
+        if (!channel) {
+            return message.channel.send("❌ invalid channel")
         }
-
-        let content = snipe.get(channel.id).content
-
-        if (content) {
-            if (snipe.get(channel.id).attachments.url) {
-                content = snipe.get(channel).attachments.url
-            }
-        }
-
-        const created = new Date(snipe.get(channel.id).createdTimestamp)
-
-        const color = getColor(message.member);
-
-        const embed = new MessageEmbed()
-            .setColor(color)
-            .setTitle(snipe.get(channel.id).author.tag)
-            .setDescription(content)
-
-            .setFooter(timeSince(created) + " ago")
-        
-        message.channel.send(embed)
-
     }
+
+    if (!snipe || !snipe.get(channel.id)) {
+        return message.channel.send("❌ nothing to snipe in " + channel.toString())
+    }
+
+    let content = snipe.get(channel.id).content
+
+    if (content) {
+        if (snipe.get(channel.id).attachments.url) {
+            content = snipe.get(channel).attachments.url
+        }
+    }
+
+    const created = new Date(snipe.get(channel.id).createdTimestamp)
+
+    const color = getColor(message.member);
+
+    const embed = new MessageEmbed()
+        .setColor(color)
+        .setTitle(snipe.get(channel.id).author.tag)
+        .setDescription(content)
+
+        .setFooter(timeSince(created) + " ago")
+    
+    message.channel.send(embed)
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
 
 function timeSince(date) {
 

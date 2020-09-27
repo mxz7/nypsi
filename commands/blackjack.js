@@ -1,208 +1,210 @@
 const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const shuffle = require("shuffle-array")
+const shuffle = require("shuffle-array");
+const { Command, categories } = require("../utils/classes/Command");
 
 const cooldown = new Map()
 const games = new Map()
 
-module.exports = {
-    name: "blackjack",
-    description: "play blackjack",
-    category: "money",
-    aliases: ["bj"],
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
+const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj"])
 
-        if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-            return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
+
+    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
+        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
+    }
+
+    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
+        return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
+    }
+
+    if (!userExists(message.member)) createUser(message.member)
+
+    const color = getColor(message.member);
+
+    if (args[0] == "status" && message.member.user.id == "672793821850894347") {
+        if (args.length == 1) {
+            return message.channel.send("$blackjack status <@user>")
+        }
+        const member = message.mentions.members.first()
+
+        if (!member) {
+            return message.channel.send("$blackjack status <@user>")
         }
 
-        if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
+        if (!games.has(member.user.id)) {
+            return message.channel.send("invalid user")
         }
 
-        if (!userExists(message.member)) createUser(message.member)
-
-        const color = getColor(message.member);
-
-        if (args[0] == "status" && message.member.user.id == "672793821850894347") {
-            if (args.length == 1) {
-                return message.channel.send("$blackjack status <@user>")
-            }
-            const member = message.mentions.members.first()
-
-            if (!member) {
-                return message.channel.send("$blackjack status <@user>")
-            }
-
-            if (!games.has(member.user.id)) {
-                return message.channel.send("invalid user")
-            }
-
-            const game = games.get(member.user.id)
-
-            const embed = new MessageEmbed()
-                .setTitle("blackjack status")
-                .setColor(color)
-                .setDescription(member)
-                .addField("current hands", "dealer: " + getDealerCards(member) + " " + calcTotalDealer(member) + "\n" +
-                    "user: " + getCards(member) + " " + calcTotal(member))
-                .addField("deck",  game.deck.join(" **|** "))
-                .addField("next card", game.deck[0])
-            
-            return message.channel.send(embed)
-        }
-
-        if (games.has(message.member.user.id)) {
-            return message.channel.send("❌ you are already playing blackjack")
-        }
-
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 30 - diff
-
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
-
-            let remaining
-
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
-        }
-
-        if (args.length == 0) {
-            const embed = new MessageEmbed()
-                .setTitle("blackjack help")
-                .setColor(color)
-                .addField("usage", "$blackjack <bet>\n$blackjack info")
-                .addField("game rules", "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
-                    "the dealer will always stand on or above **17**\n" +
-                    "**2**x multiplier for winning, on a draw you receive your bet back")
-                .addField("help", "1️⃣ **hit** receive a new card\n" + 
-                    "2️⃣ **stand** end your turn and allow the dealer to play\n" + 
-                    "3️⃣ **double down** take one more card and double your bet")
-                .setFooter("bot.tekoh.wtf")
-
-            return message.channel.send(embed).catch(() => message.channel.send("❌ $blackjack <bet>"))
-        }
-
-        if (args[0] == "info") {
-            const embed = new MessageEmbed()
-                .setTitle("blackjack help")
-                .setColor(color)
-                .addField("technical info", "blackjack works exactly how it would in real life\n" +
-                    "when you create a game, a full 52 deck is shuffled in a random order\n" +
-                    "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-                    "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)")
-                .setFooter("bot.tekoh.wtf")
-            
-            return message.channel.send(embed).catch()
-        }
-
-        if (args[0] == "all") {
-            args[0] = getBalance(message.member)
-        }
-
-        if (args[0] == "half") {
-            args[0] = getBalance(message.member) / 2
-        }
-
-        if (parseInt(args[0])) {
-            args[0] = formatBet(args[0])
-        } else {
-            return message.channel.send("❌ invalid bet")
-        }
-
-        const bet = parseInt(args[0])
-
-        if (bet <= 0) {
-            return message.channel.send("❌ $blackjack <bet>")
-        }
-
-        if (bet > getBalance(message.member)) {
-            return message.channel.send("❌ you cannot afford this bet")
-        }
-
-        if (bet > 500000) {
-            return message.channel.send("❌ maximum bet is $**500k**")
-        }
-
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id)
-        }, 30000)
-
-        updateBalance(message.member, getBalance(message.member) - bet)
-
-        const id = Math.random()
-
-        const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
-            "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
-            "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
-            "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
-    
-        
-        const voteMulti = await getVoteMulti(message.member)
-        
-        games.set(message.member.user.id, {
-            bet: bet,
-            deck: shuffle(newDeck),
-            cards: [],
-            dealerCards: [],
-            id: id,
-            first: true,
-            dealerPlay: false,
-            voted: voteMulti
-        })
-
-        newDealerCard(message.member)
-        newCard(message.member)
-        newDealerCard(message.member)
-        newCard(message.member)
-
-        const loadingEmbed = new MessageEmbed()
-            .setTitle("loading.. | " + message.member.user.username)
-            .setFooter("bot.tekoh.wtf")
-            .setColor(color)
+        const game = games.get(member.user.id)
 
         const embed = new MessageEmbed()
-            .setTitle("blackjack | " + message.member.user.username)
-            .setDescription("**bet** $" + bet.toLocaleString())
+            .setTitle("blackjack status")
             .setColor(color)
-            .addField("dealer", games.get(message.member.user.id).dealerCards[0])
-            .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+            .setDescription(member)
+            .addField("current hands", "dealer: " + getDealerCards(member) + " " + calcTotalDealer(member) + "\n" +
+                "user: " + getCards(member) + " " + calcTotal(member))
+            .addField("deck",  game.deck.join(" **|** "))
+            .addField("next card", game.deck[0])
+        
+        return message.channel.send(embed)
+    }
+
+    if (games.has(message.member.user.id)) {
+        return message.channel.send("❌ you are already playing blackjack")
+    }
+
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 30 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+    }
+
+    if (args.length == 0) {
+        const embed = new MessageEmbed()
+            .setTitle("blackjack help")
+            .setColor(color)
+            .addField("usage", "$blackjack <bet>\n$blackjack info")
+            .addField("game rules", "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
+                "the dealer will always stand on or above **17**\n" +
+                "**2**x multiplier for winning, on a draw you receive your bet back")
+            .addField("help", "1️⃣ **hit** receive a new card\n" + 
+                "2️⃣ **stand** end your turn and allow the dealer to play\n" + 
+                "3️⃣ **double down** take one more card and double your bet")
+            .setFooter("bot.tekoh.wtf")
+
+        return message.channel.send(embed).catch(() => message.channel.send("❌ $blackjack <bet>"))
+    }
+
+    if (args[0] == "info") {
+        const embed = new MessageEmbed()
+            .setTitle("blackjack help")
+            .setColor(color)
+            .addField("technical info", "blackjack works exactly how it would in real life\n" +
+                "when you create a game, a full 52 deck is shuffled in a random order\n" +
+                "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)")
             .setFooter("bot.tekoh.wtf")
         
+        return message.channel.send(embed).catch()
+    }
+
+    if (args[0] == "all") {
+        args[0] = getBalance(message.member)
+    }
+
+    if (args[0] == "half") {
+        args[0] = getBalance(message.member) / 2
+    }
+
+    if (parseInt(args[0])) {
+        args[0] = formatBet(args[0])
+    } else {
+        return message.channel.send("❌ invalid bet")
+    }
+
+    const bet = parseInt(args[0])
+
+    if (bet <= 0) {
+        return message.channel.send("❌ $blackjack <bet>")
+    }
+
+    if (bet > getBalance(message.member)) {
+        return message.channel.send("❌ you cannot afford this bet")
+    }
+
+    if (bet > 500000) {
+        return message.channel.send("❌ maximum bet is $**500k**")
+    }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id)
+    }, 30000)
+
+    updateBalance(message.member, getBalance(message.member) - bet)
+
+    const id = Math.random()
+
+    const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
+        "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
+        "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
+        "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
+
+    
+    const voteMulti = await getVoteMulti(message.member)
+    
+    games.set(message.member.user.id, {
+        bet: bet,
+        deck: shuffle(newDeck),
+        cards: [],
+        dealerCards: [],
+        id: id,
+        first: true,
+        dealerPlay: false,
+        voted: voteMulti
+    })
+
+    newDealerCard(message.member)
+    newCard(message.member)
+    newDealerCard(message.member)
+    newCard(message.member)
+
+    const loadingEmbed = new MessageEmbed()
+        .setTitle("loading.. | " + message.member.user.username)
+        .setFooter("bot.tekoh.wtf")
+        .setColor(color)
+
+    const embed = new MessageEmbed()
+        .setTitle("blackjack | " + message.member.user.username)
+        .setDescription("**bet** $" + bet.toLocaleString())
+        .setColor(color)
+        .addField("dealer", games.get(message.member.user.id).dealerCards[0])
+        .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        .setFooter("bot.tekoh.wtf")
+    
+    if (getBalance(message.member) >= bet) {
+        embed.addField("help", "1️⃣ hit | 2️⃣ stand | 3️⃣ double down")
+    } else {
+        embed.addField("help", ":one: hit | :two: stand")
+    }
+
+    message.channel.send(loadingEmbed).then(async m => {
+        await m.react("1️⃣")
+        await m.react("2️⃣")
+
         if (getBalance(message.member) >= bet) {
-            embed.addField("help", "1️⃣ hit | 2️⃣ stand | 3️⃣ double down")
-        } else {
-            embed.addField("help", ":one: hit | :two: stand")
+            await m.react("3️⃣")
         }
 
-        message.channel.send(loadingEmbed).then(async m => {
-            await m.react("1️⃣")
-            await m.react("2️⃣")
+        await m.edit(embed)
+        playGame(message, m)
+    }).catch()
 
-            if (getBalance(message.member) >= bet) {
-                await m.react("3️⃣")
-            }
-
-            await m.edit(embed)
-            playGame(message, m)
-        }).catch()
-    }
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
 
 function newCard(member) {
     const bet = games.get(member.user.id).bet

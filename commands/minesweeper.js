@@ -1,6 +1,7 @@
 const { userExists, createUser, getBalance, formatBet, updateBalance, getVoteMulti, updateXp, getXp } = require("../economy/utils")
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
 
 const cooldown = new Map()
 const games = new Map()
@@ -14,134 +15,135 @@ abcde.set("c", 2)
 abcde.set("d", 3)
 abcde.set("e", 4)
 
-module.exports = {
-    name: "minesweeper",
-    description: "play minesweeper",
-    category: "money",
-    aliases: ["sweeper", "ms"],
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
-        
-        if (!userExists(message.member)) createUser(message.member)
+const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
 
-        const color = getColor(message.member)
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        if (games.has(message.author.id)) {
-            return message.channel.send("❌ you are already playing minesweeper")
-        }
+    if (!userExists(message.member)) createUser(message.member)
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 30 - diff
+    const color = getColor(message.member)
 
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
-
-            let remaining
-
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
-        }
-
-        if (args.length == 0) {
-            const embed = new MessageEmbed()
-                .setTitle("minesweeper help")
-                .setColor(color)
-                .addField("usage", "$ms <bet>")
-                .addField("game rules", "a 5x5 grid of white squares will be created\n" +
-                    "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
-                    "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet")
-                .addField("help", "`a1` - this would be the most top left square\n" +
-                    "`e5` - this would be the most bottom right square\n" +
-                    "`finish` - this is used to end the game and collect your reward")
-
-            return message.channel.send(embed)
-        }
-
-        if (args[0] == "all") {
-            args[0] = getBalance(message.member)
-        }
-
-        if (args[0] == "half") {
-            args[0] = getBalance(message.member) / 2
-        }
-
-        if (parseInt(args[0])) {
-            args[0] = formatBet(args[0])
-        } else {
-            return message.channel.send("❌ invalid bet")
-        }
-
-        const bet = parseInt(args[0])
-
-        if (bet <= 0) {
-            return message.channel.send("❌ $ms <bet>")
-        }
-
-        if (bet > getBalance(message.member)) {
-            return message.channel.send("❌ you cannot afford this bet")
-        }
-
-        if (bet > 100000) {
-            return message.channel.send("❌ maximum bet is $**100k**")
-        }
-
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id)
-        }, 30000)
-
-        updateBalance(message.member, getBalance(message.member) - bet)
-
-        const id = Math.random()
-
-        const grid = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]
-
-        for (let i = 0; i < 5; i++) {
-            const num = Math.floor(Math.random() * 25)
-
-            if (grid[num] != "b") {
-                grid[num] = "b"
-            } else {
-                i--
-            }
-        }
-
-        const table = toTable(grid)
-
-        const voteMulti = await getVoteMulti(message.member)
-
-        games.set(message.author.id, {
-            bet: bet,
-            win: 0,
-            grid: grid,
-            id: id,
-            voted: voteMulti
-        })
-
-        const embed = new MessageEmbed()
-            .setTitle("minesweeper | " + message.author.username)
-            .setColor(color)
-            .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
-            .addField("your grid", table)
-            .addField("help", "type `finish` to stop playing")
-            .setFooter("bot.tekoh.wtf")
-
-        const msg = await message.channel.send(embed)
-
-        playGame(message, msg)
+    if (games.has(message.author.id)) {
+        return message.channel.send("❌ you are already playing minesweeper")
     }
+
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 30 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+    }
+
+    if (args.length == 0) {
+        const embed = new MessageEmbed()
+            .setTitle("minesweeper help")
+            .setColor(color)
+            .addField("usage", "$ms <bet>")
+            .addField("game rules", "a 5x5 grid of white squares will be created\n" +
+                "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
+                "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet")
+            .addField("help", "`a1` - this would be the most top left square\n" +
+                "`e5` - this would be the most bottom right square\n" +
+                "`finish` - this is used to end the game and collect your reward")
+
+        return message.channel.send(embed)
+    }
+
+    if (args[0] == "all") {
+        args[0] = getBalance(message.member)
+    }
+
+    if (args[0] == "half") {
+        args[0] = getBalance(message.member) / 2
+    }
+
+    if (parseInt(args[0])) {
+        args[0] = formatBet(args[0])
+    } else {
+        return message.channel.send("❌ invalid bet")
+    }
+
+    const bet = parseInt(args[0])
+
+    if (bet <= 0) {
+        return message.channel.send("❌ $ms <bet>")
+    }
+
+    if (bet > getBalance(message.member)) {
+        return message.channel.send("❌ you cannot afford this bet")
+    }
+
+    if (bet > 100000) {
+        return message.channel.send("❌ maximum bet is $**100k**")
+    }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id)
+    }, 30000)
+
+    updateBalance(message.member, getBalance(message.member) - bet)
+
+    const id = Math.random()
+
+    const grid = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]
+
+    for (let i = 0; i < 5; i++) {
+        const num = Math.floor(Math.random() * 25)
+
+        if (grid[num] != "b") {
+            grid[num] = "b"
+        } else {
+            i--
+        }
+    }
+
+    const table = toTable(grid)
+
+    const voteMulti = await getVoteMulti(message.member)
+
+    games.set(message.author.id, {
+        bet: bet,
+        win: 0,
+        grid: grid,
+        id: id,
+        voted: voteMulti
+    })
+
+    const embed = new MessageEmbed()
+        .setTitle("minesweeper | " + message.author.username)
+        .setColor(color)
+        .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+        .addField("your grid", table)
+        .addField("help", "type `finish` to stop playing")
+        .setFooter("bot.tekoh.wtf")
+
+    const msg = await message.channel.send(embed)
+
+    playGame(message, msg)
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
 
 function getFront(grid) {
     const gridFront = []
