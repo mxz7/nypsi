@@ -1,10 +1,14 @@
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 module.exports = {
     name: "flip",
     description: "flip a coin",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         const headTails = ["heads", "tails"];
 

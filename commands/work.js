@@ -1,7 +1,7 @@
 const { workMessages } = require("../lists.json")
 const { getColor } = require("../utils/utils")
 const { getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const cooldown = new Map()
 
@@ -9,6 +9,10 @@ module.exports = {
     name: "work",
     description: "work a random job and safely earn a random amount of money",
     category: "money",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

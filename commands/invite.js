@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const { getColor } = require("../utils/utils")
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "generate an invite link for the bot",
     category: "info",
     aliases: ["bot"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         const color = getColor(message.member)
 

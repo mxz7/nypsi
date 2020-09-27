@@ -2,7 +2,7 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const { getColor } = require("./utils")
 const fs = require("fs");
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message, Message } = require("discord.js");;
 const { getPrefix } = require("../guilds/utils.js");
 
 const commands = new Map()
@@ -66,6 +66,10 @@ function loadCommands() {
     console.log("time taken: " + timeTaken + "ms")
 }
 
+/**
+ * 
+ * @param {Array} commandsArray 
+ */
 function reloadCommand(commandsArray) {
     const reloadTable = []
 
@@ -113,6 +117,11 @@ function reloadCommand(commandsArray) {
     return table(reloadTable, {border: getBorderCharacters("ramac")})
 }
 
+/**
+ * 
+ * @param {Message} message 
+ * @param {Array} args 
+ */
 async function helpCmd(message, args) {
     logCommand(message, args);
 
@@ -257,6 +266,12 @@ async function helpCmd(message, args) {
     return pageManager()
 }
 
+/**
+ * 
+ * @param {String} cmd 
+ * @param {Message} message 
+ * @param {Array} args 
+ */
 function runCommand(cmd, message, args) {
     if (cmd == "help") {
         return helpCmd(message, args)
@@ -322,6 +337,10 @@ function runCommand(cmd, message, args) {
     } catch {}
 }
 
+/**
+ * 
+ * @param {String} cmd 
+ */
 function commandExists(cmd) {
     if (commands.has(cmd)) {
         return true

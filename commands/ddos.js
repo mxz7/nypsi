@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getMember, getColor } = require("../utils/utils");
 
 const cooldown = new Map()
@@ -7,6 +7,10 @@ module.exports = {
     name: "ddos",
     description: "ddos someone (fake)",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

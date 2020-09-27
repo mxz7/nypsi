@@ -1,4 +1,5 @@
 const { list } = require("../optout.json");
+const { Message } = require("discord.js")
 
 const cooldown = new Set();
 
@@ -6,6 +7,10 @@ module.exports = {
     name: "optout",
     description: "optout of dms from the bot",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (cooldown.has(message.member.id)) {

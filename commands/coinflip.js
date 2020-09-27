@@ -1,6 +1,6 @@
 const { getMember, getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
 
@@ -13,6 +13,10 @@ module.exports = {
     description: "flip a coin, double or nothing",
     category: "money",
     aliases: ["cf"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!userExists(message.member)) {

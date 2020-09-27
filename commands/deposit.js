@@ -1,6 +1,6 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const cooldown = new Map()
 
@@ -9,6 +9,10 @@ module.exports = {
     description: "deposit money into your bank",
     category: "money",
     aliases: ["dep"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)

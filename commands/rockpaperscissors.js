@@ -1,6 +1,6 @@
 const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -10,6 +10,10 @@ module.exports = {
     description: "play rock paper scissors",
     category: "money",
     aliases: ["rps"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

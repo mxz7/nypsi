@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp } = require("../economy/utils.js")
@@ -8,7 +8,12 @@ module.exports = {
     description: "~",
     category: "none",
     permissions: ["bot owner"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
+
         if (message.member.user.id != "672793821850894347") return
 
         if (args.length == 0) return

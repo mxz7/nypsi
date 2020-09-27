@@ -1,6 +1,6 @@
 const { getColor } = require("../utils/utils")
 const { topAmount } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js")
 
 const cooldown = new Map()
 
@@ -9,6 +9,10 @@ module.exports = {
     description: "view top users",
     category: "money",
     aliases: ["top"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

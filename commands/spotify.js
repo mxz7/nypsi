@@ -1,10 +1,14 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const { getColor, getMember } = require("../utils/utils")
 
 module.exports = {
     name: "spotify",
     description: "show information about what you're playing on spotify",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let member;

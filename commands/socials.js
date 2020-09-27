@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor, getMember } = require("../utils/utils")
 const { profileExists, profileExistsID, createProfile, getProfile, getProfileID, updateProfile } = require("../socials/utils")
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "socials",
     description: "set yours and view people's different social media accounts",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let color = getColor(message.member)

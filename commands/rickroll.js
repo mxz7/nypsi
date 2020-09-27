@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
 const { list } = require("../optout.json");
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "rickroll",
     description: "rickroll your friends",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         
         const color = getColor(message.member);

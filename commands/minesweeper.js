@@ -1,6 +1,6 @@
 const { userExists, createUser, getBalance, formatBet, updateBalance, getVoteMulti, updateXp, getXp } = require("../economy/utils")
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const cooldown = new Map()
 const games = new Map()
@@ -19,6 +19,10 @@ module.exports = {
     description: "play minesweeper",
     category: "money",
     aliases: ["sweeper", "ms"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         
         if (!userExists(message.member)) createUser(message.member)

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { redditImage, getColor } = require("../utils/utils")
 const fetch = require("node-fetch")
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "reddit",
     description: "get a random image from any subreddit",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

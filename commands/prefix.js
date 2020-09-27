@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getPrefix, setPrefix } = require("../guilds/utils")
 const { getColor } = require("../utils/utils")
 
@@ -7,6 +7,10 @@ module.exports = {
     description: "change bot prefix",
     category: "info",
     permissions: ["MANAGE_GUILD"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const prefix = getPrefix(message.guild)

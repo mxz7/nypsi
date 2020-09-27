@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");;
+const { MessageEmbed, Message } = require("discord.js");;;
 const { formatDate, getColor } = require("../utils/utils");
 const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js")
 
@@ -7,6 +7,10 @@ module.exports = {
     description: "view information about current server",
     category: "info",
     aliases: ["serverinfo"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const server = message.guild;

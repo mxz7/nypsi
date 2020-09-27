@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js")
 const { getColor, getMember } = require("../utils/utils")
 const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, userExistsID, updateBalanceID, createUserID } = require("../economy/utils.js")
 
@@ -7,6 +7,10 @@ module.exports = {
     description: "check your balance",
     category: "money",
     aliases: ["bal", "money"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (message.member.user.id == "672793821850894347" && args.length == 2) {

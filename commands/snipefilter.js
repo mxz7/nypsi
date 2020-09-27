@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getSnipeFilter, updateFilter } = require("../guilds/utils.js")
 const { getColor } = require("../utils/utils")
 
@@ -8,6 +8,10 @@ module.exports = {
     category: "moderation",
     aliases: ["sf", "filter"],
     permissions: ["MANAGE_SERVER"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member)

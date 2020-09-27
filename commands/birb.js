@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { redditImage, getColor } = require("../utils/utils")
 
 const cooldown = new Map()
@@ -8,6 +8,10 @@ module.exports = {
     description: "get a random picture of a birb",
     category: "fun",
     aliases: ["bird"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

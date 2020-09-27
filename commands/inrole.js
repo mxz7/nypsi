@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils");
 const { inCooldown, addCooldown } = require("../guilds/utils");
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "inrole",
     description: "get the members in a role",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

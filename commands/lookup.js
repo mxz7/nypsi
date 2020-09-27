@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const fetch = require("node-fetch");
 const { getColor } = require("../utils/utils")
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "lookup",
     description: "lookup ip addresses and domains",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

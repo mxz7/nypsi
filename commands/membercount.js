@@ -8,6 +8,10 @@ module.exports = {
     category: "moderation",
     aliases: ["counter"],
     permissions: ["MANAGE_SERVER"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member)
