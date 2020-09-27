@@ -1,37 +1,40 @@
 const { MessageEmbed, Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
 
-module.exports = {
-    name: "reload",
-    description: "reload commands",
-    category: "none",
-    permissions: ["bot owner"],
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
-        if (message.member.user.id != "672793821850894347") return
-        const { loadCommands, reloadCommand } = require("../utils/commandhandler")
+const cmd = new Command("reload", "reload commands", categories.NONE)
 
-        if (args.length == 0) {
-            loadCommands()
-            message.react("✅")
-            console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
-        } else {
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-            let msg = reloadCommand(args).split("✔")
-            msg = "```\n" + msg + "```"
+    if (message.member.user.id != "672793821850894347") return
+    const { loadCommands, reloadCommand } = require("../utils/commandhandler")
 
-            const embed = new MessageEmbed()
-                .setTitle("reload")
-                .setDescription(msg)
-                .setFooter("bot.tekoh.wtf")
-                .setColor("#60d16b")
-            
-            message.channel.send(embed)
-        }
+    if (args.length == 0) {
+        loadCommands()
+        message.react("✅")
+        console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
+    } else {
+
+        let msg = reloadCommand(args).split("✔")
+        msg = "```\n" + msg + "```"
+
+        const embed = new MessageEmbed()
+            .setTitle("reload")
+            .setDescription(msg)
+            .setFooter("bot.tekoh.wtf")
+            .setColor("#60d16b")
+        
+        message.channel.send(embed)
     }
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
 
 function getTimeStamp() {
     const date = new Date();

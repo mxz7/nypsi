@@ -1,5 +1,6 @@
 const { MessageEmbed, Message } = require("discord.js")
 const { getColor } = require("../utils/utils.js")
+const { Command, categories } = require("../utils/classes/Command")
 
 const answers = ["as i see it, yes",
     "ask again later",
@@ -24,59 +25,61 @@ const answers = ["as i see it, yes",
 
 const cooldown = new Map()
 
-module.exports = {
-    name: "8ball",
-    description: "ask the 8ball a question",
-    category: "fun",
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
+const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
 
-        const color = getColor(message.member);
+/**
+ * 
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init) / 1000)
-            const time = 5 - diff
+    const color = getColor(message.member);
 
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 5 - diff
 
-            let remaining
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
 
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
+        let remaining
 
-            
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
         }
 
-        if (args.length == 0) {
-            return message.channel.send("❌ you must ask the 8ball something")
-        }
-
-        cooldown.set(message.member.id, new Date());
-
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 5000);
-
-        const question = args.join(" ")
-
-        const embed = new MessageEmbed()
-            .setColor(color)
-            .setTitle("8ball")
-            .setDescription("\n**" + question + "** - " + message.member.user.toString() + "\n\n🎱 " + answers[Math.floor(Math.random() * answers.length)])
-            .setFooter("bot.tekoh.wtf")
-
-        message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_MESSAGES'")
-        })
+        
+        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
     }
+
+    if (args.length == 0) {
+        return message.channel.send("❌ you must ask the 8ball something")
+    }
+
+    cooldown.set(message.member.id, new Date());
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id);
+    }, 5000);
+
+    const question = args.join(" ")
+
+    const embed = new MessageEmbed()
+        .setColor(color)
+        .setTitle("8ball")
+        .setDescription("\n**" + question + "** - " + message.member.user.toString() + "\n\n🎱 " + answers[Math.floor(Math.random() * answers.length)])
+        .setFooter("bot.tekoh.wtf")
+
+    message.channel.send(embed).catch(() => {
+        return message.channel.send("❌ i may be lacking permission: 'EMBED_MESSAGES'")
+    })
 }
+
+cmd.setRun(run)
+
+module.exports = cmd

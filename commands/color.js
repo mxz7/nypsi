@@ -1,51 +1,52 @@
 const { MessageEmbed, Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
 const { getMember } = require("../utils/utils")
 
-module.exports = {
-    name: "color",
-    description: "get a random hex color code",
-    category: "info",
-    aliases: ["colour"],
-    /**
-     * @param {Message} message 
-     * @param {Array<String>} args 
-     */
-    run: async (message, args) => {
+const cmd = new Command("color", "get a random hex color code", categories.INFO)
 
-        let color
-        let member
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
 
-        if (args.length == 0) {
-            color = Math.floor(Math.random() * 16777215).toString(16)
-        }
+    let color
+    let member
 
-        if (args.length != 0) {
-
-            if (!message.mentions.members.first()) {
-                member = getMember(message, args[0]);
-            } else {
-                member = message.mentions.members.first();
-            }
-
-            if (!member) {
-                color = args[0].split("#").join("")
-            } else {
-                color = member.displayHexColor
-            }
-        }
-
-        const embed = new MessageEmbed()
-            .setDescription("**#" + color + "**")
-            .setColor(color)
-        
-        if (member) {
-            embed.setDescription(member.user.toString())
-            embed.setTitle(member.displayHexColor)
-        }
-
-        message.channel.send(embed).catch(() => {
-            message.channel.send("❌ invalid color")
-        })
-
+    if (args.length == 0) {
+        color = Math.floor(Math.random() * 16777215).toString(16)
     }
+
+    if (args.length != 0) {
+
+        if (!message.mentions.members.first()) {
+            member = getMember(message, args[0]);
+        } else {
+            member = message.mentions.members.first();
+        }
+
+        if (!member) {
+            color = args[0].split("#").join("")
+        } else {
+            color = member.displayHexColor
+        }
+    }
+
+    const embed = new MessageEmbed()
+        .setDescription("**#" + color + "**")
+        .setColor(color)
+    
+    if (member) {
+        embed.setDescription(member.user.toString())
+        embed.setTitle(member.displayHexColor)
+    }
+
+    message.channel.send(embed).catch(() => {
+        message.channel.send("❌ invalid color")
+    })
+
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
