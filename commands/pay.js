@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getMember, getColor } = require("../utils/utils")
 const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
 
@@ -10,6 +10,10 @@ module.exports = {
     name: "pay",
     description: "give other users money",
     category: "money",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
 const { getCase, setReason } = require("../moderation/utils")
 
@@ -7,6 +7,10 @@ module.exports = {
     description: "set a reason for a case/punishment",
     category: "moderation",
     permissions: ["MANAGE_MESSAGES"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return

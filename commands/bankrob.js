@@ -1,7 +1,7 @@
 const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists } = require("../economy/utils.js")
 const Discord = require("discord.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 
 const cooldown = new Map()
@@ -10,6 +10,10 @@ module.exports = {
     name: "bankrob",
     description: "rob a bank for a high reward/high risk",
     category: "money",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)

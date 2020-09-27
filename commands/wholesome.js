@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const { getColor } = require("../utils/utils");
 const { wholesome } = require("../lists.json")
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "wholesome",
     description: "get a random wholesome picture",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

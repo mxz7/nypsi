@@ -1,6 +1,6 @@
 const { getColor } = require("../utils/utils")
 const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒"]
@@ -12,6 +12,10 @@ module.exports = {
     name: "slots",
     description: "play slots",
     category: "money",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

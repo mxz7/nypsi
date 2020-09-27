@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const fetch = require("node-fetch");
 const { getColor } = require("../utils/utils")
 
@@ -9,6 +9,10 @@ module.exports = {
     description: "view stats for an instagram account",
     category: "info",
     aliases: ["ig"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

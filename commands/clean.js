@@ -7,6 +7,10 @@ module.exports = {
     description: "clean up bot commands and responses",
     category: "moderation",
     permissions: ["MANAGE_MESSAGES"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return

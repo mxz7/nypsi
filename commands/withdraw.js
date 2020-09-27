@@ -1,6 +1,6 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const tax = 0.05
 
@@ -11,6 +11,10 @@ module.exports = {
     description: "withdraw money from your bank",
     category: "money",
     aliases: ["with"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)

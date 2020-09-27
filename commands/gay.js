@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const {  getMember, getColor } = require("../utils/utils")
 
 const cache = new Map()
@@ -9,6 +9,10 @@ module.exports = {
     description: "gay calculator",
     category: "fun",
     aliases: ["howgay"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let color = getColor(message.member)

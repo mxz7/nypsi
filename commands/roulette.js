@@ -1,6 +1,6 @@
 const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const shuffle = require("shuffle-array")
 
 const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
@@ -12,6 +12,10 @@ module.exports = {
     description: "play roulette",
     category: "money",
     aliases: ["r"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getMember, getColor } = require("../utils/utils");
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "view active presences for a user",
     category: "info",
     aliases: ["activity", "game"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");

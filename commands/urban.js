@@ -1,5 +1,5 @@
 const urban = require("relevant-urban")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
 
 const cooldown = new Map()
@@ -8,6 +8,10 @@ module.exports = {
     name: "urban",
     description: "get a definition from urban dictionary",
     category: "info",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         const color = getColor(message.member);

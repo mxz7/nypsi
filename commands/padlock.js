@@ -1,6 +1,6 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 
 const cooldown = new Map()
 
@@ -8,6 +8,10 @@ module.exports = {
     name: "padlock",
     description: "buy a padlock to protect your wallet",
     category: "money",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!userExists(message.member)) createUser(message.member)

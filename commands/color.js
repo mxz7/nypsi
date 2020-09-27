@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getMember } = require("../utils/utils")
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "get a random hex color code",
     category: "info",
     aliases: ["colour"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let color
