@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");
 const fetch = require("node-fetch")
 const { getColor } = require("../utils/utils");
 const { hypixel } = require("../config.json")
@@ -24,6 +24,10 @@ module.exports = {
     description: "view hypixel stats for a minecraft account",
     category: "info",
     aliases: ["h"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (args.length == 0) {

@@ -1,5 +1,5 @@
 const { getColor, getMember } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getCases, profileExists, createProfile } = require("../moderation/utils")
 
 const cooldown = new Map()
@@ -10,6 +10,10 @@ module.exports = {
     category: "moderation",
     aliases: ["modlogs"],
     permissions: ["MANAGE_MESSAGES"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return

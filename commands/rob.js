@@ -1,6 +1,6 @@
 const { getColor, getMember } = require("../utils/utils")
 const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { list } = require("../optout.json")
 
 const cooldown = new Map();
@@ -11,6 +11,10 @@ module.exports = {
     description: "rob other server members",
     category: "money",
     aliases: ["steal"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         
         const color = getColor(message.member);

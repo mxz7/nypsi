@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getMember, getColor, formatDate } = require("../utils/utils")
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "information about when you joined the server",
     category: "info",
     aliases: ["joined"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let member;

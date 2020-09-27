@@ -7,6 +7,10 @@ module.exports = {
     name: "raffle",
     description: "select a random user from current online members or a specific role",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         let color = getColor(message.member)

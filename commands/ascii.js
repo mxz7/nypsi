@@ -1,6 +1,6 @@
 const ascii = require("figlet");
 const { getColor } = require("../utils/utils.js")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js")
 const { list } = require("../optout.json");
 
 const cooldown = new Map()
@@ -9,6 +9,10 @@ module.exports = {
     name: "ascii",
     description: "create ascii text",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (list.includes(message.member.user.id)) {

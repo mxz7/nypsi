@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { getColor } = require("../utils/utils")
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "snipe the most recently edited message",
     category: "fun",
     aliases: ["es"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         const { eSnipe } = require("../nypsi.js")
 

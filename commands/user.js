@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const { getMember, formatDate, getColor } = require("../utils/utils");
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "view info about a user",
     category: "info",
     aliases: ["whois", "who"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

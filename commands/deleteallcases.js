@@ -1,5 +1,5 @@
 const { getColor } = require("../utils/utils")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { deleteServer, profileExists } = require("../moderation/utils")
 
 module.exports = {
@@ -8,6 +8,10 @@ module.exports = {
     category: "moderation",
     permissions: ["server owner"],
     aliases: ["dac"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         const color = getColor(message.member)
 

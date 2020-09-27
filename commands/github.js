@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Message } = require("discord.js");;
 const { getColor } = require("../utils/utils")
 
 module.exports = {
@@ -6,6 +6,10 @@ module.exports = {
     description: "view code for the bot on github",
     category: "info",
     aliases: ["git"],
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
 
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {

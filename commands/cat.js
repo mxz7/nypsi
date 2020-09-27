@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed, Message } = require("discord.js");
 const { redditImage, getColor } = require("../utils/utils")
 
 const cooldown = new Map()
@@ -8,6 +8,10 @@ module.exports = {
     name: "cat",
     description: "get a random picture of a cat",
     category: "fun",
+    /**
+     * @param {Message} message 
+     * @param {Array} args 
+     */
     run: async (message, args) => {
         if (!message.guild.me.hasPermission("EMBED_LINKS")) {
             return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
