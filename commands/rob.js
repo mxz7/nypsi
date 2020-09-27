@@ -13,7 +13,7 @@ module.exports = {
     aliases: ["steal"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
         

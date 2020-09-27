@@ -7,7 +7,7 @@ module.exports = {
     permissions: ["bot owner"],
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
         if (message.member.user.id != "672793821850894347") return

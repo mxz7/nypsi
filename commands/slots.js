@@ -14,7 +14,7 @@ module.exports = {
     category: "money",
     /**
      * @param {Message} message 
-     * @param {Array} args 
+     * @param {Array<String>} args 
      */
     run: async (message, args) => {
 
