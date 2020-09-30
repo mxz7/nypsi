@@ -202,7 +202,7 @@ async function runChecks() {
         })
     }, 600000)
 
-    if (client.user.username.includes("beta")) return
+    if (client.user.id == "685193083570094101") return
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size)
