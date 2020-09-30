@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -16,19 +16,17 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("MANAGE_ROLES") || !message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send("❌ i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'")
+        return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
     }
 
-    const color = getColor(message.member)
-
     if (args.length == 0 || message.mentions.members.first() == null) {
-        return message.channel.send("❌ $unmute <@user(s)>")
+        return message.channel.send(new ErrorEmbed("$unmute <@user(s)>"))
     }
 
     let muteRole = message.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
 
     if (!muteRole) {
-        return message.channel.send("❌ there is no 'muted' role")
+        return message.channel.send(new ErrorEmbed("there is no 'muted' role"))
     }
 
     let count = 0
@@ -41,7 +39,7 @@ async function run(message, args) {
         if (m.roles.cache.has(muteRole.id)) {
             await m.roles.remove(muteRole).then(() => count++).catch(() => {
                 fail = true
-                return message.channel.send("❌ there was an error when removing the role, please ensure i have the correct permissions")
+                return message.channel.send(new ErrorEmbed("there was an error when removing the role, please ensure i have the correct permissions"))
             })
         } else {
             failed.push(m.user.tag)
@@ -63,18 +61,15 @@ async function run(message, args) {
         }
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, "✅ **" + count + "** member(s) unmuted")
         .setTitle("unmute | " + message.member.user.username)
-        .setDescription("✅ **" + count + "** member(s) unmuted")
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
 
     if (count == 1) {
         embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted")
     }
 
     if (count == 0) {
-        return message.channel.send("❌ i was unable to unmute any users")
+        return message.channel.send(new ErrorEmbed("i was unable to unmute any users"))
     }
 
     if (failed.length != 0) {

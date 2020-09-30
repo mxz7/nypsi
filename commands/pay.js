@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getMember, getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
+const { getMember } = require("../utils/utils")
 const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const tax = 0.15
 
@@ -14,8 +15,6 @@ const cmd = new Command("pay", "give other users money", categories.MONEY)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -33,18 +32,16 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed() 
+        const embed = new CustomEmbed(message.member) 
             .setTitle("pay help")
-            .setColor(color)
             .addField("usage", "$pay <user> <amount>")
             .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $pay <user> <amount>"))
+        return message.channel.send(embed)
     }
 
     let target = message.mentions.members.first();
@@ -54,15 +51,15 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send("❌ invalid user")
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (target.user.bot) {
-        return message.channel.send("❌ invalid user")
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (message.member == target) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (!userExists(target)) createUser(target)
@@ -80,7 +77,7 @@ async function run(message, args) {
     if (parseInt(args[1])) {
         args[1] = formatBet(args[1])
     } else {
-        return message.channel.send("❌ invalid amount")
+        return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
     let amount = parseInt(args[1]) 
@@ -88,11 +85,11 @@ async function run(message, args) {
     let taxEnabled = false
 
     if (amount > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this payment")
+        return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
     }
 
     if (amount <= 0) {
-        return message.channel.send("❌ invalid payment")
+        return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -111,11 +108,9 @@ async function run(message, args) {
     
     updateBalance(message.member, getBalance(message.member) - amount)
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle("processing payment..")
-        .setColor(color)
         .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
-        .setFooter("bot.tekoh.wtf")
 
     if (taxEnabled) {
         embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
@@ -126,12 +121,10 @@ async function run(message, args) {
     }
 
     message.channel.send(embed).then(m => {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
-            .setColor("#5efb8f")
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
-            .setFooter("bot.tekoh.wtf")
             
 
         if (taxEnabled) {
@@ -144,10 +137,7 @@ async function run(message, args) {
         setTimeout(() =>{
             m.edit(embed)
         }, 1500)
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    })
 }
 
 cmd.setRun(run)

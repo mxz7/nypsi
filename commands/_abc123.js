@@ -1,9 +1,9 @@
-const { MessageEmbed, Message } = require("discord.js")
+const { Message } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp } = require("../economy/utils.js")
 const { categories, Command } = require("../utils/classes/Command.js")
-const avatar = require("./avatar.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const _abc123 = new Command("_abc123", "get info about users viewable to the bot", categories.NONE)
 
@@ -42,14 +42,11 @@ async function run(message, args)  {
             }
         })
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
             .setTitle(user.user.tag)
-            .setColor("#60d16b")
-            .setDescription("`" + user.id + "`")
             .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
             .addField("user info", "**tag** " + user.user.tag + "\n" +
                 "**created** " + formatDate(user.user.createdAt), true)
-            .setFooter("bot.tekoh.wtf")
 
         if (userExists(user)) {
             let voted = false
@@ -88,14 +85,11 @@ async function run(message, args)  {
             }
         })
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
             .setTitle(user.user.tag)
-            .setColor("#60d16b")
-            .setDescription("`" + user.id + "`")
             .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
             .addField("user info", "**tag** " + user.user.tag + "\n" +
                 "**created** " + formatDate(user.user.createdAt), true)
-            .setFooter("bot.tekoh.wtf")
 
         if (userExists(user)) {
             let voted = false
@@ -141,17 +135,10 @@ async function run(message, args)  {
                 }
             })
 
-
-            
-            const embed = new MessageEmbed()
+            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
                 .setTitle(guild.name)
-                .setDescription(names.get(1).join("\n"))
-                .setFooter("bot.tekoh.wtf")
-                .setColor("#60d16b")
             
-            const msg = await message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            })
+            const msg = await message.channel.send(embed)
     
             if (names.size >= 2) {
                 await msg.react("⬅")
@@ -238,17 +225,10 @@ async function run(message, args)  {
                 }
             })
 
-
-            
-            const embed = new MessageEmbed()
+            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
                 .setTitle(guild.name)
-                .setDescription(names.get(1).join("\n"))
-                .setFooter("bot.tekoh.wtf")
-                .setColor("#60d16b")
             
-            const msg = await message.channel.send(embed).catch(() => {
-                return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-            })
+            const msg = await message.channel.send(embed)
     
             if (names.size >= 2) {
                 await msg.react("⬅")
@@ -315,11 +295,8 @@ async function run(message, args)  {
             return el != null;
         });
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, filtered)
             .setTitle("top " + filtered.length)
-            .setColor("#60d16b")
-            .setDescription(filtered)
-            .setFooter("bot.tekoh.wtf")
 
         message.channel.send(embed)
     }
@@ -355,11 +332,9 @@ async function guildInfo(guild) {
         invites = (await guild.fetchInvites().catch()).keyArray()
     } catch {}
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, "`" + guild.id + "`")
         .setTitle(guild.name)
-        .setColor("#60d16b")
         .setThumbnail(guild.iconURL({format: "png", dynamic: true, size: 128}))
-        .setDescription("`" + guild.id + "`")
         .addField("info", "**owner** " + owner + "\n" + 
             "**created** " + formatDate(guild.createdAt) + "\n" +
             "**region** " + guild.region, true)
@@ -370,7 +345,6 @@ async function guildInfo(guild) {
             "**online** " + online.size.toLocaleString() + "\n" +
             "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
             "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
-        .setFooter("bot.tekoh.wtf")
 
     if (invites && invites.length > 0) {
         embed.addField("invite (" + invites.length + ")", invites[Math.floor(Math.random() * invites.length)], true)

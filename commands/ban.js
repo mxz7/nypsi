@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js")
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js")
 const { newCase, profileExists, createProfile } = require("../moderation/utils");
 const { inCooldown, addCooldown } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("ban", "ban one or more users from the server", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
@@ -12,40 +12,31 @@ const cmd = new Command("ban", "ban one or more users from the server", categori
 */
 async function run(message, args) {
 
-    const color = getColor(message.member);
-
     if (!message.member.hasPermission("BAN_MEMBERS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            const embed = new MessageEmbed()
-                .setTitle("ban")
-                .setDescription("❌ requires permission: *BAN_MEMBERS*")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
-            return message.channel.send(embed)
+            return message.channel.send(new ErrorEmbed("requires permission: *BAN_MEMBERS*"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send("❌ i am lacking permission: 'BAN_MEMBERS'");
+        return message.channel.send(new ErrorEmbed("i am lacking permission: 'BAN_MEMBERS'"));
     }
 
     let idOnly = false
 
     if (args.length == 0 && message.mentions.members.first() == null) {
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false)
             .setTitle("ban help")
-            .setColor(color)
             .addField("usage", "$ban <@user(s)> (reason) [-s] [-k]")
             .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can ban one or more members in one command (must tag them)\n" +
                 "**(reason)** reason for the ban, will be given to all banned members\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
                 "**[-k]** if used, messages from banned members wont be deleted")
             .addField("examples", "$ban @member hacking\n$ban @member @member2 @member3 hacking\n$ban @member hacking -s")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $ban <@user(s)> (reason) [-s]"))
+        return message.channel.send(embed)
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -68,7 +59,7 @@ async function run(message, args) {
             message.mentions.members.set(member.user.id, member)
         }
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
     }
 
     const members = message.mentions.members
@@ -110,7 +101,7 @@ async function run(message, args) {
         }).catch(() => {
             if (idOnly) {
                 fail = true
-                return message.channel.send(`❌ unable to ban the id: \`${member}\``)
+                return message.channel.send(new ErrorEmbed(`unable to ban the id: \`${member}\``))
             }
             failed.push(members.get(member).user.tag)
         })
@@ -119,14 +110,12 @@ async function run(message, args) {
     if (fail) return
 
     if (count == 0) {
-        return message.channel.send("❌ i was unable to ban any users")
+        return message.channel.send(new ErrorEmbed("i was unable to ban any users"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, `✅ **${count}** members banned for: ${reason.split(": ")[1]}`)
         .setTitle("ban | " + message.member.user.username)
         .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
     
     if (count == 1) {
         if (idOnly) {

@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
@@ -11,35 +11,26 @@ const cmd = new Command("unban", "unban one or more users", categories.MODERATIO
  */
 async function run(message, args) {
 
-    const color = getColor(message.member);
-
     if (!message.member.hasPermission("BAN_MEMBERS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            const embed = new MessageEmbed()
-                .setTitle("unban")
-                .setDescription("❌ requires permission: *BAN_MEMBERS*")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
-            return message.channel.send(embed)
+            return message.channel.send(new ErrorEmbed("requires permission: *BAN_MEMBERS*"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send("❌ i am lacking permission: 'BAN_MEMBERS'");
+        return message.channel.send(new ErrorEmbed("i am lacking permission: 'BAN_MEMBERS'"));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("unban help")
-            .setColor(color)
             .addField("usage", "$unban <user(s)> [-s]")
             .addField("help", "**<>** required | **[]** parameter\n" + "**<users>** you can unban one or more members in one command\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
             .addField("examples", "$unban user#1234 **(only works if members are in cache)**\n$unban 123456789012345678\n$unban 123456789012345678 123456789012345678 -s")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $unban <user(s)> [-s]"))
+        return message.channel.send(embed)
     }
 
     const members = []
@@ -75,13 +66,11 @@ async function run(message, args) {
     }
 
     if (members.length == 0) {
-        return message.channel.send("i was unable to unban any users")
+        return message.channel.send(new ErrorEmbed("i was unable to unban any users"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true)
         .setTitle(`unban | ${message.member.user.username}`)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
 
     if (members.length == 1) {
         embed.setDescription("✅ `" + members[0] + "` was unbanned")

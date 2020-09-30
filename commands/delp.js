@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -11,8 +11,6 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", categorie
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member)
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,11 +28,8 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
-    }
 
-    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
@@ -42,7 +37,7 @@ async function run(message, args) {
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send("❌ $delp <amount>");
+        return message.channel.send(new ErrorEmbed("$delp <amount>"));
     }
 
     let amount = parseInt(args[0])

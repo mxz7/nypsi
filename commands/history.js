@@ -1,7 +1,8 @@
-const { getColor, getMember } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
+const { getMember } = require("../utils/utils")
+const { Message } = require("discord.js");
 const { getCases, profileExists, createProfile } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -14,8 +15,6 @@ const cmd = new Command("history", "view punishment history for a given user", c
 async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
-
-    const color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -33,15 +32,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("history help")
-            .setColor(color)
             .addField("usage", "$history @user\n$history <user ID or tag>")
-            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed)
     }
@@ -67,7 +65,7 @@ async function run(message, args) {
             member = getMember(message, args.join(" "))
 
             if (!member) {
-                return message.channel.send("❌ can't find `" + args[0] + "` - please use a user ID if they are no longer in the server")
+                return message.channel.send(new ErrorEmbed(`can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`))
             }
         }
     }
@@ -82,7 +80,7 @@ async function run(message, args) {
     }
 
     if (cases.length == 0) {
-        return message.channel.send("❌ no history to display")
+        return message.channel.send(new ErrorEmbed("no history to display"))
     }
 
     cooldown.set(message.author.id, new Date())
@@ -109,14 +107,13 @@ async function run(message, args) {
         pages.push(page)
     }
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member)
         .setFooter("page 1/" + pages.length + " | total: " + cases.length)
         
     if (unknownMember) {
-        embed.setAuthor("history for " + member)
+        embed.setHeader("history for " + member)
     } else {
-        embed.setAuthor("history for " + member.user.tag)
+        embed.setHeader("history for " + member.user.tag)
     }
 
     for (case0 of pages[0]) {
@@ -150,13 +147,12 @@ async function run(message, args) {
                     await msg.reactions.removeAll()
                 })
 
-            const newEmbed = new MessageEmbed()
-                .setColor(color)
+            const newEmbed = new CustomEmbed(message.member)
                 
             if (unknownMember) {
-                newEmbed.setAuthor("history for " + member)
+                newEmbed.setHeader("history for " + member)
             } else {
-                newEmbed.setAuthor("history for " + member.user.tag)
+                newEmbed.setHeader("history for " + member.user.tag)
             }
             
             if (!reaction) return

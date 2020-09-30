@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { redditImage, getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
+const { redditImage } = require("../utils/utils")
 const fetch = require("node-fetch");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -12,8 +13,6 @@ const cmd = new Command("reddit", "get a random image from any subreddit", categ
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -31,11 +30,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));1
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ $reddit <subreddit>")
+        return message.channel.send(new ErrorEmbed("$reddit <subreddit>"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -52,17 +51,17 @@ async function run(message, args) {
         allowed = res.data.children.filter(post => !post.data.is_self)
 
     } catch (e) {
-        return message.channel.send("❌  invalid subreddit")
+        return message.channel.send(new ErrorEmbed("invalid subreddit"))
     }
 
     const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
     if (!chosen) {
-        return message.channel.send("❌ unable to find image")
+        return message.channel.send(new ErrorEmbed("unable to find image"))
     }
 
     if (chosen.data.over_18 && !message.channel.nsfw) {
-        return message.channel.send("❌ you must do this in an nsfw channel")
+        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
     }
 
     const a = await redditImage(chosen, allowed)
@@ -75,22 +74,18 @@ async function run(message, args) {
     url = "https://reddit.com" + url
 
     if (image == "lol") {
-        return message.channel.send("❌ unable to find image")
+        return message.channel.send(new ErrorEmbed("unable to find image"))
     }
 
     const subreddit = args[0]
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member)
         .setTitle(title)
-        .setAuthor("u/" + author + " | r/" + subreddit)
+        .setHeader("u/" + author + " | r/" + subreddit)
         .setURL(url)
         .setImage(image)
-        .setFooter("bot.tekoh.wtf")
 
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
-    })
+    message.channel.send(embed)
 
 }
 

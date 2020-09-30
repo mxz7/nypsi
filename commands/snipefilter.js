@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { getSnipeFilter, updateFilter } = require("../guilds/utils.js");
 const { Command, categories } = require("../utils/classes/Command.js");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.MODERATION).setAliases(["sf", "filter"]).setPermissions(["MANAGE_SERVER"])
 
@@ -11,16 +11,9 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
  */
 async function run(message, args) {
 
-    const color = getColor(message.member)
-
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            const embed = new MessageEmbed()
-                .setTitle("snipe filter")
-                .setDescription("❌ requires permission: *MANAGE_SERVER*")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
-            return message.channel.send(embed)
+            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_SERVER*"))
         }
         return
     }
@@ -28,10 +21,8 @@ async function run(message, args) {
     let filter = getSnipeFilter(message.guild)
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
             .setTitle("current snipe filter")
-            .setDescription("`" + filter.join("`\n`") + "`")
-            .setColor(color)
             .setFooter("use $sf (add/del/+/-) to modify the filter")
         
         return message.channel.send(embed)
@@ -39,14 +30,12 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
-            return message.channel.send("❌ $sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way")
+            return message.channel.send(new ErrorEmbed("$sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way"))
         }
 
         if (filter.indexOf(args[1].toString().toLowerCase()) > -1) {
-            const embed = new MessageEmbed()
+            const embed = new CustomEmbed(message.member, false, "❌ `" + args[1] + "` already exists in the filter")
                 .setTitle("snipe filter")
-                .setDescription("❌ `" + args[1] + "` already exists in the filter")
-                .setColor(color)
                 .setFooter("you can use $sf to view the filter")
 
             return message.channel.send(embed)
@@ -58,49 +47,39 @@ async function run(message, args) {
 
             filter.splice(filter.indexOf(args[1].toString()), 1);
 
-            const embed = new MessageEmbed()
+            const embed = new CustomEmbed(message.member, true, "❌ filter has exceeded the maximum size - please use *$sf del/-* or *$sf reset*")
                 .setTitle("snipe filter")
-                .setDescription("❌ filter has exceeded the maximum size - please use *$sf del/-* or *$sf reset*")
-                .setColor(color)
-                .setFooter("bot.tekoh.wtf")
 
             return message.channel.send(embed)
         }
 
         updateFilter(message.guild, filter)
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, true, "✅ added `" + args[1] + "` to the filter")
             .setTitle("snipe filter")
-            .setDescription("✅ added `" + args[1] + "` to the filter")
-            .setFooter("bot.tekoh.wtf")
-            .setColor(color)
         return message.channel.send(embed)
     }
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send("❌ $sf del/- <word>")
+            return message.channel.send(new ErrorEmbed("$sf del/- <word>"))
         }
 
         if (filter.indexOf(args[1].toString()) > -1) {
             filter.splice(filter.indexOf(args[1].toString()), 1);
         } else {
-            const embed = new MessageEmbed()
+            const embed = new CustomEmbed(message.member, false, "❌ `" + args[1] + "` not found in the filter")
                 .setTitle("snipe filter")
-                .setDescription("❌ `" + args[1] + "` not found in the filter")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
+                .setFooter("you can use $sf to view the filter")
 
             return message.channel.send(embed)
         }
 
         updateFilter(message.guild, filter)
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "✅ removed `" + args[1] + "` from the filter")
             .setTitle("snipe filter")
-            .setDescription("✅ removed `" + args[1] + "` from the filter")
             .setFooter("you can use $sf reset to reset the filter")
-            .setColor(color)
 
         return message.channel.send(embed)
     }
@@ -110,11 +89,8 @@ async function run(message, args) {
 
         updateFilter(message.guild, filter)
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset")
             .setTitle("snipe filter")
-            .setDescription("✅ filter has been reset")
-            .setFooter("you can use $sf to view the filter")
-            .setColor(color)
 
         return message.channel.send(embed)
     }

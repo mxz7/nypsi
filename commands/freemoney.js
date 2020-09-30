@@ -1,7 +1,7 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../economy/utils.js")
-const { getColor } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command.js");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 
@@ -12,8 +12,6 @@ const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -31,33 +29,26 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) > 100000) {
-        return message.channel.send("❌ you're too rich for this command bro")
+        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
     }
 
     cooldown.set(message.member.id, new Date());
 
     setTimeout(() => {
-        try {
-            cooldown.delete(message.author.id);
-        } catch {
-            console.log(message)
-            cooldown.clear()
-        }
+        cooldown.delete(message.author.id);
     }, 300000);
 
     updateBalance(message.member, getBalance(message.member) + 1000)
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, "+$**1,000**")
         .setTitle("freemoney | " + message.member.user.username)
-        .setDescription("+$**1,000**")
-        .setFooter("bot.tekoh.wtf")
-        .setColor(color)
 
     message.channel.send(embed).then(msg => {
         embed.setDescription("+$**1,000**\nnew balance: $**" + getBalance(message.member).toLocaleString() + "**")

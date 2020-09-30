@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 
@@ -11,8 +11,6 @@ const cmd = new Command("poll", "create a poll with a lot of customisation", cat
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    let color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -34,14 +32,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false)
             .setTitle("poll help")
-            .setColor(color)
             .addField("usage", "$poll (choices) <title> | (text) | (hex color)")
             .addField("help", "**<>** required | **()** optional\n" +
                 "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
@@ -51,7 +48,7 @@ async function run(message, args) {
                 "$poll 2 title | this is a description\n" +
                 "$poll 9 hello | this is a description | #13c696")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $poll <title> | (text) | (hex color)"))
+        return message.channel.send(embed)
     }
 
     if (message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
@@ -98,7 +95,7 @@ async function run(message, args) {
     }
 
     const title = args.join(" ").split("|")[0]
-    let description
+    let description, color
     
     if (mode.includes("desc")) {
         description = args.join(" ").split("|")[1]
@@ -108,10 +105,11 @@ async function run(message, args) {
         color = args.join(" ").split("|")[2]
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle(title)
-        .setColor(color)
     
+    if (color) embed.setColor(color)
+
     if (mode.includes("desc")) {
         embed.setDescription(description)
     }

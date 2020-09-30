@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { redditImage, getColor } = require("../utils/utils")
+const { redditImage } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -11,8 +12,6 @@ const cmd = new Command("thighs", "get a random thighs image", categories.NSFW)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,17 +29,17 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!message.channel.nsfw) {
-        return message.channel.send("❌ you must do this in an nsfw channel")
+        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
     }
 
     const { thighsCache } = require("../utils/imghandler")
 
     if (thighsCache.size <= 2) {
-        return message.channel.send("❌ please wait a couple more seconds..")
+        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -60,7 +59,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send("❌ unable to find thighs image")
+        return message.channel.send(new ErrorEmbed("unable to find thighs image"))
     }
 
     const image = a.split("|")[0]
@@ -72,18 +71,13 @@ async function run(message, args) {
 
     const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member)
         .setTitle(title)
-        .setAuthor("u/" + author + " | r/" + subreddit)
+        .setHeader("u/" + author + " | r/" + subreddit)
         .setURL(url)
         .setImage(image)
-        .setFooter("bot.tekoh.wtf")
 
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
-    })
-
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)

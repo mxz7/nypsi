@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");const { Command, categories } = require("../utils/classes/Command");
-;
-const { getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
+const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 
@@ -11,8 +11,6 @@ const cmd = new Command("ezpoll", "simple poll builder", categories.INFO)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -34,24 +32,24 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("ezpoll help")
-            .setColor(color)
             .addField("usage", "$ezpoll <choices..>")
             .addField("help", "after creation your message will be deleted and an embed will be created to act as the poll\n" +
                 "every word will be an option in the poll, with a maximum of 4 and minimum of two")
-                .addField("example", "$poll option1 option2")
+            .addField("example", "$poll option1 option2")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $ezpoll <choices..>"))
+        return message.channel.send(embed)
     }
 
     if (args.length < 2) {
-        return message.channel.send("❌ not enough options")
+        return message.channel.send(new ErrorEmbed("not enough options"))
     }
 
     if (message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
@@ -87,9 +85,9 @@ async function run(message, args) {
         count++
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, choices)
         .setTitle("poll by " + message.member.user.username)
-        .setColor(color)
+        .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
     
     message.channel.send(embed).then(async m => {
@@ -103,7 +101,6 @@ async function run(message, args) {
         if (args.length >= 3) await m.react("3️⃣")
         if (args.length >= 4) await m.react("4️⃣")
     })
-
 }
 
 cmd.setRun(run)

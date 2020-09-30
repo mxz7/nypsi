@@ -1,8 +1,9 @@
-const { getColor, getMember } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
 const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { list } = require("../optout.json");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 const playerCooldown = new Set()
@@ -14,8 +15,6 @@ const cmd = new Command("rob", "rob other server members", categories.MONEY).set
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.user.id)) {
         const init = cooldown.get(message.member.user.id)
@@ -33,20 +32,18 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("rob help")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
             .addField("usage", "$rob <@user>")
             .addField("help", "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
                 "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
                 "you can lose up to **25**% of your balance by failing a robbery")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $rob <user>"))
+        return message.channel.send(embed)
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -58,23 +55,23 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send("❌ invalid user")
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (target.user.bot) {
-        return message.channel.send("❌ invalid user")
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (message.member == target) {
-        return message.channel.send("❌ you cant rob yourself")
+        return message.channel.send(new ErrorEmbed("you cant rob yourself"))
     }
 
     if (!userExists(target) || getBalance(target) <= 500) {
-        return message.channel.send("❌ this user doesnt have sufficient funds")
+        return message.channel.send(new ErrorEmbed("this user doesnt have sufficient funds"))
     }
 
     if (getBalance(message.member) < 750) {
-        return message.channel.send("❌ you need $750 in your wallet to rob someone")
+        return message.channel.send(new ErrorEmbed("you need $750 in your wallet to rob someone"))
     }
 
     cooldown.set(message.member.user.id, new Date());
@@ -83,18 +80,13 @@ async function run(message, args) {
         cooldown.delete(message.author.id);
     }, 600000);
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
         .setTitle("robbery | " + message.member.user.username)
-        .setColor(color)
-        .setDescription("robbing " + target.user.toString() + "..")
-        .setFooter("bot.tekoh.wtf")
 
-    const embed2 = new MessageEmbed()
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
         .setTitle("robbery | " + message.member.user.username)
-        .setDescription("robbing " + target.user.toString() + "..")
-        .setFooter("bot.tekoh.wtf")
     
-    const embed3 = new MessageEmbed()
+    const embed3 = new CustomEmbed()
         .setFooter("use $optout to optout of bot dms")
 
     let robberySuccess = false

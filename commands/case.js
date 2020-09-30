@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { getCase, deleteCase, profileExists, createProfile } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("case", "get information about a given case", categories.MODERATION)
 
@@ -13,16 +13,12 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
-    const color = getColor(message.member)
-
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false)
             .setTitle("case help")
-            .setColor(color)
             .addField("usage", "$case <caseID>")
             .addField("help", "to delete a case, react with ❌ after running the command\n" +
                 "to delete data for the server, run $**deleteallcases**\nto delete a case you need the **MANAGE_SERVER** permission")
-            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed)
     }
@@ -32,7 +28,7 @@ async function run(message, args) {
     const case0 = getCase(message.guild, args[0])
 
     if (!case0) {
-        return message.channel.send("❌ couldn't find a case with the id `" + args[0] + "`")
+        return message.channel.send(new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`"))
     }
 
     const date = new Date(case0.time).toLocaleString()
@@ -46,7 +42,7 @@ async function run(message, args) {
         reason = "no reason specified"
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false)
         .setTitle("case " + case0.id + " | " + message.member.user.username)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
@@ -54,8 +50,6 @@ async function run(message, args) {
         .addField("user", "`" + case0.user + "`", true)
         .addField("reason", reason, true)
         .addField("deleted", case0.deleted, true)
-        .setFooter("bot.tekoh.wtf")
-        .setColor(color)
         
     if (target) {
         embed.setDescription("punished user: " + target.toString())
@@ -83,9 +77,7 @@ async function run(message, args) {
     if (reaction == "❌") {
         deleteCase(message.guild, case0.id)
 
-        const newEmbed = new MessageEmbed()
-            .setDescription("✅ case `" + case0.id +  "` successfully deleted by " + message.member.toString())
-            .setColor(color)
+        const newEmbed = new CustomEmbed(message.member, false, "✅ case `" + case0.id +  "` successfully deleted by " + message.member.toString())
 
         await msg.edit(newEmbed)
     }

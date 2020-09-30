@@ -3,6 +3,7 @@ const { getColor } = require("../utils/utils")
 const { getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
 const { MessageEmbed, Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders");
 
 const cooldown = new Map()
 
@@ -13,8 +14,6 @@ const cmd = new Command("work", "work a random job and safely earn a random amou
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -32,17 +31,17 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) <= 0) {
-        return message.channel.send("❌ you need money to work")
+        return message.channel.send(new ErrorEmbed("you need money to work"))
     }
 
     if (getBalance(message.member) > 750000) {
-        return message.channel.send("❌ you're too rich for this command bro")
+        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -74,16 +73,11 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) + earned)
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, work)
         .setTitle("work | " + message.member.user.username)
-        .setDescription(work)
-
-        .setFooter("bot.tekoh.wtf")
     
     message.channel.send(embed).then(m => {
         
-
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {
@@ -94,9 +88,7 @@ async function run(message, args) {
             m.edit(embed)
         }, 1500)
 
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
+    })
 
 }
 

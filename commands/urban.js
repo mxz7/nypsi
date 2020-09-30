@@ -1,7 +1,7 @@
 const urban = require("relevant-urban")
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -12,8 +12,6 @@ const cmd = new Command("urban", "get a definition from urban dictionary", categ
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -31,11 +29,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ $urban <definition>")
+        return message.channel.send(new ErrorEmbed("$urban <definition>"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -45,23 +43,19 @@ async function run(message, args) {
     }, 5000);
 
     const result = await urban(args.join()).catch(() => {
-        return message.channel.send("❌ unknown definition")
+        return message.channel.send(new ErrorEmbed("unknown definition"))
     })
 
     if (!result.word) return
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, result.definition + "\n\n" + result.example)
         .setTitle(result.word)
-        .setDescription(result.definition + "\n\n" + result.example)
-        .setColor(color)
-        .setAuthor("published by " + result.author)
+        .setHeader("published by " + result.author)
         .addField("👍", result.thumbsUp.toLocaleString(), true)
         .addField("👎", result.thumbsDown.toLocaleString(), true)
         .setURL(result.urbanURL)
-        .setFooter("bot.tekoh.wtf")
 
     message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

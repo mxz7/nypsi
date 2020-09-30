@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase, newMute, isMuted, deleteMute } = require("../moderation/utils")
 const { inCooldown, addCooldown } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("mute", "mute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -17,20 +17,16 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("MANAGE_ROLES") || !message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send("❌ i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'")
+        return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
     }
 
-    const color = getColor(message.member)
-
     if (args.length == 0 && message.mentions.members.first() == null) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("mute help")
-            .setColor(color)
             .addField("usage", "$mute <@user(s)> (time) [-s]")
             .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
             .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
-            .setFooter("bot.tekoh.wtf")
-        return message.channel.send(embed).catch(() => message.channel.send("$mute <@user(s)> (time in minutes)"))
+        return message.channel.send(embed)
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -46,12 +42,12 @@ async function run(message, args) {
         const member = members.find(m => m.id == args[0])
 
         if (!member) {
-            return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+            return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
         }
         
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
     }
 
     const members = message.mentions.members
@@ -86,7 +82,7 @@ async function run(message, args) {
             })
 
         } catch (e) {
-            return message.channel.send("❌ i am lacking permissions to do this")
+            return message.channel.send(new ErrorEmbed("i am lacking permissions to do this"))
         }
     }
 
@@ -114,14 +110,14 @@ async function run(message, args) {
         } else if (members.get(member).roles.cache.find(r => r.id == muteRole.id)) {
 
             if (members.keyArray().length == 1) {
-                return message.channel.send("❌ that user is already muted")
+                return message.channel.send(new ErrorEmbed("that user is already muted"))
             }
 
             failed.push(members.get(member).user.tag)
         } else {
             await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
                 fail = true
-                return message.channel.send("❌ i am unable to give users the mute role - ensure my role is above the 'muted' role")
+                return message.channel.send(new ErrorEmbed("i am unable to give users the mute role - ensure my role is above the 'muted' role"))
             })
         }
         if (fail) break
@@ -144,14 +140,11 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send("❌ i was unable to mute any users")
+        return message.channel.send(new ErrorEmbed("i was unable to mute any users"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, `✅ **${count}** member(s) muted`)
         .setTitle("mute | " + message.member.user.username)
-        .setDescription("✅ **" + count + "** member(s) muted")
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
 
     if (timedMute) {
         if (count == 1) {
