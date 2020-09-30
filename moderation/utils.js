@@ -56,7 +56,7 @@ setInterval(() => {
     date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
     fs.writeFileSync('./moderation/backup/' + date + '.json', JSON.stringify(data))
     console.log("\x1b[32m[" + getTimestamp() + "] moderation data backup complete\x1b[37m")
-}, 43200000)
+}, 43200000 * 2)
 
 
 module.exports = {
