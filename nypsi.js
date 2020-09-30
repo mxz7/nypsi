@@ -187,6 +187,18 @@ client.on("channelCreate", async ch => {
     }).catch(() => {})
 })
 
+async function checkGuild(guildID) {
+    const g = await client.guilds.cache.find(gi => gi.id == guildID)
+
+    if (g) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.checkGuild = checkGuild
+
 async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
