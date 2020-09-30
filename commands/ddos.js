@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, getColor } = require("../utils/utils");
+const { getMember } = require("../utils/utils");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -11,8 +12,6 @@ const cmd = new Command("ddos", "ddos other users (fake)", categories.FUN)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,11 +29,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ $ddos <user>")
+        return message.channel.send(new ErrorEmbed("$ddos <user>"))
     }
 
     let member;
@@ -50,7 +49,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
 
     const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
@@ -62,14 +61,11 @@ async function run(message, args) {
         cooldown.delete(message.member.id);
     }, 5000);
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, member.user.toString() + "\n\n" +
+        "**ip** *obtaining..*" + "\n" +
+        "**port** *waiting...*" + "\n\n" +
+        "**status** *online*")
         .setTitle("ddos tool | " + message.member.user.username)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
-        .setDescription(member.user.toString() + "\n\n" +
-            "**ip** *obtaining..*" + "\n" +
-            "**port** *waiting...*" + "\n\n" +
-            "**status** *online*")
     
     return message.channel.send(embed).then(m => {
         embed.setDescription(member.user.toString() + "\n\n" +
@@ -99,11 +95,16 @@ async function run(message, args) {
                 }, 1000)
             })
         }, 1000)
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    })
 }
+
+function randNumber() {
+    return Math.floor(Math.random() * 254) + 1
+}
+
+function randPort() {
+    return Math.floor(Math.random() * 25565)
+} 
 
 cmd.setRun(run)
 

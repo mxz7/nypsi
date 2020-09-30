@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const fetch = require("node-fetch")
-const { getColor } = require("../utils/utils");
 const { hypixel } = require("../config.json");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 const cache = new Map()
@@ -32,8 +32,6 @@ async function run(message, args) {
         return message.channel.send("❌ $h <username>");
     }
 
-    const color = getColor(message.member)
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -50,7 +48,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -73,8 +71,7 @@ async function run(message, args) {
         try {
             uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
         } catch (e) {
-            console.log(e)
-            return message.channel.send("❌ invalid account");
+            return message.channel.send(new ErrorEmbed("invalid account"));
         }
 
         const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
@@ -83,11 +80,11 @@ async function run(message, args) {
             hypixelData = await fetch(hypixelURL).then(hypixelData => hypixelData.json())
         } catch {
             console.log(e)
-            return await message.channel.send("❌ error fetching data")
+            return await message.channel.send(new ErrorEmbed("error fetching data"))
         }
 
         if (!hypixelData.success) {
-            return await message.channel.send("❌ error fetching data")
+            return await message.channel.send(new ErrorEmbed("error fetching data"))
         }
 
         cache.set(username.toLowerCase(), {
@@ -167,10 +164,10 @@ async function run(message, args) {
         if (cache.has(username.toLowerCase())) {
             cache.delete(username.toLowerCase())
         }
-        return message.channel.send(new MessageEmbed().setTitle(`hypixel | ${message.member.user.username}`).setDescription("❌ error reading hypixel data").setColor(color).setFooter("bot.tekoh.wtf"))
+        return message.channel.send(new ErrorEmbed("error reading hypixel data"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true)
         .setTitle("[" + rank + "] " + uuid.name)
         .addField("first login date", "`" + firstLog + "`", true)
         .addField("logged in", "`" + lastLog, true)
@@ -179,8 +176,6 @@ async function run(message, args) {
         .addField("karma", "`" + karma + "`", true)
         .addField("quests ~ challenges", "`" + quests + " ~ " + challenges + "`", true)
         .setURL(url)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
         .setThumbnail(skin)
 
     return await message.channel.send(embed)

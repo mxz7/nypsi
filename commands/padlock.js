@@ -2,6 +2,7 @@ const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExist
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command.js");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -15,11 +16,8 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
-    const color = getColor(message.member);
-
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle("padlock | " + message.member.user.username)
-        .setFooter("bot.tekoh.wtf")
     
     const padlockPrice = getPadlockPrice()
 
@@ -27,11 +25,11 @@ async function run(message, args) {
         if (hasPadlock(message.member)) {
             embed.setColor("#5efb8f")
             embed.setDescription("**protected** 🔒\nyou currently have a padlock")
-            return await message.channel.send(embed).catch()
+            return await message.channel.send(embed)
         }
 
         if (getBalance(message.member) < padlockPrice) {
-            return await message.channel.send("❌ you cannot currently afford a padlock")
+            return await message.channel.send(new ErrorEmbed("you cannot currently afford a padlock"))
         }
 
         if (cooldown.has(message.member.user.id)) {
@@ -50,7 +48,7 @@ async function run(message, args) {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+            return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
         }
 
         cooldown.set(message.member.user.id, new Date());
@@ -61,7 +59,7 @@ async function run(message, args) {
 
         updateBalance(message.member, getBalance(message.member) - padlockPrice)
         setPadlock(message.member, true)
-        return await message.channel.send("✅ you have successfully bought a padlock for $**" + padlockPrice.toLocaleString() + "**")
+        return await message.channel.send(new CustomEmbed(message.member, false, "✅ you have successfully bought a padlock for $**" + padlockPrice.toLocaleString() + "**"))
     } else {
         if (hasPadlock(message.member)) {
             embed.setColor("#5efb8f")

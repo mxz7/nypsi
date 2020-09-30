@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");;
+const { Message } = require("discord.js");;
 const fetch = require("node-fetch");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -12,20 +12,11 @@ const cmd = new Command("lookup", "lookup ip addresses and domains", categories.
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
-
-    const color = getColor(message.member)
-
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("lookup help")
             .addField("usage", "$lookup ip <ip address>\n$lookup <domain>")
             .addField("help", "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
         return message.channel.send(embed)
     }
 
@@ -45,7 +36,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -57,7 +48,7 @@ async function run(message, args) {
     if (args[0] == "ip") {
 
         if (args.length == 1) {
-            return message.channel.send("❌ you must include an ip address")
+            return message.channel.send(new ErrorEmbed("you must include an ip address"))
         }
 
         const url = "https://apimon.de/ip/" + args[1]
@@ -65,7 +56,7 @@ async function run(message, args) {
 
         const res = await fetch(url).then(url => url.json()).catch(() => {
             invalid = true
-            return message.channel.send("❌ invalid ip address")
+            return message.channel.send(new ErrorEmbed("invalid ip address"))
         })
 
         if (invalid) return
@@ -90,14 +81,12 @@ async function run(message, args) {
             ispOrg = res.as.org
             ispEmail = res.as.abuse_contacts
         } catch {
-            return message.channel.send("❌ invalid ip address")
+            return message.channel.send(new ErrorEmbed("invalid ip address"))
         }
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, true, "`" + hostname + "`")
             .setTitle(ip)
-            .setAuthor("apimon.de")
-            .setColor(color)
-            .setDescription("`" + hostname + "`")
+            .setHeader("apimon.de")
             .addField("location", "**country** `" + country + "`\n" +
                 "**region** `" + region + "`\n" +
                 "**currency** `" + countryCurrency + "`\n" +
@@ -105,12 +94,11 @@ async function run(message, args) {
             .addField("isp", "**name** `" + ispName + "`\n" +
                 "**org** `" + ispOrg + "`\n" +
                 "**abuse** `" + ispEmail + "`", true)
-            .setFooter("bot.tekoh.wtf")
         return message.channel.send(embed).then(m => m.delete({timeout: 15000})).catch()
     }
 
     if (!args[0].includes(".")) {
-        return message.channel.send("❌ invalid domain")
+        return message.channel.send(new ErrorEmbed("invalid domain"))
     }
 
     const url = "https://apimon.de/whois/" + args[0]
@@ -118,7 +106,7 @@ async function run(message, args) {
 
     const res = await fetch(url).then(url => url.json()).catch(() => {
         invalid = true
-        return message.channel.send("❌ invalid domain")
+        return message.channel.send(new ErrorEmbed("invalid domain"))
     })
 
     if (invalid) return
@@ -146,13 +134,12 @@ async function run(message, args) {
         registrantPhone = res.registrant.phone
         registrantEmail = res.registrant.email
     } catch {
-        return message.channel.send("❌ invalid domain")
+        return message.channel.send(new ErrorEmbed("invalid domain"))
     }
     
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true)
         .setTitle(domain)
-        .setAuthor("apimon.de")
-        .setColor(color)
+        .setHeader("apimon.de")
         .addField("registrant", "**name** `" + registrantName + "`\n" +
             "**street** `" + registrantStreet + "`\n" +
             "**city** `" + registrantCity + "`\n" +
@@ -162,7 +149,6 @@ async function run(message, args) {
         .addField("registrar", "**name** `" + registrarName + "`\n" +
             "**url** `" + registrarURL + "`\n" +
             "**email** `" + registrarEmail + "`\n", true)
-        .setFooter("bot.tekoh.wtf")
     return message.channel.send(embed).then(m => m.delete({timeout: 15000})).catch()
 
 }

@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js")
-const { getColor, getMember } = require("../utils/utils")
+const { Message } = require("discord.js")
+const { getMember } = require("../utils/utils")
 const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, userExistsID, updateBalanceID, createUserID } = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money"])
 
@@ -45,8 +46,6 @@ async function run(message, args) {
         return message.react("✅")
     }
 
-    const color = getColor(message.member);
-
     let target = message.member
 
     if (args.length >= 1) { 
@@ -57,22 +56,19 @@ async function run(message, args) {
         }
 
         if (!target) {
-            return message.channel.send("❌ invalid user")
+            return message.channel.send(new ErrorEmbed("invalid user"))
         }
     }
 
     if (!userExists(target)) createUser(target)
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, false)
         .setTitle(target.user.tag)
         .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
             "💳 $**" + getBankBalance(target).toLocaleString() + "** / $**" + getMaxBankBalance(target).toLocaleString() + "**")
         .setFooter("xp: " + getXp(target).toLocaleString())
 
-    return message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)

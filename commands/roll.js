@@ -1,6 +1,6 @@
-const { getColor } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("roll", "roll a dice", categories.FUN)
 
@@ -15,20 +15,14 @@ async function run(message, args) {
     if (args.length != 0) {
         if (parseInt(args[0])) {
             if (parseInt(args[0]) < 2) {
-                return message.channel.send("❌ invalid range")
+                return message.channel.send(new ErrorEmbed("invalid range"))
             } else {
                 range = parseInt(args[0])
             }
         }
     }
 
-    const color = getColor(message.member)
-
-    const embed = new MessageEmbed()
-        .setDescription("🎲 you rolled a **" + (Math.floor(Math.random() * range) + 1) + "**")
-        .setColor(color)
-
-    return message.channel.send(embed)
+    return message.channel.send(new CustomEmbed(message.member, false, "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"))
 
 }
 

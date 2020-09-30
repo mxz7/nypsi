@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor, getMember } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("spotify", "show information about what you're playing on spotify", categories.INFO)
 
@@ -23,11 +24,11 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
 
     if (member.presence.activities.length < 1) {
-        return message.channel.send("❌ not currently playing spotify")
+        return message.channel.send(new ErrorEmbed("not currently playing spotify"))
     }
 
     let activity
@@ -40,10 +41,8 @@ async function run(message, args) {
     }
 
     if (!activity) {
-        return message.channel.send("❌ not currently playing spotify")
+        return message.channel.send(new ErrorEmbed("not currently playing spotify"))
     }
-
-    const color = getColor(member)
 
     let duration = activity.timestamps.end.getTime() - activity.timestamps.start.getTime()
     duration = getTime(duration)
@@ -54,18 +53,14 @@ async function run(message, args) {
     const artist = activity.state
     const album = activity.assets.largeText
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, `[\`listen on spotify\`](${url})`)
         .setTitle(member.user.tag)
-        .setColor(color)
         .setThumbnail(image)
-        .setDescription(`[\`listen on spotify\`](${url})`)
         .addField("song", `${name} **-** ${artist}`, true)
         .addField("duration", `\`${duration}\``, true)
         .addField("album", album, true)
-        .setFooter("bot.tekoh.wtf")
 
     return message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

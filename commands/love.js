@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, getColor } = require("../utils/utils");
+const { getMember } = require("../utils/utils");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cache = new Map()
 const cooldown = new Map();
@@ -12,12 +13,6 @@ const cmd = new Command("love", "calculate your love with another person", categ
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
-    
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -35,11 +30,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ $love <user> (user)");
+        return message.channel.send(new ErrorEmbed("$love <user> (user)"));
     }
 
     let target1;
@@ -72,12 +67,12 @@ async function run(message, args) {
             target1 = getMember(message, args[0])
             target2 = getMember(message, args[1])
         } else {
-            return message.channel.send("❌ $love <user> (user)");
+            return message.channel.send(new ErrorEmbed("$love <user> (user)"));
         }
     }
     
     if (!target1 || !target2) {
-        return message.channel.send("❌ invalid user(s)");
+        return message.channel.send(new ErrorEmbed("invalid user(s)"));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -168,21 +163,11 @@ async function run(message, args) {
         loveBar = "💔💔💔💔💔💔💔💔💔💔";
     }
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, false, target1.user.toString() + " **x** " + target2.user.toString())
         .setTitle("❤ " + target1.displayName + " ❤ " + target2.displayName + " ❤")
-        .setDescription(target1.user.toString() + " **x** " + target2.user.toString())
-
-        .addField("love level", 
-        "**" + lovePercent + "**%\n" +
-        loveBar + "\n\n" +
-        "**" + loveLevel + "** " + loveEmoji)
-
-        .setFooter("bot.tekoh.wtf")
+        .addField("love level", "**" + lovePercent + "**%\n" + loveBar + "\n\n" + "**" + loveLevel + "** " + loveEmoji)
     
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-     });
+    message.channel.send(embed)
 
 }
 

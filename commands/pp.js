@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, getColor } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -13,13 +14,11 @@ const cmd = new Command("pp", "accurate prediction of your pp size", categories.
  */
 async function run(message, args) {
 
-    let color = getColor(message.member);
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 3 - diff
+        const time = 5 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -31,14 +30,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
 
     setTimeout(() => {
         cooldown.delete(message.author.id);
-    }, 3000);
+    }, 5000);
 
     let member
 
@@ -52,7 +51,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send("❌ invalid user");
+            return message.channel.send(new ErrorEmbed("invalid user"));
         }
     }
 
@@ -82,19 +81,11 @@ async function run(message, args) {
     
     sizeMsg = sizeMsg + "D"
 
-    color = getColor(member);
-
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`)
         .setTitle("pp predictor 1337")
         .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
-
-        .setFooter("bot.tekoh.wtf")
     
-    return message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)

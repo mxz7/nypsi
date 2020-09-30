@@ -1,8 +1,8 @@
-const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
 
@@ -15,8 +15,6 @@ const cmd = new Command("roulette", "play roulette", categories.MONEY).setAliase
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -34,31 +32,29 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
-        return message.channel.send("🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
+        return message.channel.send(new CustomEmbed(message.member, false, "🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
             "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
-            "🟢 1/" + values.length + " win **17**x")
+            "🟢 1/" + values.length + " win **17**x"))
     }
 
     if (args.length != 2) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("roulette help")
-            .setColor(color)
             .addField("usage", "$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n$roulette odds")
             .addField("help", "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
                 "red and black give a **2x** win and green gives a **17**x win")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+        return message.channel.send(embed)
     }
 
     if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
-        return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
     }
 
     if (args[0] == "red") {
@@ -81,26 +77,26 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+            return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
         }
     }
 
     const bet = parseInt(args[1])
 
     if (bet <= 0) {
-        return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
     }
 
     if (!bet) {
-        return message.channel.send("❌ $roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning")
+        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this bet")
+        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
     if (bet > 100000) {
-        return message.channel.send("❌ maximum bet is $**100k**")
+        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -162,12 +158,8 @@ async function run(message, args) {
         }
     }
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
         .setTitle("roulette wheel | " + message.member.user.username)
-        .setDescription("*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
-
-        .setFooter("bot.tekoh.wtf")
     
     message.channel.send(embed).then(m => {
 
@@ -197,12 +189,7 @@ async function run(message, args) {
         setTimeout(() => {
             m.edit(embed)
         }, 2000)
-
-
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    })
 }
 
 cmd.setRun(run)

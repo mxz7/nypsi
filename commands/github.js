@@ -1,7 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-
-const { getColor } = require("../utils/utils")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("github", "view code for the bot on github", categories.INFO).setAliases(["git"])
 
@@ -11,25 +10,12 @@ const cmd = new Command("github", "view code for the bot on github", categories.
  */
 async function run(message, args) {
 
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ \ni am lacking permission: 'EMBED_LINKS'");
-    }
-
-    const color = getColor(message.member);
-
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, "this bot is opensource and you can view/use the code for completely free\n" +
+        "click [here](https://github.com/tekohxd/nypsi) to view the source code on github")
         .setTitle("github")
         .setURL("https://github.com/tekohxd/nypsi")
-        .setDescription("this bot is opensource and you can view/use the code for completely free\n" +
-        "click [here](https://github.com/tekohxd/nypsi) to view the source code on github")
-        
-        .setFooter("bot.tekoh.wtf")
     
-
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ \ni may be lacking permission: 'EMBED_LINKS'");
-    });
+    message.channel.send(embed)
 
 }
 

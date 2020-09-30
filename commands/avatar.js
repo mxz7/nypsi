@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
 const { registerCommand } = require("../utils/commandhandler");
-const { getMember, getColor } = require("../utils/utils");
+const { getMember } = require("../utils/utils");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
 
@@ -12,9 +13,6 @@ avatar.setAliases(["av"])
  * @param {Array<String>} args
  */
 async function run(message, args)  {
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
 
     let member;
 
@@ -29,21 +27,16 @@ async function run(message, args)  {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
 
-    let avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
+    const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
 
-    const color = getColor(member);
-
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(member, false)
         .setTitle(member.user.tag)
-        .setColor(color)
         .setImage(avatar)
 
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
+    message.channel.send(embed)
 }
 
 avatar.setRun(run)

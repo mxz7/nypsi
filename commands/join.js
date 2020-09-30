@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, getColor, formatDate } = require("../utils/utils")
+const { getMember, formatDate } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
 
@@ -23,10 +24,8 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
-
-    const color = getColor(member);
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
     const daysAgo = timeSince(new Date(member.joinedAt))
@@ -48,16 +47,13 @@ async function run(message, args) {
 
     if (joinPos == 0) joinPos = "invalid"
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, "joined on **" + joinedServer + "**\n" +
+        " - **" + daysAgo.toLocaleString() + "** days ago\n" +
+        "join position is **" + joinPos + "**")
         .setTitle(member.user.tag)
-        .setDescription("joined on **" + joinedServer + "**\n" +
-            " - **" + daysAgo.toLocaleString() + "** days ago\n" +
-            "join position is **" + joinPos + "**")
-        .setFooter("bot.tekoh.wtf")
-        .setColor(color)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
+        
     return message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

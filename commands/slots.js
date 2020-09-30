@@ -1,7 +1,7 @@
-const { getColor } = require("../utils/utils")
 const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒"]
@@ -16,8 +16,6 @@ const cmd = new Command("slots", "play slots", categories.MONEY)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -35,7 +33,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!userExists(message.member)) {
@@ -43,30 +41,23 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("slots help")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
             .addField("usage", "$slots <bet>\n$slots info")
             .addField("help", "you should know how a slot machine works..")
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board"))
+        return message.channel.send(embed)
     }
 
     if (args.length == 1 && args[0] == "info") {
-
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("win board")
             .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.5**x win")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
         
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        })
+        return message.channel.send(embed)
     }
 
     if (!args[0]) {
-        return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
+        return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
     }
 
     if (args[0] == "all") {
@@ -81,22 +72,22 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
+            return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
         }
     }
 
     const bet = (parseInt(args[0]));
 
     if (bet <= 0) {
-        return message.channel.send("❌ $slots <bet> | $**slots info** shows the winning board")
+        return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this bet")
+        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
     if (bet > 100000) {
-        return message.channel.send("❌ maximum bet is $**100k**")
+        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -179,17 +170,11 @@ async function run(message, args) {
     }
     
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString())
         .setTitle("slots | " + message.member.user.username)
-        .setDescription("---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString())
-
-        .setFooter("bot.tekoh.wtf")
     
     message.channel.send(embed).then(m => {
-        
         if (win) {
-
             if (voted) {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
                     "+**" + (voteMulti * 100).toString() + "**% vote bonus")
@@ -212,12 +197,7 @@ async function run(message, args) {
         setTimeout(() => {
             m.edit(embed)
         }, 1500)
-
-
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    })
 }
 
 cmd.setRun(run)

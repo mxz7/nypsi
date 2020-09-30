@@ -1,5 +1,6 @@
 const { MessageEmbed, Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
 const { getMember, getColor } = require("../utils/utils");
 
 const cmd = new Command("presence", "view active presences for a user", categories.INFO).setAliases(["activity", "game"])
@@ -9,10 +10,6 @@ const cmd = new Command("presence", "view active presences for a user", categori
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
 
     let member;
 
@@ -27,16 +24,12 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
 
-    const color = getColor(message.member);
-
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member)
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-        .setFooter("bot.tekoh.wtf")
 
     if (member.presence.activities.length > 0) {
         let hasStatus = false
@@ -83,10 +76,10 @@ async function run(message, args) {
         if (hasStatus || hasSpotify || hasGame) {
             embed.setDescription(status1)
         } else {
-            return message.channel.send("❌ this user has no active presence")
+            return message.channel.send(new ErrorEmbed("this user has no active presence"))
         }
     } else {
-        return message.channel.send("❌ this user has no active presence")
+        return message.channel.send(new ErrorEmbed("this user has no active presence"))
     }
 
     message.channel.send(embed)

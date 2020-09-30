@@ -1,8 +1,8 @@
-const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -13,8 +13,6 @@ const cmd = new Command("rockpaperscissors", "play rock paper scissors", categor
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -32,7 +30,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!userExists(message.member)) {
@@ -40,23 +38,21 @@ async function run(message, args) {
     }
 
     if (args.length == 0 || args.length == 1) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("rockpaperscissors help")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
             .addField("usage", "$rps <**r**ock/**p**aper/**s**cissors> <bet>")
             .addField("help", "rock paper scissors works exactly how this game does in real life\n" +
                 "**2**x multiplier for winning")
 
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+        return message.channel.send(embed)
     }
 
     let choice = args[0]
     let memberEmoji = ""
 
     if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
-        return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
+        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
     }
 
     if (choice == "r") choice = "rock"
@@ -79,26 +75,26 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
+            return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
         }
     }
 
     const bet = (parseInt(args[1]))
 
     if (!bet) {
-        return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
+        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
     }
 
     if (bet <= 0) {
-        return message.channel.send("❌ $rps <**r**ock/**p**aper/**s**cissors> <bet>")
+        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this bet")
+        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
     if (bet > 150000) {
-        return message.channel.send("❌ maximum bet is $**150k**")
+        return message.channel.send(new ErrorEmbed("maximum bet is $**150k**"))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -160,11 +156,8 @@ async function run(message, args) {
         }
     }
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, "*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
         .setTitle("rock paper scissors | " + message.member.user.username)
-        .setDescription("*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
-        .setFooter("bot.tekoh.wtf")
 
     message.channel.send(embed).then(m => {
 
@@ -194,9 +187,7 @@ async function run(message, args) {
         setTimeout(() => {
             m.edit(embed)
         }, 1500)
-    }).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
+    })
 
 }
 

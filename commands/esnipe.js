@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("esnipe", "snipe the most recently edited message", categories.FUN).setAliases(["es"])
 
@@ -16,16 +16,16 @@ async function run(message, args) {
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
-            return message.channel.send("❌ invalid channel")
+            return message.channel.send(new ErrorEmbed("invalid channel"))
         }
         channel = message.mentions.channels.first()
         if (!channel) {
-            return message.channel.send("❌ invalid channel")
+            return message.channel.send(new ErrorEmbed("invalid channel"))
         }
     }
 
     if (!eSnipe || !eSnipe.get(channel.id)) {
-        return message.channel.send("❌ nothing to edit snipe in " + channel.toString())
+        return message.channel.send(new ErrorEmbed("nothing to edit snipe in " + channel.toString()))
     }
 
     let content = eSnipe.get(channel.id).content
@@ -38,17 +38,11 @@ async function run(message, args) {
 
     const created = new Date(eSnipe.get(channel.id).createdTimestamp)
 
-    const color = getColor(message.member);
-
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, false, content)
         .setTitle(eSnipe.get(channel.id).member.user.tag)
-        .setDescription(content)
-
         .setFooter(timeSince(created) + " ago")
     
     message.channel.send(embed)
-
 }
 
 cmd.setRun(run)
@@ -83,6 +77,10 @@ function timeSince(date) {
 
     if (sec > 0) {
         output = output + sec + "s"
+    }
+
+    if (output == "") {
+        output = "0s"
     }
 
     return output

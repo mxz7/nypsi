@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
-const { redditImage, getColor } = require("../utils/utils.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { redditImage } = require("../utils/utils.js")
 
 const cooldown = new Map()
 
@@ -11,8 +12,6 @@ const cmd = new Command("ass", "get a random ass image", categories.NSFW)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,23 +29,23 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (!message.channel.nsfw) {
-        return message.channel.send("❌ you must do this in an nsfw channel")
+        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
     }
 
     const { assCache } = require("../utils/imghandler")
 
     if (assCache.size <= 2) {
-        return message.channel.send("❌ please wait a couple more seconds..")
+        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
     }
 
     cooldown.set(message.member.id, new Date());
 
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 5000);
 
     const assLinks = Array.from(assCache.keys())
@@ -60,7 +59,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send("❌ unable to find bdsm image")
+        return message.channel.send(new ErrorEmbed("unable to find bdsm image"))
     }
 
     const image = a.split("|")[0]
@@ -72,17 +71,13 @@ async function run(message, args) {
 
     const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, false)
         .setTitle(title)
-        .setAuthor("u/" + author + " | r/" + subreddit)
+        .setHeader("u/" + author + " | r/" + subreddit)
         .setURL(url)
         .setImage(image)
-        .setFooter("bot.tekoh.wtf")
 
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be missing permission: 'EMBED_LINKS'")
-    })
+    message.channel.send(embed)
 
 }
 

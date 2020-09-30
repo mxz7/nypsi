@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache } = require("../economy/utils.js");
 const { Command, categories } = require("../utils/classes/Command.js");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 const bonusCooldown = new Map()
@@ -13,8 +13,6 @@ const cmd = new Command("vote", "vote every 12 hours to get a 20% bonus on gambl
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -32,7 +30,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -45,10 +43,8 @@ async function run(message, args) {
 
     const voted = await getVoteMulti(message.member) > 0
 
-    const embed = new MessageEmbed()
-    embed.setURL("https://top.gg/bot/678711738845102087/vote")
-    embed.setDescription("https://top.gg/bot/678711738845102087/vote")
-    embed.setFooter("bot.tekoh.wtf")
+    const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
+        .setURL("https://top.gg/bot/678711738845102087/vote")
 
     if (voted) {
 
@@ -83,9 +79,7 @@ async function run(message, args) {
         removeFromVoteCache(message.member)
     }
 
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    })
+    message.channel.send(embed)
 
 }
 

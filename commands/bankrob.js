@@ -1,9 +1,9 @@
-const { getColor } = require("../utils/utils")
 const { getBalance, createUser, updateBalance, userExists } = require("../economy/utils.js")
 const Discord = require("discord.js")
-const { MessageEmbed, Message } = require("discord.js")
+const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -18,7 +18,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {
-        return await message.channel.send("❌ you must have atleast $1k in your wallet to rob a bank")
+        return await message.channel.send(new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank"))
     }
 
     const bankWorth = new Discord.Collection()
@@ -41,8 +41,6 @@ async function run(message, args) {
         bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2))
     }
 
-    const color = getColor(message.member);
-
     if (args[0] == "status") {
         let bankList = ""
 
@@ -52,16 +50,11 @@ async function run(message, args) {
 
         bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, bankList)
             .setTitle("current bank balances")
-            .setColor(color)
-            .setDescription(bankList)
-            .setFooter("bot.tekoh.wtf")
             
             
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
+        return message.channel.send(embed)
     }
 
     if (cooldown.has(message.member.id)) {
@@ -80,7 +73,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -116,12 +109,8 @@ async function run(message, args) {
         updateBalance(message.member, getBalance(message.member) + robbedAmount)
     }
 
-    const embed = new MessageEmbed()
-        .setColor(color)
+    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..")
         .setTitle("bank robbery | " + message.member.user.username)
-        .setDescription("robbing " + bank + "..")
-
-        .setFooter("bot.tekoh.wtf")
         
     message.channel.send(embed).then(m => {
             

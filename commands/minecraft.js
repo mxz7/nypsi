@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");;
+const { Message } = require("discord.js");;
 const fetch = require("node-fetch");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getTimestamp } = require("../utils/utils");
 
 const cooldown = new Map()
 const cache = new Map()
@@ -14,16 +15,6 @@ const cmd = new Command("minecraft", "view information about a minecraft account
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
-
-    if (args.length == 0) {
-        return message.channel.send("❌ $minecraft <name/server IP>");
-    }
-    
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -41,7 +32,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+    }
+
+    if (args.length == 0) {
+        return message.channel.send(new ErrorEmbed("$minecraft <name/server IP>"));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -61,12 +56,7 @@ async function run(message, args) {
                 names1.push(n)
             }
 
-            const embed = new MessageEmbed()
-                .setTitle("minecraft cache")
-                .setColor(color)
-                .setFooter("bot.tekoh.wtf")
-                .setDescription("`" + names1.join("`\n`") + "`")
-
+            const embed = new CustomEmbed(message.member, false, "`" + names1.join("`\n`") + "`").setTitle("minecraft cache")
             return message.channel.send(embed)
         }
     }
@@ -89,17 +79,15 @@ async function run(message, args) {
                     serverCache.delete(serverIP.toLowerCase())
                 }, 600000)
             } else {
-                return message.channel.send("❌ invalid ip address")
+                return message.channel.send(new ErrorEmbed("invalid server"))
             }
         }
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, true)
             .setTitle(args[0] + " | " + res.ip + ":" + res.port)
             .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
             .addField("version", res.version, true)
             .addField("motd", res.motd.clean)
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed)
     }
@@ -130,7 +118,7 @@ async function run(message, args) {
             console.log(username)
             console.log(cache.get(username.toLowerCase()))
             cache.delete(username.toLowerCase())
-            return await message.channel.send("❌ error fetching from cache")
+            return await message.channel.send(new ErrorEmbed("error fetching from cache"))
         }
     } else {
         res = await fetch(url1).then(url => url.json()).catch(() => {
@@ -144,7 +132,7 @@ async function run(message, args) {
                 return url.json()
             }).catch(() => {
                 invalid = true
-                return message.channel.send("❌ invalid account")
+                return message.channel.send(new ErrorEmbed("invalid account"))
             })
         }
 
@@ -191,7 +179,7 @@ async function run(message, args) {
     const names = new Map()
 
     if (!nameHistory) {
-        await message.channel.send("❌ error fetching data")
+        await message.channel.send(new ErrorEmbed("error fetching data"))
         console.log("error fetching data")
         console.log(res)
     }
@@ -251,21 +239,16 @@ async function run(message, args) {
         if (e != BreakException) throw e
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, names.get(1).join("\n"))
         .setTitle(username)
         .setURL("https://namemc.com/profile/" + username)
-        .setDescription(names.get(1).join("\n"))
-        .setColor(color)
         .setThumbnail(skin)
-        .setFooter("bot.tekoh.wtf")
 
     if (oldName) {
-        embed.setAuthor("match found as an old username")
+        embed.setHeader("match found as an old username")
     }
     
-    const msg = await message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    })
+    const msg = await message.channel.send(embed)
 
     if (names.size >= 2) {
         await msg.react("⬅")
@@ -314,6 +297,17 @@ async function run(message, args) {
     }
 
 }
+
+setInterval(() => {
+    if (cache.size > 7) {
+        cache.clear()
+        console.log(`[${getTimestamp()}] minecraft username cache cleared`)
+    }
+    if (serverCache.size > 7) {
+        serverCache.clear()
+        console.log(`[${getTimestamp()}] minecraft server cache cleared`)
+    }
+}, 6 * 60 * 60 * 1000);
 
 cmd.setRun(run)
 
