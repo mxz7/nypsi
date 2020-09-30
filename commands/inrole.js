@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js");
 const { inCooldown, addCooldown } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -12,8 +12,6 @@ const cmd = new Command("inrole", "get the members in a role", categories.INFO)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -31,11 +29,12 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ $inrole <role>")
+        return message.channel.send(new ErrorEmbed("$inrole <role>"))
     }
 
     const roles = message.guild.roles.cache
@@ -51,7 +50,7 @@ async function run(message, args) {
     }
 
     if (!role) {
-        return message.channel.send("❌ couldn't find the role `" + args.join(" ") + "`")
+        return message.channel.send(new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``))
     }
 
     role = role
@@ -92,16 +91,18 @@ async function run(message, args) {
         }
     })
 
-    const embed = new MessageEmbed()
+    if (!memberList.get(1)) {
+        return message.channel.send(new CustomEmbed(message.member, false, "that role has no members"))
+    }
+
+    const embed = new CustomEmbed(message.member, false, memberList.get(1))
         .setTitle(role.name + " [" + count.toLocaleString() + "]")
-        .setColor(color)
-        .setDescription(memberList.get(1))
-        .setFooter(`bot.tekoh.wtf | page 1/${memberList.size}`)
+        .setFooter(`page 1/${memberList.size}`)
     
 
     const msg = await message.channel.send(embed)
 
-    if (memberList.size < 1) return
+    if (memberList.size <= 1) return
 
     await msg.react("⬅")
     await msg.react("➡")
@@ -129,7 +130,7 @@ async function run(message, args) {
             } else {
                 currentPage--
                 embed.setDescription(memberList.get(currentPage).join("\n"))
-                embed.setFooter(`bot.tekoh.wtf | page ${currentPage}/${lastPage}`)
+                embed.setFooter(`page ${currentPage}/${lastPage}`)
                 await msg.edit(embed)
                 return pageManager()
             }
@@ -139,7 +140,7 @@ async function run(message, args) {
             } else {
                 currentPage++
                 embed.setDescription(memberList.get(currentPage).join("\n"))
-                embed.setFooter(`bot.tekoh.wtf | page ${currentPage}/${lastPage}`)
+                embed.setFooter(`page ${currentPage}/${lastPage}`)
                 await msg.edit(embed)
                 return pageManager()
             }

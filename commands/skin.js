@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const fetch = require("node-fetch");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -13,15 +13,9 @@ const cmd = new Command("skin", "view the skin of a minecraft account", categori
  */
 async function run(message, args) {
 
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
-
     if (args.length == 0) {
-        return message.channel.send("❌ $skin <account>");
+        return message.channel.send(new ErrorEmbed("$skin <account>"));
     }
-
-    const color = getColor(message.member);
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -39,7 +33,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -56,23 +50,17 @@ async function run(message, args) {
     try {
         uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
     } catch (e) {
-        return message.channel.send("❌ invalid account");
+        return message.channel.send(new ErrorEmbed("invalid account"));
     }
 
     const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, `[download](https://mc-heads.net/download/${uuid.id})`)
         .setTitle(uuid.name)
         .setURL("https://namemc.com/profile/" + username)
-        .setDescription(`[download](https://mc-heads.net/download/${uuid.id})`)
-        .setColor(color)
         .setImage(skinIMG)
-        .setFooter("bot.tekoh.wtf")
     
-    return message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    })
-
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)

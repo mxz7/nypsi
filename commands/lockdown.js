@@ -1,34 +1,27 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const Discord = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("lockdown", "lockdown a channel (will only work if permissions are setup correctly)", categories.MODERATION)
+const cmd = new Command("lockdown", "lockdown a channel (will only work if permissions are setup correctly)", categories.MODERATION).setAliases(["lock"]).setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])
 
 /**
  * @param {Message} message 
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_MESSAGES")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            const embed = new MessageEmbed()
-                .setTitle("lockdown")
-                .setDescription("❌ requires permission: *MANAGE_CHANNELS* and *MANAGE_MESSAGES*")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
-            return message.channel.send(embed)
+            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_CHANNELS* and *MANAGE_MESSAGES*"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS") || !message.guild.me.hasPermission("MANAGE_ROLES")) {
-        return message.channel.send("❌ i am lacking permission: 'MANAGE_CHANNELS' or 'MANAGE_ROLES'")
+        return message.channel.send(new ErrorEmbed("i am lacking permission: 'MANAGE_CHANNELS' or 'MANAGE_ROLES'"))
     }
 
     if (cooldown.has(message.member.id)) {
@@ -47,7 +40,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     let channel = message.channel
@@ -85,11 +78,8 @@ async function run(message, args) {
             SEND_MESSAGES: false
         })
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked")
             .setTitle("lockdown | " + message.member.user.username)
-            .setColor(color)
-            .setDescription("✅ " + channel.toString() + " has been locked")
-            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed).catch(() => {
             return message.member.send(embed).catch()
@@ -98,14 +88,11 @@ async function run(message, args) {
         await channel.updateOverwrite(role, {
             SEND_MESSAGES: null
         })
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked")
             .setTitle("lockdown | " + message.member.user.username)
-            .setColor(color)
-            .setDescription("✅ " + channel.toString() + " has been unlocked")
-            .setFooter("bot.tekoh.wtf")
 
         return message.channel.send(embed).catch(() => {
-            return message.member.send(embed).catch()
+            return message.member.send(embed)
         })
     }
 

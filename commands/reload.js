@@ -1,5 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("reload", "reload commands", categories.NONE)
 
@@ -18,14 +19,17 @@ async function run(message, args) {
         console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
     } else {
 
-        let msg = reloadCommand(args).split("✔")
-        msg = "```\n" + msg + "```"
+        let msg
 
-        const embed = new MessageEmbed()
+        try {
+            msg = reloadCommand(args).split("✔")
+            msg = "```\n" + msg + "```"
+        } catch (e) {
+            return message.channel.send(new ErrorEmbed(`\`\`\`${e}\`\`\``))
+        }
+
+        const embed = new CustomEmbed(message.member, false, msg)
             .setTitle("reload")
-            .setDescription(msg)
-            .setFooter("bot.tekoh.wtf")
-            .setColor("#60d16b")
         
         message.channel.send(embed)
     }

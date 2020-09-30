@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils")
+const { Message } = require("discord.js");
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 const games = new Map()
@@ -15,17 +15,7 @@ const cmd = new Command("highlow", "higher or lower game", categories.MONEY).set
  */
 async function run(message, args) {
 
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
-
-    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
-    }
-
     if (!userExists(message.member)) createUser(message.member)
-
-    const color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -43,13 +33,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("highlow help")
-            .setColor(color)
             .addField("usage", "$highlow <bet>\n$highlow info")
             .addField("game rules", "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once.")
             .addField("help", "**A**ce | value of 1\n**J**ack | value of 11\n" + 
@@ -57,22 +47,18 @@ async function run(message, args) {
                 "⬆ **higher** the next card will be higher in value than your current card\n" +
                 "⬇ **lower** the next card will be lower in value than your current card\n" +
                 "💰 **cash out** end the game and receive the current win\nmax win **15**x")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $highlow <bet>"))
+        return message.channel.send(embed)
     }
 
     if (args[0] == "info") {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "highlow works exactly how it would in real life\n" +
+            "when you create a game, a full 52 deck is shuffled in a random order\n" +
+            "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+            "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)")
             .setTitle("highlow help")
-            .setColor(color)
-            .addField("technical info", "highlow works exactly how it would in real life\n" +
-                "when you create a game, a full 52 deck is shuffled in a random order\n" +
-                "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)")
-            .setFooter("bot.tekoh.wtf")
         
-        return message.channel.send(embed).catch()
+        return message.channel.send(embed)
     }
 
     if (args[0] == "all") {
@@ -86,25 +72,25 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send("❌ invalid bet")
+        return message.channel.send(new ErrorEmbed("invalid bet"))
     }
 
     const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send("❌ $highlow <bet>")
+        return message.channel.send(new ErrorEmbed("$highlow <bet>"))
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this bet")
+        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
     if (bet > 100000) {
-        return message.channel.send("❌ maximum bet is $**100k**")
+        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
     }
 
     if (games.has(message.member.user.id)) {
-        return message.channel.send("❌ you are already playing highlow")
+        return message.channel.send(new ErrorEmbed("you are already playing highlow"))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -122,7 +108,6 @@ async function run(message, args) {
         "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
         "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
 
-    
     const voteMulti = await getVoteMulti(message.member)
     
     games.set(message.member.user.id, {
@@ -136,18 +121,13 @@ async function run(message, args) {
 
     newCard(message.member)
 
-    const loadingEmbed = new MessageEmbed()
+    const loadingEmbed = new CustomEmbed(message.member)
         .setTitle("loading.. | " + message.member.user.username)
-        .setFooter("bot.tekoh.wtf")
-        .setColor(color)
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setTitle("highlow | " + message.member.user.username)
-        .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
-        .setColor(color)
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
         .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
-        .setFooter("bot.tekoh.wtf")
     
     message.channel.send(loadingEmbed).then(async m => {
         await m.react("⬆")
@@ -204,12 +184,9 @@ async function playGame(message, m) {
     const bet = games.get(message.member.user.id).bet
     let win = games.get(message.member.user.id).win
     let card = games.get(message.member.user.id).card
-    const color = getColor(message.member)
 
-    const newEmbed = new MessageEmbed()
+    const newEmbed = new CustomEmbed(message.member, true)
         .setTitle("highlow | " + message.member.user.username)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
 
     const lose = async () => {
         newEmbed.setColor("#e4334f")

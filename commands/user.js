@@ -1,6 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, formatDate, getColor } = require("../utils/utils");
+const { getMember, formatDate } = require("../utils/utils");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(["whois", "who"])
 
@@ -9,10 +10,6 @@ const cmd = new Command("user", "view info about a user in the server", categori
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
 
     let member;
 
@@ -39,17 +36,12 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send("❌ invalid user");
+        return message.channel.send(new ErrorEmbed("invalid user"));
     }
 
-    const color = getColor(member);
-
     if (args.join(" ").includes("-id")) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`")
             .setTitle(member.user.tag)
-            .setColor(color)
-            .setDescription("`" + member.user.id + "`")
-            .setFooter("bot.tekoh.wtf")
         return message.channel.send(embed)
     }
 
@@ -83,28 +75,21 @@ async function run(message, args) {
 
     rolesText = rolesText.split("@everyone").join("")
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, member.user.toString())
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-        .setColor(color)
         .setTitle(member.user.tag)
-        .setDescription(member.user.toString())
         
-        .addField("account", `**id** ${member.user.id}` +
-        `\n**created** ${created.toString().toLowerCase()}`, true)
+        .addField("account", `**id** ${member.user.id}
+            **created** ${created.toString().toLowerCase()}`, true)
 
         .addField("server", "**joined** " + joined.toString().toLowerCase() + "\n" +
             "**join pos** " + joinPos, true)
-
-        .setFooter("bot.tekoh.wtf")
     
     if (rolesText != " ") {
         embed.addField("roles [" + member._roles.length + "]", rolesText,)
     }
 
-    message.channel.send(embed).catch(() => {
-         return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)

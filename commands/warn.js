@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js");
 const { newCase, profileExists, createProfile } = require("../moderation/utils");
 const { inCooldown, addCooldown } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -13,20 +13,16 @@ const cmd = new Command("warn", "warn one or more users", categories.MODERATION)
 async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
-        
-    const color = getColor(message.member)
 
     if (args.length == 0 && message.mentions.members.first() == null) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("warn help")
-            .setColor(color)
             .addField("usage", "$warn <@user(s)> (reason) [-s")
             .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can warn one or more members in one command (must tag them)\n" +
                 "**(reason)** reason for the warn, will be given to all warned members\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n\n" +
                 "if the bot was unable to DM a user on warn, the warning will still be logged")
             .addField("examples", "$warn @member toxicity\n$warn @member @member2 toxicity")
-            .setFooter("bot.tekoh.wtf")
         
         return message.channel.send(embed)
     }
@@ -44,12 +40,12 @@ async function run(message, args) {
         const member = members.find(m => m.id == args[0])
 
         if (!member) {
-            return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+            return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
         }
         
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
     }
 
     const members = message.mentions.members
@@ -61,7 +57,7 @@ async function run(message, args) {
         }
         reason = args.join(" ")
     } else {
-        return message.channel.send("❌ you must include a warn reason")
+        return message.channel.send(new ErrorEmbed("you must include a warn reason"))
     }
 
     let count = 0
@@ -88,14 +84,11 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send("❌ i was unable to warn any users")
+        return message.channel.send(new ErrorEmbed("i was unable to warn any users"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, "✅ **" + count + "** members warned for: " + reason)
         .setTitle("warn | " + message.member.user.username)
-        .setDescription("✅ **" + count + "** members warned for: " + reason)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
     
     if (count == 1) {
         embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason)
@@ -115,7 +108,6 @@ async function run(message, args) {
     } else {
         await message.channel.send(embed)
     }
-
 }
 
 cmd.setRun(run)

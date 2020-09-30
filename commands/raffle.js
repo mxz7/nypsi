@@ -1,6 +1,6 @@
-const { MessageEmbed, MessageAttachment } = require("discord.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -11,8 +11,6 @@ const cmd = new Command("raffle", "select a random user from current online memb
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    let color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,7 +28,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     let members = []
@@ -55,7 +53,7 @@ async function run(message, args) {
         const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ")))
 
         if (!role) {
-            return await message.channel.send("❌ i wasn't able to find that role")
+            return await message.channel.send(new ErrorEmbed("i wasn't able to find that role"))
         }
 
         cooldown.set(message.member.id, new Date());
@@ -69,7 +67,7 @@ async function run(message, args) {
         })
 
         if (members.length == 0) {
-            return message.channel.send("❌ there is nobody in that role")
+            return message.channel.send(new ErrorEmbed("there is nobody in that role"))
         }
     }
 
@@ -77,13 +75,9 @@ async function run(message, args) {
 
     chosen = await message.guild.members.fetch(chosen)
 
-    color = getColor(chosen)
-
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle("raffle by " + message.member.user.tag)
-        .setColor(color)
         .setDescription("**" + chosen.user.tag + "**")
-        .setFooter("bot.tekoh.wtf")
 
     return message.channel.send(embed)
 

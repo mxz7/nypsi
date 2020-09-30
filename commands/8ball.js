@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js")
-const { getColor } = require("../utils/utils.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const answers = ["as i see it, yes",
     "ask again later",
@@ -34,8 +34,6 @@ const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
  */
 async function run(message, args) {
 
-    const color = getColor(message.member);
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -53,12 +51,11 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        return message.channel.send("❌ you must ask the 8ball something")
+        return message.channel.send(new ErrorEmbed("you must ask the 8ball something"))
     }
 
     cooldown.set(message.member.id, new Date());
@@ -69,15 +66,9 @@ async function run(message, args) {
 
     const question = args.join(" ")
 
-    const embed = new MessageEmbed()
-        .setColor(color)
-        .setTitle("8ball")
-        .setDescription("\n**" + question + "** - " + message.member.user.toString() + "\n\n🎱 " + answers[Math.floor(Math.random() * answers.length)])
-        .setFooter("bot.tekoh.wtf")
-
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_MESSAGES'")
-    })
+    const embed = new CustomEmbed(message.member, false, `**${question}** - ${message.member.user.toString()}\n\n🎱 ${answers[Math.floor(Math.random() * answers.length)]}`)
+        
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)

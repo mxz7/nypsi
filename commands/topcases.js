@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { profileExists, getAllCases } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor, getMember } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -15,9 +16,7 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
-    if (!profileExists(message.guild)) return message.channel.send("❌ no data for this server")
-
-    const color = getColor(message.member)
+    if (!profileExists(message.guild)) return message.channel.send(new ErrorEmbed("no data for this server"))
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -35,21 +34,20 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
-
-    const embed = new MessageEmbed()
-        .setTitle("top cases | " + message.member.user.username)
-        .setColor(color)
 
     const cases = getAllCases(message.guild)
 
-    if (cases.size <= 0) return message.channel.send("❌ no data for this server")
+    if (cases.size <= 0) return message.channel.send(new ErrorEmbed("no data for this server"))
 
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 5000);
+
+    const embed = new CustomEmbed(message.member, true)
+        .setTitle("top cases | " + message.member.user.username)
 
     if (args.length == 0) {
         const topStaff = new Map()
@@ -128,7 +126,12 @@ async function run(message, args) {
 
         embed.addField("top staff", staffText, true)
         embed.addField("top members", memberText, true)
-        embed.setFooter(`$topcases <user> | ${cases.size.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`)
+
+        if (deletedCaseCount) {
+            embed.setFooter(`$topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`)
+        } else {
+            embed.setFooter(`$topcases <user> | ${cases.length.toLocaleString()} total cases`)
+        }
     } else {
 
         let member
@@ -149,7 +152,7 @@ async function run(message, args) {
                 member = getMember(message, args.join(" "))
 
                 if (!member) {
-                    return message.channel.send("❌ can't find `" + args.join(" ") + "`")
+                    return message.channel.send(new ErrorEmbed("can't find `" + args.join(" ") + "`"))
                 }
             }
         }

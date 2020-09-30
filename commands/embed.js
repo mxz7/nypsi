@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 
@@ -14,9 +14,7 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
         return 
-    } 
-
-    let color = getColor(message.member)
+    }
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -34,25 +32,25 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false)
             .setTitle("embed help")
-            .setColor(color)
             .addField("usage", "$embed <title> | (text) | (hex color)")
             .addField("help", "with this command you can create a simple embed message\n" +
                 "**<>** required | **()** optional\n")
             .addField("examples", "$embed hello\n" +
                 "$embed hello | this is a description\n" +
                 "$embed hello | this is a description | #13c696")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $embed <title> | (text) | (hex color)"))
+        return message.channel.send(embed)
     }
 
     let mode = ""
+    let color
 
     if (!message.content.includes("|")) {
         mode = "title_only"
@@ -78,19 +76,20 @@ async function run(message, args) {
         color = args.join(" ").split("|")[2]
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle(title)
-        .setColor(color)
     
     if (mode.includes("desc")) {
         embed.setDescription(description)
     }
 
-    
+    if (color) {
+        embed.setColor(color)
+    }
+
     message.channel.send(embed).then(() => {
         message.delete()
     })
-
 }
 
 cmd.setRun(run)

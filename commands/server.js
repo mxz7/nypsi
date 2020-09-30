@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");;;
-const { formatDate, getColor } = require("../utils/utils");
+const { Message } = require("discord.js");;;
+const { formatDate } = require("../utils/utils");
 const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("server", "view information about the server", categories.INFO).setAliases(["serverinfo", "membercount"])
 
@@ -12,10 +13,6 @@ const cmd = new Command("server", "view information about the server", categorie
 async function run(message, args) {
 
     const server = message.guild;
-
-    if (!server.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission: 'EMBED_LINKS'");
-    }
 
     const created = formatDate(server.createdAt).toLowerCase();
 
@@ -32,25 +29,18 @@ async function run(message, args) {
     const users = members.filter(member => !member.user.bot)
     const bots = members.filter(member => member.user.bot)
     const online = users.filter(member => member.presence.status != "offline")
-    
-    const color = getColor(message.member);
 
     if (args.length == 1 && args[0] == "-id") {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle(server.name)
-            .setColor(color)
             .setDescription("`" + server.id + "`")
-            .setFooter("bot.tekoh.wtf")
         
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
+        return message.channel.send(embed)
     }
        
     if (args.length == 1 && args[0] == "-m") {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setThumbnail(server.iconURL({format: "png", dynamic: true, size: 128}))
-            .setColor(color)
             .setTitle(server.name)
 
             .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
@@ -59,16 +49,11 @@ async function run(message, args) {
                 "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
                 "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
 
-            .setFooter("bot.tekoh.wtf")
-
-        return message.channel.send(embed).catch(() => {
-            return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-        });
+        return message.channel.send(embed)
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setThumbnail(server.iconURL({format: "png", dynamic: true, size: 128}))
-        .setColor(color)
         .setTitle(server.name)
         
         .addField("info", "**owner** " + server.owner.user.tag + "\n" +
@@ -85,15 +70,11 @@ async function run(message, args) {
             "**member peak** " + getPeaks(message.guild).members.toLocaleString() + "\n" + 
             "**online peak** " + getPeaks(message.guild).onlines.toLocaleString())
 
-        .setFooter("bot.tekoh.wtf")
-
     if (server.memberCount >= 25000) {
         embed.setFooter(`real member count: ${server.memberCount} | stats are inaccurate to optimise with large servers`)
     }
 
-    message.channel.send(embed).catch(() => {
-         return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
+    message.channel.send(embed)
 
 }
 

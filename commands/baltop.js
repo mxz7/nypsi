@@ -1,7 +1,7 @@
-const { getColor } = require("../utils/utils")
 const { topAmount } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
@@ -11,9 +11,7 @@ const cmd = new Command("baltop", "view top balances in the server", categories.
  * @param {Message} message 
  * @param {Array<String>} args 
  */
-async function run(message, args)  {
-
-    const color = getColor(message.member);
+async function run(message, args) {
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -30,8 +28,9 @@ async function run(message, args)  {
             remaining = `${minutes}m${seconds}s`
         } else {
             remaining = `${seconds}s`
-            }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        }
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     cooldown.set(message.member.id, new Date());
@@ -62,17 +61,11 @@ async function run(message, args)  {
         return el != null;
     });
           
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false)
         .setTitle("top " + filtered.length)
-        .setColor(color)
         .setDescription(filtered)
 
-        .setFooter("bot.tekoh.wtf")
-
-    message.channel.send(embed).catch(() => {
-        return message.channel.send("❌ i may be lacking permission: 'EMBED_LINKS'");
-    });
-
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)

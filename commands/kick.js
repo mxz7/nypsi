@@ -1,8 +1,8 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { getColor } = require("../utils/utils");
+const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase } = require("../moderation/utils");
 const { inCooldown, addCooldown } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("kick", "kick one or more users", categories.INFO).setPermissions(["KICK_MEMBERS"])
 
@@ -11,38 +11,29 @@ const cmd = new Command("kick", "kick one or more users", categories.INFO).setPe
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-
-    const color = getColor(message.member);
         
     if (!message.member.hasPermission("KICK_MEMBERS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            const embed = new MessageEmbed()
-                .setTitle("kick")
-                .setDescription("❌ requires permission: *KICK_MEMBERS*")
-                .setFooter("bot.tekoh.wtf")
-                .setColor(color)
-            return message.channel.send(embed)
+            return message.channel.send(new ErrorEmbed("requires permission: *KICK_MEMBERS*"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
-        return message.channel.send("❌ i am lacking permission: 'KICK_MEMBERS'");
+        return message.channel.send(new ErrorEmbed("i am lacking permission: 'KICK_MEMBERS'"));
     }
 
     if (args.length == 0 && message.mentions.members.first() == null) {
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("kick help")
-            .setColor(color)
             .addField("usage", "$kick <@user(s)> (reason) [-s]")
             .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can kick one or more members in one command (must tag them)\n" +
                 "**(reason)** reason for the kick, will be given to all kicked members\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
             .addField("examples", "$kick @member hacking\n$kick @member @member2 @member3 hacking\n$kick @member hacking -s")
-            .setFooter("bot.tekoh.wtf")
 
-        return message.channel.send(embed).catch(() => message.channel.send("❌ $kick <@user(s)> (reason) [-s]"))
+        return message.channel.send(embed)
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -58,12 +49,12 @@ async function run(message, args) {
         const member = members.find(m => m.id == args[0])
 
         if (!member) {
-            return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+            return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
         }
         
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send("❌ unable to find member with ID `" + args[0] + "`")
+        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
     }
 
     const members = message.mentions.members
@@ -97,14 +88,11 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send("❌ i was unable to kick any users")
+        return message.channel.send(new ErrorEmbed("i was unable to kick any users"))
     }
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, `✅ **${count}** members kicked for: ${reason.split(": ")[1]}`)
         .setTitle("kick | " + message.member.user.username)
-        .setDescription("✅ **" + count + "** members kicked for: " + reason.split(": ")[1])
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
 
     if (failed.length != 0) {
         embed.addField("error", "unable to kick: " + failed.join(", "))

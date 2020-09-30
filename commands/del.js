@@ -1,6 +1,6 @@
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getColor } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map();
 
@@ -14,13 +14,7 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
         return
-    } 
-
-    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
     }
-
-    const color = getColor(message.member)
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -38,11 +32,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send("❌ $del <amount> (@user)");
+        return message.channel.send(new ErrorEmbed("$del <amount> (@user)"));
     }
 
     let amount = parseInt(args[0])
@@ -103,11 +97,8 @@ async function run(message, args) {
             amount = 10000
         }
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member, false, "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message")
             .setTitle("delete | " + message.member.user.tag)
-            .setDescription("deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message")
-            .setColor(color)
-            .setFooter("bot.tekoh.wtf")
 
         const m = await message.channel.send(embed)
         for (let i = 0; i < (amount1 / 100); i++) {

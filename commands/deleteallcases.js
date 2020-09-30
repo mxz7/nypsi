@@ -1,7 +1,7 @@
-const { getColor } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { deleteServer, profileExists } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("deleteallcases", "delete all cases in a server", categories.MODERATION).setAliases(["dac"]).setPermissions(["server owner"])
 
@@ -11,26 +11,18 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", catego
  */
 async function run(message, args) {
 
-    const color = getColor(message.member)
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
     if (message.member.hasPermission("MANAGE_MESSAGES") && message.guild.owner.user.id != message.member.user.id) {
-        const embed = new MessageEmbed()
-            .setTitle("deleting all cases")
-            .setDescription("❌ to delete all cases you must be the server owner")
-            .setFooter("bot.tekoh.wtf")
-            .setColor(color)
+        const embed = new ErrorEmbed("to delete all cases you must be the server owner")
 
         return message.channel.send(embed)
     }
 
-    if (!profileExists(message.guild)) return await message.channel.send("❌ there are no cases to delete")
+    if (!profileExists(message.guild)) return await message.channel.send(new ErrorEmbed("there are no cases to delete"))
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
         .setTitle("confirmation")
-        .setColor(color)
-        .setDescription("react with ✅ to delete all punishment/moderation cases")
         .setFooter("this cannot be reversed")
 
     const msg = await message.channel.send(embed)
@@ -51,9 +43,8 @@ async function run(message, args) {
     if (reaction == "✅") {
         deleteServer(message.guild)
 
-        const newEmbed = new MessageEmbed()
+        const newEmbed = new CustomEmbed(message.member, false, "✅ all cases have been deleted")
             .setDescription("✅ all cases have been deleted")
-            .setColor(color)
 
         await msg.edit(newEmbed)
     }

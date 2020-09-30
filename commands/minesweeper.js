@@ -1,7 +1,7 @@
 const { userExists, createUser, getBalance, formatBet, updateBalance, getVoteMulti, updateXp, getXp } = require("../economy/utils")
-const { getColor } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
+const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 const games = new Map()
@@ -25,10 +25,8 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
-    const color = getColor(message.member)
-
     if (games.has(message.author.id)) {
-        return message.channel.send("❌ you are already playing minesweeper")
+        return message.channel.send(new ErrorEmbed("you are already playing minesweeper"))
     }
 
     if (cooldown.has(message.member.id)) {
@@ -47,13 +45,12 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new MessageEmbed().setDescription("❌ still on cooldown for " + remaining).setColor(color));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
     if (args.length == 0) {
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed(message.member)
             .setTitle("minesweeper help")
-            .setColor(color)
             .addField("usage", "$ms <bet>")
             .addField("game rules", "a 5x5 grid of white squares will be created\n" +
                 "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
@@ -76,21 +73,21 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send("❌ invalid bet")
+        return message.channel.send(new ErrorEmbed("invalid bet"))
     }
 
     const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send("❌ $ms <bet>")
+        return message.channel.send(new ErrorEmbed("$ms <bet>"))
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send("❌ you cannot afford this bet")
+        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
     if (bet > 100000) {
-        return message.channel.send("❌ maximum bet is $**100k**")
+        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -127,13 +124,10 @@ async function run(message, args) {
         voted: voteMulti
     })
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setTitle("minesweeper | " + message.author.username)
-        .setColor(color)
-        .setDescription("**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
-        .setFooter("bot.tekoh.wtf")
 
     const msg = await message.channel.send(embed)
 
@@ -230,14 +224,11 @@ async function playGame(message, msg) {
     const bet = games.get(message.author.id).bet
     let win = games.get(message.author.id).win
     const grid = games.get(message.author.id).grid
-    const color = getColor(message.member)
 
     let table
 
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member, true)
         .setTitle("minesweeper | " + message.author.username)
-        .setColor(color)
-        .setFooter("bot.tekoh.wtf")
     
     const lose = async () => {
         embed.setColor("#e4334f")
@@ -304,7 +295,7 @@ async function playGame(message, msg) {
     if (fail) return
 
     if (response.length != 2 && response != "finish") {
-        await message.channel.send("❌ " + message.author.toString() + " invalid coordinate, example: `a3`")
+        await message.channel.send(message.author.toString() + " invalid coordinate, example: `a3`")
         return playGame(message, msg)
     }
 
@@ -339,7 +330,7 @@ async function playGame(message, msg) {
         }
 
         if (!check || !check1) {
-            await message.channel.send("❌ " + message.author.toString() + " invalid coordinate, example: `a3`")
+            await message.channel.send(message.author.toString() + " invalid coordinate, example: `a3`")
             return playGame(message, msg)
         }
     }
