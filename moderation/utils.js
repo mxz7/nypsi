@@ -51,6 +51,14 @@ setInterval(async () => {
 
 }, 24 * 60 * 60 * 1000);
 
+setInterval(() => {
+    let date = new Date()
+    date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
+    fs.writeFileSync('./moderation/backup/' + date + '.json', JSON.stringify(data))
+    console.log("\x1b[32m[" + getTimestamp() + "] moderation data backup complete\x1b[37m")
+}, 43200000)
+
+
 module.exports = {
 
     /**
