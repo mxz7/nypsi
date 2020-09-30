@@ -66,6 +66,22 @@ setInterval(async () => {
 
 }, 3600000)
 
+setInterval(async () => {
+
+    const { checkGuild } = require("../nypsi")
+    
+    for (guild in guilds) {
+        const exists = await checkGuild(guild)
+
+        if (!exists) {
+            delete guilds[guild]
+
+            console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds.json`)
+        }
+    }
+
+}, 24 * 60 * 60 * 1000);
+
 const fetchCooldown = new Set()
 const checkCooldown = new Set()
 

@@ -36,6 +36,21 @@ setInterval(() => {
     }
 }, 60000)
 
+setInterval(async () => {
+    const { checkGuild } = require("../nypsi")
+    
+    for (guild in data) {
+        const exists = await checkGuild(guild)
+
+        if (!exists) {
+            delete data[guild]
+
+            console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds.json`)
+        }
+    }
+
+}, 24 * 60 * 60 * 1000);
+
 module.exports = {
 
     /**
