@@ -11,17 +11,6 @@ const aliases = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 
-
-/**
- * 
- * @param {Command} command 
- */
-exports.registerCommand = function(command) {
-    if (command instanceof Command) {
-        console.log(true)
-    }
-}
-
 function loadCommands() {
     console.log("loading commands..")
     const startTime = new Date().getTime()
