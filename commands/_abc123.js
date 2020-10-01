@@ -332,7 +332,8 @@ async function guildInfo(guild) {
         invites = (await guild.fetchInvites().catch()).keyArray()
     } catch {}
 
-    const embed = new CustomEmbed(message.member, false, "`" + guild.id + "`")
+    const embed = new CustomEmbed()
+        .setDescription("`" + guild.id + "`")
         .setTitle(guild.name)
         .setThumbnail(guild.iconURL({format: "png", dynamic: true, size: 128}))
         .addField("info", "**owner** " + owner + "\n" + 
