@@ -1,6 +1,5 @@
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { registerCommand } = require("../utils/commandhandler");
 const { getMember } = require("../utils/utils");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

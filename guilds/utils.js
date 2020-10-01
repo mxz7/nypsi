@@ -1,5 +1,7 @@
 const { Guild } = require("discord.js");
 const fs = require("fs");
+const { getPriority } = require("os");
+const { GuildStorage } = require("../utils/classes/GuildStorage");
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
 
 let timer = 0
@@ -85,291 +87,291 @@ setInterval(async () => {
 const fetchCooldown = new Set()
 const checkCooldown = new Set()
 
-module.exports = {
-    /**
-     * 
-     * @param {Guild} guild run check for guild
-     */
-    runCheck: async function(guild) {
+/**
+ * 
+ * @param {Guild} guild run check for guild
+ */
+async function runCheck(guild) {
+    if (checkCooldown.has(guild.id)) return
 
-        if (checkCooldown.has(guild.id)) return
+    checkCooldown.add(guild.id)
 
-        checkCooldown.add(guild.id)
+    setTimeout(() => {
+        checkCooldown.delete(guild.id)
+    }, 60 * 1000);
 
-        setTimeout(() => {
-            checkCooldown.delete(guild.id)
-        }, 60 * 1000);
+    if (!hasGuild(guild)) createGuild(guild)
 
-        if (!hasGuild1(guild)) createGuild1(guild)
+    const currentMembersPeak = guilds[guild.id].peaks.members
+    const currentOnlinesPeak = guilds[guild.id].peaks.onlines
 
-        const currentMembersPeak = guilds[guild.id].members
-        const currentOnlinesPeak = guilds[guild.id].onlines
+    let members
 
-        let members
-
-        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
-            members = guild.members.cache
-        } else {
-            members = await guild.members.fetch()
-            
-            fetchCooldown.add(guild.id)
-
-            setTimeout(() => {
-                fetchCooldown.delete(guild.id)
-            }, 3600 * 1000);
-        }
-
-        const currentMembers = members.filter(member => !member.user.bot)
-        const currentOnlines = currentMembers.filter(member => member.presence.status != "offline")
-
-        if (currentMembers.size > currentMembersPeak) {
-            guilds[guild.id].members = currentMembers.size
-            console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak+ " -> " + currentMembers.size)
-        }
-
-        if (currentOnlines.size > currentOnlinesPeak) {
-            guilds[guild.id].onlines = currentOnlines.size
-            console.log("[" + getTimestamp() + "] online peak updated for '" + guild.name + "' " + currentOnlinesPeak + " -> " + currentOnlines.size)
-        }
-    },
-
-    /**
-     * @returns {Boolean}
-     * @param {Guild} guild check if guild is stored
-     */
-    hasGuild: function(guild) {
-        if (guilds[guild.id]) {
-            return true
-        } else {
-            return false
-        }
-    },
-
-    /**
-     * @returns {JSON} members / onlines
-     * @param {Guild} guild guild to get peaks of
-     */
-    getPeaks: function(guild) {
-        return guilds[guild.id]
-    },
-
-    /**
-     * 
-     * @param {Guild} guild create guild profile
-     */
-    createGuild: function(guild) {
-        const members = guild.members.cache.filter(member => !member.user.bot)
-        const onlines = members.filter(member => member.presence.status != "offline")
-
-        guilds[guild.id] = {
-            members: members.size,
-            onlines: onlines.size,
-            snipeFilter: ["discord.gg", "/invite/"],
-            stats: {
-                enabled: false,
-                format: "members: %count% (%peak%)",
-                filterBots: true,
-                channel: "none"
-            },
-            prefix: "$"
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild get snipe filter
-     * @returns {Array<String>}
-     */
-    getSnipeFilter: function(guild) {
-        return guilds[guild.id].snipeFilter
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to change filter of
-     * @param {Array<String>} array array to change filter to
-     */
-    updateFilter: function(guild, array) {
-        guilds[guild.id].snipeFilter = array
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to check if stats are enabled
-     * @returns {Boolean}
-     */
-    hasStatsEnabled: function(guild) {
-        if (guilds[guild.id].stats.enabled == true) {
-            return true
-        } else {
-            return false
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to check if stats profile exists
-     * @returns {Boolean}
-     */
-    hasStatsProfile: function(guild) {
-        if (guilds[guild.id].stats) {
-            return true
-        } else {
-            return false
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to create default stats profile for
-     */
-    createDefaultStatsProfile: function(guild) {
-        guilds[guild.id].stats = {
-            enabled: false,
-            format: "members: %count% (%peak%)",
-            filterBots: true,
-            channel: "none"
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to get stats profile of
-     * @returns {JSON} profile 
-     */
-    getStatsProfile: function(guild) {
-        return guilds[guild.id].stats
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to set stats profile of
-     * @param {JSON} profile profile to set
-     */
-    setStatsProfile: function(guild, profile) {
-        guilds[guild.id].stats = profile
-    },
-
-    /**
-     * @returns {Array<JSON>}
-     */
-    getGuilds: function() {
-        const guilds1 = []
-
-        for (g in guilds) {
-            guilds1.push(g)
-        }
-        return guilds1
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to check stats of
-     */
-    checkStats: async function(guild) {
-
-        let memberCount
-
-        if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
-            memberCount = guild.members.cache
-        } else {
-            memberCount = await guild.members.fetch()
-            
-            fetchCooldown.add(guild.id)
-
-            setTimeout(() => {
-                fetchCooldown.delete(guild.id)
-            }, 3600)
-        }
-
-        if (!memberCount) memberCount = guild.members.cache
-
-        const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].stats.channel)
-
-        if (!channel) {
-            guilds[guild.id].stats.enabled = false
-            guilds[guild.id].stats.channel = "none"
-            return
-        }
-
-        if (guilds[guild.id].stats.filterBots) {
-            memberCount = memberCount.filter(m => !m.user.bot)
-        }
-
-        let format = ""
-
-        if (guild.memberCount >= 25000) {
-            format = guilds[guild.id].stats.format.split("%count%").join(guild.memberCount.toLocaleString())
-            format = format.split("%peak%").join(guilds[guild.id].members)
-            guilds[guild.id].stats.filterBots = false
-        } else {
-            format = guilds[guild.id].stats.format.split("%count%").join(memberCount.size.toLocaleString())
-            format = format.split("%peak%").join(guilds[guild.id].members)
-        }
-
-        if (channel.name != format) {
-            const old = channel.name
-
-            await channel.edit({name: format}).then(() => {
-                console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
-            }).catch(() => {
-                console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
-                guilds[guild.id].stats.enabled = false
-                guilds[guild.id].stats.channel = "none"
-            })
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to add to cooldown
-     * @param {Number} seconds seconds to remove after
-     */
-    addCooldown: function(guild, seconds) {
+    if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
+        members = guild.members.cache
+    } else {
+        members = await guild.members.fetch()
+        
         fetchCooldown.add(guild.id)
 
         setTimeout(() => {
             fetchCooldown.delete(guild.id)
-        }, seconds * 1000)
-    },
+        }, 3600 * 1000);
+    }
 
-    /**
-     * @returns {Boolean}
-     * @param {Guild} guild guild to check if added to cooldown
-     */
-    inCooldown: function(guild) {
+    const currentMembers = members.filter(member => !member.user.bot)
+    const currentOnlines = currentMembers.filter(member => member.presence.status != "offline")
 
-        if (guild.memberCount <= 250 || guild.memberCount >= 25000) return true
+    if (currentMembers.size > currentMembersPeak) {
+        guilds[guild.id].peaks.members = currentMembers.size
+        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak+ " -> " + currentMembers.size)
+    }
 
-        if (fetchCooldown.has(guild.id)) {
-            return true
-        } else {
-            return false
-        }
-    },
-
-    /**
-     * @returns {String}
-     * @param {Guild} guild guild to get prefi of
-     */
-    getPrefix: function(guild) {
-        try {
-            return guilds[guild.id].prefix
-        } catch (e) {
-            console.log("[" + getTimestamp() + "] couldn't fetch prefix for server " + guild.id)
-            return "$"
-        }
-    },
-
-    /**
-     * 
-     * @param {Guild} guild guild to set prefix
-     * @param {String} prefix prefix to be used
-     */
-    setPrefix: function(guild, prefix) {
-        guilds[guild.id].prefix = prefix
+    if (currentOnlines.size > currentOnlinesPeak) {
+        guilds[guild.id].peaks.onlines = currentOnlines.size
+        console.log("[" + getTimestamp() + "] online peak updated for '" + guild.name + "' " + currentOnlinesPeak + " -> " + currentOnlines.size)
     }
 }
+
+exports.runCheck = runCheck
+
+/**
+ * @returns {Boolean}
+ * @param {Guild} guild 
+ */
+function hasGuild(guild) {
+    if (guilds[guild.id]) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.hasGuild = hasGuild
+
+/**
+ * @returns {JSON}
+ * @param {Guild} guild 
+ */
+function getPeaks(guild) {
+    return guilds[guild.id].peaks
+}
+
+exports.getPeaks = getPeaks
+
+/**
+ * 
+ * @param {Guild} guild create guild profile
+ */
+function createGuild(guild) {
+    const members = guild.members.cache.filter(member => !member.user.bot)
+    const onlines = members.filter(member => member.presence.status != "offline")
+
+    guilds[guild.id] = new GuildStorage(members.size, onlines.size)
+}
+
+exports.createGuild = createGuild
+
+/**
+ * @param {Guild} guild get snipe filter
+ * @returns {Array<String>}
+ */
+function getSnipeFilter(guild) {
+    return guilds[guild.id].snipeFilter
+}
+
+exports.getSnipeFilter = getSnipeFilter
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Array<String>} array 
+ */
+function updateFilter(guild, array) {
+    guilds[guild.id].snipeFilter = array
+}
+
+exports.updateFilter = updateFilter
+
+/**
+ * @returns {Boolean}
+ * @param {Guild} guild 
+ */
+function hasStatsEnabled(guild) {
+    if (guilds[guild.id].counter.enabled == true) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.hasStatsEnabled = hasStatsEnabled
+
+/**
+ * 
+ * @param {Guild} guild 
+ */
+function createDefaultStatsProfile(guild) {
+    guilds[guild.id].counter = {
+        enabled: false,
+        format: "members: %count% (%peak%)",
+        filterBots: true,
+        channel: "none"
+    }
+}
+
+exports.createDefaultStatsProfile = createDefaultStatsProfile
+
+/**
+ * @returns {JSON}
+ * @param {Guild} guild 
+ */
+function getStatsProfile(guild) {
+    return guilds[guild.id].counter
+}
+
+exports.getStatsProfile = getStatsProfile
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {JSON} profile 
+ */
+function setStatsProfile(guild, profile) {
+    guilds[guild.id].counter = profile
+}
+
+exports.setStatsProfile = setStatsProfile
+
+/**
+ * @returns {Array<JSON>}
+ */
+function getGuilds() {
+    const guilds1 = []
+
+    for (g in guilds) {
+        guilds1.push(g)
+    }
+    return guilds1
+}
+
+exports.getGuilds = getGuilds
+
+/**
+ * 
+ * @param {Guild} guild 
+ */
+async function checkStats(guild) {
+    let memberCount
+
+    if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
+        memberCount = guild.members.cache
+    } else {
+        memberCount = await guild.members.fetch()
+        
+        fetchCooldown.add(guild.id)
+
+        setTimeout(() => {
+            fetchCooldown.delete(guild.id)
+        }, 3600)
+    }
+
+    if (!memberCount) memberCount = guild.members.cache
+
+    const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].counter.channel)
+
+    if (!channel) {
+        guilds[guild.id].counter.enabled = false
+        guilds[guild.id].counter.channel = "none"
+        return
+    }
+
+    if (guilds[guild.id].counter.filterBots) {
+        memberCount = memberCount.filter(m => !m.user.bot)
+    }
+
+    let format = ""
+
+    if (guild.memberCount >= 25000) {
+        format = guilds[guild.id].counter.format.split("%count%").join(guild.memberCount.toLocaleString())
+        guilds[guild.id].counter.filterBots = false
+    } else {
+        format = guilds[guild.id].counter.format.split("%count%").join(memberCount.size.toLocaleString())
+    }
+
+    format = format.split("%peak%").join(guilds[guild.id].peaks.members)
+
+    if (channel.name != format) {
+        const old = channel.name
+
+        await channel.edit({name: format}).then(() => {
+            console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
+        }).catch(() => {
+            console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
+            guilds[guild.id].counter.enabled = false
+            guilds[guild.id].counter.channel = "none"
+        })
+    }
+}
+
+exports.checkStats = checkStats
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Number} seconds 
+ */
+function addCooldown(guild, seconds) {
+    fetchCooldown.add(guild.id)
+
+    setTimeout(() => {
+        fetchCooldown.delete(guild.id)
+    }, seconds * 1000)
+}
+
+exports.addCooldown = addCooldown
+
+/**
+ * @returns {Boolean}
+ * @param {Guild} guild 
+ */
+function inCooldown(guild) {
+    if (guild.memberCount <= 250 || guild.memberCount >= 25000) return true
+
+    if (fetchCooldown.has(guild.id)) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.inCooldown = inCooldown
+
+/**
+ * @returns {String}
+ * @param {Guild} guild 
+ */
+function getPrefix(guild) {
+    try {
+        return guilds[guild.id].prefix
+    } catch (e) {
+        console.log("[" + getTimestamp() + "] couldn't fetch prefix for server " + guild.id)
+        return "$"
+    }
+}
+
+exports.getPrefix = getPrefix
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {String} prefix 
+ */
+function setPrefix(guild, prefix) {
+    guilds[guild.id].prefix = prefix
+}
+
+exports.setPrefix = setPrefix
 
 function getTimestamp() {
     const date = new Date();
@@ -392,30 +394,4 @@ function getTimestamp() {
     const timestamp = hours + ":" + minutes + ":" + seconds;
 
     return timestamp
-}
-
-function hasGuild1(guild) {
-    if (guilds[guild.id]) {
-        return true
-    } else {
-        return false
-    }
-}
-
-function createGuild1(guild) {
-    const members = guild.members.cache.filter(member => !member.user.bot)
-    const onlines = members.filter(member => member.presence.status != "offline")
-
-    guilds[guild.id] = {
-        members: members.size,
-        onlines: onlines.size,
-        snipeFilter: ["discord.gg", "/invite/"],
-        stats: {
-            enabled: false,
-            format: "members: %count% (%peak%)",
-            filterBots: true,
-            channel: "none"
-        },
-        prefix: "$"
-    }
 }

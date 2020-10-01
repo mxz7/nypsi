@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getTimestamp } = require("../utils/utils")
-const { hasStatsProfile, createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks } = require("../guilds/utils")
+const { createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -24,8 +24,6 @@ async function run(message, args) {
     }
 
     if (!hasGuild(message.guild)) createGuild(message.guild)
-
-    if (!hasStatsProfile(message.guild)) createDefaultStatsProfile(message.guild)
 
     const profile = getStatsProfile(message.guild)
 
