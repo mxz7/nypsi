@@ -12,7 +12,7 @@ const cmd = new Command("socials", "set yours and view people's different social
  * @param {Message} message 
  * @param {Array<String>} args 
  */
-async function run(message, args) {)
+async function run(message, args) {
 
     if (cooldown.has(message.member.user.id)) {
         const init = cooldown.get(message.member.user.id)
