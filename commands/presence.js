@@ -1,6 +1,6 @@
 const { MessageEmbed, Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
+fconst { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders");
 const { getMember, getColor } = require("../utils/utils");
 
 const cmd = new Command("presence", "view active presences for a user", categories.INFO).setAliases(["activity", "game"])
