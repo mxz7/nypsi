@@ -2,7 +2,7 @@ const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("reload", "reload commands", categories.NONE)
+const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions("bot owner")
 
 /**
  * @param {Message} message 
