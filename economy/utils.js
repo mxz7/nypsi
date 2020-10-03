@@ -87,7 +87,7 @@ setInterval(() => {
 }, 120000)
 
 function randomOffset() {
-    return parseInt(Math.floor(Math.random() * 25000))
+    return parseInt(Math.floor(Math.random() * 50000))
 }
 
 let padlockPrice = 25000 + randomOffset()
