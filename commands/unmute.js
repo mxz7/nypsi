@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { inCooldown, addCooldown } = require("../guilds/utils");
 const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -19,9 +20,32 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
     }
 
-    if (args.length == 0 || message.mentions.members.first() == null) {
+    if (args.length == 0) {
         return message.channel.send(new ErrorEmbed("$unmute <@user(s)>"))
     }
+
+    if (args[0].length == 18 && message.mentions.members.first() == null) {
+        let members
+
+        if (inCooldown(message.guild)) {
+            members = message.guild.members.cache
+        } else {
+            members = await message.guild.members.fetch()
+            addCooldown(message.guild, 3600)
+        }
+
+        const member = members.find(m => m.id == args[0])
+
+        if (!member) {
+            return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
+        }
+        
+        message.mentions.members.set(member.user.id, member)
+    } else if (message.mentions.members.first() == null) {
+        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
+    }
+
+    const members = message.mentions.members
 
     let muteRole = message.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
 
