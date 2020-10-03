@@ -127,7 +127,7 @@ async function run(message, args) {
 
     let mutedLength = ""
 
-    if (timedMute && time < 3600) {
+    if (timedMute && time < 600) {
         setTimeout( async () => {
             for (member of members.keyArray()) {
                 await members.get(member).roles.remove(muteRole).catch()
@@ -178,7 +178,7 @@ async function run(message, args) {
         if (failed.indexOf(m.user.tag) == -1) {
             newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, reason)
 
-            if (time >= 3600) {
+            if (time >= 600) {
                 if (isMuted(message.guild, members.get(member))) {
                     deleteMute(message.guild, members.get(member))
                 }
