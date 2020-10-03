@@ -115,7 +115,7 @@ async function run(message, args) {
     }
 
     if (!message.member.hasPermission("ADMINISTRATOR")) {
-        embed.setAuthor(message.member.user.tag)
+        embed.setHeader(message.member.user.tag)
     }
     
     message.channel.send(embed).then(async m => {
