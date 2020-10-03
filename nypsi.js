@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const { token } = require("./config.json");
 const { getUserCount, updateStats } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, } = require("./guilds/utils.js")
-const { runCommand, loadCommands } = require("./utils/commandhandler")
+const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp } = require("./utils/utils");
 const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils");
@@ -19,22 +19,39 @@ exports.snipe = snipe
 loadCommands()
 
 client.once("ready", async () => {
-    const domains = ["lonely.lol", "tekoh.wtf", "tekoh.xyz", "alone.wtf"]
+    const games = ["$help | lonely.lol", "$help | tekoh.wtf", "$help | tekoh.xyz", "$help | alone.wtf", "$help | racist.wtf", 
+    "have you joined the $support server?", "x0x"]
 
-    setTimeout(() => {
+    setTimeout(async () => {
+        const a = await getRandomCommand()
+
+        let game = games[Math.floor(Math.random() * games.length)]
+
+        if (game == "x0x") {
+            game = `\$${a.name} - ${a.description}`
+        }
+
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: "$help | " + domains[Math.floor(Math.random() * domains.length)]
+                name: game
             }
         })
     }, 5000)
 
-    setInterval(() => {
+    setInterval(async () => {
+        const a = await getRandomCommand()
+
+        let game = games[Math.floor(Math.random() * games.length)]
+
+        if (game == "x0x") {
+            game = `\$${a.name} - ${a.description}`
+        }
+
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: "$help | " + domains[Math.floor(Math.random() * domains.length)]
+                name: game
             }
         })
     }, 30 * 60 * 1000)
