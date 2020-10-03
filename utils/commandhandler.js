@@ -1,10 +1,11 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
-const { getColor } = require("./utils")
 const fs = require("fs");
-const { MessageEmbed, Message } = require("discord.js");;
+const { Message } = require("discord.js");;
 const { getPrefix } = require("../guilds/utils.js");
-const { Command, categories } = require("./classes/Command")
+const { Command, categories } = require("./classes/Command");
+const { CustomEmbed } = require("./classes/EmbedBuilders.js");
+const { getTimestamp } = require("./utils.js");
 
 const commands = new Map()
 const aliases = new Map()
@@ -158,11 +159,8 @@ async function helpCmd(message, args) {
         }
     }
 
-    const color = getColor(message.member)
-
-    const embed = new MessageEmbed()
+    const embed = new CustomEmbed(message.member)
         .setTitle("help")
-        .setColor(color)
         .setFooter(prefix + "help <command> | get more info about a command")
 
 
@@ -368,33 +366,43 @@ function getCmdCategory(cmd) {
     return commands.get(cmd).category;
 }
 
+async function getRandomCommand() {
+    const a = []
+
+    await commands.forEach(d => {
+        if (d.category != "none" && d.category != "nsfw") {
+            a.push(d)
+        }
+    })
+
+    const choice = a[Math.floor(Math.random() * a.length)]
+
+    return choice
+}
+
+exports.getRandomCommand = getRandomCommand
+
+/**
+ * 
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ * @param {String} commandName
+ */
 function logCommand(message, args) {
     args.shift();
 
     const server = message.guild.name
 
-    console.log("\x1b[33m[" + getTimeStamp() + "] " + message.member.user.tag + ": '" + message.content + "' ~ '" + server + "'\x1b[37m");
-}
+    let content = message.content
 
-function getTimeStamp() {
-    const date = new Date();
-    let hours = date.getHours().toString();
-    let minutes = date.getMinutes().toString();
-    let seconds = date.getSeconds().toString();
-
-    if (hours.length == 1) {
-        hours = "0" + hours;
-    } 
-
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    } 
-
-    if (seconds.length == 1) {
-        seconds = "0" + seconds;
+    if (content.length > 75) {
+        content = content.substr(0, 75) + "..."
     }
 
-    const timestamp = hours + ":" + minutes + ":" + seconds;
+    const msg = `\x1b[33m[command in guild]: ${message.guild.name} (${message.guild.id})\n` +
+        `   \x1b[33m- [time]: ${getTimestamp()}\n` +
+        `   \x1b[33m- [user]: ${message.author.tag} (${message.author.id})\n` +
+        `   \x1b[33m- [command]: ${content}\x1b[37m`
 
-    return timestamp
+    console.log(msg);
 }

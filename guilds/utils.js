@@ -78,7 +78,7 @@ setInterval(async () => {
         if (!exists) {
             delete guilds[guild]
 
-            console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds.json`)
+            console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds data`)
         }
     }
 
