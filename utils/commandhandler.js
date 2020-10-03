@@ -399,10 +399,8 @@ function logCommand(message, args) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `\x1b[33m[command in guild]: ${message.guild.name} (${message.guild.id})\n` +
-        `   \x1b[33m- [time]: ${getTimestamp()}\n` +
-        `   \x1b[33m- [user]: ${message.author.tag} (${message.author.id})\n` +
-        `   \x1b[33m- [command]: ${content}\x1b[37m`
+    const msg = `\x1b[33m[${getTimestamp()}] ~ ['${message.guild.name}' (${message.guild.id})]\n` +
+        `   \x1b[33m- ['${message.author.tag}' (${message.author.id})]: ${content}\x1b[37m`
 
     console.log(msg);
 }
