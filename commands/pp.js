@@ -63,11 +63,12 @@ async function run(message, args) {
     } else {
         size = Math.floor(Math.random() * 15)
 
-        const bigInch = Math.floor(Math.random() * 40)
+        const bigInch = Math.floor(Math.random() * 55)
 
         if (bigInch == 7) {
             size = Math.floor(Math.random() * 30) + 15
         }
+        
         cache.set(member.user.id, size)
 
         setTimeout(() => {
