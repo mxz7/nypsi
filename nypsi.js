@@ -54,7 +54,7 @@ client.once("ready", async () => {
                 name: game
             }
         })
-    }, 30 * 60 * 1000)
+    }, 15 * 60 * 1000)
 
     const { commandsSize } = require("./utils/commandhandler")
 
