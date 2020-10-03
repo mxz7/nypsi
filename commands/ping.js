@@ -10,13 +10,15 @@ const cmd = new Command("ping", "get ping/latency of the bot and api", categorie
  */
 async function run(message, args) {
 
-    const ping = message.createdTimestamp - Date.now()
+    const now =  new Date().getTime()
 
-    const embed = new CustomEmbed(message.member, false, "**bot** - `" + ping + "ms`\n" +
+    const msg = await message.channel.send("pinging..")
+
+    const embed = new CustomEmbed(message.member, false, "**bot** - `" + (msg.createdTimestamp - message.createdTimestamp) + "ms`\n" +
         "**api** - `" + Math.round(message.client.ws.ping) + "ms`")
         .setFooter("nypsi is hosted in an NYC data center")
     
-    return await message.channel.send(embed)
+    return await msg.edit(embed)
 
 }
 
