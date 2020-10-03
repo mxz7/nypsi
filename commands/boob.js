@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("boob", "get a random boob image", categories.NSFW)
+const cmd = new Command("boob", "get a random boob image", categories.NSFW).setAliases(["boobs"])
 
 /**
  * @param {Message} message 
