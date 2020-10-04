@@ -152,7 +152,7 @@ async function run(message, args) {
 
             const embed = new CustomEmbed(message.member, true, "$**socials <social media> add/+ <username>** *add a social media*\n$**socials <social media> del/- <username>** *remove a social media*\n$**socials <user>** *view a user's social medias*")
                 .setTitle("socials")
-                .addField("supported social medias", "`youtube`\n`twitter`\n`instagram`\n`snapchat`\n`email`")
+                .addField("supported social medias", "`youtube` `twitter` `instagram` `snapchat` `email`")
 
             return message.channel.send(embed)
         }
