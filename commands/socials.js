@@ -36,7 +36,7 @@ async function run(message, args) {
     cooldown.set(message.member.user.id, new Date());
 
     setTimeout(() => {
-        cooldown.delete(message.member.user.id);
+        cooldown.delete(message.author.id);
     }, 3000);
 
     if (args.length <= 1 && args[0] != "help") {

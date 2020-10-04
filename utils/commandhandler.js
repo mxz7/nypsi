@@ -327,7 +327,7 @@ function runCommand(cmd, message, args) {
             
                     setTimeout(() => {
                         try {
-                            xpCooldown.delete(message.member.user.id)
+                            xpCooldown.delete(message.author.id)
                         } catch {}
                     }, 120000)
                 }

@@ -38,7 +38,7 @@ async function run(message, args) {
     }
 
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 15000);
 
     const prefix = getPrefix(message.guild)

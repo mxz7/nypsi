@@ -192,7 +192,7 @@ async function playGame(message, m) {
         newEmbed.setColor("#e4334f")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" + "\n\n**you lose!!**")
         newEmbed.addField("card", "| " + card + " |")
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -222,7 +222,7 @@ async function playGame(message, m) {
         }
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -232,7 +232,7 @@ async function playGame(message, m) {
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -335,7 +335,7 @@ async function playGame(message, m) {
             return win1()
         }
     } else {
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         return m.reactions.removeAll()
     }
 }
