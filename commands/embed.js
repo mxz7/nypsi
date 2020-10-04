@@ -62,7 +62,7 @@ async function run(message, args) {
 
     cooldown.set(message.member.id, new Date());
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 10000);
 
     const title = args.join(" ").split("|")[0]

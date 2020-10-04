@@ -338,7 +338,7 @@ async function playGame(message, m) {
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -368,7 +368,7 @@ async function playGame(message, m) {
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + winnings)
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -379,7 +379,7 @@ async function playGame(message, m) {
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + bet)
-        games.delete(message.member.user.id)
+        games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
@@ -579,7 +579,7 @@ async function playGame(message, m) {
             }, 1500)
 
         } else {
-            games.delete(message.member.user.id)
+            games.delete(message.author.id)
             return m.reactions.removeAll()
         }
     }

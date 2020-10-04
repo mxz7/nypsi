@@ -64,7 +64,7 @@ async function run(message, args) {
     }
 
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 3000);
 
     let chosen = members[Math.floor(Math.random() * members.length)]
