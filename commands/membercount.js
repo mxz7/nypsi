@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getTimestamp } = require("../utils/utils")
-const { createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks } = require("../guilds/utils")
+const { createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -26,6 +26,7 @@ async function run(message, args) {
     if (!hasGuild(message.guild)) createGuild(message.guild)
 
     const profile = getStatsProfile(message.guild)
+    const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "**enabled** `" + profile.enabled + "`\n" +
@@ -33,15 +34,15 @@ async function run(message, args) {
             "**channel** `" + profile.channel + "`\n" + 
             "**format** `" + profile.format + "`")
             .setTitle("member count")
-            .setFooter("use $counter help to view additional commands")
+            .setFooter(`use ${prefix}counter help to view additional commands`)
 
         return message.channel.send(embed)
     } else if (args[0].toLowerCase() == "help") {
-        const embed = new CustomEmbed(message.member, false, "$**counter enable** *enables the counter and creates a channel with the current format*\n" +
-            "$**counter disable** *disables the counter and does NOT delete the channel*\n" +
-            "$**counter format** *view/change the current channel format*\n" +
-            "$**counter filterbots** *view/change the setting to filter bots*\n" +
-            "$**counter channel** *set a channel as the channel to be used*")
+        const embed = new CustomEmbed(message.member, false, `${prefix}**counter enable** *enables the counter and creates a channel with the current format*\n` +
+            `${prefix}**counter disable** *disables the counter and does NOT delete the channel*\n` +
+            `${prefix}**counter format** *view/change the current channel format*\n` +
+            `${prefix}**counter filterbots** *view/change the setting to filter bots*\n` +
+            `${prefix}**counter channel** *set a channel as the channel to be used*`)
             .setTitle("member count")
             .setFooter("channel will be updated every 10 minutes")
         
@@ -107,7 +108,7 @@ async function run(message, args) {
             const embed = new CustomEmbed(message.member, false, "this is how your channel will appear\n %count% is replaced with the member count\n%peak% is replaced with the member peak")
                 .setTitle("member count")
                 .addField("current format", "`" + profile.format + "`")
-                .addField("help", "to change this format, do $**counter format <new format>**")
+                .addField("help", `to change this format, do ${prefix}**counter format <new format>**`)
             
             return message.channel.send(embed)
         }
@@ -138,7 +139,7 @@ async function run(message, args) {
             const embed = new CustomEmbed(message.member, false, "if this is true, bots will not be counted towards the member count")
                 .setTitle("member count")
                 .addField("current value", "`" + profile.filterBots + "`")
-                .addField("help", "to change this option, do $**counter filterbots <new value (true/false)>**")
+                .addField("help", `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`)
             
             return message.channel.send(embed)
         }
@@ -163,7 +164,7 @@ async function run(message, args) {
             const embed = new CustomEmbed(message.member, false, "by setting the channel it will change the channel that is used to display the counter")
                 .setTitle("member count")
                 .addField("current value", "`" + profile.channel + "`")
-                .addField("help", "to change this value, do $**counter channel <channel id>**")
+                .addField("help", `to change this value, do ${prefix}**counter channel <channel id>**`)
 
             return message.channel.send(embed)
         }
@@ -226,10 +227,10 @@ async function run(message, args) {
 
         return message.channel.send(embed)
     } else {
-        const embed = new CustomEmbed(message.member, false, "$**counter enable** *enables the counter and creates a channel with the current format*\n" +
-            "$**counter disable** *disables the counter and does NOT delete the channel*\n" +
-            "$**counter format** *view/change the current channel format*\n" +
-            "$**counter filterbots** *view/change the setting to filter bots*")
+        const embed = new CustomEmbed(message.member, false, `${prefix}**counter enable** *enables the counter and creates a channel with the current format*\n` +
+            `${prefix}**counter disable** *disables the counter and does NOT delete the channel*\n` +
+            `${prefix}**counter format** *view/change the current channel format*\n` +
+            `${prefix}**counter filterbots** *view/change the setting to filter bots*`)
             .setTitle("member count")
             .setFooter("member count will be updated every 10 minutes")
         

@@ -1,7 +1,8 @@
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
 const { getMember } = require("../utils/utils");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cache = new Map()
 const cooldown = new Map();
@@ -33,8 +34,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$love <user> (user)"));
+        return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`));
     }
 
     let target1;
@@ -67,7 +70,7 @@ async function run(message, args) {
             target1 = getMember(message, args[0])
             target2 = getMember(message, args[1])
         } else {
-            return message.channel.send(new ErrorEmbed("$love <user> (user)"));
+            return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`));
         }
     }
     

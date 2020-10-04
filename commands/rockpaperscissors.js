@@ -2,7 +2,8 @@ const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMul
 const { Message } = require("discord.js");
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map()
 
@@ -37,10 +38,12 @@ async function run(message, args) {
         createUser(message.member)
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0 || args.length == 1) {
         const embed = new CustomEmbed(message.member)
             .setTitle("rockpaperscissors help")
-            .addField("usage", "$rps <**r**ock/**p**aper/**s**cissors> <bet>")
+            .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
             .addField("help", "rock paper scissors works exactly how this game does in real life\n" +
                 "**2**x multiplier for winning")
 
@@ -52,7 +55,7 @@ async function run(message, args) {
     let memberEmoji = ""
 
     if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
-        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
     }
 
     if (choice == "r") choice = "rock"
@@ -75,18 +78,18 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
         }
     }
 
     const bet = (parseInt(args[1]))
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
     }
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$rps <**r**ock/**p**aper/**s**cissors> <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
     }
 
     if (bet > getBalance(message.member)) {

@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { getSnipeFilter, updateFilter } = require("../guilds/utils.js");
+const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js");
 const { Command, categories } = require("../utils/classes/Command.js");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -20,23 +20,25 @@ async function run(message, args) {
 
     let filter = getSnipeFilter(message.guild)
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
             .setTitle("current snipe filter")
-            .setFooter("use $sf (add/del/+/-) to modify the filter")
+            .setFooter(`use ${prefix}sf (add/del/+/-) to modify the filter`)
         
         return message.channel.send(embed)
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("$sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way"))
+            return message.channel.send(new ErrorEmbed(`${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`))
         }
 
         if (filter.indexOf(args[1].toString().toLowerCase()) > -1) {
             const embed = new CustomEmbed(message.member, false, "❌ `" + args[1] + "` already exists in the filter")
                 .setTitle("snipe filter")
-                .setFooter("you can use $sf to view the filter")
+                .setFooter(`you can use ${prefix}sf to view the filter`)
 
             return message.channel.send(embed)
         }
@@ -47,7 +49,7 @@ async function run(message, args) {
 
             filter.splice(filter.indexOf(args[1].toString()), 1);
 
-            const embed = new CustomEmbed(message.member, true, "❌ filter has exceeded the maximum size - please use *$sf del/-* or *$sf reset*")
+            const embed = new CustomEmbed(message.member, true, `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`)
                 .setTitle("snipe filter")
 
             return message.channel.send(embed)
@@ -62,7 +64,7 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("$sf del/- <word>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}sf del/- <word>`))
         }
 
         if (filter.indexOf(args[1].toString()) > -1) {
@@ -70,7 +72,7 @@ async function run(message, args) {
         } else {
             const embed = new CustomEmbed(message.member, false, "❌ `" + args[1] + "` not found in the filter")
                 .setTitle("snipe filter")
-                .setFooter("you can use $sf to view the filter")
+                .setFooter(`you can use ${prefix}sf to view the filter`)
 
             return message.channel.send(embed)
         }
@@ -79,7 +81,7 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false, "✅ removed `" + args[1] + "` from the filter")
             .setTitle("snipe filter")
-            .setFooter("you can use $sf reset to reset the filter")
+            .setFooter(`you can use ${prefix}sf reset to reset the filter`)
 
         return message.channel.send(embed)
     }

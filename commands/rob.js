@@ -2,7 +2,8 @@ const { getMember } = require("../utils/utils")
 const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp, getDMsEnabled } = require("../economy/utils.js")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map();
 const playerCooldown = new Set()
@@ -34,10 +35,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("rob help")
-            .addField("usage", "$rob <@user>")
+            .addField("usage", `${prefix}rob <@user>`)
             .addField("help", "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
                 "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
                 "you can lose up to **25**% of your balance by failing a robbery")

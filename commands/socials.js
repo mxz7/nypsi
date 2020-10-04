@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { getMember } = require("../utils/utils")
 const { profileExists, profileExistsID, createProfile, getProfile, getProfileID, updateProfile } = require("../socials/utils");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map()
 
@@ -59,9 +60,10 @@ async function run(message, args) {
         }
 
         const profile = getProfile(member)
+        const prefix = getPrefix(message.guild)
 
         const embed = new CustomEmbed(message.member)
-            .setFooter("do $socials help for commands")
+            .setFooter(`do ${prefix}socials help for commands`)
 
         if (member == message.member) {
             embed.setTitle("your socials")
@@ -150,7 +152,7 @@ async function run(message, args) {
                 && args[1] != "+"
                 && args[1] != "-")) {
 
-            const embed = new CustomEmbed(message.member, true, "$**socials <social media> add/+ <username>** *add a social media*\n$**socials <social media> del/- <username>** *remove a social media*\n$**socials <user>** *view a user's social medias*")
+            const embed = new CustomEmbed(message.member, true, `${prefix}**socials <social media> add/+ <username>** *add a social media*\n${prefix}**socials <social media> del/- <username>** *remove a social media*\n${prefix}**socials <user>** *view a user's social medias*`)
                 .setTitle("socials")
                 .addField("supported social medias", "`youtube` `twitter` `instagram` `snapchat` `email`")
 

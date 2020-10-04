@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { inCooldown, addCooldown } = require("../guilds/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -20,8 +20,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$unmute <@user(s)>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}unmute <@user(s)>`))
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {

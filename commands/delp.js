@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -36,8 +37,10 @@ async function run(message, args) {
         args[0] = 5
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed("$delp <amount>"));
+        return message.channel.send(new ErrorEmbed(`${prefix}delp <amount>`));
     }
 
     let amount = parseInt(args[0])

@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -36,15 +37,17 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("embed help")
-            .addField("usage", "$embed <title> | (text) | (hex color)")
+            .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
             .addField("help", "with this command you can create a simple embed message\n" +
                 "**<>** required | **()** optional\n")
-            .addField("examples", "$embed hello\n" +
-                "$embed hello | this is a description\n" +
-                "$embed hello | this is a description | #13c696")
+            .addField("examples", `${prefix}embed hello\n` +
+                `${prefix}embed hello | this is a description\n` +
+                `${prefix}embed hello | this is a description | #13c696`)
 
         return message.channel.send(embed)
     }
