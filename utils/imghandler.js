@@ -81,7 +81,7 @@ async function cacheUpdate(links, imgs, name) {
     }
     const end = new Date().getTime()
     const total = ((end - start) / 1000) + "s"
-    console.log(`\x1b[32m[${getTimestamp()}] ${name} cache loaded (${total})\x1b[37m`)
+    console.log(`\x1b[32m[${getTimestamp()}] ${name} images loaded (${total})\x1b[37m`)
 }
 
 async function updateCache() {
@@ -109,7 +109,7 @@ async function updateCache() {
     exports.snekCache = snekCache
     const end = new Date().getTime()
     const total = ((end - start) / 1000) + "s"
-    console.log("\x1b[32m[" + getTimestamp() + "] img caches updated (" + total + ")\x1b[37m")
+    console.log("\x1b[32m[" + getTimestamp() + "] images updated (" + total + ")\x1b[37m")
 }
 
 exports.updateCache = updateCache
