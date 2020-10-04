@@ -1,8 +1,8 @@
 const ascii = require("figlet");
 const { Message } = require("discord.js")
-const { list } = require("../optout.json");
 const { Command, categories } = require("../utils/classes/Command.js");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getDMsEnabled } = require("../economy/utils.js");
 
 const cooldown = new Map()
 
@@ -14,8 +14,8 @@ const cmd = new Command("ascii", "create ascii text", categories.FUN)
  */
 async function run(message, args) {
 
-    if (list.includes(message.member.user.id)) {
-        return message.channel.send(new ErrorEmbed("you have opted out of bot dms, use $optin to enable this command"));
+    if (!getDMsEnabled(message.member)) {
+        return message.channel.send(new ErrorEmbed("you have opted out of bot dms, use $dms to enable this command"));
     }
 
     if (cooldown.has(message.member.id)) {
