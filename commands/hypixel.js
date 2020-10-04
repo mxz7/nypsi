@@ -1,6 +1,7 @@
 const { Message } = require("discord.js");
 const fetch = require("node-fetch")
 const { hypixel } = require("../config.json");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -28,8 +29,10 @@ const cmd = new Command("hypixel", "view hypixel stats for a minecraft account",
  */
 async function run(message, args) {
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send("❌ $h <username>");
+        return message.channel.send(new ErrorEmbed(`${prefix}h <username>`));
     }
 
     if (cooldown.has(message.member.id)) {

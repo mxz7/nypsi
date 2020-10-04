@@ -1,6 +1,6 @@
 const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase, newMute, isMuted, deleteMute } = require("../moderation/utils")
-const { inCooldown, addCooldown } = require("../guilds/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -20,10 +20,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0 && message.mentions.members.first() == null) {
         const embed = new CustomEmbed(message.member)
             .setTitle("mute help")
-            .addField("usage", "$mute <@user(s)> (time) [-s]")
+            .addField("usage", `${prefix}mute <@user(s)> (time) [-s]`)
             .addField("help", "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work")
             .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*")
         return message.channel.send(embed)

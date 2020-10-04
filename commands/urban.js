@@ -1,7 +1,8 @@
 const urban = require("relevant-urban")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map()
 
@@ -32,8 +33,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$urban <definition>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}urban <definition>`))
     }
 
     cooldown.set(message.member.id, new Date());

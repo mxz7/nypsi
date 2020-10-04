@@ -1,5 +1,6 @@
 const { Message } = require("discord.js");
 const fetch = require("node-fetch");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -13,8 +14,10 @@ const cmd = new Command("skin", "view the skin of a minecraft account", categori
  */
 async function run(message, args) {
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$skin <account>"));
+        return message.channel.send(new ErrorEmbed(`${prefix}skin <account>`));
     }
 
     if (cooldown.has(message.member.id)) {

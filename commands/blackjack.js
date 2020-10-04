@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map()
 const games = new Map()
@@ -40,10 +41,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("blackjack help")
-            .addField("usage", "$blackjack <bet>\n$blackjack info")
+            .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
             .addField("game rules", "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
                 "the dealer will always stand on or above **17**\n" +
                 "**2**x multiplier for winning, on a draw you receive your bet back")
@@ -81,7 +84,7 @@ async function run(message, args) {
     const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$blackjack <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}blackjack <bet>`))
     }
 
     if (bet > getBalance(message.member)) {

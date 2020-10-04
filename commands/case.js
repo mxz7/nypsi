@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { getCase, deleteCase, profileExists, createProfile } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -13,12 +14,14 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("case help")
-            .addField("usage", "$case <caseID>")
+            .addField("usage", `${prefix}case <caseID>`)
             .addField("help", "to delete a case, react with ❌ after running the command\n" +
-                "to delete data for the server, run $**deleteallcases**\nto delete a case you need the **MANAGE_SERVER** permission")
+                `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the **MANAGE_SERVER** permission`)
 
         return message.channel.send(embed)
     }

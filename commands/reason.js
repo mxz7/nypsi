@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { getCase, setReason } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -13,10 +14,12 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length <= 1) {
         const embed = new CustomEmbed(message.member)
             .setTitle("reason help")
-            .addField("usage", "$reason <case ID> <new reason>")
+            .addField("usage", `${prefix}reason <case ID> <new reason>`)
             .addField("help", "use this command to change the current reason for a punishment case")
         
         return await message.channel.send(embed)

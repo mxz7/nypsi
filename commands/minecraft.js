@@ -1,5 +1,6 @@
 const { Message } = require("discord.js");;
 const fetch = require("node-fetch");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
 const { getTimestamp } = require("../utils/utils");
@@ -35,8 +36,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$minecraft <name/server IP>"));
+        return message.channel.send(new ErrorEmbed(`${prefix}minecraft <name/server IP>`));
     }
 
     cooldown.set(message.member.id, new Date());

@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -36,14 +37,16 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
 
         const embed = new CustomEmbed(message.member)
             .setTitle("ezpoll help")
-            .addField("usage", "$ezpoll <choices..>")
+            .addField("usage", `${prefix}ezpoll <choices..>`)
             .addField("help", "after creation your message will be deleted and an embed will be created to act as the poll\n" +
                 "every word will be an option in the poll, with a maximum of 4 and minimum of two")
-            .addField("example", "$poll option1 option2")
+            .addField("example", `${prefix}ezpoll option1 option2`)
 
         return message.channel.send(embed)
     }

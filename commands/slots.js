@@ -1,7 +1,8 @@
 const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒"]
@@ -40,10 +41,12 @@ async function run(message, args) {
         createUser(message.member)
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("slots help")
-            .addField("usage", "$slots <bet>\n$slots info")
+            .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField("help", "you should know how a slot machine works..")
         return message.channel.send(embed)
     }
@@ -57,7 +60,7 @@ async function run(message, args) {
     }
 
     if (!args[0]) {
-        return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
+        return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
     }
 
     if (args[0] == "all") {
@@ -72,14 +75,14 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
+            return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
         }
     }
 
     const bet = (parseInt(args[0]));
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$slots <bet> | $**slots info** shows the winning board"))
+        return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
     }
 
     if (bet > getBalance(message.member)) {

@@ -1,5 +1,6 @@
 const { Message } = require("discord.js");
 const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache } = require("../economy/utils.js");
+const { getPrefix } = require("../guilds/utils.js");
 const { Command, categories } = require("../utils/classes/Command.js");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -32,6 +33,8 @@ async function run(message, args) {
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
+
+    const prefix = getPrefix(message.guild)
 
     cooldown.set(message.member.id, new Date());
 
@@ -75,7 +78,7 @@ async function run(message, args) {
         embed.setTitle("vote ❌ | " + message.member.user.username)
         embed.setColor("#e4334f")
         embed.addField("rewards", "× **20**% gambling bonus\n× **xp** gambling bonus\n× $**15,000** reward")
-        embed.setFooter("you must run $vote to redeem $15,000")
+        embed.setFooter(`you must run ${prefix}vote to redeem $15,000`)
         removeFromVoteCache(message.member)
     }
 

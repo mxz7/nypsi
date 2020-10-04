@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { inCooldown, addCooldown } = require("../guilds/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -33,8 +33,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$inrole <role>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}inrole <role>`))
     }
 
     const roles = message.guild.roles.cache

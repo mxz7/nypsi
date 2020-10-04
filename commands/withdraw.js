@@ -1,7 +1,8 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const tax = 0.05
 
@@ -36,10 +37,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("withdraw help")
-            .addField("usage", "$withdraw <amount>")
+            .addField("usage", `${prefix}withdraw <amount>`)
             .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank\n" +
                 "there will be a tax of **5**% when withdrawing $**100,000** or more in funds")
         return message.channel.send(embed)

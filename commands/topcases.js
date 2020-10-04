@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { profileExists, getAllCases } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { getMember } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map()
 
@@ -48,6 +49,8 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, true)
         .setTitle("top cases | " + message.member.user.username)
+
+    const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
         const topStaff = new Map()
@@ -128,9 +131,9 @@ async function run(message, args) {
         embed.addField("top members", memberText, true)
 
         if (deletedCaseCount) {
-            embed.setFooter(`$topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`)
+            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`)
         } else {
-            embed.setFooter(`$topcases <user> | ${cases.length.toLocaleString()} total cases`)
+            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`)
         }
     } else {
 

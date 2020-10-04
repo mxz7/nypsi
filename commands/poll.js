@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -36,17 +37,19 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("poll help")
-            .addField("usage", "$poll (choices) <title> | (text) | (hex color)")
+            .addField("usage", `${prefix}poll (choices) <title> | (text) | (hex color)`)
             .addField("help", "**<>** required | **()** optional\n" +
                 "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
                 "if a number isnt found for choices then 👍👎 emojis will be used\n" +
                 "largest number of choices is 10, and 1 is minimum")
-            .addField("examples", "$poll question?\n" +
-                "$poll 2 title | this is a description\n" +
-                "$poll 9 hello | this is a description | #13c696")
+            .addField("examples", `${prefix}poll question?\n` +
+                `${prefix}poll 2 title | this is a description\n` +
+                `${prefix}poll 9 hello | this is a description | #13c696`)
 
         return message.channel.send(embed)
     }

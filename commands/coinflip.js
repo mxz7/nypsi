@@ -3,7 +3,8 @@ const { Message } = require("discord.js");
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map();
 
@@ -40,14 +41,16 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length != 2 && args.length != 3) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("coinflip help")
-            .addField("usage", "$coinflip <heads/tails> <bet>")
+            .addField("usage", `${prefix}coinflip <heads/tails> <bet>`)
             .addField("help", "with coinflip you can play against the bot or against another user\n" +
                 "when playing against another user they must have enough money for the bet\n" +
                 "when playing against another user you will not receive a 20% vote bonus")
-            .addField("examples", "$coinflip heads 100\n$coinflip member tails 500")
+            .addField("examples", `${prefix}coinflip heads 100\n${prefix}coinflip member tails 500`)
 
         return message.channel.send(embed)
     }
@@ -57,7 +60,7 @@ async function run(message, args) {
     if (args[0].toLowerCase() == "h") args[0] = "heads"
 
     if (args[0].toLowerCase() != "tails" && args[0].toLowerCase() != "heads") {
-        return message.channel.send(new ErrorEmbed("$coinflip <h/t> <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
     }
 
     if (args[1] == "all") {
@@ -72,14 +75,14 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed("$coinflip <h/t> <bet>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
         }
     }
 
     const bet = (parseInt(args[1]));
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$coinflip <h/t> <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
     }
 
     if (bet > getBalance(message.member)) {

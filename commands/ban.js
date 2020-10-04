@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { newCase, profileExists, createProfile } = require("../moderation/utils");
-const { inCooldown, addCooldown } = require("../guilds/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -25,16 +25,18 @@ async function run(message, args) {
 
     let idOnly = false
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0 && message.mentions.members.first() == null) {
 
         const embed = new CustomEmbed(message.member, false)
             .setTitle("ban help")
-            .addField("usage", "$ban <@user(s)> (reason) [-s] [-k]")
+            .addField("usage", `${prefix}ban <@user(s)> (reason) [-s] [-k]`)
             .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can ban one or more members in one command (must tag them)\n" +
                 "**(reason)** reason for the ban, will be given to all banned members\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
                 "**[-k]** if used, messages from banned members wont be deleted")
-            .addField("examples", "$ban @member hacking\n$ban @member @member2 @member3 hacking\n$ban @member hacking -s")
+            .addField("examples", `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s`)
 
         return message.channel.send(embed)
     }

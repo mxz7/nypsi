@@ -2,7 +2,8 @@ const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMul
 const { Message } = require("discord.js");
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
 
@@ -43,10 +44,12 @@ async function run(message, args) {
             "🟢 1/" + values.length + " win **17**x"))
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
             .setTitle("roulette help")
-            .addField("usage", "$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n$roulette odds")
+            .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
             .addField("help", "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
                 "red and black give a **2x** win and green gives a **17**x win")
 
@@ -54,7 +57,7 @@ async function run(message, args) {
     }
 
     if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
-        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
     }
 
     if (args[0] == "red") {
@@ -77,18 +80,18 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+            return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
         }
     }
 
     const bet = parseInt(args[1])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
     }
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("$roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | $**roulette odds** shows the odds of winning"))
+        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
     }
 
     if (bet > getBalance(message.member)) {

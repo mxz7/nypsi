@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { profileExists, createProfile, newCase } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -22,13 +23,15 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i am lacking permission: 'BAN_MEMBERS'"));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("unban help")
-            .addField("usage", "$unban <user(s)> [-s]")
+            .addField("usage", `${prefix}unban <user(s)> [-s]`)
             .addField("help", "**<>** required | **[]** parameter\n" + "**<users>** you can unban one or more members in one command\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
-            .addField("examples", "$unban user#1234 **(only works if members are in cache)**\n$unban 123456789012345678\n$unban 123456789012345678 123456789012345678 -s")
+            .addField("examples", `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`)
 
         return message.channel.send(embed)
     }

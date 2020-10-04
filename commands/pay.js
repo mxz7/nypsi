@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { getMember } = require("../utils/utils")
 const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const tax = 0.15
 
@@ -35,10 +36,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member) 
             .setTitle("pay help")
-            .addField("usage", "$pay <user> <amount>")
+            .addField("usage", `${prefix}pay <user> <amount>`)
             .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
 
         return message.channel.send(embed)
