@@ -86,6 +86,10 @@ async function run(message, args) {
 
     let mode = ""
 
+    if (args.length == 0) {
+        return message.channel.send(new ErrorEmbed("missing text"))
+    }
+
     if (!message.content.includes("|")) {
         mode = "title_only"
     } else if (args.join(" ").split("|").length == 2) {
