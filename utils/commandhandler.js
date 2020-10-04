@@ -14,8 +14,6 @@ const cooldown = new Set()
 
 function loadCommands() {
     console.log(`[${getTimestamp()}] loading commands..`)
-    const startTime = new Date().getTime()
-
     const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
     const failedTable = []
 
@@ -57,15 +55,11 @@ function loadCommands() {
     exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
 
-    const endTime = new Date().getTime()
-    const timeTaken = endTime - startTime
-
     if (failedTable.length != 0) {
         console.log(table(failedTable, {border: getBorderCharacters("ramac")}))
     } else {
         console.log(`[${getTimestamp()}] all commands loaded without error ✅`)
     }
-    console.log(`[${getTimestamp()}] time taken: ${timeTaken}ms`)
 }
 
 /**
