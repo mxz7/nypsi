@@ -36,10 +36,6 @@ async function run(message, args) {
     if (args.length == 0) {
         cooldown.set(message.member.id, new Date());
 
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 3000);
-
         const members1 = message.guild.members.cache
 
         members1.forEach(m => {
@@ -58,10 +54,6 @@ async function run(message, args) {
 
         cooldown.set(message.member.id, new Date());
 
-        setTimeout(() => {
-            cooldown.delete(message.member.id);
-        }, 3000);
-
         role.members.forEach(m => {
             members.push(m.user.id)
         })
@@ -70,6 +62,10 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("there is nobody in that role"))
         }
     }
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id);
+    }, 3000);
 
     let chosen = members[Math.floor(Math.random() * members.length)]
 
