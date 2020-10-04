@@ -51,14 +51,13 @@ async function run(message, args) {
     const url = `https://open.spotify.com/track/${activity.syncID}`
     const name = activity.details
     const artist = activity.state
-    const album = activity.assets.largeText
 
     const embed = new CustomEmbed(message.member, false, `[\`listen on spotify\`](${url})`)
         .setTitle(member.user.tag)
         .setThumbnail(image)
-        .addField("song", `${name} **-** ${artist}`, true)
+        .addField("song", name, true)
+        .addField("artist", artist, true)
         .addField("duration", `\`${duration}\``, true)
-        .addField("album", album, true)
 
     return message.channel.send(embed)
 }
