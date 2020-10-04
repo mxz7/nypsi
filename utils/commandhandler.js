@@ -13,7 +13,7 @@ const xpCooldown = new Set()
 const cooldown = new Set()
 
 function loadCommands() {
-    console.log("loading commands..")
+    console.log(`[${getTimestamp()}] loading commands..`)
     const startTime = new Date().getTime()
 
     const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
@@ -63,9 +63,9 @@ function loadCommands() {
     if (failedTable.length != 0) {
         console.log(table(failedTable, {border: getBorderCharacters("ramac")}))
     } else {
-        console.log("all commands loaded without error ✅")
+        console.log(`[${getTimestamp()}] all commands loaded without error ✅`)
     }
-    console.log("time taken: " + timeTaken + "ms")
+    console.log(`[${getTimestamp()}] time taken: ${timeTaken}ms`)
 }
 
 /**
