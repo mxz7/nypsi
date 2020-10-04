@@ -40,7 +40,7 @@ async function run(message, args) {
     cooldown.set(message.member.id, new Date());
 
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 5000);
 
     let allowed

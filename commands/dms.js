@@ -35,7 +35,7 @@ async function run(message, args) {
     cooldown.set(message.member.id, new Date());
 
     setTimeout(() => {
-        cooldown.delete(message.member.id);
+        cooldown.delete(message.author.id);
     }, 30000);
 
     if (!userExists(message.member)) createUser(message.member)
