@@ -1,7 +1,8 @@
 const { userExists, createUser, getBalance, formatBet, updateBalance, getVoteMulti, updateXp, getXp } = require("../economy/utils")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map()
 const games = new Map()
@@ -48,10 +49,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("minesweeper help")
-            .addField("usage", "$ms <bet>")
+            .addField("usage", `${prefix}ms <bet>`)
             .addField("game rules", "a 5x5 grid of white squares will be created\n" +
                 "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
                 "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet")
@@ -79,7 +82,7 @@ async function run(message, args) {
     const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$ms <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}ms <bet>`))
     }
 
     if (bet > getBalance(message.member)) {

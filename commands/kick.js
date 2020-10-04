@@ -1,6 +1,6 @@
 const { Message } = require("discord.js");
 const { profileExists, createProfile, newCase } = require("../moderation/utils");
-const { inCooldown, addCooldown } = require("../guilds/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -23,15 +23,17 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i am lacking permission: 'KICK_MEMBERS'"));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0 && message.mentions.members.first() == null) {
 
         const embed = new CustomEmbed(message.member)
             .setTitle("kick help")
-            .addField("usage", "$kick <@user(s)> (reason) [-s]")
+            .addField("usage", `${prefix}kick <@user(s)> (reason) [-s]`)
             .addField("help", "**<>** required | **()** optional | **[]** parameter\n" + "**<@users>** you can kick one or more members in one command (must tag them)\n" +
                 "**(reason)** reason for the kick, will be given to all kicked members\n" +
                 "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible")
-            .addField("examples", "$kick @member hacking\n$kick @member @member2 @member3 hacking\n$kick @member hacking -s")
+            .addField("examples", `${prefix}kick @member hacking\n${prefix}kick @member @member2 @member3 hacking\n${prefix}kick @member hacking -s`)
 
         return message.channel.send(embed)
     }

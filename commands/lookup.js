@@ -1,5 +1,6 @@
 const { Message } = require("discord.js");;
 const fetch = require("node-fetch");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -12,10 +13,13 @@ const cmd = new Command("lookup", "lookup ip addresses and domains", categories.
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("lookup help")
-            .addField("usage", "$lookup ip <ip address>\n$lookup <domain>")
+            .addField("usage", `${prefix}lookup ip <ip address>\n${prefix}lookup <domain>`)
             .addField("help", "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain")
         return message.channel.send(embed)
     }

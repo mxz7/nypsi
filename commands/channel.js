@@ -1,4 +1,5 @@
 const { Message } = require("discord.js");
+const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -44,24 +45,26 @@ async function run(message, args) {
 
     let fail = false
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("channel help")
-            .addField("usage", "$channel create <name(s)>\n" +
-                "$channel delete <#channel(s)>\n" +
-                "$channel rename <#channel> <name>\n" +
-                "$channel nsfw <#channel>")
+            .addField("usage", `${prefix}channel create <name(s)>\n` +
+                `${prefix}channel delete <#channel(s)>\n` +
+                `${prefix}channel rename <#channel> <name>\n` +
+                `${prefix}channel nsfw <#channel>`)
             .addField("help", "you can create/delete multiple channels at the same time, examples on this can be seen below")
-            .addField("examples", "$channel create channel\n" +
-                "$channel create channel1 channel2 channel3\n" +
-                "$channel delete #channel1 #channel2 #channel3")
+            .addField("examples", `${prefix}channel create channel\n` +
+                `${prefix}channel create channel1 channel2 channel3\n` +
+                `${prefix}channel delete #channel1 #channel2 #channel3`)
 
         return message.channel.send(embed)
     }
 
     if (args[0] == "create" || args[0] == "c") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("$channel **c**reate <name1 name2>\nexample: $channel c channel1 channel2"))
+            return message.channel.send(new ErrorEmbed(`${prefix}channel **c**reate <name1 name2>\nexample: ${prefix}channel c channel1 channel2`))
         }
         args.shift()
 
@@ -84,7 +87,7 @@ async function run(message, args) {
 
     if (args[0] == "delete" || args[0] == "del") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("$channel **del**ete <channel>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}channel **del**ete <channel>`))
         }
 
         args.shift()
@@ -108,7 +111,7 @@ async function run(message, args) {
 
     if (args[0] == "rename" || args[0] == "r") {
         if (!args.length >= 3) {
-            return message.channel.send(new ErrorEmbed("$channel **r**ename <channel> <name>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}channel **r**ename <channel> <name>`))
         }
         const channel = message.mentions.channels.first()
 
@@ -136,7 +139,7 @@ async function run(message, args) {
 
     if (args[0] == "nsfw") {
         if (args.length != 2) {
-            return message.channel.send(new ErrorEmbed("$channel nsfw <channel>"))
+            return message.channel.send(new ErrorEmbed(`${prefix}channel nsfw <channel>`))
         }
 
         const channel = message.mentions.channels.first()

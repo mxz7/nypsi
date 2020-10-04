@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
 const shuffle = require("shuffle-array");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map()
 const games = new Map()
@@ -37,10 +38,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("highlow help")
-            .addField("usage", "$highlow <bet>\n$highlow info")
+            .addField("usage", `${prefix}highlow <bet>\n${prefix}highlow info`)
             .addField("game rules", "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once.")
             .addField("help", "**A**ce | value of 1\n**J**ack | value of 11\n" + 
                 "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
@@ -78,7 +81,7 @@ async function run(message, args) {
     const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed("$highlow <bet>"))
+        return message.channel.send(new ErrorEmbed(`${prefix}highlow <bet>`))
     }
 
     if (bet > getBalance(message.member)) {

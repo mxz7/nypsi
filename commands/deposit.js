@@ -1,7 +1,8 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map()
 
@@ -35,10 +36,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    const prefix = getPrefix(message.guild)
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("deposit help")
-            .addField("usage", "$deposit <amount>")
+            .addField("usage", `${prefix}deposit <amount>`)
             .addField("help", "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
                 "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as your use the bot more.")
         return message.channel.send(embed)

@@ -2,7 +2,8 @@ const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExist
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getPrefix } = require("../guilds/utils.js");
 
 const cooldown = new Map()
 
@@ -20,6 +21,7 @@ async function run(message, args) {
         .setTitle("padlock | " + message.member.user.username)
     
     const padlockPrice = getPadlockPrice()
+    const prefix = getPrefix(message.guild)
 
     if (args.length == 1 && args[0].toLowerCase() == "buy") {
         if (hasPadlock(message.member)) {
@@ -66,7 +68,7 @@ async function run(message, args) {
             embed.setDescription("**protected** 🔒\nyou currently have a padlock")
             return await message.channel.send(embed).catch()
         } else {
-            embed.setDescription("**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**" + padlockPrice.toLocaleString() + "** with $padlock buy")
+            embed.setDescription(`**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**${padlockPrice.toLocaleString()}** with ${prefix}padlock buy`)
             embed.setColor("#e4334f")
             return await message.channel.send(embed).catch()
         }
