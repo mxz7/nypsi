@@ -1,3 +1,5 @@
+const startUp = Date.now()
+
 const Discord = require("discord.js");
 const { MessageEmbed } = require("discord.js");;
 const client = new Discord.Client();
@@ -74,7 +76,12 @@ client.once("ready", async () => {
     console.log("users in currency: " + getUserCount())
     console.log("--bot summary--\n");
 
-    console.log("logged in as " + client.user.tag + " @ " + getTimestamp() + "\n- bot run log starting below -\n");
+    console.log("logged in as " + client.user.tag + " @ " + getTimestamp());
+
+    const now = Date.now()
+    const timeTaken = (now - startUp) / 1000
+
+    console.log(`time taken: ${timeTaken}s\n`)
 });
 
 client.on("guildCreate", guild => {
