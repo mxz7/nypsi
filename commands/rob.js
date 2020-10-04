@@ -1,7 +1,6 @@
 const { getMember } = require("../utils/utils")
-const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
+const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp, getDMsEnabled } = require("../economy/utils.js")
 const { Message } = require("discord.js");
-const { list } = require("../optout.json");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -174,7 +173,7 @@ async function run(message, args) {
         setTimeout(async () => {
             await m.edit(embed2)
 
-            if (!list.includes(target.user.id)) {
+            if (getDMsEnabled(message.member)) {
                 if (robberySuccess) {
                     target.send("you have been robbed!!", embed3).catch(() => {})
                 } else {
