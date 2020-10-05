@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const { MessageEmbed } = require("discord.js");;
 const client = new Discord.Client();
 const { token } = require("./config.json");
-const { getUserCount, updateStats } = require("./economy/utils.js")
+const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
@@ -248,6 +248,16 @@ async function runChecks() {
     await updateStats(client.guilds.cache.size)
     console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
 }
+
+/**
+ * 
+ * @param {JSON} vote 
+ */
+async function onVote(vote) {
+    doVote(client, vote)
+}
+
+exports.onVote = onVote
 
 setTimeout(() => {
     client.login(token).then(() => {

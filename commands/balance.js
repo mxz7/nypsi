@@ -1,8 +1,9 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, userExistsID, updateBalanceID, createUserID } = require("../economy/utils.js")
+const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, getPrestigeRequirement, getPrestigeRequirementBal } = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money"])
 
@@ -18,30 +19,20 @@ async function run(message, args) {
 
         if (!target) {
             target = args[0]
-            if (!userExistsID(target)) {
+            if (!userExists(target)) {
                 return message.channel.send("❌ invalid user - you must tag the user for this command or use a user id");
             }
             id = true
         }
 
         if (args[1] == "reset") {
-            if (id) {
-                createUserID(target)
-                return message.react("✅")
-            } else {
-                createUser(target)
-                return message.react("✅")
-            }
+            createUser(target)
+            return message.react("✅")
         }
 
         const amount = parseInt(args[1])
 
-        if (id) {
-            updateBalanceID(target, amount)
-        } else {
-            updateBalance(target, amount)
-        }
-
+        updateBalance(target, amount)
 
         return message.react("✅")
     }
@@ -52,7 +43,7 @@ async function run(message, args) {
         target = message.mentions.members.first();
 
         if (!target) {
-            target = getMember(message, args[0])
+            target = getMember(message, args.join(" "))
         }
 
         if (!target) {
@@ -67,6 +58,14 @@ async function run(message, args) {
         .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
             "💳 $**" + getBankBalance(target).toLocaleString() + "** / $**" + getMaxBankBalance(target).toLocaleString() + "**")
         .setFooter("xp: " + getXp(target).toLocaleString())
+
+    if (message.member ==  target) {
+        if (getXp(target) >= getPrestigeRequirement(target) && getBankBalance(target) >= getPrestigeRequirementBal(target)) {
+            return message.channel.send(`${message.member.user.toString()} you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`, embed)
+        }
+    }
+
+    
 
     return message.channel.send(embed)
 }
