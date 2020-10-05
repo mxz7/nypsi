@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache } = require("../economy/utils.js");
+const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache, getPrestige } = require("../economy/utils.js");
 const { getPrefix } = require("../guilds/utils.js");
 const { Command, categories } = require("../utils/classes/Command.js");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -34,7 +34,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
-    const prefix = getPrefix(message.guild)
+    if (!userExists(message.member)) createUser(message.member)
 
     cooldown.set(message.member.id, new Date());
 
@@ -42,43 +42,23 @@ async function run(message, args) {
         cooldown.delete(message.author.id);
     }, 5000);
 
-    if (!userExists(message.member)) createUser(message.member)
-
+    const prefix = getPrefix(message.guild)
+    const amount = 15000 * (getPrestige(message.member) + 1)
+    const crateCount = 1 + getPrestige(message.member)
     const voted = await getVoteMulti(message.member) > 0
 
     const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
 
     if (voted) {
-
-        if (!bonusCooldown.has(message.member.id)) {
-            embed.setTitle("vote ✅ | " + message.member.user.username)
-            embed.setColor("#5efb8f")
-            embed.addField("rewards", "✓ **20**% gambling bonus\n✓ **xp** gambling bonus\n✓ $**15,000** added to your balance")
-            embed.setFooter("you can claim another $15,000 in 6 hours")
-            updateBalance(message.member, getBalance(message.member) + 15000)
-            bonusCooldown.set(message.member.id, new Date())
-            setTimeout(() => {
-                try {
-                    bonusCooldown.delete(message.author.id)
-                } catch {}
-            }, 21600000)
-        } else {
-            const init = bonusCooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr - init))
-            const time = 21600000 - diff
-            const remaining = getUptime(time)
-
-            embed.setTitle("vote ✅ | " + message.member.user.username)
-            embed.setColor("#5efb8f")
-            embed.addField("rewards", "✓ **20**% gambling bonus\n✓ **xp** gambling bonus\n- $**15,000** available in: " + remaining)
-        }
+        embed.setTitle("vote ✅ | " + message.member.user.username)
+        embed.setColor("#5efb8f")
+        embed.addField("rewards", "✓ **20**% gambling bonus\n✓ **xp** gambling bonus")
     } else {
         embed.setTitle("vote ❌ | " + message.member.user.username)
         embed.setColor("#e4334f")
-        embed.addField("rewards", "× **20**% gambling bonus\n× **xp** gambling bonus\n× $**15,000** reward")
-        embed.setFooter(`you must run ${prefix}vote to redeem $15,000`)
+        embed.addField("rewards", `× **20**% gambling bonus\n× **xp** gambling bonus\n× $**${amount.toLocaleString()}** reward\n× **${crateCount}** vote crate`)
+        embed.setFooter("you get increased rewards for prestiging")
         removeFromVoteCache(message.member)
     }
 
