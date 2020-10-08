@@ -585,25 +585,3 @@ function setDMsEnabled(member, value) {
 }
 
 exports.setDMsEnabled = setDMsEnabled
-
-/*const newUsers = {}
-
-for (user in users) {
-    const userID = user
-    user = users[user]
-
-    if (user.balance <= 1500 && user.xp < 25) continue
-
-    const newProfile = new EconProfile()
-
-    newProfile.money.balance = user.balance
-    newProfile.money.bank = user.bank
-    newProfile.xp = user.xp
-    newProfile.padlock = user.padlockStatus
-
-    newUsers[userID] = newProfile
-}
-
-console.log(newUsers)
-console.log(Object.keys(newUsers).length)
-users = newUsers*/
