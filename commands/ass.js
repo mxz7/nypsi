@@ -5,7 +5,7 @@ const { redditImage } = require("../utils/utils.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("ass", "get a random ass image", categories.NSFW).setAliases("peach")
+const cmd = new Command("ass", "get a random ass image", categories.NSFW).setAliases(["peach"])
 
 /**
  * @param {Message} message 
