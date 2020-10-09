@@ -238,7 +238,7 @@ async function runChecks() {
         })
     }, 600000)
 
-    if (client.user.id == "685193083570094101") return
+    if (client.user.id != "678711738845102087") return
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size)
