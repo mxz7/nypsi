@@ -6,7 +6,7 @@ const { getPrefix } = require("../guilds/utils");
 
 const cooldown = new Map()
 
-const cmd = new Command("urban", "get a definition from urban dictionary", categories.INFO)
+const cmd = new Command("urban", "get a definition from urban dictionary", categories.INFO).setAliases(["define"])
 
 /**
  * @param {Message} message 
