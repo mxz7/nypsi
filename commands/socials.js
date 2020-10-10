@@ -39,6 +39,8 @@ async function run(message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id);
     }, 3000);
+    
+    const prefix = getPrefix(message.guild)
 
     if (args.length <= 1 && args[0] != "help") {
         let member = message.member
@@ -60,7 +62,6 @@ async function run(message, args) {
         }
 
         const profile = getProfile(member)
-        const prefix = getPrefix(message.guild)
 
         const embed = new CustomEmbed(message.member)
             .setFooter(`do ${prefix}socials help for commands`)
