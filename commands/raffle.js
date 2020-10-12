@@ -72,8 +72,8 @@ async function run(message, args) {
     chosen = await message.guild.members.fetch(chosen)
 
     const embed = new CustomEmbed(message.member)
-        .setTitle("raffle by " + message.member.user.tag)
-        .setDescription("**" + chosen.user.tag + "**")
+        .setTitle(`${message.member.user.username}'s raffle`)
+        .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``)
 
     return message.channel.send(embed)
 
