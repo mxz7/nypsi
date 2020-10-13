@@ -74,6 +74,8 @@ async function run(message, args) {
         embed.setFooter(`real member count: ${server.memberCount} | stats are inaccurate to optimise with large servers`)
     }
 
+    embed.setFooter(`real full count: ${server.memberCount} | stats are temporarily inaccurate`)
+
     message.channel.send(embed)
 
 }

@@ -288,6 +288,8 @@ async function checkStats(guild) {
 
     if (guilds[guild.id].counter.filterBots) {
         memberCount = memberCount.filter(m => !m.user.bot)
+    } else {
+        memberCount = guild.memberCount
     }
 
     let format = ""
