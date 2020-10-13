@@ -286,19 +286,16 @@ async function checkStats(guild) {
         return
     }
 
-    if (guilds[guild.id].counter.filterBots) {
-        memberCount = memberCount.filter(m => !m.user.bot)
-    } else {
-        memberCount = guild.memberCount
-    }
-
     let format = ""
 
-    if (guild.memberCount >= 25000) {
+    if (guilds[guild.id].counter.filterBots && guild.memberCount < 25000) {
+        memberCount = memberCount.filter(m => !m.user.bot)
+        format = guilds[guild.id].counter.format.split("%count%").join(memberCount.size.toLocaleString())
+    } else if (guilds[guild.id].counter.filterBots && guild.memberCount >= 25000) {
         format = guilds[guild.id].counter.format.split("%count%").join(guild.memberCount.toLocaleString())
         guilds[guild.id].counter.filterBots = false
-    } else {
-        format = guilds[guild.id].counter.format.split("%count%").join(memberCount.size.toLocaleString())
+    } else if (!guilds[guild.id].counter.filterBots) {
+        format = guilds[guild.id].counter.format.split("%count%").join(guild.memberCount.toLocaleString())
     }
 
     format = format.split("%peak%").join(guilds[guild.id].peaks.members)
