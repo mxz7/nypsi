@@ -4,7 +4,7 @@ const { getCase, deleteCase, profileExists, createProfile } = require("../modera
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("case", "get information about a given case", categories.MODERATION)
+const cmd = new Command("case", "get information about a given case", categories.MODERATION).setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER"])
 
 /**
  * @param {Message} message 
