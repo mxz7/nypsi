@@ -210,16 +210,22 @@ function daysUntilChristmas() {
             return "ITS CHRISTMAS"
         }
     }
-    
-    function daysUntil(date) {
-        const ms = Math.floor(date - current);
-    
-        const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    
-        return days
-    }
 
     return daysUntil(date).toString()
 }
 
 exports.daysUntilChristmas = daysUntilChristmas
+
+/**
+ * @returns {Number}
+ * @param {Date} date 
+ */
+function daysUntil(date) {
+    const ms = Math.floor(date - current);
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+
+    return days
+}
+
+exports.daysUntil = daysUntil
