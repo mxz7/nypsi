@@ -1,7 +1,9 @@
 const { Guild } = require("discord.js");
 const fs = require("fs");
 const { getPriority } = require("os");
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
 const { GuildStorage } = require("../utils/classes/GuildStorage");
+const { daysUntilChristmas } = require("../utils/utils");
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
 
 let timer = 0
@@ -371,6 +373,94 @@ function setPrefix(guild, prefix) {
 }
 
 exports.setPrefix = setPrefix
+
+/**
+ * @returns {Boolean}
+ * @param {Guild} guild 
+ */
+function hasChristmasCountdown(guild) {
+    if (!guilds[guild.id].xmas) {
+        return false
+    } else {
+        return true
+    }
+}
+
+exports.hasChristmasCountdown = hasChristmasCountdown
+
+function createNewChristmasCountdown(guild) {
+    guilds[guild.id].xmas = {
+        enabled: false,
+        format: "`%days%` days until christmas",
+        channel: "none"
+    }
+}
+
+exports.createNewChristmasCountdown = createNewChristmasCountdown
+
+/**
+ * @returns {JSON}
+ * @param {Guild} guild 
+ */
+function getChristmasCountdown(guild) {
+    return guilds[guild.id].xmas
+}
+
+exports.getChristmasCountdown = getChristmasCountdown
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {JSON} xmas 
+ */
+function setChristmasCountdown(guild, xmas) {
+    guilds[guild.id].xmas = xmas
+}
+
+exports.setChristmasCountdown = setChristmasCountdown
+
+/**
+ * @returns {Boolean}
+ * @param {Guild} guild 
+ */
+function hasChristmasCountdownEnabled(guild) {
+    if (guilds[guild.id].xmas.enabled == true) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.hasChristmasCountdownEnabled = hasChristmasCountdownEnabled
+
+/**
+ * 
+ * @param {Guild} guild 
+ */
+async function checkChristmasCountdown(guild) {
+    const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].xmas.channel)
+
+    if (!channel) {
+        guilds[guild.id].xmas.enabled = false
+        guilds[guild.id].xmas.channel = "none"
+        return
+    }
+
+    let format = guilds[guild.id].xmas.format
+
+    format = format.split("%days%").join(daysUntilChristmas().toString())
+
+    await channel.send(new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:").setFooter("bot.tekoh.wtf")).then(() => {
+        console.log(`[${getTimestamp()}] sent christmas countdown in ${guild.name} ~ ${format}`)
+    }).catch(() => {
+        console.log(`[${getTimestamp()}] error sending christmas countdown in ${guild.name}`)
+        guilds[guild.id].xmas.enabled = false
+        guilds[guild.id].xmas.channel = "none"
+        return
+    })
+}
+
+exports.checkChristmasCountdown = checkChristmasCountdown
 
 function getTimestamp() {
     const date = new Date();
