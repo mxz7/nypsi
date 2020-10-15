@@ -221,7 +221,7 @@ exports.daysUntilChristmas = daysUntilChristmas
  * @param {Date} date 
  */
 function daysUntil(date) {
-    const ms = Math.floor(date - current);
+    const ms = Math.floor(date - new Date());
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
