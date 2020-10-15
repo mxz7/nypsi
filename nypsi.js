@@ -5,7 +5,7 @@ const { MessageEmbed } = require("discord.js");;
 const client = new Discord.Client();
 const { token } = require("./config.json");
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, daysUntilChristmas } = require("./utils/utils");
@@ -237,10 +237,24 @@ async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach(async guild => {
             if (hasStatsEnabled(guild)) {
-                checkStats(guild)
+                await checkStats(guild)
             }
         })
     }, 600000)
+
+    const now = new Date()
+    const needed = new Date(Date.parse(`${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`) + 10800000)
+
+    setTimeout(() => {
+        setInterval(async () => {
+            client.guilds.cache.forEach(async guild => {
+                if (hasChristmasCountdownEnabled(guild))
+                await checkChristmasCountdown(guild)
+            })
+        }, 86400000)
+    }, needed - now)
+
+    console.log(`[${getTimestamp()}] christmas countdowns will run in ${MStoTime(needed - now)}`)
 
     if (client.user.id != "678711738845102087") return
 
@@ -273,3 +287,33 @@ setTimeout(() => {
         }, 2000)
     })
 }, 2000)
+
+function MStoTime(ms) {
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    const daysms = ms % (24 * 60 * 60 * 1000)
+    const hours = Math.floor((daysms) / (60*60*1000))
+    const hoursms = ms % (60 * 60 * 1000)
+    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutesms = ms % (60 * 1000)
+    const sec = Math.floor((minutesms) / (1000))
+
+    let output = ""
+
+    if (days > 0) {
+        output = output + days + "d "
+    }
+
+    if (hours > 0) {
+        output = output + hours + "h "
+    }
+
+    if (minutes > 0) {
+        output = output + minutes + "m "
+    }
+
+    if (sec > 0) {
+        output = output + sec + "s"
+    }
+
+    return output
+}

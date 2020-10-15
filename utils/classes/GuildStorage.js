@@ -16,6 +16,11 @@ exports.GuildStorage = class {
                 filterBots: true,
                 channel: "none"
             },
+            xmas: {
+                enabled: false,
+                format: "`%days%` days until christmas",
+                channel: "none"
+            },
             disabledCommands: [],
             snipeFilter: ["discord.gg", "/invite/"],
             chatFilter: [],
