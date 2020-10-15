@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const { getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getTimestamp } = require("../utils/utils");
+const { getTimestamp, formatDate } = require("../utils/utils");
 
 const cooldown = new Map()
 const cache = new Map()
@@ -195,27 +195,11 @@ async function run(message, args) {
         nameHistory.forEach(item => {
 
             if (item.timestamp) {
-                const date = new Date(item.timestamp)
-
-                const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
-    
-                const year = date.getFullYear()
-                const month = months[date.getMonth()]
-                const day = date.getDate()
-    
-                const timestamp = month + " " + day + " " + year
+                const timestamp = formatDate(new Date(item.timestamp))
 
                 value = "`" + item.name + "` | `" + timestamp + "`"
             } else if (item.changedToAt) {
-                const date = new Date(item.changedToAt)
-
-                const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sept", "oct", "nov", "dec"]
-    
-                const year = date.getFullYear()
-                const month = months[date.getMonth()]
-                const day = date.getDate()
-    
-                const timestamp = month + " " + day + " " + year
+                const timestamp = formatDate(new Date(item.changedToAt))
 
                 value = "`" + item.name + "` | `" + timestamp + "`"
             } else {
