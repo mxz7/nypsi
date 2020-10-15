@@ -1,4 +1,4 @@
-const { getMember } = require("../utils/utils")
+const { getMember, formatDate } = require("../utils/utils")
 const { Message } = require("discord.js");
 const { getCases, profileExists, createProfile } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
@@ -120,11 +120,11 @@ async function run(message, args) {
     }
 
     for (case0 of pages[0]) {
-        const date = new Date(case0.time)
+        const date = formatDate(new Date(case0.time))
         if (case0.deleted) {
             embed.addField("case " + case0.id, "`[deleted]`")
         } else {
-            embed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date.toLocaleString())
+            embed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
         }
     }
 
@@ -166,11 +166,11 @@ async function run(message, args) {
                 } else {
                     currentPage--
                     for (case0 of pages[currentPage]) {
-                        const date = new Date(case0.time)
+                        const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
                         } else {
-                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date.toLocaleString())
+                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
                         }
                     }
                     newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
@@ -183,11 +183,11 @@ async function run(message, args) {
                 } else {
                     currentPage++
                     for (case0 of pages[currentPage]) {
-                        const date = new Date(case0.time)
+                        const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
                         } else {
-                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date.toLocaleString())
+                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
                         }
                     }
                     newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
