@@ -11,11 +11,12 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", ca
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
             return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_SERVER*"))
         }
-        return
+        return message.channel.send(new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`))
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
