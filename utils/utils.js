@@ -202,10 +202,8 @@ function daysUntilChristmas() {
     const current = new Date()
     
     if (current.getMonth() >= 11) {
-        console.log("a")
         if (current.getDate() > 25) {
             date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear() + 1}`))
-            console.log("b")
         } else if (current.getDate() == 25) {
             return "ITS CHRISTMAS"
         }
