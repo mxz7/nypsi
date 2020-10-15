@@ -79,8 +79,7 @@ async function run(message, args) {
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
         .setTitle(member.user.tag)
         
-        .addField("account", `**id** ${member.user.id}
-            **created** ${created.toString().toLowerCase()}`, true)
+        .addField("account", `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`, true)
 
         .addField("server", "**joined** " + joined.toString().toLowerCase() + "\n" +
             "**join pos** " + joinPos, true)
