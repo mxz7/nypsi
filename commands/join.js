@@ -28,7 +28,7 @@ async function run(message, args) {
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
-    const daysAgo = timeSince(new Date(member.joinedAt))
+    const daysAgo = daysAgo(new Date(member.joinedAt))
 
     const members = message.guild.members.cache
     let membersSorted = []
@@ -59,12 +59,3 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
-
-function timeSince(date) {
-
-    const ms = Math.floor((new Date() - date));
-
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-
-    return days
-}

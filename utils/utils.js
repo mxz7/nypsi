@@ -179,3 +179,47 @@ function getTimestamp() {
 }
 
 exports.getTimestamp = getTimestamp
+
+/**
+ * @returns {Number}
+ * @param {Date} date 
+ */
+function daysAgo(date) {
+    const ms = Math.floor(new Date() - date);
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+
+    return days
+}
+
+exports.daysAgo = daysAgo
+
+/**
+ * @returns {String}
+ */
+function daysUntilChristmas() {
+    let date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear()}`))
+    const current = new Date()
+    
+    if (current.getMonth() >= 11) {
+        console.log("a")
+        if (current.getDate() > 25) {
+            date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear() + 1}`))
+            console.log("b")
+        } else if (current.getDate() == 25) {
+            return "ITS CHRISTMAS"
+        }
+    }
+    
+    function daysUntil(date) {
+        const ms = Math.floor(date - current);
+    
+        const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    
+        return days
+    }
+
+    return daysUntil(date).toString()
+}
+
+exports.daysUntilChristmas = daysUntilChristmas
