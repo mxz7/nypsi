@@ -1,6 +1,6 @@
 const { Message } = require("discord.js");
 const { Command, categories } = require("../utils/classes/Command");
-const { getMember, formatDate } = require("../utils/utils")
+const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
@@ -28,7 +28,7 @@ async function run(message, args) {
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
-    const daysAgo = daysAgo(new Date(member.joinedAt))
+    const timeAgo = daysAgo(new Date(member.joinedAt))
 
     const members = message.guild.members.cache
     let membersSorted = []
@@ -48,7 +48,7 @@ async function run(message, args) {
     if (joinPos == 0) joinPos = "invalid"
 
     const embed = new CustomEmbed(message.member, false, "joined on **" + joinedServer + "**\n" +
-        " - **" + daysAgo.toLocaleString() + "** days ago\n" +
+        " - **" + timeAgo.toLocaleString() + "** days ago\n" +
         "join position is **" + joinPos + "**")
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
