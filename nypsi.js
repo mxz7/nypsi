@@ -8,7 +8,7 @@ const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { getTimestamp } = require("./utils/utils");
+const { getTimestamp, daysUntilChristmas } = require("./utils/utils");
 const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils");
 
 const snipe = new Map()
@@ -22,7 +22,7 @@ loadCommands()
 
 client.once("ready", async () => {
     const games = ["$help | lonely.lol", "$help | tekoh.wtf", "$help | tekoh.xyz", "$help | alone.wtf", "$help | racist.wtf", 
-    "have you joined the $support server?", "x0x"]
+    "have you joined the $support server?", "x0x", "xmas"]
 
     setTimeout(async () => {
         const a = await getRandomCommand()
@@ -31,6 +31,8 @@ client.once("ready", async () => {
 
         if (game == "x0x") {
             game = `\$${a.name} - ${a.description}`
+        } else if (game == "xmas") {
+            game = `${daysUntilChristmas()} days until christmas`
         }
 
         client.user.setPresence({
@@ -48,6 +50,8 @@ client.once("ready", async () => {
 
         if (game == "x0x") {
             game = `\$${a.name} - ${a.description}`
+        } else if (game == "xmas") {
+            game = `${daysUntilChristmas()} days until christmas`
         }
 
         client.user.setPresence({
