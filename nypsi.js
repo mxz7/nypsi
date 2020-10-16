@@ -215,6 +215,16 @@ client.on("channelCreate", async ch => {
     }).catch(() => {})
 })
 
+process.on("unhandledRejection", error => {
+    let stack = error.stack.split("\n").join("\n\x1b[31m")
+
+    if (stack.length > 200) {
+        stack = stack.substr(0, 200) + "..."
+    }
+
+    console.log(`\x1b[31m[${getTimestamp()}] ${stack}`)
+})
+
 async function checkGuild(guildID) {
     const g = await client.guilds.cache.find(gi => gi.id == guildID)
 
