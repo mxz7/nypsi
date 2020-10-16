@@ -21,7 +21,8 @@ async function run(message, args) {
             .setTitle("case help")
             .addField("usage", `${prefix}case <caseID>`)
             .addField("help", "to delete a case, react with ❌ after running the command\n" +
-                `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the **MANAGE_SERVER** permission`)
+                "dates are in MM/DD/YYYY format\n" +
+                `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`MANAGE_SERVER\` permission`)
 
         return message.channel.send(embed)
     }
