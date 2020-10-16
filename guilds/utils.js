@@ -424,6 +424,8 @@ exports.setChristmasCountdown = setChristmasCountdown
  * @param {Guild} guild 
  */
 function hasChristmasCountdownEnabled(guild) {
+    if (!hasChristmasCountdown(guild)) return false
+
     if (guilds[guild.id].xmas.enabled == true) {
         return true
     } else {
