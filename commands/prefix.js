@@ -13,8 +13,6 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    const color = getColor(message.member)
-
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
             return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_GUILD*"))
