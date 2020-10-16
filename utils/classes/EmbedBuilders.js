@@ -129,6 +129,20 @@ exports.CustomEmbed = class {
 
         return this
     }
+
+    /**
+     * @returns {CustomEmbed}
+     * @param {Date} date 
+     */
+    setTimestamp(date) {
+        if (date) {
+            this.embed.setTimestamp(date)
+        } else {
+            this.embed.setTimestamp()
+        }
+
+        return this
+    }
 }
 
 exports.ErrorEmbed = class {
@@ -243,6 +257,18 @@ exports.ErrorEmbed = class {
 
         return this
     }
-}
 
-//CREATE CLASSES FOR GUILDS + USERS + MODERATION ETC
+    /**
+     * @returns {CustomEmbed}
+     * @param {Date} date 
+     */
+    setTimestamp(date) {
+        if (date) {
+            this.embed.setTimestamp(date)
+        } else {
+            this.embed.setTimestamp()
+        }
+
+        return this
+    }
+}
