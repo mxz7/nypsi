@@ -243,7 +243,14 @@ async function runChecks() {
     }, 600000)
 
     const now = new Date()
-    const needed = new Date(Date.parse(`${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`) + 10800000)
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000)
 
     setTimeout(() => {
         setInterval(async () => {
