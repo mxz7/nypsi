@@ -269,6 +269,10 @@ async function runChecks() {
                 await checkChristmasCountdown(guild)
             })
         }, 86400000)
+        client.guilds.cache.forEach(async guild => {
+            if (hasChristmasCountdownEnabled(guild))
+            await checkChristmasCountdown(guild)
+        })
     }, needed - now)
 
     console.log(`[${getTimestamp()}] christmas countdowns will run in ${MStoTime(needed - now)}`)
