@@ -566,6 +566,8 @@ exports.getPrestigeRequirementBal = getPrestigeRequirementBal
  * @param {GuildMember} member 
  */
 function getDMsEnabled(member) {
+    if (!userExists(member)) createUser(member)
+
     if (users[member.user.id].dms) {
         return true
     } else {
