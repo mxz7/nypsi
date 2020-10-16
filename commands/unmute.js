@@ -87,7 +87,7 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, true, "✅ **" + count + "** member(s) unmuted")
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted")
         .setTitle("unmute | " + message.member.user.username)
 
     if (count == 1) {

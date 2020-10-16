@@ -74,7 +74,7 @@ async function run(message, args) {
         }
         reason = reason + args.join(" ")
     } else {
-        reason = reason + "no reason specified"
+        reason = reason + "no reason given"
     }
 
     if (reason.includes("-k")) {
@@ -115,15 +115,29 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to ban any users"))
     }
 
-    const embed = new CustomEmbed(message.member, true, `✅ **${count}** members banned for: ${reason.split(": ")[1]}`)
+    const embed = new CustomEmbed(message.member)
         .setTitle("ban | " + message.member.user.username)
         .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
+
+    if (reason.split(": ")[1] == "no reason given" && count != 1) {
+        embed.setDescription(`✅ **${count}** members banned`)
+    } else {
+        embed.setDescription(`✅ **${count}** members banned for: ${reason.split(": ")[1]}`)
+    }
     
     if (count == 1) {
         if (idOnly) {
-            embed.setDescription(`✅ \`${members.first()}\` has been banned for: ${reason.split(": ")[1]}`)
+            if (reason.split(": ")[1] == "no reason given") {
+                embed.setDescription(`✅ \`${members.first()}\` has been banned`)
+            } else {
+                embed.setDescription(`✅ \`${members.first()}\` has been banned for: ${reason.split(": ")[1]}`)
+            }
         } else {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split(": ")[1])
+            if (reason.split(": ")[1] == "no reason given") {
+                embed.setDescription("✅ `" + members.first().user.tag + "` has been banned")
+            } else {
+                embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split(": ")[1])
+            }
         }
     }
 
@@ -148,7 +162,15 @@ async function run(message, args) {
         } else if (failed.indexOf(m.user.tag) == -1) {
             newCase(message.guild, "ban", m.user.id, message.member.user.tag, reason.split(": ")[1])
 
-            await m.send("you have been banned in **" + message.guild.name + "** for `" + reason.split(": ")[1] + "`").catch(() => {})
+            if (reason.split(": ")[1] == "no reason given") {
+                await m.send(`you have been banned from ${message.guild.name}`)
+            } else {
+                const embed = new CustomEmbed(m)
+                    .setTitle(`banned from ${message.guild.name}`)
+                    .addField("reason", `\`${reason.split(": ")[1]}\``)
+
+                await m.send(`you have been banned from ${message.guild.name}`, embed)
+            }
         }
     }
 
