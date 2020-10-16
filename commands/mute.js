@@ -206,7 +206,7 @@ async function run(message, args) {
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`muted in ${message.guild.name}`)
-                    .addF1ield("length", `\`${mutedLength}\``, true)
+                    .addField("length", `\`${mutedLength}\``, true)
                     .setFooter("unmuted")
                     .setTimestamp(unmuteDate)
 
