@@ -98,6 +98,9 @@ async function run(message, args) {
 
         if (time) {
             timedMute = true
+            reason = reason.split(" ")
+            reason.shift()
+            reason = reason.join(" ")
         }
     }
 
@@ -145,7 +148,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to mute any users"))
     }
 
-    const embed = new CustomEmbed(message.member, true, `✅ **${count}** member(s) muted`)
+    const embed = new CustomEmbed(message.member, false, `✅ **${count}** member(s) muted`)
         .setTitle("mute | " + message.member.user.username)
 
     if (timedMute) {
@@ -187,13 +190,31 @@ async function run(message, args) {
 
                 newMute(message.guild, members.get(member), unmuteDate)
             }
-
             
             if (!timedMute) {
-                await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "` (permanent)").catch()
                 newMute(message.guild, members.get(member), 9999999999999)
+
+                const embed = new CustomEmbed(m)
+                    .setTitle(`muted in ${message.guild.name}`)
+                    .addField("length", "`permanent`", true)
+
+                if (reason != "") {
+                    embed.addField("reason", `\`${reason}\``, true)
+                }
+
+                await m.send(`you have been muted in ${message.guild.name}`, embed)
             } else {
-                await m.send("you have been muted in **" + message.guild.name + "** for `" + reason + "`").catch()
+                const embed = new CustomEmbed(m)
+                    .setTitle(`muted in ${message.guild.name}`)
+                    .addF1ield("length", `\`${mutedLength}\``, true)
+                    .setFooter("unmuted")
+                    .setTimestamp(unmuteDate)
+
+                if (reason != "") {
+                    embed.addField("reason", `\`${reason}\``, true)
+                }
+
+                await m.send(`you have been muted in ${message.guild.name}`, embed)
             }
         }
     }
@@ -246,15 +267,41 @@ function getTime(ms) {
     let output = ""
 
     if (days > 0) {
-        output = output + days + "d "
+        let a = " days"
+
+        if (days == 1) {
+            a = " day"
+        }
+
+        output = days + a
     }
 
     if (hours > 0) {
-        output = output + hours + "h "
+        let a = " hours"
+
+        if (hours == 1) {
+            a = " hour"
+        }
+
+        if (output == "") {
+            output = hours + a
+        } else {
+            output = `${output} ${hours}${a}`
+        }
     }
 
     if (minutes > 0) {
-        output = output + minutes + "m "
+        let a = " mins"
+
+        if (minutes == 1) {
+            a = " min"
+        }
+
+        if (output == "") {
+            output = minutes + a
+        } else {
+            output = `${output} ${minutes}${a}`
+        }
     }
 
     if (sec > 0) {

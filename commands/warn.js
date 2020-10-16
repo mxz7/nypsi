@@ -77,7 +77,11 @@ async function run(message, args) {
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
             failed.push(members.get(member).user.tag)
         } else {
-            await members.get(member).send(messageDM).catch(() => {
+            const embed = new CustomEmbed(members.get(member))
+                .setTitle(`warned in ${message.guild.name}`)
+                .addField("reason", `\`${reason}\``)
+
+            await members.get(member).send(`you have been warned in ${message.guild.name}`, embed).catch(() => {
                 error.push(members.get(member).user.tag)
             })
             count++
@@ -89,7 +93,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to warn any users"))
     }
 
-    const embed = new CustomEmbed(message.member, true, "✅ **" + count + "** members warned for: " + reason)
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason)
         .setTitle("warn | " + message.member.user.username)
     
     if (count == 1) {
