@@ -68,7 +68,7 @@ async function run(message, args) {
         }
         reason = reason + args.join(" ")
     } else {
-        reason = reason + "no reason specified"
+        reason = reason + "no reason given"
     }
 
     let count = 0
@@ -93,15 +93,25 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to kick any users"))
     }
 
-    const embed = new CustomEmbed(message.member, true, `✅ **${count}** members kicked for: ${reason.split(": ")[1]}`)
+    const embed = new CustomEmbed(message.member)
         .setTitle("kick | " + message.member.user.username)
+
+    if (reason.split(": ")[1] == "no reason given" && count != 1) {
+        embed.setDescription(`✅ **${count}** members kicked`)
+    } else {
+        embed.setDescription(`✅ **${count}** members kicked for: ${reason.split(": ")[1]}`)
+    }
 
     if (failed.length != 0) {
         embed.addField("error", "unable to kick: " + failed.join(", "))
     }
 
     if (count == 1) {
-        embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1])
+        if (reason.split(": ")[1] == "no reason given") {
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked")
+        } else {
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1])
+        }
     }
 
     if (args.join(" ").includes("-s")) {
@@ -118,7 +128,15 @@ async function run(message, args) {
         if (failed.indexOf(m.user.tag) == -1) {
             newCase(message.guild, "kick", m.user.id, message.member.user.tag, reason.split(": ")[1])
 
-            await m.send("you have been kicked in **" + message.guild.name + "** for `" + reason.split(": ")[1] + "`").catch()
+            if (reason.split(": ")[1] == "no reason given") {
+                await m.send(`you have been kicked from ${message.guild.name}`)
+            } else {
+                const embed = new CustomEmbed(m)
+                    .setTitle(`kicked from ${message.guild.name}`)
+                    .addField("reason", `\`${reason.split(": ")[1]}\``)
+
+                await m.send(`you have been kicked from ${message.guild.name}`, embed)
+            }
         }
     }
 

@@ -72,7 +72,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to unban any users"))
     }
 
-    const embed = new CustomEmbed(message.member, true)
+    const embed = new CustomEmbed(message.member)
         .setTitle(`unban | ${message.member.user.username}`)
 
     if (members.length == 1) {
