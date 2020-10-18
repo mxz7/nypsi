@@ -174,16 +174,18 @@ client.on("messageUpdate", message => {
 
 client.on("message", async message => {
 
+    if (!ready) return
+
     if (message.author.bot) return;
 
     if (!message.guild) {
         console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
 
         const embed = new MessageEmbed()
-                .setTitle("support")
-                .setColor("#36393f")
-                .setDescription("support server: https://discord.gg/hJTDNST")
-                .setFooter("bot.tekoh.wtf")
+            .setTitle("support")
+            .setColor("#36393f")
+            .setDescription("support server: https://discord.gg/hJTDNST")
+            .setFooter("bot.tekoh.wtf")
         return await message.channel.send(embed)
     }
 
@@ -191,9 +193,11 @@ client.on("message", async message => {
 
     if (client.user.id == "685193083570094101") prefix = "£"
 
-    if (!message.content.startsWith(prefix)) return;
+    if (message.content == `<@!${client.user.id}>`) {
+        return message.channel.send(`my prefix for this server is \`${prefix}\``)
+    }
 
-    if (!ready) return
+    if (!message.content.startsWith(prefix)) return;
 
     const args = message.content.substring(prefix.length).split(" ");
 
