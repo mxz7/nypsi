@@ -36,14 +36,27 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`));
-    }
-
     let target1;
     let target2;
 
-    if (args.length == 1) {
+    if (args.length == 0) {
+        target1 = message.member
+
+        const members = []
+        const members1 = message.guild.members.cache
+
+        members1.forEach(m => {
+            if (!m.user.bot && m.presence.status != "offline") {
+                if (members.indexOf(m.user.id) == -1) {
+                    members.push(m.user.id)
+                }
+            }
+        })
+
+        target2 = members[Math.floor(Math.random() * members.length)]
+
+        target2 = await message.guild.members.fetch(target2)
+    } else if (args.length == 1) {
         target1 = message.member;
 
         if (!message.mentions.members.first()) {
@@ -166,9 +179,7 @@ async function run(message, args) {
         loveBar = "💔💔💔💔💔💔💔💔💔💔";
     }
 
-    const embed = new CustomEmbed(message.member, false, target1.user.toString() + " **x** " + target2.user.toString())
-        .setTitle("❤ " + target1.displayName + " ❤ " + target2.displayName + " ❤")
-        .addField("love level", "**" + lovePercent + "**%\n" + loveBar + "\n\n" + "**" + loveLevel + "** " + loveEmoji)
+    const embed = new CustomEmbed(message.member, false, `${target1.user.toString()} **x** ${target2.user.toString()}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`)
     
     message.channel.send(embed)
 
