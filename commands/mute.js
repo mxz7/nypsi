@@ -181,7 +181,16 @@ async function run(message, args) {
     for (member of members.keyArray()) {
         const m = members.get(member)
         if (failed.indexOf(m.user.tag) == -1) {
-            newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, reason)
+
+            let storeReason = reason
+
+            if (!timedMute) {
+                storeReason = "[perm] " + reason
+            } else {
+                storeReason = `[${mutedLength}] ${reason}`
+            }
+
+            newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, storeReason)
 
             if (time >= 600) {
                 if (isMuted(message.guild, members.get(member))) {
