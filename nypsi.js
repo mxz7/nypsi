@@ -185,7 +185,6 @@ client.on("message", async message => {
             .setTitle("support")
             .setColor("#36393f")
             .setDescription("support server: https://discord.gg/hJTDNST")
-            .setFooter("bot.tekoh.wtf")
         return await message.channel.send(embed)
     }
 
