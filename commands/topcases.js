@@ -223,7 +223,6 @@ async function run(message, args) {
                 "`\nunmutes `" + unmutes.toLocaleString() + "`", true)
         }
         embed.addField("member stats", "punishments `" + punishments.toLocaleString() + "`\ndeleted `" + deletedCases.toLocaleString() + "`", true)
-        embed.setFooter("bot.tekoh.wtf")
     }
 
     return await message.channel.send(embed)
