@@ -264,7 +264,7 @@ async function run(message, args) {
                 } else {
                     currentPage--
                     embed.setDescription(names.get(currentPage).join("\n"))
-                    embed.setFooter("bot.tekoh.wtf | page " + currentPage + "/" + lastPage)
+                    embed.setFooter("page " + currentPage + "/" + lastPage)
                     await msg.edit(embed)
                     return pageManager()
                 }
@@ -274,7 +274,7 @@ async function run(message, args) {
                 } else {
                     currentPage++
                     embed.setDescription(names.get(currentPage).join("\n"))
-                    embed.setFooter("bot.tekoh.wtf | page " + currentPage + "/" + lastPage)
+                    embed.setFooter("page " + currentPage + "/" + lastPage)
                     await msg.edit(embed)
                     return pageManager()
                 }
