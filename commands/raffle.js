@@ -49,7 +49,7 @@ async function run(message, args) {
             }
         })
     } else {
-        const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ")))
+        const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
 
         if (!role) {
             return await message.channel.send(new ErrorEmbed("i wasn't able to find that role"))
