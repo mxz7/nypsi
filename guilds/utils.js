@@ -458,7 +458,7 @@ async function checkChristmasCountdown(guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
     }
 
-    await channel.send(new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:").setFooter("bot.tekoh.wtf")).then(() => {
+    await channel.send(new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")).then(() => {
         console.log(`[${getTimestamp()}] sent christmas countdown in ${guild.name} ~ ${format}`)
     }).catch(() => {
         console.log(`[${getTimestamp()}] error sending christmas countdown in ${guild.name}`)
