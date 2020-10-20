@@ -58,7 +58,7 @@ async function run(message, args) {
 
     const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
 
-    const embed = new CustomEmbed(message.member, true, `[download](https://mc-heads.net/download/${uuid.id})`)
+    const embed = new CustomEmbed(message.member, false, `[download](https://mc-heads.net/download/${uuid.id})`)
         .setTitle(uuid.name)
         .setURL("https://namemc.com/profile/" + username)
         .setImage(skinIMG)
