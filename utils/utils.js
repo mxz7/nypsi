@@ -147,7 +147,7 @@ exports.getMember = getMember
  */
 function formatDate(date) {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Intl.DateTimeFormat("en-US", options).format(date).toLowerCase();
+    return new Intl.DateTimeFormat("en-US", options).format(date).toLowerCase().split(",").join("");
 }
 
 exports.formatDate = formatDate

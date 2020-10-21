@@ -226,7 +226,7 @@ async function run(message, args) {
         if (e != BreakException) throw e
     }
 
-    const embed = new CustomEmbed(message.member, true, names.get(1).join("\n"))
+    const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
         .setTitle(username)
         .setURL("https://namemc.com/profile/" + username)
         .setThumbnail(skin)
