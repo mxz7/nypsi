@@ -124,7 +124,7 @@ async function run(message, args) {
         if (case0.deleted) {
             embed.addField("case " + case0.id, "`[deleted]`")
         } else {
-            embed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
+            embed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\non " + date)
         }
     }
 
@@ -170,7 +170,7 @@ async function run(message, args) {
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
                         } else {
-                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
+                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\non " + date)
                         }
                     }
                     newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
