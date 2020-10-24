@@ -266,6 +266,23 @@ async function helpCmd(message, args) {
  * @param {Array<String>} args 
  */
 function runCommand(cmd, message, args) {
+
+    if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
+        return message.member.send("❌ i don't have permission to send messages in that channel - please contact server staff if this is an error")
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
+        return message.channel.send("❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+            "if this error still shows, check channel specific permissions")
+    }
+
+
+    if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
+        return message.channel.send("❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
+            "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
+            "if this error still shows, check channel specific permissions")
+    }
+
     if (cmd == "help") {
         return helpCmd(message, args)
     }
@@ -286,16 +303,6 @@ function runCommand(cmd, message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 500)
-
-    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return
-
-    if (!message.guild.me.hasPermission("EMBED_LINKS")) {
-        return message.channel.send("❌ i am lacking permission `EMBED_LINKS`")
-    }
-
-    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i am lacking permission `MANAGE_MESSAGES`")
-    }
 
     try {
         logCommand(message, args)
