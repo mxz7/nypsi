@@ -105,33 +105,10 @@ async function runCheck(guild) {
     if (!hasGuild(guild)) createGuild(guild)
 
     const currentMembersPeak = guilds[guild.id].peaks.members
-    const currentOnlinesPeak = guilds[guild.id].peaks.onlines
 
-    let members
-
-    if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
-        members = guild.members.cache
-    } else {
-        members = await guild.members.fetch()
-        
-        fetchCooldown.add(guild.id)
-
-        setTimeout(() => {
-            fetchCooldown.delete(guild.id)
-        }, 3600 * 1000);
-    }
-
-    const currentMembers = members.filter(member => !member.user.bot)
-    const currentOnlines = currentMembers.filter(member => member.presence.status != "offline")
-
-    if (currentMembers.size > currentMembersPeak) {
-        guilds[guild.id].peaks.members = currentMembers.size
-        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak+ " -> " + currentMembers.size)
-    }
-
-    if (currentOnlines.size > currentOnlinesPeak) {
-        guilds[guild.id].peaks.onlines = currentOnlines.size
-        console.log("[" + getTimestamp() + "] online peak updated for '" + guild.name + "' " + currentOnlinesPeak + " -> " + currentOnlines.size)
+    if (guild.memberCount > currentMembersPeak) {
+        guilds[guild.id].peaks.members = guild.memberCount
+        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak + " -> " + guild.memberCount)
     }
 }
 
@@ -167,9 +144,8 @@ exports.getPeaks = getPeaks
  */
 function createGuild(guild) {
     const members = guild.members.cache.filter(member => !member.user.bot)
-    const onlines = members.filter(member => member.presence.status != "offline")
 
-    guilds[guild.id] = new GuildStorage(members.size, onlines.size)
+    guilds[guild.id] = new GuildStorage(members.size, 0)
 }
 
 exports.createGuild = createGuild
@@ -266,19 +242,25 @@ exports.getGuilds = getGuilds
 async function checkStats(guild) {
     let memberCount
 
-    if (fetchCooldown.has(guild.id) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250 || guild.memberCount >= 25000) {
-        memberCount = guild.members.cache
-    } else {
-        memberCount = await guild.members.fetch()
-        
-        fetchCooldown.add(guild.id)
+    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 25000) {
+        guilds[guild.id].counter.filterBots = false
+        memberCount = guild.memberCount
+    } else if (guilds[guild.id].counter.filterBots) {
+        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 50) {
+            members = guild.members.cache
+        } else {
+            members = await guild.members.fetch()
+            addCooldown(guild, 3600)
+        }
 
-        setTimeout(() => {
-            fetchCooldown.delete(guild.id)
-        }, 3600)
+        members = members.filter(m => !m.user.bot)
+
+        memberCount = members.size
+    } else {
+        memberCount = guild.memberCount
     }
 
-    if (!memberCount) memberCount = guild.members.cache
+    if (!memberCount) memberCount = guild.memberCount
 
     const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].counter.channel)
 
@@ -288,18 +270,8 @@ async function checkStats(guild) {
         return
     }
 
-    let format = ""
-
-    if (guilds[guild.id].counter.filterBots && guild.memberCount < 25000) {
-        memberCount = memberCount.filter(m => !m.user.bot)
-        format = guilds[guild.id].counter.format.split("%count%").join(memberCount.size.toLocaleString())
-    } else if (guilds[guild.id].counter.filterBots && guild.memberCount >= 25000) {
-        format = guilds[guild.id].counter.format.split("%count%").join(guild.memberCount.toLocaleString())
-        guilds[guild.id].counter.filterBots = false
-    } else if (!guilds[guild.id].counter.filterBots) {
-        format = guilds[guild.id].counter.format.split("%count%").join(guild.memberCount.toLocaleString())
-    }
-
+    let format = guilds[guild.id].counter.format
+    format = format.split("%count%").join(memberCount.toLocaleString())
     format = format.split("%peak%").join(guilds[guild.id].peaks.members)
 
     if (channel.name != format) {
@@ -337,7 +309,7 @@ exports.addCooldown = addCooldown
  * @param {Guild} guild 
  */
 function inCooldown(guild) {
-    if (guild.memberCount <= 250 || guild.memberCount >= 25000) return true
+    if (guild.memberCount <= 50 || guild.memberCount >= 25000) return true
 
     if (fetchCooldown.has(guild.id)) {
         return true

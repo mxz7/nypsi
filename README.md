@@ -24,7 +24,7 @@ join the support server: https://discord.gg/hJTDNST or add me `[max#0777]`
  - the `$socials` command allows you to view other people's social media accounts and allows you to add your own - your accounts will only be displayed if you add them to the bot, run `$socials help` for more information
  
 ##### 📊 server stats
- - nypsi tracks every server's online peaks as well as member peaks, this information can be viewed with `$server`
+ - nypsi tracks every server's member peaks, this information can be viewed with `$server`
  - nypsi is also able to create a member counter for your server, similar to other bots but allows you to customise it for free - `$counter`
  
 ##### 🎮 fun commands
