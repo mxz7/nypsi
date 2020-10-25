@@ -2,7 +2,8 @@ const { Message } = require("discord.js");
 const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils");
 const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { getExactMember } = require("../utils/utils");
 
 const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -44,7 +45,13 @@ async function run(message, args) {
         
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
+        const member = getExactMember(message, args[0])
+
+        if (!member) {
+            return message.channel.send(new ErrorEmbed("unable to find member `" + args[0] + "`"))
+        }
+
+        message.mentions.members.set(member.user.id, member)
     }
 
     const members = message.mentions.members
