@@ -13,7 +13,7 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_SERVER*"))
+            return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
         return
     }
