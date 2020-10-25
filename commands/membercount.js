@@ -105,7 +105,7 @@ async function run(message, args) {
         return message.channel.send(embed)
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false, "this is how your channel will appear\n %count% is replaced with the member count\n%peak% is replaced with the member peak")
+            const embed = new CustomEmbed(message.member, false, "this is how your channel will appear\n %count% is replaced with the member count\n%peak% is replaced with the total member peak")
                 .setTitle("member count")
                 .addField("current format", "`" + profile.format + "`")
                 .addField("help", `to change this format, do ${prefix}**counter format <new format>**`)
