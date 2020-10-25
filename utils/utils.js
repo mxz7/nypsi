@@ -118,20 +118,24 @@ exports.redditImage = redditImage
  */
 function getMember(message, memberName) {
     if (!message.guild) return null
-    let target = message.guild.members.cache.find(member => {
-        if (member.user.tag.slice(0, -5).toLowerCase() == memberName.toLowerCase()) {
+
+    const members = message.guild.members.cache
+
+    let target = members.find(member => {
+        if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
             return member;
         }
     });
 
+
     if (!target) {
-        target = message.guild.members.cache.find(member => {
-            return member.displayName.toLowerCase().includes(memberName.toLowerCase()) || member.user.tag.toLowerCase().includes(memberName.toLowerCase());
+        target = members.find(member => {
+            return member.user.tag.toLowerCase().includes(memberName.toLowerCase()) || member.displayName.toLowerCase().includes(memberName.toLowerCase())
         });
     }
 
     if (!target) {
-        target = message.guild.members.cache.find(member => {
+        target = members.find(member => {
             return member.user.id == memberName;
         });
     }
