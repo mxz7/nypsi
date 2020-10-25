@@ -44,8 +44,7 @@ async function run(message, args) {
     for (arg of args) {
         if (arg.length == 18) {
             await message.guild.members.unban(arg, message.member.user.tag).then(user => {
-                members.push(user.username + "#" + user.discriminator)
-                newCase(message.guild, "unban", arg, message.member.user.tag, message.content)
+                members.push(user)
             }).catch(() => {
                 failed.push(arg)
             })
@@ -58,8 +57,7 @@ async function run(message, args) {
                 if (findingMember) {
                     const id = findingMember.id
                     await message.guild.members.unban(id, message.member.user.tag).then(user => {
-                        members.push(user.username + "#" + user.discriminator)
-                        newCase(message.guild, "unban", id, message.member.user.tag, message.content)
+                        members.push(user)
                     }).catch(() => {
                         failed.push(arg)
                     })
@@ -76,7 +74,7 @@ async function run(message, args) {
         .setTitle(`unban | ${message.member.user.username}`)
 
     if (members.length == 1) {
-        embed.setDescription("✅ `" + members[0] + "` was unbanned")
+        embed.setDescription("✅ `" + members[0].tag + "` was unbanned")
     } else {
         embed.setDescription("✅ **" + members.length + "** members have been unbanned")
     }
@@ -87,11 +85,18 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        return message.member.send(embed).catch()
+        await message.member.send(embed).catch()
     } else {
-        return message.channel.send(embed)
+        await message.channel.send(embed)
     }
 
+    const members1 = []
+
+    for (m of members) {
+        members1.push(m.id)
+    }
+
+    newCase(message.guild, "unban", members1, message.member.user.tag, message.content)
 }
 
 cmd.setRun(run)
