@@ -124,26 +124,42 @@ function getMember(message, memberName) {
     let target = members.find(member => {
         if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
             return member;
+        } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
+            return member
+        } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
+            return member
+        } else if (member.displayName.toLowerCase().includes(memberName.toLowerCase())) {
+            return member
+        } else if (member.user.id == memberName) {
+            return member
         }
     });
-
-
-    if (!target) {
-        target = members.find(member => {
-            return member.user.tag.toLowerCase().includes(memberName.toLowerCase()) || member.displayName.toLowerCase().includes(memberName.toLowerCase())
-        });
-    }
-
-    if (!target) {
-        target = members.find(member => {
-            return member.user.id == memberName;
-        });
-    }
 
     return target;
 }
 
 exports.getMember = getMember
+
+/**
+ * 
+ * @param {Message} message 
+ * @param {String} memberName 
+ */
+function getExactMember(message, memberName) {
+    if (!message.guild) return null
+
+    const members = message.guild.members.cache
+
+    let target = members.find(member => {
+        if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
+            return member;
+        } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
+            return member
+        }
+    });
+
+    return target
+}
 
 /**
  * @returns {String}
