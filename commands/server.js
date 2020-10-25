@@ -67,11 +67,7 @@ async function run(message, args) {
             `**member peak** ${getPeaks(message.guild).members.toLocaleString()}`)
 
     if (server.memberCount >= 25000) {
-        embed.setFooter(`real member count: ${server.memberCount} | stats are inaccurate to optimise with large servers`)
-    }
-
-    if ((users.size + bots.size) < server.memberCount) {
-        embed.setFooter(`real full count: ${server.memberCount} | stats may be temporarily inaccurate`)
+        embed.setFooter(`humans and bots may be inaccurate due to server size`)
     }
     
     message.channel.send(embed)
