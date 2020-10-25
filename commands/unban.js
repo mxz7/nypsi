@@ -74,7 +74,7 @@ async function run(message, args) {
         .setTitle(`unban | ${message.member.user.username}`)
 
     if (members.length == 1) {
-        embed.setDescription("✅ `" + members[0].tag + "` was unbanned")
+        embed.setDescription("✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned")
     } else {
         embed.setDescription("✅ **" + members.length + "** members have been unbanned")
     }
