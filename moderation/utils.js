@@ -95,30 +95,36 @@ module.exports = {
 
     /**
      * 
-     * @param {Number} guild guild to create new case in
+     * @param {Guild} guild guild to create new case in
      * @param {String} caseType mute, unmute, kick, warn, ban, unban
-     * @param {String} userID id of user being punished
+     * @param {Array<String>} userIDs list of user ids
      * @param {String} moderator moderator issuing punishment
-     * @param {Message} command entire message
+     * @param {String} command entire message
      */
-    newCase: function(guild, caseType, userID, moderator, command) {
-        const currentCases = data[guild.id].cases
-        const count = data[guild.id].caseCount
-
-        const case0 = {
-            id: count,
-            type: caseType,
-            user: userID,
-            moderator: moderator,
-            command: command,
-            time: new Date().getTime(),
-            deleted: false
+    newCase: function(guild, caseType, userIDs, moderator, command) {
+        if (!(userIDs instanceof Array)) {
+            userIDs = [userIDs]
         }
 
-        currentCases.push(case0)
-
-        data[guild.id].cases = currentCases
-        data[guild.id].caseCount = count + 1
+        for (userID of userIDs) {
+            const currentCases = data[guild.id].cases
+            const count = data[guild.id].caseCount
+    
+            const case0 = {
+                id: count,
+                type: caseType,
+                user: userID,
+                moderator: moderator,
+                command: command,
+                time: new Date().getTime(),
+                deleted: false
+            }
+    
+            currentCases.push(case0)
+    
+            data[guild.id].cases = currentCases
+            data[guild.id].caseCount = count + 1
+        }
     },
 
     /**
@@ -179,20 +185,26 @@ module.exports = {
     /**
      * 
      * @param {Guild} guild 
-     * @param {GuildMember} member 
+     * @param {Array<String>} userIDs 
      * @param {Date} date 
      */
-    newMute: function(guild, member, date) {
-        const currentMutes = data[guild.id].mutes
-
-        const d = {
-            user: member.user.id,
-            unmuteTime: date
+    newMute: function(guild, userIDs, date) {
+        if (!(userIDs instanceof Array)) {
+            userIDs = [userIDs]
         }
 
-        currentMutes.push(d)
+        for (userID of userIDs) {
+            const currentMutes = data[guild.id].mutes
 
-        data[guild.id].mutes = currentMutes
+            const d = {
+                user: userID,
+                unmuteTime: date
+            }
+    
+            currentMutes.push(d)
+    
+            data[guild.id].mutes = currentMutes
+        }
     },
 
     /**
@@ -242,6 +254,14 @@ module.exports = {
             }
         
         }, 120000)
+    },
+
+    /**
+     * @returns {JSON}
+     * @param {Guild} guild 
+     */
+    getMutes: function(guild) {
+        return data[guild.id].mutes
     },
 
     /**

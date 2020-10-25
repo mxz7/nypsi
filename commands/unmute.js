@@ -75,7 +75,7 @@ async function run(message, args) {
                 return message.channel.send(new ErrorEmbed("there was an error when removing the role, please ensure i have the correct permissions"))
             })
         } else {
-            failed.push(m.user.tag)
+            failed.push(m.user)
         }
         if (fail) break
     }
@@ -83,16 +83,6 @@ async function run(message, args) {
     if (fail) return
 
     if (!profileExists(message.guild)) createProfile(message.guild)
-
-    for (member of message.mentions.members.keyArray()) {
-        if (failed.indexOf(message.mentions.members.get(member).user.tag) == -1) {
-            newCase(message.guild, "unmute", message.mentions.members.get(member).user.id, message.member.user.tag, message.content)
-
-            if (isMuted(message.guild, message.mentions.members.get(member))) {
-                deleteMute(message.guild, message.mentions.members.get(member))
-            }
-        }
-    }
 
     const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted")
         .setTitle("unmute | " + message.member.user.username)
@@ -106,16 +96,38 @@ async function run(message, args) {
     }
 
     if (failed.length != 0) {
-        embed.addField("error", "unable to unmute: " + failed.join(", "))
+        const failedTags = []
+        for (fail1 of failed) {
+            failedTags.push(fail1.tag)
+        }
+
+        embed.addField("error", "unable to unmute: " + failedTags.join(", "))
     }
 
     if (args.join(" ").includes("-s")) {
         message.delete()
-        return message.member.send(embed).catch(() => {})
+        await message.member.send(embed).catch(() => {})
     } else {
-        return message.channel.send(embed)
+        await message.channel.send(embed)
     }
 
+    const members1 = members.keyArray()
+
+    if (failed.length != 0) {
+        for (fail1 of failed) {
+            if (members1.includes(fail1.id)) {
+                members1.splice(members1.indexOf(fail1.id), 1)
+            }
+        }
+    }
+
+    for (m of members1) {
+        if (isMuted(message.guild, members.get(m))) {
+            deleteMute(message.guild, members.get(m))
+        }
+    }
+
+    newCase(message.guild, "unmute", members1, message.author.tag, message.content)
 }
 
 cmd.setRun(run)

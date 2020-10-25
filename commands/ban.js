@@ -91,7 +91,7 @@ async function run(message, args) {
             const memberHighestRole = message.member.roles.highest
 
             if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
-                failed.push(members.get(member).user.tag)
+                failed.push(members.get(member).user)
                 continue
             }
         }
@@ -105,8 +105,9 @@ async function run(message, args) {
                 fail = true
                 return message.channel.send(new ErrorEmbed(`unable to ban the id: \`${member}\``))
             }
-            failed.push(members.get(member).user.tag)
+            failed.push(members.get(member).user)
         })
+        count++
     }
 
     if (fail) return
@@ -119,13 +120,13 @@ async function run(message, args) {
         .setTitle("ban | " + message.member.user.username)
         .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
 
-    if (reason.split(": ")[1] == "no reason given" && count != 1) {
+    if (reason.split(": ")[1] == "no reason given") {
         embed.setDescription(`✅ **${count}** members banned`)
     } else {
         embed.setDescription(`✅ **${count}** members banned for: ${reason.split(": ")[1]}`)
     }
     
-    if (count == 1) {
+    if (count == 1 && failed.length == 0) {
         if (idOnly) {
             if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription(`✅ \`${members.first()}\` has been banned`)
@@ -142,7 +143,12 @@ async function run(message, args) {
     }
 
     if (failed.length != 0) {
-        embed.addField("error", "unable to ban: " + failed.join(", "))
+        const failedTags = []
+        for (fail1 of failed) {
+            failedTags.push(fail1.tag)
+        }
+
+        embed.addField("error", "unable to ban: " + failedTags.join(", "))
     }
 
     if (args.join(" ").includes("-s")) {
@@ -154,26 +160,35 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    for (member of members.keyArray()) {
-        const m = members.get(member)
+    if (idOnly) {
+        newCase(message.guild, "ban", members.first(), message.member.user.tag, reason.split(": ")[1])
+    } else {
+        const members1 = members.keyArray()
 
-        if (idOnly) {
-            newCase(message.guild, "ban", m, message.member.user.tag, reason.split(": ")[1])
-        } else if (failed.indexOf(m.user.tag) == -1) {
-            newCase(message.guild, "ban", m.user.id, message.member.user.tag, reason.split(": ")[1])
+        if (failed.length != 0) {
+            for (fail of failed) {
+                if (members1.includes(fail.id)) {
+                    members1.splice(members1.indexOf(fail.id), 1)
+                }
+            }
+        }
+    
+        newCase(message.guild, "ban", members1, message.author.tag, reason.split(": ")[1])
 
+        for (member of members1) {
+            const m = members.get(member)
+    
             if (reason.split(": ")[1] == "no reason given") {
                 await m.send(`you have been banned from ${message.guild.name}`)
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
                     .addField("reason", `\`${reason.split(": ")[1]}\``)
-
+    
                 await m.send(`you have been banned from ${message.guild.name}`, embed)
             }
         }
     }
-
 }
 
 cmd.setRun(run)
