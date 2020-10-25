@@ -161,6 +161,8 @@ function getExactMember(message, memberName) {
     return target
 }
 
+exports.getExactMember = getExactMember
+
 /**
  * @returns {String}
  * @param {Date} date 
