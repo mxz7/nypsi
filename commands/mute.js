@@ -18,7 +18,7 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("MANAGE_ROLES") || !message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i am lacking permissions for this command\npossibly: 'MANAGE_ROLES' or 'MANAGE_CHANNELS'"))
+        return message.channel.send(new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work"))
     }
 
     const prefix = getPrefix(message.guild)
@@ -91,7 +91,7 @@ async function run(message, args) {
             })
 
         } catch (e) {
-            return message.channel.send(new ErrorEmbed("i am lacking permissions to do this"))
+            return message.channel.send(new ErrorEmbed("error creating mute role - make sure i have `manage roles` permission and `manage channels`"))
         }
     }
 

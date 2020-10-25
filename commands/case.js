@@ -22,7 +22,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}case <caseID>`)
             .addField("help", "to delete a case, react with ❌ after running the command\n" +
                 "dates are in MM/DD/YYYY format\n" +
-                `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`MANAGE_SERVER\` permission`)
+                `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`)
 
         return message.channel.send(embed)
     }

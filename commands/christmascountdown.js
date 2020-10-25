@@ -14,13 +14,13 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_SERVER*"))
+            return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
         return message.channel.send(new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`))
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i am lacking permission: 'MANAGE_CHANNELS'"))
+        return message.channel.send(new ErrorEmbed("i need the `manage channels` permission for this command to work"))
     }
 
     if (!hasGuild(message.guild)) createGuild(message.guild)

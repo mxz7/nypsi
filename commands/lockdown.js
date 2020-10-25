@@ -15,13 +15,13 @@ async function run(message, args) {
         
     if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_MESSAGES")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_CHANNELS* and *MANAGE_MESSAGES*"))
+            return message.channel.send(new ErrorEmbed("you need the `manage channels` and `manage messages` permission"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS") || !message.guild.me.hasPermission("MANAGE_ROLES")) {
-        return message.channel.send(new ErrorEmbed("i am lacking permission: 'MANAGE_CHANNELS' or 'MANAGE_ROLES'"))
+        return message.channel.send(new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work"))
     }
 
     if (cooldown.has(message.member.id)) {

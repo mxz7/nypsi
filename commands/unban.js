@@ -14,13 +14,13 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("BAN_MEMBERS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("requires permission: *BAN_MEMBERS*"))
+            return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
         }
         return 
     }
 
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send(new ErrorEmbed("i am lacking permission: 'BAN_MEMBERS'"));
+        return message.channel.send(new ErrorEmbed("i need the `ban members` permission for this command to work"));
     }
 
     const prefix = getPrefix(message.guild)

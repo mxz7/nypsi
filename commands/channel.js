@@ -34,13 +34,13 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_CHANNELS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("requires permission: *MANAGE_CHANNELS*"))
+            return message.channel.send(new ErrorEmbed("you need the `manage channels` permission"))
         }
         return
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i am lacking permission: 'MANAGE_CHANNELS"))
+        return message.channel.send(new ErrorEmbed("i need the `manage channel` permission for this command to work"))
     }
 
     let fail = false
