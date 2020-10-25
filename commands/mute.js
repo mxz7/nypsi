@@ -118,14 +118,14 @@ async function run(message, args) {
         const memberHighestRole = message.member.roles.highest
 
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
-            failed.push(members.get(member).user.tag)
+            failed.push(members.get(member).user)
         } else if (members.get(member).roles.cache.find(r => r.id == muteRole.id)) {
 
             if (members.keyArray().length == 1) {
                 return message.channel.send(new ErrorEmbed("that user is already muted"))
             }
 
-            failed.push(members.get(member).user.tag)
+            failed.push(members.get(member).user)
         } else {
             await members.get(member).roles.add(muteRole).then(() => count++).catch(() => {
                 fail = true
@@ -159,13 +159,13 @@ async function run(message, args) {
         .setTitle("mute | " + message.member.user.username)
 
     if (timedMute) {
-        if (count == 1) {
+        if (count == 1 && failed.length == 0) {
             embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**")
         } else {
             embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**")
         }
     } else {
-        if (count == 1) {
+        if (count == 1 && failed.length == 0) {
             embed.setDescription("✅ `" + members.first().user.tag + "` has been muted")
         } else {
             embed.setDescription("✅ **" + count + "** members muted")
@@ -173,7 +173,12 @@ async function run(message, args) {
     }
 
     if (failed.length != 0) {
-        embed.addField("error", "unable to mute: " + failed.join(", "))
+        const failedTags = []
+        for (fail1 of failed) {
+            failedTags.push(fail1.tag)
+        }
+
+        embed.addField("error", "unable to mute: " + failedTags.join(", "))
     }
 
     if (args.join(" ").includes("-s")) {
@@ -185,56 +190,66 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    for (member of members.keyArray()) {
-        const m = members.get(member)
-        if (failed.indexOf(m.user.tag) == -1) {
+    let storeReason = reason
 
-            let storeReason = reason
+    if (!timedMute) {
+        storeReason = "[perm] " + reason
+    } else {
+        storeReason = `[${mutedLength}] ${reason}`
+    }
 
-            if (!timedMute) {
-                storeReason = "[perm] " + reason
-            } else {
-                storeReason = `[${mutedLength}] ${reason}`
-            }
+    const members1 = members.keyArray()
 
-            newCase(message.guild, "mute", members.get(member).user.id, message.member.user.tag, storeReason)
-
-            if (time >= 600) {
-                if (isMuted(message.guild, members.get(member))) {
-                    deleteMute(message.guild, members.get(member))
-                }
-
-                newMute(message.guild, members.get(member), unmuteDate)
-            }
-            
-            if (!timedMute) {
-                newMute(message.guild, members.get(member), 9999999999999)
-
-                const embed = new CustomEmbed(m)
-                    .setTitle(`muted in ${message.guild.name}`)
-                    .addField("length", "`permanent`", true)
-
-                if (reason != "") {
-                    embed.addField("reason", `\`${reason}\``, true)
-                }
-
-                await m.send(`you have been muted in ${message.guild.name}`, embed)
-            } else {
-                const embed = new CustomEmbed(m)
-                    .setTitle(`muted in ${message.guild.name}`)
-                    .addField("length", `\`${mutedLength}\``, true)
-                    .setFooter("unmuted")
-                    .setTimestamp(unmuteDate)
-
-                if (reason != "") {
-                    embed.addField("reason", `\`${reason}\``, true)
-                }
-
-                await m.send(`you have been muted in ${message.guild.name}`, embed)
+    if (failed.length != 0) {
+        for (fail1 of failed) {
+            if (members1.includes(fail1.id)) {
+                members1.splice(members1.indexOf(fail1.id), 1)
             }
         }
     }
 
+    newCase(message.guild, "mute", members1, message.author.tag, reason)
+
+    for (m of members1) {
+        if (isMuted(message.guild, members.get(m))) {
+            deleteMute(message.guild, members.get(m))
+        }
+    }
+    
+    if (timedMute && time >= 600) {
+        newMute(message.guild, members1, unmuteDate)
+    }
+
+    if (!timedMute) {
+        newMute(message.guild, members1, 9999999999999)
+    }
+
+    for (m of members1) {
+        m = members.get(m)
+        if (!timedMute) {
+            const embed = new CustomEmbed(m)
+                .setTitle(`muted in ${message.guild.name}`)
+                .addField("length", "`permanent`", true)
+
+            if (reason != "") {
+                embed.addField("reason", `\`${reason}\``, true)
+            }
+
+            await m.send(`you have been muted in ${message.guild.name}`, embed)
+        } else {
+            const embed = new CustomEmbed(m)
+                .setTitle(`muted in ${message.guild.name}`)
+                .addField("length", `\`${mutedLength}\``, true)
+                .setFooter("unmuted")
+                .setTimestamp(unmuteDate)
+
+            if (reason != "") {
+                embed.addField("reason", `\`${reason}\``, true)
+            }
+
+            await m.send(`you have been muted in ${message.guild.name}`, embed)
+        }
+    }
 }
 
 cmd.setRun(run)

@@ -82,17 +82,16 @@ async function run(message, args) {
         const memberHighestRole = message.member.roles.highest
 
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
-            failed.push(members.get(member).user.tag)
+            failed.push(members.get(member).user)
         } else {
             const embed = new CustomEmbed(members.get(member))
                 .setTitle(`warned in ${message.guild.name}`)
                 .addField("reason", `\`${reason}\``)
 
             await members.get(member).send(`you have been warned in ${message.guild.name}`, embed).catch(() => {
-                error.push(members.get(member).user.tag)
+                error.push(members.get(member).user)
             })
             count++
-            newCase(message.guild, "warn", members.get(member).user.id, message.member.user.tag, reason)
         }
     }
 
@@ -103,16 +102,26 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason)
         .setTitle("warn | " + message.member.user.username)
     
-    if (count == 1) {
+    if (count == 1 && failed.length == 0) {
         embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason)
     }
 
     if (failed.length != 0) {
-        embed.addField("error", "unable to warn: " + failed.join(", "))
+        const failedTags = []
+        for (fail of failed) {
+            failedTags.push(fail.tag)
+        }
+
+        embed.addField("error", "unable to warn: " + failedTags.join(", "))
     }
 
     if (error.length != 0) {
-        embed.addField("warning", "unable to DM: " + error.join(", "))
+        const errorTags = []
+        for (err of error) {
+            errorTags.push(fail.tag)
+        }
+
+        embed.addField("warning", "unable to DM: " + errorTags.join(", "))
     }
 
     if (args.join(" ").includes("-s")) {
@@ -121,6 +130,18 @@ async function run(message, args) {
     } else {
         await message.channel.send(embed)
     }
+
+    const members1 = members.keyArray()
+
+    if (failed.length != 0) {
+        for (fail of failed) {
+            if (members1.includes(fail.id)) {
+                members1.splice(members1.indexOf(fail.id), 1)
+            }
+        }
+    }
+
+    newCase(message.guild, "warn", members1, message.author.tag, reason)
 }
 
 cmd.setRun(run)

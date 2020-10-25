@@ -79,12 +79,12 @@ async function run(message, args) {
         const memberHighestRole = message.member.roles.highest
 
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
-            failed.push(members.get(member).user.tag)
+            failed.push(members.get(member).user)
         } else {
             await members.get(member).kick(reason).then(() => {
                 count++
             }).catch(() => {
-                failed.push(members.get(member).user.tag)
+                failed.push(members.get(member).user)
             })
         }
     }
@@ -96,14 +96,19 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member)
         .setTitle("kick | " + message.member.user.username)
 
-    if (reason.split(": ")[1] == "no reason given" && count != 1) {
+    if (reason.split(": ")[1] == "no reason given") {
         embed.setDescription(`✅ **${count}** members kicked`)
     } else {
         embed.setDescription(`✅ **${count}** members kicked for: ${reason.split(": ")[1]}`)
     }
 
     if (failed.length != 0) {
-        embed.addField("error", "unable to kick: " + failed.join(", "))
+        const failedTags = []
+        for (fail1 of failed) {
+            failedTags.push(fail1.tag)
+        }
+
+        embed.addField("error", "unable to kick: " + failedTags.join(", "))
     }
 
     if (count == 1) {
@@ -123,20 +128,29 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    for (member of members.keyArray()) {
-        const m = members.get(member)
-        if (failed.indexOf(m.user.tag) == -1) {
-            newCase(message.guild, "kick", m.user.id, message.member.user.tag, reason.split(": ")[1])
+    const members1 = members.keyArray()
 
-            if (reason.split(": ")[1] == "no reason given") {
-                await m.send(`you have been kicked from ${message.guild.name}`)
-            } else {
-                const embed = new CustomEmbed(m)
-                    .setTitle(`kicked from ${message.guild.name}`)
-                    .addField("reason", `\`${reason.split(": ")[1]}\``)
-
-                await m.send(`you have been kicked from ${message.guild.name}`, embed)
+    if (failed.length != 0) {
+        for (fail of failed) {
+            if (members1.includes(fail.id)) {
+                members1.splice(members1.indexOf(fail.id), 1)
             }
+        }
+    }
+
+    newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
+
+    for (member of members1) {
+        const m = members.get(member)
+
+        if (reason.split(": ")[1] == "no reason given") {
+            await m.send(`you have been kicked from ${message.guild.name}`)
+        } else {
+            const embed = new CustomEmbed(m)
+                .setTitle(`kicked from ${message.guild.name}`)
+                .addField("reason", `\`${reason.split(": ")[1]}\``)
+
+            await m.send(`you have been kicked from ${message.guild.name}`, embed)
         }
     }
 
