@@ -2,7 +2,7 @@ const { Message } = require("discord.js");
 const { newCase, profileExists, createProfile } = require("../moderation/utils");
 const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
 const { Command, categories } = require("../utils/classes/Command");
-warconst { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
 const { getExactMember } = require("../utils/utils");
 
 const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
