@@ -36,6 +36,10 @@ async function run(message, args) {
         }
     }
 
+    if (content.split("\n").length > 10) {
+        content = content.split("\n").join(".")
+    }
+
     const created = new Date(eSnipe.get(channel.id).createdTimestamp)
 
     const embed = new CustomEmbed(message.member, false, content)
