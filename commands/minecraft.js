@@ -234,6 +234,10 @@ async function run(message, args) {
     if (oldName) {
         embed.setHeader("match found as an old username")
     }
+
+    if (names.size >= 2) {
+        embed.setFooter(`page 1/${names.size}`)
+    }
     
     const msg = await message.channel.send(embed)
 
