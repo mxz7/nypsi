@@ -14,10 +14,6 @@ async function run(message, args) {
 
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
-    if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i am lacking permission: 'MANAGE_MESSAGES'");
-    }
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
