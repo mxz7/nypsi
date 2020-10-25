@@ -107,7 +107,6 @@ async function run(message, args) {
             }
             failed.push(members.get(member).user)
         })
-        count++
     }
 
     if (fail) return
