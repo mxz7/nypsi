@@ -344,8 +344,7 @@ async function guildInfo(guild) {
         .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
             "**bots** " + bots.size.toLocaleString() + "\n" + 
             "**online** " + online.size.toLocaleString() + "\n" +
-            "**member peak** " + getPeaks(guild).members.toLocaleString() + "\n" + 
-            "**online peak** " + getPeaks(guild).onlines.toLocaleString(), true)
+            "**member peak** " + getPeaks(guild).members.toLocaleString(), true)
 
     if (invites && invites.length > 0) {
         embed.addField("invite (" + invites.length + ")", invites[Math.floor(Math.random() * invites.length)], true)
