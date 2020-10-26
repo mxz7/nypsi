@@ -14,7 +14,7 @@ async function run(message, args) {
 
     if (args.length != 0) {
         if (parseInt(args[0])) {
-            if (parseInt(args[0]) < 2) {
+            if (parseInt(args[0]) < 2 || parseInt(args[0]) > 1000000000) {
                 return message.channel.send(new ErrorEmbed("invalid range"))
             } else {
                 range = parseInt(args[0])
