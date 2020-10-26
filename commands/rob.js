@@ -122,7 +122,7 @@ async function run(message, args) {
         embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
             "your padlock has saved you from a robbery, but it has been broken\nthey would have stolen $**" + amountMoney.toLocaleString() + "**")
     } else {
-        const chance = Math.floor(Math.random() * 20)
+        const chance = Math.floor(Math.random() * 22)
 
         if (chance > 8) {
             robberySuccess = true
