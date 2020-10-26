@@ -208,7 +208,7 @@ async function run(message, args) {
         }
     }
 
-    newCase(message.guild, "mute", members1, message.author.tag, reason)
+    newCase(message.guild, "mute", members1, message.author.tag, storeReason)
 
     for (m of members1) {
         if (isMuted(message.guild, members.get(m))) {
