@@ -11,7 +11,7 @@ const cmd = new Command("evaluate", "evaluate code", categories.NONE).setAliases
 async function run(message, args) {
     if (message.author.id != "672793821850894347") return
 
-    const res = await eval(args.join(" "))
+    const res = await eval("(async () => {" + args.join(" ") + "})()")
 
     const embed = new CustomEmbed(message.member, false, `\`\`\`js\n${res}\`\`\``)
 
