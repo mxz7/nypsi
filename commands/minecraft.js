@@ -107,7 +107,7 @@ async function run(message, args) {
     if (cache.has(username.toLowerCase())) {
         try {
             if (cache.get(username.toLowerCase()).invalid) {
-                return message.channel.send("❌ invalid account")
+                return message.channel.send(new ErrorEmbed("invalid account"))
             }
             if (cache.get(username.toLowerCase()).oldName) {
                 res2 = cache.get(username.toLowerCase()).response
