@@ -84,4 +84,3 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
-
