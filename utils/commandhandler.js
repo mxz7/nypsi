@@ -276,10 +276,15 @@ function runCommand(cmd, message, args) {
             "if this error still shows, check channel specific permissions")
     }
 
-
     if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
         return message.channel.send("❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
             "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
+            "if this error still shows, check channel specific permissions")
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
+        return message.channel.send("❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+            "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
             "if this error still shows, check channel specific permissions")
     }
 
