@@ -134,7 +134,10 @@ async function run(message, args) {
 
     const msg = await message.channel.send(embed)
 
-    playGame(message, msg)
+    playGame(message, msg).catch(e => {
+        console.error(e)
+        return message.channel.send(new ErrorEmbed("an error occured while running - join support server"))
+    })
 
 }
 
