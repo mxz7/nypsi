@@ -138,7 +138,10 @@ async function run(message, args) {
         await m.react("💰")
 
         await m.edit(embed)
-        playGame(message, m)
+        playGame(message, m).catch(e => {
+            console.error(e)
+            return message.channel.send(new ErrorEmbed("an error occured while running - join support server"))
+        })
     })
 
 }
