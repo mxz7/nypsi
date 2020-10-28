@@ -76,7 +76,11 @@ async function run(message, args) {
         url = url + ".png"
     }
 
-    await message.guild.emojis.create(url, emojiName)
+    let fail = false
+
+    await message.guild.emojis.create(url, emojiName).catch(() => {
+        return message.channel.send(new ErrorEmbed("error adding emoji - have you reached the emoji cap?"))
+    })
 
     return message.channel.send(new CustomEmbed(message.member, false, `✅ emoji added as \`:${emojiName}:\``))
 }
