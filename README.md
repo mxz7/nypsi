@@ -1,7 +1,7 @@
 # nypsi
 
 ### 🍟 invite / use in your server
-invite link can be found at: [bot.tekoh.wtf](http://bot.tekoh.wtf)
+invite link can be found at: [invite.nypsi.xyz](http://invite.nypsi.xyz)
 
 ### 🍪 top.gg
 top.gg url: https://top.gg/bot/678711738845102087

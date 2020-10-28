@@ -24,7 +24,7 @@ exports.CustomEmbed = class {
         }
 
         if (footer) {
-            this.embed.setFooter("bot.tekoh.wtf")
+            this.embed.setFooter("nypsi.xyz")
         }
         
         return this
