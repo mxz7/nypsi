@@ -10,9 +10,9 @@ const cmd = new Command("invite", "generate an invite link for the bot", categor
  */
 async function run(message, args) {
 
-    const embed = new CustomEmbed(message.member, false, "bot invite: [bot.tekoh.wtf](http://bot.tekoh.wtf)\nsupport server: https://discord.gg/hJTDNST")
+    const embed = new CustomEmbed(message.member, false, "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST")
         .setTitle("nypsi")
-        .setFooter("made by max#0777 | tekoh.wtf | racist.wtf")
+        .setFooter("made by max#0777 | tekoh.wtf")
 
     message.channel.send(embed)
 }
