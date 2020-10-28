@@ -32,7 +32,7 @@ client.once("ready", async () => {
         if (game == "x0x") {
             game = `\$${a.name} - ${a.description}`
         } else if (game == "xmas") {
-            game = `${daysUntilChristmas()} days until christmas`
+            game = `🎅 ${daysUntilChristmas()} days until christmas`
         }
 
         client.user.setPresence({
