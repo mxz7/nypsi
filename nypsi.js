@@ -21,7 +21,7 @@ exports.snipe = snipe
 loadCommands()
 
 client.once("ready", async () => {
-    const games = ["$help | lonely.lol", "$help | tekoh.wtf", "$help | tekoh.xyz", "$help | alone.wtf", "$help | racist.wtf", 
+    const games = ["$help | nypsi.xyz", "$help | tekoh.wtf", "$help | nypsi.xyz",
     "have you joined the $support server?", "x0x", "xmas"]
 
     setTimeout(async () => {
