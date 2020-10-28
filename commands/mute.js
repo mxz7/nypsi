@@ -100,7 +100,7 @@ async function run(message, args) {
     let time = 0
 
     if (reason != "") {
-        time = getDuration(reason.split(" ")[0])
+        time = getDuration(reason.split(" ")[0].toLowerCase())
         unmuteDate = new Date().getTime() + (time * 1000)
 
         if (time) {
