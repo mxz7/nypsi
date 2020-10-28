@@ -34,6 +34,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
 
+    if (!message.guild.me.hasPermission("MANAGE_EMOJIS")) {
+        return message.channel.send(new ErrorEmbed("i need the `manage emojis` permission for this command to work"));
+    }
+
     if (!message.member.hasPermission("MANAGE_EMOJIS")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
             return message.channel.send(new ErrorEmbed("you need the `manage emojis` permission"))
