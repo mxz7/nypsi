@@ -5,7 +5,7 @@ const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBan
 const { categories, Command } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const _abc123 = new Command("_abc123", "get info about users viewable to the bot", categories.NONE)
+const _abc123 = new Command("find", "get info about users viewable to the bot", categories.NONE)
 
 _abc123.setPermissions(["bot owner"])
 
