@@ -92,7 +92,6 @@ async function run(message, args) {
             `new vote rewards: \$**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}** and **${getPrestige(message.member) + 1}** vote crates\n` +
             `you have also been given: **${getPrestige(message.member)}** prestige crates`)
         await msg.edit(embed)
-        //TODO: GIVE PRESTIGE CRATES & add vote + 1% on prestige - needs adding everywhere liek above and in getvotemulti thing
     }
 
     

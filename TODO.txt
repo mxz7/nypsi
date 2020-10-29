@@ -1,0 +1,11 @@
+add items (crowbar, ski mask, padlock, gun, knife, bread, fishing rod)
+
+add crates (prestige, vote, premium)
+
++1% vote bonus on prestige and change vote bonus to 15%
+
+enable max bet calculations globally
+
+add workers - not as important
+
+finish website
