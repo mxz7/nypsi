@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, getPrestigeRequirement, getPrestigeRequirementBal } = require("../economy/utils.js")
+const { getBalance, createUser, userExists, updateBalance, getBankBalance, getMaxBankBalance, getXp, getPrestigeRequirement, getPrestigeRequirementBal, getPrestige } = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
@@ -53,13 +53,19 @@ async function run(message, args) {
 
     if (!userExists(target)) createUser(target)
 
+    let footer = `xp: ${getXp(target).toLocaleString()}`
+
+    if (getPrestige(target) > 0) {
+        footer += ` | prestige: ${getPrestige(target)}`
+    }
+
     const embed = new CustomEmbed(message.member, false)
         .setTitle(target.user.tag)
         .setDescription("💰 $**" + getBalance(target).toLocaleString() + "**\n" +
             "💳 $**" + getBankBalance(target).toLocaleString() + "** / $**" + getMaxBankBalance(target).toLocaleString() + "**")
-        .setFooter("xp: " + getXp(target).toLocaleString())
+        .setFooter(footer)
 
-    if (message.member ==  target) {
+    if (message.member == target) {
         if (getXp(target) >= getPrestigeRequirement(target) && getBankBalance(target) >= getPrestigeRequirementBal(target)) {
             return message.channel.send(`${message.member.user.toString()} you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`, embed)
         }
