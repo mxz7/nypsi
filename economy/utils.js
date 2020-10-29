@@ -587,3 +587,11 @@ function setDMsEnabled(member, value) {
 }
 
 exports.setDMsEnabled = setDMsEnabled
+
+function calcMaxBet(member) {
+    const base = 100000
+
+    return base + (base * getPrestige(member))
+}
+
+exports.calcMaxBet = calcMaxBet
