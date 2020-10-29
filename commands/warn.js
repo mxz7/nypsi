@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
-const { newCase, profileExists, createProfile } = require("../moderation/utils");
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getExactMember } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { newCase, profileExists, createProfile } = require("../moderation/utils")
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getExactMember } = require("../utils/utils")
 
 const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -77,7 +77,7 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    for (member of members.keyArray()) {
+    for (let member of members.keyArray()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -108,7 +108,7 @@ async function run(message, args) {
 
     if (failed.length != 0) {
         const failedTags = []
-        for (fail of failed) {
+        for (let fail of failed) {
             failedTags.push(fail.tag)
         }
 
@@ -117,8 +117,8 @@ async function run(message, args) {
 
     if (error.length != 0) {
         const errorTags = []
-        for (err of error) {
-            errorTags.push(fail.tag)
+        for (let err of error) {
+            errorTags.push(err.tag)
         }
 
         embed.addField("warning", "unable to DM: " + errorTags.join(", "))
@@ -134,7 +134,7 @@ async function run(message, args) {
     const members1 = members.keyArray()
 
     if (failed.length != 0) {
-        for (fail of failed) {
+        for (let fail of failed) {
             if (members1.includes(fail.id)) {
                 members1.splice(members1.indexOf(fail.id), 1)
             }

@@ -1,8 +1,8 @@
 const urban = require("relevant-urban")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 
@@ -30,7 +30,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -39,11 +39,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`${prefix}urban <definition>`))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const result = await urban(args.join()).catch(() => {
         return message.channel.send(new ErrorEmbed("unknown definition"))

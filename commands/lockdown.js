@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const Discord = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const Discord = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -40,7 +40,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     let channel = message.channel
@@ -49,10 +49,10 @@ async function run(message, args) {
         channel = message.mentions.channels.first()
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 1500);
+        cooldown.delete(message.author.id)
+    }, 1500)
 
     let locked = false
 

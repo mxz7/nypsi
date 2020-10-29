@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { getMember } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
@@ -13,20 +13,20 @@ avatar.setAliases(["av"])
  */
 async function run(message, args)  {
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args.join(" "));
+            member = getMember(message, args.join(" "))
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })

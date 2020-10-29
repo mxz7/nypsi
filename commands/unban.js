@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { profileExists, createProfile, newCase } = require("../moderation/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { profileExists, createProfile, newCase } = require("../moderation/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
@@ -20,7 +20,7 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send(new ErrorEmbed("i need the `ban members` permission for this command to work"));
+        return message.channel.send(new ErrorEmbed("i need the `ban members` permission for this command to work"))
     }
 
     const prefix = getPrefix(message.guild)
@@ -41,7 +41,7 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    for (arg of args) {
+    for (let arg of args) {
         if (arg.length == 18) {
             await message.guild.members.unban(arg, message.member.user.tag).then(user => {
                 members.push(user)
@@ -62,7 +62,9 @@ async function run(message, args) {
                         failed.push(arg)
                     })
                 }
-            } catch {}
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 
@@ -92,7 +94,7 @@ async function run(message, args) {
 
     const members1 = []
 
-    for (m of members) {
+    for (let m of members) {
         members1.push(m.id)
     }
 

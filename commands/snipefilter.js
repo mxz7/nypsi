@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js");
-const { Command, categories } = require("../utils/classes/Command.js");
+const { Message } = require("discord.js")
+const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js")
+const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.MODERATION).setAliases(["sf", "filter"]).setPermissions(["MANAGE_SERVER"])
@@ -47,7 +47,7 @@ async function run(message, args) {
 
         if (filter.join("").length > 1000) {
 
-            filter.splice(filter.indexOf(args[1].toString()), 1);
+            filter.splice(filter.indexOf(args[1].toString()), 1)
 
             const embed = new CustomEmbed(message.member, true, `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`)
                 .setTitle("snipe filter")
@@ -68,7 +68,7 @@ async function run(message, args) {
         }
 
         if (filter.indexOf(args[1].toString()) > -1) {
-            filter.splice(filter.indexOf(args[1].toString()), 1);
+            filter.splice(filter.indexOf(args[1].toString()), 1)
         } else {
             const embed = new CustomEmbed(message.member, false, "❌ `" + args[1] + "` not found in the filter")
                 .setTitle("snipe filter")

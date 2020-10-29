@@ -1,10 +1,10 @@
-const { Guild } = require("discord.js");
-const fs = require("fs");
-const { getPriority } = require("os");
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
-const { GuildStorage } = require("../utils/classes/GuildStorage");
-const { daysUntilChristmas } = require("../utils/utils");
-let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
+const { Guild } = require("discord.js")
+const fs = require("fs")
+const { getPriority } = require("os")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { GuildStorage } = require("../utils/classes/GuildStorage")
+const { daysUntilChristmas } = require("../utils/utils")
+let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
 
 let timer = 0
 let timerCheck = true
@@ -15,7 +15,7 @@ setInterval(() => {
 
         fs.writeFile("./guilds/data.json", JSON.stringify(guilds), (err) => {
             if (err) {
-                return console.log(err);
+                return console.log(err)
             }
             console.log("\x1b[32m[" + getTimestamp() + "] guilds saved\x1b[37m")
         })
@@ -27,7 +27,7 @@ setInterval(() => {
     }
 
     if (timer >= 10 && !timerCheck) {
-        guilds = JSON.parse(fs.readFileSync("./guilds/data.json"));
+        guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
         console.log("\x1b[32m[" + getTimestamp() + "] guild data refreshed\x1b[37m")
         timerCheck = true
         timer = 0
@@ -74,7 +74,7 @@ setInterval(async () => {
 
     const { checkGuild } = require("../nypsi")
     
-    for (guild in guilds) {
+    for (let guild in guilds) {
         const exists = await checkGuild(guild)
 
         if (!exists) {
@@ -84,7 +84,7 @@ setInterval(async () => {
         }
     }
 
-}, 24 * 60 * 60 * 1000);
+}, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
 const checkCooldown = new Set()
@@ -100,7 +100,7 @@ async function runCheck(guild) {
 
     setTimeout(() => {
         checkCooldown.delete(guild.id)
-    }, 60 * 1000);
+    }, 60 * 1000)
 
     if (!hasGuild(guild)) createGuild(guild)
 
@@ -227,7 +227,7 @@ exports.setStatsProfile = setStatsProfile
 function getGuilds() {
     const guilds1 = []
 
-    for (g in guilds) {
+    for (let g in guilds) {
         guilds1.push(g)
     }
     return guilds1
@@ -246,6 +246,9 @@ async function checkStats(guild) {
         guilds[guild.id].counter.filterBots = false
         memberCount = guild.memberCount
     } else if (guilds[guild.id].counter.filterBots) {
+
+        let members
+
         if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 50) {
             members = guild.members.cache
         } else {
@@ -443,24 +446,24 @@ async function checkChristmasCountdown(guild) {
 exports.checkChristmasCountdown = checkChristmasCountdown
 
 function getTimestamp() {
-    const date = new Date();
-    let hours = date.getHours().toString();
-    let minutes = date.getMinutes().toString();
-    let seconds = date.getSeconds().toString();
+    const date = new Date()
+    let hours = date.getHours().toString()
+    let minutes = date.getMinutes().toString()
+    let seconds = date.getSeconds().toString()
     
     if (hours.length == 1) {
-        hours = "0" + hours;
+        hours = "0" + hours
     } 
     
     if (minutes.length == 1) {
-        minutes = "0" + minutes;
+        minutes = "0" + minutes
     } 
     
     if (seconds.length == 1) {
-        seconds = "0" + seconds;
+        seconds = "0" + seconds
     }
     
-    const timestamp = hours + ":" + minutes + ":" + seconds;
+    const timestamp = hours + ":" + minutes + ":" + seconds
 
     return timestamp
 }

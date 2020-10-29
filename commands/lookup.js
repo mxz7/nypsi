@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");;
-const fetch = require("node-fetch");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const fetch = require("node-fetch")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -40,14 +40,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
     if (args[0] == "ip") {
 

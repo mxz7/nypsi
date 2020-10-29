@@ -1,5 +1,5 @@
-const { GuildMember, Message } = require('discord.js');
-const isImageUrl = require('is-image-url');
+const { GuildMember, Message } = require("discord.js")
+const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 
 /**
@@ -8,10 +8,10 @@ const fetch = require("node-fetch")
  */
 function getColor(member) {
     if (member.displayHexColor == "#ffffff") {
-        return "#f8f8ff";
-     } else {
-         return member.displayHexColor;
-     }
+        return "#f8f8ff"
+    } else {
+        return member.displayHexColor
+    }
 }
 
 exports.getColor = getColor
@@ -93,7 +93,7 @@ async function redditImage(post, allowed) {
         let newTitle = ""
         let count = 0
 
-        for (char of a) {
+        for (let char of a) {
             if (count == 145) {
                 newTitle = newTitle + "..."
                 break
@@ -124,7 +124,7 @@ function getMember(message, memberName) {
     let target
     let possible = new Map()
 
-    for (member of members.keyArray()) {
+    for (let member of members.keyArray()) {
         member = members.get(member)
         
         if (member.user.id == memberName) {
@@ -174,7 +174,7 @@ function getMember(message, memberName) {
         }
     }
 
-    return target;
+    return target
 }
 
 exports.getMember = getMember
@@ -191,13 +191,13 @@ function getExactMember(message, memberName) {
 
     let target = members.find(member => {
         if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
-            return member;
+            return member
         } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
             return member
         } else if (member.user.id == memberName) {
             return member
         }
-    });
+    })
 
     return target
 }
@@ -209,8 +209,8 @@ exports.getExactMember = getExactMember
  * @param {Date} date 
  */
 function formatDate(date) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Intl.DateTimeFormat("en-US", options).format(date).toLowerCase().split(",").join("");
+    const options = { year: "numeric", month: "short", day: "numeric" }
+    return new Intl.DateTimeFormat("en-US", options).format(date).toLowerCase().split(",").join("")
 }
 
 exports.formatDate = formatDate
@@ -219,24 +219,24 @@ exports.formatDate = formatDate
  * @returns {String}
  */
 function getTimestamp() {
-    const date = new Date();
-    let hours = date.getHours().toString();
-    let minutes = date.getMinutes().toString();
-    let seconds = date.getSeconds().toString();
+    const date = new Date()
+    let hours = date.getHours().toString()
+    let minutes = date.getMinutes().toString()
+    let seconds = date.getSeconds().toString()
     
     if (hours.length == 1) {
-        hours = "0" + hours;
+        hours = "0" + hours
     } 
     
     if (minutes.length == 1) {
-        minutes = "0" + minutes;
+        minutes = "0" + minutes
     } 
     
     if (seconds.length == 1) {
-        seconds = "0" + seconds;
+        seconds = "0" + seconds
     }
     
-    const timestamp = hours + ":" + minutes + ":" + seconds;
+    const timestamp = hours + ":" + minutes + ":" + seconds
 
     return timestamp
 }
@@ -248,7 +248,7 @@ exports.getTimestamp = getTimestamp
  * @param {Date} date 
  */
 function daysAgo(date) {
-    const ms = Math.floor(new Date() - date);
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
@@ -282,7 +282,7 @@ exports.daysUntilChristmas = daysUntilChristmas
  * @param {Date} date 
  */
 function daysUntil(date) {
-    const ms = Math.floor(date - new Date());
+    const ms = Math.floor(date - new Date())
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 

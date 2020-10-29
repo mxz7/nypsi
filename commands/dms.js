@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../economy/utils");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../economy/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("dms", "enable/disable dms with the bot", categories.INFO).setAliases(["optout", "optin"])
 
@@ -29,14 +29,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 30000);
+        cooldown.delete(message.author.id)
+    }, 30000)
 
     if (!userExists(message.member)) createUser(message.member)
 

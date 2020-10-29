@@ -1,9 +1,9 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../economy/utils.js")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command.js");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY)
 
@@ -30,7 +30,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -39,11 +39,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 300000);
+        cooldown.delete(message.author.id)
+    }, 300000)
 
     updateBalance(message.member, getBalance(message.member) + 1000)
 

@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -11,20 +11,20 @@ const cmd = new Command("join", "information about when you joined the server", 
  */
 async function run(message, args) {
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0]);
+            member = getMember(message, args[0])
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()

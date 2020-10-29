@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getExactMember } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getExactMember } = require("../utils/utils")
 
 const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -66,7 +66,7 @@ async function run(message, args) {
     let fail = false
     let failed = []
 
-    for (member of message.mentions.members.keyArray()) {
+    for (let member of message.mentions.members.keyArray()) {
         const m = message.mentions.members.get(member)
 
         if (m.roles.cache.has(muteRole.id)) {
@@ -97,7 +97,7 @@ async function run(message, args) {
 
     if (failed.length != 0) {
         const failedTags = []
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -114,14 +114,14 @@ async function run(message, args) {
     const members1 = members.keyArray()
 
     if (failed.length != 0) {
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             if (members1.includes(fail1.id)) {
                 members1.splice(members1.indexOf(fail1.id), 1)
             }
         }
     }
 
-    for (m of members1) {
+    for (let m of members1) {
         if (isMuted(message.guild, members.get(m))) {
             deleteMute(message.guild, members.get(m))
         }

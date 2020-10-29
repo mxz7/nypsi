@@ -1,9 +1,9 @@
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { Message } = require("discord.js");
-const shuffle = require("shuffle-array");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const { Message } = require("discord.js")
+const shuffle = require("shuffle-array")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const cooldown = new Map()
 
@@ -31,7 +31,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) {
@@ -110,10 +110,10 @@ async function run(message, args) {
 
     const values = ["rock", "paper", "scissors"]
 
-    const index = values.indexOf(choice);
+    const index = values.indexOf(choice)
 
     if (index > -1) {
-        values.splice(index, 1);
+        values.splice(index, 1)
     }
     
     const winning = shuffle(values)[Math.floor(Math.random() * values.length)]

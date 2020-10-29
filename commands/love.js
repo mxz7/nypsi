@@ -1,11 +1,11 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { getMember } = require("../utils/utils");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { getMember } = require("../utils/utils")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cache = new Map()
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("love", "calculate your love with another person", categories.INFO)
 
@@ -31,13 +31,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
 
-    let target1;
-    let target2;
+    let target1
+    let target2
 
     if (args.length == 0) {
         target1 = message.member
@@ -57,12 +57,12 @@ async function run(message, args) {
 
         target2 = await message.guild.members.fetch(target2)
     } else if (args.length == 1) {
-        target1 = message.member;
+        target1 = message.member
 
         if (!message.mentions.members.first()) {
-            target2 = getMember(message, args[0]);
+            target2 = getMember(message, args[0])
         } else {
-            target2 = message.mentions.members.first();
+            target2 = message.mentions.members.first()
         }
     } else {
         if (message.mentions.members.size == 2) {
@@ -83,19 +83,19 @@ async function run(message, args) {
             target1 = getMember(message, args[0])
             target2 = getMember(message, args[1])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`));
+            return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`))
         }
     }
     
     if (!target1 || !target2) {
-        return message.channel.send(new ErrorEmbed("invalid user(s)"));
+        return message.channel.send(new ErrorEmbed("invalid user(s)"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const combo = (parseInt(target1.user.id) + parseInt(target2.user.id)).toString()
 
@@ -104,7 +104,7 @@ async function run(message, args) {
     if (cache.has(combo)) {
         lovePercent = cache.get(combo)
     } else {
-        lovePercent = Math.ceil(Math.random() * 101) - 1;
+        lovePercent = Math.ceil(Math.random() * 101) - 1
 
         cache.set(combo, lovePercent)
 
@@ -113,70 +113,70 @@ async function run(message, args) {
         }, 60000)
     }
 
-    let loveLevel;
-    let loveEmoji;
-    let loveBar = "";
+    let loveLevel
+    let loveEmoji
+    let loveBar = ""
 
     if (target1 == target2) {
         lovePercent = 0
     }
 
     if (lovePercent == 100) {
-        loveLevel = "perfect!!";
-        loveEmoji = "💞👀🍆🍑";
+        loveLevel = "perfect!!"
+        loveEmoji = "💞👀🍆🍑"
     } else if (lovePercent == 69) {
-        loveLevel = "ooo 69 hehe horny";
-        loveEmoji = "🍆🍑💦😩";
+        loveLevel = "ooo 69 hehe horny"
+        loveEmoji = "🍆🍑💦😩"
     } else if (lovePercent > 90) {
-        loveLevel = "perfect!!";
-        loveEmoji = "💞👀";
+        loveLevel = "perfect!!"
+        loveEmoji = "💞👀"
     } else if (lovePercent > 75) {
-        loveLevel = "amazing!!";
-        loveEmoji = "💕";
+        loveLevel = "amazing!!"
+        loveEmoji = "💕"
     } else if (lovePercent > 55) {
-        loveLevel = "good";
-        loveEmoji = "💖";
+        loveLevel = "good"
+        loveEmoji = "💖"
     } else if (lovePercent > 40) {
-        loveLevel = "okay";
-        loveEmoji = "💝";
+        loveLevel = "okay"
+        loveEmoji = "💝"
     } else if (lovePercent > 25) {
-        loveLevel = "uhh..";
-        loveEmoji = "❤";
+        loveLevel = "uhh.."
+        loveEmoji = "❤"
     } else if (lovePercent < 5 && lovePercent != 0) {
-        loveLevel = "alone forever";
-        loveEmoji = "😭";
+        loveLevel = "alone forever"
+        loveEmoji = "😭"
     } else if (lovePercent == 0) {
-        loveLevel = "lol loner";
-        loveEmoji = "😭";
+        loveLevel = "lol loner"
+        loveEmoji = "😭"
     } else {
-        loveLevel = "lets not talk about it..";
-        loveEmoji = "💔";
+        loveLevel = "lets not talk about it.."
+        loveEmoji = "💔"
     }
 
-    let loveBarNum = Math.ceil(lovePercent / 10) * 10;
+    let loveBarNum = Math.ceil(lovePercent / 10) * 10
 
     if (loveBarNum == 100) {
-        loveBar = "**❤❤❤❤❤❤❤❤❤**";
+        loveBar = "**❤❤❤❤❤❤❤❤❤**"
     } else if (loveBarNum > 90) {
-        loveBar = "**❤❤❤❤❤❤❤❤❤** 💔";
+        loveBar = "**❤❤❤❤❤❤❤❤❤** 💔"
     } else if (loveBarNum > 80) {
-        loveBar = "**❤❤❤❤❤❤❤❤** 💔💔";
+        loveBar = "**❤❤❤❤❤❤❤❤** 💔💔"
     } else if (loveBarNum > 70) {
-        loveBar = "**❤❤❤❤❤❤❤** 💔💔💔";
+        loveBar = "**❤❤❤❤❤❤❤** 💔💔💔"
     } else if (loveBarNum > 60) {
-        loveBar = "**❤❤❤❤❤❤** 💔💔💔💔";
+        loveBar = "**❤❤❤❤❤❤** 💔💔💔💔"
     } else if (loveBarNum > 50) {
-        loveBar = "**❤❤❤❤❤** 💔💔💔💔💔";
+        loveBar = "**❤❤❤❤❤** 💔💔💔💔💔"
     } else if (loveBarNum > 40) {
-        loveBar = "**❤❤❤❤** 💔💔💔💔💔💔";
+        loveBar = "**❤❤❤❤** 💔💔💔💔💔💔"
     } else if (loveBarNum > 30) {
-        loveBar = "**❤❤❤** 💔💔💔💔💔💔💔";
+        loveBar = "**❤❤❤** 💔💔💔💔💔💔💔"
     } else if (loveBarNum > 20) {
-        loveBar = "**❤❤** 💔💔💔💔💔💔";
+        loveBar = "**❤❤** 💔💔💔💔💔💔"
     } else if (loveBarNum > 10) {
-        loveBar = "**❤** 💔💔💔💔💔💔💔";
+        loveBar = "**❤** 💔💔💔💔💔💔💔"
     } else {
-        loveBar = "💔💔💔💔💔💔💔💔💔💔";
+        loveBar = "💔💔💔💔💔💔💔💔💔💔"
     }
 
     const embed = new CustomEmbed(message.member, false, `${target1.user.toString()} **x** ${target2.user.toString()}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`)

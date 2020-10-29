@@ -1,8 +1,8 @@
 const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const tax = 0.05
 
@@ -34,7 +34,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -76,11 +76,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 30000);
+        cooldown.delete(message.author.id)
+    }, 30000)
 
     const embed = new CustomEmbed(message.member, true)
         .setTitle("bank withdrawal | processing")

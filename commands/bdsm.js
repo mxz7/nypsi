@@ -30,7 +30,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!message.channel.nsfw) {
@@ -43,11 +43,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const bdsmLinks = Array.from(bdsmCache.keys())
 
@@ -85,3 +85,6 @@ cmd.setRun(run)
 
 module.exports = cmd
 
+function hello() {
+    console.log("hello")
+}

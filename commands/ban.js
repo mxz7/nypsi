@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
-const { newCase, profileExists, createProfile } = require("../moderation/utils");
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { newCase, profileExists, createProfile } = require("../moderation/utils")
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("ban", "ban one or more users from the server", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
@@ -20,7 +20,7 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send(new ErrorEmbed("i need the `ban members` permission for this command to work"));
+        return message.channel.send(new ErrorEmbed("i need the `ban members` permission for this command to work"))
     }
 
     let idOnly = false
@@ -85,7 +85,7 @@ async function run(message, args) {
     let failed = []
     let fail = false
 
-    for (member of members.keyArray()) {
+    for (let member of members.keyArray()) {
         if (!idOnly) {
             const targetHighestRole = members.get(member).roles.highest
             const memberHighestRole = message.member.roles.highest
@@ -143,7 +143,7 @@ async function run(message, args) {
 
     if (failed.length != 0) {
         const failedTags = []
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -174,7 +174,7 @@ async function run(message, args) {
     
         newCase(message.guild, "ban", members1, message.author.tag, reason.split(": ")[1])
 
-        for (member of members1) {
+        for (let member of members1) {
             const m = members.get(member)
     
             if (reason.split(": ")[1] == "no reason given") {

@@ -1,12 +1,12 @@
-const fs = require("fs");
-let users = JSON.parse(fs.readFileSync("./economy/users.json"));
+const fs = require("fs")
+let users = JSON.parse(fs.readFileSync("./economy/users.json"))
 const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
 const { topgg } = require("../config.json")
-const DBL = require("dblapi.js");
-const { inCooldown, addCooldown } = require("../guilds/utils");
-const { GuildMember, Guild, Client } = require("discord.js");
-const { getTimestamp } = require("../utils/utils");
-const { EconProfile } = require("../utils/classes/EconStorage");
+const DBL = require("dblapi.js")
+const { inCooldown, addCooldown } = require("../guilds/utils")
+const { GuildMember, Guild, Client } = require("discord.js")
+const { getTimestamp } = require("../utils/utils")
+const { EconProfile } = require("../utils/classes/EconStorage")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -19,7 +19,7 @@ setInterval(() => {
 
         fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
-                return console.log(err);
+                return console.log(err)
             }
             console.log("\x1b[32m[" + getTimestamp() + "] economy data saved\x1b[37m")
         })
@@ -31,13 +31,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./economy/users.json"));
+        users = JSON.parse(fs.readFileSync("./economy/users.json"))
         console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./economy/users.json"));
+        users = JSON.parse(fs.readFileSync("./economy/users.json"))
         console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
         timer = 0
     }
@@ -47,27 +47,27 @@ setInterval(() => {
 setInterval(() => {
     let date = new Date()
     date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
-    fs.writeFileSync('./economy/backup/' + date + '.json', JSON.stringify(users))
+    fs.writeFileSync("./economy/backup/" + date + ".json", JSON.stringify(users))
     console.log("\x1b[32m[" + getTimestamp() + "] user data backup complete\x1b[37m")
 }, 43200000)
 
 setInterval(() => {
-    for (user in users) {
-        if (users[user].money.balance == NaN || users[user].money.balance == null || users[user].money.balance == undefined || users[user].money.balance == -NaN || users[user].money.balance < 0) {
+    for (let user in users) {
+        if (isNaN(users[user].money.balance) || users[user].money.balance == null || users[user].money.balance == undefined || users[user].money.balance == -NaN || users[user].money.balance < 0) {
 
             users[user].money.balance = 0
 
             console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
         }
 
-        if (users[user].money.bank == NaN || users[user].money.bank == null || users[user].money.bank == undefined || users[user].money.bank == -NaN || users[user].money.bank < 0) {
+        if (isNaN(users[user].money.bank) || users[user].money.bank == null || users[user].money.bank == undefined || users[user].money.bank == -NaN || users[user].money.bank < 0) {
 
             users[user].money.bank = 0
 
             console.log("[" + getTimestamp() + "] " + user + " bank set to 0 because NaN")
         }
 
-        if (users[user].xp == NaN || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN || users[user].xp < 0) {
+        if (isNaN(users[user].xp) || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN || users[user].xp < 0) {
 
             users[user].xp = 0
 
@@ -94,7 +94,7 @@ dbl.webhook.on("ready", hook => {
 
 dbl.webhook.on("vote", vote => {
     console.log(vote)
-    const { onVote } = require("../nypsi");
+    const { onVote } = require("../nypsi")
     onVote(vote)
 })
 
@@ -212,7 +212,7 @@ exports.getUserCount = getUserCount
 function getUserCountGuild(guild) {
     let count = 0
 
-    for (user in users) {
+    for (let user in users) {
         if (guild.members.cache.find(member => member.user.id == user)) {
             count++
         }
@@ -348,19 +348,19 @@ exports.getMaxBankBalance = getMaxBankBalance
 function topAmountGlobal(amount) {
     const users1 = []
 
-    for (user in users) {
+    for (let user in users) {
         users1.push(user)
     }
 
     users1.sort(function(a, b) {
-        return users[b].money.balance - users[a].money.balance;
+        return users[b].money.balance - users[a].money.balance
     })
 
     let usersFinal = []
 
     let count = 0
 
-    for (user of users1) {
+    for (let user of users1) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
@@ -382,50 +382,50 @@ exports.topAmountGlobal = topAmountGlobal
 async function topAmount(guild, amount) {
     let members
 
-        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250) {
-            members = guild.members.cache
-        } else {
-            members = await guild.members.fetch()
+    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250) {
+        members = guild.members.cache
+    } else {
+        members = await guild.members.fetch()
 
-            addCooldown(guild, 3600)
-        }
+        addCooldown(guild, 3600)
+    }
 
-        if (!members) members = guild.members.cache
+    if (!members) members = guild.members.cache
     
-        const users1 = []
+    const users1 = []
 
-        for (user in users) {
-            if (members.find(member => member.user.id == user) && users[user].money.balance != 0) {
-                users1.push(user)
-            }
+    for (let user in users) {
+        if (members.find(member => member.user.id == user) && users[user].money.balance != 0) {
+            users1.push(user)
         }
+    }
 
-        users1.sort(function(a, b) {
-            return users[b].money.balance - users[a].money.balance;
+    users1.sort(function(a, b) {
+        return users[b].money.balance - users[a].money.balance
+    })
+
+    let usersFinal = []
+
+    let count = 0
+
+    const getMemberID = (guild, id) => {
+        let target = guild.members.cache.find(member => {
+            return member.user.id == id
         })
-
-        let usersFinal = []
-
-        let count = 0
-
-        const getMemberID = (guild, id) => {
-            let target = guild.members.cache.find(member => {
-                return member.user.id == id
-            })
         
-            return target
-        }
+        return target
+    }
 
-        for (user of users1) {
-            if (count >= amount) break
-            if (usersFinal.join().length >= 1500) break
+    for (let user of users1) {
+        if (count >= amount) break
+        if (usersFinal.join().length >= 1500) break
 
-            if (!users[user].money.balance == 0) {
-                usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].money.balance.toLocaleString()
-                count++
-            }
+        if (!users[user].money.balance == 0) {
+            usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].money.balance.toLocaleString()
+            count++
         }
-        return usersFinal
+    }
+    return usersFinal
 }
 
 exports.topAmount = topAmount
@@ -449,9 +449,9 @@ exports.createUser = createUser
  * @returns {String}
  */
 function winBoard() {
-    lol = ""
+    let lol = ""
 
-    for (item in multiplier) {
+    for (let item in multiplier) {
         lol = lol + item + " | " + item + " | " + item + "  **||** win: **" + multiplier[item] + "**x\n"
     }
 

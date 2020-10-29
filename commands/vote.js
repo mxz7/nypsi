@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache, getPrestige } = require("../economy/utils.js");
-const { getPrefix } = require("../guilds/utils.js");
-const { Command, categories } = require("../utils/classes/Command.js");
+const { Message } = require("discord.js")
+const { getVoteMulti, getBalance, updateBalance, userExists, createUser, removeFromVoteCache, getPrestige } = require("../economy/utils.js")
+const { getPrefix } = require("../guilds/utils.js")
+const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -31,16 +31,16 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const prefix = getPrefix(message.guild)
     const amount = 15000 * (getPrestige(message.member) + 1)

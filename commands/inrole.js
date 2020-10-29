@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -30,7 +30,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -54,8 +54,6 @@ async function run(message, args) {
     if (!role) {
         return message.channel.send(new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``))
     }
-
-    role = role
 
     let members
 
