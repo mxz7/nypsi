@@ -1,0 +1,50 @@
+const { Message } = require("discord.js");
+const { calcMaxBet, userExists, createUser } = require("../economy/utils");
+const { Command, categories } = require("../utils/classes/Command");
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
+
+const cooldown = new Map()
+
+const cmd = new Command("maxbet", "calculate your maximum bet", categories.MONEY)
+
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
+    if (!userExists(message.member)) createUser(message.member)
+
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 5 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+    }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.member.id)
+    }, 5000)
+
+    const maxBet = calcMaxBet(message.member)
+
+    return message.channel.send(new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`))
+}
+
+cmd.setRun(run)
+
+module.exports = cmd
