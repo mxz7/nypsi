@@ -271,7 +271,15 @@ async function playGame(message, m) {
         const newCard1 = getValue(message.member)
 
         if (newCard1 > oldCard) {
-            win = win + 1
+            
+            if (win == 0) {
+                win += 1
+            } else if (win > 2.5) {
+                win += 1
+            } else {
+                win += 0.5
+            }
+
             games.set(message.member.user.id, {
                 bet: bet,
                 win: win,
@@ -305,7 +313,15 @@ async function playGame(message, m) {
         const newCard1 = getValue(message.member)
 
         if (newCard1 < oldCard) {
-            win = win + 1
+            
+            if (win == 0) {
+                win += 1
+            } else if (win > 2.5) {
+                win += 1
+            } else {
+                win += 0.5
+            }
+
             games.set(message.member.user.id, {
                 bet: bet,
                 win: win,
