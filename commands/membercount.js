@@ -178,7 +178,7 @@ async function run(message, args) {
                 return message.channel.send(new ErrorEmbed("invalid channel"))
             }
         } else {
-            const c = message.guild.channels.find(c => c.id == args[1])
+            const c = message.guild.channels.cache.find(c => c.id == args[1])
 
             if (!c) {
                 return message.channel.send(new ErrorEmbed("invalid channel"))
