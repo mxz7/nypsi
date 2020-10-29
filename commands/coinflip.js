@@ -1,14 +1,14 @@
 const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
-const Discord = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const Discord = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
-const waiting = new Discord.Collection();
+const waiting = new Discord.Collection()
 
 const cmd = new Command("coinflip", "flip a coin, double or nothing", categories.MONEY).setAliases(["cf"])
 
@@ -38,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -79,7 +79,7 @@ async function run(message, args) {
         }
     }
 
-    const bet = (parseInt(args[1]));
+    const bet = (parseInt(args[1]))
 
     if (bet <= 0) {
         return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
@@ -96,8 +96,8 @@ async function run(message, args) {
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
     updateBalance(message.member, getBalance(message.member) - bet)
 
@@ -111,10 +111,7 @@ async function run(message, args) {
         win = true
         updateBalance(message.member, getBalance(message.member) + (bet * 2))
     }
-
-    delete lols
-    delete choice
-
+    
     let voted = false
     let voteMulti = 0
 

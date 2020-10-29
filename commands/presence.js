@@ -1,7 +1,7 @@
-const { MessageEmbed, Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders");
-const { getMember, getColor } = require("../utils/utils");
+const { MessageEmbed, Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
+const { getMember, getColor } = require("../utils/utils")
 
 const cmd = new Command("presence", "view active presences for a user", categories.INFO).setAliases(["activity", "game"])
 
@@ -11,20 +11,20 @@ const cmd = new Command("presence", "view active presences for a user", categori
  */
 async function run(message, args) {
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0]);
+            member = getMember(message, args[0])
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     const embed = new CustomEmbed(message.member)
@@ -39,7 +39,7 @@ async function run(message, args) {
         let hasSpotify = false
         let spotify = ""
         
-        for (activity of member.presence.activities) {
+        for (let activity of member.presence.activities) {
             if (activity.name.toLowerCase() == "custom status" && activity.state != undefined) {
                 if (hasStatus) return
 

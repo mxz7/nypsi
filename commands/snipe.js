@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", categories.FUN).setAliases(["s"])
@@ -56,7 +56,7 @@ module.exports = cmd
 
 function timeSince(date) {
 
-    const ms = Math.floor((new Date() - date));
+    const ms = Math.floor((new Date() - date))
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)

@@ -1,9 +1,9 @@
-const ascii = require("figlet");
+const ascii = require("figlet")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getDMsEnabled } = require("../economy/utils.js");
-const { getPrefix } = require("../guilds/utils.js");
+const { Command, categories } = require("../utils/classes/Command.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getDMsEnabled } = require("../economy/utils.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const cooldown = new Map()
 
@@ -18,7 +18,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (!getDMsEnabled(message.member)) {
-        return message.channel.send(new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`));
+        return message.channel.send(new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`))
     }
 
     if (cooldown.has(message.member.id)) {
@@ -38,7 +38,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (args.length == 0) {
@@ -103,19 +103,19 @@ async function run(message, args) {
         text = args.join(" ")
     }
 
-    let asciiString = "";
+    let asciiString = ""
     let fail = false
 
     await ascii(text, {
         font: font
     }, async (err, data) => {
         if (!err) {
-            asciiString = "```" + data + "```";
+            asciiString = "```" + data + "```"
         } else {
             fail = true
             return message.channel.send(new ErrorEmbed("error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**"))
         }
-    });
+    })
 
     setTimeout(() => {
 
@@ -124,15 +124,15 @@ async function run(message, args) {
         }
 
         if (asciiString.length >= 2000) {
-            return message.channel.send(new ErrorEmbed("ascii text exceeds discord message size"));
+            return message.channel.send(new ErrorEmbed("ascii text exceeds discord message size"))
         }
         
         message.member.send(asciiString).then( () => {
-            return message.channel.send(new CustomEmbed(message.member, false, "✅ success **-** check your dms"));
+            return message.channel.send(new CustomEmbed(message.member, false, "✅ success **-** check your dms"))
         }).catch( () => {
-            return message.channel.send(new ErrorEmbed("unable to send you a dm"));
-        });
-    }, 500);
+            return message.channel.send(new ErrorEmbed("unable to send you a dm"))
+        })
+    }, 500)
 
 }
 

@@ -1,9 +1,9 @@
 const { getMember, formatDate } = require("../utils/utils")
-const { Message } = require("discord.js");
-const { getCases, profileExists, createProfile } = require("../moderation/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { Message } = require("discord.js")
+const { getCases, profileExists, createProfile } = require("../moderation/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 
@@ -34,7 +34,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -89,12 +89,12 @@ async function run(message, args) {
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000);
+    }, 5000)
 
 
     let count = 0
     let page = []
-    for (case0 of cases) {
+    for (let case0 of cases) {
         if (count == 5) {
             pages.push(page)
             page = []
@@ -119,7 +119,7 @@ async function run(message, args) {
         embed.setHeader("history for " + member.user.tag)
     }
 
-    for (case0 of pages[0]) {
+    for (let case0 of pages[0]) {
         const date = formatDate(new Date(case0.time))
         if (case0.deleted) {
             embed.addField("case " + case0.id, "`[deleted]`")
@@ -142,7 +142,7 @@ async function run(message, args) {
             return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
         }
 
-        async function pageManager() {
+        const pageManager = async () => {
             const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
                 .then(collected => {
                     return collected.first().emoji.name
@@ -165,7 +165,7 @@ async function run(message, args) {
                     return pageManager()
                 } else {
                     currentPage--
-                    for (case0 of pages[currentPage]) {
+                    for (let case0 of pages[currentPage]) {
                         const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
@@ -182,7 +182,7 @@ async function run(message, args) {
                     return pageManager()
                 } else {
                     currentPage++
-                    for (case0 of pages[currentPage]) {
+                    for (let case0 of pages[currentPage]) {
                         const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")

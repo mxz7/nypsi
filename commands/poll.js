@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("poll", "create a poll with a lot of customisation", categories.INFO)
 
@@ -34,7 +34,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -55,16 +55,16 @@ async function run(message, args) {
     }
 
     if (message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
-        cooldown.set(message.member.id, new Date());
+        cooldown.set(message.member.id, new Date())
         setTimeout(() => {
-            cooldown.delete(message.author.id);
-        }, 10000);
+            cooldown.delete(message.author.id)
+        }, 10000)
     }
 
     if (!message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR")) {
-        cooldown.set(message.member.id, new Date());
+        cooldown.set(message.member.id, new Date())
         setTimeout(() => {
-            cooldown.delete(message.author.id);
+            cooldown.delete(message.author.id)
         }, 60000)
     }
 

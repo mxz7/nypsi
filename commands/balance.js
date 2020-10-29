@@ -14,13 +14,13 @@ const cmd = new Command("balance", "check your balance", categories.MONEY).setAl
 async function run(message, args) {
 
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
-        let target = message.mentions.members.first();
+        let target = message.mentions.members.first()
         let id = false
 
         if (!target) {
             target = args[0]
             if (!userExists(target)) {
-                return message.channel.send("❌ invalid user - you must tag the user for this command or use a user id");
+                return message.channel.send("❌ invalid user - you must tag the user for this command or use a user id")
             }
             id = true
         }
@@ -40,7 +40,7 @@ async function run(message, args) {
     let target = message.member
 
     if (args.length >= 1) { 
-        target = message.mentions.members.first();
+        target = message.mentions.members.first()
 
         if (!target) {
             target = getMember(message, args.join(" "))

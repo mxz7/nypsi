@@ -29,7 +29,7 @@ setInterval(() => {
     }
 
     if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./socials/users.json"));
+        users = JSON.parse(fs.readFileSync("./socials/users.json"))
         console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
         timer = 0
     }

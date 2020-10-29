@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser } = require("../economy/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders");
+const { Message } = require("discord.js")
+const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser } = require("../economy/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", categories.MONEY)
 
@@ -29,7 +29,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -42,13 +42,13 @@ async function run(message, args) {
     }
 
     if (currentBal < neededBal) {
-        return message.channel.send(new CustomEmbed(message.member, false, `you need \$**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
+        return message.channel.send(new CustomEmbed(message.member, false, `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
     }
 
-    let embed = new CustomEmbed(message.member, true, "are you sure you want to prestige?\n\n" + `you will lose **${neededXp.toLocaleString()}**xp and \$**${neededBal.toLocaleString()}**\n\n` +
+    let embed = new CustomEmbed(message.member, true, "are you sure you want to prestige?\n\n" + `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n` +
         "react with ✅ to prestige").setTitle(`prestige | ${message.member.user.username}`)
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     const msg = await message.channel.send(embed)
     await msg.react("✅")
@@ -70,7 +70,7 @@ async function run(message, args) {
     if (reaction == "✅") {
         setTimeout(() => {
             cooldown.delete(message.author.id)
-        }, 1800000);
+        }, 1800000)
         currentXp = getXp(message.member)
         neededXp = getPrestigeRequirement(message.member)
         currentBal = getBankBalance(message.member)
@@ -81,7 +81,7 @@ async function run(message, args) {
         }
     
         if (currentBal < neededBal) {
-            return message.channel.send(new CustomEmbed(message.member, false, `you need \$**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
+            return message.channel.send(new CustomEmbed(message.member, false, `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
         }
 
         updateBankBalance(message.member, currentBal - neededBal)
@@ -89,7 +89,7 @@ async function run(message, args) {
         setPrestige(message.member, getPrestige(message.member) + 1)
 
         embed.setDescription(`you are now prestige **${getPrestige(message.member)}**\n\n` + 
-            `new vote rewards: \$**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}** and **${getPrestige(message.member) + 1}** vote crates\n` +
+            `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}** and **${getPrestige(message.member) + 1}** vote crates\n` +
             `you have also been given: **${getPrestige(message.member)}** prestige crates`)
         await msg.edit(embed)
     }

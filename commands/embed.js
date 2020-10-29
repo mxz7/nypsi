@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("embed", "create an embed message", categories.INFO).setPermissions(["MANAGE_MESSAGES"])
 
@@ -34,7 +34,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -63,10 +63,10 @@ async function run(message, args) {
         mode = "title_desc_color"
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
     const title = args.join(" ").split("|")[0]
     let description

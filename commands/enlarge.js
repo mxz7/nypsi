@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", categories.INFO).setAliases(["emoji"])
 
@@ -31,7 +31,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -48,11 +48,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 3000);
+        cooldown.delete(message.author.id)
+    }, 3000)
 
     const emojiID = emoji[2].slice(0, emoji[2].length - 1)
 

@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { profileExists, createProfile, newCase } = require("../moderation/utils");
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { profileExists, createProfile, newCase } = require("../moderation/utils")
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("kick", "kick one or more users", categories.INFO).setPermissions(["KICK_MEMBERS"])
@@ -20,7 +20,7 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
-        return message.channel.send(new ErrorEmbed("i need the `kick members` permission for this command to work"));
+        return message.channel.send(new ErrorEmbed("i need the `kick members` permission for this command to work"))
     }
 
     const prefix = getPrefix(message.guild)
@@ -74,7 +74,7 @@ async function run(message, args) {
     let count = 0
     let failed = []
 
-    for (member of members.keyArray()) {
+    for (let member of members.keyArray()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -104,7 +104,7 @@ async function run(message, args) {
 
     if (failed.length != 0) {
         const failedTags = []
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -131,7 +131,7 @@ async function run(message, args) {
     const members1 = members.keyArray()
 
     if (failed.length != 0) {
-        for (fail of failed) {
+        for (let fail of failed) {
             if (members1.includes(fail.id)) {
                 members1.splice(members1.indexOf(fail.id), 1)
             }
@@ -140,7 +140,7 @@ async function run(message, args) {
 
     newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
 
-    for (member of members1) {
+    for (let member of members1) {
         const m = members.get(member)
 
         if (reason.split(": ")[1] == "no reason given") {

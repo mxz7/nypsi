@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -29,14 +29,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
@@ -47,34 +47,37 @@ async function run(message, args) {
     let imgCache = 0
 
     try {
-        for (link of Array.from(bdsmCache.keys())) {
+        for (let link of Array.from(bdsmCache.keys())) {
             imgCache = imgCache + bdsmCache.get(link).length
         }
-        for (link of Array.from(assCache.keys())) {
+        for (let link of Array.from(assCache.keys())) {
             imgCache = imgCache + assCache.get(link).length
         }
-        for (link of Array.from(thighsCache.keys())) {
+        for (let link of Array.from(thighsCache.keys())) {
             imgCache = imgCache + thighsCache.get(link).length
         }
-        for (link of Array.from(pornCache.keys())) {
+        for (let link of Array.from(pornCache.keys())) {
             imgCache = imgCache + pornCache.get(link).length
         }
-        for (link of Array.from(birbCache.keys())) {
+        for (let link of Array.from(birbCache.keys())) {
             imgCache = imgCache + birbCache.get(link).length
         }
-        for (link of Array.from(catCache.keys())) {
+        for (let link of Array.from(catCache.keys())) {
             imgCache = imgCache + catCache.get(link).length
         }
-        for (link of Array.from(dogCache.keys())) {
+        for (let link of Array.from(dogCache.keys())) {
             imgCache = imgCache + dogCache.get(link).length
         }
-        for (link of Array.from(rabbitCache.keys())) {
+        for (let link of Array.from(rabbitCache.keys())) {
             imgCache = imgCache + rabbitCache.get(link).length
         }
-        for (link of Array.from(snekCache.keys())) {
+        for (let link of Array.from(snekCache.keys())) {
             imgCache = imgCache + snekCache.get(link).length
         }
-    } catch {}
+    } catch (error) {
+        console.error("error counting image cache")
+        console.error(error)
+    }
 
 
     let memberCount = 0

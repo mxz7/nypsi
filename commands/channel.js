@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -29,7 +29,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!message.member.hasPermission("MANAGE_CHANNELS")) {
@@ -70,7 +70,7 @@ async function run(message, args) {
 
         let channels = ""
 
-        for (arg of args) {
+        for (let arg of args) {
             const newChannel = await message.guild.channels.create(arg).catch(() => fail = true)
             if (fail) break
             channels = channels + "**" + newChannel.toString() + "** ✅\n"
@@ -81,7 +81,7 @@ async function run(message, args) {
         }
 
         const embed = new CustomEmbed(message.member, false, channels)
-                .setTitle("channel | " + message.member.user.username)
+            .setTitle("channel | " + message.member.user.username)
         return message.channel.send(embed)
     }
 

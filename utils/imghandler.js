@@ -69,7 +69,7 @@ const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
  */
 async function cacheUpdate(links, imgs, name) {
     const start = new Date().getTime()
-    for (link of links) {
+    for (let link of links) {
         const res = await fetch(link).then(a => a.json())
 
         const allowed = res.data.children.filter(post => !post.data.is_self)

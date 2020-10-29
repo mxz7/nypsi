@@ -30,14 +30,14 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
     let amount
 
@@ -46,10 +46,10 @@ async function run(message, args) {
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        args[0] = 5;
+        args[0] = 5
     }
 
-    amount = parseInt(args[0]);
+    amount = parseInt(args[0])
 
     if (amount > 10 && !message.member.hasPermission("ADMINISTRATOR")) amount = 10
 
@@ -58,8 +58,8 @@ async function run(message, args) {
     const balTop = await topAmount(message.guild, amount)
 
     let filtered = balTop.filter(function (el) {
-        return el != null;
-    });
+        return el != null
+    })
           
     const embed = new CustomEmbed(message.member, false)
         .setTitle("top " + filtered.length)

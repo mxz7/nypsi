@@ -1,9 +1,9 @@
 const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
 const { getColor } = require("../utils/utils")
-const { MessageEmbed, Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command.js");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const { MessageEmbed, Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const cooldown = new Map()
 
@@ -50,14 +50,14 @@ async function run(message, args) {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+            return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
         }
 
-        cooldown.set(message.member.user.id, new Date());
+        cooldown.set(message.member.user.id, new Date())
 
         setTimeout(() => {
-            cooldown.delete(message.author.id);
-        }, 60000);
+            cooldown.delete(message.author.id)
+        }, 60000)
 
         updateBalance(message.member, getBalance(message.member) - padlockPrice)
         setPadlock(message.member, true)

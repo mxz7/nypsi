@@ -1,8 +1,8 @@
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("clean", "clean up bot commands and responses", categories.MODERATION)
 
@@ -30,12 +30,12 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 15000);
+        cooldown.delete(message.author.id)
+    }, 15000)
 
     const prefix = getPrefix(message.guild)
 

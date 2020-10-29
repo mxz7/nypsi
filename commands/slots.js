@@ -1,8 +1,8 @@
 const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒"]
@@ -34,7 +34,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) {
@@ -79,7 +79,7 @@ async function run(message, args) {
         }
     }
 
-    const bet = (parseInt(args[0]));
+    const bet = (parseInt(args[0]))
 
     if (bet <= 0) {
         return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
@@ -93,11 +93,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     updateBalance(message.member, getBalance(message.member) - bet)
 

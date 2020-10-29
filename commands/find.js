@@ -151,7 +151,7 @@ async function run(message, args)  {
                     return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
                 }
     
-                async function pageManager() {
+                const pageManager = async () => {
                     const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
                         .then(collected => {
                             return collected.first().emoji.name
@@ -241,7 +241,7 @@ async function run(message, args)  {
                     return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
                 }
     
-                async function pageManager() {
+                const pageManager = async () => {
                     const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
                         .then(collected => {
                             return collected.first().emoji.name
@@ -292,8 +292,8 @@ async function run(message, args)  {
         const balTop = topAmountGlobal(amount)
 
         const filtered = balTop.filter(function (el) {
-            return el != null;
-        });
+            return el != null
+        })
 
         const embed = new CustomEmbed(message.member, false, filtered)
             .setTitle("top " + filtered.length)
@@ -315,8 +315,8 @@ async function guildInfo(guild) {
     const balTop = await topAmount(guild, 5)
 
     const filtered = balTop.filter(function (el) {
-        return el != null;
-    });
+        return el != null
+    })
 
     let owner
 
@@ -330,7 +330,9 @@ async function guildInfo(guild) {
 
     try {
         invites = (await guild.fetchInvites().catch()).keyArray()
-    } catch {}
+    } catch {
+        invites = undefined
+    }
 
     const embed = new CustomEmbed()
         .setDescription("`" + guild.id + "`")

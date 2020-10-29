@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");;
-const fetch = require("node-fetch");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getTimestamp, formatDate } = require("../utils/utils");
+const { Message } = require("discord.js")
+const fetch = require("node-fetch")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getTimestamp, formatDate } = require("../utils/utils")
 
 const cooldown = new Map()
 const cache = new Map()
@@ -33,20 +33,20 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}minecraft <name/server IP>`));
+        return message.channel.send(new ErrorEmbed(`${prefix}minecraft <name/server IP>`))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     if (args[0] == "-cache") {
         if (cache.size > 100) {
@@ -55,7 +55,7 @@ async function run(message, args) {
             const names = cache.keys()
             const names1 = []
 
-            for (n of names) {
+            for (let n of names) {
                 names1.push(n)
             }
 
@@ -194,6 +194,8 @@ async function run(message, args) {
     try {
         nameHistory.forEach(item => {
 
+            let value = ""
+
             if (item.timestamp) {
                 const timestamp = formatDate(new Date(item.timestamp))
 
@@ -221,7 +223,7 @@ async function run(message, args) {
                     names.get(lastPage).push(value)
                 }
             }
-        });
+        })
     } catch (e) {
         if (e != BreakException) throw e
     }
@@ -252,7 +254,7 @@ async function run(message, args) {
             return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
         }
 
-        async function pageManager() {
+        const pageManager = async () => {
             const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
                 .then(collected => {
                     return collected.first().emoji.name
@@ -298,7 +300,7 @@ setInterval(() => {
         serverCache.clear()
         console.log(`[${getTimestamp()}] minecraft server cache cleared`)
     }
-}, 6 * 60 * 60 * 1000);
+}, 6 * 60 * 60 * 1000)
 
 cmd.setRun(run)
 

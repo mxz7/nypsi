@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");
-const { calcMaxBet, userExists, createUser } = require("../economy/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
+const { Message } = require("discord.js")
+const { calcMaxBet, userExists, createUser } = require("../economy/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
@@ -31,7 +31,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     cooldown.set(message.member.id, new Date())

@@ -1,7 +1,7 @@
-const { Message } = require("discord.js");;;
-const { formatDate } = require("../utils/utils");
-const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { formatDate } = require("../utils/utils")
+const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("server", "view information about the server", categories.INFO).setAliases(["serverinfo", "membercount"])
@@ -12,9 +12,9 @@ const cmd = new Command("server", "view information about the server", categorie
  */
 async function run(message, args) {
 
-    const server = message.guild;
+    const server = message.guild
 
-    const created = formatDate(server.createdAt).toLowerCase();
+    const created = formatDate(server.createdAt).toLowerCase()
 
     let members 
 
@@ -67,7 +67,7 @@ async function run(message, args) {
             `**member peak** ${getPeaks(message.guild).members.toLocaleString()}`)
 
     if (server.memberCount >= 25000) {
-        embed.setFooter(`humans and bots may be inaccurate due to server size`)
+        embed.setFooter("humans and bots may be inaccurate due to server size")
     }
     
     message.channel.send(embed)

@@ -1,11 +1,11 @@
 const { getMember } = require("../utils/utils")
 const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp, getDMsEnabled } = require("../economy/utils.js")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
-const cooldown = new Map();
+const cooldown = new Map()
 const playerCooldown = new Set()
 
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
@@ -32,7 +32,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -76,11 +76,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you need $750 in your wallet to rob someone"))
     }
 
-    cooldown.set(message.member.user.id, new Date());
+    cooldown.set(message.member.user.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 600000);
+        cooldown.delete(message.author.id)
+    }, 600000)
 
     const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
         .setTitle("robbery | " + message.member.user.username)

@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
-const shuffle = require("shuffle-array");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils.js");
+const shuffle = require("shuffle-array")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils.js")
 
 const cooldown = new Map()
 const games = new Map()
@@ -38,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -226,7 +226,7 @@ function calcTotal(member) {
 
     let aceAs11 = false
 
-    for (card of cards) {
+    for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join()
         
         if (card.includes("K") || card.includes("Q") || card.includes("J")) {
@@ -270,7 +270,7 @@ function calcTotalDealer(member) {
 
     let aceAs11 = false
 
-    for (card of cards) {
+    for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join()
         
         if (card.includes("K") || card.includes("Q") || card.includes("J")) {
@@ -311,7 +311,7 @@ function getCards(member) {
 
     let message = ""
     
-    for (card of cards) {
+    for (let card of cards) {
         message = message + "| " + card + " "
     }
 
@@ -323,7 +323,7 @@ function getDealerCards(member) {
 
     let message = ""
     
-    for (card of cards) {
+    for (let card of cards) {
         message = message + "| " + card + " "
     }
 
