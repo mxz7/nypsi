@@ -2,7 +2,7 @@ const startUp = Date.now()
 
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
-const client = new Discord.Client()
+const client = new Discord.Client({ disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
