@@ -5,7 +5,7 @@ const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({ disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, setPrefix, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, daysUntilChristmas } = require("./utils/utils")
@@ -97,6 +97,7 @@ client.on("guildCreate", guild => {
 
 client.on("guildDelete", guild => {
     console.log("\x1b[36m[" + getTimestamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
+    setPrefix(guild, "$")
 })
 
 client.on("rateLimit", rate => {
@@ -140,7 +141,13 @@ client.on("messageDelete", message => {
             if (d.includes(word.toLowerCase())) return
         }
 
-        snipe.set(message.channel.id, message)
+        snipe.set(message.channel.id, {
+            content: message.content,
+            createdTimestamp: message.createdTimestamp,
+            channel: {
+                id: message.channel.id
+            }
+        })
 
         exports.snipe = snipe
     }
@@ -166,7 +173,13 @@ client.on("messageUpdate", message => {
             if (d.includes(word.toLowerCase())) return
         }
 
-        eSnipe.set(message.channel.id, message)
+        eSnipe.set(message.channel.id, {
+            content: message.content,
+            createdTimestamp: message.createdTimestamp,
+            channel: {
+                id: message.channel.id
+            }
+        })
 
         exports.eSnipe = eSnipe
     }

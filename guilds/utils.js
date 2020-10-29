@@ -45,7 +45,7 @@ setInterval(async () => {
     await snipe.forEach(msg => {
         const diff = now - msg.createdTimestamp
 
-        if (diff >= 86400000) {
+        if (diff >= 43200000) {
             snipe.delete(msg.channel.id)
             snipeCount++
         }
@@ -58,7 +58,7 @@ setInterval(async () => {
     await eSnipe.forEach(msg => {
         const diff = now - msg.createdTimestamp
 
-        if (diff >= 86400000) {
+        if (diff >= 43200000) {
             eSnipe.delete(msg.channel.id)
             eSnipeCount++
         }

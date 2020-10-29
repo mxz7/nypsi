@@ -30,12 +30,6 @@ async function run(message, args) {
 
     let content = eSnipe.get(channel.id).content
 
-    if (content) {
-        if (eSnipe.get(channel.id).attachments.url) {
-            content = eSnipe.get(channel).attachments.url
-        }
-    }
-
     if (content.split("\n").length > 10) {
         content = content.split("\n").join(".")
     }
