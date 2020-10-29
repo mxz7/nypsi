@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige } = require("../economy/utils");
+const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser } = require("../economy/utils");
 const { Command, categories } = require("../utils/classes/Command");
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders");
 
@@ -31,6 +31,8 @@ async function run(message, args) {
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
     }
+
+    if (!userExists(message.member)) createUser(message.member)
 
     let currentXp = getXp(message.member), neededXp = getPrestigeRequirement(message.member)
     let currentBal = getBankBalance(message.member), neededBal = getPrestigeRequirementBal(neededXp)
