@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { getMember } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -29,37 +29,37 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (args.length == 0) {
         return message.channel.send(new ErrorEmbed("$ddos <user>"))
     }
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0]);
+            member = getMember(message, args[0])
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
     const port = `${randPort()}`
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 5000);
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     const embed = new CustomEmbed(message.member, true, member.user.toString() + "\n\n" +
         "**ip** *obtaining..*" + "\n" +

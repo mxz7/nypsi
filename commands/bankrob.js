@@ -44,7 +44,7 @@ async function run(message, args) {
     if (args[0] == "status") {
         let bankList = ""
 
-        for (bank1 of bankWorth.keys()) {
+        for (const bank1 of bankWorth.keys()) {
             bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
         }
 
@@ -73,14 +73,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 600000);
+        cooldown.delete(message.author.id)
+    }, 600000)
 
     const banks = ["barclays", "santander", "bankofamerica", "lloyds", "hsbc", "fleeca", "mazebank"]
 

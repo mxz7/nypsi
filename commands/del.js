@@ -1,8 +1,8 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATION).setAliases(["purge"]).setPermissions(["MANAGE_MESSAGES"])
 
@@ -32,11 +32,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed("$del <amount> (@user)"));
+        return message.channel.send(new ErrorEmbed("$del <amount> (@user)"))
     }
 
     let amount = parseInt(args[0])
@@ -47,11 +47,11 @@ async function run(message, args) {
         if (amount > 100) {
             amount = 100
         }
-        cooldown.set(message.member.id, new Date());
+        cooldown.set(message.member.id, new Date())
 
         setTimeout(() => {
-            cooldown.delete(message.author.id);
-        }, 30000);
+            cooldown.delete(message.author.id)
+        }, 30000)
     }
     
     if (message.mentions.members.first()) {
@@ -61,10 +61,8 @@ async function run(message, args) {
         const collected = await message.channel.messages.fetch({limit: 100})
 
         const collecteda = collected.filter(msg => {
-            if (!msg.member) {
-            } else {
-                return msg.member.user.id == target.user.id
-            }
+            if (!msg.author) return
+            return msg.author.id == target.user.id
         })
 
         if (collecteda.size == 0) {
@@ -73,7 +71,7 @@ async function run(message, args) {
 
         let count = 0
 
-        for (msg of collecteda.array()) {
+        for (let msg of collecteda.array()) {
             if (count >= amount) {
                 await collecteda.delete(msg.id)
             } else {
@@ -161,7 +159,7 @@ module.exports = cmd
 
 function timeSince(date) {
 
-    const ms = Math.floor((new Date() - date));
+    const ms = Math.floor((new Date() - date))
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 

@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("evaluate", "evaluate code", categories.NONE).setAliases(["eval"]).setPermissions(["bot owner"])
 

@@ -1,8 +1,8 @@
-const { Message } = require("discord.js");
-const { hasGuild, createGuild, getChristmasCountdown, getPrefix, setChristmasCountdown, checkChristmasCountdown, hasChristmasCountdown, createNewChristmasCountdown } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders");
-const { daysUntilChristmas } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { hasGuild, createGuild, getChristmasCountdown, getPrefix, setChristmasCountdown, checkChristmasCountdown, hasChristmasCountdown, createNewChristmasCountdown } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { daysUntilChristmas } = require("../utils/utils")
 
 const cmd = new Command("christmascountdown", "create a christmas countdown", categories.FUN).setAliases(["christmas", "xmas"]).setPermissions(["MANAGE_SERVER"])
 

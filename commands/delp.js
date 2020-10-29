@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -30,7 +30,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (args.length == 0) {
@@ -40,7 +40,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}delp <amount>`));
+        return message.channel.send(new ErrorEmbed(`${prefix}delp <amount>`))
     }
 
     let amount = parseInt(args[0])
@@ -55,11 +55,11 @@ async function run(message, args) {
                 amount = 50
             }
         }
-        cooldown.set(message.member.id, new Date());
+        cooldown.set(message.member.id, new Date())
 
         setTimeout(() => {
-            cooldown.delete(message.author.id);
-        }, 30000);
+            cooldown.delete(message.author.id)
+        }, 30000)
     }
 
     if (amount > 100) amount = 100
@@ -70,10 +70,8 @@ async function run(message, args) {
         const collected = await message.channel.messages.fetch({limit: 50})
 
         const collecteda = collected.filter(msg => {
-            if (!msg.member) {
-            } else {
-                return msg.member.user.id == "672793821850894347"
-            }
+            if (!msg.author) return
+            return msg.author.id == "672793821850894347"
         })
 
         return await message.channel.bulkDelete(collecteda)
@@ -86,10 +84,8 @@ async function run(message, args) {
     }
     
     const collecteda = collected.filter(msg => {
-        if (!msg.member) {
-        } else {
-            return msg.member.user.id == message.member.user.id
-        }
+        if (!msg.author) return
+        return msg.author.id == message.author.id
     })
 
 
@@ -99,7 +95,7 @@ async function run(message, args) {
 
     let count = 0
 
-    for (msg of collecteda.array()) {
+    for (let msg of collecteda.array()) {
         if (count >= amount) {
             await collecteda.delete(msg.id)
         } else {

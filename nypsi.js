@@ -1,15 +1,15 @@
 const startUp = Date.now()
 
-const Discord = require("discord.js");
-const { MessageEmbed } = require("discord.js");;
-const client = new Discord.Client();
-const { token } = require("./config.json");
+const Discord = require("discord.js")
+const { MessageEmbed } = require("discord.js")
+const client = new Discord.Client()
+const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { getTimestamp, daysUntilChristmas } = require("./utils/utils");
-const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils");
+const { getTimestamp, daysUntilChristmas } = require("./utils/utils")
+const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils")
 
 const snipe = new Map()
 const eSnipe = new Map()
@@ -22,7 +22,7 @@ loadCommands()
 
 client.once("ready", async () => {
     const games = ["$help | nypsi.xyz", "$help | tekoh.wtf", "$help | nypsi.xyz",
-    "have you joined the $support server?", "x0x", "xmas"]
+        "have you joined the $support server?", "x0x", "xmas"]
 
     setTimeout(async () => {
         const a = await getRandomCommand()
@@ -30,7 +30,7 @@ client.once("ready", async () => {
         let game = games[Math.floor(Math.random() * games.length)]
 
         if (game == "x0x") {
-            game = `\$${a.name} - ${a.description}`
+            game = `$${a.name} - ${a.description}`
         } else if (game == "xmas") {
             game = `🎅 ${daysUntilChristmas()} days until christmas`
         }
@@ -49,7 +49,7 @@ client.once("ready", async () => {
         let game = games[Math.floor(Math.random() * games.length)]
 
         if (game == "x0x") {
-            game = `\$${a.name} - ${a.description}`
+            game = `$${a.name} - ${a.description}`
         } else if (game == "xmas") {
             game = `${daysUntilChristmas()} days until christmas`
         }
@@ -78,15 +78,15 @@ client.once("ready", async () => {
     console.log("user count: " + memberCount.toLocaleString())
     console.log("commands count: " + commandsSize)
     console.log("users in currency: " + getUserCount())
-    console.log("--bot summary--\n");
+    console.log("--bot summary--\n")
 
-    console.log("logged in as " + client.user.tag + " @ " + getTimestamp());
+    console.log("logged in as " + client.user.tag + " @ " + getTimestamp())
 
     const now = Date.now()
     const timeTaken = (now - startUp) / 1000
 
     console.log(`time taken: ${timeTaken}s\n`)
-});
+})
 
 client.on("guildCreate", guild => {
     console.log("\x1b[36m[" + getTimestamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
@@ -136,7 +136,7 @@ client.on("messageDelete", message => {
         const c = b.split("|").join("")
         const d = c.split("_").join("")
 
-        for (word of filter) {
+        for (let word of filter) {
             if (d.includes(word.toLowerCase())) return
         }
 
@@ -162,7 +162,7 @@ client.on("messageUpdate", message => {
         const c = b.split("|").join("")
         const d = c.split("_").join("")
 
-        for (word of filter) {
+        for (let word of filter) {
             if (d.includes(word.toLowerCase())) return
         }
 
@@ -176,7 +176,7 @@ client.on("message", async message => {
 
     if (!ready) return
 
-    if (message.author.bot) return;
+    if (message.author.bot) return
 
     if (!message.guild) {
         console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
@@ -196,14 +196,14 @@ client.on("message", async message => {
         return message.channel.send(`my prefix for this server is \`${prefix}\``)
     }
 
-    if (!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(prefix)) return
 
-    const args = message.content.substring(prefix.length).split(" ");
+    const args = message.content.substring(prefix.length).split(" ")
 
-    const cmd = args[0].toLowerCase();
+    const cmd = args[0].toLowerCase()
 
-    return runCommand(cmd, message, args);
-});
+    return runCommand(cmd, message, args)
+})
 
 client.on("channelCreate", async ch => {
     if (!ch.guild) return
@@ -269,12 +269,12 @@ async function runChecks() {
         setInterval(async () => {
             client.guilds.cache.forEach(async guild => {
                 if (hasChristmasCountdownEnabled(guild))
-                await checkChristmasCountdown(guild)
+                    await checkChristmasCountdown(guild)
             })
         }, 86400000)
         client.guilds.cache.forEach(async guild => {
             if (hasChristmasCountdownEnabled(guild))
-            await checkChristmasCountdown(guild)
+                await checkChristmasCountdown(guild)
         })
     }, needed - now)
 

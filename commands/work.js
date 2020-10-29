@@ -1,9 +1,9 @@
 const { workMessages } = require("../lists.json")
 const { getColor } = require("../utils/utils")
 const { getBalance, updateBalance, userExists, createUser } = require("../economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders");
+const { MessageEmbed, Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
@@ -31,7 +31,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -44,11 +44,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 1800000);
+    }, 1800000)
 
     let earnedMax = 14
 

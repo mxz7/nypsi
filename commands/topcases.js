@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
-const { profileExists, getAllCases } = require("../moderation/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { profileExists, getAllCases } = require("../moderation/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 
@@ -35,7 +35,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const cases = getAllCases(message.guild)
@@ -45,7 +45,7 @@ async function run(message, args) {
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000);
+    }, 5000)
 
     const embed = new CustomEmbed(message.member, true)
         .setTitle("top cases | " + message.member.user.username)
@@ -58,7 +58,7 @@ async function run(message, args) {
 
         let deletedCaseCount = 0
 
-        for (case0 of cases) {
+        for (let case0 of cases) {
             if (case0.deleted) {
                 deletedCaseCount++
                 continue
@@ -80,11 +80,11 @@ async function run(message, args) {
         const staff = []
         const members = []
 
-        for (s of topStaff.keys()) {
+        for (let s of topStaff.keys()) {
             staff.push(s)
         }
 
-        for (m of topMembers.keys()) {
+        for (let m of topMembers.keys()) {
             members.push(m)
         }
 
@@ -101,7 +101,7 @@ async function run(message, args) {
 
         let count = 0
 
-        for (s of staff) {
+        for (let s of staff) {
             if (count >= 5) break
 
             staffText[count] = (count + 1) + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
@@ -111,7 +111,7 @@ async function run(message, args) {
 
         count = 0
 
-        for (m of members) {
+        for (let m of members) {
             if (count >= 5) break
 
             let username = await message.guild.members.cache.find(mem => mem.id == m)
@@ -148,7 +148,6 @@ async function run(message, args) {
                 member = members.find(m => m.user.id == args[0])
 
                 if (!member) {
-                    unknownMember = true
                     member = args[0]
                 }
             } else {
@@ -173,7 +172,7 @@ async function run(message, args) {
         let unbans = 0
         let unmutes = 0
 
-        for (case0 of cases) {
+        for (let case0 of cases) {
             if (case0.moderator == member.user.tag) {
                 if (case0.deleted) {
                     deletedCasesModerator++
@@ -181,24 +180,24 @@ async function run(message, args) {
                     punished++
 
                     switch (case0.type) {
-                        case "mute":
-                            mutes++
-                            break
-                        case "ban":
-                            bans++
-                            break
-                        case "kick":
-                            kicks++
-                            break
-                        case "warn":
-                            warns++
-                            break
-                        case "unban":
-                            unbans++
-                            break
-                        case "unmute":
-                            unmutes++
-                            break
+                    case "mute":
+                        mutes++
+                        break
+                    case "ban":
+                        bans++
+                        break
+                    case "kick":
+                        kicks++
+                        break
+                    case "warn":
+                        warns++
+                        break
+                    case "unban":
+                        unbans++
+                        break
+                    case "unmute":
+                        unmutes++
+                        break
                     }
                 }
             } else if (case0.user == member.user.id) {

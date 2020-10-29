@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -11,20 +11,20 @@ const cmd = new Command("spotify", "show information about what you're playing o
  */
 async function run(message, args) {
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args.join(" "));
+            member = getMember(message, args.join(" "))
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (member.presence.activities.length < 1) {
@@ -33,7 +33,7 @@ async function run(message, args) {
 
     let activity
 
-    for (a of member.presence.activities) {
+    for (let a of member.presence.activities) {
         if (a.name.toLowerCase() == "spotify") {
             activity = a
             break
@@ -74,7 +74,7 @@ function getTime(ms) {
 
     if (sec.toString().length == 1) sec = `0${sec}`
 
-    output = `${minutes}:${sec}`
+    const output = `${minutes}:${sec}`
 
     return output
 }

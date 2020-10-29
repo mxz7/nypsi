@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const { profileExists, createProfile, newCase, newMute, isMuted, deleteMute } = require("../moderation/utils")
-const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getExactMember } = require("../utils/utils");
+const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getExactMember } = require("../utils/utils")
 
 const cmd = new Command("mute", "mute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -113,7 +113,7 @@ async function run(message, args) {
 
     let fail = false
 
-    for (member of members.keyArray()) {
+    for (let member of members.keyArray()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -141,7 +141,7 @@ async function run(message, args) {
 
     if (timedMute && time < 600) {
         setTimeout( async () => {
-            for (member of members.keyArray()) {
+            for (let member of members.keyArray()) {
                 await members.get(member).roles.remove(muteRole).catch()
             }
         }, time * 1000)
@@ -174,7 +174,7 @@ async function run(message, args) {
 
     if (failed.length != 0) {
         const failedTags = []
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -201,7 +201,7 @@ async function run(message, args) {
     const members1 = members.keyArray()
 
     if (failed.length != 0) {
-        for (fail1 of failed) {
+        for (let fail1 of failed) {
             if (members1.includes(fail1.id)) {
                 members1.splice(members1.indexOf(fail1.id), 1)
             }
@@ -210,7 +210,7 @@ async function run(message, args) {
 
     newCase(message.guild, "mute", members1, message.author.tag, storeReason)
 
-    for (m of members1) {
+    for (let m of members1) {
         if (isMuted(message.guild, members.get(m))) {
             deleteMute(message.guild, members.get(m))
         }
@@ -224,7 +224,7 @@ async function run(message, args) {
         newMute(message.guild, members1, 9999999999999)
     }
 
-    for (m of members1) {
+    for (let m of members1) {
         m = members.get(m)
         if (!timedMute) {
             const embed = new CustomEmbed(m)

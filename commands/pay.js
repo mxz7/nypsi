@@ -1,13 +1,13 @@
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const tax = 0.15
 
-const cooldown = new Map();
+const cooldown = new Map()
 
 const cmd = new Command("pay", "give other users money", categories.MONEY)
 
@@ -33,7 +33,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -47,7 +47,7 @@ async function run(message, args) {
         return message.channel.send(embed)
     }
 
-    let target = message.mentions.members.first();
+    let target = message.mentions.members.first()
 
     if (!target) {
         target = getMember(message, args[0])
@@ -95,11 +95,11 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
 
     if (getBalance(message.member) >= 250000 || getBalance(target) >= 250000 || getBankBalance(message.member) >= 250000 || getBankBalance(target) >= 250000) {

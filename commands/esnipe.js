@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("esnipe", "snipe the most recently edited message", categories.FUN).setAliases(["es"])
@@ -32,7 +32,7 @@ async function run(message, args) {
 
     if (content) {
         if (eSnipe.get(channel.id).attachments.url) {
-            content = snipe.get(channel).attachments.url
+            content = eSnipe.get(channel).attachments.url
         }
     }
 
@@ -55,7 +55,7 @@ module.exports = cmd
 
 function timeSince(date) {
 
-    const ms = Math.floor((new Date() - date));
+    const ms = Math.floor((new Date() - date))
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)

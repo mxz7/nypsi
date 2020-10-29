@@ -1,11 +1,11 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
-const fs = require("fs");
-const { Message } = require("discord.js");;
-const { getPrefix } = require("../guilds/utils.js");
-const { Command, categories } = require("./classes/Command");
-const { CustomEmbed } = require("./classes/EmbedBuilders.js");
-const { getTimestamp } = require("./utils.js");
+const fs = require("fs")
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils.js")
+const { Command, categories } = require("./classes/Command")
+const { CustomEmbed } = require("./classes/EmbedBuilders.js")
+const { getTimestamp } = require("./utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -14,32 +14,32 @@ const cooldown = new Set()
 
 function loadCommands() {
     console.log(`[${getTimestamp()}] loading commands..`)
-    const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"));
+    const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"))
     const failedTable = []
 
     if (commands.size > 0) {
-        for (command of commands.keys()) {
+        for (let command of commands.keys()) {
             delete require.cache[require.resolve(`../commands/${command}.js`)]
         }
         commands.clear()
     }
 
-    for (file of commandFiles) {
+    for (let file of commandFiles) {
         let command
         
         try {
-            command = require(`../commands/${file}`);
+            command = require(`../commands/${file}`)
 
-            let enabled = true;
+            let enabled = true
         
             if (!command.name || !command.description || !command.run || !command.category) {
-                enabled = false;
+                enabled = false
             }
 
             if (enabled) {
-                commands.set(command.name, command);
+                commands.set(command.name, command)
                 if (command.aliases) {
-                    for (a of command.aliases) {
+                    for (let a of command.aliases) {
                         aliases.set(a, command.name)
                     }
                 }
@@ -69,7 +69,7 @@ function loadCommands() {
 function reloadCommand(commandsArray) {
     const reloadTable = []
 
-    for (cmd of commandsArray) {
+    for (let cmd of commandsArray) {
         try {
             commands.delete(cmd)
             if (aliases.has(cmd)) {
@@ -81,18 +81,18 @@ function reloadCommand(commandsArray) {
                 return console.log("error deleting from cache")
             }
             
-            const commandData = require(`../commands/${cmd}`);
+            const commandData = require(`../commands/${cmd}`)
         
-            let enabled = true;
+            let enabled = true
             
             if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
-                enabled = false;
+                enabled = false
             }
             
             if (enabled) {
-                commands.set(commandData.name, commandData);
+                commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
-                    for (a of commandData.aliases) {
+                    for (let a of commandData.aliases) {
                         aliases.set(a, commandData.name)
                     }
                 }
@@ -119,13 +119,13 @@ function reloadCommand(commandsArray) {
  * @param {Array<String>} args 
  */
 async function helpCmd(message, args) {
-    logCommand(message, args);
+    logCommand(message, args)
 
     const helpCategories = new Map()
 
     const prefix = getPrefix(message.guild)
 
-    for (cmd of commands.keys()) {
+    for (let cmd of commands.keys()) {
         const category = getCmdCategory(cmd)
 
         if (helpCategories.has(category)) {
@@ -334,12 +334,18 @@ function runCommand(cmd, message, args) {
                     setTimeout(() => {
                         try {
                             xpCooldown.delete(message.author.id)
-                        } catch {}
+                        } catch {
+                            console.log("error deleting from xpCooldown")
+                        }
                     }, 120000)
                 }
-            } catch {}
+            } catch (e) {
+                console.log(e)
+            }
         }, 10000)
-    } catch {}
+    } catch (e) {
+        console.log(e)
+    }
 }
 
 /**
@@ -361,15 +367,15 @@ exports.runCommand = runCommand
 exports.commandExists = commandExists
 
 function getCmdName(cmd) {
-    return commands.get(cmd).name;
+    return commands.get(cmd).name
 }
 
 function getCmdDesc(cmd) {
-    return commands.get(cmd).description;
+    return commands.get(cmd).description
 }
 
 function getCmdCategory(cmd) {
-    return commands.get(cmd).category;
+    return commands.get(cmd).category
 }
 
 async function getRandomCommand() {
@@ -395,7 +401,7 @@ exports.getRandomCommand = getRandomCommand
  * @param {String} commandName
  */
 function logCommand(message, args) {
-    args.shift();
+    args.shift()
 
     const server = message.guild.name
 
@@ -408,5 +414,5 @@ function logCommand(message, args) {
     const msg = `\x1b[33m[${getTimestamp()}] ~ ['${message.guild.name}' (${message.guild.id})]\n` +
         `   \x1b[33m- ['${message.author.tag}' (${message.author.id})]: ${content}\x1b[37m`
 
-    console.log(msg);
+    console.log(msg)
 }

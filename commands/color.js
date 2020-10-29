@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -21,9 +21,9 @@ async function run(message, args) {
     if (args.length != 0) {
 
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0]);
+            member = getMember(message, args[0])
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
 
         if (!member) {

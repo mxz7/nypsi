@@ -1,9 +1,9 @@
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { profileExists, profileExistsID, createProfile, getProfile, getProfileID, updateProfile } = require("../socials/utils");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { profileExists, profileExistsID, createProfile, getProfile, getProfileID, updateProfile } = require("../socials/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
 const cooldown = new Map()
@@ -32,14 +32,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.user.id, new Date());
+    cooldown.set(message.member.user.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 3000);
+        cooldown.delete(message.author.id)
+    }, 3000)
     
     const prefix = getPrefix(message.guild)
 
@@ -50,12 +50,12 @@ async function run(message, args) {
             if (!message.mentions.members.first()) {
                 member = getMember(message, args[0])
             } else {
-                member = message.mentions.members.first();
+                member = message.mentions.members.first()
             }
         }
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("invalid user"));
+            return message.channel.send(new ErrorEmbed("invalid user"))
         }
 
         if (!profileExists(member)) {
@@ -79,7 +79,7 @@ async function run(message, args) {
             if (profile.youtube.length != 0) {
                 const links = []
 
-                for (l of profile.youtube) {
+                for (let l of profile.youtube) {
                     const username = l.split(" | ")[0]
                     const url = l.split(" | ")[1]
 
@@ -92,7 +92,7 @@ async function run(message, args) {
             if (profile.twitter.length != 0) {
                 const links = []
 
-                for (l of profile.twitter) {
+                for (let l of profile.twitter) {
                     const username = l.split(" | ")[0]
                     const url = l.split(" | ")[1]
 
@@ -105,7 +105,7 @@ async function run(message, args) {
             if (profile.instagram.length != 0) {
                 const links = []
 
-                for (l of profile.instagram) {
+                for (let l of profile.instagram) {
                     const username = l.split(" | ")[0]
                     const url = l.split(" | ")[1]
 
@@ -118,7 +118,7 @@ async function run(message, args) {
             if (profile.snapchat.length != 0) {
                 const links = []
 
-                for (l of profile.snapchat) {
+                for (let l of profile.snapchat) {
                     const username = l.split(" | ")[0]
                     const url = l.split(" | ")[1]
 
@@ -131,7 +131,7 @@ async function run(message, args) {
             if (profile.email.length != 0) {
                 const links = []
 
-                for (l of profile.email) {
+                for (let l of profile.email) {
                     links.push(l)
                 }
 
@@ -166,51 +166,51 @@ async function run(message, args) {
             const profile = getProfile(message.member)
 
             switch (args[0].toLowerCase()) {
-                case "youtube":
-                    if (profile.youtube.length > 0) {
-                        return message.channel.send(new ErrorEmbed("you already have the maximum amount of youtube accounts added (1)"))
+            case "youtube":
+                if (profile.youtube.length > 0) {
+                    return message.channel.send(new ErrorEmbed("you already have the maximum amount of youtube accounts added (1)"))
+                }
+                if (args.length != 4) {
+                    return message.channel.send(new ErrorEmbed("you must include a URL with youtube: $socials youtube add <username> <url>"))
+                } else {
+                    if (!args[3].toLowerCase().includes("https://youtube.com/") && !args[3].toLowerCase().includes("https://www.youtube.com")) {
+                        return message.channel.send(new ErrorEmbed("invalid youtube url"))
                     }
-                    if (args.length != 4) {
-                        return message.channel.send(new ErrorEmbed("you must include a URL with youtube: $socials youtube add <username> <url>"))
-                    } else {
-                        if (!args[3].toLowerCase().includes("https://youtube.com/") && !args[3].toLowerCase().includes("https://www.youtube.com")) {
-                            return message.channel.send(new ErrorEmbed("invalid youtube url"))
-                        }
                     
-                        if (args[3].toLowerCase().includes(".com/logout")) {
-                            return message.channel.send(new ErrorEmbed("invalid youtube url"))
-                        }
+                    if (args[3].toLowerCase().includes(".com/logout")) {
+                        return message.channel.send(new ErrorEmbed("invalid youtube url"))
                     }
-                    break
-                case "twitter":
-                    if (profile.twitter.length > 1) {
-                        return message.channel.send(new ErrorEmbed("you already have the maximum amount of twitter accounts added (2)"))
-                    }
-                    break
-                case "instagram":
-                    if (profile.instagram.length > 1) {
-                        return message.channel.send(new ErrorEmbed("you already have the maximum amount of instagram accounts added (2)"))
-                    }
-                    break
-                case "snapchat":
-                    if (profile.snapchat.length > 0) {
-                        return message.channel.send(new ErrorEmbed("you already have the maximum amount of snapchat accounts added (1)"))
-                    }
-                    break
-                case "email":
-                    if (profile.email.length > 0) {
-                        return message.channel.send(new ErrorEmbed("you already have the maximum amount of emails added (1)"))
-                    }
+                }
+                break
+            case "twitter":
+                if (profile.twitter.length > 1) {
+                    return message.channel.send(new ErrorEmbed("you already have the maximum amount of twitter accounts added (2)"))
+                }
+                break
+            case "instagram":
+                if (profile.instagram.length > 1) {
+                    return message.channel.send(new ErrorEmbed("you already have the maximum amount of instagram accounts added (2)"))
+                }
+                break
+            case "snapchat":
+                if (profile.snapchat.length > 0) {
+                    return message.channel.send(new ErrorEmbed("you already have the maximum amount of snapchat accounts added (1)"))
+                }
+                break
+            case "email":
+                if (profile.email.length > 0) {
+                    return message.channel.send(new ErrorEmbed("you already have the maximum amount of emails added (1)"))
+                }
 
-                    const index = args[2].search(regex)
+                const index = args[2].search(regex)
 
-                    if (index == -1) {
-                        return message.channel.send(new ErrorEmbed("invalid email address"))
-                    }
+                if (index == -1) {
+                    return message.channel.send(new ErrorEmbed("invalid email address"))
+                }
 
-                    if (index != 0) {
-                        args[2] = args[2].substr(index)
-                    }
+                if (index != 0) {
+                    args[2] = args[2].substr(index)
+                }
             }
 
             const username = args[2]
@@ -235,21 +235,21 @@ async function run(message, args) {
             }
 
             switch (args[0].toLowerCase()) {
-                case "youtube":
-                    profile.youtube.push(username + " | " + url)
-                    break
-                case "twitter":
-                    profile.twitter.push(username + " | " + url)
-                    break
-                case "instagram":
-                    profile.instagram.push(username + " | " + url)
-                    break
-                case "snapchat":
-                    profile.snapchat.push(username + " | " + url)
-                    break
-                case "email":
-                    profile.email.push(username)
-                    break
+            case "youtube":
+                profile.youtube.push(username + " | " + url)
+                break
+            case "twitter":
+                profile.twitter.push(username + " | " + url)
+                break
+            case "instagram":
+                profile.instagram.push(username + " | " + url)
+                break
+            case "snapchat":
+                profile.snapchat.push(username + " | " + url)
+                break
+            case "email":
+                profile.email.push(username)
+                break
             }
 
             updateProfile(message.member, profile)
@@ -262,31 +262,31 @@ async function run(message, args) {
             let usernames = []
 
             switch (args[0].toLowerCase()) {
-                case "youtube": 
-                    for (l of profile.youtube) {
-                        usernames.push(l.split(" | ")[0])
-                    }
-                    break
-                case "twitter":
-                    for (l of profile.twitter) {
-                        usernames.push(l.split(" | ")[0])
-                    }
-                    break
-                case "instagram":
-                    for (l of profile.instagram) {
-                        usernames.push(l.split(" | ")[0])
-                    }
-                    break
-                case "snapchat":
-                    for (l of profile.snapchat) {
-                        usernames.push(l.split(" | ")[0])
-                    }
-                    break
-                case "email":
-                    for (l of profile.email) {
-                        usernames.push(l)
-                    }
-                    break
+            case "youtube": 
+                for (let l of profile.youtube) {
+                    usernames.push(l.split(" | ")[0])
+                }
+                break
+            case "twitter":
+                for (let l of profile.twitter) {
+                    usernames.push(l.split(" | ")[0])
+                }
+                break
+            case "instagram":
+                for (let l of profile.instagram) {
+                    usernames.push(l.split(" | ")[0])
+                }
+                break
+            case "snapchat":
+                for (let l of profile.snapchat) {
+                    usernames.push(l.split(" | ")[0])
+                }
+                break
+            case "email":
+                for (let l of profile.email) {
+                    usernames.push(l)
+                }
+                break
             }
 
             if (usernames.indexOf(username) == -1) {
@@ -294,21 +294,21 @@ async function run(message, args) {
             }
 
             switch (args[0].toLowerCase()) {
-                case "youtube":
-                    profile.youtube.splice(usernames.indexOf(username), 1)
-                    break
-                case "twitter":
-                    profile.twitter.splice(usernames.indexOf(username), 1)
-                    break
-                case "instagram":
-                    profile.instagram.splice(usernames.indexOf(username), 1)
-                    break
-                case "snapchat":
-                    profile.snapchat.splice(usernames.indexOf(username), 1)
-                    break
-                case "email":
-                    profile.email.splice(usernames.indexOf(username), 1)
-                    break
+            case "youtube":
+                profile.youtube.splice(usernames.indexOf(username), 1)
+                break
+            case "twitter":
+                profile.twitter.splice(usernames.indexOf(username), 1)
+                break
+            case "instagram":
+                profile.instagram.splice(usernames.indexOf(username), 1)
+                break
+            case "snapchat":
+                profile.snapchat.splice(usernames.indexOf(username), 1)
+                break
+            case "email":
+                profile.email.splice(usernames.indexOf(username), 1)
+                break
             }
 
             return message.channel.send(new CustomEmbed(message.member, false, `✅ removed \`${username}\``))

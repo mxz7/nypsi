@@ -1,8 +1,8 @@
 const { userExists, createUser, getBalance, formatBet, updateBalance, getVoteMulti, updateXp, getXp } = require("../economy/utils")
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js");
-const { getPrefix } = require("../guilds/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 const games = new Map()
@@ -46,7 +46,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
     const prefix = getPrefix(message.guild)
@@ -148,20 +148,20 @@ module.exports = cmd
 function getFront(grid) {
     const gridFront = []
 
-    for (item of grid) {
+    for (let item of grid) {
         switch (item){
-            case "a":
-                gridFront.push(":white_large_square:")
-                break
-            case "b":
-                gridFront.push(":white_large_square:")
-                break
-            case "c":
-                gridFront.push(":blue_square:")
-                break
-            case "x":
-                gridFront.push(":red_square:")
-                break
+        case "a":
+            gridFront.push(":white_large_square:")
+            break
+        case "b":
+            gridFront.push(":white_large_square:")
+            break
+        case "c":
+            gridFront.push(":blue_square:")
+            break
+        case "x":
+            gridFront.push(":red_square:")
+            break
         }
     }
 
@@ -175,7 +175,7 @@ function toTable(grid) {
 
     grid = getFront(grid)
 
-    for (item of grid) {
+    for (let item of grid) {
 
         if (count == 5) {
             count = 0
@@ -183,18 +183,18 @@ function toTable(grid) {
             let emoji
 
             switch (globalCount) {
-                case 1:
-                    emoji = ":two:"
-                    break
-                case 2:
-                    emoji = ":three:"
-                    break
-                case 3:
-                    emoji = ":four:"
-                    break
-                case 4:
-                    emoji = ":five:"
-                    break
+            case 1:
+                emoji = ":two:"
+                break
+            case 2:
+                emoji = ":three:"
+                break
+            case 3:
+                emoji = ":four:"
+                break
+            case 4:
+                emoji = ":five:"
+                break
             }
             globalCount++
 
@@ -213,16 +213,16 @@ function toLocation(coordinate) {
     const number = coordinate.split("")[1]
 
     switch (number) {
-        case "1":
-            return abcde.get(letter)
-        case "2":
-            return abcde.get(letter) + 5
-        case "3":
-            return abcde.get(letter) + 10
-        case "4":
-            return abcde.get(letter) + 15
-        case "5":
-            return abcde.get(letter) + 20
+    case "1":
+        return abcde.get(letter)
+    case "2":
+        return abcde.get(letter) + 5
+    case "3":
+        return abcde.get(letter) + 10
+    case "4":
+        return abcde.get(letter) + 15
+    case "5":
+        return abcde.get(letter) + 20
     }
 }
 
@@ -321,14 +321,14 @@ async function playGame(message, msg) {
         let check = false
         let check1 = false
 
-        for (n of possibleLetters) {
+        for (let n of possibleLetters) {
             if (n == letter) {
                 check = true
                 break
             } 
         }
 
-        for (n of possibleNumbers) {
+        for (let n of possibleNumbers) {
             if (n == number) {
                 check1 = true
                 break
@@ -344,38 +344,38 @@ async function playGame(message, msg) {
     const location = toLocation(response)
 
     switch (grid[location]) {
-        case "b":
-            grid[location] = "x"
-            table = toTable(grid)
-            return lose()
-        case "c":
-            return playGame(message, msg)
-        case "a":
-            grid[location] = "c"
+    case "b":
+        grid[location] = "x"
+        table = toTable(grid)
+        return lose()
+    case "c":
+        return playGame(message, msg)
+    case "a":
+        grid[location] = "c"
 
-            if (win < 1) {
-                win = win + 0.5
-            } else {
-                win++
-            }
+        if (win < 1) {
+            win = win + 0.5
+        } else {
+            win++
+        }
 
-            games.set(message.author.id, {
-                bet: bet,
-                win: win,
-                grid: grid,
-                id: games.get(message.author.id).id,
-                voted: games.get(message.author.id).voted
-            })
+        games.set(message.author.id, {
+            bet: bet,
+            win: win,
+            grid: grid,
+            id: games.get(message.author.id).id,
+            voted: games.get(message.author.id).voted
+        })
 
-            table = toTable(grid)
+        table = toTable(grid)
 
-            embed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
-            embed.addField("your grid", table)
-            embed.addField("help", "type `finish` to stop playing")
+        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
+        embed.addField("your grid", table)
+        embed.addField("help", "type `finish` to stop playing")
 
-            msg.edit(embed)
+        msg.edit(embed)
 
-            return playGame(message, msg)
+        return playGame(message, msg)
     }
 
 }

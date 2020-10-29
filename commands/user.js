@@ -1,6 +1,6 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
-const { getMember, formatDate } = require("../utils/utils");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
+const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(["whois", "who"])
@@ -11,10 +11,10 @@ const cmd = new Command("user", "view info about a user in the server", categori
  */
 async function run(message, args) {
 
-    let member;
+    let member
 
     if (args.length == 0) {
-        member = message.member;
+        member = message.member
     } else {
         if (!message.mentions.members.first()) {
 
@@ -26,9 +26,9 @@ async function run(message, args) {
                 username = username.split("-id ").join("")
             }
 
-            member = getMember(message, username);
+            member = getMember(message, username)
         } else {
-            member = message.mentions.members.first();
+            member = message.mentions.members.first()
         }
         if (args[0] == "-id" && args.length == 1) {
             member = message.member
@@ -36,7 +36,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"));
+        return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
     if (args.join(" ").includes("-id")) {
@@ -62,9 +62,9 @@ async function run(message, args) {
 
     if (joinPos == 0) joinPos = "invalid"
 
-    const joined = formatDate(member.joinedAt);
+    const joined = formatDate(member.joinedAt)
     const daysAgo = timeSince(new Date(member.joinedAt))
-    const created = formatDate(member.user.createdAt);
+    const created = formatDate(member.user.createdAt)
     const roles = member.roles._roles
 
     let rolesText = ""
@@ -97,7 +97,7 @@ module.exports = cmd
 
 function timeSince(date) {
 
-    const ms = Math.floor((new Date() - date));
+    const ms = Math.floor((new Date() - date))
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 

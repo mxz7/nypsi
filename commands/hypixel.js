@@ -1,8 +1,8 @@
-const { Message } = require("discord.js");
+const { Message } = require("discord.js")
 const fetch = require("node-fetch")
-const { hypixel } = require("../config.json");
-const { getPrefix } = require("../guilds/utils");
-const { Command, categories } = require("../utils/classes/Command");
+const { hypixel } = require("../config.json")
+const { getPrefix } = require("../guilds/utils")
+const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -10,7 +10,7 @@ const cache = new Map()
 
 const BASE = 10_000
 const GROWTH = 2_500
-const REVERSE_PQ_PREFIX = -(BASE - 0.5 * GROWTH) / GROWTH;
+const REVERSE_PQ_PREFIX = -(BASE - 0.5 * GROWTH) / GROWTH
 const REVERSE_CONST = REVERSE_PQ_PREFIX * REVERSE_PQ_PREFIX
 const GROWTH_DIVIDES_2 = 2 / GROWTH
 
@@ -32,7 +32,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}h <username>`));
+        return message.channel.send(new ErrorEmbed(`${prefix}h <username>`))
     }
 
     if (cooldown.has(message.member.id)) {
@@ -51,14 +51,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``));
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date());
+    cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 10000);
+        cooldown.delete(message.author.id)
+    }, 10000)
 
     const username = args[0]
     
@@ -74,14 +74,14 @@ async function run(message, args) {
         try {
             uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
         } catch (e) {
-            return message.channel.send(new ErrorEmbed("invalid account"));
+            return message.channel.send(new ErrorEmbed("invalid account"))
         }
 
         const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
 
         try {
             hypixelData = await fetch(hypixelURL).then(hypixelData => hypixelData.json())
-        } catch {
+        } catch (e) {
             console.log(e)
             return await message.channel.send(new ErrorEmbed("error fetching data"))
         }
@@ -194,7 +194,7 @@ function getLevel(exp) {
 }
 
 function timeSince(date) {
-    const ms = Math.floor((new Date() - date));
+    const ms = Math.floor((new Date() - date))
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 

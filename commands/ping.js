@@ -1,5 +1,5 @@
-const { Message } = require("discord.js");
-const { Command, categories } = require("../utils/classes/Command");
+const { Message } = require("discord.js")
+const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("ping", "get ping/latency of the bot and api", categories.INFO).setAliases(["latency"])
