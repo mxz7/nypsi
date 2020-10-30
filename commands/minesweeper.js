@@ -99,6 +99,16 @@ async function run(message, args) {
         cooldown.delete(message.member.id)
     }, 30000)
 
+    setTimeout(() => {
+        if (games.has(message.author.id)) {
+            games.delete(message.author.id)
+            updateBalance(message.member, getBalance(message.member) + bet)
+            if (cooldown.has(message.author.id)) {
+                cooldown.delete(message.author.id)
+            }
+        }
+    }, 180000)
+
     updateBalance(message.member, getBalance(message.member) - bet)
 
     const id = Math.random()
@@ -227,6 +237,9 @@ function toLocation(coordinate) {
 }
 
 async function playGame(message, msg) {
+
+    if (!games.has(message.author.id)) return
+
     const bet = games.get(message.author.id).bet
     let win = games.get(message.author.id).win
     const grid = games.get(message.author.id).grid
