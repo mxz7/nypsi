@@ -98,7 +98,7 @@ async function run(message, args) {
     }, 10000)
 
 
-    if (getBalance(message.member) >= 250000 || getBalance(target) >= 250000 || getBankBalance(message.member) >= 250000 || getBankBalance(target) >= 250000) {
+    if (amount > 250000) {
         taxEnabled = true
         updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
     } else {
