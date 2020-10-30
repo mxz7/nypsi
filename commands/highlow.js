@@ -124,10 +124,12 @@ async function run(message, args) {
 
     setTimeout(() => {
         if (games.has(message.author.id)) {
-            games.delete(message.author.id)
-            updateBalance(message.member, getBalance(message.member) + bet)
-            if (cooldown.has(message.author.id)) {
-                cooldown.delete(message.author.id)
+            if (games.get(message.author.id).id == id) {
+                games.delete(message.author.id)
+                updateBalance(message.member, getBalance(message.member) + bet)
+                if (cooldown.has(message.author.id)) {
+                    cooldown.delete(message.author.id)
+                }
             }
         }
     }, 180000)
