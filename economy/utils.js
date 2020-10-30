@@ -391,6 +391,10 @@ async function topAmount(guild, amount) {
     }
 
     if (!members) members = guild.members.cache
+
+    members = members.filter(m => {
+        return !m.user.bot
+    })
     
     const users1 = []
 
