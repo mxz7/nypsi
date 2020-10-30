@@ -9,3 +9,12 @@ enable max bet calculations globally
 add workers - not as important
 
 finish website
+
+current plans for prestige:
+
+each prestige level:
+
++1% vote bonus
++75k max bet
++1 vote crate on vote (need to add vote crates)
++(prestige level) amount of prestige crates
