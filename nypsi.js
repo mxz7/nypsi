@@ -143,6 +143,7 @@ client.on("messageDelete", message => {
 
         snipe.set(message.channel.id, {
             content: message.content,
+            member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
             channel: {
                 id: message.channel.id
@@ -175,6 +176,7 @@ client.on("messageUpdate", message => {
 
         eSnipe.set(message.channel.id, {
             content: message.content,
+            member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
             channel: {
                 id: message.channel.id

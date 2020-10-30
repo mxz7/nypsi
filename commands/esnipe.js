@@ -37,7 +37,7 @@ async function run(message, args) {
     const created = new Date(eSnipe.get(channel.id).createdTimestamp)
 
     const embed = new CustomEmbed(message.member, false, content)
-        .setTitle(eSnipe.get(channel.id).member.user.tag)
+        .setTitle(eSnipe.get(channel.id).member)
         .setFooter(timeSince(created) + " ago")
     
     message.channel.send(embed)
