@@ -93,7 +93,7 @@ async function run(message, args) {
 
     updateBankBalance(message.member, getBankBalance(message.member) - amount)
 
-    if (amount >= 100000) {
+    if (amount >= 200000) {
         taxEnabled = true
         amount = amount - (amount * tax)
     }
