@@ -124,6 +124,16 @@ async function run(message, args) {
         voted: voteMulti
     })
 
+    setTimeout(() => {
+        if (games.has(message.author.id)) {
+            games.delete(message.author.id)
+            updateBalance(message.member, getBalance(message.member) + bet)
+            if (cooldown.has(message.author.id)) {
+                cooldown.delete(message.author.id)
+            }
+        }
+    }, 180000)
+
     newDealerCard(message.member)
     newCard(message.member)
     newDealerCard(message.member)
@@ -331,6 +341,8 @@ function getDealerCards(member) {
 }
 
 async function playGame(message, m) {
+
+    if (!games.has(message.author.id)) return
 
     let bet = games.get(message.member.user.id).bet
     const first = games.get(message.member.user.id).first
