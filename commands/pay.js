@@ -9,7 +9,7 @@ const tax = 0.15
 
 const cooldown = new Map()
 
-const cmd = new Command("pay", "give other users money", categories.MONEY)
+const cmd = new Command("pay", "give other users money", categories.MONEY).setAliases(["give"])
 
 /**
  * @param {Message} message 
