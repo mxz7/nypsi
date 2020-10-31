@@ -4,7 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("raffle", "select a random user from current online members or a specific role", categories.FUN)
+const cmd = new Command("raffle", "select a random user all server members or from a specific role", categories.FUN)
 
 /**
  * @param {Message} message 
@@ -39,10 +39,11 @@ async function run(message, args) {
 
     let members = []
 
-    if (args.length == 0) {const members1 = message.guild.members.cache
+    if (args.length == 0) {
+        const members1 = message.guild.members.cache
 
         members1.forEach(m => {
-            if (!m.user.bot && m.presence.status != "offline") {
+            if (!m.user.bot) {
                 if (members.indexOf(m.user.id) == -1) {
                     members.push(m.user.id)
                 }
