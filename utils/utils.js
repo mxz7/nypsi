@@ -140,17 +140,25 @@ function getMember(message, memberName) {
             } else {
                 possible.set(0, member)
             }
-        } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
+        } else if (member.user.displayName.toLowerCase() == memberName.toLowerCase()) {
+
             if (member.user.bot) {
                 possible.set(4, member)
             } else {
                 possible.set(1, member)
             }
-        } else if (member.displayName.toLowerCase().includes(memberName.toLowerCase())) {
+
+        } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
             if (member.user.bot) {
                 possible.set(5, member)
             } else {
                 possible.set(2, member)
+            }
+        } else if (member.displayName.toLowerCase().includes(memberName.toLowerCase())) {
+            if (member.user.bot) {
+                possible.set(6, member)
+            } else {
+                possible.set(3, member)
             }
             
         } 
@@ -169,6 +177,8 @@ function getMember(message, memberName) {
             target = possible.get(4)
         } else if (possible.get(5)) {
             target = possible.get(5)
+        } else if (possible.get(6)) {
+            target = possible.get(6)
         } else {
             target = null
         }
