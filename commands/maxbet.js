@@ -40,7 +40,7 @@ async function run(message, args) {
         cooldown.delete(message.member.id)
     }, 5000)
 
-    const maxBet = calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member)
 
     return message.channel.send(new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`))
 }
