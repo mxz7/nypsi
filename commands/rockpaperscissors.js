@@ -175,7 +175,7 @@ async function run(message, args) {
                     "+**" + (voteMulti * 100).toString() + "**% bonus")
 
                 if (bet >= 1000) {
-                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
+                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
                     updateXp(message.member, getXp(message.member) + xpBonus)
                     embed.setFooter("+" + xpBonus + "xp")
                 }
