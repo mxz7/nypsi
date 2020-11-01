@@ -229,7 +229,11 @@ async function getMulti(member) {
 
     let multi = 0
 
-    if (hasVoted(id)) {
+    const voted = await hasVoted(id)
+
+    console.log(voted)
+
+    if (voted) {
         multi += 15
     }
 
