@@ -46,7 +46,7 @@ async function run(message, args) {
         const members1 = message.guild.members.cache
 
         members1.forEach(m => {
-            if (!m.user.bot && m.presence.status != "offline") {
+            if (!m.user.bot) {
                 if (members.indexOf(m.user.id) == -1) {
                     members.push(m.user.id)
                 }
