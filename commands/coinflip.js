@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getXp, updateXp, getMulti, calcMaxBet, getPrestige } = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const Discord = require("discord.js")
@@ -47,10 +47,8 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("coinflip help")
             .addField("usage", `${prefix}coinflip <heads/tails> <bet>`)
-            .addField("help", "with coinflip you can play against the bot or against another user\n" +
-                "when playing against another user they must have enough money for the bet\n" +
-                "when playing against another user you will not receive a 20% vote bonus")
-            .addField("examples", `${prefix}coinflip heads 100\n${prefix}coinflip member tails 500`)
+            .addField("help", "if you win, you will double your bet")
+            .addField("example", `${prefix}coinflip heads 100`)
 
         return message.channel.send(embed)
     }
@@ -89,8 +87,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
-    if (bet > 150000) {
-        return message.channel.send(new ErrorEmbed("maximum bet is $**150k**"))
+    const maxBet = await calcMaxBet(message.member)
+
+    if (bet > maxBet) {
+        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}\nyou can upgrade this by prestiging and voting`))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -116,7 +116,7 @@ async function run(message, args) {
     let voteMulti = 0
 
     if (win) {
-        voteMulti = await getVoteMulti(message.member)
+        voteMulti = await getMulti(message.member)
 
         if (voteMulti > 0) {
             voted = true
@@ -142,10 +142,10 @@ async function run(message, args) {
 
             if (voted) {
                 embed.addField("**winner!!**", "**you win** $" + Math.round(((bet * 2) + ((bet * 2) * voteMulti))).toLocaleString() + "\n" +
-                    "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                    "+**" + (voteMulti * 100).toString() + "**% bonus")
                 
                 if (bet >= 1000) {
-                    const xpBonus = Math.floor(Math.random() * 2) + 1
+                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
                     updateXp(message.member, getXp(message.member) + xpBonus)
                     embed.setFooter("+" + xpBonus + "xp")
                 }

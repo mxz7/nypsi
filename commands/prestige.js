@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser } = require("../economy/utils")
+const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser, getMulti, calcMaxBet } = require("../economy/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
@@ -88,9 +88,12 @@ async function run(message, args) {
         updateXp(message.member, currentXp - neededXp)
         setPrestige(message.member, getPrestige(message.member) + 1)
 
+        const multi = await getMulti(message.member)
+        const maxBet = await calcMaxBet(message.member)
+
         embed.setDescription(`you are now prestige **${getPrestige(message.member)}**\n\n` + 
-            `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}** and **${getPrestige(message.member) + 1}** vote crates\n` +
-            `you have also been given: **${getPrestige(message.member)}** prestige crates`)
+            `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**\n` +
+            `your new multiplier: **${multi}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`)
         await msg.edit(embed)
     }
 
