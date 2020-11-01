@@ -140,7 +140,7 @@ function getMember(message, memberName) {
             } else {
                 possible.set(0, member)
             }
-        } else if (member.user.displayName.toLowerCase() == memberName.toLowerCase()) {
+        } else if (member.displayName.toLowerCase() == memberName.toLowerCase()) {
 
             if (member.user.bot) {
                 possible.set(4, member)
