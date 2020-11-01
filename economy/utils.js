@@ -628,7 +628,7 @@ function getDMsEnabled(member) {
 
     if (!userExists(id)) createUser(id)
 
-    if (users[id].dms == false) {
+    if (users[id].dms == true) {
         return true
     } else {
         return false
