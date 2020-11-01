@@ -92,6 +92,8 @@ async function run(message, args) {
 
     message.channel.send(embed).then(() => {
         message.delete()
+    }).catch((e) => {
+        message.channel.send(new ErrorEmbed(e))
     })
 }
 
