@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
+const { userExists, createUser, getBalance, updateBalance, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -88,8 +88,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
-    if (bet > 100000) {
-        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
+    const maxBet = await calcMaxBet(message.member)
+
+    if (bet > maxBet) {
+        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}\nyou can upgrade this by prestiging and voting`))
     }
 
     if (games.has(message.member.user.id)) {
@@ -111,7 +113,7 @@ async function run(message, args) {
         "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
         "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
 
-    const voteMulti = await getVoteMulti(message.member)
+    const voteMulti = await getMulti(message.member)
     
     games.set(message.member.user.id, {
         bet: bet,
@@ -227,7 +229,7 @@ async function playGame(message, m) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
             if (bet >= 1000) {
-                const xpBonus = Math.floor(Math.random() * 2) + 1
+                const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
                 updateXp(message.member, getXp(message.member) + xpBonus)
                 newEmbed.setFooter("+" + xpBonus + "xp")
             }
@@ -235,7 +237,7 @@ async function playGame(message, m) {
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
                 "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
                 "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
-                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% vote bonus")
+                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% bonus")
         } else {
             newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
                 "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +

@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
-const { getBalance, userExists, getVoteMulti, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp } = require("../economy/utils.js")
+const { getBalance, userExists, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp, hasVoted } = require("../economy/utils.js")
 const { categories, Command } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -50,7 +50,7 @@ async function run(message, args)  {
 
         if (userExists(user)) {
             let voted = false
-            if (await getVoteMulti(user) > 0) voted = true
+            if (await hasVoted(user)) voted = true
             embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
                 "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
                 "**xp** " + getXp(user) + "\n" +
@@ -93,7 +93,7 @@ async function run(message, args)  {
 
         if (userExists(user)) {
             let voted = false
-            if (await getVoteMulti(user) > 0) voted = true
+            if (await hasVoted(user)) voted = true
             embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
                 "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
                 "**xp** " + getXp(user) + "\n" +

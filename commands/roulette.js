@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getVoteMulti, getXp, updateXp } = require("../economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
@@ -98,8 +98,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
     }
 
-    if (bet > 100000) {
-        return message.channel.send(new ErrorEmbed("maximum bet is $**100k**"))
+    const maxBet = await calcMaxBet(message.member)
+
+    if (bet > maxBet) {
+        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}\nyou can upgrade this by prestiging and voting`))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -149,7 +151,7 @@ async function run(message, args) {
     let voteMulti = 0
 
     if (win) {
-        voteMulti = await getVoteMulti(message.member)
+        voteMulti = await getMulti(message.member)
 
         if (voteMulti > 0) {
             voted = true
@@ -175,7 +177,7 @@ async function run(message, args) {
                     "+**" + (voteMulti * 100).toString() + "**% vote bonus")
                 
                 if (bet >= 1000) {
-                    const xpBonus = Math.floor(Math.random() * 2) + 1
+                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
                     updateXp(message.member, getXp(message.member) + xpBonus)
                     embed.setFooter("+" + xpBonus + "xp")
                 }

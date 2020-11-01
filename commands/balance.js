@@ -66,12 +66,10 @@ async function run(message, args) {
         .setFooter(footer)
 
     if (message.member == target) {
-        if (getXp(target) >= getPrestigeRequirement(target) && getBankBalance(target) >= getPrestigeRequirementBal(target)) {
-            return message.channel.send(`${message.member.user.toString()} you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`, embed)
+        if (getXp(target) >= getPrestigeRequirement(target) && getBankBalance(target) >= getPrestigeRequirementBal(getXp(target))) {
+            return message.channel.send(`you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`, embed)
         }
     }
-
-    
 
     return message.channel.send(embed)
 }

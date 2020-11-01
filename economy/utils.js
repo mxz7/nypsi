@@ -7,6 +7,7 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
 const { getTimestamp } = require("../utils/utils")
 const { EconProfile } = require("../utils/classes/EconStorage")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -93,7 +94,6 @@ dbl.webhook.on("ready", hook => {
 })
 
 dbl.webhook.on("vote", vote => {
-    console.log(vote)
     const { onVote } = require("../nypsi")
     onVote(vote)
 })
@@ -107,17 +107,40 @@ async function doVote(client, vote) {
     const { user } = vote
     const members = client.users.cache
 
+    voteCache.set(user, true)
+
+    setTimeout(() => {
+        if (voteCache.has(member.user.id)) {
+            voteCache.delete(member.user.id)
+        }
+    }, 21600000)
+
+    if (!userExists(user)) return
+
     let member = await members.find(m => m.id == user)
 
-    if (!member) member = user
+    let id = false
+    let memberID
 
-    if (!userExists(member)) createUser(member)
+    if (!member) {
+        member = user
+        id = true
+    } else {
+        memberID = member.id
+    }
 
-    const amount = 15000 * (getPrestige(member) + 1)
-    const crateCount = 1 + getPrestige(member)
+    const amount = 15000 * (getPrestige(memberID) + 1)
+    const multi = await getMulti(memberID) * 100
 
-    updateBalance(member, getBalance(member) + amount)
-    //GIVE CRATES
+    updateBalance(memberID, getBalance(memberID) + amount)
+
+    if (!id && getDMsEnabled(memberID)) {
+        const embed = new CustomEmbed().setColor("#5efb8f").setDescription("you have received the following: \n\n" +
+            `+ $**${amount.toLocaleString()}**\n` +
+            `+ **15**% multiplier, total: **${multi}**%`)
+
+        await member.send("thank you for voting!", embed)
+    }
 }
 
 exports.doVote = doVote
@@ -152,50 +175,72 @@ function removeFromVoteCache(member) {
 
 exports.removeFromVoteCache = removeFromVoteCache
 
+async function hasVoted(member) {
+
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (voteCache.has(id)) {
+        return voteCache.get(id)
+    } else {
+        try {
+            const voted = await dbl.hasVoted(id)
+
+            if (voted) {
+                voteCache.set(id, true)
+                setTimeout(() => {
+                    if (voteCache.has(id)) {
+                        voteCache.delete(id)
+                    }
+                }, 900000)
+                return true
+            } else {
+                voteCache.set(id, false)
+                setTimeout(() => {
+                    if (voteCache.has(id)) {
+                        voteCache.delete(id)
+                    }
+                }, 60000)
+                return false
+            }
+        } catch {
+            voteCache.set(id, false)
+            setTimeout(() => {
+                voteCache.delete(id)
+            }, 600000)
+            console.log("[" + getTimestamp() + "] dbl server error - 10 minute cache for " + id)
+            return false
+        }
+    } 
+}
+
+exports.hasVoted = hasVoted
+
 /**
  * @param {GuildMember} member
  * @returns {Number}
  */
-async function getVoteMulti(member) {
-    try {
-        if (voteCache.has(member.user.id)) {
-            if (!voteCache.get(member.user.id)) {
-                voteCache.delete(member.user.id)
-                return 0
-            }
-            return 0.2
-        } 
+async function getMulti(member) {
 
-        const voted = await dbl.hasVoted(member.user.id)
+    let id = member
 
-        if (voted) {
-            voteCache.set(member.user.id, true)
-            setTimeout(() => {
-                if (voteCache.has(member.user.id)) {
-                    voteCache.delete(member.user.id)
-                }
-            }, 900000)
-            return 0.2
-        } else {
-            voteCache.set(member.user.id, false)
-            setTimeout(() => {
-                if (voteCache.has(member.user.id)) {
-                    voteCache.delete(member.user.id)
-                }
-            }, 60000)
-            return 0
-        }
-    } catch {
-        voteCache.set(member.user.id, false)
-        setTimeout(() => {
-            voteCache.delete(member.user.id)
-        }, 600000)
-        console.log("[" + getTimestamp() + "] dbl server error - 10 minute cache for " + member.user.id)
-        return 0
+    if (member.user) id = member.user.id
+
+    let multi = 0
+
+    if (hasVoted(id)) {
+        multi += 0.15
     }
+
+    const prestigeBonus = (getPrestige(member) * 2) / 100
+
+    multi += prestigeBonus
+
+    return multi    
 }
 
-exports.getVoteMulti = getVoteMulti
+exports.getMulti = getMulti
 
 /**
  * @returns {Number}
@@ -544,7 +589,7 @@ exports.setPrestige = setPrestige
  * @param {GuildMember} member 
  */
 function getPrestigeRequirement(member) {
-    const constant = 500
+    const constant = 250
     const extra = getPrestige(member) * constant
 
     return 500 + extra
@@ -570,9 +615,14 @@ exports.getPrestigeRequirementBal = getPrestigeRequirementBal
  * @param {GuildMember} member 
  */
 function getDMsEnabled(member) {
-    if (!userExists(member)) createUser(member)
 
-    if (users[member.user.id].dms) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (!userExists(id)) createUser(id)
+
+    if (users[id].dms == false) {
         return true
     } else {
         return false
@@ -592,10 +642,22 @@ function setDMsEnabled(member, value) {
 
 exports.setDMsEnabled = setDMsEnabled
 
-function calcMaxBet(member) {
+/**
+ * @returns {Number}
+ * @param {Member} member 
+ */
+async function calcMaxBet(member) {
     const base = 100000
+    const voted = await hasVoted(member)
+    const bonus = 75000
 
-    return base + (base * getPrestige(member))
+    let total = base
+
+    if (voted) {
+        total += 50000
+    }
+
+    return total + (bonus * getPrestige(member))
 }
 
 exports.calcMaxBet = calcMaxBet

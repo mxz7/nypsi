@@ -1,5 +1,5 @@
 const { getMember } = require("../utils/utils")
-const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getVoteMulti, getXp, updateXp, getDMsEnabled } = require("../economy/utils.js")
+const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getXp, updateXp, getDMsEnabled, hasVoted } = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -132,9 +132,9 @@ async function run(message, args) {
             embed2.setColor("#5efb8f")
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
 
-            const voted = await getVoteMulti(message.member)
+            const voted = await hasVoted(message.member)
 
-            if (voted > 0) {
+            if (voted) {
                 updateXp(message.member, getXp(message.member) + 1)
                 embed2.setFooter("+1xp")
             }
@@ -146,11 +146,11 @@ async function run(message, args) {
             
             playerCooldown.add(target.user.id)
 
-            const length = Math.floor(Math.random() * 8) + 2
+            const length = Math.floor(Math.random() * 30) + 30
     
             setTimeout(() => {
                 playerCooldown.delete(target.user.id)
-            }, length * 60 * 1000)
+            }, length * 1000)
         } else {
             const amount = (Math.floor(Math.random() * 20) + 5)
             const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
