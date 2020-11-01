@@ -374,7 +374,7 @@ async function playGame(message, m) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
             if (bet >= 1000) {
-                const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
+                const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
                 updateXp(message.member, getXp(message.member) + xpBonus)
                 newEmbed.setFooter("+" + xpBonus + "xp")
             }
