@@ -655,7 +655,7 @@ exports.setDMsEnabled = setDMsEnabled
 async function calcMaxBet(member) {
     const base = 100000
     const voted = await hasVoted(member)
-    const bonus = 75000
+    const bonus = 50000
 
     let total = base
 
