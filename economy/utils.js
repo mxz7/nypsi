@@ -230,14 +230,16 @@ async function getMulti(member) {
     let multi = 0
 
     if (hasVoted(id)) {
-        multi += 0.15
+        multi += 15
     }
 
-    const prestigeBonus = (getPrestige(member) * 2) / 100
+    const prestigeBonus = (getPrestige(member) * 2)
 
     multi += prestigeBonus
 
-    return multi    
+    multi = multi / 100
+
+    return multi
 }
 
 exports.getMulti = getMulti
