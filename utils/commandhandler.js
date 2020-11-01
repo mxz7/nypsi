@@ -337,7 +337,7 @@ function runCommand(cmd, message, args) {
                         } catch {
                             console.log("error deleting from xpCooldown")
                         }
-                    }, 120000)
+                    }, 60000)
                 }
             } catch (e) {
                 console.log(e)
