@@ -182,7 +182,7 @@ async function run(message, args) {
         if (win) {
             if (voted) {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
-                    "+**" + (voteMulti * 100).toString() + "**% vote bonus")
+                    "+**" + (voteMulti * 100).toString() + "**% bonus")
                     
                 if (bet >= 1000) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
