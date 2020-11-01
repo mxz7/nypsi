@@ -1,18 +1,19 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const { redditImage } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
+const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("boob", "get a random boob image", categories.NSFW).setAliases(["boobs", "boobies", "tits", "titties", "booby", "boobie"])
+const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN)
 
 /**
  * @param {Message} message 
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -29,18 +30,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
-    }
-
-    if (!message.channel.nsfw) {
-        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
-    }
-
-    const { boobCache } = require("../utils/imghandler")
-
-    if (boobCache.size <= 2) {
-        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
     }
 
     cooldown.set(message.member.id, new Date())
@@ -49,36 +39,65 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const boobLinks = Array.from(boobCache.keys())
+    let member
 
-    const subredditChoice = boobLinks[Math.floor(Math.random() * boobLinks.length)]
+    if (args.length == 0) {
+        member = message.member
+    } else {
+        if (!message.mentions.members.first()) {
+            member = getMember(message, args[0])
+        } else {
+            member = message.mentions.members.first()
+        }
 
-    const allowed = boobCache.get(subredditChoice)
-
-    const chosen = allowed[Math.floor(Math.random() * allowed.length)]
-
-    const a = await redditImage(chosen, allowed)
-
-    if (a == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find boob image"))
+        if (!member) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
     }
 
-    const image = a.split("|")[0]
-    const title = a.split("|")[1]
-    let url = a.split("|")[2]
-    const author = a.split("|")[3]
+    
+    const letters = ["AA", "A", "B", "C", "D", "DD"]
 
-    url = "https://reddit.com" + url
+    let sizeMsg = ""
+    let sizeEmoji = ""
 
-    const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
+    if (cache.has(member.user.id)) {
+        sizeMsg = cache.get(member.user.id).msg
+        sizeEmoji = cache.get(member.user.id).emoji
+    } else {
+        let size
+
+        size = Math.floor(Math.random() * 18) + 30
+
+        const index = Math.floor(Math.random() * letters.length)
+
+        let letter = letters[index]
+
+        if (index > 4) {
+            sizeEmoji = "🍈"
+        } else if (index > 2) {
+            sizeEmoji = "🍒"
+        } else {
+            sizeEmoji = "🥞"
+        }
+
+        sizeMsg = `${size}${letter}`
+        
+        cache.set(member.user.id, {
+            msg: sizeMsg,
+            emoji: sizeEmoji
+        })
+
+        setTimeout(() => {
+            cache.delete(member.user.id)
+        }, 60000)
+    }
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle(title)
-        .setHeader("u/" + author + " | r/" + subreddit)
-        .setURL(url)
-        .setImage(image)
-
-    message.channel.send(embed)
+        .setTitle("boob calculator")
+        .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
+    
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)
