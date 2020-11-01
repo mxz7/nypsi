@@ -84,7 +84,6 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`)
         .setTitle("pp predictor 1337")
-        .setDescription(member.user.toString() + "\n" + sizeMsg + "\n📏 " + size + " inches")
     
     return message.channel.send(embed)
 }
