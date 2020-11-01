@@ -326,10 +326,10 @@ function runCommand(cmd, message, args) {
     
         setTimeout(() => {
             try {
-                if (!xpCooldown.has(message.member.user.id)) {
+                if (!xpCooldown.has(message.author.id)) {
                     updateXp(message.member, getXp(message.member) + 1)
             
-                    xpCooldown.add(message.member.user.id)
+                    xpCooldown.add(message.author.id)
             
                     setTimeout(() => {
                         try {
