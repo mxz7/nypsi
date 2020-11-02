@@ -110,8 +110,8 @@ async function doVote(client, vote) {
     voteCache.set(user, true)
 
     setTimeout(() => {
-        if (voteCache.has(member.user.id)) {
-            voteCache.delete(member.user.id)
+        if (voteCache.has(user)) {
+            voteCache.delete(user)
         }
     }, 21600000)
 
