@@ -83,10 +83,10 @@ async function run(message, args) {
 
         sizeMsg = `${size}${letter}`
         
-        //cache.set(member.user.id, {
-        //    msg: sizeMsg,
-        //    emoji: sizeEmoji
-        //})
+        cache.set(member.user.id, {
+            msg: sizeMsg,
+            emoji: sizeEmoji
+        })
 
         setTimeout(() => {
             cache.delete(member.user.id)
