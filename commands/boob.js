@@ -67,7 +67,7 @@ async function run(message, args) {
     } else {
         let size
 
-        size = Math.floor(Math.random() * 18) + 30
+        size = (Math.floor(Math.random() * 9) * 2) + 30
 
         const index = Math.floor(Math.random() * letters.length)
 
@@ -83,10 +83,10 @@ async function run(message, args) {
 
         sizeMsg = `${size}${letter}`
         
-        cache.set(member.user.id, {
-            msg: sizeMsg,
-            emoji: sizeEmoji
-        })
+        //cache.set(member.user.id, {
+        //    msg: sizeMsg,
+        //    emoji: sizeEmoji
+        //})
 
         setTimeout(() => {
             cache.delete(member.user.id)
