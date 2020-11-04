@@ -97,6 +97,7 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 10000)
 
+    updateBalance(message.member, getBalance(message.member) - amount)
 
     if (amount > 250000) {
         taxEnabled = true
@@ -104,8 +105,6 @@ async function run(message, args) {
     } else {
         updateBalance(target, getBalance(target) + amount)
     }
-    
-    updateBalance(message.member, getBalance(message.member) - amount)
 
     const embed = new CustomEmbed(message.member)
         .setTitle("processing payment..")
