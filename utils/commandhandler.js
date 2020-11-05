@@ -407,12 +407,11 @@ function logCommand(message, args) {
 
     let content = message.content
 
-    if (content.length > 75) {
+    if (content.length > 100) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `\x1b[33m[${getTimestamp()}] ~ ['${message.guild.name}' (${message.guild.id})]\n` +
-        `   \x1b[33m- ['${message.author.tag}' (${message.author.id})]: ${content}\x1b[37m`
+    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${message.author.tag}: '${content}'`
 
     console.log(msg)
 }
