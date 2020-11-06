@@ -445,6 +445,27 @@ async function checkChristmasCountdown(guild) {
 
 exports.checkChristmasCountdown = checkChristmasCountdown
 
+/**
+ * @param {Guild} guild get snipe filter
+ * @returns {Array<String>}
+ */
+function getChatFilter(guild) {
+    return guilds[guild.id].chatFilter
+}
+
+exports.getChatFilter = getChatFilter
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Array<String>} array 
+ */
+function updateChatFilter(guild, array) {
+    guilds[guild.id].chatFilter = array
+}
+
+exports.updateChatFilter = updateChatFilter
+
 function getTimestamp() {
     const date = new Date()
     let hours = date.getHours().toString()
