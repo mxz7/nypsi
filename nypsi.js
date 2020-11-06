@@ -5,7 +5,7 @@ const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({ disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
-const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, setPrefix, } = require("./guilds/utils.js")
+const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, setPrefix, getChatFilter, } = require("./guilds/utils.js")
 const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, daysUntilChristmas } = require("./utils/utils")
@@ -132,13 +132,12 @@ client.on("messageDelete", message => {
 
         const filter = getSnipeFilter(message.guild)
 
-        const a = message.content.toLowerCase().split("`").join("")
-        const b = a.split("*").join("")
-        const c = b.split("|").join("")
-        const d = c.split("_").join("")
+        let content = message.content.toLowerCase().normalize("NFD")
+
+        content = content.replace(/[^A-z0-9\s]/g, "")
 
         for (let word of filter) {
-            if (d.includes(word.toLowerCase())) return
+            if (content.includes(word.toLowerCase())) return
         }
 
         snipe.set(message.channel.id, {
@@ -165,13 +164,12 @@ client.on("messageUpdate", message => {
 
         const filter = getSnipeFilter(message.guild)
 
-        const a = message.content.toLowerCase().split("`").join("")
-        const b = a.split("*").join("")
-        const c = b.split("|").join("")
-        const d = c.split("_").join("")
+        let content = message.content.toLowerCase().normalize("NFD")
+
+        content = content.replace(/[^A-z0-9\s]/g, "")
 
         for (let word of filter) {
-            if (d.includes(word.toLowerCase())) return
+            if (content.includes(word.toLowerCase())) return
         }
 
         eSnipe.set(message.channel.id, {
@@ -202,6 +200,20 @@ client.on("message", async message => {
             .setDescription("support server: https://discord.gg/hJTDNST")
         return await message.channel.send(embed)
     }
+
+    if (!message.member.hasPermission("ADMINISTRATOR")) {
+        const filter = getChatFilter(message.guild)
+
+        let content = message.content.toLowerCase().normalize("NFD")
+    
+        content = content.replace(/[^A-z0-9\s]/g, "")
+    
+        for (let word of filter) {
+            if (content.includes(word.toLowerCase())) {
+                return await message.delete()
+            }
+        }
+    } 
 
     let prefix = getPrefix(message.guild)
 

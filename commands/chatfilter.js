@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js")
+const { getChatFilter, updateChatFilter, getPrefix } = require("../guilds/utils.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.MODERATION).setAliases(["sf"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("chatfilter", "change the chat filter for your server", categories.MODERATION).setAliases(["filter"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message 
@@ -18,33 +18,33 @@ async function run(message, args) {
         return
     }
 
-    let filter = getSnipeFilter(message.guild)
+    let filter = getChatFilter(message.guild)
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
-            .setTitle("current snipe filter")
-            .setFooter(`use ${prefix}sf (add/del/+/-) to modify the filter`)
-        
-        if (filter.length == 0) {
-            embed.setDescription("`❌` empty snipe filter")
-        }
+            .setTitle("current chat filter")
+            .setFooter(`use ${prefix}filter (add/del/+/-) to modify the filter`)
 
+        if (filter.length == 0) {
+            embed.setDescription("`❌` empty chat filter")
+        }
+        
         return message.channel.send(embed)
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`))
+            return message.channel.send(new ErrorEmbed(`${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`))
         }
 
         let word = args[1].toString().toLowerCase().normalize("NFD").replace(/[^A-z0-9\s]/g, "")
 
         if (filter.indexOf(word) > -1) {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
-                .setTitle("snipe filter")
-                .setFooter(`you can use ${prefix}sf to view the filter`)
+                .setTitle("chat filter")
+                .setFooter(`you can use ${prefix}filter to view the filter`)
 
             return message.channel.send(embed)
         }
@@ -55,22 +55,22 @@ async function run(message, args) {
 
             filter.splice(filter.indexOf(word), 1)
 
-            const embed = new CustomEmbed(message.member, true, `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`)
-                .setTitle("snipe filter")
+            const embed = new CustomEmbed(message.member, true, `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`)
+                .setTitle("chat filter")
 
             return message.channel.send(embed)
         }
 
-        updateFilter(message.guild, filter)
+        updateChatFilter(message.guild, filter)
 
         const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter")
-            .setTitle("snipe filter")
+            .setTitle("chat filter")
         return message.channel.send(embed)
     }
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${prefix}sf del/- <word>`))
+            return message.channel.send(new ErrorEmbed(`${prefix}filter del/- <word>`))
         }
 
         let word = args[1].toString().toLowerCase().normalize("NFD").replace(/[^A-z0-9\s]/g, "")
@@ -79,28 +79,28 @@ async function run(message, args) {
             filter.splice(filter.indexOf(word), 1)
         } else {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` not found in the filter")
-                .setTitle("snipe filter")
-                .setFooter(`you can use ${prefix}sf to view the filter`)
+                .setTitle("chat filter")
+                .setFooter(`you can use ${prefix}filter to view the filter`)
 
             return message.channel.send(embed)
         }
 
-        updateFilter(message.guild, filter)
+        updateChatFilter(message.guild, filter)
 
         const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
-            .setTitle("snipe filter")
-            .setFooter(`you can use ${prefix}sf reset to reset the filter`)
+            .setTitle("chat filter")
+            .setFooter(`you can use ${prefix}filter reset to reset the filter`)
 
         return message.channel.send(embed)
     }
 
     if (args[0].toLowerCase() == "reset") {
-        filter = ["discord.gg", "/invite/"]
+        filter = []
 
-        updateFilter(message.guild, filter)
+        updateChatFilter(message.guild, filter)
 
         const embed = new CustomEmbed(message.member, false, "✅ filter has been reset")
-            .setTitle("snipe filter")
+            .setTitle("chat filter")
 
         return message.channel.send(embed)
     }
