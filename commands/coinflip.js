@@ -145,7 +145,7 @@ async function run(message, args) {
                 cooldown.delete(message.author.id)
             }, 10000)
 
-            updateBalance(target, getBalance(message.member) - bet)
+            updateBalance(target, getBalance(target) - bet)
 
             const lols = ["heads", "tails"]
             const choice = shuffle(lols)[Math.floor(Math.random() * lols.length)]
@@ -162,7 +162,7 @@ async function run(message, args) {
                 loser = message.member
             }
 
-            updateBalance(winner, getBalance(message.member) + (bet * 2))
+            updateBalance(winner, getBalance(winner) + (bet * 2))
 
             waiting.splice(waiting.indexOf(message.author.id), 1)
 
@@ -186,7 +186,7 @@ async function run(message, args) {
         } else {
             updateBalance(message.member, getBalance(message.member) + bet)
             waiting.splice(waiting.indexOf(message.author.id), 1)
-            return message.channel.send(new CustomEmbed("✅ coinflip request denied"))
+            return message.channel.send(new CustomEmbed(target, false, "✅ coinflip request denied"))
         }
     }
 
