@@ -411,7 +411,7 @@ function logCommand(message, args) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${message.author.tag}: '${content}'`
+    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${message.author.tag}: '${content}'\x1b[37m`
 
     console.log(msg)
 }
