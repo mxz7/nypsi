@@ -119,7 +119,9 @@ async function run(message, args) {
 
     const grid = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]
 
-    for (let i = 0; i < 5; i++) {
+    const bombs = Math.floor(Math.random() * 3) + 4
+
+    for (let i = 0; i < bombs; i++) {
         const num = Math.floor(Math.random() * 25)
 
         if (grid[num] != "b") {
