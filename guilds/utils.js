@@ -252,7 +252,7 @@ async function checkStats(guild) {
         if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 50) {
             members = guild.members.cache
         } else {
-            members = await guild.members.fetch()
+            members = await guild.members.fetch().catch(() => {})
             addCooldown(guild, 3600)
         }
 
