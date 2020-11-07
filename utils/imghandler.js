@@ -29,7 +29,11 @@ const assLinks = ["https://www.reddit.com/r/ass.json?limit=777",
     "https://www.reddit.com/r/TheUnderbun.json?limit=777",
     "https://www.reddit.com/r/booty.json?limit=777",
     "https://www.reddit.com/r/HungryButts.json?limit=777",
-    "https://www.reddit.com/r/whooties.json?limit=777"]
+    "https://www.reddit.com/r/whooties.json?limit=777",
+    "https://www.reddit.com/r/WhiteCheeks.json?limit=777",
+    "https://www.reddit.com/r/AssholeBehindThong.json?limit=777",
+    "https://www.reddit.com/r/WomenBendingOver.json?limit=777",
+    "https://www.reddit.com/r/thickwhitegirls.json?limit=777"]
 const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777", 
     "https://www.reddit.com/r/realgirls.json?limit=777", 
     "https://www.reddit.com/r/legalteens.json?limit=777",
@@ -46,7 +50,8 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777",
     "https://www.reddit.com/r/camsluts.json?limit=777",
     "https://www.reddit.com/r/cumsluts.json?limit=777",
     "https://www.reddit.com/r/cumfetish.json?limit=777",
-    "https://www.reddit.com/r/creampies.json?limit=777"]
+    "https://www.reddit.com/r/creampies.json?limit=777",
+    "https://www.reddit.com/r/Phatasswhitegirls.json?limit=777"]
 const birbLinks = ["https://www.reddit.com/r/birb.json?limit=777", 
     "https://www.reddit.com/r/budgies.json?limit=777",
     "https://www.reddit.com/r/parrots.json?limit=777"]
