@@ -139,6 +139,11 @@ async function run(message, args) {
         if (fail) return
 
         if (response == "yes" || response == "y" || response == "accept") {
+
+            if (bet > getBalance(target)) {
+                return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+            }
+
             cooldown.set(message.member.id, new Date())
 
             setTimeout(() => {
