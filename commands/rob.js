@@ -108,7 +108,7 @@ async function run(message, args) {
         setPadlock(target, false)
 
         const amount = (Math.floor(Math.random() * 35) + 5)
-        const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
+        const amountMoney = Math.round(getBalance(target) * (amount / 100))
 
         embed2.setColor("#e4334f")
         embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken")
