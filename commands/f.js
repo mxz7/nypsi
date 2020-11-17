@@ -43,7 +43,17 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 30000)
 
-    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${args.join(" ")}**`)
+    let content = args.join(" ")
+
+    if (content.split("\n").length > 2) {
+        content = content.split("\n").join(".")
+    }
+
+    if (content.length > 50) {
+        content = content.substr(0, 50)
+    }
+
+    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`)
 
     const msg = await message.channel.send(embed)
 
@@ -63,7 +73,7 @@ async function run(message, args) {
     async function getReactions() {
         await msg.awaitReactions(filter, {max: 1, time:15000, errors:["time"]}).catch(async () => {
             finished = true
-            await message.channel.send(new CustomEmbed(message.member, false, `**${reacted.get(msg.id).length.toLocaleString()}** people paid their respects to **${args.join(" ")}**`))
+            await message.channel.send(new CustomEmbed(message.member, false, `**${reacted.get(msg.id).length.toLocaleString()}** people paid their respects to **${content}**`))
             return reacted.delete(msg.id)
         })
         if (!finished) {
