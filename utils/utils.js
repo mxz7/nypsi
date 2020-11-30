@@ -282,7 +282,7 @@ function daysUntilChristmas() {
         }
     }
 
-    return daysUntil(date).toString()
+    return (daysUntil(date) + 1).toString()
 }
 
 exports.daysUntilChristmas = daysUntilChristmas
