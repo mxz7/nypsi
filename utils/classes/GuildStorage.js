@@ -22,7 +22,7 @@ exports.GuildStorage = class {
                 channel: "none"
             },
             disabledCommands: [],
-            snipeFilter: ["discord.gg", "/invite/"],
+            snipeFilter: ["discordgg", "discordcom"],
             chatFilter: [],
             prefix: "$"
         }
