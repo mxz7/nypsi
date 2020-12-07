@@ -95,7 +95,7 @@ async function run(message, args) {
     }
 
     if (args[0].toLowerCase() == "reset") {
-        filter = ["discord.gg", "/invite/"]
+        filter = ["discordgg", "discordcom"]
 
         updateFilter(message.guild, filter)
 
