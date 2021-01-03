@@ -187,7 +187,14 @@ async function run(message, args) {
         console.log(res)
     }
 
-    nameHistory.reverse()
+    try {
+        nameHistory.reverse()
+    } catch (e) {
+        console.error(e)
+        return console.log(res)
+    }
+
+    
 
     const BreakException = {}
 
