@@ -65,7 +65,7 @@ async function run(message, args) {
                 member = args[0]
             }
         } else {
-            member = getMember(message, args.join(" "))
+            member = await getMember(message, args.join(" "))
 
             if (!member) {
                 return message.channel.send(new ErrorEmbed(`can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`))

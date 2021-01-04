@@ -116,10 +116,16 @@ exports.redditImage = redditImage
  * @param {Message} message
  * @param {String} memberName name of member
  */
-function getMember(message, memberName) {
+async function getMember(message, memberName) {
     if (!message.guild) return null
 
-    const members = message.guild.members.cache
+    let members
+
+    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
+        members = message.guild.members.cache
+    } else {
+        members = await message.guild.members.fetch()
+    }
 
     let target
     let possible = new Map()
@@ -194,10 +200,16 @@ exports.getMember = getMember
  * @param {Message} message 
  * @param {String} memberName 
  */
-function getExactMember(message, memberName) {
+async function getExactMember(message, memberName) {
     if (!message.guild) return null
 
-    const members = message.guild.members.cache
+    let members
+
+    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
+        members = message.guild.members.cache
+    } else {
+        members = await message.guild.members.fetch()
+    }
 
     let target = members.find(member => {
         if (member.user.username.toLowerCase() == memberName.toLowerCase()) {

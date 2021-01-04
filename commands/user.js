@@ -26,7 +26,7 @@ async function run(message, args) {
                 username = username.split("-id ").join("")
             }
 
-            member = getMember(message, username)
+            member = await getMember(message, username)
         } else {
             member = message.mentions.members.first()
         }

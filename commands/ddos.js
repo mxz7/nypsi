@@ -42,7 +42,7 @@ async function run(message, args) {
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0])
+            member = await getMember(message, args[0])
         } else {
             member = message.mentions.members.first()
         }
