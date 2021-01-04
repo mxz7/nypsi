@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { inCooldown, addCooldown } = require("../guilds/utils")
 
 const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
 
@@ -17,7 +18,7 @@ async function run(message, args) {
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = getMember(message, args[0])
+            member = await getMember(message, args[0])
         } else {
             member = message.mentions.members.first()
         }
@@ -30,7 +31,15 @@ async function run(message, args) {
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
     const timeAgo = daysAgo(new Date(member.joinedAt))
 
-    const members = message.guild.members.cache
+    let members
+
+    if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size || message.guild.memberCount <= 50) {
+        members = message.guild.members.cache
+    } else {
+        members = await message.guild.members.fetch()
+        addCooldown(message.guild, 3600)
+    }
+
     let membersSorted = []
 
     members.forEach(m => {
