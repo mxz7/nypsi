@@ -66,7 +66,7 @@ async function run(message, args) {
         let target
 
         if (!message.mentions.members.first()) {
-            target = getExactMember(message, args[0])
+            target = await getExactMember(message, args[0])
         } else {
             target = message.mentions.members.first()
         }
