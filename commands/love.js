@@ -60,7 +60,7 @@ async function run(message, args) {
         target1 = message.member
 
         if (!message.mentions.members.first()) {
-            target2 = getMember(message, args[0])
+            target2 = await getMember(message, args[0])
         } else {
             target2 = message.mentions.members.first()
         }
@@ -73,15 +73,15 @@ async function run(message, args) {
             if (args[0].startsWith("<@")) {
                 target1 = message.mentions.members.first()
 
-                target2 = getMember(message, args[1])
+                target2 = await getMember(message, args[1])
             } else {
                 target2 = message.mentions.members.first()
 
-                target1 = getMember(message, args[0])
+                target1 = await getMember(message, args[0])
             }
         } else if (message.mentions.members.size == 0) {
-            target1 = getMember(message, args[0])
-            target2 = getMember(message, args[1])
+            target1 = await getMember(message, args[0])
+            target2 = await getMember(message, args[1])
         } else {
             return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`))
         }
@@ -179,7 +179,7 @@ async function run(message, args) {
         loveBar = "💔💔💔💔💔💔💔💔💔💔"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${target1.user.toString()} **x** ${target2.user.toString()}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`)
+    const embed = new CustomEmbed(message.member, false, `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`)
     
     message.channel.send(embed)
 
