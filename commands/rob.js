@@ -53,7 +53,7 @@ async function run(message, args) {
     let target = message.mentions.members.first()
 
     if (!target) {
-        target = getMember(message, args[0])
+        target = await getMember(message, args[0])
     }
 
     if (!target) {

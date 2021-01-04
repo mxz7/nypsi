@@ -50,7 +50,7 @@ async function run(message, args) {
         
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        const member = getExactMember(message, args[0])
+        const member = await getExactMember(message, args[0])
 
         if (!member) {
             return message.channel.send(new ErrorEmbed("unable to find member `" + args[0] + "`"))
