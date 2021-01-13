@@ -60,6 +60,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
+    if (target.user.bot) {
+        return message.channel.send(new ErrorEmbed("invalid user"))
+    }
+
     if (message.member == target) {
         return message.channel.send(new ErrorEmbed("you cant rob yourself"))
     }

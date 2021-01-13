@@ -61,6 +61,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
+    if (target.user.bot) {
+        return message.channel.send(new ErrorEmbed("invalid user"))
+    }
+
     if (!userExists(target)) createUser(target)
 
     if (!userExists(message.member)) createUser(message.member)
