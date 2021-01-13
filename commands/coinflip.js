@@ -75,6 +75,14 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("unable to find that member"))
         }
 
+        if (message.member == target) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+    
+        if (target.user.bot) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+
         if (args[1] == "all") {
             args[1] = getBalance(message.member)
         }
