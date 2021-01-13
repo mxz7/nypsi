@@ -21,8 +21,10 @@ exports.snipe = snipe
 loadCommands()
 
 client.once("ready", async () => {
-    const games = ["$help | nypsi.xyz", "$help | tekoh.wtf", "$help | nypsi.xyz",
-        "have you joined the $support server?", "x0x", "xmas"]
+    const games = ["$help | nypsi.xyz", "$help | tekoh.wtf", 
+        "$help | nypsi.xyz", "$help | nypsi.xyz", "$help | nypsi.xyz",
+        "have you joined the $support server?", "x0x", "x0x", 
+        "x0x", "xmas"]
 
     setTimeout(async () => {
         const a = await getRandomCommand()
@@ -32,7 +34,7 @@ client.once("ready", async () => {
         if (game == "x0x") {
             game = `$${a.name} - ${a.description}`
         } else if (game == "xmas") {
-            game = `🎅 ${daysUntilChristmas()} days until christmas`
+            game = `${daysUntilChristmas()} days until christmas`
         }
 
         client.user.setPresence({
