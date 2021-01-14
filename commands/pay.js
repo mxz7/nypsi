@@ -47,6 +47,10 @@ async function run(message, args) {
         return message.channel.send(embed)
     }
 
+    if (message.guild.id == "747056029795221513") {
+        return message.channel.send(new ErrorEmbed("this has been disabled in the support server"))
+    }
+
     let target = message.mentions.members.first()
 
     if (!target) {

@@ -63,6 +63,11 @@ async function run(message, args) {
     if (args[0].toLowerCase() == "h") args[0] = "heads"
 
     if (args[0].toLowerCase() != "tails" && args[0].toLowerCase() != "heads") {
+        
+        if (message.guild.id == "747056029795221513") {
+            return message.channel.send(new ErrorEmbed("this has been disabled in the support server"))
+        }
+        
         let target
 
         if (!message.mentions.members.first()) {
