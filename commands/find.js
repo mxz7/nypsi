@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Guild } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
 const { getBalance, userExists, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp, hasVoted, getPrestige } = require("../economy/utils.js")
@@ -308,12 +308,11 @@ _abc123.setRun(run)
 
 module.exports = _abc123
 
+/**
+ * 
+ * @param {Guild} guild 
+ */
 async function guildInfo(guild) {
-    const members = guild.members.cache
-    const users = members.filter(member => !member.user.bot)
-    const bots = members.filter(member => member.user.bot)
-    const online = users.filter(member => member.presence.status != "offline")
-
     const balTop = await topAmount(guild, 5)
 
     const filtered = balTop.filter(function (el) {
@@ -345,9 +344,7 @@ async function guildInfo(guild) {
             "**region** " + guild.region, true)
         .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
             "**channels** " + guild.channels.cache.size, true)
-        .addField("member info", "**humans** " + users.size.toLocaleString() + "\n" +
-            "**bots** " + bots.size.toLocaleString() + "\n" + 
-            "**online** " + online.size.toLocaleString() + "\n" +
+        .addField("member info", "**members** " + guild.memberCount.toLocaleString() + "\n" +
             "**member peak** " + getPeaks(guild).members.toLocaleString(), true)
 
     if (invites && invites.length > 0) {
