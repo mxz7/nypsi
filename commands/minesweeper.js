@@ -184,12 +184,75 @@ function getFront(grid) {
     return gridFront
 }
 
+function getExposedFront(grid) {
+    const gridFront = []
+
+    for (let item of grid) {
+        switch (item){
+        case "a":
+            gridFront.push(":white_large_square:")
+            break
+        case "b":
+            gridFront.push(":red_square:")
+            break
+        case "c":
+            gridFront.push(":blue_square:")
+            break
+        case "x":
+            gridFront.push(":red_square:")
+            break
+        }
+    }
+
+    return gridFront
+}
+
 function toTable(grid) {
     let table = ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
     let count = 0
     let globalCount = 1
 
     grid = getFront(grid)
+
+    for (let item of grid) {
+
+        if (count == 5) {
+            count = 0
+            
+            let emoji
+
+            switch (globalCount) {
+            case 1:
+                emoji = ":two:"
+                break
+            case 2:
+                emoji = ":three:"
+                break
+            case 3:
+                emoji = ":four:"
+                break
+            case 4:
+                emoji = ":five:"
+                break
+            }
+            globalCount++
+
+            table = table + "\n" + emoji + item
+        } else {
+            table = table + item
+        }
+        count++
+    }
+
+    return table
+}
+
+function toExposedTable(grid) {
+    let table = ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
+    let count = 0
+    let globalCount = 1
+
+    grid = getExposedFront(grid)
 
     for (let item of grid) {
 
@@ -325,7 +388,7 @@ async function playGame(message, msg) {
     }
 
     if (response == "finish") {
-        table = toTable(grid)
+        table = toExposedTable(grid)
         if (win < 1) {
             return lose()
         } else if (win == 1) {
@@ -365,7 +428,7 @@ async function playGame(message, msg) {
     switch (grid[location]) {
     case "b":
         grid[location] = "x"
-        table = toTable(grid)
+        table = toExposedTable(grid)
         return lose()
     case "c":
         return playGame(message, msg)
