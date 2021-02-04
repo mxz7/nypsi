@@ -4,12 +4,14 @@
 invite link can be found at: [invite.nypsi.xyz](http://invite.nypsi.xyz)
 
 ### 🍪 top.gg
-top.gg url: https://top.gg/bot/678711738845102087
+top.gg url: [`[https://top.gg/bot/678711738845102087]`](https://top.gg/bot/678711738845102087)
 
 ### 🌴 support
-join the support server: https://discord.gg/hJTDNST or add me `[max#0777]`
+join the support server: [`[https://discord.gg/hJTDNST]`](https://discord.gg/hJTDNST) or add me `[max#0777]`
 
 ### 🌵 features
+
+better showcase of features can be found on the bot's website: [`[nypsi.xyz]`](https://nypsi.xyz)
 
 ##### 💸 gambling / economy
  - nypsi has a decent economy system mainly focused on gambling and working as a team to rob people who find themselves with a lot of money. i'd like to think that the   `$blackjack` command is as realistic as you can get with a discord bot
@@ -26,6 +28,10 @@ join the support server: https://discord.gg/hJTDNST or add me `[max#0777]`
 ##### 📊 server stats
  - nypsi tracks every server's member peaks, this information can be viewed with `$server`
  - nypsi is also able to create a member counter for your server, similar to other bots but allows you to customise it for free - `$counter`
+
+##### 🎅 christmas countdown
+ - 24/7 running christmas countdown, updates daily
+ - sends a message to a specified channel once everyday with a customisable message
  
 ##### 🎮 fun commands
  - there are a lot of fun commands available for use, including `$reddit` which allows you to grab a random image from any subreddit, as well as `$ddos` which will generate a *fake* ip address
