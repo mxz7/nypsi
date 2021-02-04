@@ -1,17 +1,17 @@
 # nypsi
 
 ### 🍟 invite / use in your server
-invite link can be found at: [invite.nypsi.xyz](http://invite.nypsi.xyz)
+invite link can be found at: [`invite.nypsi.xyz`](http://invite.nypsi.xyz)
 
 ### 🍪 top.gg
-top.gg url: [`[https://top.gg/bot/678711738845102087]`](https://top.gg/bot/678711738845102087)
+top.gg url: [`https://top.gg/bot/678711738845102087`](https://top.gg/bot/678711738845102087)
 
 ### 🌴 support
-join the support server: [`[https://discord.gg/hJTDNST]`](https://discord.gg/hJTDNST) or add me `[max#0777]`
+join the support server: [`https://discord.gg/hJTDNST`](https://discord.gg/hJTDNST) or add me `max#0777`
 
 ### 🌵 features
 
-better showcase of features can be found on the bot's website: [`[nypsi.xyz]`](https://nypsi.xyz)
+better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
 
 ##### 💸 gambling / economy
  - nypsi has a decent economy system mainly focused on gambling and working as a team to rob people who find themselves with a lot of money. i'd like to think that the   `$blackjack` command is as realistic as you can get with a discord bot
