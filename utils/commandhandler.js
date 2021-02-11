@@ -320,31 +320,39 @@ function runCommand(cmd, message, args) {
         console.log(e)
     }
 
-    try {
-        if (!message.member) return
-        if (!userExists(message.member)) return
-    
-        setTimeout(() => {
-            try {
-                if (!xpCooldown.has(message.author.id)) {
-                    updateXp(message.member, getXp(message.member) + 1)
-            
-                    xpCooldown.add(message.author.id)
-            
-                    setTimeout(() => {
-                        try {
-                            xpCooldown.delete(message.author.id)
-                        } catch {
-                            console.log("error deleting from xpCooldown")
-                        }
-                    }, 60000)
+    let cmdName = cmd
+
+    if (alias) {
+        cmdName = aliases.get(cmd)
+    }
+
+    if (getCmdCategory(cmdName) == "money") {
+        try {
+            if (!message.member) return
+            if (!userExists(message.member)) return
+        
+            setTimeout(() => {
+                try {
+                    if (!xpCooldown.has(message.author.id)) {
+                        updateXp(message.member, getXp(message.member) + 1)
+                
+                        xpCooldown.add(message.author.id)
+                
+                        setTimeout(() => {
+                            try {
+                                xpCooldown.delete(message.author.id)
+                            } catch {
+                                console.log("error deleting from xpCooldown")
+                            }
+                        }, 60000)
+                    }
+                } catch (e) {
+                    console.log(e)
                 }
-            } catch (e) {
-                console.log(e)
-            }
-        }, 10000)
-    } catch (e) {
-        console.log(e)
+            }, 10000)
+        } catch (e) {
+            console.log(e)
+        }
     }
 }
 
