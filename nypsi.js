@@ -21,7 +21,7 @@ exports.snipe = snipe
 loadCommands()
 
 client.once("ready", async () => {
-    const games = ["$help | nypsi.xyz", "$help | tekoh.wtf", 
+    const games = ["$help | nypsi.xyz", "$help | tekoh.net", 
         "$help | nypsi.xyz", "$help | nypsi.xyz", "$help | nypsi.xyz",
         "have you joined the $support server?", "x0x", "x0x", 
         "x0x", "xmas"]
@@ -72,7 +72,7 @@ client.once("ready", async () => {
         memberCount = memberCount + g.memberCount
     })
 
-    console.log("\n ~~ tekoh.wtf ~~")
+    console.log("\n ~~ tekoh.net ~~")
     console.log(" ~~ max#0777 ~~ ")
 
     console.log("\n--bot summary--")

@@ -12,7 +12,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false, "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST")
         .setTitle("nypsi")
-        .setFooter("made by max#0777 | tekoh.wtf")
+        .setFooter("made by max#0777 | tekoh.net")
 
     message.channel.send(embed)
 }
