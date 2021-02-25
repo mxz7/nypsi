@@ -26,7 +26,12 @@ async function run(message, args)  {
 
         let user = users.find(u => u.id == args[1])
         if (!user) {
-            return message.react("❌")
+
+            user = await message.client.users.fetch(args[1])
+
+            if (!user) {
+                return message.react("❌")
+            }
         }
 
         console.log(user)
@@ -42,23 +47,25 @@ async function run(message, args)  {
             }
         })
 
-        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
-            .setTitle(user.user.tag)
-            .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-            .addField("user info", "**tag** " + user.user.tag + "\n" +
-                "**created** " + formatDate(user.user.createdAt), true)
+        const tag = `${user.username}#${user.discriminator}`
 
-        if (userExists(user)) {
+        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
+            .setTitle(tag)
+            .addField("user info", "**tag** " + tag, true)
+
+        if (userExists(user.id)) {
             let voted = false
-            if (await hasVoted(user)) voted = true
-            embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
-                "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
-                "**xp** " + getXp(user).toLocaleString() + "\n" +
+            if (await hasVoted(user.id)) voted = true
+            embed.addField("economy", "💰 $**" + getBalance(user.id).toLocaleString() + "**\n" +
+                "💳 $**" + getBankBalance(user.id).toLocaleString() + "** / **" + getMaxBankBalance(user.id).toLocaleString() + "**\n" +
+                "**xp** " + getXp(user.id).toLocaleString() + "\n" +
                 "**voted** " + voted + "\n" +
-                "**prestige** " + getPrestige(user), true)
+                "**prestige** " + getPrestige(user.id), true)
         }
-        
-        embed.addField("guilds", guildNames)
+
+        if (guildNames != "") {
+            embed.addField("guilds", guildNames)
+        }
         
         message.channel.send(embed)
     } else if (args[0] == "tag") {
@@ -86,23 +93,25 @@ async function run(message, args)  {
             }
         })
 
-        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
-            .setTitle(user.user.tag)
-            .setThumbnail(user.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-            .addField("user info", "**tag** " + user.user.tag + "\n" +
-                "**created** " + formatDate(user.user.createdAt), true)
+        const tag = `${user.username}#${user.discriminator}`
 
-        if (userExists(user)) {
+        const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
+            .setTitle(tag)
+            .addField("user info", "**tag** " + tag, true)
+
+        if (userExists(user.id)) {
             let voted = false
-            if (await hasVoted(user)) voted = true
-            embed.addField("economy", "💰 $**" + getBalance(user).toLocaleString() + "**\n" +
-                "💳 $**" + getBankBalance(user).toLocaleString() + "** / **" + getMaxBankBalance(user).toLocaleString() + "**\n" +
-                "**xp** " + getXp(user).toLocaleString() + "\n" +
+            if (await hasVoted(user.id)) voted = true
+            embed.addField("economy", "💰 $**" + getBalance(user.id).toLocaleString() + "**\n" +
+                "💳 $**" + getBankBalance(user.id).toLocaleString() + "** / **" + getMaxBankBalance(user.id).toLocaleString() + "**\n" +
+                "**xp** " + getXp(user.id).toLocaleString() + "\n" +
                 "**voted** " + voted + "\n" +
-                "**prestige** " + getPrestige(user), true)
+                "**prestige** " + getPrestige(user.id), true)
         }
-        
-        embed.addField("guilds", guildNames)
+
+        if (guildNames != "") {
+            embed.addField("guilds", guildNames)
+        }
         
         message.channel.send(embed)
     } else if (args[0] == "gid") {
