@@ -89,7 +89,7 @@ async function run(message, args) {
     if (iq < 80 && iq != 69) {
         iqMsg = "you're a rock :rock:"
     } else if (iq < 90) {
-        iqMsg = "u probably push on doors that say pull"
+        iqMsg = "u probably push doors that say pull"
     } else if (iq < 98) {
         iqMsg = "dumbass.. 🤣"
     } else if (iq < 103) {
