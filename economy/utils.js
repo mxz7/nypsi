@@ -335,7 +335,11 @@ exports.updateBalance = updateBalance
  * @param {GuildMember} member to get bank balance of
  */
 function getBankBalance(member) {
-    return parseInt(users[member.user.id].money.bank)
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    return parseInt(users[id].money.bank)
 }
 
 exports.getBankBalance = getBankBalance
@@ -357,7 +361,11 @@ exports.updateBankBalance = updateBankBalance
  * @param {GuildMember} member to get xp of
  */
 function getXp(member) {
-    return parseInt(users[member.user.id].xp)
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    return parseInt(users[id].xp)
 }
 
 exports.getXp = getXp
