@@ -61,7 +61,7 @@ async function run(message, args) {
     if (cache.has(member.user.id)) {
         iq = cache.get(member.user.id)
     } else {
-        const chance = Math.floor(Math.random() * 30)
+        const chance = Math.floor(Math.random() * 25)
 
         if (chance == 7) {
             const chance2 = Math.floor(Math.random() * 10)
@@ -86,7 +86,7 @@ async function run(message, args) {
         }, 60000)
     }
 
-    if (iq < 80) {
+    if (iq < 80 && iq != 69) {
         iqMsg = "you're a rock :rock:"
     } else if (iq < 90) {
         iqMsg = "u probably push on doors that say pull"
