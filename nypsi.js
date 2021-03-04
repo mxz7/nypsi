@@ -13,10 +13,12 @@ const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moder
 
 const snipe = new Map()
 const eSnipe = new Map()
+const mentions = new Map()
 let ready = false
 
 exports.eSnipe = eSnipe
 exports.snipe = snipe
+exports.mentions = mentions
 
 loadCommands()
 
@@ -215,7 +217,53 @@ client.on("message", async message => {
                 return await message.delete()
             }
         }
-    } 
+    }
+
+    if (message.mentions.members.first()) {
+        message.mentions.members.forEach(m => {
+            if (m.user.bot || m.user.id == message.author.id) {
+                return
+            }
+
+            let content = message.content
+
+            if (content.length > 100) {
+                content = content.substr(0, 97) + "..."
+            }
+
+            content = content.replace(/(\r\n|\n|\r)/gm, " ")
+
+            const data = {
+                user: message.author.tag,
+                content: content,
+                date: message.createdTimestamp,
+                link: message.url
+            }
+
+            if (!mentions.has(message.guild.id)) {
+                mentions.set(message.guild.id, new Map())
+            }
+
+            const guildData = mentions.get(message.guild.id)
+
+            if (!guildData.has(m.user.id)) {
+                guildData.set(m.user.id, [])
+            }
+
+            const userData = guildData.get(m.user.id)
+
+            if (userData.length >= 5) {
+                userData.shift()
+            }
+
+            userData.push(data)
+
+            guildData.set(m.user.id, userData)
+            mentions.set(message.guild.id, guildData)
+
+            exports.mentions = mentions
+        })
+    }
 
     let prefix = getPrefix(message.guild)
 
