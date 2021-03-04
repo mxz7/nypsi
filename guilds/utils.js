@@ -35,12 +35,11 @@ setInterval(() => {
 }, 120000)
 
 setInterval(async () => {
-    const { snipe, eSnipe } = require("../nypsi")
+    const { snipe, eSnipe, mentions } = require("../nypsi")
 
     const now = new Date().getTime()
 
-    let snipeCount = 0
-    let eSnipeCount = 0
+    let snipeCount, eSnipeCount, mentionsCount = 0
 
     await snipe.forEach(msg => {
         const diff = now - msg.createdTimestamp
@@ -66,6 +65,23 @@ setInterval(async () => {
 
     if (eSnipeCount > 0) {
         console.log("[" + getTimestamp() + "] deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
+    }
+
+    await mentions.forEach(guildData => {
+        guildData.forEach(userData => {
+            for (let i of userData) {
+                const diff = now - i.date 
+
+                if (diff >= 86400000) {
+                    userData.splice(userData.indexOf(i), 1)
+                    mentionsCount++
+                }
+            }
+        })
+    })
+
+    if (mentionsCount > 0) {
+        console.log("[" + getTimestamp() + "] deleted " + mentionsCount.toLocaleString() + " mentions")
     }
 
 }, 3600000)
