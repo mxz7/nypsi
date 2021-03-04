@@ -39,12 +39,13 @@ async function run(message, args) {
     }, 5000)
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-    const { snipe, eSnipe } = require("../nypsi.js")
+    const { snipe, eSnipe, mentions } = require("../nypsi.js")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
     const { bdsmCache, thighsCache, pornCache, assCache, birbCache, catCache, dogCache, rabbitCache, snekCache } = require("../utils/imghandler")
-    let imgCache = 0
+    let imgCache= 0
+    let mentionsSize = 0
 
     try {
         for (let link of Array.from(bdsmCache.keys())) {
@@ -79,6 +80,11 @@ async function run(message, args) {
         console.error(error)
     }
 
+    await mentions.forEach(async guildData => {
+        await guildData.forEach(userData => {
+            mentionsSize += userData.length
+        })
+    })
 
     let memberCount = 0
 
@@ -98,7 +104,8 @@ async function run(message, args) {
             " -- **this server** " + getUserCountGuild(message.guild) + "\n" +
             "**vote** " + getVoteCacheSize().toLocaleString() + "\n" +
             "**snipe** " + snipedMessages.toLocaleString() + "\n" +
-            "**imgs** " + imgCache.toLocaleString(), true)
+            "**imgs** " + imgCache.toLocaleString() + "\n" +
+            "**mentions** " + mentionsSize.toLocaleString() + "\n", true)
         .addField("usage", "**memory** " + memUsage + "mb", true)
 
     message.channel.send(embed)
