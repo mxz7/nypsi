@@ -67,8 +67,8 @@ setInterval(async () => {
         console.log("[" + getTimestamp() + "] deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
     }
 
-    await mentions.forEach(async guildData => {
-        await guildData.forEach(userData => {
+    await mentions.forEach(async (guildData, key) => {
+        await guildData.forEach((userData, key) => {
             for (let i of userData) {
                 const diff = now - i.date 
 
@@ -77,7 +77,14 @@ setInterval(async () => {
                     mentionsCount++
                 }
             }
+
+            if (userData.length == 0) {
+                guildData.delete(key)
+            }
         })
+        if (guildData.size == 0) {
+            mentions.delete(key)
+        }
     })
 
     if (mentionsCount > 0) {
