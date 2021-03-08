@@ -252,7 +252,7 @@ client.on("message", async message => {
 
             const userData = guildData.get(m.user.id)
 
-            if (userData.length >= 5) {
+            if (userData.length >= 15) {
                 userData.shift()
             }
 
@@ -302,7 +302,7 @@ process.on("unhandledRejection", error => {
         stack = stack.substr(0, 200) + "..."
     }
 
-    console.log(`\x1b[31m[${getTimestamp()}] ${stack}`)
+    console.log(`\x1b[31m[${getTimestamp()}] ${stack}\x1b[37m`)
 })
 
 async function checkGuild(guildID) {
