@@ -40,6 +40,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`${prefix}reddit <subreddit>`))
     }
 
+    if (args[0].toLowerCase() == "body" && !message.channel.nsfw)  {
+        return message.channel.send(new ErrorEmbed("this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"))
+    }
+
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
