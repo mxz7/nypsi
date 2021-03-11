@@ -105,8 +105,6 @@ function addMember(member, level) {
     }
 
     data[id] = new PremUser(id, level)
-
-    console.log(data)
 }
 
 exports.addMember = addMember

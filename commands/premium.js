@@ -113,6 +113,8 @@ async function run(message, args) {
         }
 
         addMember(args[1], parseInt(args[2]))
+
+        return message.channel.send("✅ created profile at tier " + args[2])
     }
 }
 
