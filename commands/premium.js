@@ -5,8 +5,6 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
 
-const cooldown = new Map()
-
 const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
 
 /**
@@ -14,25 +12,6 @@ const cmd = new Command("premium", "view your premium status", categories.INFO).
  * @param {Array<String>} args 
  */
 async function run(message, args) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
-        const time = 1 - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
-    }
 
     const defaultMessage = () => {
 
