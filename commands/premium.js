@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../guilds/utils")
-const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember, renewUser, revokeUser } = require("../premium/utils")
+const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember, renewUser, revokeUser, expireUser } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
@@ -142,6 +142,18 @@ async function run(message, args) {
         revokeUser(args[1], message.content)
 
         return message.channel.send(new CustomEmbed(message.member, false, "✅ membership revoked"))
+    } else if (args[0].toLowerCase() == "expire") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length != 2) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        expireUser(args[1])
+
+        return message.channel.send(new CustomEmbed(message.member, false, "✅ membership expired"))
     }
 }
 
