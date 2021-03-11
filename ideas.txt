@@ -2,6 +2,7 @@ bronze //
 
 access to last 15 mentions within 24 hours
 shorter cooldown on image commands and nsfw commands
+shorter cooldown on fun commands
 donator role in support server
 
 
