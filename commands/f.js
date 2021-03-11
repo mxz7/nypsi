@@ -1,4 +1,5 @@
 const { Message } = require("discord.js")
+const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
@@ -13,11 +14,18 @@ const cmd = new Command("f", "pay your respects", categories.FUN)
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
+    let cooldownLength = 30
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 15
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 30 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -41,7 +49,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 30000)
+    }, cooldownLength * 1000)
 
     let content = args.join(" ")
 
