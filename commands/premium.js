@@ -1,0 +1,129 @@
+const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember } = require("../premium/utils")
+const { Command, categories } = require("../utils/classes/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { formatDate, daysAgo } = require("../utils/utils")
+
+const cooldown = new Map()
+
+const cmd = new Command("premium", "view your premium status", categories.INFO)
+
+/**
+ * @param {Message} message 
+ * @param {Array<String>} args 
+ */
+async function run(message, args) {
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 1 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    const defaultMessage = () => {
+
+        if (isPremium(message.member)) {
+            const embed = new CustomEmbed(message.member, false)
+
+            embed.setTitle("premium status")
+
+            const profile = getPremiumProfile(message.member)
+
+            const timeStarted = formatDate(profile.startDate)
+            const timeAgo = daysAgo(profile.startDate)
+
+            embed.setDescription(`**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n\nthank you so much for supporting!`)
+
+            return message.channel.send(embed)
+        } else {
+            return message.channel.send(new CustomEmbed(message.member, false, "you currently have no premium membership\n\nhttps://www.patreon.com/nypsi").setFooter(`join the support server if this is an issue (${getPrefix(message.guild)}support)`))
+        }
+    }
+
+    if (args.length == 0) {
+        return defaultMessage()
+    } else if (args[0].toLowerCase() == "check") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length == 1) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        const a = check(args[1])
+
+        if (!a) {
+            return message.channel.send(new CustomEmbed(message.member, false, "no premium data"))
+        }
+
+        console.log(a)
+
+        const embed = new CustomEmbed(message.member, false, `level: ${a.level}\n\ncheck console for all info`).setTitle(args[1])
+        
+        return message.channel.send(embed)
+    } else if (args[0].toLowerCase() == "update") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length < 4) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        if (!isPremium(args[2])) {
+            return message.channel.send(new ErrorEmbed("this user does not have a profile, use $premium add dumbass check it before u update it"))
+        }
+
+        switch (args[1].toLowerCase()) {
+        case "level":
+            setTier(args[2], parseInt(args[3]))
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ tier changed to ${args[3]}`))
+        case "embed":
+            setEmbedColor(args[2], args[3])
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ embed color changed to ${args[3]}`))
+        case "status" :
+            setStatus(args[2], parseInt(args[3]))
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`))
+        case "reason":
+            setReason(args[2], args.join(" "))
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`))
+        }
+    } else if (args[0].toLowerCase() == "add") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length < 3) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        addMember(args[1], parseInt(args[2]))
+    }
+}
+
+function check(member) {
+    if (isPremium(member)) {
+        return getPremiumProfile(member)
+    } else {
+        return null
+    }
+}
+
+cmd.setRun(run)
+
+module.exports = cmd
