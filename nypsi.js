@@ -378,6 +378,30 @@ async function onVote(vote) {
 
 exports.onVote = onVote
 
+/**
+ * @param {String} id 
+ */
+async function requestDM(id, content) {
+    const member = await client.users.fetch(id)
+
+    if (member) {
+        await member.send(content).catch(async () => {
+            const tekoh = await client.users.fetch(672793821850894347)
+
+            await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+        })
+        return true
+    } else {
+        const tekoh = await client.users.fetch(672793821850894347)
+
+        await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+
+        return false
+    }
+}
+
+exports.requestDM = requestDM
+
 setTimeout(() => {
     client.login(token).then(() => {
         setTimeout(() => {
