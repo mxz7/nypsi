@@ -1,13 +1,13 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../guilds/utils")
-const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember } = require("../premium/utils")
+const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember, renewUser, revokeUser } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { formatDate, daysAgo } = require("../utils/utils")
+const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("premium", "view your premium status", categories.INFO)
+const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
 
 /**
  * @param {Message} message 
@@ -45,8 +45,11 @@ async function run(message, args) {
 
             const timeStarted = formatDate(profile.startDate)
             const timeAgo = daysAgo(profile.startDate)
+            const expires = formatDate(profile.expireDate)
+            const timeUntil = daysUntil(profile.expireDate)
 
-            embed.setDescription(`**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n\nthank you so much for supporting!`)
+            embed.setDescription(`**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`)
+            embed.setFooter("thank you so much for supporting!")
 
             return message.channel.send(embed)
         } else {
@@ -114,7 +117,31 @@ async function run(message, args) {
 
         addMember(args[1], parseInt(args[2]))
 
-        return message.channel.send("✅ created profile at tier " + args[2])
+        return message.channel.send(new CustomEmbed(message.member, false, "✅ created profile at tier " + args[2]))
+    } else if (args[0].toLowerCase() == "renew") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length != 2) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        renewUser(args[1])
+
+        return message.channel.send(new CustomEmbed(message.member, false, "✅ membership renewed"))
+    } else if (args[0].toLowerCase() == "revoke") {
+        if (message.author.id != "672793821850894347") {
+            return defaultMessage()
+        }
+
+        if (args.length != 2) {
+            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
+        }
+
+        revokeUser(args[1], message.content)
+
+        return message.channel.send(new CustomEmbed(message.member, false, "✅ membership revoked"))
     }
 }
 
