@@ -254,6 +254,9 @@ function setStartDate(member, date) {
 
 exports.setStartDate = setStartDate
 
+/**
+ * @param {String} member id
+ */
 function renewUser(member) {
     const profile = PremUser.fromData(data[member])
 
@@ -268,6 +271,9 @@ function renewUser(member) {
 
 exports.renewUser = renewUser
 
+/**
+ * @param {String} member id
+ */
 function expireUser(member) {
     const profile = PremUser.fromData(data[member])
 
@@ -278,6 +284,10 @@ function expireUser(member) {
 
 exports.expireUser = expireUser
 
+/**
+ * @param {String} member id
+ * @param {String} reason
+ */
 function revokeUser(member, reason) {
     const profile = PremUser.fromData(data[member])
 
@@ -292,3 +302,23 @@ function revokeUser(member, reason) {
 }
 
 exports.revokeUser = revokeUser
+
+/**
+ * @returns {Date}
+ * @param {String} member id
+ */
+function getLastDaily(member) {
+    return data[member].lastDaily
+}
+
+exports.getLastDaily = getLastDaily
+
+/**
+ * @returns {Date}
+ * @param {String} member id
+ */
+function getLastWeekly(member) {
+    return data[member].lastWeekly
+}
+
+exports.getLastWeekly = getLastWeekly
