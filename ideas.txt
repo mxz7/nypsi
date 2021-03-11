@@ -33,4 +33,4 @@ super donator role in support server (custom colour)
 shorter cooldown on gambling commands
 shorter cooldown on polls and embeds
 shorter cooldown on minecraft commands
-shoter $dp cooldown
+shorter $dp cooldown
