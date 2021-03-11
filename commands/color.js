@@ -28,6 +28,9 @@ async function run(message, args) {
 
         if (!member) {
             color = args[0].split("#").join("")
+            if (color.length > 6) {
+                color = color.substr(0, 6)
+            }
         } else {
             color = member.displayHexColor
         }
