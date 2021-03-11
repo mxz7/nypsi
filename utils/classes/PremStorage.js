@@ -13,6 +13,7 @@ class PremUser {
         this.status = status.ACTIVE
         this.revokeReason = "none"
         this.startDate = new Date().getTime()
+        this.expireDate = new Date().setDate(new Date().getDate() + 35)
 
         return this
     }
@@ -104,6 +105,33 @@ class PremUser {
         case 4: 
             return "PLATINUM"
         }
+    }
+
+    static getLevelString(number) {
+        switch (number) {
+        case 0:
+            return "none"
+        case 1:
+            return "BRONZE"
+        case 2:
+            return "SILVER"
+        case 3:
+            return "GOLD"
+        case 4: 
+            return "PLATINUM"
+        }
+    }
+
+    renew() {
+        this.expireDate = new Date().setDate(new Date().getDate() + 35)
+    }
+
+    async expire() {
+        const { requestDM } = require("../../nypsi")
+        const d = await requestDM(this.id, `your ${this.getLevelString()} membership has expired, join the support server if this is an error ($support)`)
+
+        this.status = status.INACTIVE
+        this.level = 0
     }
 
     /**

@@ -1,7 +1,7 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { PremUser } = require("../utils/classes/PremStorage")
-const { getTimestamp } = require("../utils/utils")
+const { PremUser, status } = require("../utils/classes/PremStorage")
+const { getTimestamp, formatDate } = require("../utils/utils")
 let data = JSON.parse(fs.readFileSync("./premium/data.json"))
 
 let timer = 0
@@ -43,6 +43,21 @@ setInterval(() => {
     fs.writeFileSync("./premium/backup/" + date + ".json", JSON.stringify(data))
     console.log("\x1b[32m[" + getTimestamp() + "] premium data backup complete\x1b[37m")
 }, 43200000)
+
+setInterval(async () => {
+    const now = new Date().getDate()
+
+    for (let user in data) {
+        user = data[user]
+        const expiry = user.expireDate
+
+        if (expiry <= now) {
+            user = PremUser.fromData(user)
+
+            await user.expire()
+        }
+    }
+}, 3600000)
 
 /**
  * @returns {Boolean}
@@ -104,7 +119,13 @@ function addMember(member, level) {
         id = member.user.id
     }
 
-    data[id] = new PremUser(id, level)
+    const profile = new PremUser(id, level)
+
+    data[id] = profile
+
+    
+    const { requestDM } = require("../nypsi")
+    requestDM(id, `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(profile.expireDate)}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`)
 }
 
 exports.addMember = addMember
@@ -119,7 +140,7 @@ function getPremiumProfile(member) {
         id = member.user.id
     }
 
-    return data[id]
+    return PremUser.fromData(data[id])
 }
 
 exports.getPremiumProfile = getPremiumProfile
@@ -135,6 +156,10 @@ function setTier(member, level) {
     }
 
     data[id].level = level
+
+    
+    const { requestDM } = require("../nypsi")
+    requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
 }
 
 exports.setTier = setTier
@@ -228,3 +253,42 @@ function setStartDate(member, date) {
 }
 
 exports.setStartDate = setStartDate
+
+function renewUser(member) {
+    const profile = PremUser.fromData(data[member])
+
+    profile.renew()
+
+    data[member] = profile
+
+    
+    const { requestDM } = require("../nypsi")  
+    requestDM(member, `your membership has been renewed until **${formatDate(profile.expireDate)}**`)
+}
+
+exports.renewUser = renewUser
+
+function expireUser(member) {
+    const profile = PremUser.fromData(data[member])
+
+    profile.expire()
+
+    data[member] = profile
+}
+
+exports.expireUser
+
+function revokeUser(member, reason) {
+    const profile = PremUser.fromData(data[member])
+
+    profile.status = status.REVOKED
+    profile.revokeReason = reason
+    profile.level = 0
+
+    data[member] = profile
+
+    const { requestDM } = require("../nypsi")  
+    requestDM(member, "your membership has been revoked")
+}
+
+exports.revokeUser = revokeUser
