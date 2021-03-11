@@ -128,7 +128,7 @@ class PremUser {
 
     async expire() {
         const { requestDM } = require("../../nypsi")
-        const d = await requestDM(this.id, `your ${this.getLevelString()} membership has expired, join the support server if this is an error ($support)`)
+        const d = await requestDM(this.id, `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`)
 
         this.status = status.INACTIVE
         this.level = 0

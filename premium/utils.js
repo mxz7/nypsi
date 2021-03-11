@@ -276,7 +276,7 @@ function expireUser(member) {
     data[member] = profile
 }
 
-exports.expireUser
+exports.expireUser = expireUser
 
 function revokeUser(member, reason) {
     const profile = PremUser.fromData(data[member])
