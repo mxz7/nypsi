@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -14,11 +15,17 @@ const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
  */
 async function run(message, args) {
 
+    let cooldownLength = 5
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 1
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -37,7 +44,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     let member
 
@@ -61,7 +68,16 @@ async function run(message, args) {
     if (cache.has(member.user.id)) {
         iq = cache.get(member.user.id)
     } else {
-        const chance = Math.floor(Math.random() * 25)
+
+        let chanceAmount = 25
+
+        if (isPremium(message.author.id)) {
+            if (getTier(message.author.id) >= 3) {
+                chanceAmount = 10
+            }
+        }
+
+        const chance = Math.floor(Math.random() * chanceAmount)
 
         if (chance == 7) {
             const chance2 = Math.floor(Math.random() * 10)
@@ -102,6 +118,8 @@ async function run(message, args) {
         iqMsg = "nerd 🤓"
     } else if (iq == 420) {
         iqMsg = "🚬🍁🍂"
+    } else {
+        iqMsg = "uh. woah."
     }
 
     const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`)

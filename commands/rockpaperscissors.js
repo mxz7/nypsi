@@ -4,6 +4,7 @@ const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils.js")
+const { isPremium, getTier } = require("../premium/utils.js")
 
 const cooldown = new Map()
 
@@ -15,11 +16,19 @@ const cmd = new Command("rockpaperscissors", "play rock paper scissors", categor
  */
 async function run(message, args) {
 
+    let cooldownLength = 10
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 5
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -106,7 +115,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.member.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     updateBalance(message.member, getBalance(message.member) - bet)
 

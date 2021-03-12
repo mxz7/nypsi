@@ -1,4 +1,6 @@
 const { Message } = require("discord.js")
+const { getPrefix } = require("../guilds/utils")
+const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
@@ -135,6 +137,17 @@ async function run(message, args) {
                 if (currentPage >= lastPage) {
                     return pageManager()
                 } else {
+
+                    if (!isPremium(message.author.id)) {
+                        newEmbed.setFooter(`page ${currentPage}/${lastPage} - this is only available for patreons (${getPrefix(message.guild)}patreon)`)
+                        for (let i of pages.get(currentPage)) {
+                            const fieldName = i.split("|6|9|")[0]
+                            const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
+                            newEmbed.addField(fieldName, fieldValue)
+                        }
+                        return await msg.edit(newEmbed)
+                    }
+
                     currentPage++
 
                     for (let i of pages.get(currentPage)) {

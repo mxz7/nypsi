@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -14,11 +15,17 @@ const cmd = new Command("pp", "accurate prediction of your pp size", categories.
  */
 async function run(message, args) {
 
+    let cooldownLength = 5
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 1
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -37,7 +44,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     let member
 
@@ -63,7 +70,15 @@ async function run(message, args) {
     } else {
         size = Math.floor(Math.random() * 15)
 
-        const bigInch = Math.floor(Math.random() * 45)
+        let chance = 45
+
+        if (isPremium(message.author.id)) {
+            if (getTier(message.author.id) >= 3) {
+                chance = 10
+            }
+        }
+
+        const bigInch = Math.floor(Math.random() * chance)
 
         if (bigInch == 7) {
             size = Math.floor(Math.random() * 54) + 15

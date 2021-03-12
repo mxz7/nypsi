@@ -4,6 +4,7 @@ const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBal
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
+const { isPremium, getTier } = require("../premium/utils")
 
 const tax = 0.15
 
@@ -17,11 +18,19 @@ const cmd = new Command("pay", "give other users money", categories.MONEY).setAl
  */
 async function run(message, args) {
 
+    let cooldownLength = 10
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 5
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 10 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -103,7 +112,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 10000)
+    }, cooldownLength * 1000)
 
     updateBalance(message.member, getBalance(message.member) - amount)
 

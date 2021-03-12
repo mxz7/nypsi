@@ -10,6 +10,7 @@ const { runCommand, loadCommands, getRandomCommand } = require("./utils/commandh
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, daysUntilChristmas } = require("./utils/utils")
 const { runUnmuteChecks, deleteMute, isMuted, profileExists } = require("./moderation/utils")
+const { isPremium, setTier, renewUser, addMember, getTier } = require("./premium/utils")
 
 const snipe = new Map()
 const eSnipe = new Map()
@@ -108,6 +109,37 @@ client.on("rateLimit", rate => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
     console.log("\x1b[31m[" + getTimestamp() + "] rate limit: " + reason + "\x1b[37m")
+})
+
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+    if (newMember.guild.id == "747056029795221513") {
+        if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+
+            let tier = 0
+
+            if (newMember.roles.cache.find(r => r.id == "819870959325413387")) { // platinum 
+                tier = 4
+            } else if (newMember.roles.cache.find(r => r.id == "819870846536646666")) { // gold 
+                tier = 3
+            } else if (newMember.roles.cache.find(r => r.id == "819870727834566696")) { // silver
+                tier = 2
+            } else if (newMember.roles.cache.find(r => r.id == "819870590718181391")) { // bronze
+                tier = 1
+            }
+
+            if (tier == 0 || tier > 4) return
+
+            if (isPremium(newMember.user.id)) {
+
+                if (tier <= getTier(newMember.user.id)) return
+
+                setTier(newMember.user.id, tier)
+                renewUser(newMember.user.id)
+            } else {
+                addMember(newMember.user.id, tier)
+            }
+        }
+    }
 })
 
 client.on("guildMemberAdd", member => {
@@ -377,6 +409,30 @@ async function onVote(vote) {
 }
 
 exports.onVote = onVote
+
+/**
+ * @param {String} id 
+ */
+async function requestDM(id, content) {
+    const member = await client.users.fetch(id)
+
+    if (member) {
+        await member.send(content).catch(async () => {
+            const tekoh = await client.users.fetch(672793821850894347)
+
+            await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+        })
+        return true
+    } else {
+        const tekoh = await client.users.fetch(672793821850894347)
+
+        await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+
+        return false
+    }
+}
+
+exports.requestDM = requestDM
 
 setTimeout(() => {
     client.login(token).then(() => {
