@@ -108,7 +108,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, cooldownLength)
+    }, cooldownLength * 1000)
 
     updateBalance(message.member, getBalance(message.member) - bet)
 

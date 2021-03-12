@@ -118,6 +118,8 @@ async function run(message, args) {
         iqMsg = "nerd 🤓"
     } else if (iq == 420) {
         iqMsg = "🚬🍁🍂"
+    } else {
+        iqMsg = "uh. woah."
     }
 
     const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`)

@@ -74,7 +74,7 @@ async function run(message, args) {
 
         if (isPremium(message.author.id)) {
             if (getTier(message.author.id) >= 3) {
-                chance = 15
+                chance = 10
             }
         }
 
