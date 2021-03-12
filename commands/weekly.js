@@ -52,7 +52,7 @@ async function run(message, args) {
     if (!isPremium(message.author.id)) {
         return notValidForYou()
     } else {
-        if (getTier(message.author.id) < 2) {
+        if (getTier(message.author.id) < 3) {
             return notValidForYou()
         }
 
@@ -87,7 +87,7 @@ async function run(message, args) {
             const timeRemaining = Math.abs(604800000 - diff)
             const dd = timeUntil(new Date().getTime() + timeRemaining)
 
-            const embed = new CustomEmbed(message.member, false, "you have already used your weekly reward! come back in " + dd)
+            const embed = new CustomEmbed(message.member, false, "you have already used your weekly reward! come back in **" + dd + "**")
 
             return message.channel.send(embed)
         }
