@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { isPremium } = require("../premium/utils")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -70,7 +70,15 @@ async function run(message, args) {
     } else {
         size = Math.floor(Math.random() * 15)
 
-        const bigInch = Math.floor(Math.random() * 45)
+        let chance = 45
+
+        if (isPremium(message.author.id)) {
+            if (getTier(message.author.id) >= 3) {
+                chance = 15
+            }
+        }
+
+        const bigInch = Math.floor(Math.random() * chance)
 
         if (bigInch == 7) {
             size = Math.floor(Math.random() * 54) + 15
