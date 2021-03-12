@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { isPremium } = require("../premium/utils")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -68,7 +68,16 @@ async function run(message, args) {
     if (cache.has(member.user.id)) {
         iq = cache.get(member.user.id)
     } else {
-        const chance = Math.floor(Math.random() * 25)
+
+        let chanceAmount = 25
+
+        if (isPremium(message.author.id)) {
+            if (getTier(message.author.id) >= 3) {
+                chanceAmount = 10
+            }
+        }
+
+        const chance = Math.floor(Math.random() * chanceAmount)
 
         if (chance == 7) {
             const chance2 = Math.floor(Math.random() * 10)
