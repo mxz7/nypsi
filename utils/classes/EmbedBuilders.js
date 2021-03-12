@@ -1,4 +1,5 @@
 const { MessageEmbed, GuildMember } = require("discord.js")
+const { isPremium, getTier, getEmbedColor } = require("../../premium/utils")
 const { getColor } = require("../utils")
 
 exports.CustomEmbed = class {
@@ -12,7 +13,20 @@ exports.CustomEmbed = class {
         this.embed = new MessageEmbed()
 
         if (member) {
-            this.embed.setColor(getColor(member))
+
+            if (isPremium(member.user.id)) {
+                if (getTier(member.user.id) >= 2) {
+                    if (getEmbedColor(member.user.id) != "default") {
+                        this.embed.setColor(getEmbedColor(member.user.id))
+                    } else {
+                        this.embed.setColor(getColor(member))
+                    }
+                } else {
+                    this.embed.setColor(getColor(member))
+                }
+            } else {
+                this.embed.setColor(getColor(member))
+            }
         }
 
         if (text) {
