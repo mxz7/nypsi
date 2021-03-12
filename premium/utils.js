@@ -180,6 +180,16 @@ function setEmbedColor(member, color) {
 exports.setEmbedColor = setEmbedColor
 
 /**
+ * @returns {String}
+ * @param {String} member id
+ */
+function getEmbedColor(member) {
+    return data[member].embedColor
+}
+
+exports.getEmbedColor = getEmbedColor
+
+/**
  * @param {GuildMember} member
  * @param {Date} date
  */
