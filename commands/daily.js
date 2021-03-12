@@ -44,7 +44,7 @@ async function run(message, args) {
     }
 
     const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, false, `${getPrefix(message.guild)}daily is for SILVER tier and higher`).setFooter(`${getPrefix(message.guild)}patreon`)
+        const embed = new CustomEmbed(message.member, false, `${getPrefix(message.guild)}daily is for BRONZE tier and higher`).setFooter(`${getPrefix(message.guild)}patreon`)
 
         return message.channel.send(embed)
     }
@@ -52,7 +52,7 @@ async function run(message, args) {
     if (!isPremium(message.author.id)) {
         return notValidForYou()
     } else {
-        if (getTier(message.author.id) < 2) {
+        if (getTier(message.author.id) < 1) {
             return notValidForYou()
         }
 
