@@ -26,8 +26,15 @@ async function run(message, args) {
             const timeAgo = daysAgo(profile.startDate)
             const expires = formatDate(profile.expireDate)
             const timeUntil = daysUntil(profile.expireDate)
+            const embedColor = profile.embedColor
 
-            embed.setDescription(`**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`)
+            let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`
+
+            if (profile.level >= 2) {
+                description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)\n\n**color** #${embedColor} - (${getPrefix(message.guild)}setcolor)`
+            }
+
+            embed.setDescription(description)
             embed.setFooter("thank you so much for supporting!")
 
             return message.channel.send(embed)
