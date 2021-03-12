@@ -1,5 +1,6 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../guilds/utils")
+const { isPremium, getTier } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -12,12 +13,20 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", categorie
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
+    let cooldownLength = 30
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 10
+        }
+    }
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 30 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -35,6 +44,11 @@ async function run(message, args) {
 
     if (args.length == 0) {
         args[0] = 5
+        if (isPremium(message.author.id)) {
+            if (getTier(message.author.id) == 4) {
+                args[0] = 100
+            }
+        }
     }
 
     const prefix = getPrefix(message.guild)
@@ -45,37 +59,21 @@ async function run(message, args) {
 
     let amount = parseInt(args[0])
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-            if (amount > 10) {
-                amount = 10
-            }
-        } else {
-            if (amount > 50) {
-                amount = 50
-            }
-        }
-        cooldown.set(message.member.id, new Date())
+    cooldown.set(message.member.id, new Date())
 
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, 30000)
-    }
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, cooldownLength * 1000)
 
     if (amount > 100) amount = 100
 
-    let collected
-
-    if (message.member.user.id == "672793821850894347") {
-        const collected = await message.channel.messages.fetch({limit: 50})
-
-        const collecteda = collected.filter(msg => {
-            if (!msg.author) return
-            return msg.author.id == "672793821850894347"
-        })
-
-        return await message.channel.bulkDelete(collecteda)
+    if (!isPremium(message.author.id)) {
+        if (amount > 20) {
+            amount = 20
+        }
     }
+
+    let collected
 
     if (amount <= 6) {
         collected = await message.channel.messages.fetch({limit: 25})

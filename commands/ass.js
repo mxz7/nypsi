@@ -1,4 +1,5 @@
 const { Message } = require("discord.js")
+const { isPremium } = require("../premium/utils.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { redditImage } = require("../utils/utils.js")
@@ -12,12 +13,18 @@ const cmd = new Command("ass", "get a random ass image", categories.NSFW).setAli
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
+    let cooldownLength = 5
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 1
+    }
         
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -46,7 +53,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     const assLinks = Array.from(assCache.keys())
 

@@ -1,5 +1,6 @@
 const { Message } = require("discord.js")
 const { wholesome } = require("../lists.json")
+const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -13,11 +14,17 @@ const cmd = new Command("wholesome", "get a random wholesome picture", categorie
  */
 async function run(message, args) {
 
+    let cooldownLength = 5
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 1
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -36,7 +43,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(message.member)
         .setTitle("<3")

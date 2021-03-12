@@ -3,6 +3,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils.js")
+const { isPremium, getTier } = require("../premium/utils.js")
 
 const cooldown = new Map()
 
@@ -16,11 +17,19 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
+    let cooldownLength = 30
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 10
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 30 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -83,7 +92,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 30000)
+    }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle("bank deposit | processing")
