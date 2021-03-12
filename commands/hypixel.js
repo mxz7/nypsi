@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const fetch = require("node-fetch")
 const { hypixel } = require("../config.json")
 const { getPrefix } = require("../guilds/utils")
+const { isPremium, getTier } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -35,11 +36,19 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`${prefix}h <username>`))
     }
 
+    let cooldownLength = 10
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 2
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 10 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -58,7 +67,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 10000)
+    }, cooldownLength * 1000)
 
     const username = args[0]
     
