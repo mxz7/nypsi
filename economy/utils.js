@@ -8,6 +8,7 @@ const { GuildMember, Guild, Client } = require("discord.js")
 const { getTimestamp } = require("../utils/utils")
 const { EconProfile } = require("../utils/classes/EconStorage")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { isPremium, getTier } = require("../premium/utils")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -238,6 +239,19 @@ async function getMulti(member) {
     const prestigeBonus = (getPrestige(member) * 2)
 
     multi += prestigeBonus
+
+    if (isPremium(id)) {
+        switch (getTier(id)) {
+        case 2:
+            multi += 5
+            break
+        case 3:
+            multi += 10
+            break
+        case 4:
+            multi += 15
+        }
+    }
 
     multi = multi / 100
 

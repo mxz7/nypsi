@@ -4,6 +4,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cooldown = new Map()
 const playerCooldown = new Set()
@@ -15,6 +16,14 @@ const cmd = new Command("rob", "rob other server members", categories.MONEY).set
  * @param {Array<String>} args 
  */
 async function run(message, args) {
+
+    let cooldownLength = 600
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 400
+        }
+    }
 
     if (cooldown.has(message.member.user.id)) {
         const init = cooldown.get(message.member.user.id)
@@ -84,7 +93,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 600000)
+    }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
         .setTitle("robbery | " + message.member.user.username)
