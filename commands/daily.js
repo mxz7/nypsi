@@ -44,7 +44,7 @@ async function run(message, args) {
     }
 
     const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, false, `${getPrefix(message.guild)}daily is for silver tier and higher`).setFooter(`${getPrefix(message.guild)}patreon`)
+        const embed = new CustomEmbed(message.member, false, `${getPrefix(message.guild)}daily is for SILVER tier and higher`).setFooter(`${getPrefix(message.guild)}patreon`)
 
         return message.channel.send(embed)
     }
