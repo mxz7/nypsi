@@ -29,7 +29,7 @@ async function run(message, args) {
         const init = cooldown.get(message.member.user.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 600 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
