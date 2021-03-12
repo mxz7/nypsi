@@ -87,7 +87,7 @@ async function run(message, args) {
             const timeRemaining = Math.abs(86400000 - diff)
             const dd = timeUntil(new Date().getTime() + timeRemaining)
 
-            const embed = new CustomEmbed(message.member, false, "you have already used your daily reward! come back in " + dd)
+            const embed = new CustomEmbed(message.member, false, "you have already used your daily reward! come back in **" + dd + "**")
 
             return message.channel.send(embed)
         }
