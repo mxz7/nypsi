@@ -31,7 +31,11 @@ async function run(message, args) {
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`
 
             if (profile.level >= 2) {
-                description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)\n\n**color** #${embedColor} - (${getPrefix(message.guild)}setcolor)`
+                description += `\n\n**color** #${embedColor} - (${getPrefix(message.guild)}setcolor)`
+            }
+
+            if (profile.level < 4) {
+                description += "\n\nyou can upgrade your tier at https://www.patreon.com/nypsi"
             }
 
             embed.setDescription(description)
