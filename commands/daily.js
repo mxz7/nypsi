@@ -66,11 +66,11 @@ async function run(message, args) {
             let amount = 30000
             const multi = await getMulti(message.member)
 
-            let description = `$${getBalance(message.member)}\n + $**${amount.toLocaleString()}**`
+            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi)
-                description = `$${getBalance(message.member)}\n + $**${amount.toLocaleString()}** (+**${(multi * 100).toLocaleString()}**% bonus)`
+                description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${(multi * 100).toLocaleString()}**% bonus)`
             }
 
             updateBalance(message.member, getBalance(message.member) + amount)
