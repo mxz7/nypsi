@@ -93,7 +93,7 @@ async function run(message, args) {
 
         embed.setDescription(`you are now prestige **${getPrestige(message.member)}**\n\n` + 
             `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**\n` +
-            `your new multiplier: **${multi}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`)
+            `your new multiplier: **${multi * 100}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`)
         await msg.edit(embed)
     }
 
