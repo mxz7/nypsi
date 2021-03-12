@@ -4,6 +4,7 @@ const { getBalance, updateBalance, userExists, createUser } = require("../econom
 const { MessageEmbed, Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { isPremium, getTier } = require("../premium/utils")
 
 const cooldown = new Map()
 
@@ -15,11 +16,19 @@ const cmd = new Command("work", "work a random job and safely earn a random amou
  */
 async function run(message, args) {
 
+    let cooldownLength = 1800
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            cooldownLength = 900
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 1800 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -48,7 +57,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 1800000)
+    }, cooldownLength * 1000)
 
     let earnedMax = 14
 
