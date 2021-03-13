@@ -49,8 +49,12 @@ async function run(message, args) {
             return message.channel.send(embed)
         }
 
-        if (!commandExists(args[1])) {
+        if (!commandExists(word)) {
             return message.channel.send(new ErrorEmbed(`you must use the command's name, you can use ${getPrefix(message.guild)}help <command> to find this`))
+        }
+
+        if (word == "disablecommand") {
+            return message.channel.send(new CustomEmbed(message.member, false, "nice try"))
         }
 
         filter.push(word)
