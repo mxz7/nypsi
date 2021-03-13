@@ -50,7 +50,7 @@ async function run(message, args) {
             .setTitle("ezpoll help")
             .addField("usage", `${prefix}ezpoll <choices..>`)
             .addField("help", "after creation your message will be deleted and an embed will be created to act as the poll\n" +
-                "every word will be an option in the poll, with a maximum of 4 and minimum of two")
+                "every word will be an option in the poll, with a maximum of 4 and minimum of two - use _ to have a space")
             .addField("example", `${prefix}ezpoll option1 option2`)
 
         return message.channel.send(embed)
@@ -71,6 +71,8 @@ async function run(message, args) {
 
     for (let option of args) {
         if (count > 4) break
+
+        option = option.split("_").join(" ")
             
         if (count == 1) {
             choices = "1️⃣ " + option
