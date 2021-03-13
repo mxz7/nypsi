@@ -288,3 +288,5 @@ class ErrorEmbed {
         return this
     }
 }
+
+exports.ErrorEmbed = ErrorEmbed
