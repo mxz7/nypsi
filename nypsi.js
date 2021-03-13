@@ -48,6 +48,8 @@ client.on("messageUpdate", messageUpdate.bind(null))
 client.on("message", message.bind(null))
 client.on("channelCreate", channelCreate.bind(null))
 
+client.on("shardReady", (shardID) => console.log(`[${getTimestamp()}] shard#${shardID} ready`))
+
 process.on("unhandledRejection", error => {
     let stack = error.stack.split("\n").join("\n\x1b[31m")
 
@@ -155,13 +157,16 @@ async function requestDM(id, content) {
 
 exports.requestDM = requestDM
 
-client.login(token).then(() => {
-    setTimeout(() => {
-        runChecks()
-        updateCache()
-        runUnmuteChecks(client)
-    }, 2000)
-})
+setTimeout(() => {
+    console.log(`[${getTimestamp()}] logging in...`)
+    client.login(token).then(() => {
+        setTimeout(() => {
+            runChecks()
+            updateCache()
+            runUnmuteChecks(client)
+        }, 2000)
+    })
+}, 1000)
 
 function MStoTime(ms) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
