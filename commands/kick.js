@@ -81,6 +81,13 @@ async function run(message, args) {
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.owner.user.id != message.member.user.id) {
             failed.push(members.get(member).user)
         } else {
+            
+            if (members.get(member).user.id == message.client.user.id) {
+                await message.channel.send("well... i guess this is goodbye ):")
+                await message.guild.leave()
+                return
+            }
+
             await members.get(member).kick(reason).then(() => {
                 count++
             }).catch(() => {
