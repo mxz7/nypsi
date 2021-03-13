@@ -114,6 +114,12 @@ async function run(message, args) {
     let fail = false
 
     for (let member of members.keyArray()) {
+
+        if (members.get(member).user.id == message.client.user.id) {
+            await message.channel.send("youll never shut me up 😏")
+            continue
+        }
+
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 

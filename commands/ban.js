@@ -94,7 +94,14 @@ async function run(message, args) {
                 failed.push(members.get(member).user)
                 continue
             }
+
+            if (members.get(member).user.id == message.client.user.id) {
+                await message.channel.send("well... i guess this is goodbye ):")
+                await message.guild.leave()
+                return
+            }
         }
+
         await message.guild.members.ban(member, {
             days: days,
             reason: reason

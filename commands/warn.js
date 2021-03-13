@@ -93,6 +93,10 @@ async function run(message, args) {
             })
             count++
         }
+
+        if (members.get(member).user.id == message.client.user.id) {
+            await message.channel.send("wow... 😢")
+        }
     }
 
     if (count == 0) {
