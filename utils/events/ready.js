@@ -60,17 +60,12 @@ module.exports = async (client, startUp) => {
         memberCount = memberCount + g.memberCount
     })
 
-    console.log("\n ~~ tekoh.net ~~")
-    console.log(" ~~ max#0777 ~~ ")
-
-    console.log("\n--bot summary--")
-    console.log("server count: " + client.guilds.cache.size.toLocaleString())
+    console.log("\nserver count: " + client.guilds.cache.size.toLocaleString())
     console.log("user count: " + memberCount.toLocaleString())
     console.log("commands count: " + commandsSize)
     console.log("users in currency: " + getUserCount())
-    console.log("--bot summary--\n")
 
-    console.log("logged in as " + client.user.tag + " @ " + getTimestamp())
+    console.log("\nlogged in as " + client.user.tag + " @ " + getTimestamp())
 
     const now = Date.now()
     const timeTaken = (now - startUp) / 1000
