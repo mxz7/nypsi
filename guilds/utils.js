@@ -3,7 +3,7 @@ const fs = require("fs")
 const { getPriority } = require("os")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { GuildStorage } = require("../utils/classes/GuildStorage")
-const { daysUntilChristmas } = require("../utils/utils")
+const { daysUntilChristmas, getTimestamp } = require("../utils/utils")
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
 
 let timer = 0
@@ -489,25 +489,23 @@ function updateChatFilter(guild, array) {
 
 exports.updateChatFilter = updateChatFilter
 
-function getTimestamp() {
-    const date = new Date()
-    let hours = date.getHours().toString()
-    let minutes = date.getMinutes().toString()
-    let seconds = date.getSeconds().toString()
-    
-    if (hours.length == 1) {
-        hours = "0" + hours
-    } 
-    
-    if (minutes.length == 1) {
-        minutes = "0" + minutes
-    } 
-    
-    if (seconds.length == 1) {
-        seconds = "0" + seconds
-    }
-    
-    const timestamp = hours + ":" + minutes + ":" + seconds
-
-    return timestamp
+/**
+ * @param {Guild} guild 
+ * @returns {Array<String>}
+ */
+function getDisabledCommands(guild) {
+    return guilds[guild.id].disabledCommands
 }
+
+exports.getDisabledCommands = getDisabledCommands
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Array<String>} array 
+ */
+function updateDisabledCommands(guild, array) {
+    guilds[guild.id].disabledCommands = array
+}
+
+exports.updateDisabledCommands = updateDisabledCommands

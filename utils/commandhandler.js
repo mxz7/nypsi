@@ -2,9 +2,9 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const fs = require("fs")
 const { Message } = require("discord.js")
-const { getPrefix } = require("../guilds/utils.js")
+const { getPrefix, getDisabledCommands } = require("../guilds/utils.js")
 const { Command, categories } = require("./classes/Command")
-const { CustomEmbed } = require("./classes/EmbedBuilders.js")
+const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const { getTimestamp } = require("./utils.js")
 
 const commands = new Map()
@@ -312,8 +312,14 @@ function runCommand(cmd, message, args) {
     try {
         logCommand(message, args)
         if (alias) {
+            if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd).name) != -1) {
+                return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            }
             commands.get(aliases.get(cmd)).run(message, args)
         } else {
+            if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
+                return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            }
             commands.get(cmd).run(message, args)
         }
     } catch(e) {
