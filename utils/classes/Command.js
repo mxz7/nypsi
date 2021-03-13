@@ -1,6 +1,6 @@
-exports.Command = class {
+class Command {
     /**
-     * @returns {Command} 
+     * @returns {Command}
      * @param {String} name command name
      * @param {String} description command description
      * @param {String} category command category
@@ -43,6 +43,8 @@ exports.Command = class {
         return this
     }
 }
+
+exports.Command = Command
 
 const categories = {
     NONE: "none",

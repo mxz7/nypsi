@@ -2,7 +2,7 @@ const { MessageEmbed, GuildMember } = require("discord.js")
 const { isPremium, getTier, getEmbedColor } = require("../../premium/utils")
 const { getColor } = require("../utils")
 
-exports.CustomEmbed = class {
+class CustomEmbed {
     /**
      * @returns {CustomEmbed}
      * @param {GuildMember} member
@@ -159,7 +159,9 @@ exports.CustomEmbed = class {
     }
 }
 
-exports.ErrorEmbed = class {
+exports.CustomEmbed = CustomEmbed
+
+class ErrorEmbed {
     /**
      * @returns {ErrorEmbed}
      * @param {String} text 

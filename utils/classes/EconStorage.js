@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
 
-exports.EconProfile = class {
+class EconProfile {
     /**
      * @returns {EconProfile}
      */
@@ -23,3 +23,5 @@ exports.EconProfile = class {
         return this
     }
 }
+
+exports.EconProfile = EconProfile

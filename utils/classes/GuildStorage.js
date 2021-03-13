@@ -1,4 +1,4 @@
-exports.GuildStorage = class {
+class GuildStorage {
     /**
      * @returns {GuildStorage}
      * @param {Collection} members 
@@ -29,3 +29,5 @@ exports.GuildStorage = class {
         return this.guild
     }
 }
+
+exports.GuildStorage = GuildStorage
