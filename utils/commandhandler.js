@@ -312,7 +312,7 @@ function runCommand(cmd, message, args) {
     try {
         logCommand(message, args)
         if (alias) {
-            if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd).name) != -1) {
+            if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
                 return message.channel.send(new ErrorEmbed("that command has been disabled"))
             }
             commands.get(aliases.get(cmd)).run(message, args)
