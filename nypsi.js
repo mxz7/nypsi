@@ -2,7 +2,8 @@ const startUp = Date.now()
 
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
-const client = new Discord.Client({ disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000 })
+const client = new Discord.Client({ 
+    disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000, shardCount: 2 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, hasGuild, createGuild, getSnipeFilter, checkStats, hasStatsEnabled, getPrefix, checkChristmasCountdown, hasChristmasCountdownEnabled, setPrefix, getChatFilter, } = require("./guilds/utils.js")
@@ -15,7 +16,6 @@ const { isPremium, setTier, renewUser, addMember, getTier } = require("./premium
 const snipe = new Map()
 const eSnipe = new Map()
 const mentions = new Map()
-let ready = false
 
 exports.eSnipe = eSnipe
 exports.snipe = snipe
@@ -23,309 +23,30 @@ exports.mentions = mentions
 
 loadCommands()
 
-client.once("ready", async () => {
-    const games = ["$help | nypsi.xyz", "$help | tekoh.net", 
-        "$help | nypsi.xyz", "$help | nypsi.xyz", "$help | nypsi.xyz",
-        "have you joined the $support server?", "x0x", "x0x", 
-        "x0x", "xmas"]
+const ready = require("./utils/events/ready")
+const guildCreate = require("./utils/events/guildCreate")
+const guildDelete = require("./utils/events/guildDelete")
+const guildMemberUpdate = require("./utils/events/guildMemberUpdate")
+const guildMemberAdd = require("./utils/events/guildMemberAdd")
+const messageDelete = require("./utils/events/messageDelete")
+const messageUpdate = require("./utils/events/messageUpdate")
+const message = require("./utils/events/message")
+const channelCreate = require("./utils/events/channelCreate")
 
-    setTimeout(async () => {
-        const a = await getRandomCommand()
-
-        let game = games[Math.floor(Math.random() * games.length)]
-
-        if (game == "x0x") {
-            game = `$${a.name} - ${a.description}`
-        } else if (game == "xmas") {
-            game = `${daysUntilChristmas()} days until christmas`
-        }
-
-        client.user.setPresence({
-            status: "dnd",
-            activity: {
-                name: game
-            }
-        })
-    }, 5000)
-
-    setInterval(async () => {
-        const a = await getRandomCommand()
-
-        let game = games[Math.floor(Math.random() * games.length)]
-
-        if (game == "x0x") {
-            game = `$${a.name} - ${a.description}`
-        } else if (game == "xmas") {
-            game = `${daysUntilChristmas()} days until christmas`
-        }
-
-        client.user.setPresence({
-            status: "dnd",
-            activity: {
-                name: game
-            }
-        })
-    }, 15 * 60 * 1000)
-
-    const { commandsSize } = require("./utils/commandhandler")
-
-    let memberCount = 0
-
-    await client.guilds.cache.forEach(g => {
-        memberCount = memberCount + g.memberCount
-    })
-
-    console.log("\n ~~ tekoh.net ~~")
-    console.log(" ~~ max#0777 ~~ ")
-
-    console.log("\n--bot summary--")
-    console.log("server count: " + client.guilds.cache.size.toLocaleString())
-    console.log("user count: " + memberCount.toLocaleString())
-    console.log("commands count: " + commandsSize)
-    console.log("users in currency: " + getUserCount())
-    console.log("--bot summary--\n")
-
-    console.log("logged in as " + client.user.tag + " @ " + getTimestamp())
-
-    const now = Date.now()
-    const timeTaken = (now - startUp) / 1000
-
-    console.log(`time taken: ${timeTaken}s\n`)
-})
-
-client.on("guildCreate", guild => {
-    console.log("\x1b[36m[" + getTimestamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
-    if (!hasGuild(guild)) {
-        createGuild(guild)
-    }
-})
-
-client.on("guildDelete", guild => {
-    console.log("\x1b[36m[" + getTimestamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
-    setPrefix(guild, "$")
-})
-
+client.once("ready", ready.bind(null, client, startUp))
+client.on("guildCreate", guildCreate.bind(null, client))
+client.on("guildDelete", guildDelete.bind(null, client))
 client.on("rateLimit", rate => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
     console.log("\x1b[31m[" + getTimestamp() + "] rate limit: " + reason + "\x1b[37m")
 })
-
-client.on("guildMemberUpdate", async (oldMember, newMember) => {
-    if (newMember.guild.id == "747056029795221513") {
-        if (oldMember.roles.cache.size < newMember.roles.cache.size) {
-
-            let tier = 0
-
-            if (newMember.roles.cache.find(r => r.id == "819870959325413387")) { // platinum 
-                tier = 4
-            } else if (newMember.roles.cache.find(r => r.id == "819870846536646666")) { // gold 
-                tier = 3
-            } else if (newMember.roles.cache.find(r => r.id == "819870727834566696")) { // silver
-                tier = 2
-            } else if (newMember.roles.cache.find(r => r.id == "819870590718181391")) { // bronze
-                tier = 1
-            }
-
-            if (tier == 0 || tier > 4) return
-
-            if (isPremium(newMember.user.id)) {
-
-                if (tier <= getTier(newMember.user.id)) return
-
-                setTier(newMember.user.id, tier)
-                renewUser(newMember.user.id)
-            } else {
-                addMember(newMember.user.id, tier)
-            }
-        }
-    }
-})
-
-client.on("guildMemberAdd", member => {
-    runCheck(member.guild)
-
-    if (!profileExists(member.guild)) return
-
-    if (isMuted(member.guild, member)) {
-        const muteRole = member.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
-
-        if (!muteRole) return deleteMute(member.guild, member)
-
-        member.roles.add(muteRole)
-    }
-})
-
-client.on("messageDelete", message => {
-
-    if (!message) return
-
-    if (!message.member) return
-
-    if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
-
-        if (!hasGuild(message.guild)) createGuild(message.guild)
-
-        const filter = getSnipeFilter(message.guild)
-
-        let content = message.content.toLowerCase().normalize("NFD")
-
-        content = content.replace(/[^A-z0-9\s]/g, "")
-
-        for (let word of filter) {
-            if (content.includes(word.toLowerCase())) return
-        }
-
-        snipe.set(message.channel.id, {
-            content: message.content,
-            member: message.author.tag,
-            createdTimestamp: message.createdTimestamp,
-            channel: {
-                id: message.channel.id
-            }
-        })
-
-        exports.snipe = snipe
-    }
-})
-
-client.on("messageUpdate", message => {
-    if (!message) return
-
-    if (!message.member) return
-
-    if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
-
-        if (!hasGuild(message.guild)) createGuild(message.guild)
-
-        const filter = getSnipeFilter(message.guild)
-
-        let content = message.content.toLowerCase().normalize("NFD")
-
-        content = content.replace(/[^A-z0-9\s]/g, "")
-
-        for (let word of filter) {
-            if (content.includes(word.toLowerCase())) return
-        }
-
-        eSnipe.set(message.channel.id, {
-            content: message.content,
-            member: message.author.tag,
-            createdTimestamp: message.createdTimestamp,
-            channel: {
-                id: message.channel.id
-            }
-        })
-
-        exports.eSnipe = eSnipe
-    }
-})
-
-client.on("message", async message => {
-
-    if (!ready) return
-
-    if (message.author.bot) return
-
-    if (!message.guild) {
-        console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
-
-        const embed = new MessageEmbed()
-            .setTitle("support")
-            .setColor("#36393f")
-            .setDescription("support server: https://discord.gg/hJTDNST")
-        return await message.channel.send(embed)
-    }
-
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
-        const filter = getChatFilter(message.guild)
-
-        let content = message.content.toLowerCase().normalize("NFD")
-    
-        content = content.replace(/[^A-z0-9\s]/g, "")
-    
-        for (let word of filter) {
-            if (content.includes(word.toLowerCase())) {
-                return await message.delete()
-            }
-        }
-    }
-
-    if (message.mentions.members.first()) {
-        message.mentions.members.forEach(m => {
-            if (m.user.bot || m.user.id == message.author.id) {
-                return
-            }
-
-            let content = message.content
-
-            if (content.length > 100) {
-                content = content.substr(0, 97) + "..."
-            }
-
-            content = content.replace(/(\r\n|\n|\r)/gm, " ")
-
-            const data = {
-                user: message.author.tag,
-                content: content,
-                date: message.createdTimestamp,
-                link: message.url
-            }
-
-            if (!mentions.has(message.guild.id)) {
-                mentions.set(message.guild.id, new Map())
-            }
-
-            const guildData = mentions.get(message.guild.id)
-
-            if (!guildData.has(m.user.id)) {
-                guildData.set(m.user.id, [])
-            }
-
-            const userData = guildData.get(m.user.id)
-
-            if (userData.length >= 15) {
-                userData.shift()
-            }
-
-            userData.push(data)
-
-            guildData.set(m.user.id, userData)
-            mentions.set(message.guild.id, guildData)
-
-            exports.mentions = mentions
-        })
-    }
-
-    let prefix = getPrefix(message.guild)
-
-    if (client.user.id == "685193083570094101") prefix = "£"
-
-    if (message.content == `<@!${client.user.id}>`) {
-        return message.channel.send(`my prefix for this server is \`${prefix}\``)
-    }
-
-    if (!message.content.startsWith(prefix)) return
-
-    const args = message.content.substring(prefix.length).split(" ")
-
-    const cmd = args[0].toLowerCase()
-
-    return runCommand(cmd, message, args)
-})
-
-client.on("channelCreate", async ch => {
-    if (!ch.guild) return
-    const muteRole = ch.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
-
-    if (!muteRole) return
-
-    ch.updateOverwrite(muteRole,{
-        SEND_MESSAGES: false,
-        SPEAK: false,
-        ADD_REACTIONS: false
-    }).catch(() => {})
-})
+client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
+client.on("guildMemberAdd", guildMemberAdd.bind(null))
+client.on("messageDelete", messageDelete.bind(null))
+client.on("messageUpdate", messageUpdate.bind(null))
+client.on("message", message.bind(null))
+client.on("channelCreate", channelCreate.bind(null))
 
 process.on("unhandledRejection", error => {
     let stack = error.stack.split("\n").join("\n\x1b[31m")
@@ -434,16 +155,14 @@ async function requestDM(id, content) {
 
 exports.requestDM = requestDM
 
-setTimeout(() => {
-    client.login(token).then(() => {
-        setTimeout(() => {
-            ready = true
-            runChecks()
-            updateCache()
-            runUnmuteChecks(client)
-        }, 2000)
-    })
-}, 2000)
+client.login(token).then(() => {
+    setTimeout(() => {
+        runChecks()
+        updateCache()
+        runUnmuteChecks(client)
+        console.log(client)
+    }, 2000)
+})
 
 function MStoTime(ms) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
