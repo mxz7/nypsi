@@ -1,5 +1,5 @@
 const { Guild, Client } = require("discord.js")
-const { setPrefix } = require("../../guilds/utils")
+const { setPrefix, updateDisabledCommands } = require("../../guilds/utils")
 const { getTimestamp } = require("../utils")
 
 /**
@@ -9,4 +9,5 @@ const { getTimestamp } = require("../utils")
 module.exports = async (client, guild) => {
     console.log("\x1b[36m[" + getTimestamp() + "] removed from server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
     setPrefix(guild, "$")
+    updateDisabledCommands(guild, [])
 }
