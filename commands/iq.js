@@ -71,8 +71,8 @@ async function run(message, args) {
 
         let chanceAmount = 25
 
-        if (isPremium(message.author.id)) {
-            if (getTier(message.author.id) >= 3) {
+        if (isPremium(member.user.id)) {
+            if (getTier(member.user.id) >= 3) {
                 chanceAmount = 10
             }
         }
