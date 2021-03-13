@@ -80,7 +80,7 @@ async function run(message, args) {
 
     if (slutAmount >= 95) {
         slutEmoji = "🍆💦🍒🍑😈😉😏 🍆💦😜"
-        slutText = "whore ass hooker slut cousin fucker sweet home alabama"
+        slutText = "whore ass hooker cumslut cousin fucker sweet home alabama"
     } else if (slutAmount >= 80) {
         slutEmoji = "🍆🍒🍑😈 👉👌"
         slutText = "pornhub and onlyfans is your family business"
@@ -89,7 +89,7 @@ async function run(message, args) {
         slutText = "took 12 loads in one sitting"
     } else if (slutAmount >= 45) {
         slutEmoji = "👉👌💦"
-        slutText = "princess slut"
+        slutText = "princess cumslut"
     } else if (slutAmount >= 35) {
         slutEmoji = "🍆✊"
         slutText = "you would fuck anyone"
