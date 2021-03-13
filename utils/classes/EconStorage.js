@@ -2,7 +2,7 @@ const { GuildMember } = require("discord.js")
 
 exports.EconProfile = class {
     /**
-     * @returns {JSON}
+     * @returns {EconProfile}
      */
     constructor() {
         this.money = {

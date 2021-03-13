@@ -1,6 +1,6 @@
 exports.GuildStorage = class {
     /**
-     * @returns {JSON}
+     * @returns {GuildStorage}
      * @param {Collection} members 
      * @param {Collection} onlines 
      */
