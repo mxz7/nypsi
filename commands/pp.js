@@ -86,7 +86,7 @@ async function run(message, args) {
         const bigInch = Math.floor(Math.random() * chance)
 
         if (bigInch == 7) {
-            size = Math.floor(Math.random() * 54) + 15
+            size = Math.floor(Math.random() * 55) + 15
         }
         
         cache.set(member.user.id, size)
