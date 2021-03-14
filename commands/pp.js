@@ -16,6 +16,7 @@ const cmd = new Command("pp", "accurate prediction of your pp size", categories.
 async function run(message, args) {
 
     let cooldownLength = 5
+    let cacheTime = 60
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
@@ -62,6 +63,10 @@ async function run(message, args) {
         }
     }
 
+    if (isPremium(member.user.id)) {
+        cacheTime = 25
+    }
+
     let size
     let sizeMsg = "8"
 
@@ -88,7 +93,7 @@ async function run(message, args) {
 
         setTimeout(() => {
             cache.delete(member.user.id)
-        }, 60000)
+        }, cacheTime * 1000)
     }
 
     for (let i = 0; i < size; i++) {
