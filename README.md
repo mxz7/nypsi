@@ -9,6 +9,9 @@ top.gg url: [`https://top.gg/bot/678711738845102087`](https://top.gg/bot/6787117
 ### 🌴 support
 join the support server: [`https://discord.gg/hJTDNST`](https://discord.gg/hJTDNST) or add me `max#0777`
 
+### 💰 patreon
+gimme ur moneis ):< - haha joking but seriously check out the patreon it would help me massively, you also get benefits with the bot!!! [`https://patreon.com/nypsi`](https://patreon.com/nypsi)
+
 ### 🌵 features
 
 better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
