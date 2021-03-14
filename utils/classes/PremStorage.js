@@ -90,6 +90,16 @@ class PremUser {
     }
 
     /**
+     * @returns {PremUser}
+     * @param {Date} date
+     */
+    setExpireDate(date) {
+        this.expireDate = date
+        
+        return this
+    }
+
+    /**
      * @returns {String}
      */
     getLevelString() {
@@ -146,6 +156,7 @@ class PremUser {
         a.setStatus(object.status)
         a.setReason(object.revokeReason)
         a.setStartDate(object.startDate)
+        a.setExpireDate(object.expireDate)
 
         return a
     }
