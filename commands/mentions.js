@@ -139,7 +139,7 @@ async function run(message, args) {
                 } else {
 
                     if (!isPremium(message.author.id)) {
-                        newEmbed.setFooter(`page ${currentPage}/${lastPage} - this is only available for patreons (${getPrefix(message.guild)}patreon)`)
+                        newEmbed.setFooter(`pages are only available for patreons (${getPrefix(message.guild)}patreon)`)
                         for (let i of pages.get(currentPage)) {
                             const fieldName = i.split("|6|9|")[0]
                             const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
