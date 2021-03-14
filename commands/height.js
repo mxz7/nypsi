@@ -16,9 +16,11 @@ const cmd = new Command("height", "accurate prediction of your height", categori
 async function run(message, args) {
 
     let cooldownLength = 5
+    let cacheTime = 60
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
+        cacheTime = 25
     }
 
     if (cooldown.has(message.member.id)) {
@@ -62,6 +64,10 @@ async function run(message, args) {
         }
     }
 
+    if (isPremium(member.user.id)) {
+        cacheTime = 25
+    }
+
     let size
     let feet
     let inches
@@ -84,7 +90,7 @@ async function run(message, args) {
 
         setTimeout(() => {
             cache.delete(member.user.id)
-        }, 60000)
+        }, cacheTime * 1000)
     }
 
     if (feet == 6) {

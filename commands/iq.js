@@ -16,9 +16,11 @@ const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
 async function run(message, args) {
 
     let cooldownLength = 5
+    let cacheTime = 60
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
+        cacheTime = 25
     }
 
     if (cooldown.has(message.member.id)) {
@@ -40,12 +42,6 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
-
     let member
 
     if (args.length == 0) {
@@ -61,6 +57,16 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("invalid user"))
         }
     }
+
+    if (isPremium(member.user.id)) {
+        cacheTime = 25
+    }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, cooldownLength * 1000)
 
     let iq
     let iqMsg
@@ -99,7 +105,7 @@ async function run(message, args) {
 
         setTimeout(() => {
             cache.delete(member.user.id)
-        }, 60000)
+        }, cacheTime * 1000)
     }
 
     if (iq == 69) {
