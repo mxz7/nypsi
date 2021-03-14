@@ -23,7 +23,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
  - every `ban, kick, mute, warn, unban and unmute` that is ran through nypsi is logged and saved and can be accessed with the `$history` and `$case` commands. with all of these commands you are also able to punish multiple people in the same command. use `$help mod` to view all of the moderation commands available. you are also able to moderate the `$snipe / $esnipe` command by including a filter with `$sf`
  
 ##### ⛏ minecraft
- - `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way` there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
+ - `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
  
 ##### 💬 social media
  - the `$socials` command allows you to view other people's social media accounts and allows you to add your own - your accounts will only be displayed if you add them to the bot, run `$socials help` for more information
