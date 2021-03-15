@@ -98,7 +98,7 @@ async function run(message, args) {
     } else if (slutAmount >= 35) {
         slutEmoji = "🍆✊"
         slutText = "you would fuck anyone"
-    }else if (slutAmount >= 25) {
+    } else if (slutAmount >= 25) {
         slutEmoji = "🍆🧎‍♂️"
         slutText = "still a whore"
     } else if (slutAmount >= 15) {
