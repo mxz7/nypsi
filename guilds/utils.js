@@ -265,14 +265,14 @@ exports.getGuilds = getGuilds
 async function checkStats(guild) {
     let memberCount
 
-    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 25000) {
+    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 2500) {
         guilds[guild.id].counter.filterBots = false
         memberCount = guild.memberCount
     } else if (guilds[guild.id].counter.filterBots) {
 
         let members
 
-        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 50) {
+        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
             members = guild.members.cache
         } else {
             members = await guild.members.fetch().catch(() => {})
