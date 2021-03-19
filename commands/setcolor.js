@@ -24,7 +24,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
 
         embed.setDescription(`**color** #${getEmbedColor(message.author.id)}\n\nuse \`${getPrefix(message.guild)}setcolor <hex color code>\` to change this
-        you can use ${getPrefix(message.guild)}color to find a color, or an online color picker tool`)
+        you can use ${getPrefix(message.guild)}color to find a color, or an [online color picker tool](https://color.tekoh.net)`)
 
         return message.channel.send(embed)
     }
