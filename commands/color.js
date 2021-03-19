@@ -36,15 +36,16 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, `**#${color}**`)
+    const embed = new CustomEmbed(message.member, false, `[**#${color}**](https://color.tekoh.net/#${color})`)
         .setColor(color)
     
     if (member) {
         embed.setDescription(member.user.toString())
         embed.setTitle(member.displayHexColor)
+        embed.setURL(`https://color.tekoh.net/${member.displayHexColor}`)
     }
 
-    message.channel.send(embed).catch(() => {
+    return await message.channel.send(embed).catch(() => {
         message.channel.send(new ErrorEmbed("invalid color"))
     })
 
