@@ -15,7 +15,7 @@ class CustomEmbed {
         if (member) {
 
             if (isPremium(member.user.id)) {
-                if (getTier(member.user.id) >= 2) {
+                if (getTier(member.user.id) >= 1) {
                     if (getEmbedColor(member.user.id) != "default") {
                         this.embed.setColor(getEmbedColor(member.user.id))
                     } else {
