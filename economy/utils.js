@@ -138,7 +138,7 @@ async function doVote(client, vote) {
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed().setColor("#5efb8f").setDescription("you have received the following: \n\n" +
             `+ $**${amount.toLocaleString()}**\n` +
-            `+ **15**% multiplier, total: **${multi}**%`)
+            `+ **10**% multiplier, total: **${multi}**%`)
 
         await member.send("thank you for voting!", embed)
     }
@@ -233,7 +233,7 @@ async function getMulti(member) {
     const voted = await hasVoted(id)
 
     if (voted) {
-        multi += 15
+        multi += 10
     }
 
     const prestigeBonus = (getPrestige(member) * 2)
@@ -390,6 +390,9 @@ exports.getXp = getXp
  * @param {Number} amount to update xp to
  */
 function updateXp(member, amount) {
+
+    if (users[member.user.id].xp >= 1000000) return
+
     const amount1 = parseInt(amount)
     users[member.user.id].xp = amount1
 }

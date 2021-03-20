@@ -7,7 +7,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const cooldown = new Map()
 const bonusCooldown = new Map()
 
-const cmd = new Command("vote", "vote every 12 hours to get an extra 15% bonus on gambling wins as well as a money reward", categories.MONEY)
+const cmd = new Command("vote", "vote every 12 hours to get an extra 10% bonus on gambling wins as well as a money reward", categories.MONEY)
 
 /**
  * @param {Message} message 
@@ -54,11 +54,11 @@ async function run(message, args) {
     if (voted) {
         embed.setTitle("vote ✅")
         embed.setColor("#5efb8f")
-        embed.addField("rewards", `✓ +**15**% multiplier, total: **${multi}**%\n✓ **xp** gambling bonus\n✓ +$**50k** max bet`)
+        embed.addField("rewards", `✓ +**10**% multiplier, total: **${multi}**%\n✓ **xp** gambling bonus\n✓ +$**50k** max bet`)
     } else {
         embed.setTitle("vote ❌")
         embed.setColor("#e4334f")
-        embed.addField("rewards", `× +**15**% multiplier, current: **${multi}**%\n× **xp** gambling bonus\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward`)
+        embed.addField("rewards", `× +**10**% multiplier, current: **${multi}**%\n× **xp** gambling bonus\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward`)
         embed.setFooter("you get increased rewards for prestiging")
         removeFromVoteCache(message.member)
     }
