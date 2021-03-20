@@ -1,2 +1,8 @@
 node_modules/
-*json
+users.json
+data.json
+backup/
+config.json
+slotsmulti.json
+lists.json
+.eslintrc.json

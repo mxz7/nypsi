@@ -1,0 +1,25 @@
+{
+  "name": "nypsi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nypsi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "common-tags": "^1.8.0",
+    "dblapi.js": "^2.4.1",
+    "discord.js": "^12.5.1",
+    "figlet": "^1.5.0",
+    "is-image-url": "^1.1.8",
+    "node-fetch": "^2.6.1",
+    "relevant-urban": "^2.0.0",
+    "shuffle-array": "^1.0.1",
+    "table": "^5.4.6"
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0"
+  }
+}
