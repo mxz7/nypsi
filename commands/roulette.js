@@ -185,7 +185,7 @@ async function run(message, args) {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
                     "+**" + (voteMulti * 100).toString() + "**% bonus")
                 
-                if (bet >= 1000) {
+                if (bet >= 10000) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
                     updateXp(message.member, getXp(message.member) + xpBonus)
                     embed.setFooter("+" + xpBonus + "xp")
