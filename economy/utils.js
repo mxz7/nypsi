@@ -390,6 +390,9 @@ exports.getXp = getXp
  * @param {Number} amount to update xp to
  */
 function updateXp(member, amount) {
+
+    if (users[member.user.id].xp >= 1000000) return
+
     const amount1 = parseInt(amount)
     users[member.user.id].xp = amount1
 }
