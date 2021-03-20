@@ -6,8 +6,6 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium, getTier } = require("../premium/utils")
 
-const tax = 0.15
-
 const cooldown = new Map()
 
 const cmd = new Command("pay", "give other users money", categories.MONEY).setAliases(["give"])
@@ -94,8 +92,6 @@ async function run(message, args) {
 
     let amount = parseInt(args[1]) 
 
-    let taxEnabled = false
-
     if (amount > getBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
     }
@@ -110,10 +106,23 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
+    let tax = 0
+
+    if (amount >= 10000000) {
+        tax = 0.5
+    } else if (amount >= 1000000) {
+        tax = 0.4
+    } else if (amount >= 500000) {
+        tax = 0.3
+    } else if (amount >= 250000) {
+        tax = 0.2
+    } else if (amount >= 100000) {
+        tax = 0.1
+    } 
+
     updateBalance(message.member, getBalance(message.member) - amount)
 
-    if (amount > 250000) {
-        taxEnabled = true
+    if (tax > 0) {
         updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
     } else {
         updateBalance(target, getBalance(target) + amount)
@@ -123,7 +132,7 @@ async function run(message, args) {
         .setTitle("processing payment..")
         .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
 
-    if (taxEnabled) {
+    if (tax > 0) {
         embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
         embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
     } else {
@@ -134,11 +143,11 @@ async function run(message, args) {
     message.channel.send(embed).then(m => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
-            .setDescription(message.member.user.toString() + " -> " + target.user.toString())
+            .setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
             
 
-        if (taxEnabled) {
+        if (tax > 0) {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
         } else {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
