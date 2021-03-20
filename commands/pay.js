@@ -18,7 +18,7 @@ const cmd = new Command("pay", "give other users money", categories.MONEY).setAl
  */
 async function run(message, args) {
 
-    let cooldownLength = 10
+    let cooldownLength = 15
 
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
