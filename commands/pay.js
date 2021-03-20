@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
+const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance, getXp, getPrestige } = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
@@ -98,6 +98,45 @@ async function run(message, args) {
 
     if (amount <= 0) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
+    }
+
+    if (amount >= 200000 || (getBalance(target) + amount) >= 1000000) {
+        const targetXP = getXp(target)
+        const targetPrestige = getPrestige(target)
+
+        if (targetPrestige == 0) {
+
+            if (targetXP <= 25) {
+                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+            } else if (targetXP <= 100) {
+
+                if (amount >= 500000 || (getBalance(target) + amount) >= 1500000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+                
+            } else if (targetXP <= 1000) {
+
+                if (amount >= 1000000 || (getBalance(target) + amount) >= 2000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            } else {
+
+                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            }
+
+        } else if (targetPrestige == 1) {
+            if (targetXP <= 100) {
+
+                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            }
+        }
     }
 
     cooldown.set(message.member.id, new Date())
