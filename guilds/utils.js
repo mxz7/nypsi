@@ -279,9 +279,13 @@ async function checkStats(guild) {
             addCooldown(guild, 3600)
         }
 
-        members = members.filter(m => !m.user.bot)
+        if (members.size == guild.memberCount) {
+            members = members.filter(m => !m.user.bot)
 
-        memberCount = members.size
+            memberCount = members.size
+        } else {
+            memberCount = guild.memberCount
+        }
     } else {
         memberCount = guild.memberCount
     }

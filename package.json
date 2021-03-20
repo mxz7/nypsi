@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "common-tags": "^1.8.0",
     "dblapi.js": "^2.4.1",
     "discord.js": "^12.5.1",
     "figlet": "^1.5.0",
@@ -17,7 +16,7 @@
     "node-fetch": "^2.6.1",
     "relevant-urban": "^2.0.0",
     "shuffle-array": "^1.0.1",
-    "table": "^5.4.6"
+    "table": "^6.0.7"
   },
   "devDependencies": {
     "eslint": "^7.22.0"
