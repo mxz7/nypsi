@@ -1,12 +1,10 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance } = require("../economy/utils.js")
+const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance, getXp, getPrestige } = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium, getTier } = require("../premium/utils")
-
-const tax = 0.15
 
 const cooldown = new Map()
 
@@ -18,7 +16,7 @@ const cmd = new Command("pay", "give other users money", categories.MONEY).setAl
  */
 async function run(message, args) {
 
-    let cooldownLength = 10
+    let cooldownLength = 15
 
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
@@ -54,10 +52,6 @@ async function run(message, args) {
             .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
 
         return message.channel.send(embed)
-    }
-
-    if (message.guild.id == "747056029795221513") {
-        return message.channel.send(new ErrorEmbed("this has been disabled in the support server"))
     }
 
     let target = message.mentions.members.first()
@@ -98,8 +92,6 @@ async function run(message, args) {
 
     let amount = parseInt(args[1]) 
 
-    let taxEnabled = false
-
     if (amount > getBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
     }
@@ -108,16 +100,68 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
+    if (amount >= 200000 || (getBalance(target) + amount) >= 1000000) {
+        const targetXP = getXp(target)
+        const targetPrestige = getPrestige(target)
+
+        if (targetPrestige == 0) {
+
+            if (targetXP <= 25) {
+                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+            } else if (targetXP <= 100) {
+
+                if (amount >= 500000 || (getBalance(target) + amount) >= 1500000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+                
+            } else if (targetXP <= 1000) {
+
+                if (amount >= 1000000 || (getBalance(target) + amount) >= 2000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            } else {
+
+                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            }
+
+        } else if (targetPrestige == 1) {
+            if (targetXP <= 100) {
+
+                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+
+            }
+        }
+    }
+
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
+    let tax = 0
+
+    if (amount >= 10000000) {
+        tax = 0.5
+    } else if (amount >= 1000000) {
+        tax = 0.4
+    } else if (amount >= 500000) {
+        tax = 0.3
+    } else if (amount >= 250000) {
+        tax = 0.2
+    } else if (amount >= 100000) {
+        tax = 0.1
+    } 
+
     updateBalance(message.member, getBalance(message.member) - amount)
 
-    if (amount > 250000) {
-        taxEnabled = true
+    if (tax > 0) {
         updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)))
     } else {
         updateBalance(target, getBalance(target) + amount)
@@ -127,7 +171,7 @@ async function run(message, args) {
         .setTitle("processing payment..")
         .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
 
-    if (taxEnabled) {
+    if (tax > 0) {
         embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
         embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
     } else {
@@ -138,11 +182,11 @@ async function run(message, args) {
     message.channel.send(embed).then(m => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
-            .setDescription(message.member.user.toString() + " -> " + target.user.toString())
+            .setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
             
 
-        if (taxEnabled) {
+        if (tax > 0) {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
         } else {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
