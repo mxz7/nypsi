@@ -39,7 +39,11 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed(`${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`))
         }
 
-        let word = args[1].toString().toLowerCase().normalize("NFD").replace(/[^A-z0-9\s]/g, "")
+        const word = args[1].toString().toLowerCase().normalize("NFD").replace(/[^A-z0-9\s]/g, "")
+    
+        if (word == "" || word == " ") {
+            return message.channel.send(new ErrorEmbed("word must contain letters or numbers"))
+        }
 
         if (filter.indexOf(word) > -1) {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
