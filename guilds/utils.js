@@ -131,7 +131,7 @@ async function runCheck(guild) {
 
     if (guild.memberCount > currentMembersPeak) {
         guilds[guild.id].peaks.members = guild.memberCount
-        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak + " -> " + guild.memberCount)
+        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak.toLocaleString() + " -> " + guild.memberCount.toLocaleString())
     }
 }
 
