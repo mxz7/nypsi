@@ -13,11 +13,11 @@ const cmd = new Command("setcolor", "set the color of the bot's messages (premiu
 async function run(message, args) {
 
     if (!isPremium(message.author.id)) {
-        return message.channel.send(new ErrorEmbed("you must be a SILVER tier patreon for this command\n\nhttps://www.patreon.com/nypsi"))
+        return message.channel.send(new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi"))
     }
 
     if (getTier(message.author.id) < 1) {
-        return message.channel.send(new ErrorEmbed("you must be atleast SILVER tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"))
+        return message.channel.send(new ErrorEmbed("you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"))
     }
 
     if (args.length == 0) {
