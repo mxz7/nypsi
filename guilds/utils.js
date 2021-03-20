@@ -339,8 +339,6 @@ exports.addCooldown = addCooldown
  * @param {Guild} guild 
  */
 function inCooldown(guild) {
-    if (guild.memberCount <= 50 || guild.memberCount >= 25000) return true
-
     if (fetchCooldown.has(guild.id)) {
         return true
     } else {
