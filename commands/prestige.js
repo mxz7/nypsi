@@ -34,6 +34,10 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
+    if (getPrestige(message.member) >= 100) {
+        return message.channel.send(new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png"))
+    }
+
     let currentXp = getXp(message.member), neededXp = getPrestigeRequirement(message.member)
     let currentBal = getBankBalance(message.member), neededBal = getPrestigeRequirementBal(neededXp)
 
