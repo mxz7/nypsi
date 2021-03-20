@@ -174,7 +174,7 @@ async function run(message, args) {
                 if (args.length != 4) {
                     return message.channel.send(new ErrorEmbed("you must include a URL with youtube: $socials youtube add <username> <url>"))
                 } else {
-                    if (!args[3].toLowerCase().includes("https://youtube.com/") && !args[3].toLowerCase().includes("https://www.youtube.com")) {
+                    if (!args[3].toLowerCase().startsWith("https://youtube.com/")) {
                         return message.channel.send(new ErrorEmbed("invalid youtube url"))
                     }
                     
