@@ -60,7 +60,8 @@ async function run(message, args) {
     await roles.forEach(r => {
         if (colors.length >= 100) return
         if (r.hexColor != "#000000") {
-            colors.push(r.hexColor)
+            if (colors.indexOf(r.hexColor.substr(1, 7)) != -1) return
+            colors.push(r.hexColor.substr(1, 7))
         }
     })
 
@@ -74,7 +75,7 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 15 * 1000)
 
-    // http://127.0.0.1:5500/#!#ff0000!#00ff00!#0000ff&?test&?#777777
+    // http://127.0.0.1:5500/#!ff0000!00ff00!0000ff&?test&?6c8ab9
 
     let url = "https://color.tekoh.net/#!"
 
@@ -103,9 +104,11 @@ async function run(message, args) {
         }
     }
 
-    url += `&?#${color}`
+    url += `&?${color}`
 
-    return message.channel.send(new CustomEmbed(message.member, true, url))
+    const embed = new CustomEmbed(message.member, true).setTitle("palette").setURL(url)
+
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)
