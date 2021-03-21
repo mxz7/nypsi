@@ -108,6 +108,12 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, true).setTitle("palette").setURL(url)
 
+    if (url.length < 500) {
+        embed.setDescription(url)
+    } else {
+        embed.setDescription(`very long URL generated ~ ${colors.length} colors`)
+    }
+
     return message.channel.send(embed)
 }
 
