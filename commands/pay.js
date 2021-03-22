@@ -135,6 +135,14 @@ async function run(message, args) {
                     return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
                 }
 
+            } else {
+                if (amount >= 10000000 || (getBalance(target) + amount) >= 15000000) {
+                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                }
+            }
+        } else if (targetPrestige < 4) {
+            if (amount >= 15000000 || (getBalance(target) + amount) >= 50000000) {
+                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
             }
         }
     }
