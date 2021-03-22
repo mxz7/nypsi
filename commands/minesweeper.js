@@ -444,10 +444,10 @@ async function playGame(message, msg) {
     case "a":
         grid[location] = "c"
 
-        if (win < 1) {
-            win = win + 0.5
+        if (win < 3) {
+            win += 0.5
         } else {
-            win++
+            win += 1
         }
 
         games.set(message.author.id, {

@@ -63,7 +63,7 @@ async function run(message, args) {
     if (args.length == 1 && args[0] == "info") {
         const embed = new CustomEmbed(message.member)
             .setTitle("win board")
-            .setDescription(winBoard() + "\nhaving any two same fruits next to eachother gives a **1.5**x win")
+            .setDescription(winBoard() + "\nhaving any two same fruits in reel 1 & 2 gives a **1.2**x win")
         
         return message.channel.send(embed)
     }
