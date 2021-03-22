@@ -7,7 +7,7 @@ const client = new Discord.Client({
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
 const { runCheck, checkStats, hasStatsEnabled, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
-const { loadCommands } = require("./utils/commandhandler")
+const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, MStoTime } = require("./utils/utils")
 const { runUnmuteChecks } = require("./moderation/utils")
@@ -160,6 +160,7 @@ setTimeout(() => {
     console.log(`[${getTimestamp()}] logging in...`)
     client.login(token).then(() => {
         setTimeout(() => {
+            runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
             runChecks()
             updateCache()
             runUnmuteChecks(client)
