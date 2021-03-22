@@ -96,7 +96,6 @@ async function run(message, args) {
 }
 
 function timeUntil(date) {
-
     const ms = Math.floor(date - new Date())
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
