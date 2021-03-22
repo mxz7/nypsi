@@ -1,14 +1,15 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists } = require("../economy/utils.js")
 const fs = require("fs")
-const { Message } = require("discord.js")
+const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../guilds/utils.js")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const { getTimestamp } = require("./utils.js")
+const { getTimestamp, MStoTime } = require("./utils.js")
 
 const commands = new Map()
 const aliases = new Map()
+const popularCommands = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 
@@ -312,11 +313,13 @@ function runCommand(cmd, message, args) {
     try {
         logCommand(message, args)
         if (alias) {
+            updatePopularCommands(commands.get(aliases.get(cmd)).name)
             if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
                 return message.channel.send(new ErrorEmbed("that command has been disabled"))
             }
             commands.get(aliases.get(cmd)).run(message, args)
         } else {
+            updatePopularCommands(commands.get(cmd).name)
             if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
                 return message.channel.send(new ErrorEmbed("that command has been disabled"))
             }
@@ -429,3 +432,89 @@ function logCommand(message, args) {
 
     console.log(msg)
 }
+
+/**
+ * @param {String} command
+ */
+function updatePopularCommands(command) {
+    if (popularCommands.has(command)) {
+        popularCommands.set(command, popularCommands.get(command) + 1)
+    } else {
+        popularCommands.set(command, 1)
+    }
+}
+
+/**
+ * @param {Client} client
+ * @param {String} serverID
+ * @param {String} channelID
+ */
+function runPopularCommandsTimer(client, serverID, channelID) {
+
+    const now = new Date()
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000)
+
+    const postPopularCommands = async () => {
+        const guild = await client.guilds.fetch(serverID)
+    
+        if (!guild) {
+            return console.log("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+        }
+    
+        const channel = await guild.channels.cache.find(ch => ch.id == channelID)
+    
+        if (!channel) {
+            return console.log("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
+        }
+    
+        const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
+    
+        let msg = ""
+        let count = 1
+            
+        for (let [key, value] of sortedCommands) {
+            if (count >= 11) break
+
+            let pos = count
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`
+            count++
+        }
+    
+        const embed = new CustomEmbed()
+    
+        embed.setTitle("top 10 commands from today")
+        embed.setDescription(msg)
+        embed.setColor("#000001")
+
+        channel.send(embed)
+
+        popularCommands.clear()
+    }
+
+    setTimeout(async () => {
+        setInterval(() => {
+            postPopularCommands()
+        }, 86400000)
+        postPopularCommands()
+    }, needed - now)
+
+    console.log(`[${getTimestamp()}] popular commands will run in ${MStoTime(needed - now)}`)
+}
+
+exports.runPopularCommandsTimer = runPopularCommandsTimer
