@@ -456,7 +456,7 @@ exports.topAmountGlobal = topAmountGlobal
 async function topAmount(guild, amount) {
     let members
 
-    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size || guild.memberCount <= 250) {
+    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
     } else {
         members = await guild.members.fetch()
