@@ -499,7 +499,18 @@ async function topAmount(guild, amount) {
         if (usersFinal.join().length >= 1500) break
 
         if (!users[user].money.balance == 0) {
-            usersFinal[count] = (count + 1) + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].money.balance.toLocaleString()
+
+            let pos = count + 1
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].money.balance.toLocaleString()
             count++
         }
     }
