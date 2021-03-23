@@ -55,6 +55,7 @@ const categories = {
     MODERATION: "moderation",
     ADMIN: "admin",
     MINECRAFT: "minecraft",
+    UTILITY: "utility",
     NSFW: "nsfw"
 }
 
