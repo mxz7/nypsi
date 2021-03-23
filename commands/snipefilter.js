@@ -3,7 +3,7 @@ const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js"
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.MODERATION).setAliases(["sf"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.ADMIN).setAliases(["sf"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message 
