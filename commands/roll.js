@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("roll", "roll a dice", categories.FUN)
+const cmd = new Command("roll", "roll a dice", categories.UTILITY)
 
 /**
  * @param {Message} message 

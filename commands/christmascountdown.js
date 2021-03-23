@@ -4,7 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { daysUntilChristmas } = require("../utils/utils")
 
-const cmd = new Command("christmascountdown", "create a christmas countdown", categories.FUN).setAliases(["christmas", "xmas"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("christmascountdown", "create a christmas countdown", categories.ADMIN).setAliases(["christmas", "xmas"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message 

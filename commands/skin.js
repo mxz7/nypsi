@@ -7,7 +7,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("skin", "view the skin of a minecraft account", categories.INFO)
+const cmd = new Command("skin", "view the skin of a minecraft account", categories.MINECRAFT)
 
 /**
  * @param {Message} message 

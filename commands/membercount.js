@@ -4,7 +4,7 @@ const { createDefaultStatsProfile, setStatsProfile, getStatsProfile, hasGuild, c
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("membercount", "create an updating member count channel for your server", categories.MODERATION).setAliases(["counter"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("membercount", "create an updating member count channel for your server", categories.ADMIN).setAliases(["counter"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message 

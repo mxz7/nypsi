@@ -6,7 +6,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("lookup", "lookup ip addresses and domains", categories.INFO)
+const cmd = new Command("lookup", "lookup ip addresses and domains", categories.UTILITY)
 
 /**
  * @param {Message} message 
