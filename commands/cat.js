@@ -7,7 +7,7 @@ const { isPremium } = require("../premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("cat", "get a random picture of a cat", categories.FUN)
+const cmd = new Command("cat", "get a random picture of a cat", categories.ANIMALS)
 
 /**
  * @param {Message} message 
