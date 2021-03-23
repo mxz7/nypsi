@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("channel", "create, delete and modify channels", categories.MODERATION).setAliases(["ch"]).setPermissions(["MANAGE_CHANNELS"])
+const cmd = new Command("channel", "create, delete and modify channels", categories.ADMIN).setAliases(["ch"]).setPermissions(["MANAGE_CHANNELS"])
 
 /**
  * @param {Message} message 

@@ -3,7 +3,7 @@ const { deleteServer, profileExists } = require("../moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("deleteallcases", "delete all cases in a server", categories.MODERATION).setAliases(["dac"]).setPermissions(["server owner"])
+const cmd = new Command("deleteallcases", "delete all cases in a server", categories.ADMIN).setAliases(["dac"]).setPermissions(["server owner"])
 
 /**
  * @param {Message} message 
