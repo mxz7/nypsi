@@ -4,7 +4,7 @@ const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("createpalette", "create a color palette for color.tekoh.net from role colors", categories.INFO).setAliases(["palette", "rolepalette"])
+const cmd = new Command("createpalette", "create a color palette for color.tekoh.net from role colors", categories.UTILITY).setAliases(["palette", "rolepalette"])
 
 const cooldown = new Map()
 
