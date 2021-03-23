@@ -8,6 +8,8 @@ const { isPremium } = require("../premium/utils")
 
 const cooldown = new Map()
 
+const blacklisted = ["body", "shit"]
+
 const cmd = new Command("reddit", "get a random image from any subreddit", categories.INFO)
 
 /**
@@ -47,8 +49,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`${prefix}reddit <subreddit>`))
     }
 
-    if (args[0].toLowerCase() == "body" && !message.channel.nsfw)  {
-        return message.channel.send(new ErrorEmbed("this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"))
+    for (let bannedSubReddit of blacklisted) {
+        if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
+            return message.channel.send(new ErrorEmbed("this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"))
+        }
     }
 
     cooldown.set(message.member.id, new Date())
