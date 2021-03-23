@@ -8,7 +8,7 @@ const { isPremium } = require("../premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("love", "calculate your love with another person", categories.INFO)
+const cmd = new Command("love", "calculate your love with another person", categories.FUN)
 
 /**
  * @param {Message} message 
