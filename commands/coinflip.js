@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getXp, calcMaxBet, getPrestige } = require("../economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists, formatBet, calcMaxBet } = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const Discord = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -129,45 +129,6 @@ async function run(message, args) {
 
     if (bet > targetMaxBet) {
         return message.channel.send(new ErrorEmbed(`**${target.user.tag}**'s max bet is too low for this bet`))
-    }
-    
-    if (bet >= 200000 || (getBalance(target) + bet) >= 1000000) {
-        const targetXP = getXp(target)
-        const targetPrestige = getPrestige(target)
-
-        if (targetPrestige == 0) {
-
-            if (targetXP <= 25) {
-                return message.channel.send(new ErrorEmbed("this bet is too high for that user"))
-            } else if (targetXP <= 100) {
-
-                if (bet >= 500000 || (getBalance(target) + bet) >= 1500000) {
-                    return message.channel.send(new ErrorEmbed("this bet is too high for that user"))
-                }
-                
-            } else if (targetXP <= 1000) {
-
-                if (bet >= 1000000 || (getBalance(target) + bet) >= 2000000) {
-                    return message.channel.send(new ErrorEmbed("this bet is too high for that user"))
-                }
-
-            } else {
-
-                if (bet >= 5000000 || (getBalance(target) + bet) >= 10000000) {
-                    return message.channel.send(new ErrorEmbed("this bet is too high for that user"))
-                }
-
-            }
-
-        } else if (targetPrestige == 1) {
-            if (targetXP <= 100) {
-
-                if (bet >= 5000000 || (getBalance(target) + bet) >= 10000000) {
-                    return message.channel.send(new ErrorEmbed("this bet is too high for that user"))
-                }
-
-            }
-        }
     }
 
     waiting.push(message.author.id)
