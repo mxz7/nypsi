@@ -97,12 +97,13 @@ async function run(message, args) {
 
         await msg.react("⬅")
         await msg.react("➡")
+        await msg.react("❌")
 
         let currentPage = 1
         const lastPage = pages.size
 
         const filter = (reaction, user) => {
-            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+            return ["⬅", "➡", "❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
         }
 
         const pageManager = async () => {
@@ -159,6 +160,12 @@ async function run(message, args) {
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
+            } else if (reaction == "❌") {
+                mentions.get(message.guild.id).set(message.author.id, [])
+
+                newEmbed.setDescription("✅ mentions cleared")
+
+                return msg.edit(newEmbed)
             }
         }
 
