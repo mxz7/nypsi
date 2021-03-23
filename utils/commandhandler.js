@@ -129,6 +129,8 @@ async function helpCmd(message, args) {
     for (let cmd of commands.keys()) {
         const category = getCmdCategory(cmd)
 
+        if (category == "none") continue
+
         if (helpCategories.has(category)) {
             const current = helpCategories.get(category)
             const lastPage = current.get(current.size)
@@ -155,8 +157,7 @@ async function helpCmd(message, args) {
     }
 
     const embed = new CustomEmbed(message.member)
-        .setTitle("help")
-        .setFooter(prefix + "help <command> | get more info about a command")
+        .setFooter(prefix + "help <command> | get info about a command")
 
 
     /**
@@ -166,14 +167,28 @@ async function helpCmd(message, args) {
     let pageSystemNeeded = false
 
     if (args.length == 0) {
-        embed.addField("fun", prefix + "**help** fun", true)
-        embed.addField("info", prefix + "**help** info", true)
-        embed.addField("money", prefix + "**help** money", true)
-        embed.addField("mod", prefix + "**help** mod", true)
-        embed.addField("nsfw", prefix + "**help** nsfw", true)
-        embed.addField("support", "https://discord.gg/hJTDNST", true)
+
+        const categories = Array.from(helpCategories.keys()).sort()
+
+        let categoriesMsg = ""
+        let categoriesMsg2 = ""
+
+        for (const category of categories) {
+            categoriesMsg += `${prefix}help **${category}**\n`
+        }
+
+        embed.setTitle("help menu")
+        embed.setDescription("invite nypsi to your server [invite.nypsi.xyz](http://invite.nypsi.xyz)\n" +
+            `prefix for this server is \`${prefix}\``)
+        embed.addField("command categories", categoriesMsg, true)
+        embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
+        embed.addField("support", "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST")
+        embed.addField("news", "random news here")
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
+        if (args[0].toLowerCase() == "util") args[0] = "utility"
+        if (args[0].toLowerCase() == "pictures") args[0] = "animals"
+
         if (helpCategories.has(args[0].toLowerCase())) {
             const pages = helpCategories.get(args[0].toLowerCase())
 
@@ -181,6 +196,7 @@ async function helpCmd(message, args) {
                 pageSystemNeeded = true
             }
 
+            embed.setTitle(`${args[0].toLowerCase()} commands`)
             embed.setDescription(pages.get(1))
             embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
 
@@ -204,6 +220,8 @@ async function helpCmd(message, args) {
             if (cmd.aliases) {
                 desc = desc + "\n**aliases** `" + prefix + cmd.aliases.join("`, `" + prefix) + "`"
             }
+
+            embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
         } 
     }
