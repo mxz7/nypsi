@@ -48,10 +48,14 @@ exports.Command = Command
 
 const categories = {
     NONE: "none",
+    ANIMALS: "animals",
     FUN: "fun",
     INFO: "info",
     MONEY: "money",
     MODERATION: "moderation",
+    ADMIN: "admin",
+    MINECRAFT: "minecraft",
+    UTILITY: "utility",
     NSFW: "nsfw"
 }
 

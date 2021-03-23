@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cache = new Map()
 const serverCache = new Map()
 
-const cmd = new Command("minecraft", "view information about a minecraft account", categories.INFO).setAliases(["mc"])
+const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
 
 /**
  * @param {Message} message 

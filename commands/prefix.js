@@ -3,7 +3,7 @@ const { getPrefix, setPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("prefix", "change the bot's prefix", categories.INFO).setPermissions(["MANAGE_GUILD"])
+const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions(["MANAGE_GUILD"])
 
 /**
  * @param {Message} message 

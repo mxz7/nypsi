@@ -3,7 +3,7 @@ const { getChatFilter, updateChatFilter, getPrefix } = require("../guilds/utils.
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("chatfilter", "change the chat filter for your server", categories.MODERATION).setAliases(["filter"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("chatfilter", "change the chat filter for your server", categories.ADMIN).setAliases(["filter"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message 

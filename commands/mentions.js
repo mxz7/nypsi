@@ -6,7 +6,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command("mentions", "view who mentioned you recently", categories.INFO).setAliases(["pings", "whothefuckpingedme"])
+const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases(["pings", "whothefuckpingedme"])
 
 /**
  * @param {Message} message 
