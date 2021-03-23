@@ -1,6 +1,6 @@
 const { Message, MessageEmbed } = require("discord.js")
 const { mentions } = require("../../nypsi")
-const { getChatFilter, getPrefix } = require("../../guilds/utils")
+const { getChatFilter, getPrefix, inCooldown } = require("../../guilds/utils")
 const { runCommand } = require("../commandhandler")
 const { getTimestamp } = require("../utils")
 
@@ -34,51 +34,65 @@ module.exports = async (message) => {
         }
     }
 
-    if (message.mentions.members.first()) {
-        message.mentions.members.forEach(m => {
-            if (m.user.bot || m.user.id == message.author.id) {
-                return
-            }
+    const addMention = (m) => {
+        if (m.user.bot || m.user.id == message.author.id) {
+            return
+        }
 
-            let content = message.content
+        let content = message.content
 
-            if (content.length > 100) {
-                content = content.substr(0, 97) + "..."
-            }
+        if (content.length > 100) {
+            content = content.substr(0, 97) + "..."
+        }
 
-            content = content.replace(/(\r\n|\n|\r)/gm, " ")
+        content = content.replace(/(\r\n|\n|\r)/gm, " ")
 
-            const data = {
-                user: message.author.tag,
-                content: content,
-                date: message.createdTimestamp,
-                link: message.url
-            }
+        const data = {
+            user: message.author.tag,
+            content: content,
+            date: message.createdTimestamp,
+            link: message.url
+        }
 
-            if (!mentions.has(message.guild.id)) {
-                mentions.set(message.guild.id, new Map())
-            }
+        if (!mentions.has(message.guild.id)) {
+            mentions.set(message.guild.id, new Map())
+        }
 
-            const guildData = mentions.get(message.guild.id)
+        const guildData = mentions.get(message.guild.id)
 
-            if (!guildData.has(m.user.id)) {
-                guildData.set(m.user.id, [])
-            }
+        if (!guildData.has(m.user.id)) {
+            guildData.set(m.user.id, [])
+        }
 
-            const userData = guildData.get(m.user.id)
+        const userData = guildData.get(m.user.id)
 
-            if (userData.length >= 15) {
-                userData.shift()
-            }
+        if (userData.length >= 15) {
+            userData.shift()
+        }
 
-            userData.push(data)
+        userData.push(data)
 
-            guildData.set(m.user.id, userData)
-            mentions.set(message.guild.id, guildData)
+        guildData.set(m.user.id, userData)
+        mentions.set(message.guild.id, guildData)
 
-            exports.mentions = mentions
-        })
+        exports.mentions = mentions
     }
+
+    if (message.mentions.everyone) {
+        let members = message.guild.members.cache
+
+        if (!inCooldown(message.guild)) {
+            members = await message.guild.members.fetch()
+        }
+
+        members.forEach((m) => addMention(m))
+    } else if (message.mentions.roles.first()) {
+        message.mentions.roles.forEach(r => {
+            r.members.forEach((m) => addMention(m))
+        })
+    } else if (message.mentions.members.first()) {
+        message.mentions.members.forEach((m) => addMention(m))
+    } 
 
     let prefix = getPrefix(message.guild)
 
