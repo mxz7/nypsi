@@ -617,12 +617,7 @@ async function playGame(message, m) {
 }
 
 function dealerPlay(message) {
-
-    if (calcTotalDealer(message.member) >= 17) {
-        return
-    }
-
-    while (calcTotalDealer(message.member) < 17 && calcTotalDealer(message.member) <= calcTotal(message.member) && calcTotalDealer(message.member) < 21) {
+    while (calcTotalDealer(message.member) < 17) {
         newDealerCard(message.member)
     }
     return 
