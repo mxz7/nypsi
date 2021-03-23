@@ -2,6 +2,11 @@ const { GuildMember, Message } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 
+const news = {
+    text: "",
+    date: new Date().getTime()
+}
+
 /**
  * @returns {String}
  * @param {GuildMember} member member to get color of
@@ -344,3 +349,22 @@ function MStoTime(ms) {
 }
 
 exports.MStoTime = MStoTime
+
+/**
+ * @returns {String}
+ */
+function getNews() {
+    return news
+}
+
+exports.getNews = getNews
+
+/**
+ * @param {Object} string
+ */
+function setNews(string) {
+    news.text = string
+    news.date = new Date().getTime()
+}
+
+exports.setNews = setNews
