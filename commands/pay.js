@@ -114,7 +114,7 @@ async function run(message, args) {
                     return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
                 }
                 
-            } else if (targetXP <= 1000) {
+            } else if (targetXP <= 500) {
 
                 if (amount >= 1000000 || (getBalance(target) + amount) >= 2000000) {
                     return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
@@ -131,12 +131,12 @@ async function run(message, args) {
         } else if (targetPrestige == 1) {
             if (targetXP <= 100) {
 
-                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
+                if (amount >= 10000000 || (getBalance(target) + amount) >= 20000000) {
                     return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
                 }
 
             } else {
-                if (amount >= 10000000 || (getBalance(target) + amount) >= 15000000) {
+                if (amount >= 5000000 || (getBalance(target) + amount) >= 30000000) {
                     return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
                 }
             }
@@ -156,11 +156,11 @@ async function run(message, args) {
     let tax = 0
 
     if (amount >= 10000000) {
-        tax = 0.5
-    } else if (amount >= 1000000) {
         tax = 0.4
-    } else if (amount >= 500000) {
+    } else if (amount >= 1000000) {
         tax = 0.3
+    } else if (amount >= 500000) {
+        tax = 0.25
     } else if (amount >= 250000) {
         tax = 0.2
     } else if (amount >= 100000) {
