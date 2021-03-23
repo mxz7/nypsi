@@ -1,5 +1,5 @@
 const { snipe } = require("../../nypsi")
-const { hasGuild, createGuild, getSnipeFilter } = require("../../guilds/utils")
+const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../../guilds/utils")
 const { Message } = require("discord.js")
 
 /**
@@ -21,6 +21,12 @@ module.exports = (message) => {
         content = content.replace(/[^A-z0-9\s]/g, "")
 
         for (let word of filter) {
+            if (content.includes(word.toLowerCase())) return
+        }
+
+        const chatFilter = getChatFilter(message.guild)
+    
+        for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
 
