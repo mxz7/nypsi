@@ -190,12 +190,13 @@ async function run(message, args) {
     message.channel.send(embed).then(m => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
-            .setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
+            .setDescription(message.member.user.toString() + " -> " + target.user.toString())
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
             
 
         if (tax > 0) {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
+            embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
         } else {
             embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
         }
