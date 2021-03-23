@@ -4,8 +4,9 @@ const { Message } = require("discord.js")
 
 /**
  * @param {Message} message
+ * @param {Message} newMessage
  */
-module.exports = async (message) => {
+module.exports = async (message, newMessage) => {
     if (!message) return
 
     if (!message.member) return
@@ -13,7 +14,7 @@ module.exports = async (message) => {
     if (!message.member.hasPermission("ADMINISTRATOR")) {
         const filter = getChatFilter(message.guild)
 
-        let content = message.content.toLowerCase().normalize("NFD")
+        let content = newMessage.content.toLowerCase().normalize("NFD")
     
         content = content.replace(/[^A-z0-9\s]/g, "")
     
@@ -35,6 +36,12 @@ module.exports = async (message) => {
         content = content.replace(/[^A-z0-9\s]/g, "")
 
         for (let word of filter) {
+            if (content.includes(word.toLowerCase())) return
+        }
+
+        const chatFilter = getChatFilter(message.guild)
+    
+        for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
 
