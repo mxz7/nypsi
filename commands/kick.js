@@ -4,7 +4,7 @@ const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("kick", "kick one or more users", categories.INFO).setPermissions(["KICK_MEMBERS"])
+const cmd = new Command("kick", "kick one or more users", categories.MODERATION).setPermissions(["KICK_MEMBERS"])
 
 /**
  * @param {Message} message 
