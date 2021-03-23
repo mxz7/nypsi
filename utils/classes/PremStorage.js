@@ -137,8 +137,29 @@ class PremUser {
     }
 
     async expire() {
-        const { requestDM } = require("../../nypsi")
-        const d = await requestDM(this.id, `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`)
+        const { requestDM, requestRemoveRole } = require("../../nypsi")
+        const d = await requestDM(this.id, `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`).catch (() => {})
+
+        let roleID
+
+        switch (this.level) {
+        case 1:
+            roleID = "819870590718181391"
+            break
+        case 2:
+            roleID = "819870727834566696"
+            break
+        case 3:
+            roleID = "819870846536646666"
+            break
+        case 4:
+            roleID = "819870959325413387"
+            break
+        }
+
+        const e = await requestRemoveRole(this.id, roleID).catch((e) => {
+            console.log(e)
+        })
 
         this.status = status.INACTIVE
         this.level = 0
