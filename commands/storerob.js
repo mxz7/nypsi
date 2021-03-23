@@ -103,7 +103,7 @@ async function run(message, args) {
     let percentLost
     let amountLost
 
-    if (caught <= 7) {
+    if (caught <= 5) {
         robberySuccess = false
 
         percentLost = Math.floor(Math.random() * 50) + 10
