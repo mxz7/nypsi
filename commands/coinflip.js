@@ -102,14 +102,14 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
+            return message.channel.send(new ErrorEmbed(`${prefix}coinflip @user 100`))
         }
     }
     
     const bet = (parseInt(args[1]))
     
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}coinflip <h/t> <bet>`))
+        return message.channel.send(new ErrorEmbed(`${prefix}coinflip @user 100`))
     }
     
     if (bet > getBalance(message.member)) {
