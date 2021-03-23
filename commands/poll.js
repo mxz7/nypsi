@@ -6,7 +6,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("poll", "create a poll with a lot of customisation", categories.INFO)
+const cmd = new Command("poll", "create a poll with a lot of customisation", categories.UTILITY)
 
 /**
  * @param {Message} message 

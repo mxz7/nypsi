@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("flip", "flip a coin", categories.FUN)
+const cmd = new Command("flip", "flip a coin", categories.UTILITY)
 
 /**
  * @param {Message} message 
@@ -10,7 +10,7 @@ const cmd = new Command("flip", "flip a coin", categories.FUN)
  */
 async function run(message, args) {
 
-    const headTails = ["heads", "tails"]
+    const headTails = ["heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails"]
 
     let embed = new CustomEmbed(message.member, false)
 
