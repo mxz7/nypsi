@@ -164,7 +164,8 @@ async function run(message, args) {
                 mentions.get(message.guild.id).set(message.author.id, [])
 
                 newEmbed.setDescription("✅ mentions cleared")
-
+                
+                await msg.reactions.removeAll()
                 return msg.edit(newEmbed)
             }
         }
