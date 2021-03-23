@@ -22,7 +22,7 @@ ranks.set("MVP", "MVP")
 ranks.set("VIP_PLUS", "VIP+")
 ranks.set("VIP", "VIP")
 
-const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", categories.INFO).setAliases(["h"])
+const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", categories.MINECRAFT).setAliases(["h"])
 
 /**
  * @param {Message} message 

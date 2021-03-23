@@ -4,7 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { commandExists } = require("../utils/commandhandler")
 
-const cmd = new Command("disablecommand", "disable certain commands in your server", categories.MODERATION).setAliases(["disablecmd", "disable"])
+const cmd = new Command("disablecommand", "disable certain commands in your server", categories.ADMIN).setAliases(["disablecmd", "disable"])
 
 /**
  * @param {Message} message 
