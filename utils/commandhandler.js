@@ -5,7 +5,7 @@ const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../guilds/utils.js")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const { getTimestamp, MStoTime } = require("./utils.js")
+const { getTimestamp, MStoTime, getNews, formatDate } = require("./utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -177,13 +177,20 @@ async function helpCmd(message, args) {
             categoriesMsg += `${prefix}help **${category}**\n`
         }
 
+        const news = getNews()
+
+        const lastSet = formatDate(news.date)
+
         embed.setTitle("help menu")
         embed.setDescription("invite nypsi to your server [invite.nypsi.xyz](http://invite.nypsi.xyz)\n" +
             `prefix for this server is \`${prefix}\``)
         embed.addField("command categories", categoriesMsg, true)
         embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
         embed.addField("support", "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST")
-        embed.addField("news", "random news here")
+
+        if (news.text != "") {
+            embed.addField("news", `${news.text} - *${lastSet}*`)
+        }
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (args[0].toLowerCase() == "util") args[0] = "utility"
