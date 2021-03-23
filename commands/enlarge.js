@@ -3,7 +3,7 @@ const { getPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", categories.INFO).setAliases(["emoji"])
+const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", categories.UTILITY).setAliases(["emoji"])
 
 const cooldown = new Map()
 

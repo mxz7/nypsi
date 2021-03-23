@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("inrole", "get the members in a role", categories.INFO)
+const cmd = new Command("inrole", "get the members in a role", categories.UTILITY)
 
 /**
  * @param {Message} message 

@@ -10,7 +10,7 @@ const cooldown = new Map()
 
 const blacklisted = ["body", "shit"]
 
-const cmd = new Command("reddit", "get a random image from any subreddit", categories.INFO)
+const cmd = new Command("reddit", "get a random image from any subreddit", categories.UTILITY)
 
 /**
  * @param {Message} message 

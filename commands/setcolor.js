@@ -4,7 +4,7 @@ const { isPremium, getTier, getEmbedColor, setEmbedColor } = require("../premium
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", categories.INFO).setAliases(["setcolour"])
+const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", categories.UTILITY).setAliases(["setcolour"])
 
 /**
  * @param {Message} message 
