@@ -66,7 +66,6 @@ const dogLinks = ["https://www.reddit.com/r/dog.json?limit=777",
 const duckLinks = ["https://www.reddit.com/r/duck.json?limit=777",
     "https://www.reddit.com/r/BACKYARDDUCKS.json?limit=777"]
 const lizardLinks = ["https://www.reddit.com/r/Lizards.json?limit=777",
-    "https://www.reddit.com/r/reptiles.json?limit=777",
     "https://www.reddit.com/r/BeardedDragons.json?limit=777"]
 const rabbitLinks = ["https://www.reddit.com/r/rabbits.json?limit=777"]
 const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
