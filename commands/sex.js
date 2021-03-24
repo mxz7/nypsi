@@ -9,6 +9,8 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
 const cooldown = new Map()
 const looking = new Map()
 
+const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly"]
+
 /**
  * @param {Message} message 
  * @param {Array<String>} args 
@@ -46,19 +48,38 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    const addToLooking = () => {
+    const addToLooking = (description) => {
         const obj = {
             user: message.author,
             guild: message.guild,
             channel: message.channel.id,
+            description: description,
             date: new Date().getTime()
         }
 
         looking.set(message.author.id, obj)
     }
 
-    if (looking.length == 0) {
-        addToLooking()
+    let description = ""
+
+    if (args.length > 0) {
+        description = args.join(" ")
+        description = description.replace(/[^A-z0-9\s]/g, "")
+
+        if (description.length > 50) {
+            description = description.substr(0, 50) + "..."
+        }
+            
+        for (const word of descFilter) {
+            if (description.includes(word)) {
+                description = ""
+                break
+            }
+        }
+    }
+
+    if (looking.size == 0) {
+        addToLooking(description)
         return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     } else {
         if (looking.has(message.author.id)) {
@@ -72,15 +93,31 @@ async function run(message, args) {
 
             looking.delete(key.user.id)
 
-            await message.channel.send(new CustomEmbed(message.member, true, `a match has been made from **${key.guild.name}**\n\n` +
-            `send **${key.user.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${message.author.username}`))
+            const embed = new CustomEmbed(message.member, true, `a match has been made from **${key.guild.name}**\n\n` +
+            `go ahead and send **${key.user.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${message.author.username}`)
+
+            if (key.description != "") {
+                embed.setDescription(`a match has been made from **${key.guild.name}**\n\n` +
+                `**${key.user.tag}** - ${key.description}\n\n` +
+                "go ahead and send them a *private* message 😉😏")
+            }
+
+            await message.channel.send(embed)
 
             const channel = await key.guild.channels.cache.find(ch => ch.id == key.channel)
 
-            return await channel.send(key.user.toString() + " a match has been found", new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\nsend **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f"))
+            const embed2 = new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f")
+
+            if (description != "") {
+                embed2.setDescription(`a match has been made from **${message.guild.name}**\n\n` +
+                `**${message.author.tag}** - ${description}\n\n` +
+                "go ahead and send them a *private* message 😉😏")
+            }
+
+            return await channel.send(key.user.toString() + " a match has been found", embed2)
         }
 
-        addToLooking()
+        addToLooking(description)
         return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     }
 
