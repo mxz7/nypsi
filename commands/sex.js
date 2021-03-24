@@ -78,7 +78,7 @@ async function run(message, args) {
         }
     }
 
-    if (looking.length == 0) {
+    if (looking.size == 0) {
         addToLooking(description)
         return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     } else {
@@ -109,7 +109,7 @@ async function run(message, args) {
             const embed2 = new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f")
 
             if (description != "") {
-                embed.setDescription(`a match has been made from **${message.guild.name}**\n\n` +
+                embed2.setDescription(`a match has been made from **${message.guild.name}**\n\n` +
                 `**${message.author.tag}** - ${description}\n\n` +
                 "go ahead and send them a *private* message 😉😏")
             }
@@ -117,7 +117,7 @@ async function run(message, args) {
             return await channel.send(key.user.toString() + " a match has been found", embed2)
         }
 
-        addToLooking()
+        addToLooking(description)
         return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     }
 
