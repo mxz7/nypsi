@@ -58,7 +58,7 @@ async function run(message, args) {
 
     if (looking.length == 0) {
         addToLooking()
-        return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle("milf finder"))
+        return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     } else {
         if (looking.has(message.author.id)) {
             return message.channel.send(new ErrorEmbed("we're already searching for a match.. calm down you horny shit"))
@@ -72,15 +72,15 @@ async function run(message, args) {
             looking.delete(key.user.id)
 
             await message.channel.send(new CustomEmbed(message.member, true, `a match has been made from **${key.guild.name}**\n\n` +
-            `send **${key.user.tag}** a *private* message 😉😏`).setTitle("milf finder"))
+            `send **${key.user.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${message.author.username}`))
 
             const channel = await key.guild.channels.cache.find(ch => ch.id == key.channel)
 
-            return await channel.send(key.user.toString() + " a match has been found", new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\nsend **${message.author.tag}** a *private* message 😉😏`).setTitle("milf finder").setColor("#5efb8f"))
+            return await channel.send(key.user.toString() + " a match has been found", new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\nsend **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f"))
         }
 
         addToLooking()
-        return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle("milf finder"))
+        return message.channel.send(new CustomEmbed(message.member, false, "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found").setTitle(`milf finder | ${message.author.username}`))
     }
 
 }
@@ -97,12 +97,9 @@ setInterval(() => {
     const expire = 10800000
 
     looking.forEach(async obj => {
-        console.log(now - obj.date)
         if (now - obj.date >= expire) {
             await obj.user.send(new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢").setColor("#e4334f").setTitle("milf finder"))
             looking.delete(obj.user.id)
         }
     })
-
-    console.log("ran interval")
 }, 600000)
