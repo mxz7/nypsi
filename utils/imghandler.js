@@ -80,6 +80,11 @@ async function cacheUpdate(links, imgs, name) {
     const start = new Date().getTime()
     for (let link of links) {
         const res = await fetch(link).then(a => a.json())
+        
+        if (res.message == "Forbidden") {
+            console.log(`\x1b[31m[${getTimestamp()}] skipped ${link} due to private subreddit\x1b[37m`)
+            continue
+        }
 
         const allowed = res.data.children.filter(post => !post.data.is_self)
         if (allowed) {
