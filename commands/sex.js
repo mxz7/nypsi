@@ -9,7 +9,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
 const cooldown = new Map()
 const looking = new Map()
 
-const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly"]
+const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"]
 
 /**
  * @param {Message} message 
