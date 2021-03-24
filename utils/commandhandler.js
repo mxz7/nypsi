@@ -174,7 +174,7 @@ async function helpCmd(message, args) {
         let categoriesMsg2 = ""
 
         for (const category of categories) {
-            categoriesMsg += `${prefix}help **${category}**\n`
+            categoriesMsg += `» ${prefix}help **${category}**\n`
         }
 
         const news = getNews()
@@ -182,11 +182,11 @@ async function helpCmd(message, args) {
         const lastSet = formatDate(news.date)
 
         embed.setTitle("help menu")
-        embed.setDescription("invite nypsi to your server [invite.nypsi.xyz](http://invite.nypsi.xyz)\n" +
-            `prefix for this server is \`${prefix}\``)
+        embed.setDescription("invite nypsi to your server: [invite.nypsi.xyz](http://invite.nypsi.xyz)\n\n" +
+            "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
+            `my prefix for this server is \`${prefix}\``)
         embed.addField("command categories", categoriesMsg, true)
         embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-        embed.addField("support", "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST")
 
         if (news.text != "") {
             embed.addField("news", `${news.text} - *${lastSet}*`)
