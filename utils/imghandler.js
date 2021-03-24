@@ -9,6 +9,8 @@ const thighsCache = new Map()
 const birbCache = new Map()
 const catCache = new Map()
 const dogCache = new Map()
+const duckCache = new Map()
+const lizardCache = new Map()
 const rabbitCache = new Map()
 const snekCache = new Map()
 
@@ -61,9 +63,12 @@ const dogLinks = ["https://www.reddit.com/r/dog.json?limit=777",
     "https://www.reddit.com/r/dogpictures.json?limit=777",
     "https://www.reddit.com/r/goldenretrievers.json?limit=777",
     "https://www.reddit.com/r/shiba.json?limit=777"]
+const duckLinks = ["https://www.reddit.com/r/duck.json?limit=777",
+    "https://www.reddit.com/r/BACKYARDDUCKS.json?limit=777"]
+const lizardLinks = ["https://www.reddit.com/r/Lizards.json?limit=777",
+    "https://www.reddit.com/r/BeardedDragons.json?limit=777"]
 const rabbitLinks = ["https://www.reddit.com/r/rabbits.json?limit=777"]
 const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
-
 
 /**
  * 
@@ -107,6 +112,10 @@ async function updateCache() {
     exports.catCache = catCache
     await cacheUpdate(dogLinks, dogCache, "dog")
     exports.dogCache = dogCache
+    await cacheUpdate(duckLinks, duckCache, "duck")
+    exports.duckCache = duckCache
+    await cacheUpdate(lizardLinks, lizardCache, "lizard")
+    exports.lizardCache = lizardCache
     await cacheUpdate(rabbitLinks, rabbitCache, "rabbit")
     exports.rabbitCache = rabbitCache
     await cacheUpdate(snekLinks, snekCache, "snek")
