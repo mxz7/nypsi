@@ -26,9 +26,11 @@ module.exports = async (message) => {
         let content = message.content.toLowerCase().normalize("NFD")
     
         content = content.replace(/[^A-z0-9\s]/g, "")
+
+        content = content.split(" ")
     
         for (let word of filter) {
-            if (content.includes(word.toLowerCase())) {
+            if (content.indexOf(word.toLowerCase()) != -1) {
                 return await message.delete()
             }
         }
