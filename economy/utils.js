@@ -520,6 +520,87 @@ async function topAmount(guild, amount) {
 exports.topAmount = topAmount
 
 /**
+ * @returns {Array<String>}
+ * @param {Guild} guild to pull data from
+ * @param {Number} amount of users to return with
+ */
+async function topAmountPrestige(guild, amount) {
+    let members
+
+    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+        members = guild.members.cache
+    } else {
+        members = await guild.members.fetch()
+
+        addCooldown(guild, 3600)
+    }
+
+    if (!members) members = guild.members.cache
+
+    members = members.filter(m => {
+        return !m.user.bot
+    })
+    
+    const users1 = []
+
+    for (let user in users) {
+        if (members.find(member => member.user.id == user) && users[user].prestige != 0) {
+            users1.push(user)
+        }
+    }
+
+    users1.sort(function(a, b) {
+        return users[b].prestige - users[a].prestige
+    })
+
+    let usersFinal = []
+
+    let count = 0
+
+    const getMemberID = (guild, id) => {
+        let target = guild.members.cache.find(member => {
+            return member.user.id == id
+        })
+        
+        return target
+    }
+
+    for (let user of users1) {
+        if (count >= amount) break
+        if (usersFinal.join().length >= 1500) break
+
+        if (!users[user].prestige == 0) {
+
+            let pos = count + 1
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            let thing = "th"
+
+            if (users[user].prestige == 1) {
+                thing = "st"
+            } else if (users[user].prestige == 2) {
+                thing = "nd"
+            } else if (users[user].prestige == 3) {
+                thing = "rd"
+            }
+
+            usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** " + users[user].prestige + thing + " prestige" 
+            count++
+        }
+    }
+    return usersFinal
+}
+
+exports.topAmountPrestige = topAmountPrestige
+
+/**
  * 
  * @param {GuildMember} member to create profile for
  */
