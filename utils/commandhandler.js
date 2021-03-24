@@ -195,6 +195,10 @@ async function helpCmd(message, args) {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation"
         if (args[0].toLowerCase() == "util") args[0] = "utility"
         if (args[0].toLowerCase() == "pictures") args[0] = "animals"
+        if (args[0].toLowerCase() == "eco") args[0] = "money"
+        if (args[0].toLowerCase() == "economy") args[0] = "money"
+        if (args[0].toLowerCase() == "gamble") args[0] = "money"
+        if (args[0].toLowerCase() == "gambling") args[0] = "money"
 
         if (helpCategories.has(args[0].toLowerCase())) {
             const pages = helpCategories.get(args[0].toLowerCase())
