@@ -1,4 +1,5 @@
 const { Message } = require("discord.js")
+const { getDMsEnabled } = require("../economy/utils")
 const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
@@ -98,7 +99,11 @@ setInterval(() => {
 
     looking.forEach(async obj => {
         if (now - obj.date >= expire) {
-            await obj.user.send(new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢").setColor("#e4334f").setTitle("milf finder"))
+
+            if (getDMsEnabled(obj.user.id)) {
+                await obj.user.send(new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢").setColor("#e4334f").setTitle("milf finder"))
+            }
+
             looking.delete(obj.user.id)
         }
     })
