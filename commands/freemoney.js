@@ -2,6 +2,7 @@ const { userExists, updateBalance, getBalance, createUser } = require("../econom
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { isPremium, getTier } = require("../premium/utils.js")
 
 const cooldown = new Map()
 
@@ -35,7 +36,7 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
-    if (getBalance(message.member) > 100000) {
+    if (getBalance(message.member) > 500000) {
         return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
     }
 
@@ -45,13 +46,27 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 300000)
 
-    updateBalance(message.member, getBalance(message.member) + 1000)
+    let amount = 1000
 
-    const embed = new CustomEmbed(message.member, false, "+$**1,000**")
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 1) {
+            amount = 2500
+        } else if (getTier(message.author.id) == 2) {
+            amount = 5000
+        } else if (getTier(message.author.id) == 3) {
+            amount = 7500
+        } else if (getTier(message.author.id) == 4) {
+            amount = 10000
+        }
+    }
+
+    updateBalance(message.member, getBalance(message.member) + amount)
+
+    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`)
         .setTitle("freemoney | " + message.member.user.username)
 
     message.channel.send(embed).then(msg => {
-        embed.setDescription("+$**1,000**\nnew balance: $**" + getBalance(message.member).toLocaleString() + "**")
+        embed.setDescription(`+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(message.member).toLocaleString()}**`)
         setTimeout(() => {
             msg.edit(embed)
         }, 1000)
