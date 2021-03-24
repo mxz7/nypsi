@@ -73,11 +73,11 @@ async function run(message, args) {
             looking.delete(key.user.id)
 
             await message.channel.send(new CustomEmbed(message.member, true, `a match has been made from **${key.guild.name}**\n\n` +
-            `send **${key.user.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${message.author.username}`))
+            `go ahead and send **${key.user.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${message.author.username}`))
 
             const channel = await key.guild.channels.cache.find(ch => ch.id == key.channel)
 
-            return await channel.send(key.user.toString() + " a match has been found", new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\nsend **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f"))
+            return await channel.send(key.user.toString() + " a match has been found", new CustomEmbed(undefined, true, `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`).setTitle(`milf finder | ${key.user.username}`).setColor("#5efb8f"))
         }
 
         addToLooking()
