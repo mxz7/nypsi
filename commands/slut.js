@@ -7,7 +7,7 @@ const { getMember } = require("../utils/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("slut", "measure how much of a slut you are", categories.FUN).setAliases(["howslut"])
+const cmd = new Command("slut", "measure how much of a slut you are", categories.FUN).setAliases(["howslut", "whore", "cumslut"])
 
 /**
  * @param {Message} message
