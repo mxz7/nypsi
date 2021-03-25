@@ -81,10 +81,10 @@ module.exports = async (message) => {
     }
 
     if (message.mentions.everyone) {
-        let members = message.guild.members.cache
+        let members = message.channel.members
 
         if (!inCooldown(message.guild)) {
-            members = await message.guild.members.fetch()
+            await message.guild.members.fetch()
         }
 
         members.forEach((m) => addMention(m))
