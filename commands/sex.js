@@ -64,17 +64,16 @@ async function run(message, args) {
 
     if (args.length > 0) {
         description = args.join(" ")
-        description = description.replace(/[^A-z0-9\s]/g, "")
-
-        if (description.length > 50) {
-            description = description.substr(0, 50) + "..."
-        }
+        const descriptionCheck = description.replace(/[^A-z0-9\s]/g, "")
             
         for (const word of descFilter) {
-            if (description.includes(word)) {
+            if (descriptionCheck.includes(word)) {
                 description = ""
                 break
             }
+        }
+        if (description.length > 50) {
+            description = description.substr(0, 50) + "..."
         }
     }
 
