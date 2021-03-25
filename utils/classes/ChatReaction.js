@@ -5,9 +5,10 @@ class ChatReactionProfile {
      * @param {Array<String>} phraseList
      * @param {Object} settings
      * @param {Object} stats
+     * @param {Array<String>} blacklisted
      * @returns {ChatReactionProfile}
      */
-    constructor(phraseList, settings, stats) {
+    constructor(phraseList, settings, stats, blacklisted) {
         if (!phraseList) {
             this.wordList = []
         } else {
@@ -30,6 +31,12 @@ class ChatReactionProfile {
             this.stats = stats
         } else {
             this.stats = {}
+        }
+
+        if (blacklisted) {
+            this.blacklisted = blacklisted
+        } else {
+            this.blacklisted = []
         }
 
         return this
