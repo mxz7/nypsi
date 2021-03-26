@@ -12,6 +12,7 @@ const {
     updateWords,
 } = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
+const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
@@ -27,7 +28,11 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    const cooldownLength = 15
+    let cooldownLength = 10
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 5
+    }
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
