@@ -123,7 +123,6 @@ async function run(message, args) {
     if (args.length == 0) {
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
         const a = await startReaction(message.guild, message.channel)
 
