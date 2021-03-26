@@ -171,7 +171,7 @@ async function run(message, args) {
 
             words.push(phrase)
 
-            updateWords(words)
+            updateWords(message.guild, words)
 
             return message.channel.send(new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`))
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
@@ -193,7 +193,13 @@ async function run(message, args) {
 
             words.splice(words.indexOf(phrase), 1)
 
+            updateWords(message.guild, words)
+
             return message.channel.send(new CustomEmbed(message.member, false, `✅ removed \`${phrase} from wordlist\``))
+        } else if (args[1].toLowerCase() == "reset") {
+            updateWords(message.guild, [])
+
+            return message.channel.send(new CustomEmbed(message.member, false, "✅ wordlist has been reset"))
         }
     }
 }
