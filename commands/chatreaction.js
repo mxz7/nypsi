@@ -225,6 +225,8 @@ async function run(message, args) {
             } else {
                 embed.setDescription("``")
             }
+
+            return message.channel.send(embed)
         }
     }
 }
