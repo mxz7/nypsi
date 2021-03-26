@@ -125,7 +125,7 @@ exports.updateWords = updateWords
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-async function getWordList(guild) {
+function getWordList(guild) {
     return data[guild.id].wordList
 }
 
