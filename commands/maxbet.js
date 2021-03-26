@@ -8,8 +8,8 @@ const cooldown = new Map()
 const cmd = new Command("maxbet", "calculate your maximum bet", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
@@ -42,7 +42,13 @@ async function run(message, args) {
 
     const maxBet = await calcMaxBet(message.member)
 
-    return message.channel.send(new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`))
+    return message.channel.send(
+        new CustomEmbed(
+            message.member,
+            false,
+            `your maximum bet is $**${maxBet.toLocaleString()}**`
+        )
+    )
 }
 
 cmd.setRun(run)

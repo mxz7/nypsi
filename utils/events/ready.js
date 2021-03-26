@@ -8,11 +8,18 @@ const { daysUntilChristmas, getTimestamp } = require("../utils")
  * @param {Number} startUp
  */
 module.exports = async (client, startUp) => {
-
-    const games = ["$help | nypsi.xyz", "$help | tekoh.net", 
-        "$help | nypsi.xyz", "$help | nypsi.xyz", "$help | nypsi.xyz",
-        "have you joined the $support server?", "x0x", "x0x", 
-        "x0x", "xmas"]
+    const games = [
+        "$help | nypsi.xyz",
+        "$help | tekoh.net",
+        "$help | nypsi.xyz",
+        "$help | nypsi.xyz",
+        "$help | nypsi.xyz",
+        "have you joined the $support server?",
+        "x0x",
+        "x0x",
+        "x0x",
+        "xmas",
+    ]
 
     setTimeout(async () => {
         const a = await getRandomCommand()
@@ -28,8 +35,8 @@ module.exports = async (client, startUp) => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: game
-            }
+                name: game,
+            },
         })
     }, 5000)
 
@@ -47,8 +54,8 @@ module.exports = async (client, startUp) => {
         client.user.setPresence({
             status: "dnd",
             activity: {
-                name: game
-            }
+                name: game,
+            },
         })
     }, 15 * 60 * 1000)
 
@@ -56,7 +63,7 @@ module.exports = async (client, startUp) => {
 
     let memberCount = 0
 
-    await client.guilds.cache.forEach(g => {
+    await client.guilds.cache.forEach((g) => {
         memberCount = memberCount + g.memberCount
     })
 

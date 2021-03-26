@@ -37,11 +37,11 @@ setInterval(() => {
 
 module.exports = {
     /**
-     * 
+     *
      * @param {GuildMember} member member to check
      * @returns {Boolean}
      */
-    profileExists: function(member) {
+    profileExists: function (member) {
         if (users[member.user.id]) {
             return true
         } else {
@@ -50,11 +50,11 @@ module.exports = {
     },
 
     /**
-     * 
+     *
      * @param {String} id member id to check
      * @returns {Boolean}
      */
-    profileExistsID: function(id) {
+    profileExistsID: function (id) {
         if (users[id]) {
             return true
         } else {
@@ -63,43 +63,43 @@ module.exports = {
     },
 
     /**
-     * 
+     *
      * @param {GuildMember} member member to create profile for
      */
-    createProfile: function(member) {
+    createProfile: function (member) {
         users[member.user.id] = {
-            "youtube": [],
-            "twitter": [],
-            "instagram": [],
-            "snapchat": [],
-            "email": []
+            youtube: [],
+            twitter: [],
+            instagram: [],
+            snapchat: [],
+            email: [],
         }
     },
 
     /**
-     * 
+     *
      * @param {GuildMember} member member to get profile of
      * @returns {JSON}
      */
-    getProfile: function(member) {
+    getProfile: function (member) {
         return users[member.user.id]
     },
 
     /**
-     * 
+     *
      * @param {String} id member id to get profile of
      * @returns {JSON}
      */
-    getProfileID: function(id) {
+    getProfileID: function (id) {
         return users[id]
     },
 
     /**
-     * 
+     *
      * @param {GuildMember} member member of profile to update
      * @param {JSON} profile new profile
      */
-    updateProfile: function(member, profile) {
+    updateProfile: function (member, profile) {
         users[member.user.id] = profile
-    }
+    },
 }

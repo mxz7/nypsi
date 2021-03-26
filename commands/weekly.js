@@ -10,8 +10,8 @@ const cooldown = new Map()
 const cmd = new Command("weekly", "get your weekly bonus (patreon only)", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (cooldown.has(message.member.id)) {
@@ -44,7 +44,11 @@ async function run(message, args) {
     }
 
     const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, false, `${getPrefix(message.guild)}weekly is for SILVER tier and higher`).setFooter(`${getPrefix(message.guild)}patreon`)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `${getPrefix(message.guild)}weekly is for SILVER tier and higher`
+        ).setFooter(`${getPrefix(message.guild)}patreon`)
 
         return message.channel.send(embed)
     }
@@ -66,20 +70,28 @@ async function run(message, args) {
             let amount = 100000
             const multi = await getMulti(message.member)
 
-            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
+            let description = `$${getBalance(
+                message.member
+            ).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi)
-                description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${(multi * 100).toLocaleString()}**% bonus)`
+                description = `$${getBalance(
+                    message.member
+                ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${(
+                    multi * 100
+                ).toLocaleString()}**% bonus)`
             }
 
             updateBalance(message.member, getBalance(message.member) + amount)
-            
+
             const embed = new CustomEmbed(message.member, false, description)
 
-            return message.channel.send(embed).then(msg => {
+            return message.channel.send(embed).then((msg) => {
                 setTimeout(() => {
-                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`)
+                    embed.setDescription(
+                        `new balance: $**${getBalance(message.member).toLocaleString()}**`
+                    )
                     msg.edit(embed)
                 }, 2000)
             })
@@ -87,11 +99,14 @@ async function run(message, args) {
             const timeRemaining = Math.abs(604800000 - diff)
             const dd = timeUntil(new Date().getTime() + timeRemaining)
 
-            const embed = new CustomEmbed(message.member, false, "you have already used your weekly reward! come back in **" + dd + "**")
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "you have already used your weekly reward! come back in **" + dd + "**"
+            )
 
             return message.channel.send(embed)
         }
-
     }
 }
 
@@ -100,11 +115,11 @@ function timeUntil(date) {
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor((daysms) / (60*60*1000))
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
     const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutes = Math.floor(hoursms / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    const sec = Math.floor(minutesms / 1000)
 
     let output = ""
 

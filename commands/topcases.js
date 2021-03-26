@@ -7,17 +7,21 @@ const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("topcases", "see who has the top moderation cases", categories.MODERATION).setPermissions("MANAGE_MESSAGES")
+const cmd = new Command(
+    "topcases",
+    "see who has the top moderation cases",
+    categories.MODERATION
+).setPermissions("MANAGE_MESSAGES")
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
-    if (!profileExists(message.guild)) return message.channel.send(new ErrorEmbed("no data for this server"))
+    if (!profileExists(message.guild))
+        return message.channel.send(new ErrorEmbed("no data for this server"))
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -47,8 +51,9 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const embed = new CustomEmbed(message.member, true)
-        .setTitle("top cases | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, true).setTitle(
+        "top cases | " + message.member.user.username
+    )
 
     const prefix = getPrefix(message.guild)
 
@@ -88,11 +93,11 @@ async function run(message, args) {
             members.push(m)
         }
 
-        staff.sort(function(a, b) {
+        staff.sort(function (a, b) {
             return topStaff.get(b) - topStaff.get(a)
         })
 
-        members.sort(function(a, b) {
+        members.sort(function (a, b) {
             return topMembers.get(b) - topMembers.get(a)
         })
 
@@ -104,7 +109,14 @@ async function run(message, args) {
         for (let s of staff) {
             if (count >= 5) break
 
-            staffText[count] = (count + 1) + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
+            staffText[count] =
+                count +
+                1 +
+                " `" +
+                s +
+                "` **" +
+                topStaff.get(s).toLocaleString() +
+                "** punishments given"
 
             count++
         }
@@ -114,7 +126,7 @@ async function run(message, args) {
         for (let m of members) {
             if (count >= 5) break
 
-            let username = await message.guild.members.cache.find(mem => mem.id == m)
+            let username = await message.guild.members.cache.find((mem) => mem.id == m)
 
             if (!username) {
                 username = m
@@ -122,7 +134,14 @@ async function run(message, args) {
                 username = username.user.tag
             }
 
-            memberText[count] = (count + 1) + " `" + username + "` **" + topMembers.get(m).toLocaleString() + "** punishments taken"
+            memberText[count] =
+                count +
+                1 +
+                " `" +
+                username +
+                "` **" +
+                topMembers.get(m).toLocaleString() +
+                "** punishments taken"
 
             count++
         }
@@ -131,12 +150,15 @@ async function run(message, args) {
         embed.addField("top members", memberText, true)
 
         if (deletedCaseCount) {
-            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`)
+            embed.setFooter(
+                `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`
+            )
         } else {
-            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`)
+            embed.setFooter(
+                `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`
+            )
         }
     } else {
-
         let member
 
         if (message.mentions.members.first()) {
@@ -145,7 +167,7 @@ async function run(message, args) {
             const members = message.guild.members.cache
 
             if (args[0].length == 18) {
-                member = members.find(m => m.user.id == args[0])
+                member = members.find((m) => m.user.id == args[0])
 
                 if (!member) {
                     member = args[0]
@@ -154,7 +176,9 @@ async function run(message, args) {
                 member = await getMember(message, args.join(" "))
 
                 if (!member) {
-                    return message.channel.send(new ErrorEmbed("can't find `" + args.join(" ") + "`"))
+                    return message.channel.send(
+                        new ErrorEmbed("can't find `" + args.join(" ") + "`")
+                    )
                 }
             }
         }
@@ -180,24 +204,24 @@ async function run(message, args) {
                     punished++
 
                     switch (case0.type) {
-                    case "mute":
-                        mutes++
-                        break
-                    case "ban":
-                        bans++
-                        break
-                    case "kick":
-                        kicks++
-                        break
-                    case "warn":
-                        warns++
-                        break
-                    case "unban":
-                        unbans++
-                        break
-                    case "unmute":
-                        unmutes++
-                        break
+                        case "mute":
+                            mutes++
+                            break
+                        case "ban":
+                            bans++
+                            break
+                        case "kick":
+                            kicks++
+                            break
+                        case "warn":
+                            warns++
+                            break
+                        case "unban":
+                            unbans++
+                            break
+                        case "unmute":
+                            unmutes++
+                            break
                     }
                 }
             } else if (case0.user == member.user.id) {
@@ -212,20 +236,40 @@ async function run(message, args) {
         embed.setDescription(member.user.toString())
 
         if (punished > 5) {
-            embed.addField("moderator stats", "cases `" + punished.toLocaleString() + 
-                "`\ndeleted cases `" + deletedCasesModerator.toLocaleString() + 
-                "`\nbans `" + bans.toLocaleString() + 
-                "`\nkicks `" + kicks.toLocaleString() +
-                "`\nmutes `" + mutes.toLocaleString() +
-                "`\nwarns `" + warns.toLocaleString() +
-                "`\nunbans `" + unbans.toLocaleString() +
-                "`\nunmutes `" + unmutes.toLocaleString() + "`", true)
+            embed.addField(
+                "moderator stats",
+                "cases `" +
+                    punished.toLocaleString() +
+                    "`\ndeleted cases `" +
+                    deletedCasesModerator.toLocaleString() +
+                    "`\nbans `" +
+                    bans.toLocaleString() +
+                    "`\nkicks `" +
+                    kicks.toLocaleString() +
+                    "`\nmutes `" +
+                    mutes.toLocaleString() +
+                    "`\nwarns `" +
+                    warns.toLocaleString() +
+                    "`\nunbans `" +
+                    unbans.toLocaleString() +
+                    "`\nunmutes `" +
+                    unmutes.toLocaleString() +
+                    "`",
+                true
+            )
         }
-        embed.addField("member stats", "punishments `" + punishments.toLocaleString() + "`\ndeleted `" + deletedCases.toLocaleString() + "`", true)
+        embed.addField(
+            "member stats",
+            "punishments `" +
+                punishments.toLocaleString() +
+                "`\ndeleted `" +
+                deletedCases.toLocaleString() +
+                "`",
+            true
+        )
     }
 
     return await message.channel.send(embed)
-
 }
 
 cmd.setRun(run)
