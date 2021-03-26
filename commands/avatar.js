@@ -11,8 +11,7 @@ avatar.setAliases(["av"])
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args)  {
-
+async function run(message, args) {
     let member
 
     if (args.length == 0) {
@@ -31,9 +30,7 @@ async function run(message, args)  {
 
     const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
 
-    const embed = new CustomEmbed(member, false)
-        .setTitle(member.user.tag)
-        .setImage(avatar)
+    const embed = new CustomEmbed(member, false).setTitle(member.user.tag).setImage(avatar)
 
     message.channel.send(embed)
 }

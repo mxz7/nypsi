@@ -1,5 +1,16 @@
 const { Message } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
+const {
+    userExists,
+    createUser,
+    getBalance,
+    updateBalance,
+    formatBet,
+    getXp,
+    updateXp,
+    calcMaxBet,
+    getMulti,
+    getPrestige,
+} = require("../economy/utils.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -12,11 +23,10 @@ const games = new Map()
 const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (games.has(message.member.user.id)) {
@@ -56,23 +66,32 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("blackjack help")
             .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
-            .addField("game rules", "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
-                "the dealer will always stand on or above **17**\n" +
-                "**2**x multiplier for winning, on a draw you receive your bet back")
-            .addField("help", "1️⃣ **hit** receive a new card\n" + 
-                "2️⃣ **stand** end your turn and allow the dealer to play\n" + 
-                "3️⃣ **double down** take one more card and double your bet")
+            .addField(
+                "game rules",
+                "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
+                    "the dealer will always stand on or above **17**\n" +
+                    "**2**x multiplier for winning, on a draw you receive your bet back"
+            )
+            .addField(
+                "help",
+                "1️⃣ **hit** receive a new card\n" +
+                    "2️⃣ **stand** end your turn and allow the dealer to play\n" +
+                    "3️⃣ **double down** take one more card and double your bet"
+            )
 
         return message.channel.send(embed)
     }
 
     if (args[0] == "info") {
-        const embed = new CustomEmbed(message.member, false, "blackjack works exactly how it would in real life\n" +
-            "when you create a game, a full 52 deck is shuffled in a random order\n" +
-            "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-            "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)")
-            .setTitle("blackjack help")
-        
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "blackjack works exactly how it would in real life\n" +
+                "when you create a game, a full 52 deck is shuffled in a random order\n" +
+                "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)"
+        ).setTitle("blackjack help")
+
         return message.channel.send(embed)
     }
 
@@ -103,7 +122,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -116,14 +139,63 @@ async function run(message, args) {
 
     const id = Math.random()
 
-    const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
-        "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
-        "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
-        "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
+    const newDeck = [
+        "A♠",
+        "2♠",
+        "3♠",
+        "4♠",
+        "5♠",
+        "6♠",
+        "7♠",
+        "8♠",
+        "9♠",
+        "10♠",
+        "J♠",
+        "Q♠",
+        "K♠",
+        "A♣",
+        "2♣",
+        "3♣",
+        "4♣",
+        "5♣",
+        "6♣",
+        "7♣",
+        "8♣",
+        "9♣",
+        "10♣",
+        "J♣",
+        "Q♣",
+        "K♣",
+        "A♥️",
+        "2♥️",
+        "3♥️",
+        "4♥️",
+        "5♥️",
+        "6♥️",
+        "7♥️",
+        "8♥️",
+        "9♥️",
+        "10♥️",
+        "J♥️",
+        "Q♥️",
+        "K♥️",
+        "A♦",
+        "2♦",
+        "3♦",
+        "4♦",
+        "5♦",
+        "6♦",
+        "7♦",
+        "8♦",
+        "9♦",
+        "10♦",
+        "J♦",
+        "Q♦",
+        "K♦",
+    ]
 
-    
     const multi = await getMulti(message.member)
-    
+
     games.set(message.member.user.id, {
         bet: bet,
         deck: shuffle(newDeck),
@@ -132,7 +204,7 @@ async function run(message, args) {
         id: id,
         first: true,
         dealerPlay: false,
-        voted: multi
+        voted: multi,
     })
 
     setTimeout(() => {
@@ -152,35 +224,43 @@ async function run(message, args) {
     newDealerCard(message.member)
     newCard(message.member)
 
-    const loadingEmbed = new CustomEmbed(message.member, false)
-        .setTitle("loading.. | " + message.member.user.username)
+    const loadingEmbed = new CustomEmbed(message.member, false).setTitle(
+        "loading.. | " + message.member.user.username
+    )
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setTitle("blackjack | " + message.member.user.username)
         .addField("dealer", games.get(message.member.user.id).dealerCards[0])
-        .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-    
+        .addField(
+            message.member.user.tag,
+            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+        )
+
     if (getBalance(message.member) >= bet) {
         embed.addField("help", "1️⃣ hit | 2️⃣ stand | 3️⃣ double down")
     } else {
         embed.addField("help", ":one: hit | :two: stand")
     }
 
-    message.channel.send(loadingEmbed).then(async m => {
-        await m.react("1️⃣")
-        await m.react("2️⃣")
+    message.channel
+        .send(loadingEmbed)
+        .then(async (m) => {
+            await m.react("1️⃣")
+            await m.react("2️⃣")
 
-        if (getBalance(message.member) >= bet) {
-            await m.react("3️⃣")
-        }
+            if (getBalance(message.member) >= bet) {
+                await m.react("3️⃣")
+            }
 
-        await m.edit(embed)
-        playGame(message, m).catch(e => {
-            console.error(e)
-            return message.channel.send(new ErrorEmbed("an error occured while running - join support server"))
+            await m.edit(embed)
+            playGame(message, m).catch((e) => {
+                console.error(e)
+                return message.channel.send(
+                    new ErrorEmbed("an error occured while running - join support server")
+                )
+            })
         })
-    }).catch()
-
+        .catch()
 }
 
 cmd.setRun(run)
@@ -210,7 +290,7 @@ function newCard(member) {
         id: id,
         first: first,
         dealerPlay: false,
-        voted: voted
+        voted: voted,
     })
 }
 
@@ -237,7 +317,7 @@ function newDealerCard(member) {
         id: id,
         first: first,
         dealerPlay: false,
-        voted: voted
+        voted: voted,
     })
 }
 
@@ -251,7 +331,7 @@ function calcTotal(member) {
 
     for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join()
-        
+
         if (card.includes("K") || card.includes("Q") || card.includes("J")) {
             total = total + 10
         } else if (card.includes("A")) {
@@ -295,7 +375,7 @@ function calcTotalDealer(member) {
 
     for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join()
-        
+
         if (card.includes("K") || card.includes("Q") || card.includes("J")) {
             total = total + 10
         } else if (card.includes("A")) {
@@ -333,7 +413,7 @@ function getCards(member) {
     const cards = games.get(member.user.id).cards
 
     let message = ""
-    
+
     for (let card of cards) {
         message = message + "| " + card + " "
     }
@@ -345,7 +425,7 @@ function getDealerCards(member) {
     const cards = games.get(member.user.id).dealerCards
 
     let message = ""
-    
+
     for (let card of cards) {
         message = message + "| " + card + " "
     }
@@ -354,28 +434,35 @@ function getDealerCards(member) {
 }
 
 async function playGame(message, m) {
-
     if (!games.has(message.author.id)) return
 
     let bet = games.get(message.member.user.id).bet
     const first = games.get(message.member.user.id).first
     const dealerPlaya = games.get(message.member.user.id).dealerPlay
 
-    const newEmbed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
-        .setTitle("blackjack | " + message.member.user.username)
+    const newEmbed = new CustomEmbed(
+        message.member,
+        true,
+        "**bet** $" + bet.toLocaleString()
+    ).setTitle("blackjack | " + message.member.user.username)
 
     const lose = async () => {
         newEmbed.setColor("#e4334f")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
-        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        newEmbed.addField(
+            "dealer",
+            getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+        )
+        newEmbed.addField(
+            message.member.user.tag,
+            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+        )
         games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
 
     const win = async () => {
-
         let winnings = bet * 2
 
         newEmbed.setColor("#5efb8f")
@@ -388,16 +475,33 @@ async function playGame(message, m) {
                 newEmbed.setFooter("+" + xpBonus + "xp")
             }
 
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
-                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% bonus")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString() +
+                    "\n" +
+                    "+**" +
+                    (games.get(message.member.user.id).voted * 100).toString() +
+                    "**% bonus"
+            )
         } else {
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString()
+            )
         }
-        
-        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+
+        newEmbed.addField(
+            "dealer",
+            getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+        )
+        newEmbed.addField(
+            message.member.user.tag,
+            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+        )
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
         await m.edit(newEmbed)
@@ -406,15 +510,23 @@ async function playGame(message, m) {
 
     const draw = async () => {
         newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
-        newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        newEmbed.setDescription(
+            "**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString()
+        )
+        newEmbed.addField(
+            "dealer",
+            getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+        )
+        newEmbed.addField(
+            message.member.user.tag,
+            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+        )
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
         await m.edit(newEmbed)
         return m.reactions.removeAll()
     }
-    
+
     if (calcTotalDealer(message.member) > 21) {
         return win()
     } else if (calcTotalDealer(message.member) == 21 && !first && dealerPlaya) {
@@ -454,27 +566,34 @@ async function playGame(message, m) {
             id: games.get(message.member.user.id).id,
             first: false,
             dealerPlay: false,
-            voted: games.get(message.member.user.id).voted
+            voted: games.get(message.member.user.id).voted,
         })
 
         let filter
 
         if (getBalance(message.member) >= bet) {
             filter = (reaction, user) => {
-                return ["1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                return (
+                    ["1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name) &&
+                    user.id == message.member.user.id
+                )
             }
         } else {
             filter = (reaction, user) => {
-                return ["1️⃣", "2️⃣"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                return (
+                    ["1️⃣", "2️⃣"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                )
             }
         }
 
         let fail = false
 
-        const reaction = await m.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-            .then(collected => {
+        const reaction = await m
+            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .then((collected) => {
                 return collected.first().emoji.name
-            }).catch(() => {
+            })
+            .catch(() => {
                 fail = true
                 games.delete(message.author.id)
                 return message.channel.send(message.author.toString() + " blackjack game expired")
@@ -489,16 +608,23 @@ async function playGame(message, m) {
                 return lose()
             }
 
-            const newEmbed1 = new CustomEmbed(message.member, true, message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(
+                message.member,
+                true,
+                message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString()
+            )
                 .setTitle("blackjack")
                 .addField("dealer", games.get(message.member.user.id).dealerCards[0])
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(
+                    message.member.user.tag,
+                    getCards(message.member) + " **" + calcTotal(message.member) + "**"
+                )
             await m.edit(newEmbed1)
 
             if (calcTotal(message.member) == 21) {
                 return setTimeout(() => {
                     dealerPlay(message)
-    
+
                     if (calcTotal(message.member) == calcTotalDealer(message.member)) {
                         return draw()
                     } else if (calcTotalDealer(message.member) > 21) {
@@ -518,12 +644,21 @@ async function playGame(message, m) {
             }
 
             return playGame(message, m)
-
         } else if (reaction == "2️⃣") {
-            const newEmbed1 = new CustomEmbed(message.member, true, message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(
+                message.member,
+                true,
+                message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString()
+            )
                 .setTitle("blackjack")
-                .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(
+                    "dealer",
+                    getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+                )
+                .addField(
+                    message.member.user.tag,
+                    getCards(message.member) + " **" + calcTotal(message.member) + "**"
+                )
             m.edit(newEmbed1)
 
             games.set(message.member.user.id, {
@@ -534,9 +669,9 @@ async function playGame(message, m) {
                 id: games.get(message.member.user.id).id,
                 first: false,
                 dealerPlay: true,
-                voted: games.get(message.member.user.id).voted
+                voted: games.get(message.member.user.id).voted,
             })
-            
+
             setTimeout(() => {
                 dealerPlay(message)
 
@@ -556,9 +691,7 @@ async function playGame(message, m) {
                     }
                 }
             }, 1500)
-
         } else if (reaction == "3️⃣") {
-
             updateBalance(message.member, getBalance(message.member) - bet)
 
             bet = bet * 2
@@ -571,17 +704,26 @@ async function playGame(message, m) {
                 id: games.get(message.member.user.id).id,
                 first: false,
                 dealerPlay: false,
-                voted: games.get(message.member.user.id).voted
+                voted: games.get(message.member.user.id).voted,
             })
 
             newCard(message.member)
 
-            const newEmbed1 = new CustomEmbed(message.member, true, message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(
+                message.member,
+                true,
+                message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString()
+            )
                 .setTitle("blackjack")
-                .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(
+                    "dealer",
+                    getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+                )
+                .addField(
+                    message.member.user.tag,
+                    getCards(message.member) + " **" + calcTotal(message.member) + "**"
+                )
             m.edit(newEmbed1)
-
 
             if (calcTotal(message.member) > 21) {
                 return setTimeout(() => {
@@ -608,7 +750,6 @@ async function playGame(message, m) {
                     }
                 }
             }, 1500)
-
         } else {
             games.delete(message.author.id)
             return m.reactions.removeAll()
@@ -620,5 +761,5 @@ function dealerPlay(message) {
     while (calcTotalDealer(message.member) < 17) {
         newDealerCard(message.member)
     }
-    return 
+    return
 }

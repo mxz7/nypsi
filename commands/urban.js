@@ -7,20 +7,23 @@ const { isPremium } = require("../premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("urban", "get a definition from urban dictionary", categories.INFO).setAliases(["define"])
+const cmd = new Command(
+    "urban",
+    "get a definition from urban dictionary",
+    categories.INFO
+).setAliases(["define"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -58,7 +61,11 @@ async function run(message, args) {
 
     if (!result.word) return
 
-    const embed = new CustomEmbed(message.member, false, result.definition + "\n\n" + result.example)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        result.definition + "\n\n" + result.example
+    )
         .setTitle(result.word)
         .setHeader("published by " + result.author)
         .addField("👍", result.thumbsUp.toLocaleString(), true)

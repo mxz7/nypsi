@@ -7,11 +7,10 @@ const cooldown = new Map()
 const cmd = new Command("clean", "clean up bot commands and responses", categories.MODERATION)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
     if (cooldown.has(message.member.id)) {
@@ -39,12 +38,13 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    const collected = await message.channel.messages.fetch({limit: 50})
+    const collected = await message.channel.messages.fetch({ limit: 50 })
 
-    const collecteda = collected.filter(msg => msg.author.id == message.client.user.id || msg.content.startsWith(prefix))
+    const collecteda = collected.filter(
+        (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix)
+    )
 
     await message.channel.bulkDelete(collecteda)
-
 }
 
 cmd.setRun(run)

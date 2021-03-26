@@ -15,7 +15,6 @@ setInterval(() => {
     const data1 = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
 
     if (JSON.stringify(data) != JSON.stringify(data1)) {
-
         fs.writeFile("./chatreactions/data.json", JSON.stringify(data), (err) => {
             if (err) {
                 return console.log(err)
@@ -44,14 +43,21 @@ setInterval(() => {
 
 setInterval(() => {
     let date = new Date()
-    date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
+    date =
+        getTimestamp().split(":").join(".") +
+        " - " +
+        date.getDate() +
+        "." +
+        date.getMonth() +
+        "." +
+        date.getFullYear()
     fs.writeFileSync("./chatreactions/backup/" + date + ".json", JSON.stringify(data))
     console.log("\x1b[32m[" + getTimestamp() + "] chatreactions data backup complete\x1b[37m")
 }, 43200000)
 
 setInterval(async () => {
     const { checkGuild } = require("../nypsi")
-    
+
     for (let guild in data) {
         const exists = await checkGuild(guild)
 
@@ -61,7 +67,6 @@ setInterval(async () => {
             console.log(`[${getTimestamp()}] deleted guild '${guild}' from chatreaction data`)
         }
     }
-
 }, 24 * 60 * 60 * 1000)
 
 /**
@@ -135,7 +140,6 @@ exports.getReactionStats = getReactionStats
  * @param {TextChannel} channel
  */
 async function startReaction(guild, channel) {
-
     if (currentChannels.has(channel.id)) return "xoxo69"
 
     currentChannels.add(channel.id)
@@ -166,17 +170,17 @@ async function startReaction(guild, channel) {
 
     let winners = []
 
-    const filter = m => m.content == chosenWord && winners.indexOf(m.author.tag) == -1 && !m.member.user.bot
+    const filter = (m) =>
+        m.content == chosenWord && winners.indexOf(m.author.tag) == -1 && !m.member.user.bot
 
     const timeout = getReactionSettings(guild).timeout
 
     const collector = channel.createMessageCollector(filter, {
         max: 3,
-        time: timeout * 1000
+        time: timeout * 1000,
     })
 
     collector.on("collect", async (message) => {
-
         let time = message.createdTimestamp
 
         time = ((time - now) / 1000).toFixed(2)
@@ -195,7 +199,7 @@ async function startReaction(guild, channel) {
                 add2ndPlace(guild, message.member)
             }
 
-            const field = await embed.embed.fields.find(f => f.name == "winners")
+            const field = await embed.embed.fields.find((f) => f.name == "winners")
 
             field.value += `\n${badge} ${message.author.toString()} in \`${time}s\``
         }
@@ -204,7 +208,6 @@ async function startReaction(guild, channel) {
     })
 
     collector.on("end", async () => {
-
         if (winners.length == 0) {
             embed.setDescription(embed.embed.description + "\n\nnobody won ):")
         }
@@ -277,7 +280,7 @@ async function getServerLeaderboard(guild) {
 
     if (!members) members = guild.members.cache
 
-    members = members.filter(m => {
+    members = members.filter((m) => {
         return !m.user.bot
     })
 
@@ -286,19 +289,28 @@ async function getServerLeaderboard(guild) {
     const usersThird = []
 
     for (const user in data[guild.id].stats) {
-        if (members.find(member => member.user.id == user) && data[guild.id].stats[user].wins != 0) {
+        if (
+            members.find((member) => member.user.id == user) &&
+            data[guild.id].stats[user].wins != 0
+        ) {
             usersWins.push(user)
         }
-        if (members.find(member => member.user.id == user) && data[guild.id].stats[user].secondPlace != 0) {
+        if (
+            members.find((member) => member.user.id == user) &&
+            data[guild.id].stats[user].secondPlace != 0
+        ) {
             usersSecond.push(user)
         }
-        if (members.find(member => member.user.id == user) && data[guild.id].stats[user].thirdPlace != 0) {
+        if (
+            members.find((member) => member.user.id == user) &&
+            data[guild.id].stats[user].thirdPlace != 0
+        ) {
             usersThird.push(user)
         }
     }
 
     const getMember = (id) => {
-        const target = members.find(member => member.user.id == id)
+        const target = members.find((member) => member.user.id == id)
 
         return target
     }
@@ -352,7 +364,9 @@ async function getServerLeaderboard(guild) {
             pos = "🥉"
         }
 
-        secondMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].secondPlace}`
+        secondMsg += `${pos} **${getMember(user).user.tag}** ${
+            data[guild.id].stats[user].secondPlace
+        }`
     }
 
     for (const user of usersThird) {
@@ -366,7 +380,9 @@ async function getServerLeaderboard(guild) {
             pos = "🥉"
         }
 
-        thirdMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].thirdPlace}`
+        thirdMsg += `${pos} **${getMember(user).user.tag}** ${
+            data[guild.id].stats[user].thirdPlace
+        }`
     }
 
     const d = new Map()

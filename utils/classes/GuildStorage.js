@@ -1,30 +1,30 @@
 class GuildStorage {
     /**
      * @returns {GuildStorage}
-     * @param {Collection} members 
-     * @param {Collection} onlines 
+     * @param {Collection} members
+     * @param {Collection} onlines
      */
     constructor(members, onlines) {
         this.guild = {
             peaks: {
                 members: members,
-                onlines: onlines
+                onlines: onlines,
             },
             counter: {
                 enabled: false,
                 format: "members: %count% (%peak%)",
                 filterBots: true,
-                channel: "none"
+                channel: "none",
             },
             xmas: {
                 enabled: false,
                 format: "`%days%` days until christmas",
-                channel: "none"
+                channel: "none",
             },
             disabledCommands: [],
             snipeFilter: ["discordgg", "discordcom"],
             chatFilter: [],
-            prefix: "$"
+            prefix: "$",
         }
         return this.guild
     }

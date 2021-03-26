@@ -1,19 +1,30 @@
 const { Message } = require("discord.js")
-const { createReactionProfile, hasReactionProfile, getWords, startReaction, getReactionStats, hasReactionStatsProfile, createReactionStatsProfile, getServerLeaderboard } = require("../chatreactions/utils")
+const {
+    createReactionProfile,
+    hasReactionProfile,
+    getWords,
+    startReaction,
+    getReactionStats,
+    hasReactionStatsProfile,
+    createReactionStatsProfile,
+    getServerLeaderboard,
+} = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases(["cr", "reaction"])
+const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases([
+    "cr",
+    "reaction",
+])
 
 const cooldown = new Map()
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 15
 
     if (cooldown.has(message.member.id)) {
@@ -34,32 +45,39 @@ async function run(message, args) {
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
-    
+
     if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild)
-    if (!hasReactionStatsProfile(message.guild, message.member)) createReactionStatsProfile(message.guild, message.member)
+    if (!hasReactionStatsProfile(message.guild, message.member))
+        createReactionStatsProfile(message.guild, message.member)
 
     const helpCmd = () => {
-        const embed = new CustomEmbed(message.member, true).setTitle("chat reactions | " + message.author.username)
+        const embed = new CustomEmbed(message.member, true).setTitle(
+            "chat reactions | " + message.author.username
+        )
         const prefix = getPrefix(message.guild)
-        
-        embed.setDescription(`${prefix}**cr start** *start a random chat reaction*\n` +
-            `${prefix}**cr settings** *view/modify the chat reaction settings for your server*\n` +
-            `${prefix}**cr words** *view/modify the chat reaction word list*\n` +
-            `${prefix}**cr blacklist** *add/remove people to the blacklist*\n` +
-            `${prefix}**cr deleteall** *delete all chat reaction data*\n` +
-            `${prefix}**cr stats** *view the chat reaction stats for this server*`)
-        
+
+        embed.setDescription(
+            `${prefix}**cr start** *start a random chat reaction*\n` +
+                `${prefix}**cr settings** *view/modify the chat reaction settings for your server*\n` +
+                `${prefix}**cr words** *view/modify the chat reaction word list*\n` +
+                `${prefix}**cr blacklist** *add/remove people to the blacklist*\n` +
+                `${prefix}**cr deleteall** *delete all chat reaction data*\n` +
+                `${prefix}**cr stats** *view the chat reaction stats for this server*`
+        )
+
         return message.channel.send(embed)
     }
-    
+
     const showStats = async () => {
         cooldown.set(message.member.id, new Date())
 
         setTimeout(() => {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
-        
-        const embed = new CustomEmbed(message.member, false).setTitle("chat reactions | " + message.author.username)
+
+        const embed = new CustomEmbed(message.member, false).setTitle(
+            "chat reactions | " + message.author.username
+        )
 
         const stats = getReactionStats(message.guild, message.member)
 
@@ -76,7 +94,10 @@ async function run(message, args) {
             embed.addField("third place", leaderboards.get("third"), true)
         }
 
-        embed.addField("your stats", `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`)
+        embed.addField(
+            "your stats",
+            `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`
+        )
 
         return message.channel.send(embed)
     }
@@ -91,12 +112,13 @@ async function run(message, args) {
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
-            return message.channel.send(new ErrorEmbed("there is already a chat reaction in this channel"))
+            return message.channel.send(
+                new ErrorEmbed("there is already a chat reaction in this channel")
+            )
         }
     } else if (args[0].toLowerCase() == "stats") {
         return showStats()
     }
-
 }
 
 cmd.setRun(run)

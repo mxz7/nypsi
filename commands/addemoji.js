@@ -3,17 +3,20 @@ const { getPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("addemoji", "add an emoji from a different server to your server", categories.UTILITY).setPermissions(["MANAGE_EMOJIS"])
+const cmd = new Command(
+    "addemoji",
+    "add an emoji from a different server to your server",
+    categories.UTILITY
+).setPermissions(["MANAGE_EMOJIS"])
 
 const cooldown = new Map()
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -35,7 +38,9 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("MANAGE_EMOJIS")) {
-        return message.channel.send(new ErrorEmbed("i need the `manage emojis` permission for this command to work"))
+        return message.channel.send(
+            new ErrorEmbed("i need the `manage emojis` permission for this command to work")
+        )
     }
 
     if (!message.member.hasPermission("MANAGE_EMOJIS")) {
@@ -48,7 +53,9 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage"))
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")
+        )
     }
 
     let emoji = args[0]
@@ -79,10 +86,14 @@ async function run(message, args) {
     let fail = false
 
     await message.guild.emojis.create(url, emojiName).catch(() => {
-        return message.channel.send(new ErrorEmbed("error adding emoji - have you reached the emoji cap?"))
+        return message.channel.send(
+            new ErrorEmbed("error adding emoji - have you reached the emoji cap?")
+        )
     })
 
-    return message.channel.send(new CustomEmbed(message.member, false, `✅ emoji added as \`:${emojiName}:\``))
+    return message.channel.send(
+        new CustomEmbed(message.member, false, `✅ emoji added as \`:${emojiName}:\``)
+    )
 }
 
 cmd.setRun(run)

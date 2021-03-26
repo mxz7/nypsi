@@ -2,14 +2,17 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("snipe", "snipe the most recently deleted message", categories.FUN).setAliases(["s"])
+const cmd = new Command(
+    "snipe",
+    "snipe the most recently deleted message",
+    categories.FUN
+).setAliases(["s"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const { snipe } = require("../nypsi.js")
 
     let channel = message.channel
@@ -39,9 +42,8 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false, content)
         .setTitle(snipe.get(channel.id).member)
         .setFooter(timeSince(created) + " ago")
-    
-    message.channel.send(embed)
 
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)
@@ -49,16 +51,15 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-
-    const ms = Math.floor((new Date() - date))
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor((daysms) / (60*60*1000))
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
     const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutes = Math.floor(hoursms / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    const sec = Math.floor(minutesms / 1000)
 
     let output = ""
 

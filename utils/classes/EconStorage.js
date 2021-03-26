@@ -7,7 +7,7 @@ class EconProfile {
     constructor() {
         this.money = {
             balance: 500,
-            bank: 4500
+            bank: 4500,
         }
         this.xp = 0
         this.prestige = 0
@@ -17,7 +17,7 @@ class EconProfile {
         this.inventory = {
             vote: 0,
             prestige: 0,
-            basic: 0
+            basic: 0,
         }
         this.workers = {}
         return this

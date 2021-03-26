@@ -1,24 +1,92 @@
-const { getBalance, createUser, getMultiplier, updateBalance, userExists, winBoard, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
+const {
+    getBalance,
+    createUser,
+    getMultiplier,
+    updateBalance,
+    userExists,
+    winBoard,
+    formatBet,
+    getXp,
+    updateXp,
+    calcMaxBet,
+    getMulti,
+    getPrestige,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils.js")
 const { isPremium, getTier } = require("../premium/utils.js")
 
-const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
-const reel2 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍋", "🍒", "🍒"]
-const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒", "🍒"]
+const reel1 = [
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍊",
+    "🍊",
+    "🍊",
+    "🍊",
+    "🍋",
+    "🍋",
+    "🍒",
+]
+const reel2 = [
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍊",
+    "🍊",
+    "🍊",
+    "🍊",
+    "🍋",
+    "🍋",
+    "🍋",
+    "🍒",
+    "🍒",
+]
+const reel3 = [
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍉",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍇",
+    "🍊",
+    "🍊",
+    "🍊",
+    "🍋",
+    "🍋",
+    "🍒",
+    "🍒",
+]
 
 const cooldown = new Map()
 
 const cmd = new Command("slots", "play slots", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 10
 
     if (isPremium(message.author.id)) {
@@ -63,13 +131,17 @@ async function run(message, args) {
     if (args.length == 1 && args[0] == "info") {
         const embed = new CustomEmbed(message.member)
             .setTitle("win board")
-            .setDescription(winBoard() + "\nhaving any two same fruits in reel 1 & 2 gives a **1.2**x win")
-        
+            .setDescription(
+                winBoard() + "\nhaving any two same fruits in reel 1 & 2 gives a **1.2**x win"
+            )
+
         return message.channel.send(embed)
     }
 
     if (!args[0]) {
-        return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)
+        )
     }
 
     if (args[0] == "all") {
@@ -84,14 +156,20 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
+            return message.channel.send(
+                new ErrorEmbed(
+                    `${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`
+                )
+            )
         }
     }
 
-    const bet = (parseInt(args[0]))
+    const bet = parseInt(args[0])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`))
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)
+        )
     }
 
     if (bet > getBalance(message.member)) {
@@ -101,7 +179,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -197,21 +279,40 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
+            updateBalance(
+                message.member,
+                getBalance(message.member) + Math.round(winnings * voteMulti)
+            )
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
-    
 
-    const embed = new CustomEmbed(message.member, true, "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString())
-        .setTitle("slots | " + message.member.user.username)
-    
-    message.channel.send(embed).then(m => {
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "---------------\n" +
+            one +
+            " | " +
+            two +
+            " | " +
+            three +
+            "\n---------------\n**bet** $" +
+            bet.toLocaleString()
+    ).setTitle("slots | " + message.member.user.username)
+
+    message.channel.send(embed).then((m) => {
         if (win) {
             if (voted) {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
-                    "+**" + (voteMulti * 100).toString() + "**% bonus")
-                    
+                embed.addField(
+                    "**winner!!**",
+                    "**you win** $" +
+                        winnings.toLocaleString() +
+                        "\n" +
+                        "+**" +
+                        (voteMulti * 100).toString() +
+                        "**% bonus"
+                )
+
                 if (bet >= 10000) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
                     updateXp(message.member, getXp(message.member) + xpBonus)

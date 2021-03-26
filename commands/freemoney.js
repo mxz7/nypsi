@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -62,16 +61,22 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) + amount)
 
-    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`)
-        .setTitle("freemoney | " + message.member.user.username)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `+$**${amount.toLocaleString()}**`
+    ).setTitle("freemoney | " + message.member.user.username)
 
-    message.channel.send(embed).then(msg => {
-        embed.setDescription(`+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(message.member).toLocaleString()}**`)
+    message.channel.send(embed).then((msg) => {
+        embed.setDescription(
+            `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(
+                message.member
+            ).toLocaleString()}**`
+        )
         setTimeout(() => {
             msg.edit(embed)
         }, 1000)
     })
-
 }
 
 cmd.setRun(run)

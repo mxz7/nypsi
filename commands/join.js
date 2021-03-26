@@ -4,14 +4,17 @@ const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 
-const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
+const cmd = new Command(
+    "join",
+    "information about when you joined the server",
+    categories.INFO
+).setAliases(["joined"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let member
 
     if (args.length == 0) {
@@ -33,7 +36,11 @@ async function run(message, args) {
 
     let members
 
-    if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size || message.guild.memberCount <= 50) {
+    if (
+        inCooldown(message.guild) ||
+        message.guild.memberCount == message.guild.members.cache.size ||
+        message.guild.memberCount <= 50
+    ) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -42,26 +49,36 @@ async function run(message, args) {
 
     let membersSorted = []
 
-    members.forEach(m => {
+    members.forEach((m) => {
         if (m.joinedTimestamp) {
             membersSorted.push(m.id)
         }
     })
 
-    membersSorted.sort(function(a, b) {
-        return members.find(m => m.id == a).joinedAt - members.find(m => m.id == b).joinedAt
+    membersSorted.sort(function (a, b) {
+        return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
     })
-    
+
     let joinPos = membersSorted.indexOf(member.id) + 1
 
     if (joinPos == 0) joinPos = "invalid"
 
-    const embed = new CustomEmbed(message.member, false, "joined on **" + joinedServer + "**\n" +
-        " - **" + timeAgo.toLocaleString() + "** days ago\n" +
-        "join position is **" + joinPos + "**")
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        "joined on **" +
+            joinedServer +
+            "**\n" +
+            " - **" +
+            timeAgo.toLocaleString() +
+            "** days ago\n" +
+            "join position is **" +
+            joinPos +
+            "**"
+    )
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-        
+
     return message.channel.send(embed)
 }
 
