@@ -3,7 +3,8 @@ const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const answers = ["as i see it, yes",
+const answers = [
+    "as i see it, yes",
     "ask again later",
     "better not tell you now",
     "cannot predict now",
@@ -22,19 +23,19 @@ const answers = ["as i see it, yes",
     "without a doubt",
     "yes.",
     "yes – definitely",
-    "you may rely on it"]
+    "you may rely on it",
+]
 
 const cooldown = new Map()
 
 const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
@@ -73,8 +74,14 @@ async function run(message, args) {
 
     const question = args.join(" ")
 
-    const embed = new CustomEmbed(message.member, false, `**${question}** - ${message.member.user.toString()}\n\n🎱 ${answers[Math.floor(Math.random() * answers.length)]}`)
-        
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${
+            answers[Math.floor(Math.random() * answers.length)]
+        }`
+    )
+
     message.channel.send(embed)
 }
 

@@ -11,7 +11,7 @@ module.exports = (member) => {
     if (!profileExists(member.guild)) return
 
     if (isMuted(member.guild, member)) {
-        const muteRole = member.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+        const muteRole = member.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
         if (!muteRole) return deleteMute(member.guild, member)
 

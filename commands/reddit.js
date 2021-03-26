@@ -13,17 +13,16 @@ const blacklisted = ["body", "shit"]
 const cmd = new Command("reddit", "get a random image from any subreddit", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -51,7 +50,11 @@ async function run(message, args) {
 
     for (let bannedSubReddit of blacklisted) {
         if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
-            return message.channel.send(new ErrorEmbed("this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"))
+            return message.channel.send(
+                new ErrorEmbed(
+                    "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"
+                )
+            )
         }
     }
 
@@ -64,10 +67,11 @@ async function run(message, args) {
     let allowed
 
     try {
-        const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then(a => a.json())
+        const res = await fetch(
+            "https://www.reddit.com/r/" + args[0] + ".json?limit=100"
+        ).then((a) => a.json())
 
-        allowed = res.data.children.filter(post => !post.data.is_self)
-
+        allowed = res.data.children.filter((post) => !post.data.is_self)
     } catch (e) {
         return message.channel.send(new ErrorEmbed("invalid subreddit"))
     }
@@ -104,7 +108,6 @@ async function run(message, args) {
         .setImage(image)
 
     message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

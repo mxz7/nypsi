@@ -22,14 +22,17 @@ ranks.set("MVP", "MVP")
 ranks.set("VIP_PLUS", "VIP+")
 ranks.set("VIP", "VIP")
 
-const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", categories.MINECRAFT).setAliases(["h"])
+const cmd = new Command(
+    "hypixel",
+    "view hypixel stats for a minecraft account",
+    categories.MINECRAFT
+).setAliases(["h"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
@@ -70,7 +73,7 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     const username = args[0]
-    
+
     let uuid
     let hypixelData
 
@@ -81,7 +84,7 @@ async function run(message, args) {
         const uuidURL = "https://api.mojang.com/users/profiles/minecraft/" + username
 
         try {
-            uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
+            uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json())
         } catch (e) {
             return message.channel.send(new ErrorEmbed("invalid account"))
         }
@@ -89,7 +92,7 @@ async function run(message, args) {
         const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
 
         try {
-            hypixelData = await fetch(hypixelURL).then(hypixelData => hypixelData.json())
+            hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json())
         } catch (e) {
             console.log(e)
             return await message.channel.send(new ErrorEmbed("error fetching data"))
@@ -101,7 +104,7 @@ async function run(message, args) {
 
         cache.set(username.toLowerCase(), {
             hypixel: hypixelData,
-            mojang: uuid
+            mojang: uuid,
         })
 
         setTimeout(() => {
@@ -157,7 +160,7 @@ async function run(message, args) {
             challenges = hypixelData.player.challenges.all_time
         }
 
-        await Object.entries(challenges).forEach(c => {
+        await Object.entries(challenges).forEach((c) => {
             if (!parseInt(challenges)) {
                 challenges = 0
             }
@@ -191,7 +194,6 @@ async function run(message, args) {
         .setThumbnail(skin)
 
     return await message.channel.send(embed)
-
 }
 
 cmd.setRun(run)
@@ -199,11 +201,13 @@ cmd.setRun(run)
 module.exports = cmd
 
 function getLevel(exp) {
-    return exp < 0 ? 1 : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp))
+    return exp < 0
+        ? 1
+        : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp))
 }
 
 function timeSince(date) {
-    const ms = Math.floor((new Date() - date))
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
