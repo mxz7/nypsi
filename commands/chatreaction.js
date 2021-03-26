@@ -140,6 +140,16 @@ async function run(message, args) {
         return showStats()
     } else if (args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "lb") {
         return showLeaderboard()
+    } else if (args[0].toLowerCase() == "settings") {
+        if (!message.member.hasPermission("MANAGE_GUILD")) {
+            return message.channel.send(
+                new ErrorEmbed("you need the `manage server` permission to do this")
+            )
+        }
+
+        if (args.length == 1) {
+            //
+        }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
