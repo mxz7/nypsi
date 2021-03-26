@@ -214,7 +214,7 @@ async function startReaction(guild, channel) {
     const start = new Date().getTime()
 
     const winners = new Map()
-    
+
     let waiting = false
 
     const filter = (m) => m.content == chosenWord && !winners.get(m.author.id) && !m.member.user.bot
@@ -250,12 +250,16 @@ async function startReaction(guild, channel) {
                     } else {
                         const field = await embed.embed.fields.find((f) => f.name == "winners")
 
-                        field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``
+                        field.value += `\n🥈 ${winners.get(2).mention} in \`${
+                            winners.get(2).time
+                        }s\``
 
                         add2ndPlace(guild, winners.get(2).member)
 
                         if (winners.get(3)) {
-                            field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``
+                            field.value += `\n🥉 ${winners.get(3).mention} in \`${
+                                winners.get(3).time
+                            }s\``
                             add3rdPlace(guild, winners.get(3).member)
                         }
 
@@ -276,7 +280,7 @@ async function startReaction(guild, channel) {
         winners.set(winners.size + 1, {
             mention: message.author.toString(),
             time: time,
-            member: message.member
+            member: message.member,
         })
         if (!waiting) {
             return await msg.edit(embed)

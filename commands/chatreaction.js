@@ -128,7 +128,6 @@ async function run(message, args) {
     if (args.length == 0) {
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
-
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
