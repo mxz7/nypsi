@@ -8,11 +8,10 @@ const cooldown = new Map()
 const cmd = new Command("ddos", "ddos other users (fake)", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -61,33 +60,54 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const embed = new CustomEmbed(message.member, true, member.user.toString() + "\n\n" +
-        "**ip** *obtaining..*" + "\n" +
-        "**port** *waiting...*" + "\n\n" +
-        "**status** *online*")
-        .setTitle("ddos tool | " + message.member.user.username)
-    
-    return message.channel.send(embed).then(m => {
-        embed.setDescription(member.user.toString() + "\n\n" +
-            `**ip** *${ip}*` + "\n" +
-            "**port** *scanning..*" + "\n\n" +
-            "**status** *online*")
-        
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        member.user.toString() +
+            "\n\n" +
+            "**ip** *obtaining..*" +
+            "\n" +
+            "**port** *waiting...*" +
+            "\n\n" +
+            "**status** *online*"
+    ).setTitle("ddos tool | " + message.member.user.username)
+
+    return message.channel.send(embed).then((m) => {
+        embed.setDescription(
+            member.user.toString() +
+                "\n\n" +
+                `**ip** *${ip}*` +
+                "\n" +
+                "**port** *scanning..*" +
+                "\n\n" +
+                "**status** *online*"
+        )
+
         setTimeout(() => {
             m.edit(embed).then(() => {
-                embed.setDescription(member.user.toString() + "\n\n" +
-                    `**ip** *${ip}*` + "\n" +
-                    `**port** *${port}*` + "\n\n" +
-                    "**status** *online*")
-                
+                embed.setDescription(
+                    member.user.toString() +
+                        "\n\n" +
+                        `**ip** *${ip}*` +
+                        "\n" +
+                        `**port** *${port}*` +
+                        "\n\n" +
+                        "**status** *online*"
+                )
+
                 setTimeout(() => {
                     m.edit(embed).then(() => {
-                        embed.setDescription(member.user.toString() + "\n\n" +
-                            `**ip** *${ip}*` + "\n" +
-                            `**port** *${port}*` + "\n\n" +
-                            "**status** *offline*")
+                        embed.setDescription(
+                            member.user.toString() +
+                                "\n\n" +
+                                `**ip** *${ip}*` +
+                                "\n" +
+                                `**port** *${port}*` +
+                                "\n\n" +
+                                "**status** *offline*"
+                        )
                         embed.setColor("#5efb8f")
-                        
+
                         setTimeout(() => {
                             m.edit(embed)
                         }, 1000)
@@ -104,7 +124,7 @@ function randNumber() {
 
 function randPort() {
     return Math.floor(Math.random() * 25565)
-} 
+}
 
 cmd.setRun(run)
 

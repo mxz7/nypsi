@@ -1,24 +1,40 @@
 const { Message } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../guilds/utils")
-const { profileExists, createProfile, newCase, isMuted, deleteMute } = require("../moderation/utils")
+const {
+    profileExists,
+    createProfile,
+    newCase,
+    isMuted,
+    deleteMute,
+} = require("../moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command(
+    "unmute",
+    "unmute one or more users",
+    categories.MODERATION
+).setPermissions(["MANAGE_MESSAGES"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
         return
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_ROLES") || !message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work"))
+    if (
+        !message.guild.me.hasPermission("MANAGE_ROLES") ||
+        !message.guild.me.hasPermission("MANAGE_CHANNELS")
+    ) {
+        return message.channel.send(
+            new ErrorEmbed(
+                "i need the `manage roles` and `manage channels` permission for this command to work"
+            )
+        )
     }
 
     const prefix = getPrefix(message.guild)
@@ -37,12 +53,14 @@ async function run(message, args) {
             addCooldown(message.guild, 3600)
         }
 
-        const member = members.find(m => m.id == args[0])
+        const member = members.find((m) => m.id == args[0])
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("unable to find member with ID `" + args[0] + "`"))
+            return message.channel.send(
+                new ErrorEmbed("unable to find member with ID `" + args[0] + "`")
+            )
         }
-        
+
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
         const member = await getExactMember(message, args[0])
@@ -56,7 +74,7 @@ async function run(message, args) {
 
     const members = message.mentions.members
 
-    let muteRole = message.guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+    let muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
     if (!muteRole) {
         return message.channel.send(new ErrorEmbed("there is no 'muted' role"))
@@ -70,10 +88,17 @@ async function run(message, args) {
         const m = message.mentions.members.get(member)
 
         if (m.roles.cache.has(muteRole.id)) {
-            await m.roles.remove(muteRole).then(() => count++).catch(() => {
-                fail = true
-                return message.channel.send(new ErrorEmbed("there was an error when removing the role, please ensure i have the correct permissions"))
-            })
+            await m.roles
+                .remove(muteRole)
+                .then(() => count++)
+                .catch(() => {
+                    fail = true
+                    return message.channel.send(
+                        new ErrorEmbed(
+                            "there was an error when removing the role, please ensure i have the correct permissions"
+                        )
+                    )
+                })
         } else {
             failed.push(m.user)
         }
@@ -84,11 +109,16 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted")
-        .setTitle("unmute | " + message.member.user.username)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        "✅ **" + count + "** member(s) unmuted"
+    ).setTitle("unmute | " + message.member.user.username)
 
     if (count == 1) {
-        embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted")
+        embed.setDescription(
+            "✅ `" + message.mentions.members.first().user.tag + "` has been unmuted"
+        )
     }
 
     if (count == 0) {

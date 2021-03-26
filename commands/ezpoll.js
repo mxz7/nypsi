@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("ezpoll", "simple poll builder", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -45,12 +44,14 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-
         const embed = new CustomEmbed(message.member)
             .setTitle("ezpoll help")
             .addField("usage", `${prefix}ezpoll <choices..>`)
-            .addField("help", "after creation your message will be deleted and an embed will be created to act as the poll\n" +
-                "every word will be an option in the poll, with a maximum of 4 and minimum of two - use _ to have a space")
+            .addField(
+                "help",
+                "after creation your message will be deleted and an embed will be created to act as the poll\n" +
+                    "every word will be an option in the poll, with a maximum of 4 and minimum of two - use _ to have a space"
+            )
             .addField("example", `${prefix}ezpoll option1 option2`)
 
         return message.channel.send(embed)
@@ -73,7 +74,7 @@ async function run(message, args) {
         if (count > 4) break
 
         option = option.split("_").join(" ")
-            
+
         if (count == 1) {
             choices = "1️⃣ " + option
         } else if (count == 2) {
@@ -91,10 +92,10 @@ async function run(message, args) {
         .setTitle("poll by " + message.member.user.username)
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
-    
-    message.channel.send(embed).then(async m => {
+
+    message.channel.send(embed).then(async (m) => {
         await message.delete().catch()
-        
+
         if (args.length >= 2) {
             await m.react("1️⃣")
             await m.react("2️⃣")

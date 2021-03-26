@@ -1,5 +1,16 @@
 const { Message } = require("discord.js")
-const { userExists, createUser, getBalance, updateBalance, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
+const {
+    userExists,
+    createUser,
+    getBalance,
+    updateBalance,
+    formatBet,
+    getXp,
+    updateXp,
+    calcMaxBet,
+    getMulti,
+    getPrestige,
+} = require("../economy/utils.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -12,11 +23,10 @@ const games = new Map()
 const cmd = new Command("highlow", "higher or lower game", categories.MONEY).setAliases(["hl"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 30
@@ -53,23 +63,32 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("highlow help")
             .addField("usage", `${prefix}highlow <bet>\n${prefix}highlow info`)
-            .addField("game rules", "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once.")
-            .addField("help", "**A**ce | value of 1\n**J**ack | value of 11\n" + 
-                "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
-                "⬆ **higher** the next card will be higher in value than your current card\n" +
-                "⬇ **lower** the next card will be lower in value than your current card\n" +
-                "💰 **cash out** end the game and receive the current win\nmax win **15**x")
+            .addField(
+                "game rules",
+                "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once."
+            )
+            .addField(
+                "help",
+                "**A**ce | value of 1\n**J**ack | value of 11\n" +
+                    "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
+                    "⬆ **higher** the next card will be higher in value than your current card\n" +
+                    "⬇ **lower** the next card will be lower in value than your current card\n" +
+                    "💰 **cash out** end the game and receive the current win\nmax win **15**x"
+            )
 
         return message.channel.send(embed)
     }
 
     if (args[0] == "info") {
-        const embed = new CustomEmbed(message.member, false, "highlow works exactly how it would in real life\n" +
-            "when you create a game, a full 52 deck is shuffled in a random order\n" +
-            "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-            "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)")
-            .setTitle("highlow help")
-        
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "highlow works exactly how it would in real life\n" +
+                "when you create a game, a full 52 deck is shuffled in a random order\n" +
+                "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)"
+        ).setTitle("highlow help")
+
         return message.channel.send(embed)
     }
 
@@ -100,7 +119,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     if (games.has(message.member.user.id)) {
@@ -117,20 +140,70 @@ async function run(message, args) {
 
     const id = Math.random()
 
-    const newDeck = ["A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠", 
-        "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣", 
-        "A♥️", "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️",
-        "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"]
+    const newDeck = [
+        "A♠",
+        "2♠",
+        "3♠",
+        "4♠",
+        "5♠",
+        "6♠",
+        "7♠",
+        "8♠",
+        "9♠",
+        "10♠",
+        "J♠",
+        "Q♠",
+        "K♠",
+        "A♣",
+        "2♣",
+        "3♣",
+        "4♣",
+        "5♣",
+        "6♣",
+        "7♣",
+        "8♣",
+        "9♣",
+        "10♣",
+        "J♣",
+        "Q♣",
+        "K♣",
+        "A♥️",
+        "2♥️",
+        "3♥️",
+        "4♥️",
+        "5♥️",
+        "6♥️",
+        "7♥️",
+        "8♥️",
+        "9♥️",
+        "10♥️",
+        "J♥️",
+        "Q♥️",
+        "K♥️",
+        "A♦",
+        "2♦",
+        "3♦",
+        "4♦",
+        "5♦",
+        "6♦",
+        "7♦",
+        "8♦",
+        "9♦",
+        "10♦",
+        "J♦",
+        "Q♦",
+        "K♦",
+    ]
 
     const voteMulti = await getMulti(message.member)
-    
+
     games.set(message.member.user.id, {
         bet: bet,
         win: 0,
         deck: shuffle(newDeck),
         card: "",
         id: id,
-        voted: voteMulti
+        voted: voteMulti,
     })
 
     setTimeout(() => {
@@ -147,26 +220,32 @@ async function run(message, args) {
 
     newCard(message.member)
 
-    const loadingEmbed = new CustomEmbed(message.member)
-        .setTitle("loading.. | " + message.member.user.username)
+    const loadingEmbed = new CustomEmbed(message.member).setTitle(
+        "loading.. | " + message.member.user.username
+    )
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
+    )
         .setTitle("highlow | " + message.member.user.username)
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
         .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
-    
-    message.channel.send(loadingEmbed).then(async m => {
+
+    message.channel.send(loadingEmbed).then(async (m) => {
         await m.react("⬆")
         await m.react("⬇")
         await m.react("💰")
 
         await m.edit(embed)
-        playGame(message, m).catch(e => {
+        playGame(message, m).catch((e) => {
             console.error(e)
-            return message.channel.send(new ErrorEmbed("an error occured while running - join support server"))
+            return message.channel.send(
+                new ErrorEmbed("an error occured while running - join support server")
+            )
         })
     })
-
 }
 
 cmd.setRun(run)
@@ -186,7 +265,7 @@ function newCard(member) {
         deck: deck,
         card: choice,
         id: games.get(member.user.id).id,
-        voted: games.get(member.user.id).voted
+        voted: games.get(member.user.id).voted,
     })
 }
 
@@ -210,19 +289,28 @@ function getValue(member) {
 }
 
 async function playGame(message, m) {
-
     if (!games.has(message.author.id)) return
 
     const bet = games.get(message.member.user.id).bet
     let win = games.get(message.member.user.id).win
     let card = games.get(message.member.user.id).card
 
-    const newEmbed = new CustomEmbed(message.member, true)
-        .setTitle("highlow | " + message.member.user.username)
+    const newEmbed = new CustomEmbed(message.member, true).setTitle(
+        "highlow | " + message.member.user.username
+    )
 
     const lose = async () => {
         newEmbed.setColor("#e4334f")
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" + "\n\n**you lose!!**")
+        newEmbed.setDescription(
+            "**bet** $" +
+                bet.toLocaleString() +
+                "\n**" +
+                win +
+                "**x ($" +
+                Math.round(bet * win).toLocaleString() +
+                ")" +
+                "\n\n**you lose!!**"
+        )
         newEmbed.addField("card", "| " + card + " |")
         games.delete(message.author.id)
         await m.edit(newEmbed)
@@ -230,7 +318,6 @@ async function playGame(message, m) {
     }
 
     const win1 = async () => {
-
         let winnings = Math.round(bet * win)
 
         newEmbed.setColor("#5efb8f")
@@ -243,14 +330,35 @@ async function playGame(message, m) {
                 newEmbed.setFooter("+" + xpBonus + "xp")
             }
 
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
-                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% bonus")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n" +
+                    "**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")" +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString() +
+                    "\n" +
+                    "+**" +
+                    (games.get(message.member.user.id).voted * 100).toString() +
+                    "**% bonus"
+            )
         } else {
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n" +
+                    "**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")" +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString()
+            )
         }
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
@@ -261,7 +369,17 @@ async function playGame(message, m) {
 
     const draw = async () => {
         newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+        newEmbed.setDescription(
+            "**bet** $" +
+                bet.toLocaleString() +
+                "\n**" +
+                win +
+                "**x ($" +
+                Math.round(bet * win).toLocaleString() +
+                ")" +
+                "\n\n**draw!!**\nyou win $" +
+                bet.toLocaleString()
+        )
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
@@ -279,25 +397,26 @@ async function playGame(message, m) {
 
     let fail = false
 
-    const reaction = await m.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] }).then(collected => {
-        return collected.first().emoji.name
-    }).catch(() => {
-        fail = true
-        games.delete(message.author.id)
-        return message.channel.send(message.author.toString() + " highlow game expired")
-    })
+    const reaction = await m
+        .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+        .then((collected) => {
+            return collected.first().emoji.name
+        })
+        .catch(() => {
+            fail = true
+            games.delete(message.author.id)
+            return message.channel.send(message.author.toString() + " highlow game expired")
+        })
 
     if (fail) return
 
     if (reaction == "⬆") {
-
         const oldCard = getValue(message.member)
         newCard(message.member)
         card = games.get(message.member.user.id).card
         const newCard1 = getValue(message.member)
 
         if (newCard1 > oldCard) {
-            
             if (win == 0) {
                 win += 1
             } else if (win > 2.5) {
@@ -312,18 +431,32 @@ async function playGame(message, m) {
                 deck: games.get(message.member.user.id).deck,
                 card: games.get(message.member.user.id).card,
                 id: games.get(message.member.user.id).id,
-                voted: games.get(message.member.user.id).voted
+                voted: games.get(message.member.user.id).voted,
             })
 
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")"
+            )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬆").users.remove(message.member)
             await m.edit(newEmbed)
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")"
+            )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬆").users.remove(message.member)
             await m.edit(newEmbed)
@@ -331,7 +464,6 @@ async function playGame(message, m) {
         } else {
             return lose()
         }
-
     } else if (reaction == "⬇") {
         const oldCard = getValue(message.member)
         newCard(message.member)
@@ -339,7 +471,6 @@ async function playGame(message, m) {
         const newCard1 = getValue(message.member)
 
         if (newCard1 < oldCard) {
-
             if (win < 2) {
                 win += 0.5
             } else {
@@ -352,18 +483,32 @@ async function playGame(message, m) {
                 deck: games.get(message.member.user.id).deck,
                 card: games.get(message.member.user.id).card,
                 id: games.get(message.member.user.id).id,
-                voted: games.get(message.member.user.id).voted
+                voted: games.get(message.member.user.id).voted,
             })
 
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")"
+            )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬇").users.remove(message.member)
             await m.edit(newEmbed)
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
-            newEmbed.setDescription("**bet** $" + bet.toLocaleString() + 
-                "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
+            newEmbed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")"
+            )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬇").users.remove(message.member)
             await m.edit(newEmbed)

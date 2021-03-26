@@ -7,7 +7,11 @@ const { getMember } = require("../utils/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("slut", "measure how much of a slut you are", categories.FUN).setAliases(["howslut", "whore", "cumslut"])
+const cmd = new Command("slut", "measure how much of a slut you are", categories.FUN).setAliases([
+    "howslut",
+    "whore",
+    "cumslut",
+])
 
 /**
  * @param {Message} message
@@ -79,7 +83,7 @@ async function run(message, args) {
             cache.delete(member.user.id)
         }, cacheTime * 1000)
     }
-    
+
     let slutText = ""
     let slutEmoji = ""
 
@@ -109,8 +113,11 @@ async function run(message, args) {
         slutText = "virgin"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`)
-        .setTitle("slut calculator")
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`
+    ).setTitle("slut calculator")
 
     return await message.channel.send(embed)
 }

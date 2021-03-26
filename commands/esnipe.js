@@ -2,14 +2,17 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("esnipe", "snipe the most recently edited message", categories.FUN).setAliases(["es"])
+const cmd = new Command(
+    "esnipe",
+    "snipe the most recently edited message",
+    categories.FUN
+).setAliases(["es"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const { eSnipe } = require("../nypsi.js")
 
     let channel = message.channel
@@ -25,7 +28,9 @@ async function run(message, args) {
     }
 
     if (!eSnipe || !eSnipe.get(channel.id)) {
-        return message.channel.send(new ErrorEmbed("nothing to edit snipe in " + channel.toString()))
+        return message.channel.send(
+            new ErrorEmbed("nothing to edit snipe in " + channel.toString())
+        )
     }
 
     let content = eSnipe.get(channel.id).content
@@ -39,7 +44,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false, content)
         .setTitle(eSnipe.get(channel.id).member)
         .setFooter(timeSince(created) + " ago")
-    
+
     message.channel.send(embed)
 }
 
@@ -48,16 +53,15 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-
-    const ms = Math.floor((new Date() - date))
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor((daysms) / (60*60*1000))
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
     const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutes = Math.floor(hoursms / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    const sec = Math.floor(minutesms / 1000)
 
     let output = ""
 

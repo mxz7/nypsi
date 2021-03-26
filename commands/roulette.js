@@ -1,4 +1,15 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getXp, updateXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils.js")
+const {
+    getBalance,
+    createUser,
+    updateBalance,
+    userExists,
+    formatBet,
+    getXp,
+    updateXp,
+    calcMaxBet,
+    getMulti,
+    getPrestige,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
@@ -6,18 +17,38 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils.js")
 const { isPremium, getTier } = require("../premium/utils.js")
 
-const values = ["b", "b", "b", "b", "b", "b", "b", "b", "b", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "g"]
+const values = [
+    "b",
+    "b",
+    "b",
+    "b",
+    "b",
+    "b",
+    "b",
+    "b",
+    "b",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "r",
+    "g",
+]
 
 const cooldown = new Map()
 
 const cmd = new Command("roulette", "play roulette", categories.MONEY).setAliases(["r"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 10
 
     if (isPremium(message.author.id)) {
@@ -48,9 +79,25 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
-        return message.channel.send(new CustomEmbed(message.member, false, "🔴 " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
-            "⚫ " + ((values.length - 1) / 2) + "/" + values.length + " win **2**x\n" + 
-            "🟢 1/" + values.length + " win **17**x"))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                "🔴 " +
+                    (values.length - 1) / 2 +
+                    "/" +
+                    values.length +
+                    " win **2**x\n" +
+                    "⚫ " +
+                    (values.length - 1) / 2 +
+                    "/" +
+                    values.length +
+                    " win **2**x\n" +
+                    "🟢 1/" +
+                    values.length +
+                    " win **17**x"
+            )
+        )
     }
 
     const prefix = getPrefix(message.guild)
@@ -58,15 +105,32 @@ async function run(message, args) {
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
             .setTitle("roulette help")
-            .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
-            .addField("help", "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
-                "red and black give a **2x** win and green gives a **17**x win")
+            .addField(
+                "usage",
+                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`
+            )
+            .addField(
+                "help",
+                "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
+                    "red and black give a **2x** win and green gives a **17**x win"
+            )
 
         return message.channel.send(embed)
     }
 
-    if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
-        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
+    if (
+        args[0] != "red" &&
+        args[0] != "green" &&
+        args[0] != "black" &&
+        args[0] != "r" &&
+        args[0] != "g" &&
+        args[0] != "b"
+    ) {
+        return message.channel.send(
+            new ErrorEmbed(
+                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+            )
+        )
     }
 
     if (args[0] == "red") {
@@ -89,18 +153,30 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
+            return message.channel.send(
+                new ErrorEmbed(
+                    `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+                )
+            )
         }
     }
 
     const bet = parseInt(args[1])
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+            )
+        )
     }
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed(`${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+            )
+        )
     }
 
     if (bet > getBalance(message.member)) {
@@ -110,7 +186,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -140,10 +220,10 @@ async function run(message, args) {
 
     if (colorBet == "b") {
         colorBet = "⚫"
-    } 
+    }
     if (colorBet == "r") {
         colorBet = "🔴"
-    } 
+    }
     if (colorBet == "g") {
         colorBet = "🟢"
     }
@@ -167,24 +247,43 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(message.member, getBalance(message.member), + Math.round(winnings * voteMulti))
+            updateBalance(
+                message.member,
+                getBalance(message.member),
+                +Math.round(winnings * voteMulti)
+            )
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
 
-    const embed = new CustomEmbed(message.member, true, "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
-        .setTitle("roulette wheel | " + message.member.user.username)
-    
-    message.channel.send(embed).then(m => {
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
+    ).setTitle("roulette wheel | " + message.member.user.username)
 
-        embed.setDescription("**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString())
-        
+    message.channel.send(embed).then((m) => {
+        embed.setDescription(
+            "**landed on** " +
+                roll +
+                "\n\n**choice** " +
+                colorBet +
+                "\n**your bet** $" +
+                bet.toLocaleString()
+        )
+
         if (win) {
-
             if (voted) {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
-                    "+**" + (voteMulti * 100).toString() + "**% bonus")
-                
+                embed.addField(
+                    "**winner!!**",
+                    "**you win** $" +
+                        winnings.toLocaleString() +
+                        "\n" +
+                        "+**" +
+                        (voteMulti * 100).toString() +
+                        "**% bonus"
+                )
+
                 if (bet >= 10000) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
                     updateXp(message.member, getXp(message.member) + xpBonus)

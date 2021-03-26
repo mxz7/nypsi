@@ -7,14 +7,19 @@ const { getPrefix } = require("../guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("history", "view punishment history for a given user", categories.MODERATION).setAliases(["modlogs"]).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command(
+    "history",
+    "view punishment history for a given user",
+    categories.MODERATION
+)
+    .setAliases(["modlogs"])
+    .setPermissions(["MANAGE_MESSAGES"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
     if (cooldown.has(message.member.id)) {
@@ -58,7 +63,7 @@ async function run(message, args) {
         const members = message.guild.members.cache
 
         if (args[0].length == 18) {
-            member = members.find(m => m.user.id == args[0])
+            member = members.find((m) => m.user.id == args[0])
 
             if (!member) {
                 unknownMember = true
@@ -68,7 +73,11 @@ async function run(message, args) {
             member = await getMember(message, args.join(" "))
 
             if (!member) {
-                return message.channel.send(new ErrorEmbed(`can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`))
+                return message.channel.send(
+                    new ErrorEmbed(
+                        `can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`
+                    )
+                )
             }
         }
     }
@@ -91,7 +100,6 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
-
     let count = 0
     let page = []
     for (let case0 of cases) {
@@ -110,9 +118,10 @@ async function run(message, args) {
         pages.push(page)
     }
 
-    const embed = new CustomEmbed(message.member)
-        .setFooter("page 1/" + pages.length + " | total: " + cases.length)
-        
+    const embed = new CustomEmbed(message.member).setFooter(
+        "page 1/" + pages.length + " | total: " + cases.length
+    )
+
     if (unknownMember) {
         embed.setHeader("history for " + member)
     } else {
@@ -124,7 +133,10 @@ async function run(message, args) {
         if (case0.deleted) {
             embed.addField("case " + case0.id, "`[deleted]`")
         } else {
-            embed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\non " + date)
+            embed.addField(
+                "case " + case0.id,
+                "`" + case0.type + "` - " + case0.command + "\non " + date
+            )
         }
     }
 
@@ -143,21 +155,23 @@ async function run(message, args) {
         }
 
         const pageManager = async () => {
-            const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                .then(collected => {
+            const reaction = await msg
+                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .then((collected) => {
                     return collected.first().emoji.name
-                }).catch(async () => {
+                })
+                .catch(async () => {
                     await msg.reactions.removeAll()
                 })
 
             const newEmbed = new CustomEmbed(message.member)
-                
+
             if (unknownMember) {
                 newEmbed.setHeader("history for " + member)
             } else {
                 newEmbed.setHeader("history for " + member.user.tag)
             }
-            
+
             if (!reaction) return
 
             if (reaction == "⬅") {
@@ -170,15 +184,25 @@ async function run(message, args) {
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
                         } else {
-                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\non " + date)
+                            newEmbed.addField(
+                                "case " + case0.id,
+                                "`" + case0.type + "` - " + case0.command + "\non " + date
+                            )
                         }
                     }
-                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
+                    newEmbed.setFooter(
+                        "page " +
+                            (currentPage + 1) +
+                            "/" +
+                            pages.length +
+                            " | total: " +
+                            cases.length
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
             } else if (reaction == "➡") {
-                if ((currentPage + 1) >= lastPage) {
+                if (currentPage + 1 >= lastPage) {
                     return pageManager()
                 } else {
                     currentPage++
@@ -187,10 +211,20 @@ async function run(message, args) {
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.id, "`[deleted]`")
                         } else {
-                            newEmbed.addField("case " + case0.id, "`" + case0.type + "` - " + case0.command + "\nat " + date)
+                            newEmbed.addField(
+                                "case " + case0.id,
+                                "`" + case0.type + "` - " + case0.command + "\nat " + date
+                            )
                         }
                     }
-                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
+                    newEmbed.setFooter(
+                        "page " +
+                            (currentPage + 1) +
+                            "/" +
+                            pages.length +
+                            " | total: " +
+                            cases.length
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
@@ -198,7 +232,6 @@ async function run(message, args) {
         }
         return pageManager()
     }
-
 }
 
 cmd.setRun(run)

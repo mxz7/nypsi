@@ -10,11 +10,10 @@ const cooldown = new Map()
 const cmd = new Command("height", "accurate prediction of your height", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
     let cacheTime = 60
 
@@ -78,14 +77,13 @@ async function run(message, args) {
         feet = size.split("'")[0]
         inches = size.split("'")[1]
     } else {
-        
         feet = Math.floor(Math.random() * 6) + 4
         inches = Math.floor(Math.random() * 12)
 
         if (feet > 6) feet = 5
 
         size = `${feet}'${inches}`
-        
+
         cache.set(member.user.id, size)
 
         setTimeout(() => {
@@ -105,9 +103,12 @@ async function run(message, args) {
         sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`)
-        .setTitle("short person calculator")
-    
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`
+    ).setTitle("short person calculator")
+
     return message.channel.send(embed)
 }
 

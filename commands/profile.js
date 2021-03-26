@@ -1,5 +1,16 @@
 const { Message } = require("discord.js")
-const { userExists, createUser, getBalance, getBankBalance, getMaxBankBalance, getXp, getPrestige, calcMaxBet, getMulti, hasVoted } = require("../economy/utils")
+const {
+    userExists,
+    createUser,
+    getBalance,
+    getBankBalance,
+    getMaxBankBalance,
+    getXp,
+    getPrestige,
+    calcMaxBet,
+    getMulti,
+    hasVoted,
+} = require("../economy/utils")
 const { isPremium, getPremiumProfile } = require("../premium/utils")
 const { profileExistsID, getProfileID } = require("../socials/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -11,8 +22,8 @@ const cooldown = new Map()
 const cmd = new Command("profile", "view an overview of your profile and data", categories.INFO)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (cooldown.has(message.member.id)) {
@@ -53,14 +64,26 @@ async function run(message, args) {
     const xp = getXp(message.member).toLocaleString()
     const prestige = getPrestige(message.member).toLocaleString()
     const maxBet = await calcMaxBet(message.member)
-    const multi = await getMulti(message.member) * 100 + "%"
+    const multi = (await getMulti(message.member)) * 100 + "%"
     const voted = await hasVoted(message.member)
 
-    embed.addField("💰 economy", `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}`, true)
+    embed.addField(
+        "💰 economy",
+        `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
+    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}`,
+        true
+    )
 
     //PATREON
-    let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate
+    let tier,
+        tierString,
+        embedColor,
+        lastDaily,
+        lastWeekly,
+        status,
+        revokeReason,
+        startDate,
+        expireDate
 
     if (isPremium(message.author.id)) {
         const profile = getPremiumProfile(message.author.id)
@@ -83,8 +106,12 @@ async function run(message, args) {
         startDate = daysAgo(profile.startDate) + " days ago"
         expireDate = daysUntil(profile.expireDate) + " days left"
 
-        embed.addField("💲 patreon", `**tier** ${tierString}\n**level** ${tier}\n**color** #${embedColor}\n**daily** ${lastDaily}
-        **weekly** ${lastWeekly}\n**status** ${status}\n**reason** ${revokeReason}\n**start** ${startDate}\n**expire** ${expireDate}`, true)
+        embed.addField(
+            "💲 patreon",
+            `**tier** ${tierString}\n**level** ${tier}\n**color** #${embedColor}\n**daily** ${lastDaily}
+        **weekly** ${lastWeekly}\n**status** ${status}\n**reason** ${revokeReason}\n**start** ${startDate}\n**expire** ${expireDate}`,
+            true
+        )
     }
 
     //SOCIALS
@@ -99,11 +126,17 @@ async function run(message, args) {
         snapchat = profile.snapchat.join(" & ")
         email = profile.email.join(" & ")
 
-        embed.addField("💬 socials", `**youtube** ${youtube}\n**twitter** ${twitter}\n**instagram** ${instagram}\n**snapchat** ${snapchat}\n**email** ${email}`, true)
+        embed.addField(
+            "💬 socials",
+            `**youtube** ${youtube}\n**twitter** ${twitter}\n**instagram** ${instagram}\n**snapchat** ${snapchat}\n**email** ${email}`,
+            true
+        )
     }
 
     embed.setTitle(message.author.tag)
-    embed.setThumbnail(message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
+    embed.setThumbnail(
+        message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
+    )
 
     return message.channel.send(embed)
 }
