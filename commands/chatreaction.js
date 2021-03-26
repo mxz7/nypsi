@@ -165,8 +165,20 @@ async function run(message, args) {
 
             const phrase = args.slice(2, args.length).join(" ")
 
+            if (phrase == "" || phrase == " ") {
+                return message.channel.send(new ErrorEmbed("invalid phrase"))
+            }
+
             if (words.indexOf(phrase) != -1) {
                 return message.channel.send(new ErrorEmbed(`\`${phrase}\` already exists in the word list`))
+            }
+
+            if (words.length >= 100) {
+                return message.channel.send(new ErrorEmbed("wordlist is at max size (100)"))
+            }
+
+            if (phrase.length >= 150) {
+                return message.channel.send(new ErrorEmbed("phrase is too long (150 characters max)"))
             }
 
             words.push(phrase)
@@ -200,6 +212,19 @@ async function run(message, args) {
             updateWords(message.guild, [])
 
             return message.channel.send(new CustomEmbed(message.member, false, "✅ wordlist has been reset"))
+        } else if (args[1].toLowerCase() == "list") {
+            const words = getWordList(message.guild)
+
+            const embed = new CustomEmbed(message.member, false)
+
+            if (words.length == 0) {
+                embed.setDescription(
+                    "using [default word list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)"
+                )
+                embed.setTitle("chat reactions | " + message.author.username)
+            } else {
+                embed.setDescription("``")
+            }
         }
     }
 }
