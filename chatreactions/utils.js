@@ -147,6 +147,7 @@ exports.isUsingDefaultWords = isUsingDefaultWords
 
 /**
  * @param {Guild} guild
+ * @returns {Object}
  */
 function getReactionSettings(guild) {
     const profile = ChatReactionProfile.from(data[guild.id])
@@ -155,6 +156,16 @@ function getReactionSettings(guild) {
 }
 
 exports.getReactionSettings = getReactionSettings
+
+/**
+ * @param {Guild} guild
+ * @param {Object} settings
+ */
+function updateReactionSettings(guild, settings) {
+    data[guild.id].settings = settings
+}
+
+exports.updateReactionSettings
 
 /**
  * @param {Guild} guild
