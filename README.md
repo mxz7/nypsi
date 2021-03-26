@@ -1,3 +1,5 @@
+test
+
 # nypsi
 
 ### 🍟 invite / use in your server
