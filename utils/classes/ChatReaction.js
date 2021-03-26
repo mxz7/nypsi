@@ -14,7 +14,7 @@ class ChatReactionProfile {
         } else {
             this.wordList = phraseList
         }
-        
+
         if (settings) {
             this.settings = settings
         } else {
@@ -40,15 +40,6 @@ class ChatReactionProfile {
         }
 
         return this
-    }
-
-    async getDefaultWords() {
-        const res = await fetch("https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt")
-        const body = await res.text()
-
-        let words = body.split("\n")
-
-        return words
     }
 
     static from(object) {
