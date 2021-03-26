@@ -207,7 +207,7 @@ async function run(message, args) {
 
             updateWords(message.guild, words)
 
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ removed \`${phrase} from wordlist\``))
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist\``))
         } else if (args[1].toLowerCase() == "reset") {
             updateWords(message.guild, [])
 
@@ -223,7 +223,7 @@ async function run(message, args) {
                 )
                 embed.setTitle("chat reactions | " + message.author.username)
             } else {
-                embed.setDescription("``")
+                embed.setDescription(`\`${words.join("`\n`")}\``)
             }
 
             return message.channel.send(embed)
