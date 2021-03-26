@@ -149,16 +149,18 @@ async function run(message, args) {
             )
 
             embed.setDescription(
-                `**${prefix}cr words list** *view the current wordlist*\n` + 
-                `**${prefix}cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
-                `**${prefix}cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
-                `**${prefix}cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
+                `**${prefix}cr words list** *view the current wordlist*\n` +
+                    `**${prefix}cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
+                    `**${prefix}cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
+                    `**${prefix}cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
             )
 
             return message.channel.send(embed)
         } else if (args[1].toLowerCase() == "add" || args[1] == "+") {
             if (args.length == 2) {
-                return message.channel.send(new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`))
+                return message.channel.send(
+                    new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)
+                )
             }
 
             const words = getWordList(message.guild)
@@ -170,7 +172,9 @@ async function run(message, args) {
             }
 
             if (words.indexOf(phrase) != -1) {
-                return message.channel.send(new ErrorEmbed(`\`${phrase}\` already exists in the word list`))
+                return message.channel.send(
+                    new ErrorEmbed(`\`${phrase}\` already exists in the word list`)
+                )
             }
 
             if (words.length >= 100) {
@@ -178,14 +182,18 @@ async function run(message, args) {
             }
 
             if (phrase.length >= 150) {
-                return message.channel.send(new ErrorEmbed("phrase is too long (150 characters max)"))
+                return message.channel.send(
+                    new ErrorEmbed("phrase is too long (150 characters max)")
+                )
             }
 
             words.push(phrase)
 
             updateWords(message.guild, words)
 
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`))
+            return message.channel.send(
+                new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`)
+            )
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
             if (args.length == 2) {
                 return message.channel.send(
@@ -207,11 +215,15 @@ async function run(message, args) {
 
             updateWords(message.guild, words)
 
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist\``))
+            return message.channel.send(
+                new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist\``)
+            )
         } else if (args[1].toLowerCase() == "reset") {
             updateWords(message.guild, [])
 
-            return message.channel.send(new CustomEmbed(message.member, false, "✅ wordlist has been reset"))
+            return message.channel.send(
+                new CustomEmbed(message.member, false, "✅ wordlist has been reset")
+            )
         } else if (args[1].toLowerCase() == "list") {
             const words = getWordList(message.guild)
 
