@@ -1,5 +1,18 @@
 const { Message } = require("discord.js")
-const { getXp, getPrestigeRequirement, getBankBalance, getPrestigeRequirementBal, updateBankBalance, updateXp, getPrestige, setPrestige, userExists, createUser, getMulti, calcMaxBet } = require("../economy/utils")
+const {
+    getXp,
+    getPrestigeRequirement,
+    getBankBalance,
+    getPrestigeRequirementBal,
+    updateBankBalance,
+    updateXp,
+    getPrestige,
+    setPrestige,
+    userExists,
+    createUser,
+    getMulti,
+    calcMaxBet,
+} = require("../economy/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
@@ -8,9 +21,9 @@ const cmd = new Command("prestige", "prestige to gain extra benefits", categorie
 const cooldown = new Map()
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (cooldown.has(message.member.id)) {
@@ -35,22 +48,41 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getPrestige(message.member) >= 100) {
-        return message.channel.send(new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png"))
+        return message.channel.send(
+            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage(
+                "https://i.imgur.com/vB3UGgi.png"
+            )
+        )
     }
 
-    let currentXp = getXp(message.member), neededXp = getPrestigeRequirement(message.member)
-    let currentBal = getBankBalance(message.member), neededBal = getPrestigeRequirementBal(neededXp)
+    let currentXp = getXp(message.member),
+        neededXp = getPrestigeRequirement(message.member)
+    let currentBal = getBankBalance(message.member),
+        neededBal = getPrestigeRequirementBal(neededXp)
 
     if (currentXp < neededXp) {
-        return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
+        return message.channel.send(
+            new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
+        )
     }
 
     if (currentBal < neededBal) {
-        return message.channel.send(new CustomEmbed(message.member, false, `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
+            ).setTitle(`prestige | ${message.member.user.username}`)
+        )
     }
 
-    let embed = new CustomEmbed(message.member, true, "are you sure you want to prestige?\n\n" + `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n` +
-        "react with ✅ to prestige").setTitle(`prestige | ${message.member.user.username}`)
+    let embed = new CustomEmbed(
+        message.member,
+        true,
+        "are you sure you want to prestige?\n\n" +
+            `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n` +
+            "react with ✅ to prestige"
+    ).setTitle(`prestige | ${message.member.user.username}`)
 
     cooldown.set(message.member.id, new Date())
 
@@ -61,10 +93,12 @@ async function run(message, args) {
         return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id
     }
 
-    const reaction = await msg.awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
-        .then(collected => {
+    const reaction = await msg
+        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+        .then((collected) => {
             return collected.first().emoji.name
-        }).catch(async () => {
+        })
+        .catch(async () => {
             await msg.reactions.removeAll()
             embed.setDescription("❌ expired")
             await msg.edit(embed)
@@ -81,11 +115,19 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
         if (currentXp < neededXp) {
-            return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
+            return message.channel.send(
+                new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
+            )
         }
-    
+
         if (currentBal < neededBal) {
-            return message.channel.send(new CustomEmbed(message.member, false, `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`).setTitle(`prestige | ${message.member.user.username}`))
+            return message.channel.send(
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
+                ).setTitle(`prestige | ${message.member.user.username}`)
+            )
         }
 
         updateBankBalance(message.member, currentBal - neededBal)
@@ -95,13 +137,18 @@ async function run(message, args) {
         const multi = await getMulti(message.member)
         const maxBet = await calcMaxBet(message.member)
 
-        embed.setDescription(`you are now prestige **${getPrestige(message.member)}**\n\n` + 
-            `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**\n` +
-            `your new multiplier: **${multi * 100}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`)
+        embed.setDescription(
+            `you are now prestige **${getPrestige(message.member)}**\n\n` +
+                `new vote rewards: $**${(
+                    15000 *
+                    (getPrestige(message.member) + 1)
+                ).toLocaleString()}**\n` +
+                `your new multiplier: **${
+                    multi * 100
+                }**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`
+        )
         await msg.edit(embed)
     }
-
-    
 }
 
 cmd.setRun(run)

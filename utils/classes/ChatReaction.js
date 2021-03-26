@@ -14,7 +14,7 @@ class ChatReactionProfile {
         } else {
             this.wordList = phraseList
         }
-        
+
         if (settings) {
             this.settings = settings
         } else {
@@ -23,7 +23,7 @@ class ChatReactionProfile {
                 randomChannels: [],
                 timeBetweenEvents: 600,
                 randomModifier: 300,
-                timeout: 60
+                timeout: 60,
             }
         }
 
@@ -43,7 +43,9 @@ class ChatReactionProfile {
     }
 
     async getDefaultWords() {
-        const res = await fetch("https://gist.githubusercontent.com/creikey/42d23d1eec6d764e8a1d9fe7e56915c6/raw/b07de0068850166378bc3b008f9b655ef169d354/top-1000-nouns.txt")
+        const res = await fetch(
+            "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt"
+        )
         const body = await res.text()
 
         let words = body.split("\n")

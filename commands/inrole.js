@@ -8,11 +8,10 @@ const cooldown = new Map()
 const cmd = new Command("inrole", "get the members in a role", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -41,14 +40,14 @@ async function run(message, args) {
 
     const roles = message.guild.roles.cache
 
-    let role 
+    let role
 
     if (message.mentions.roles.first()) {
         role = message.mentions.roles.first()
     } else if (args[0].length == 18 && parseInt(args[0])) {
-        role = roles.find(r => r.id == args[0])
+        role = roles.find((r) => r.id == args[0])
     } else {
-        role = roles.find(r => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
+        role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
     }
 
     if (!role) {
@@ -57,7 +56,11 @@ async function run(message, args) {
 
     let members
 
-    if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size || message.guild.memberCount <= 250) {
+    if (
+        inCooldown(message.guild) ||
+        message.guild.memberCount == message.guild.members.cache.size ||
+        message.guild.memberCount <= 250
+    ) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -68,7 +71,7 @@ async function run(message, args) {
     const memberList = new Map()
     let count = 0
 
-    await members.forEach(m => {
+    await members.forEach((m) => {
         if (m.roles.cache.has(role.id)) {
             count++
             if (memberList.size >= 1) {
@@ -92,13 +95,14 @@ async function run(message, args) {
     })
 
     if (!memberList.get(1)) {
-        return message.channel.send(new CustomEmbed(message.member, false, "that role has no members"))
+        return message.channel.send(
+            new CustomEmbed(message.member, false, "that role has no members")
+        )
     }
 
     const embed = new CustomEmbed(message.member, false, memberList.get(1))
         .setTitle(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`)
-    
 
     const msg = await message.channel.send(embed)
 
@@ -115,10 +119,12 @@ async function run(message, args) {
     }
 
     async function pageManager() {
-        const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-            .then(collected => {
+        const reaction = await msg
+            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .then((collected) => {
                 return collected.first().emoji.name
-            }).catch(async () => {
+            })
+            .catch(async () => {
                 await msg.reactions.removeAll()
             })
 
@@ -147,7 +153,6 @@ async function run(message, args) {
         }
     }
     return pageManager()
-
 }
 
 cmd.setRun(run)

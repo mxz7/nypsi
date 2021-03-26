@@ -5,12 +5,40 @@ const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 const cmd = new Command("flip", "flip a coin", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
-    const headTails = ["heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails", "heads", "tails"]
+    const headTails = [
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+    ]
 
     let embed = new CustomEmbed(message.member, false)
 
@@ -19,16 +47,22 @@ async function run(message, args) {
         embed.setDescription(`💸 you threw **${answer}**`)
     } else {
         if (!parseInt(args[0])) {
-            return message.channel.send(new ErrorEmbed("invalid range: must be between 2 and 1,069"))
+            return message.channel.send(
+                new ErrorEmbed("invalid range: must be between 2 and 1,069")
+            )
         }
         const amount = parseInt(args[0])
 
         if ((amount > 1069 || amount < 2) && message.author.id != "672793821850894347") {
-            return message.channel.send(new ErrorEmbed("invalid range: must be between 2 and 1,069"))
+            return message.channel.send(
+                new ErrorEmbed("invalid range: must be between 2 and 1,069")
+            )
         }
 
         if (amount > 100000000) {
-            return message.channel.send(new ErrorEmbed("invalid range: must be between 2 and 1,069"))
+            return message.channel.send(
+                new ErrorEmbed("invalid range: must be between 2 and 1,069")
+            )
         }
 
         if (amount == 2) {
@@ -49,12 +83,13 @@ async function run(message, args) {
             const headsPercent = ((heads / amount) * 100).toFixed(2)
             const tailsPercent = ((tails / amount) * 100).toFixed(2)
 
-            embed.setDescription(`results:\n\n heads: **${heads.toLocaleString()}** (${headsPercent}%)\ntails: **${tails.toLocaleString()}** (${tailsPercent}%)`)
+            embed.setDescription(
+                `results:\n\n heads: **${heads.toLocaleString()}** (${headsPercent}%)\ntails: **${tails.toLocaleString()}** (${tailsPercent}%)`
+            )
         }
     }
 
     return message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

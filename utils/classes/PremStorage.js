@@ -20,7 +20,7 @@ class PremUser {
 
     /**
      * @returns {PremUser}
-     * @param {Number} level 
+     * @param {Number} level
      */
     setLevel(level) {
         this.level = level
@@ -47,7 +47,6 @@ class PremUser {
 
         return this
     }
-
 
     /**
      * @returns {PremUser}
@@ -95,7 +94,7 @@ class PremUser {
      */
     setExpireDate(date) {
         this.expireDate = date
-        
+
         return this
     }
 
@@ -104,31 +103,31 @@ class PremUser {
      */
     getLevelString() {
         switch (this.level) {
-        case 0:
-            return "none"
-        case 1:
-            return "BRONZE"
-        case 2:
-            return "SILVER"
-        case 3:
-            return "GOLD"
-        case 4: 
-            return "PLATINUM"
+            case 0:
+                return "none"
+            case 1:
+                return "BRONZE"
+            case 2:
+                return "SILVER"
+            case 3:
+                return "GOLD"
+            case 4:
+                return "PLATINUM"
         }
     }
 
     static getLevelString(number) {
         switch (number) {
-        case 0:
-            return "none"
-        case 1:
-            return "BRONZE"
-        case 2:
-            return "SILVER"
-        case 3:
-            return "GOLD"
-        case 4: 
-            return "PLATINUM"
+            case 0:
+                return "none"
+            case 1:
+                return "BRONZE"
+            case 2:
+                return "SILVER"
+            case 3:
+                return "GOLD"
+            case 4:
+                return "PLATINUM"
         }
     }
 
@@ -138,23 +137,26 @@ class PremUser {
 
     async expire() {
         const { requestDM, requestRemoveRole } = require("../../nypsi")
-        const d = await requestDM(this.id, `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`).catch (() => {})
+        const d = await requestDM(
+            this.id,
+            `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
+        ).catch(() => {})
 
         let roleID
 
         switch (this.level) {
-        case 1:
-            roleID = "819870590718181391"
-            break
-        case 2:
-            roleID = "819870727834566696"
-            break
-        case 3:
-            roleID = "819870846536646666"
-            break
-        case 4:
-            roleID = "819870959325413387"
-            break
+            case 1:
+                roleID = "819870590718181391"
+                break
+            case 2:
+                roleID = "819870727834566696"
+                break
+            case 3:
+                roleID = "819870846536646666"
+                break
+            case 4:
+                roleID = "819870959325413387"
+                break
         }
 
         const e = await requestRemoveRole(this.id, roleID).catch((e) => {
@@ -188,7 +190,7 @@ exports.PremUser = PremUser
 const status = {
     INACTIVE: 0,
     ACTIVE: 1,
-    REVOKED: 2
+    REVOKED: 2,
 }
 
 exports.status = status

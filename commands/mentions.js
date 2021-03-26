@@ -6,14 +6,17 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases(["pings", "whothefuckpingedme"])
+const cmd = new Command(
+    "mentions",
+    "view who mentioned you recently",
+    categories.UTILITY
+).setAliases(["pings", "whothefuckpingedme"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -62,17 +65,27 @@ async function run(message, args) {
     for (let i of userMentions) {
         if (pages.size == 0) {
             const page1 = []
-            page1.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+            page1.push(
+                `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
+            )
             pages.set(1, page1)
         } else {
             const lastPage = pages.size
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = []
-                newPage.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+                newPage.push(
+                    `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
+                )
                 pages.set(lastPage + 1, newPage)
             } else {
-                pages.get(lastPage).push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+                pages
+                    .get(lastPage)
+                    .push(
+                        `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${
+                            i.link
+                        })`
+                    )
             }
         }
     }
@@ -94,7 +107,6 @@ async function run(message, args) {
     const msg = await message.channel.send(embed)
 
     if (pages.size >= 2) {
-
         await msg.react("⬅")
         await msg.react("➡")
         await msg.react("❌")
@@ -103,17 +115,21 @@ async function run(message, args) {
         const lastPage = pages.size
 
         const filter = (reaction, user) => {
-            return ["⬅", "➡", "❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
+            return (
+                ["⬅", "➡", "❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
+            )
         }
 
         const pageManager = async () => {
-            const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                .then(collected => {
+            const reaction = await msg
+                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .then((collected) => {
                     return collected.first().emoji.name
-                }).catch(async () => {
+                })
+                .catch(async () => {
                     await msg.reactions.removeAll()
                 })
-        
+
             if (!reaction) return
 
             const newEmbed = new CustomEmbed(message.member, false).setTitle("recent mentions")
@@ -138,9 +154,12 @@ async function run(message, args) {
                 if (currentPage >= lastPage) {
                     return pageManager()
                 } else {
-
                     if (!isPremium(message.author.id)) {
-                        newEmbed.setFooter(`pages are only available for patreons (${getPrefix(message.guild)}patreon)`)
+                        newEmbed.setFooter(
+                            `pages are only available for patreons (${getPrefix(
+                                message.guild
+                            )}patreon)`
+                        )
                         for (let i of pages.get(currentPage)) {
                             const fieldName = i.split("|6|9|")[0]
                             const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
@@ -164,7 +183,7 @@ async function run(message, args) {
                 mentions.get(message.guild.id).set(message.author.id, [])
 
                 newEmbed.setDescription("✅ mentions cleared")
-                
+
                 await msg.reactions.removeAll()
                 return msg.edit(newEmbed)
             }
@@ -172,8 +191,6 @@ async function run(message, args) {
 
         return pageManager()
     }
-
-    
 }
 
 cmd.setRun(run)
@@ -181,15 +198,15 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-    const ms = Math.floor((new Date() - date))
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor((daysms) / (60*60*1000))
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
     const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutes = Math.floor(hoursms / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    const sec = Math.floor(minutesms / 1000)
 
     let output = ""
 

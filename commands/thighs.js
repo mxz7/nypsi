@@ -9,17 +9,16 @@ const cooldown = new Map()
 const cmd = new Command("thighs", "get a random thighs image", categories.NSFW)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

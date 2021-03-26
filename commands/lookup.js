@@ -9,18 +9,20 @@ const cooldown = new Map()
 const cmd = new Command("lookup", "lookup ip addresses and domains", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setTitle("lookup help")
             .addField("usage", `${prefix}lookup ip <ip address>\n${prefix}lookup <domain>`)
-            .addField("help", "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain")
+            .addField(
+                "help",
+                "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain"
+            )
         return message.channel.send(embed)
     }
 
@@ -50,7 +52,6 @@ async function run(message, args) {
     }, 10000)
 
     if (args[0] == "ip") {
-
         if (args.length == 1) {
             return message.channel.send(new ErrorEmbed("you must include an ip address"))
         }
@@ -58,10 +59,12 @@ async function run(message, args) {
         const url = "https://apimon.de/ip/" + args[1]
         let invalid = false
 
-        const res = await fetch(url).then(url => url.json()).catch(() => {
-            invalid = true
-            return message.channel.send(new ErrorEmbed("invalid ip address"))
-        })
+        const res = await fetch(url)
+            .then((url) => url.json())
+            .catch(() => {
+                invalid = true
+                return message.channel.send(new ErrorEmbed("invalid ip address"))
+            })
 
         if (invalid) return
 
@@ -91,14 +94,39 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, true, "`" + hostname + "`")
             .setTitle(ip)
             .setHeader("apimon.de")
-            .addField("location", "**country** `" + country + "`\n" +
-                "**region** `" + region + "`\n" +
-                "**currency** `" + countryCurrency + "`\n" +
-                "**timezone** `" + timezone + "`", true)
-            .addField("isp", "**name** `" + ispName + "`\n" +
-                "**org** `" + ispOrg + "`\n" +
-                "**abuse** `" + ispEmail + "`", true)
-        return message.channel.send(embed).then(m => m.delete({timeout: 15000})).catch()
+            .addField(
+                "location",
+                "**country** `" +
+                    country +
+                    "`\n" +
+                    "**region** `" +
+                    region +
+                    "`\n" +
+                    "**currency** `" +
+                    countryCurrency +
+                    "`\n" +
+                    "**timezone** `" +
+                    timezone +
+                    "`",
+                true
+            )
+            .addField(
+                "isp",
+                "**name** `" +
+                    ispName +
+                    "`\n" +
+                    "**org** `" +
+                    ispOrg +
+                    "`\n" +
+                    "**abuse** `" +
+                    ispEmail +
+                    "`",
+                true
+            )
+        return message.channel
+            .send(embed)
+            .then((m) => m.delete({ timeout: 15000 }))
+            .catch()
     }
 
     if (!args[0].includes(".")) {
@@ -108,10 +136,12 @@ async function run(message, args) {
     const url = "https://apimon.de/whois/" + args[0]
     let invalid = false
 
-    const res = await fetch(url).then(url => url.json()).catch(() => {
-        invalid = true
-        return message.channel.send(new ErrorEmbed("invalid domain"))
-    })
+    const res = await fetch(url)
+        .then((url) => url.json())
+        .catch(() => {
+            invalid = true
+            return message.channel.send(new ErrorEmbed("invalid domain"))
+        })
 
     if (invalid) return
 
@@ -140,21 +170,49 @@ async function run(message, args) {
     } catch {
         return message.channel.send(new ErrorEmbed("invalid domain"))
     }
-    
+
     const embed = new CustomEmbed(message.member, true)
         .setTitle(domain)
         .setHeader("apimon.de")
-        .addField("registrant", "**name** `" + registrantName + "`\n" +
-            "**street** `" + registrantStreet + "`\n" +
-            "**city** `" + registrantCity + "`\n" +
-            "**region** `" + registrantRegion + "`\n" +
-            "**phone** `" + registrantPhone + "`\n" +
-            "**email** `" + registrantEmail + "`", true)
-        .addField("registrar", "**name** `" + registrarName + "`\n" +
-            "**url** `" + registrarURL + "`\n" +
-            "**email** `" + registrarEmail + "`\n", true)
-    return message.channel.send(embed).then(m => m.delete({timeout: 15000})).catch()
-
+        .addField(
+            "registrant",
+            "**name** `" +
+                registrantName +
+                "`\n" +
+                "**street** `" +
+                registrantStreet +
+                "`\n" +
+                "**city** `" +
+                registrantCity +
+                "`\n" +
+                "**region** `" +
+                registrantRegion +
+                "`\n" +
+                "**phone** `" +
+                registrantPhone +
+                "`\n" +
+                "**email** `" +
+                registrantEmail +
+                "`",
+            true
+        )
+        .addField(
+            "registrar",
+            "**name** `" +
+                registrarName +
+                "`\n" +
+                "**url** `" +
+                registrarURL +
+                "`\n" +
+                "**email** `" +
+                registrarEmail +
+                "`\n",
+            true
+        )
+    return message.channel
+        .send(embed)
+        .then((m) => m.delete({ timeout: 15000 }))
+        .catch()
 }
 
 cmd.setRun(run)

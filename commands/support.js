@@ -4,14 +4,12 @@ const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("support", "join the nypsi support server", categories.INFO)
 
-
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     return message.channel.send("discord.gg/hJTDNST")
 }
 

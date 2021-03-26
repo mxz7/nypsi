@@ -9,12 +9,11 @@ const reacted = new Map()
 const cmd = new Command("f", "pay your respects", categories.FUN)
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -61,7 +60,11 @@ async function run(message, args) {
         content = content.substr(0, 50)
     }
 
-    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `press **F** to pay your respects to **${content}**`
+    )
 
     const msg = await message.channel.send(embed)
 
@@ -72,23 +75,39 @@ async function run(message, args) {
     const filter = (reaction, user) => {
         if (reaction.emoji.name == "🇫" && !reacted.get(msg.id).includes(user.id)) {
             reacted.get(msg.id).push(user.id)
-            return message.channel.send(new CustomEmbed(message.member, false, `${user.toString()} has paid respects to **${args.join(" ")}**`))
+            return message.channel.send(
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `${user.toString()} has paid respects to **${args.join(" ")}**`
+                )
+            )
         }
     }
-    
+
     let finished = false
 
     async function getReactions() {
-        await msg.awaitReactions(filter, {max: 1, time:15000, errors:["time"]}).catch(async () => {
-            finished = true
-            await message.channel.send(new CustomEmbed(message.member, false, `**${reacted.get(msg.id).length.toLocaleString()}** people paid their respects to **${content}**`))
-            return reacted.delete(msg.id)
-        })
+        await msg
+            .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+            .catch(async () => {
+                finished = true
+                await message.channel.send(
+                    new CustomEmbed(
+                        message.member,
+                        false,
+                        `**${reacted
+                            .get(msg.id)
+                            .length.toLocaleString()}** people paid their respects to **${content}**`
+                    )
+                )
+                return reacted.delete(msg.id)
+            })
         if (!finished) {
             return getReactions()
         }
     }
-    
+
     return getReactions()
 }
 

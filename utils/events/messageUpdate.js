@@ -15,9 +15,9 @@ module.exports = async (message, newMessage) => {
         const filter = getChatFilter(message.guild)
 
         let content = newMessage.content.toLowerCase().normalize("NFD")
-    
+
         content = content.replace(/[^A-z0-9\s]/g, "")
-    
+
         for (let word of filter) {
             if (content.includes(word.toLowerCase())) {
                 return await message.delete()
@@ -26,7 +26,6 @@ module.exports = async (message, newMessage) => {
     }
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
-
         if (!hasGuild(message.guild)) createGuild(message.guild)
 
         const filter = getSnipeFilter(message.guild)
@@ -40,7 +39,7 @@ module.exports = async (message, newMessage) => {
         }
 
         const chatFilter = getChatFilter(message.guild)
-    
+
         for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
@@ -50,8 +49,8 @@ module.exports = async (message, newMessage) => {
             member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
             channel: {
-                id: message.channel.id
-            }
+                id: message.channel.id,
+            },
         })
 
         exports.eSnipe = eSnipe

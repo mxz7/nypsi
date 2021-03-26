@@ -8,14 +8,17 @@ const { isPremium, getTier } = require("../premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("work", "work a random job and safely earn a random amount of money", categories.MONEY)
+const cmd = new Command(
+    "work",
+    "work a random job and safely earn a random amount of money",
+    categories.MONEY
+)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 1800
 
     if (isPremium(message.author.id)) {
@@ -82,23 +85,23 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) + earned)
 
-    const embed = new CustomEmbed(message.member, true, work)
-        .setTitle("work | " + message.member.user.username)
-    
-    message.channel.send(embed).then(m => {
-        
+    const embed = new CustomEmbed(message.member, true, work).setTitle(
+        "work | " + message.member.user.username
+    )
+
+    message.channel.send(embed).then((m) => {
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {
-            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")
+            embed.setDescription(
+                work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)"
+            )
         }
 
         setTimeout(() => {
             m.edit(embed)
         }, 1500)
-
     })
-
 }
 
 cmd.setRun(run)
