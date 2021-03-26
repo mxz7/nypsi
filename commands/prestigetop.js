@@ -5,14 +5,17 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("prestigetop", "view top prestiges in the server", categories.MONEY).setAliases(["topprestige"])
+const cmd = new Command(
+    "prestigetop",
+    "view top prestiges in the server",
+    categories.MONEY
+).setAliases(["topprestige"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -60,7 +63,7 @@ async function run(message, args) {
     let filtered = prestigeTop.filter(function (el) {
         return el != null
     })
-          
+
     const embed = new CustomEmbed(message.member, false)
         .setTitle("top " + filtered.length)
         .setDescription(filtered)

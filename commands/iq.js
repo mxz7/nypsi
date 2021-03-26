@@ -10,11 +10,10 @@ const cooldown = new Map()
 const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
     let cacheTime = 60
 
@@ -74,7 +73,6 @@ async function run(message, args) {
     if (cache.has(member.user.id)) {
         iq = cache.get(member.user.id)
     } else {
-
         let chanceAmount = 25
 
         if (isPremium(member.user.id)) {
@@ -128,9 +126,12 @@ async function run(message, args) {
         iqMsg = "uh. woah."
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`)
-        .setTitle("iq calculator")
-    
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`
+    ).setTitle("iq calculator")
+
     return message.channel.send(embed)
 }
 

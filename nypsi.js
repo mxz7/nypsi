@@ -2,11 +2,22 @@ const startUp = Date.now()
 
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
-const client = new Discord.Client({ 
-    disableMentions: "everyone", messageCacheMaxSize: 150, messageSweepInterval: 10800, messageCacheLifetime: 9000, shards: "auto" })
+const client = new Discord.Client({
+    disableMentions: "everyone",
+    messageCacheMaxSize: 150,
+    messageSweepInterval: 10800,
+    messageCacheLifetime: 9000,
+    shards: "auto",
+})
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
-const { runCheck, checkStats, hasStatsEnabled, checkChristmasCountdown, hasChristmasCountdownEnabled, } = require("./guilds/utils.js")
+const {
+    runCheck,
+    checkStats,
+    hasStatsEnabled,
+    checkChristmasCountdown,
+    hasChristmasCountdownEnabled,
+} = require("./guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { getTimestamp, MStoTime } = require("./utils/utils")
@@ -35,7 +46,7 @@ const channelCreate = require("./utils/events/channelCreate")
 client.once("ready", ready.bind(null, client, startUp))
 client.on("guildCreate", guildCreate.bind(null, client))
 client.on("guildDelete", guildDelete.bind(null, client))
-client.on("rateLimit", rate => {
+client.on("rateLimit", (rate) => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
     console.log("\x1b[31m[" + getTimestamp() + "] rate limit: " + reason + "\x1b[37m")
@@ -49,7 +60,7 @@ client.on("channelCreate", channelCreate.bind(null))
 
 client.on("shardReady", (shardID) => console.log(`[${getTimestamp()}] shard#${shardID} ready`))
 
-process.on("unhandledRejection", error => {
+process.on("unhandledRejection", (error) => {
     let stack = error.stack.split("\n").join("\n\x1b[31m")
 
     if (stack.length > 200) {
@@ -60,7 +71,7 @@ process.on("unhandledRejection", error => {
 })
 
 async function checkGuild(guildID) {
-    const g = await client.guilds.cache.find(gi => gi.id == guildID)
+    const g = await client.guilds.cache.find((gi) => gi.id == guildID)
 
     if (g) {
         return true
@@ -73,13 +84,13 @@ exports.checkGuild = checkGuild
 
 async function runChecks() {
     setInterval(async () => {
-        client.guilds.cache.forEach(async guild => {
+        client.guilds.cache.forEach(async (guild) => {
             await runCheck(guild)
         })
     }, 180000)
 
     setInterval(async () => {
-        client.guilds.cache.forEach(async guild => {
+        client.guilds.cache.forEach(async (guild) => {
             if (hasStatsEnabled(guild)) {
                 await checkStats(guild)
             }
@@ -98,14 +109,12 @@ async function runChecks() {
 
     setTimeout(() => {
         setInterval(async () => {
-            client.guilds.cache.forEach(async guild => {
-                if (hasChristmasCountdownEnabled(guild))
-                    await checkChristmasCountdown(guild)
+            client.guilds.cache.forEach(async (guild) => {
+                if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
             })
         }, 86400000)
-        client.guilds.cache.forEach(async guild => {
-            if (hasChristmasCountdownEnabled(guild))
-                await checkChristmasCountdown(guild)
+        client.guilds.cache.forEach(async (guild) => {
+            if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
         })
     }, needed - now)
 
@@ -115,16 +124,20 @@ async function runChecks() {
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size)
-        console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
+        console.log(
+            "[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size
+        )
     }, 3600000)
 
     await updateStats(client.guilds.cache.size)
-    console.log("[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size)
+    console.log(
+        "[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size
+    )
 }
 
 /**
- * 
- * @param {JSON} vote 
+ *
+ * @param {JSON} vote
  */
 async function onVote(vote) {
     doVote(client, vote)
@@ -134,7 +147,7 @@ exports.onVote = onVote
 
 /**
  * @returns {Boolean}
- * @param {String} id 
+ * @param {String} id
  */
 async function requestDM(id, content) {
     const member = await client.users.fetch(id)

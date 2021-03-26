@@ -6,20 +6,25 @@ const { isPremium } = require("../premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("boobs", "get a random boob image", categories.NSFW).setAliases(["boobies", "tits", "titties", "booby", "boobie"])
+const cmd = new Command("boobs", "get a random boob image", categories.NSFW).setAliases([
+    "boobies",
+    "tits",
+    "titties",
+    "booby",
+    "boobie",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-    
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

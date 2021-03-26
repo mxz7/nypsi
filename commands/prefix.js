@@ -3,14 +3,15 @@ const { getPrefix, setPrefix } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions(["MANAGE_GUILD"])
+const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions([
+    "MANAGE_GUILD",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const prefix = getPrefix(message.guild)
 
     if (!message.member.hasPermission("MANAGE_GUILD")) {
@@ -21,8 +22,15 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false, "current prefix: `" + prefix + "`\n\nuse " + prefix + "**prefix** <new prefix> to change the current prefix")
-            .setTitle("prefix")
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "current prefix: `" +
+                prefix +
+                "`\n\nuse " +
+                prefix +
+                "**prefix** <new prefix> to change the current prefix"
+        ).setTitle("prefix")
 
         return message.channel.send(embed)
     }
@@ -33,11 +41,13 @@ async function run(message, args) {
 
     setPrefix(message.guild, args.join(" "))
 
-    const embed = new CustomEmbed(message.member, false, "✅ prefix changed to `" + args.join(" ") + "`")
-        .setTitle("prefix")
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        "✅ prefix changed to `" + args.join(" ") + "`"
+    ).setTitle("prefix")
 
     return await message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

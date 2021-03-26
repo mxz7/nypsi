@@ -1,4 +1,13 @@
-const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
+const {
+    getBalance,
+    getBankBalance,
+    getMaxBankBalance,
+    updateBalance,
+    updateBankBalance,
+    userExists,
+    createUser,
+    formatBet,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -9,14 +18,15 @@ const tax = 0.05
 
 const cooldown = new Map()
 
-const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases(["with"])
+const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases([
+    "with",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 30
@@ -52,8 +62,11 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("withdraw help")
             .addField("usage", `${prefix}withdraw <amount>`)
-            .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank\n" +
-                "there will be a tax of **5**% when withdrawing $**100,000** or more in funds")
+            .addField(
+                "help",
+                "you can withdraw money from your bank aslong as you have that amount available in your bank\n" +
+                    "there will be a tax of **5**% when withdrawing $**100,000** or more in funds"
+            )
         return message.channel.send(embed)
     }
 
@@ -75,10 +88,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
-    let amount = parseInt(args[0]) 
+    let amount = parseInt(args[0])
 
     if (amount > getBankBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you dont have enough money in your bank account"))
+        return message.channel.send(
+            new ErrorEmbed("you dont have enough money in your bank account")
+        )
     }
 
     if (amount <= 0) {
@@ -93,7 +108,14 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, true)
         .setTitle("bank withdrawal | processing")
-        .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+        .addField(
+            "bank balance",
+            "$**" +
+                getBankBalance(message.member).toLocaleString() +
+                "** / $**" +
+                getMaxBankBalance(message.member).toLocaleString() +
+                "**"
+        )
         .addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
     const m = await message.channel.send(embed)
@@ -104,7 +126,7 @@ async function run(message, args) {
 
     if (amount >= 200000) {
         taxEnabled = true
-        amount = amount - (amount * tax)
+        amount = amount - amount * tax
     }
 
     updateBalance(message.member, getBalance(message.member) + amount)
@@ -112,16 +134,25 @@ async function run(message, args) {
     const embed1 = new CustomEmbed(message.member, true)
         .setTitle("bank withdrawal | success")
         .setColor("#5efb8f")
-        .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+        .addField(
+            "bank balance",
+            "$**" +
+                getBankBalance(message.member).toLocaleString() +
+                "** / $**" +
+                getMaxBankBalance(message.member).toLocaleString() +
+                "**"
+        )
 
     if (taxEnabled) {
-        embed1.addField("transaction amount", "-$**" + Math.round(amount).toLocaleString() + "** (**5**% taxxed)")
+        embed1.addField(
+            "transaction amount",
+            "-$**" + Math.round(amount).toLocaleString() + "** (**5**% taxxed)"
+        )
     } else {
         embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
     }
-    
-    setTimeout(() => m.edit(embed1), 1500)
 
+    setTimeout(() => m.edit(embed1), 1500)
 }
 
 cmd.setRun(run)

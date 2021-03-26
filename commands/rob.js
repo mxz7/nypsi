@@ -1,5 +1,16 @@
 const { getMember } = require("../utils/utils")
-const { userExists, updateBalance, createUser, getBalance, hasPadlock, setPadlock, getXp, updateXp, getDMsEnabled, hasVoted } = require("../economy/utils.js")
+const {
+    userExists,
+    updateBalance,
+    createUser,
+    getBalance,
+    hasPadlock,
+    setPadlock,
+    getXp,
+    updateXp,
+    getDMsEnabled,
+    hasVoted,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -12,11 +23,10 @@ const playerCooldown = new Set()
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 600
 
     if (isPremium(message.author.id)) {
@@ -50,9 +60,12 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("rob help")
             .addField("usage", `${prefix}rob <@user>`)
-            .addField("help", "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
-                "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
-                "you can lose up to **25**% of your balance by failing a robbery")
+            .addField(
+                "help",
+                "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
+                    "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
+                    "you can lose up to **25**% of your balance by failing a robbery"
+            )
 
         return message.channel.send(embed)
     }
@@ -95,14 +108,19 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
-        .setTitle("robbery | " + message.member.user.username)
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "robbing " + target.user.toString() + ".."
+    ).setTitle("robbery | " + message.member.user.username)
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..")
-        .setTitle("robbery | " + message.member.user.username)
-    
-    const embed3 = new CustomEmbed()
-        .setFooter("use $optout to optout of bot dms")
+    const embed2 = new CustomEmbed(
+        message.member,
+        true,
+        "robbing " + target.user.toString() + ".."
+    ).setTitle("robbery | " + message.member.user.username)
+
+    const embed3 = new CustomEmbed().setFooter("use $optout to optout of bot dms")
 
     let robberySuccess = false
 
@@ -114,40 +132,71 @@ async function run(message, args) {
         updateBalance(message.member, getBalance(message.member) - amountMoney)
 
         embed2.setColor("#e4334f")
-        embed2.addField("**fail!!**", "**" + target.user.tag + "** has been robbed recently and is protected by a private security team\n" +
-            "you were caught and paid $" + amountMoney.toLocaleString() + " (" + amount + "%)")
+        embed2.addField(
+            "**fail!!**",
+            "**" +
+                target.user.tag +
+                "** has been robbed recently and is protected by a private security team\n" +
+                "you were caught and paid $" +
+                amountMoney.toLocaleString() +
+                " (" +
+                amount +
+                "%)"
+        )
 
         embed3.setTitle("you were nearly robbed")
         embed3.setColor("#5efb8f")
-        embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
-                "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" + amountMoney.toLocaleString() + "**")
+        embed3.setDescription(
+            "**" +
+                message.member.user.tag +
+                "** tried to rob you in **" +
+                message.guild.name +
+                "**\n" +
+                "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" +
+                amountMoney.toLocaleString() +
+                "**"
+        )
     } else if (hasPadlock(target)) {
         setPadlock(target, false)
 
-        const amount = (Math.floor(Math.random() * 35) + 5)
+        const amount = Math.floor(Math.random() * 35) + 5
         const amountMoney = Math.round(getBalance(target) * (amount / 100))
 
         embed2.setColor("#e4334f")
-        embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken")
+        embed2.addField(
+            "fail!!",
+            "**" + target.user.tag + "** had a padlock, which has now been broken"
+        )
 
         embed3.setTitle("you were nearly robbed")
         embed3.setColor("#5efb8f")
-        embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
-            "your padlock has saved you from a robbery, but it has been broken\nthey would have stolen $**" + amountMoney.toLocaleString() + "**")
+        embed3.setDescription(
+            "**" +
+                message.member.user.tag +
+                "** tried to rob you in **" +
+                message.guild.name +
+                "**\n" +
+                "your padlock has saved you from a robbery, but it has been broken\nthey would have stolen $**" +
+                amountMoney.toLocaleString() +
+                "**"
+        )
     } else {
         const chance = Math.floor(Math.random() * 22)
 
         if (chance > 8) {
             robberySuccess = true
 
-            const amount = (Math.floor(Math.random() * 35) + 5)
+            const amount = Math.floor(Math.random() * 35) + 5
             const amountMoney = Math.round(getBalance(target) * (amount / 100))
 
             updateBalance(target, getBalance(target) - amountMoney)
             updateBalance(message.member, getBalance(message.member) + amountMoney)
 
             embed2.setColor("#5efb8f")
-            embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
+            embed2.addField(
+                "success!!",
+                "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
+            )
 
             const voted = await hasVoted(message.member)
 
@@ -158,30 +207,49 @@ async function run(message, args) {
 
             embed3.setTitle("you have been robbed")
             embed3.setColor("#e4334f")
-            embed3.setDescription("**" + message.member.user.tag + "** has robbed you in **" + message.guild.name + "**\n" +
-                "they stole a total of $**" + amountMoney.toLocaleString() + "**")
-            
+            embed3.setDescription(
+                "**" +
+                    message.member.user.tag +
+                    "** has robbed you in **" +
+                    message.guild.name +
+                    "**\n" +
+                    "they stole a total of $**" +
+                    amountMoney.toLocaleString() +
+                    "**"
+            )
+
             playerCooldown.add(target.user.id)
 
             const length = Math.floor(Math.random() * 30) + 30
-    
+
             setTimeout(() => {
                 playerCooldown.delete(target.user.id)
             }, length * 1000)
         } else {
-            const amount = (Math.floor(Math.random() * 20) + 5)
+            const amount = Math.floor(Math.random() * 20) + 5
             const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
 
             updateBalance(target, getBalance(target) + amountMoney)
             updateBalance(message.member, getBalance(message.member) - amountMoney)
 
             embed2.setColor("#e4334f")
-            embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
+            embed2.addField(
+                "fail!!",
+                "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
+            )
 
             embed3.setTitle("you were nearly robbed")
             embed3.setColor("#5efb8f")
-            embed3.setDescription("**" + message.member.user.tag + "** tried to rob you in **" + message.guild.name + "**\n" +
-                "they were caught by the police and you received $**" + amountMoney.toLocaleString() + "**")
+            embed3.setDescription(
+                "**" +
+                    message.member.user.tag +
+                    "** tried to rob you in **" +
+                    message.guild.name +
+                    "**\n" +
+                    "they were caught by the police and you received $**" +
+                    amountMoney.toLocaleString() +
+                    "**"
+            )
         }
     }
 
@@ -198,7 +266,6 @@ async function run(message, args) {
             }
         }, 1500)
     })
-
 }
 
 cmd.setRun(run)

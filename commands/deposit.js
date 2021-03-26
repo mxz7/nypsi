@@ -1,4 +1,13 @@
-const { getBalance, getBankBalance, getMaxBankBalance, updateBalance, updateBankBalance, userExists, createUser, formatBet } = require("../economy/utils.js")
+const {
+    getBalance,
+    getBankBalance,
+    getMaxBankBalance,
+    updateBalance,
+    updateBankBalance,
+    userExists,
+    createUser,
+    formatBet,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -7,14 +16,15 @@ const { isPremium, getTier } = require("../premium/utils.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("deposit", "deposit money into your bank", categories.MONEY).setAliases(["dep"])
+const cmd = new Command("deposit", "deposit money into your bank", categories.MONEY).setAliases([
+    "dep",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 30
@@ -51,15 +61,18 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("deposit help")
             .addField("usage", `${prefix}deposit <amount>`)
-            .addField("help", "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
-                "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as your use the bot more.")
+            .addField(
+                "help",
+                "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
+                    "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as your use the bot more."
+            )
         return message.channel.send(embed)
     }
 
     if (args[0] == "all") {
         args[0] = getBalance(message.member)
         const amount = parseInt(formatBet(args[0]))
-        if (amount > (getMaxBankBalance(message.member) - getBankBalance(message.member))) {
+        if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
             args[0] = getMaxBankBalance(message.member) - getBankBalance(message.member)
         }
     }
@@ -74,13 +87,13 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
-    const amount = parseInt(args[0]) 
+    const amount = parseInt(args[0])
 
     if (amount > getBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
     }
 
-    if (amount > (getMaxBankBalance(message.member) - getBankBalance(message.member))) {
+    if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("your bank is not big enough for this payment"))
     }
 
@@ -96,7 +109,14 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle("bank deposit | processing")
-        .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+        .addField(
+            "bank balance",
+            "$**" +
+                getBankBalance(message.member).toLocaleString() +
+                "** / $**" +
+                getMaxBankBalance(message.member).toLocaleString() +
+                "**"
+        )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
 
     const m = await message.channel.send(embed)
@@ -107,11 +127,17 @@ async function run(message, args) {
     const embed1 = new CustomEmbed(message.member, false)
         .setTitle("bank deposit | success")
         .setColor("#5efb8f")
-        .addField("bank balance", "$**" + getBankBalance(message.member).toLocaleString() + "** / $**" + getMaxBankBalance(message.member).toLocaleString() + "**")
+        .addField(
+            "bank balance",
+            "$**" +
+                getBankBalance(message.member).toLocaleString() +
+                "** / $**" +
+                getMaxBankBalance(message.member).toLocaleString() +
+                "**"
+        )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
-    
-    setTimeout(() => m.edit(embed1), 1500)
 
+    setTimeout(() => m.edit(embed1), 1500)
 }
 
 cmd.setRun(run)

@@ -4,7 +4,7 @@ const fetch = require("node-fetch")
 
 const news = {
     text: "",
-    date: new Date().getTime()
+    date: new Date().getTime(),
 }
 
 /**
@@ -27,7 +27,7 @@ exports.getColor = getColor
  * @param {Array} allowed
  */
 async function redditImage(post, allowed) {
-    let image = post.data.url 
+    let image = post.data.url
 
     if (image.includes("imgur.com/a/")) {
         post = allowed[Math.floor(Math.random() * allowed.length)]
@@ -43,19 +43,21 @@ async function redditImage(post, allowed) {
     }
 
     if (image.includes("gfycat")) {
-
-        const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
+        const link = await fetch(
+            "https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]
+        ).then((url) => url.json())
 
         if (link.gfyItem) {
             image = link.gfyItem.max5mbGif
-            return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
+            return (
+                image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
+            )
         }
     }
 
     let count = 0
 
     while (!isImageUrl(image)) {
-
         if (count >= 10) {
             console.log("couldnt find image @ " + post.data.subreddit_name_prefixed)
             return "lol"
@@ -76,17 +78,34 @@ async function redditImage(post, allowed) {
             image = "https://i.imgur.com/" + image.split("/")[3] + ".png"
             if (!isImageUrl(image)) {
                 image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
-                return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
+                return (
+                    image +
+                    "|" +
+                    post.data.title +
+                    "|" +
+                    post.data.permalink +
+                    "|" +
+                    post.data.author
+                )
             }
         }
 
         if (image.includes("gfycat")) {
-
-            const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(url => url.json())
+            const link = await fetch(
+                "https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]
+            ).then((url) => url.json())
 
             if (link) {
                 image = link.gfyItem.max5mbGif
-                return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
+                return (
+                    image +
+                    "|" +
+                    post.data.title +
+                    "|" +
+                    post.data.permalink +
+                    "|" +
+                    post.data.author
+                )
             }
         }
     }
@@ -126,7 +145,10 @@ async function getMember(message, memberName) {
 
     let members
 
-    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
+    if (
+        message.guild.memberCount == message.guild.members.cache.size &&
+        message.guild.memberCount <= 25
+    ) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -137,7 +159,7 @@ async function getMember(message, memberName) {
 
     for (let member of members.keyArray()) {
         member = members.get(member)
-        
+
         if (member.user.id == memberName) {
             target = member
             break
@@ -145,20 +167,17 @@ async function getMember(message, memberName) {
             target = member
             break
         } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
-
             if (member.user.bot) {
                 possible.set(3, member)
             } else {
                 possible.set(0, member)
             }
         } else if (member.displayName.toLowerCase() == memberName.toLowerCase()) {
-
             if (member.user.bot) {
                 possible.set(4, member)
             } else {
                 possible.set(1, member)
             }
-
         } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
             if (member.user.bot) {
                 possible.set(5, member)
@@ -171,8 +190,7 @@ async function getMember(message, memberName) {
             } else {
                 possible.set(3, member)
             }
-            
-        } 
+        }
     }
 
     if (!target) {
@@ -201,22 +219,25 @@ async function getMember(message, memberName) {
 exports.getMember = getMember
 
 /**
- * 
- * @param {Message} message 
- * @param {String} memberName 
+ *
+ * @param {Message} message
+ * @param {String} memberName
  */
 async function getExactMember(message, memberName) {
     if (!message.guild) return null
 
     let members
 
-    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
+    if (
+        message.guild.memberCount == message.guild.members.cache.size &&
+        message.guild.memberCount <= 25
+    ) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
     }
 
-    let target = members.find(member => {
+    let target = members.find((member) => {
         if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
             return member
         } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
@@ -233,7 +254,7 @@ exports.getExactMember = getExactMember
 
 /**
  * @returns {String}
- * @param {Date} date 
+ * @param {Date} date
  */
 function formatDate(date) {
     const options = { year: "numeric", month: "short", day: "numeric" }
@@ -250,19 +271,19 @@ function getTimestamp() {
     let hours = date.getHours().toString()
     let minutes = date.getMinutes().toString()
     let seconds = date.getSeconds().toString()
-    
+
     if (hours.length == 1) {
         hours = "0" + hours
-    } 
-    
+    }
+
     if (minutes.length == 1) {
         minutes = "0" + minutes
-    } 
-    
+    }
+
     if (seconds.length == 1) {
         seconds = "0" + seconds
     }
-    
+
     const timestamp = hours + ":" + minutes + ":" + seconds
 
     return timestamp
@@ -272,7 +293,7 @@ exports.getTimestamp = getTimestamp
 
 /**
  * @returns {Number}
- * @param {Date} date 
+ * @param {Date} date
  */
 function daysAgo(date) {
     const ms = Math.floor(new Date() - date)
@@ -290,7 +311,7 @@ exports.daysAgo = daysAgo
 function daysUntilChristmas() {
     let date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear()}`))
     const current = new Date()
-    
+
     if (current.getMonth() >= 11) {
         if (current.getDate() > 25) {
             date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear() + 1}`))
@@ -306,7 +327,7 @@ exports.daysUntilChristmas = daysUntilChristmas
 
 /**
  * @returns {Number}
- * @param {Date} date 
+ * @param {Date} date
  */
 function daysUntil(date) {
     const ms = Math.floor(date - new Date())
@@ -321,11 +342,11 @@ exports.daysUntil = daysUntil
 function MStoTime(ms) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor((daysms) / (60*60*1000))
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
     const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor((hoursms) / (60 * 1000))
+    const minutes = Math.floor(hoursms / (60 * 1000))
     const minutesms = ms % (60 * 1000)
-    const sec = Math.floor((minutesms) / (1000))
+    const sec = Math.floor(minutesms / 1000)
 
     let output = ""
 

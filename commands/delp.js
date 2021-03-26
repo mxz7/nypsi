@@ -6,14 +6,17 @@ const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("delp", "bulk delete/purge your own messages", categories.MODERATION).setAliases(["dp"])
+const cmd = new Command(
+    "delp",
+    "bulk delete/purge your own messages",
+    categories.MODERATION
+).setAliases(["dp"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -21,7 +24,7 @@ async function run(message, args) {
             cooldownLength = 10
         }
     }
-        
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -76,16 +79,15 @@ async function run(message, args) {
     let collected
 
     if (amount <= 6) {
-        collected = await message.channel.messages.fetch({limit: 25})
+        collected = await message.channel.messages.fetch({ limit: 25 })
     } else {
-        collected = await message.channel.messages.fetch({limit: 100})
+        collected = await message.channel.messages.fetch({ limit: 100 })
     }
-    
-    const collecteda = collected.filter(msg => {
+
+    const collecteda = collected.filter((msg) => {
         if (!msg.author) return
         return msg.author.id == message.author.id
     })
-
 
     if (collecteda.size == 0) {
         return

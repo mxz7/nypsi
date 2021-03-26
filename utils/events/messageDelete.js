@@ -11,7 +11,6 @@ module.exports = (message) => {
     if (!message.member) return
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
-
         if (!hasGuild(message.guild)) createGuild(message.guild)
 
         const filter = getSnipeFilter(message.guild)
@@ -25,7 +24,7 @@ module.exports = (message) => {
         }
 
         const chatFilter = getChatFilter(message.guild)
-    
+
         for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
@@ -35,8 +34,8 @@ module.exports = (message) => {
             member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
             channel: {
-                id: message.channel.id
-            }
+                id: message.channel.id,
+            },
         })
 
         exports.snipe = snipe
