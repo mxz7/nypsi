@@ -361,15 +361,15 @@ async function getServerLeaderboard(guild) {
     }
 
     usersWins.sort((a, b) => {
-        return data[guild.id].stats[b] - data[guild.id].stats[a]
+        return data[guild.id].stats[b].wins - data[guild.id].stats[a].wins
     })
 
     usersSecond.sort((a, b) => {
-        return data[guild.id].stats[b] - data[guild.id].stats[a]
+        return data[guild.id].stats[b].secondPlace - data[guild.id].stats[a].secondPlace
     })
 
     usersThird.sort((a, b) => {
-        return data[guild.id].stats[b] - data[guild.id].stats[a]
+        return data[guild.id].stats[b].thirdPlace - data[guild.id].stats[a].thirdPlace
     })
 
     usersWins.splice(5, usersWins.length - 5)
@@ -393,7 +393,7 @@ async function getServerLeaderboard(guild) {
             pos = "🥉"
         }
 
-        winsMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].wins}`
+        winsMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].wins}\n`
         count++
     }
 
@@ -412,7 +412,7 @@ async function getServerLeaderboard(guild) {
 
         secondMsg += `${pos} **${getMember(user).user.tag}** ${
             data[guild.id].stats[user].secondPlace
-        }`
+        }\n`
         count++
     }
 
@@ -431,7 +431,7 @@ async function getServerLeaderboard(guild) {
 
         thirdMsg += `${pos} **${getMember(user).user.tag}** ${
             data[guild.id].stats[user].thirdPlace
-        }`
+        }\n`
         count++
     }
 
