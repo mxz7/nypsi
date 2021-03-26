@@ -230,6 +230,8 @@ async function startReaction(guild, channel) {
 
         time = ((time - now) / 1000).toFixed(2)
 
+        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member)
+
         if (winners.length == 0) {
             embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``)
 
