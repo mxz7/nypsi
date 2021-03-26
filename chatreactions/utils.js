@@ -123,6 +123,16 @@ exports.updateWords = updateWords
 
 /**
  * @param {Guild} guild
+ * @returns {Array<String>}
+ */
+async function getWordList(guild) {
+    return data[guild.id].wordList
+}
+
+exports.getWordList = getWordList
+
+/**
+ * @param {Guild} guild
  * @returns {Boolean}
  */
 async function isUsingDefaultWords(guild) {
