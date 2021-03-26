@@ -16,6 +16,6 @@ jobs:
       - run: git status
       # commit any changed files
       # https://github.com/mikeal/publish-to-github-action
-      - uses: mikeal/publish-to-github-action@master
+      - uses: tekoh/publish-to-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
