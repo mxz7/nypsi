@@ -211,12 +211,13 @@ async function startReaction(guild, channel) {
 
     const msg = await channel.send(embed)
 
-    const now = new Date().getTime()
+    const start = new Date().getTime()
 
-    let winners = []
+    const winners = new Map()
+    
+    let waiting = false
 
-    const filter = (m) =>
-        m.content == chosenWord && winners.indexOf(m.author.tag) == -1 && !m.member.user.bot
+    const filter = (m) => m.content == chosenWord && !winners.get(m.author.id) && !m.member.user.bot
 
     const timeout = getReactionSettings(guild).timeout
 
@@ -226,32 +227,60 @@ async function startReaction(guild, channel) {
     })
 
     collector.on("collect", async (message) => {
-        let time = message.createdTimestamp
+        let time = new Date().getTime()
 
-        time = ((time - now) / 1000).toFixed(2)
+        time = ((time - start) / 1000).toFixed(2)
 
-        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member)
+        if (!hasReactionStatsProfile(guild, message.member))
+            createReactionStatsProfile(guild, message.member)
 
-        if (winners.length == 0) {
+        if (winners.size == 0) {
             embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``)
 
             addWin(guild, message.member)
         } else {
-            let badge = "🥈"
+            if (winners.size == 1) {
+                waiting = true
 
-            if (winners.length == 2) {
-                badge = "🥉"
-                add3rdPlace(guild, message.member)
+                setTimeout(async () => {
+                    waiting = false
+
+                    if (winners.size == 1) {
+                        return
+                    } else {
+                        const field = await embed.embed.fields.find((f) => f.name == "winners")
+
+                        field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``
+
+                        add2ndPlace(guild, winners.get(2).member)
+
+                        if (winners.get(3)) {
+                            field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``
+                            add3rdPlace(guild, winners.get(3).member)
+                        }
+
+                        return await msg.edit(embed)
+                    }
+                }, 1000)
             } else {
-                add2ndPlace(guild, message.member)
+                if (!waiting) {
+                    const field = await embed.embed.fields.find((f) => f.name == "winners")
+
+                    field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``
+
+                    add3rdPlace(guild, message.member)
+                }
             }
-
-            const field = await embed.embed.fields.find((f) => f.name == "winners")
-
-            field.value += `\n${badge} ${message.author.toString()} in \`${time}s\``
         }
-        winners.push(message.author.tag)
-        return await msg.edit(embed)
+
+        winners.set(winners.size + 1, {
+            mention: message.author.toString(),
+            time: time,
+            member: message.member
+        })
+        if (!waiting) {
+            return await msg.edit(embed)
+        }
     })
 
     collector.on("end", async () => {
