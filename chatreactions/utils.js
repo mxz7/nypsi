@@ -613,6 +613,24 @@ function getRandomChannels(guild) {
 exports.getRandomChannels = getRandomChannels
 
 /**
+ * @param {Guild} guild
+ * @returns {Array<String>}
+ */
+function getBlacklisted(guild) {
+    return data[guild.id].blacklisted
+}
+
+exports.getBlacklisted = getBlacklisted
+
+/**
+ * @param {Guild} guild
+ * @param {Array<String>} blacklisted
+ */
+function setBlacklisted(guild, blacklisted) {
+    data[guild.id].blacklisted = blacklisted
+}
+
+/**
  * @returns {Array<String>}
  */
 async function getDefaultWords() {
