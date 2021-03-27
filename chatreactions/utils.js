@@ -90,7 +90,10 @@ setInterval(async () => {
             }
         })
 
-        if (stop) return
+        if (stop) {
+            console.log(`stopped ${channel.name} because recent message`)
+            return
+        }
 
         const a = await startReaction(guild, channel)
 
@@ -161,6 +164,8 @@ setInterval(async () => {
                     }
 
                     await runGame(guild, channel)
+                } else {
+                    console.log(`stopped ${ch} because time`)
                 }
             } else {
                 const channel = await guild.channels.cache.find((cha) => cha.id == ch)
@@ -178,7 +183,7 @@ setInterval(async () => {
     if (count > 0) {
         console.log(`[${getTimestamp()}] ${count} chat reactions automatically started`)
     }
-}, 30000)
+}, 60000)
 
 /**
  * @param {Guild} guild
