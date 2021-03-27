@@ -11,6 +11,7 @@ const {
     getWordList,
     updateWords,
     getReactionSettings,
+    updateReactionSettings,
 } = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium } = require("../premium/utils")
@@ -189,8 +190,19 @@ async function run(message, args) {
                 )
 
                 return message.channel.send(embed)
+            } else if (args[1].toLowerCase() == "enable") {
+                const settings = getReactionSettings(message.guild)
+
+                if (settings.randomStart) {
+                    return message.channel.send(new ErrorEmbed("already enabled"))
+                }
+
+                settings.randomStart = true
+
+                updateReactionSettings(message.guild, settings)
+
+                return message.channel.send(new CustomEmbed(message.member, false, "✅ automatic start has been enabled"))
             }
-             
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
