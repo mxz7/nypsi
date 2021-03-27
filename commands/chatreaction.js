@@ -160,7 +160,7 @@ async function run(message, args) {
             if (settings.randomChannels.length == 0) {
                 channels = "none"
             } else {
-                channels = channels.join("` `")
+                channels = settings.randomChannels.join("` `")
             }
 
             embed.setDescription(
