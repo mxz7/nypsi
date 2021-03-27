@@ -191,6 +191,18 @@ async function requestRemoveRole(id, roleID) {
 
 exports.requestRemoveRole = requestRemoveRole
 
+/**
+ * @param {String} guildID
+ * @returns {Discord.Guild}
+ */
+async function getGuild(guildID) {
+    const guild = await client.guilds.fetch(guildID)
+
+    return guild
+}
+
+exports.getGuild = getGuild
+
 setTimeout(() => {
     console.log(`[${getTimestamp()}] logging in...`)
     client.login(token).then(() => {
