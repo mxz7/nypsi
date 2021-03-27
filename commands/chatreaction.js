@@ -301,7 +301,9 @@ async function run(message, args) {
                 const length = parseInt(args[2])
 
                 if (!length) {
-                    return message.channel.send(new ErrorEmbed("invalid length, it must be a whole number"))
+                    return message.channel.send(
+                        new ErrorEmbed("invalid length, it must be a whole number")
+                    )
                 }
 
                 if (length > 900) {
@@ -309,14 +311,22 @@ async function run(message, args) {
                 }
 
                 if (length < 120) {
-                    return message.channel.send(new ErrorEmbed("cannot be shorter than 120 seconds"))
+                    return message.channel.send(
+                        new ErrorEmbed("cannot be shorter than 120 seconds")
+                    )
                 }
 
                 const settings = getReactionSettings(message.guild)
 
                 settings.timeBetweenEvents = length
 
-                return message.channel.send(new CustomEmbed(message.member, false, `✅ event cooldown set to \`${length}s\``))
+                return message.channel.send(
+                    new CustomEmbed(
+                        message.member,
+                        false,
+                        `✅ event cooldown set to \`${length}s\``
+                    )
+                )
             } else if (args[1].toLowerCase() == "offset") {
                 return message.channel.send(new ErrorEmbed(`${prefix}cr settings offset <number>`))
             } else if (args[1].toLowerCase() == "length") {
