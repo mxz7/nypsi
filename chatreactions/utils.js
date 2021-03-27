@@ -71,9 +71,8 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000)
 
 setInterval(async () => {
-
     let games = 0
-    
+
     const runGame = async (guild, channel) => {
         const a = await startReaction(guild, channel)
 
@@ -81,7 +80,7 @@ setInterval(async () => {
             games++
         }
 
-
+        // set lastgame with time between events & use random offset
 
         return
     }
@@ -109,7 +108,7 @@ setInterval(async () => {
         for (ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
-                    const channel = await guild.channels.cache.find(cha => cha.id == ch)
+                    const channel = await guild.channels.cache.find((cha) => cha.id == ch)
 
                     if (!channel) {
                         channels.splice(channels.indexOf(ch), 1)
