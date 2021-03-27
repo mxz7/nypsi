@@ -597,7 +597,7 @@ async function run(message, args) {
             updateWords(message.guild, words)
 
             return message.channel.send(
-                new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist\``)
+                new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist`)
             )
         } else if (args[1].toLowerCase() == "reset") {
             updateWords(message.guild, [])
