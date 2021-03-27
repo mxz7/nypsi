@@ -218,16 +218,22 @@ async function run(message, args) {
                 return message.channel.send(
                     new CustomEmbed(message.member, false, "✅ automatic start has been disabled")
                 )
-            } else {
-                return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
-            }
-        } else if (args.length == 3) {
-            if (args[2].toLowerCase() == "channel" || args[2].toLowerCase() == "channels") {
+            } else if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
                 return message.channel.send(
                     new ErrorEmbed(
                         "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
                     )
                 )
+            } else if (args[1].toLowerCase() == "cooldown") {
+                return message.channel.send(
+                    new ErrorEmbed(`${prefix}cr settings cooldown <number>`)
+                )
+            } else if (args[1].toLowerCase() == "offset") {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings offset <number>`))
+            } else if (args[1].toLowerCase() == "length") {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings length <number>`))
+            } else {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
