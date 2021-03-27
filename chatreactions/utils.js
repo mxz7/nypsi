@@ -630,6 +630,8 @@ function setBlacklisted(guild, blacklisted) {
     data[guild.id].blacklisted = blacklisted
 }
 
+exports.setBlacklisted = setBlacklisted
+
 /**
  * @returns {Array<String>}
  */
