@@ -302,7 +302,7 @@ async function run(message, args) {
 
                 if (!length) {
                     return message.channel.send(
-                        new ErrorEmbed("invalid length, it must be a whole number")
+                        new ErrorEmbed("invalid time, it must be a whole number")
                     )
                 }
 
@@ -332,7 +332,7 @@ async function run(message, args) {
 
                 if (!length) {
                     return message.channel.send(
-                        new ErrorEmbed("invalid length, it must be a whole number")
+                        new ErrorEmbed("invalid time, it must be a whole number")
                     )
                 }
 
@@ -356,7 +356,35 @@ async function run(message, args) {
                     )
                 )
             } else if (args[1].toLowerCase() == "length") {
-                return message.channel.send(new ErrorEmbed(`${prefix}cr settings length <number>`))
+                const length = parseInt(args[2])
+
+                if (!length) {
+                    return message.channel.send(
+                        new ErrorEmbed("invalid time, it must be a whole number")
+                    )
+                }
+
+                if (length > 900) {
+                    return message.channel.send(new ErrorEmbed("cannot be longer than 900 seconds"))
+                }
+
+                if (length < 120) {
+                    return message.channel.send(
+                        new ErrorEmbed("cannot be shorter than 120 seconds")
+                    )
+                }
+
+                const settings = getReactionSettings(message.guild)
+
+                settings.timeBetweenEvents = length
+
+                return message.channel.send(
+                    new CustomEmbed(
+                        message.member,
+                        false,
+                        `✅ event cooldown set to \`${length}s\``
+                    )
+                )
             } else {
                 return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
             }
