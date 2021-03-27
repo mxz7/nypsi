@@ -163,7 +163,7 @@ async function run(message, args) {
             }
 
             embed.setDescription(
-                `**random start** \`${settings.randomStart}\`\n` +
+                `**automatic start** \`${settings.randomStart}\`\n` +
                     `**random channels** \`${channels}\`\n` +
                     `**time between events** \`${settings.timeBetweenEvents}s\`\n` +
                     `**random offset** \`${settings.randomModifier}s\`\n` +
@@ -173,6 +173,24 @@ async function run(message, args) {
             embed.setFooter(`use ${prefix}cr settings help to change this settings`)
 
             return message.channel.send(embed)
+        } else if (args.length == 2) {
+            if (args[1].toLowerCase() == "help") {
+                const embed = new CustomEmbed(message.member, false)
+
+                embed.setTitle("chat reactions | " + message.author.username)
+
+                embed.setDescription(
+                    `${prefix}**cr settings enable** *enable automatic starting*\n` +
+                        `${prefix}**cr settings disable** *disable automatic starting*\n` +
+                        `${prefix}**cr settings channel <channel>** *add/remove channels to be used for automatic starting*\n` +
+                        `${prefix}**cr settings cooldown <seconds>** *set the time between automatic chat reactions*\n` +
+                        `${prefix}**cr settings offset <seconds>** *set a maximum offset to be used with the cooldown*\n` +
+                        `${prefix}**cr settings length <seconds>** *set a maximum game length*`
+                )
+
+                return message.channel.send(embed)
+            }
+             
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
