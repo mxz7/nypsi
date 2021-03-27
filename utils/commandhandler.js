@@ -15,7 +15,7 @@ const cooldown = new Set()
 
 function loadCommands() {
     console.log(`[${getTimestamp()}] loading commands..`)
-    const commandFiles = fs.readdirSync("./commands/").filter(file => file.endsWith(".js"))
+    const commandFiles = fs.readdirSync("./commands/").filter((file) => file.endsWith(".js"))
     const failedTable = []
 
     if (commands.size > 0) {
@@ -27,12 +27,12 @@ function loadCommands() {
 
     for (let file of commandFiles) {
         let command
-        
+
         try {
             command = require(`../commands/${file}`)
 
             let enabled = true
-        
+
             if (!command.name || !command.description || !command.run || !command.category) {
                 enabled = false
             }
@@ -57,15 +57,15 @@ function loadCommands() {
     exports.commandsSize = commands.size
 
     if (failedTable.length != 0) {
-        console.log(table(failedTable, {border: getBorderCharacters("ramac")}))
+        console.log(table(failedTable, { border: getBorderCharacters("ramac") }))
     } else {
         console.log(`[${getTimestamp()}] all commands loaded without error ✅`)
     }
 }
 
 /**
- * 
- * @param {Array} commandsArray 
+ *
+ * @param {Array} commandsArray
  */
 function reloadCommand(commandsArray) {
     const reloadTable = []
@@ -81,15 +81,20 @@ function reloadCommand(commandsArray) {
             } catch (e) {
                 return console.log("error deleting from cache")
             }
-            
+
             const commandData = require(`../commands/${cmd}`)
-        
+
             let enabled = true
-            
-            if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
+
+            if (
+                !commandData.name ||
+                !commandData.description ||
+                !commandData.run ||
+                !commandData.category
+            ) {
                 enabled = false
             }
-            
+
             if (enabled) {
                 commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
@@ -110,14 +115,14 @@ function reloadCommand(commandsArray) {
     }
     exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
-    console.log(table(reloadTable, {border: getBorderCharacters("ramac")}))
-    return table(reloadTable, {border: getBorderCharacters("ramac")})
+    console.log(table(reloadTable, { border: getBorderCharacters("ramac") }))
+    return table(reloadTable, { border: getBorderCharacters("ramac") })
 }
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function helpCmd(message, args) {
     logCommand(message, args)
@@ -156,18 +161,17 @@ async function helpCmd(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member)
-        .setFooter(prefix + "help <command> | get info about a command")
-
+    const embed = new CustomEmbed(message.member).setFooter(
+        prefix + "help <command> | get info about a command"
+    )
 
     /**
      * FINDING WHAT THE USER REQUESTED
-    */
+     */
 
     let pageSystemNeeded = false
 
     if (args.length == 0) {
-
         const categories = Array.from(helpCategories.keys()).sort()
 
         let categoriesMsg = ""
@@ -182,11 +186,15 @@ async function helpCmd(message, args) {
         const lastSet = formatDate(news.date)
 
         embed.setTitle("help menu")
-        embed.setDescription("invite nypsi to your server: [invite.nypsi.xyz](http://invite.nypsi.xyz)\n\n" +
-            "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
-            `my prefix for this server is \`${prefix}\``)
+        embed.setDescription(
+            "invite nypsi to your server: [invite.nypsi.xyz](http://invite.nypsi.xyz)\n\n" +
+                "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
+                `my prefix for this server is \`${prefix}\``
+        )
         embed.addField("command categories", categoriesMsg, true)
-        embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
+        embed.setThumbnail(
+            message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
+        )
 
         if (news.text != "") {
             embed.addField("news", `${news.text} - *${lastSet}*`)
@@ -210,7 +218,6 @@ async function helpCmd(message, args) {
             embed.setTitle(`${args[0].toLowerCase()} commands`)
             embed.setDescription(pages.get(1))
             embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
-
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd
 
@@ -220,9 +227,15 @@ async function helpCmd(message, args) {
                 cmd = commands.get(args[0].toLowerCase())
             }
 
-            let desc = "**name** " + cmd.name + "\n" +
-                "**description** " + cmd.description + "\n" +
-                "**category** " + cmd.category
+            let desc =
+                "**name** " +
+                cmd.name +
+                "\n" +
+                "**description** " +
+                cmd.description +
+                "\n" +
+                "**category** " +
+                cmd.category
 
             if (cmd.permissions) {
                 desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`"
@@ -234,9 +247,9 @@ async function helpCmd(message, args) {
 
             embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
-        } 
+        }
     }
-    
+
     const msg = await message.channel.send(embed)
 
     if (!pageSystemNeeded) return
@@ -254,10 +267,12 @@ async function helpCmd(message, args) {
     }
 
     async function pageManager() {
-        const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-            .then(collected => {
+        const reaction = await msg
+            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .then((collected) => {
                 return collected.first().emoji.name
-            }).catch(async () => {
+            })
+            .catch(async () => {
                 await msg.reactions.removeAll()
             })
 
@@ -290,32 +305,39 @@ async function helpCmd(message, args) {
 }
 
 /**
- * 
- * @param {String} cmd 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {String} cmd
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 function runCommand(cmd, message, args) {
-
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
-        return message.member.send("❌ i don't have permission to send messages in that channel - please contact server staff if this is an error")
+        return message.member.send(
+            "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
+        )
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
-        return message.channel.send("❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
-            "if this error still shows, check channel specific permissions")
+        return message.channel.send(
+            "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+                "if this error still shows, check channel specific permissions"
+        )
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
-        return message.channel.send("❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
-            "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
-            "if this error still shows, check channel specific permissions")
+        return message.channel.send(
+            "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
+                "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
+                "if this error still shows, check channel specific permissions"
+        )
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
-        return message.channel.send("❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
-            "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
-            "if this error still shows, check channel specific permissions")
+        return message.channel.send(
+            "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+                "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
+                "if this error still shows, check channel specific permissions"
+        )
     }
 
     if (cmd == "help") {
@@ -354,7 +376,7 @@ function runCommand(cmd, message, args) {
             }
             commands.get(cmd).run(message, args)
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e)
     }
 
@@ -368,14 +390,14 @@ function runCommand(cmd, message, args) {
         try {
             if (!message.member) return
             if (!userExists(message.member)) return
-        
+
             setTimeout(() => {
                 try {
                     if (!xpCooldown.has(message.author.id)) {
                         updateXp(message.member, getXp(message.member) + 1)
-                
+
                         xpCooldown.add(message.author.id)
-                
+
                         setTimeout(() => {
                             try {
                                 xpCooldown.delete(message.author.id)
@@ -395,8 +417,8 @@ function runCommand(cmd, message, args) {
 }
 
 /**
- * 
- * @param {String} cmd 
+ *
+ * @param {String} cmd
  */
 function commandExists(cmd) {
     if (commands.has(cmd)) {
@@ -427,7 +449,7 @@ function getCmdCategory(cmd) {
 async function getRandomCommand() {
     const a = []
 
-    await commands.forEach(d => {
+    await commands.forEach((d) => {
         if (d.category != "none" && d.category != "nsfw") {
             a.push(d)
         }
@@ -441,9 +463,9 @@ async function getRandomCommand() {
 exports.getRandomCommand = getRandomCommand
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  * @param {String} commandName
  */
 function logCommand(message, args) {
@@ -457,7 +479,9 @@ function logCommand(message, args) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${message.author.tag}: '${content}'\x1b[37m`
+    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${
+        message.author.tag
+    }: '${content}'\x1b[37m`
 
     console.log(msg)
 }
@@ -479,7 +503,6 @@ function updatePopularCommands(command) {
  * @param {String} channelID
  */
 function runPopularCommandsTimer(client, serverID, channelID) {
-
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -492,22 +515,22 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
     const postPopularCommands = async () => {
         const guild = await client.guilds.fetch(serverID)
-    
+
         if (!guild) {
             return console.log("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
         }
-    
-        const channel = await guild.channels.cache.find(ch => ch.id == channelID)
-    
+
+        const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+
         if (!channel) {
             return console.log("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
         }
-    
+
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
-    
+
         let msg = ""
         let count = 1
-            
+
         for (let [key, value] of sortedCommands) {
             if (count >= 11) break
 
@@ -524,9 +547,9 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`
             count++
         }
-    
+
         const embed = new CustomEmbed()
-    
+
         embed.setTitle("top 10 commands from today")
         embed.setDescription(msg)
         embed.setColor("#000001")

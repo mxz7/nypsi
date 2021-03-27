@@ -1,20 +1,31 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../guilds/utils")
-const { isPremium, getPremiumProfile, setTier, setEmbedColor, setStatus, setReason, addMember, renewUser, revokeUser, expireUser } = require("../premium/utils")
+const {
+    isPremium,
+    getPremiumProfile,
+    setTier,
+    setEmbedColor,
+    setStatus,
+    setReason,
+    addMember,
+    renewUser,
+    revokeUser,
+    expireUser,
+} = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
 
-const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
+const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases([
+    "patreon",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const defaultMessage = () => {
-
         if (isPremium(message.member)) {
             const embed = new CustomEmbed(message.member, false)
 
@@ -43,7 +54,17 @@ async function run(message, args) {
 
             return message.channel.send(embed)
         } else {
-            return message.channel.send(new CustomEmbed(message.member, false, "you currently have no premium membership\n\nhttps://www.patreon.com/nypsi").setFooter(`join the support server if this is an issue (${getPrefix(message.guild)}support)`))
+            return message.channel.send(
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    "you currently have no premium membership\n\nhttps://www.patreon.com/nypsi"
+                ).setFooter(
+                    `join the support server if this is an issue (${getPrefix(
+                        message.guild
+                    )}support)`
+                )
+            )
         }
     }
 
@@ -66,8 +87,12 @@ async function run(message, args) {
 
         console.log(a)
 
-        const embed = new CustomEmbed(message.member, false, `level: ${a.level}\n\ncheck console for all info`).setTitle(args[1])
-        
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `level: ${a.level}\n\ncheck console for all info`
+        ).setTitle(args[1])
+
         return message.channel.send(embed)
     } else if (args[0].toLowerCase() == "update") {
         if (message.author.id != "672793821850894347") {
@@ -79,22 +104,34 @@ async function run(message, args) {
         }
 
         if (!isPremium(args[2])) {
-            return message.channel.send(new ErrorEmbed("this user does not have a profile, use $premium add dumbass check it before u update it"))
+            return message.channel.send(
+                new ErrorEmbed(
+                    "this user does not have a profile, use $premium add dumbass check it before u update it"
+                )
+            )
         }
 
         switch (args[1].toLowerCase()) {
-        case "level":
-            setTier(args[2], parseInt(args[3]))
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ tier changed to ${args[3]}`))
-        case "embed":
-            setEmbedColor(args[2], args[3])
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ embed color changed to ${args[3]}`))
-        case "status" :
-            setStatus(args[2], parseInt(args[3]))
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`))
-        case "reason":
-            setReason(args[2], args.join(" "))
-            return message.channel.send(new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`))
+            case "level":
+                setTier(args[2], parseInt(args[3]))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, `✅ tier changed to ${args[3]}`)
+                )
+            case "embed":
+                setEmbedColor(args[2], args[3])
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, `✅ embed color changed to ${args[3]}`)
+                )
+            case "status":
+                setStatus(args[2], parseInt(args[3]))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`)
+                )
+            case "reason":
+                setReason(args[2], args.join(" "))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`)
+                )
         }
     } else if (args[0].toLowerCase() == "add") {
         if (message.author.id != "672793821850894347") {
@@ -107,7 +144,9 @@ async function run(message, args) {
 
         addMember(args[1], parseInt(args[2]))
 
-        return message.channel.send(new CustomEmbed(message.member, false, "✅ created profile at tier " + args[2]))
+        return message.channel.send(
+            new CustomEmbed(message.member, false, "✅ created profile at tier " + args[2])
+        )
     } else if (args[0].toLowerCase() == "renew") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage()

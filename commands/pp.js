@@ -7,14 +7,15 @@ const { isPremium, getTier } = require("../premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("pp", "accurate prediction of your pp size", categories.FUN).setAliases(["penis"])
+const cmd = new Command("pp", "accurate prediction of your pp size", categories.FUN).setAliases([
+    "penis",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
     let cacheTime = 60
 
@@ -88,7 +89,7 @@ async function run(message, args) {
         if (bigInch == 7) {
             size = Math.floor(Math.random() * 55) + 15
         }
-        
+
         cache.set(member.user.id, size)
 
         setTimeout(() => {
@@ -99,12 +100,15 @@ async function run(message, args) {
     for (let i = 0; i < size; i++) {
         sizeMsg = sizeMsg + "="
     }
-    
+
     sizeMsg = sizeMsg + "D"
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`)
-        .setTitle("pp predictor 1337")
-    
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
+    ).setTitle("pp predictor 1337")
+
     return message.channel.send(embed)
 }
 

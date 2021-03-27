@@ -7,14 +7,17 @@ const { isPremium } = require("../premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("snek", "get a random picture of a snake/snek", categories.ANIMALS).setAliases(["snake"])
+const cmd = new Command(
+    "snek",
+    "get a random picture of a snake/snek",
+    categories.ANIMALS
+).setAliases(["snake"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {

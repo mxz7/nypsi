@@ -11,15 +11,16 @@ const cooldown = new Map()
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {
-        return await message.channel.send(new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank"))
+        return await message.channel.send(
+            new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank")
+        )
     }
 
     const bankWorth = new Discord.Collection()
@@ -46,15 +47,16 @@ async function run(message, args) {
         let bankList = ""
 
         for (const bank1 of bankWorth.keys()) {
-            bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
+            bankList =
+                bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
         }
 
         bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
 
-        const embed = new CustomEmbed(message.member, false, bankList)
-            .setTitle("current bank balances")
-            
-            
+        const embed = new CustomEmbed(message.member, false, bankList).setTitle(
+            "current bank balances"
+        )
+
         return message.channel.send(embed)
     }
 
@@ -114,20 +116,32 @@ async function run(message, args) {
         robberySuccess = true
 
         robbedAmount = Math.round((amount / 100) * bankWorth.get(bank))
-            
+
         updateBalance(message.member, getBalance(message.member) + robbedAmount)
     }
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..")
-        .setTitle("bank robbery | " + message.member.user.username)
-        
-    message.channel.send(embed).then(m => {
-            
+    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
+        "bank robbery | " + message.member.user.username
+    )
+
+    message.channel.send(embed).then((m) => {
         if (robberySuccess) {
-            embed.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + bank + "**")
+            embed.addField(
+                "**success!!**",
+                "**you stole** $" +
+                    robbedAmount.toLocaleString() +
+                    " (" +
+                    amount +
+                    "%) from **" +
+                    bank +
+                    "**"
+            )
             embed.setColor("#5efb8f")
         } else {
-            embed.addField("**you were caught**", "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)")
+            embed.addField(
+                "**you were caught**",
+                "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)"
+            )
             embed.setColor("#e4334f")
         }
 

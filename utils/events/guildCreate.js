@@ -7,7 +7,15 @@ const { getTimestamp } = require("../utils")
  * @param {Guild} guild
  */
 module.exports = async (client, guild) => {
-    console.log("\x1b[36m[" + getTimestamp() + "] joined new server '" + guild.name + "' new count: " + client.guilds.cache.size + "\x1b[37m")
+    console.log(
+        "\x1b[36m[" +
+            getTimestamp() +
+            "] joined new server '" +
+            guild.name +
+            "' new count: " +
+            client.guilds.cache.size +
+            "\x1b[37m"
+    )
     if (!hasGuild(guild)) {
         createGuild(guild)
     }

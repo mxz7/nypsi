@@ -1,6 +1,15 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { updateBalance, getBalance, userExists, createUser, formatBet, getBankBalance, getXp, getPrestige } = require("../economy/utils.js")
+const {
+    updateBalance,
+    getBalance,
+    userExists,
+    createUser,
+    formatBet,
+    getBankBalance,
+    getXp,
+    getPrestige,
+} = require("../economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../guilds/utils")
@@ -11,11 +20,10 @@ const cooldown = new Map()
 const cmd = new Command("pay", "give other users money", categories.MONEY).setAliases(["give"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 15
 
     if (isPremium(message.author.id)) {
@@ -46,10 +54,13 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member) 
+        const embed = new CustomEmbed(message.member)
             .setTitle("pay help")
             .addField("usage", `${prefix}pay <user> <amount>`)
-            .addField("help", "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment")
+            .addField(
+                "help",
+                "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment"
+            )
 
         return message.channel.send(embed)
     }
@@ -90,7 +101,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
-    let amount = parseInt(args[1]) 
+    let amount = parseInt(args[1])
 
     if (amount > getBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
@@ -100,52 +111,52 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
-    if (amount >= 200000 || (getBalance(target) + amount) >= 2000000) {
+    if (amount >= 200000 || getBalance(target) + amount >= 2000000) {
         const targetXP = getXp(target)
         const targetPrestige = getPrestige(target)
 
         if (targetPrestige == 0) {
-
             if (targetXP <= 25) {
                 return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
             } else if (targetXP <= 100) {
-
-                if (amount >= 500000 || (getBalance(target) + amount) >= 2500000) {
-                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                if (amount >= 500000 || getBalance(target) + amount >= 2500000) {
+                    return message.channel.send(
+                        new ErrorEmbed("you can't pay this user that much yet")
+                    )
                 }
-                
             } else if (targetXP <= 500) {
-
-                if (amount >= 1000000 || (getBalance(target) + amount) >= 3000000) {
-                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                if (amount >= 1000000 || getBalance(target) + amount >= 3000000) {
+                    return message.channel.send(
+                        new ErrorEmbed("you can't pay this user that much yet")
+                    )
                 }
-
             } else {
-
-                if (amount >= 5000000 || (getBalance(target) + amount) >= 10000000) {
-                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                if (amount >= 5000000 || getBalance(target) + amount >= 10000000) {
+                    return message.channel.send(
+                        new ErrorEmbed("you can't pay this user that much yet")
+                    )
                 }
-
             }
-
         } else if (targetPrestige == 1) {
             if (targetXP <= 100) {
-
-                if (amount >= 10000000 || (getBalance(target) + amount) >= 20000000) {
-                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                if (amount >= 10000000 || getBalance(target) + amount >= 20000000) {
+                    return message.channel.send(
+                        new ErrorEmbed("you can't pay this user that much yet")
+                    )
                 }
-
             } else {
-                if (amount >= 5000000 || (getBalance(target) + amount) >= 30000000) {
-                    return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+                if (amount >= 5000000 || getBalance(target) + amount >= 30000000) {
+                    return message.channel.send(
+                        new ErrorEmbed("you can't pay this user that much yet")
+                    )
                 }
             }
         } else if (targetPrestige < 4) {
-            if (amount >= 15000000 || (getBalance(target) + amount) >= 50000000) {
+            if (amount >= 15000000 || getBalance(target) + amount >= 50000000) {
                 return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
             }
         } else if (targetPrestige < 6) {
-            if (amount >= 1000000000 || (getBalance(target) + amount) >= 10000000000) {
+            if (amount >= 1000000000 || getBalance(target) + amount >= 10000000000) {
                 return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
             }
         }
@@ -169,7 +180,7 @@ async function run(message, args) {
         tax = 0.2
     } else if (amount >= 100000) {
         tax = 0.1
-    } 
+    }
 
     updateBalance(message.member, getBalance(message.member) - amount)
 
@@ -181,32 +192,76 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member)
         .setTitle("processing payment..")
-        .addField(message.member.user.tag, "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString())
+        .addField(
+            message.member.user.tag,
+            "$" +
+                (getBalance(message.member) + amount).toLocaleString() +
+                "\n**-** $" +
+                amount.toLocaleString()
+        )
 
     if (tax > 0) {
-        embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
-        embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + (amount - Math.round(amount * tax)).toLocaleString())
+        embed.setDescription(
+            message.member.user.toString() +
+                " -> " +
+                target.user.toString() +
+                "\n**" +
+                tax * 100 +
+                "**% tax"
+        )
+        embed.addField(
+            target.user.tag,
+            "$" +
+                (getBalance(target) - amount).toLocaleString() +
+                "\n**+** $" +
+                (amount - Math.round(amount * tax)).toLocaleString()
+        )
     } else {
         embed.setDescription(message.member.user.toString() + " -> " + target.user.toString())
-        embed.addField(target.user.tag, "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString())
+        embed.addField(
+            target.user.tag,
+            "$" +
+                (getBalance(target) - amount).toLocaleString() +
+                "\n**+** $" +
+                amount.toLocaleString()
+        )
     }
 
-    message.channel.send(embed).then(m => {
+    message.channel.send(embed).then((m) => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
-            
 
         if (tax > 0) {
-            embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + (amount - Math.round(amount * tax)).toLocaleString() + "**)")
-            embed.setDescription(message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100) + "**% tax")
+            embed.addField(
+                target.user.tag,
+                "$" +
+                    getBalance(target).toLocaleString() +
+                    " (+$**" +
+                    (amount - Math.round(amount * tax)).toLocaleString() +
+                    "**)"
+            )
+            embed.setDescription(
+                message.member.user.toString() +
+                    " -> " +
+                    target.user.toString() +
+                    "\n**" +
+                    tax * 100 +
+                    "**% tax"
+            )
         } else {
-            embed.addField(target.user.tag, "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)")
+            embed.addField(
+                target.user.tag,
+                "$" +
+                    getBalance(target).toLocaleString() +
+                    " (+$**" +
+                    amount.toLocaleString() +
+                    "**)"
+            )
         }
 
-        
-        setTimeout(() =>{
+        setTimeout(() => {
             m.edit(embed)
         }, 1500)
     })

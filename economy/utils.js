@@ -18,7 +18,6 @@ setInterval(() => {
     const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
 
     if (JSON.stringify(users) != JSON.stringify(users1)) {
-
         fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 return console.log(err)
@@ -43,34 +42,55 @@ setInterval(() => {
         console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
         timer = 0
     }
-
 }, 60000)
 
 setInterval(() => {
     let date = new Date()
-    date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
+    date =
+        getTimestamp().split(":").join(".") +
+        " - " +
+        date.getDate() +
+        "." +
+        date.getMonth() +
+        "." +
+        date.getFullYear()
     fs.writeFileSync("./economy/backup/" + date + ".json", JSON.stringify(users))
     console.log("\x1b[32m[" + getTimestamp() + "] user data backup complete\x1b[37m")
 }, 43200000)
 
 setInterval(() => {
     for (let user in users) {
-        if (isNaN(users[user].money.balance) || users[user].money.balance == null || users[user].money.balance == undefined || users[user].money.balance == -NaN || users[user].money.balance < 0) {
-
+        if (
+            isNaN(users[user].money.balance) ||
+            users[user].money.balance == null ||
+            users[user].money.balance == undefined ||
+            users[user].money.balance == -NaN ||
+            users[user].money.balance < 0
+        ) {
             users[user].money.balance = 0
 
             console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
         }
 
-        if (isNaN(users[user].money.bank) || users[user].money.bank == null || users[user].money.bank == undefined || users[user].money.bank == -NaN || users[user].money.bank < 0) {
-
+        if (
+            isNaN(users[user].money.bank) ||
+            users[user].money.bank == null ||
+            users[user].money.bank == undefined ||
+            users[user].money.bank == -NaN ||
+            users[user].money.bank < 0
+        ) {
             users[user].money.bank = 0
 
             console.log("[" + getTimestamp() + "] " + user + " bank set to 0 because NaN")
         }
 
-        if (isNaN(users[user].xp) || users[user].xp == null || users[user].xp == undefined || users[user].xp == -NaN || users[user].xp < 0) {
-
+        if (
+            isNaN(users[user].xp) ||
+            users[user].xp == null ||
+            users[user].xp == undefined ||
+            users[user].xp == -NaN ||
+            users[user].xp < 0
+        ) {
             users[user].xp = 0
 
             console.log("[" + getTimestamp() + "] " + user + " xp set to 0 because NaN")
@@ -89,20 +109,21 @@ setInterval(() => {
     console.log("[" + getTimestamp() + "] padlock price updated: $" + padlockPrice)
 }, 3600000)
 
-
-dbl.webhook.on("ready", hook => {
-    console.log(`[${getTimestamp()}] webook running on http://${hook.hostname}:${hook.port}${hook.path}`)
+dbl.webhook.on("ready", (hook) => {
+    console.log(
+        `[${getTimestamp()}] webook running on http://${hook.hostname}:${hook.port}${hook.path}`
+    )
 })
 
-dbl.webhook.on("vote", vote => {
+dbl.webhook.on("vote", (vote) => {
     const { onVote } = require("../nypsi")
     onVote(vote)
 })
 
 /**
- * 
- * @param {Client} client 
- * @param {JSON} vote 
+ *
+ * @param {Client} client
+ * @param {JSON} vote
  */
 async function doVote(client, vote) {
     const { user } = vote
@@ -118,7 +139,7 @@ async function doVote(client, vote) {
 
     if (!userExists(user)) return
 
-    let member = await members.find(m => m.id == user)
+    let member = await members.find((m) => m.id == user)
 
     let id = false
     let memberID
@@ -131,14 +152,18 @@ async function doVote(client, vote) {
     }
 
     const amount = 15000 * (getPrestige(memberID) + 1)
-    const multi = await getMulti(memberID) * 100
+    const multi = (await getMulti(memberID)) * 100
 
     updateBalance(memberID, getBalance(memberID) + amount)
 
     if (!id && getDMsEnabled(memberID)) {
-        const embed = new CustomEmbed().setColor("#5efb8f").setDescription("you have received the following: \n\n" +
-            `+ $**${amount.toLocaleString()}**\n` +
-            `+ **10**% multiplier, total: **${multi}**%`)
+        const embed = new CustomEmbed()
+            .setColor("#5efb8f")
+            .setDescription(
+                "you have received the following: \n\n" +
+                    `+ $**${amount.toLocaleString()}**\n` +
+                    `+ **10**% multiplier, total: **${multi}**%`
+            )
 
         await member.send("thank you for voting!", embed)
     }
@@ -165,7 +190,7 @@ function getVoteCacheSize() {
 exports.getVoteCacheSize = getVoteCacheSize
 
 /**
- * 
+ *
  * @param {GuildMember} member
  */
 function removeFromVoteCache(member) {
@@ -177,7 +202,6 @@ function removeFromVoteCache(member) {
 exports.removeFromVoteCache = removeFromVoteCache
 
 async function hasVoted(member) {
-
     let id = member
 
     if (member.user) id = member.user.id
@@ -213,7 +237,7 @@ async function hasVoted(member) {
             console.log("[" + getTimestamp() + "] dbl server error - 10 minute cache for " + id)
             return false
         }
-    } 
+    }
 }
 
 exports.hasVoted = hasVoted
@@ -223,7 +247,6 @@ exports.hasVoted = hasVoted
  * @returns {Number}
  */
 async function getMulti(member) {
-
     let id = member
 
     if (member.user) id = member.user.id
@@ -236,20 +259,20 @@ async function getMulti(member) {
         multi += 10
     }
 
-    const prestigeBonus = (getPrestige(member) * 2)
+    const prestigeBonus = getPrestige(member) * 2
 
     multi += prestigeBonus
 
     if (isPremium(id)) {
         switch (getTier(id)) {
-        case 2:
-            multi += 5
-            break
-        case 3:
-            multi += 10
-            break
-        case 4:
-            multi += 15
+            case 2:
+                multi += 5
+                break
+            case 3:
+                multi += 10
+                break
+            case 4:
+                multi += 15
         }
     }
 
@@ -276,7 +299,7 @@ function getUserCountGuild(guild) {
     let count = 0
 
     for (let user in users) {
-        if (guild.members.cache.find(member => member.user.id == user)) {
+        if (guild.members.cache.find((member) => member.user.id == user)) {
             count++
         }
     }
@@ -287,7 +310,7 @@ function getUserCountGuild(guild) {
 exports.getUserCountGuild = getUserCountGuild
 
 /**
- * 
+ *
  * @param {GuildMember} member - get balance
  */
 function getBalance(member) {
@@ -311,8 +334,8 @@ function getMultiplier(item) {
 exports.getMultiplier = getMultiplier
 
 /**
- * 
- * @param {GuildManager} member 
+ *
+ * @param {GuildManager} member
  * @returns {Boolean}
  */
 function userExists(member) {
@@ -331,7 +354,7 @@ exports.userExists = userExists
 
 /**
  * @param {GuildMember} member to modify balance of
- * @param {Number} amount to update balance to 
+ * @param {Number} amount to update balance to
  */
 function updateBalance(member, amount) {
     let id = member
@@ -359,8 +382,8 @@ function getBankBalance(member) {
 exports.getBankBalance = getBankBalance
 
 /**
- * 
- * @param {GuildMember} member to modify balance of 
+ *
+ * @param {GuildMember} member to modify balance of
  * @param {Number} amount to update balance to
  */
 function updateBankBalance(member, amount) {
@@ -385,12 +408,11 @@ function getXp(member) {
 exports.getXp = getXp
 
 /**
- * 
- * @param {GuildMember} member to modify xp of 
+ *
+ * @param {GuildMember} member to modify xp of
  * @param {Number} amount to update xp to
  */
 function updateXp(member, amount) {
-
     if (users[member.user.id].xp >= 1000000) return
 
     const amount1 = parseInt(amount)
@@ -426,7 +448,7 @@ function topAmountGlobal(amount) {
         users1.push(user)
     }
 
-    users1.sort(function(a, b) {
+    users1.sort(function (a, b) {
         return users[b].money.balance - users[a].money.balance
     })
 
@@ -439,7 +461,8 @@ function topAmountGlobal(amount) {
         if (usersFinal.join().length >= 1500) break
 
         if (!users[user].money.balance == 0) {
-            usersFinal[count] = (count + 1) + " `" + user + "` $" + users[user].money.balance.toLocaleString()
+            usersFinal[count] =
+                count + 1 + " `" + user + "` $" + users[user].money.balance.toLocaleString()
             count++
         }
     }
@@ -466,19 +489,19 @@ async function topAmount(guild, amount) {
 
     if (!members) members = guild.members.cache
 
-    members = members.filter(m => {
+    members = members.filter((m) => {
         return !m.user.bot
     })
-    
+
     const users1 = []
 
     for (let user in users) {
-        if (members.find(member => member.user.id == user) && users[user].money.balance != 0) {
+        if (members.find((member) => member.user.id == user) && users[user].money.balance != 0) {
             users1.push(user)
         }
     }
 
-    users1.sort(function(a, b) {
+    users1.sort(function (a, b) {
         return users[b].money.balance - users[a].money.balance
     })
 
@@ -487,10 +510,10 @@ async function topAmount(guild, amount) {
     let count = 0
 
     const getMemberID = (guild, id) => {
-        let target = guild.members.cache.find(member => {
+        let target = guild.members.cache.find((member) => {
             return member.user.id == id
         })
-        
+
         return target
     }
 
@@ -499,7 +522,6 @@ async function topAmount(guild, amount) {
         if (usersFinal.join().length >= 1500) break
 
         if (!users[user].money.balance == 0) {
-
             let pos = count + 1
 
             if (pos == 1) {
@@ -510,7 +532,12 @@ async function topAmount(guild, amount) {
                 pos = "🥉"
             }
 
-            usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + users[user].money.balance.toLocaleString()
+            usersFinal[count] =
+                pos +
+                " **" +
+                getMemberID(guild, user).user.tag +
+                "** $" +
+                users[user].money.balance.toLocaleString()
             count++
         }
     }
@@ -537,19 +564,19 @@ async function topAmountPrestige(guild, amount) {
 
     if (!members) members = guild.members.cache
 
-    members = members.filter(m => {
+    members = members.filter((m) => {
         return !m.user.bot
     })
-    
+
     const users1 = []
 
     for (let user in users) {
-        if (members.find(member => member.user.id == user) && users[user].prestige != 0) {
+        if (members.find((member) => member.user.id == user) && users[user].prestige != 0) {
             users1.push(user)
         }
     }
 
-    users1.sort(function(a, b) {
+    users1.sort(function (a, b) {
         return users[b].prestige - users[a].prestige
     })
 
@@ -558,10 +585,10 @@ async function topAmountPrestige(guild, amount) {
     let count = 0
 
     const getMemberID = (guild, id) => {
-        let target = guild.members.cache.find(member => {
+        let target = guild.members.cache.find((member) => {
             return member.user.id == id
         })
-        
+
         return target
     }
 
@@ -570,7 +597,6 @@ async function topAmountPrestige(guild, amount) {
         if (usersFinal.join().length >= 1500) break
 
         if (!users[user].prestige == 0) {
-
             let pos = count + 1
 
             if (pos == 1) {
@@ -591,7 +617,14 @@ async function topAmountPrestige(guild, amount) {
                 thing = "rd"
             }
 
-            usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** " + users[user].prestige + thing + " prestige" 
+            usersFinal[count] =
+                pos +
+                " **" +
+                getMemberID(guild, user).user.tag +
+                "** " +
+                users[user].prestige +
+                thing +
+                " prestige"
             count++
         }
     }
@@ -601,11 +634,10 @@ async function topAmountPrestige(guild, amount) {
 exports.topAmountPrestige = topAmountPrestige
 
 /**
- * 
+ *
  * @param {GuildMember} member to create profile for
  */
 function createUser(member) {
-
     let id = member
 
     if (member.user) id = member.user.id
@@ -622,7 +654,16 @@ function winBoard() {
     let lol = ""
 
     for (let item in multiplier) {
-        lol = lol + item + " | " + item + " | " + item + "  **||** win: **" + multiplier[item] + "**x\n"
+        lol =
+            lol +
+            item +
+            " | " +
+            item +
+            " | " +
+            item +
+            "  **||** win: **" +
+            multiplier[item] +
+            "**x\n"
     }
 
     return lol
@@ -660,7 +701,7 @@ function hasPadlock(member) {
 exports.hasPadlock = hasPadlock
 
 /**
- * 
+ *
  * @param {GuildMember} member to update padlock setting of
  * @param {Boolean} setting padlock to true or false
  */
@@ -671,7 +712,7 @@ function setPadlock(member, setting) {
 exports.setPadlock = setPadlock
 
 /**
- * 
+ *
  * @param {Number} guildCount guild count
  */
 async function updateStats(guildCount) {
@@ -681,8 +722,8 @@ async function updateStats(guildCount) {
 exports.updateStats = updateStats
 
 /**
- * 
- * @param {Guildmember} member 
+ *
+ * @param {Guildmember} member
  */
 function getPrestige(member) {
     let id = member
@@ -695,9 +736,9 @@ function getPrestige(member) {
 exports.getPrestige = getPrestige
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Number} amount 
+ *
+ * @param {GuildMember} member
+ * @param {Number} amount
  */
 function setPrestige(member, amount) {
     users[member.user.id].prestige = amount
@@ -707,7 +748,7 @@ exports.setPrestige = setPrestige
 
 /**
  * @returns {Number}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function getPrestigeRequirement(member) {
     const constant = 250
@@ -733,10 +774,9 @@ exports.getPrestigeRequirementBal = getPrestigeRequirementBal
 
 /**
  * @returns {Boolean}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function getDMsEnabled(member) {
-
     let id = member
 
     if (member.user) id = member.user.id
@@ -753,9 +793,9 @@ function getDMsEnabled(member) {
 exports.getDMsEnabled = getDMsEnabled
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Boolean} value 
+ *
+ * @param {GuildMember} member
+ * @param {Boolean} value
  */
 function setDMsEnabled(member, value) {
     users[member.user.id].dms = value
@@ -765,7 +805,7 @@ exports.setDMsEnabled = setDMsEnabled
 
 /**
  * @returns {Number}
- * @param {Member} member 
+ * @param {Member} member
  */
 async function calcMaxBet(member) {
     const base = 100000
@@ -778,7 +818,7 @@ async function calcMaxBet(member) {
         total += 50000
     }
 
-    return total + (bonus * getPrestige(member))
+    return total + bonus * getPrestige(member)
 }
 
 exports.calcMaxBet = calcMaxBet

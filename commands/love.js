@@ -11,11 +11,10 @@ const cooldown = new Map()
 const cmd = new Command("love", "calculate your love with another person", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
@@ -52,7 +51,7 @@ async function run(message, args) {
         const members = []
         const members1 = message.guild.members.cache
 
-        members1.forEach(m => {
+        members1.forEach((m) => {
             if (!m.user.bot) {
                 if (members.indexOf(m.user.id) == -1) {
                     members.push(m.user.id)
@@ -74,7 +73,7 @@ async function run(message, args) {
     } else {
         if (message.mentions.members.size == 2) {
             target1 = message.mentions.members.first()
-            
+
             target2 = message.mentions.members.get(message.mentions.members.keyArray()[1])
         } else if (message.mentions.members.size == 1) {
             if (args[0].startsWith("<@")) {
@@ -93,7 +92,7 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`))
         }
     }
-    
+
     if (!target1 || !target2) {
         return message.channel.send(new ErrorEmbed("invalid user(s)"))
     }
@@ -186,10 +185,13 @@ async function run(message, args) {
         loveBar = "💔💔💔💔💔💔💔💔💔💔"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`)
-    
-    message.channel.send(embed)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`
+    )
 
+    message.channel.send(embed)
 }
 
 cmd.setRun(run)

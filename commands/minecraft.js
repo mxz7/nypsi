@@ -10,14 +10,17 @@ const cooldown = new Map()
 const cache = new Map()
 const serverCache = new Map()
 
-const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
+const cmd = new Command(
+    "minecraft",
+    "view information about a minecraft account",
+    categories.MINECRAFT
+).setAliases(["mc"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
@@ -68,7 +71,11 @@ async function run(message, args) {
                 names1.push(n)
             }
 
-            const embed = new CustomEmbed(message.member, false, "`" + names1.join("`\n`") + "`").setTitle("minecraft cache")
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "`" + names1.join("`\n`") + "`"
+            ).setTitle("minecraft cache")
             return message.channel.send(embed)
         }
     }
@@ -82,9 +89,11 @@ async function run(message, args) {
         if (serverCache.has(serverIP.toLowerCase())) {
             res = serverCache.get(serverIP.toLowerCase())
         } else {
-            res = await fetch(url).then(url => url.json()).catch(() => {
-                invalid = true
-            })
+            res = await fetch(url)
+                .then((url) => url.json())
+                .catch(() => {
+                    invalid = true
+                })
             if (!invalid) {
                 serverCache.set(serverIP.toLowerCase(), res)
                 setTimeout(() => {
@@ -97,7 +106,11 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, true)
             .setTitle(args[0] + " | " + res.ip + ":" + res.port)
-            .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
+            .addField(
+                "players",
+                res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(),
+                true
+            )
             .addField("version", res.version, true)
             .addField("motd", res.motd.clean)
 
@@ -133,32 +146,36 @@ async function run(message, args) {
             return await message.channel.send(new ErrorEmbed("error fetching from cache"))
         }
     } else {
-        res = await fetch(url1).then(url => url.json()).catch(() => {
-            invalid = true
-        })
-        
-        if (invalid) {
-            res2 = await fetch(url2).then(url => {
-                oldName = true
-                invalid = false
-                return url.json()
-            }).catch(() => {
+        res = await fetch(url1)
+            .then((url) => url.json())
+            .catch(() => {
                 invalid = true
-                return message.channel.send(new ErrorEmbed("invalid account"))
             })
+
+        if (invalid) {
+            res2 = await fetch(url2)
+                .then((url) => {
+                    oldName = true
+                    invalid = false
+                    return url.json()
+                })
+                .catch(() => {
+                    invalid = true
+                    return message.channel.send(new ErrorEmbed("invalid account"))
+                })
         }
 
         if (!oldName) {
             cache.set(username.toLowerCase(), {
                 invalid: invalid,
                 oldName: false,
-                response: res
+                response: res,
             })
         } else {
             cache.set(username.toLowerCase(), {
                 invalid: invalid,
                 oldName: true,
-                response: res2
+                response: res2,
             })
         }
 
@@ -203,13 +220,10 @@ async function run(message, args) {
         return console.log(res)
     }
 
-    
-
     const BreakException = {}
 
     try {
-        nameHistory.forEach(item => {
-
+        nameHistory.forEach((item) => {
             let value = ""
 
             if (item.timestamp) {
@@ -256,7 +270,7 @@ async function run(message, args) {
     if (names.size >= 2) {
         embed.setFooter(`page 1/${names.size}`)
     }
-    
+
     const msg = await message.channel.send(embed)
 
     if (names.size >= 2) {
@@ -271,15 +285,17 @@ async function run(message, args) {
         }
 
         const pageManager = async () => {
-            const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                .then(collected => {
+            const reaction = await msg
+                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .then((collected) => {
                     return collected.first().emoji.name
-                }).catch(async () => {
+                })
+                .catch(async () => {
                     await msg.reactions.removeAll()
                 })
-            
+
             if (!reaction) return
-    
+
             if (reaction == "⬅") {
                 if (currentPage <= 1) {
                     return pageManager()
@@ -304,7 +320,6 @@ async function run(message, args) {
         }
         return pageManager()
     }
-
 }
 
 setInterval(() => {

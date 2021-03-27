@@ -1,26 +1,40 @@
 const { Message } = require("discord.js")
-const { hasGuild, createGuild, getChristmasCountdown, getPrefix, setChristmasCountdown, checkChristmasCountdown, hasChristmasCountdown, createNewChristmasCountdown } = require("../guilds/utils")
+const {
+    hasGuild,
+    createGuild,
+    getChristmasCountdown,
+    getPrefix,
+    setChristmasCountdown,
+    checkChristmasCountdown,
+    hasChristmasCountdown,
+    createNewChristmasCountdown,
+} = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { daysUntilChristmas } = require("../utils/utils")
 
-const cmd = new Command("christmascountdown", "create a christmas countdown", categories.ADMIN).setAliases(["christmas", "xmas"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("christmascountdown", "create a christmas countdown", categories.ADMIN)
+    .setAliases(["christmas", "xmas"])
+    .setPermissions(["MANAGE_SERVER"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_GUILD")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
             return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
-        return message.channel.send(new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`))
+        return message.channel.send(
+            new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`)
+        )
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i need the `manage channels` permission for this command to work"))
+        return message.channel.send(
+            new ErrorEmbed("i need the `manage channels` permission for this command to work")
+        )
     }
 
     if (!hasGuild(message.guild)) createGuild(message.guild)
@@ -31,17 +45,24 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     const help = () => {
-        const embed = new CustomEmbed(message.member, true, `${prefix}**xmas enable <channel>** *enables the christmas countdown in the given channel*\n` +
-            `${prefix}**xmas disable** *disables the christmas countdown*\n` +
-            `${prefix}**xmas channel <channel>** *change the channel used*\n` +
-            `${prefix}**xmas format <new format>** *change the format for the countdown*`)
-            .setTitle("christmas countdown")
+        const embed = new CustomEmbed(
+            message.member,
+            true,
+            `${prefix}**xmas enable <channel>** *enables the christmas countdown in the given channel*\n` +
+                `${prefix}**xmas disable** *disables the christmas countdown*\n` +
+                `${prefix}**xmas channel <channel>** *change the channel used*\n` +
+                `${prefix}**xmas format <new format>** *change the format for the countdown*`
+        ).setTitle("christmas countdown")
         return message.channel.send(embed)
     }
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false, `**enabled** \`${profile.enabled}\`\n` +
-            `**format** ${profile.format}\n**channel** \`${profile.channel}\``)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `**enabled** \`${profile.enabled}\`\n` +
+                `**format** ${profile.format}\n**channel** \`${profile.channel}\``
+        )
             .setTitle("christmas countdown")
             .setFooter(`use ${prefix}xmas help to view additional commands`)
 
@@ -63,8 +84,8 @@ async function run(message, args) {
                     return message.channel.send(new ErrorEmbed("invalid channel"))
                 }
             } else {
-                const c = message.guild.channels.find(c => c.id == args[1])
-    
+                const c = message.guild.channels.find((c) => c.id == args[1])
+
                 if (!c) {
                     return message.channel.send(new ErrorEmbed("invalid channel"))
                 } else {
@@ -87,10 +108,14 @@ async function run(message, args) {
         profile = getChristmasCountdown(message.guild)
 
         if (!profile.enabled) {
-            return message.channel.send(new ErrorEmbed("error sending message: check permissions for nypsi"))
+            return message.channel.send(
+                new ErrorEmbed("error sending message: check permissions for nypsi")
+            )
         }
 
-        return await message.channel.send(new CustomEmbed(message.member, false, "✅ christmas countdown enabled"))
+        return await message.channel.send(
+            new CustomEmbed(message.member, false, "✅ christmas countdown enabled")
+        )
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
             return message.channel.send(new ErrorEmbed("already disabled"))
@@ -99,18 +124,23 @@ async function run(message, args) {
         profile.enabled = false
         profile.channel = "none"
 
-        return await message.channel.send(new CustomEmbed(message.member, false, "✅ christmas countdown disabled"))
+        return await message.channel.send(
+            new CustomEmbed(message.member, false, "✅ christmas countdown disabled")
+        )
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
-            
             const format = profile.format.split("%days%").join(daysUntilChristmas().toString())
 
-            const embed = new CustomEmbed(message.member, false, "this is how the message will appear\n%days% will be replaced with how many days are left until christmas")
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "this is how the message will appear\n%days% will be replaced with how many days are left until christmas"
+            )
                 .setTitle("christmas countdown")
                 .addField("current format", `\`${profile.format}\``, true)
                 .addField("example", format, true)
                 .addField("help", `to change this format, do ${prefix}**xmas format <new format>**`)
-            
+
             return message.channel.send(embed)
         }
 
@@ -135,16 +165,23 @@ async function run(message, args) {
         profile = getChristmasCountdown(message.guild)
 
         if (!profile.enabled) {
-            return message.channel.send(new ErrorEmbed("error sending message: check permissions for nypsi"))
+            return message.channel.send(
+                new ErrorEmbed("error sending message: check permissions for nypsi")
+            )
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ format updated")
-            .setTitle("christmas countdown")
+        const embed = new CustomEmbed(message.member, false, "✅ format updated").setTitle(
+            "christmas countdown"
+        )
 
         return message.channel.send(embed)
     } else if (args[0].toLowerCase() == "channel") {
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false, "by setting the channel it will change the channel that the message is sent in")
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "by setting the channel it will change the channel that the message is sent in"
+            )
                 .setTitle("christmas countdown")
                 .addField("current value", "`" + profile.channel + "`")
                 .addField("help", `to change this value, do ${prefix}**xmas channel <channel id>**`)
@@ -152,7 +189,7 @@ async function run(message, args) {
             return message.channel.send(embed)
         }
 
-        let channel 
+        let channel
 
         if (args[1].length != 18) {
             if (message.mentions.channels.first()) {
@@ -161,7 +198,7 @@ async function run(message, args) {
                 return message.channel.send(new ErrorEmbed("invalid channel"))
             }
         } else {
-            const c = message.guild.channels.find(c => c.id == args[1])
+            const c = message.guild.channels.find((c) => c.id == args[1])
 
             if (!c) {
                 return message.channel.send(new ErrorEmbed("invalid channel"))
@@ -171,7 +208,9 @@ async function run(message, args) {
         }
 
         if (profile.channel == channel.id) {
-            return message.channel.send(new ErrorEmbed("channel must be different to current channel"))
+            return message.channel.send(
+                new ErrorEmbed("channel must be different to current channel")
+            )
         }
 
         profile.channel = channel.id
@@ -183,11 +222,14 @@ async function run(message, args) {
         profile = getChristmasCountdown(message.guild)
 
         if (!profile.enabled) {
-            return message.channel.send(new ErrorEmbed("error sending message: check permissions for nypsi"))
+            return message.channel.send(
+                new ErrorEmbed("error sending message: check permissions for nypsi")
+            )
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ channel updated")
-            .setTitle("christmas countdown")
+        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setTitle(
+            "christmas countdown"
+        )
 
         return message.channel.send(embed)
     } else {

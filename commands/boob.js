@@ -10,11 +10,10 @@ const cooldown = new Map()
 const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
     let cacheTime = 60
 
@@ -79,7 +78,7 @@ async function run(message, args) {
     } else {
         let size
 
-        size = (Math.floor(Math.random() * 9) * 2) + 30
+        size = Math.floor(Math.random() * 9) * 2 + 30
 
         const index = Math.floor(Math.random() * letters.length)
 
@@ -94,10 +93,10 @@ async function run(message, args) {
         }
 
         sizeMsg = `${size}${letter}`
-        
+
         cache.set(member.user.id, {
             msg: sizeMsg,
-            emoji: sizeEmoji
+            emoji: sizeEmoji,
         })
 
         setTimeout(() => {
@@ -108,7 +107,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false)
         .setTitle("boob calculator")
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
-    
+
     return message.channel.send(embed)
 }
 

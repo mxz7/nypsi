@@ -8,7 +8,9 @@ const { getMember } = require("../utils/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases(["howfurry"])
+const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases([
+    "howfurry",
+])
 
 /**
  * @param {Message} message
@@ -82,7 +84,7 @@ async function run(message, args) {
             }
         }, cacheTime * 1000)
     }
-    
+
     let furryText = ""
     let furryEmoji = ""
 
@@ -117,8 +119,11 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`)
-        .setTitle("furry detector 5000")
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`
+    ).setTitle("furry detector 5000")
 
     if (furryAmount < 7) {
         embed.setFooter("+1xp")

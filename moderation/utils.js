@@ -38,7 +38,7 @@ setInterval(() => {
 
 setInterval(async () => {
     const { checkGuild } = require("../nypsi")
-    
+
     for (let guild in data) {
         const exists = await checkGuild(guild)
 
@@ -48,28 +48,32 @@ setInterval(async () => {
             console.log(`[${getTimestamp()}] deleted guild '${guild}' from moderation data`)
         }
     }
-
 }, 24 * 60 * 60 * 1000)
 
 setInterval(() => {
     let date = new Date()
-    date = getTimestamp().split(":").join(".") + " - " + date.getDate() + "." + date.getMonth() + "." + date.getFullYear()
+    date =
+        getTimestamp().split(":").join(".") +
+        " - " +
+        date.getDate() +
+        "." +
+        date.getMonth() +
+        "." +
+        date.getFullYear()
     fs.writeFileSync("./moderation/backup/" + date + ".json", JSON.stringify(data))
     console.log("\x1b[32m[" + getTimestamp() + "] moderation data backup complete\x1b[37m")
 }, 43200000 * 2)
 
-
 module.exports = {
-
     /**
-     * 
+     *
      * @param {Guild} guild guild to create profile for
      */
-    createProfile: function(guild) {
+    createProfile: function (guild) {
         data[guild.id] = {
             caseCount: 0,
             cases: [],
-            mutes: []
+            mutes: [],
         }
     },
 
@@ -77,7 +81,7 @@ module.exports = {
      * @returns {Boolean}
      * @param {Guild} guild check if profile exists for this guild
      */
-    profileExists: function(guild) {
+    profileExists: function (guild) {
         if (data[guild.id]) {
             return true
         } else {
@@ -89,19 +93,19 @@ module.exports = {
      * @returns {Number}
      * @param {Guild} guild guild to get case count of
      */
-    getCaseCount: function(guild) {
+    getCaseCount: function (guild) {
         return data[guild.id].caseCount
     },
 
     /**
-     * 
+     *
      * @param {Guild} guild guild to create new case in
      * @param {String} caseType mute, unmute, kick, warn, ban, unban
      * @param {Array<String>} userIDs list of user ids
      * @param {String} moderator moderator issuing punishment
      * @param {String} command entire message
      */
-    newCase: function(guild, caseType, userIDs, moderator, command) {
+    newCase: function (guild, caseType, userIDs, moderator, command) {
         if (!(userIDs instanceof Array)) {
             userIDs = [userIDs]
         }
@@ -109,7 +113,7 @@ module.exports = {
         for (let userID of userIDs) {
             const currentCases = data[guild.id].cases
             const count = data[guild.id].caseCount
-    
+
             const case0 = {
                 id: count,
                 type: caseType,
@@ -117,22 +121,22 @@ module.exports = {
                 moderator: moderator,
                 command: command,
                 time: new Date().getTime(),
-                deleted: false
+                deleted: false,
             }
-    
+
             currentCases.push(case0)
-    
+
             data[guild.id].cases = currentCases
             data[guild.id].caseCount = count + 1
         }
     },
 
     /**
-     * 
+     *
      * @param {Guild} guild guild to delete case in
      * @param {String} caseID case to delete
      */
-    deleteCase: function(guild, caseID) {
+    deleteCase: function (guild, caseID) {
         const caseInfo = data[guild.id].cases[caseID]
 
         caseInfo.deleted = true
@@ -141,10 +145,10 @@ module.exports = {
     },
 
     /**
-     * 
+     *
      * @param {Guild} guild guild to delete data for
      */
-    deleteServer: function(guild) {
+    deleteServer: function (guild) {
         delete data[guild.id]
     },
 
@@ -153,7 +157,7 @@ module.exports = {
      * @param {Guild} guild guild to get cases of
      * @param {String} userID user to get cases of
      */
-    getCases: function(guild, userID) {
+    getCases: function (guild, userID) {
         const cases = []
 
         for (let case0 of data[guild.id].cases) {
@@ -169,7 +173,7 @@ module.exports = {
      * @returns {Object}
      * @param {Guild} guild guild to get cases of
      */
-    getAllCases: function(guild) {
+    getAllCases: function (guild) {
         return data[guild.id].cases
     },
 
@@ -178,17 +182,17 @@ module.exports = {
      * @param {Guild} guild guild to search for case in
      * @param {Number} caseID case to fetch
      */
-    getCase: function(guild, caseID) {
+    getCase: function (guild, caseID) {
         return data[guild.id].cases[caseID]
     },
 
     /**
-     * 
-     * @param {Guild} guild 
-     * @param {Array<String>} userIDs 
-     * @param {Date} date 
+     *
+     * @param {Guild} guild
+     * @param {Array<String>} userIDs
+     * @param {Date} date
      */
-    newMute: function(guild, userIDs, date) {
+    newMute: function (guild, userIDs, date) {
         if (!(userIDs instanceof Array)) {
             userIDs = [userIDs]
         }
@@ -198,30 +202,30 @@ module.exports = {
 
             const d = {
                 user: userID,
-                unmuteTime: date
+                unmuteTime: date,
             }
-    
+
             currentMutes.push(d)
-    
+
             data[guild.id].mutes = currentMutes
         }
     },
 
     /**
-     * 
-     * @param {Guild} guild 
-     * @param {Guildmember} member 
+     *
+     * @param {Guild} guild
+     * @param {Guildmember} member
      */
-    deleteMute: function(guild, member) {
+    deleteMute: function (guild, member) {
         deleteMute(guild, member)
     },
 
     /**
      * @returns {Boolean}
-     * @param {Guild} guild 
-     * @param {GuildMember} member 
+     * @param {Guild} guild
+     * @param {GuildMember} member
      */
-    isMuted: function(guild, member) {
+    isMuted: function (guild, member) {
         const currentMutes = data[guild.id].mutes
 
         for (let mute of currentMutes) {
@@ -234,16 +238,16 @@ module.exports = {
     },
 
     /**
-     * 
+     *
      * @param {Client} client
      */
-    runUnmuteChecks: function(client) {
+    runUnmuteChecks: function (client) {
         setInterval(() => {
             const date = new Date().getTime()
-        
+
             for (let guild in data) {
                 const mutes = data[guild].mutes
-        
+
                 if (mutes.length > 0) {
                     for (let mute of mutes) {
                         if (mute.unmuteTime <= date) {
@@ -252,31 +256,30 @@ module.exports = {
                     }
                 }
             }
-        
         }, 120000)
     },
 
     /**
      * @returns {JSON}
-     * @param {Guild} guild 
+     * @param {Guild} guild
      */
-    getMutes: function(guild) {
+    getMutes: function (guild) {
         return data[guild.id].mutes
     },
 
     /**
-     * 
-     * @param {Guild} guild 
-     * @param {Number} caseID 
-     * @param {String} reason 
+     *
+     * @param {Guild} guild
+     * @param {Number} caseID
+     * @param {String} reason
      */
-    setReason: function(guild, caseID, reason) {
+    setReason: function (guild, caseID, reason) {
         const currentCase = data[guild.id].cases[caseID]
 
         currentCase.command = reason
 
         data[guild.id].cases[caseID] = currentCase
-    }
+    },
 }
 
 function deleteMute(guild, member) {
@@ -292,9 +295,9 @@ function deleteMute(guild, member) {
 }
 
 async function requestUnmute(guild, member, client) {
-    guild = client.guilds.cache.find(g => g.id == guild)
+    guild = client.guilds.cache.find((g) => g.id == guild)
 
-    if (!guild) return 
+    if (!guild) return
 
     let members
 
@@ -306,11 +309,11 @@ async function requestUnmute(guild, member, client) {
         addCooldown(guild, 3600)
     }
 
-    member = members.find(m => m.id == member)
+    member = members.find((m) => m.id == member)
 
     if (!member) return
 
-    const muteRole = guild.roles.cache.find(r => r.name.toLowerCase() == "muted")
+    const muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
     if (!muteRole) return deleteMute(guild, member)
 
