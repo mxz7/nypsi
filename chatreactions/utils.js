@@ -71,18 +71,44 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000)
 
 setInterval(async () => {
-    let games = 0
+    let count = 0
 
     const runGame = async (guild, channel) => {
         const a = await startReaction(guild, channel)
 
         if (a != "xoxo69") {
-            games++
+            count++
+        } else {
+            return
         }
 
-        // set lastgame with time between events & use random offset
+        const settings = getReactionSettings(guild)
 
-        return
+        const base = settings.timeBetweenEvents
+        let final
+
+        if (settings.randomModifier == 0) {
+            final = base
+        } else {
+            const o = ["+", "-"]
+            let operator = o[Math.floor(Math.random() * o.length)]
+
+            if (base - settings.randomModifier < 120) {
+                operator = "+"
+            }
+
+            const amount = Math.floor(Math.random() * settings.randomModifier)
+
+            if (operator == "+") {
+                final = base + amount
+            } else {
+                final = base - amount
+            }
+        }
+
+        const nextGame = new Date().getTime() + (final * 1000)
+        
+        return lastGame.set(channel.id, nextGame)
     }
 
     for (const guildID in data) {
