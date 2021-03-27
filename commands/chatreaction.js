@@ -169,9 +169,7 @@ async function run(message, args) {
         } else {
             if (args[1].toLowerCase() == "add" || args[1] == "+") {
                 if (args.length == 2) {
-                    return message.channel.send(
-                        new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)
-                    )
+                    return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist add/+ @user`))
                 }
 
                 let user = args[2]
@@ -219,7 +217,7 @@ async function run(message, args) {
                 if (args.length == 2) {
                     return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist del/- @user`))
                 }
-                
+
                 let user = args[2]
 
                 if (user.length != 18) {
@@ -246,7 +244,9 @@ async function run(message, args) {
 
                 blacklisted.splice(blacklisted.indexOf(user), 1)
 
-                return message.channel.send(new CustomEmbed(message.member, false, "✅ user has been unblacklisted"))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ user has been unblacklisted")
+                )
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
