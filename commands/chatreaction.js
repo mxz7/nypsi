@@ -99,6 +99,12 @@ async function run(message, args) {
             `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`
         )
 
+        const blacklisted = getBlacklisted(message.guild)
+
+        if (blacklisted.indexOf(message.author.id) != -1) {
+            embed.setFooter("you are blacklisted from chat reactions in this server")
+        }
+
         return message.channel.send(embed)
     }
 
