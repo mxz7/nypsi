@@ -320,6 +320,8 @@ async function run(message, args) {
 
                 settings.timeBetweenEvents = length
 
+                updateReactionSettings(message.guild, settings)
+
                 return message.channel.send(
                     new CustomEmbed(
                         message.member,
@@ -348,6 +350,8 @@ async function run(message, args) {
 
                 settings.randomModifier = length
 
+                updateReactionSettings(message.guild, settings)
+
                 return message.channel.send(
                     new CustomEmbed(
                         message.member,
@@ -364,25 +368,27 @@ async function run(message, args) {
                     )
                 }
 
-                if (length > 900) {
-                    return message.channel.send(new ErrorEmbed("cannot be longer than 900 seconds"))
+                if (length > 120) {
+                    return message.channel.send(new ErrorEmbed("cannot be longer than 120 seconds"))
                 }
 
-                if (length < 120) {
+                if (length < 30) {
                     return message.channel.send(
-                        new ErrorEmbed("cannot be shorter than 120 seconds")
+                        new ErrorEmbed("cannot be shorter than 30 seconds")
                     )
                 }
 
                 const settings = getReactionSettings(message.guild)
 
-                settings.timeBetweenEvents = length
+                settings.timeout = length
+
+                updateReactionSettings(message.guild, settings)
 
                 return message.channel.send(
                     new CustomEmbed(
                         message.member,
                         false,
-                        `✅ event cooldown set to \`${length}s\``
+                        `✅ max length set to \`${length}s\``
                     )
                 )
             } else {
