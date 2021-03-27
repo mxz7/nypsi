@@ -250,7 +250,9 @@ async function run(message, args) {
             } else if (args[1].toLowerCase() == "reset" || args[1].toLowerCase() == "empty") {
                 setBlacklisted(message.guild, [])
 
-                return message.channel.send(new CustomEmbed(message.member, false, "✅ blacklist was emptied"))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ blacklist was emptied")
+                )
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
