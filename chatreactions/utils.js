@@ -90,7 +90,9 @@ setInterval(async () => {
             }
         })
 
-        if (stop) return
+        if (stop) {
+            return
+        }
 
         const a = await startReaction(guild, channel)
 
@@ -178,7 +180,7 @@ setInterval(async () => {
     if (count > 0) {
         console.log(`[${getTimestamp()}] ${count} chat reactions automatically started`)
     }
-}, 30000)
+}, 60000)
 
 /**
  * @param {Guild} guild
