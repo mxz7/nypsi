@@ -14,9 +14,9 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (message.member.user.id != "672793821850894347") return
+    
 
-    if (args.length == 0) {
+    if (args.length == 0 || message.member.user.id != "672793821850894347") {
         const news = getNews()
 
         if (news.text == "") {
@@ -29,6 +29,7 @@ async function run(message, args) {
 
         return message.channel.send(embed)
     } else {
+        if (message.member.user.id != "672793821850894347") return
         setNews(args.join(" "))
 
         const news = getNews()
