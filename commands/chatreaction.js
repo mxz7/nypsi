@@ -167,10 +167,10 @@ async function run(message, args) {
 
             return message.channel.send(embed)
         } else {
-            if (args[1].toLowerCase() == "add" || args[1].toLowerCase() == "+") {
-                if (args.length == 1) {
+            if (args[1].toLowerCase() == "add" || args[1] == "+") {
+                if (args.length == 2) {
                     return message.channel.send(
-                        new ErrorEmbed(`${prefix}cr blacklist add/+ <@user>`)
+                        new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)
                     )
                 }
 
@@ -215,6 +215,38 @@ async function run(message, args) {
                 )
 
                 return message.channel.send(embed)
+            } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
+                if (args.length == 2) {
+                    return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist del/- @user`))
+                }
+                
+                let user = args[2]
+
+                if (user.length != 18) {
+                    if (!message.mentions.members.first()) {
+                        return message.channel.send(
+                            new ErrorEmbed(
+                                "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                            )
+                        )
+                    } else {
+                        user = message.mentions.members.first().id
+                    }
+                }
+
+                if (!user) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                const blacklisted = getBlacklisted(message.guild)
+
+                if (blacklisted.indexOf(user) == -1) {
+                    return message.channel.send(new ErrorEmbed("this user is not blacklisted"))
+                }
+
+                blacklisted.splice(blacklisted.indexOf(user), 1)
+
+                return message.channel.send(new CustomEmbed(message.member, false, "✅ user has been unblacklisted"))
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
