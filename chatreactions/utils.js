@@ -71,7 +71,21 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000)
 
 setInterval(async () => {
-    const gamesToRun = new Map()
+
+    let games = 0
+    
+    const runGame = async (guild, channel) => {
+        const a = await startReaction(guild, channel)
+
+        if (a != "xoxo69") {
+            games++
+        }
+
+
+
+        return
+    }
+
     for (const guildID in data) {
         const { getGuild } = require("../nypsi")
         const guild = await getGuild(guildID)
@@ -103,7 +117,7 @@ setInterval(async () => {
                         continue
                     }
 
-                    gamesToRun.set(guild, channel)
+                    await runGame(guild, channel)
                 }
             } else {
                 const channel = await guild.channels.cache.find((cha) => cha.id == ch)
@@ -114,12 +128,13 @@ setInterval(async () => {
                     continue
                 }
 
-                gamesToRun.set(guild, channel)
+                await runGame(guild, channel)
             }
         }
     }
-    console.log("ran interval")
-    console.log(gamesToRun)
+    if (count > 0) {
+        console.log(`[${getTimestamp()}] ${count} chat reactions automatically started`)
+    }
 }, 30000)
 
 /**
