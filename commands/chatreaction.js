@@ -151,7 +151,9 @@ async function run(message, args) {
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions |" + message.author.username)
+            const embed = new CustomEmbed(message.member, false).setTitle(
+                "chat reactions |" + message.author.username
+            )
 
             const blacklisted = getBlacklisted(message.guild)
 
@@ -167,14 +169,20 @@ async function run(message, args) {
         } else {
             if (args[1].toLowerCase() == "add" || args[1].toLowerCase() == "+") {
                 if (args.length == 1) {
-                    return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist add/+ <@user>`))
+                    return message.channel.send(
+                        new ErrorEmbed(`${prefix}cr blacklist add/+ <@user>`)
+                    )
                 }
 
                 let user = args[2]
 
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
-                        return message.channel.send(new ErrorEmbed("you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"))
+                        return message.channel.send(
+                            new ErrorEmbed(
+                                "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                            )
+                        )
                     } else {
                         user = message.mentions.members.first()
                     }
@@ -189,7 +197,11 @@ async function run(message, args) {
                 const blacklisted = getBlacklisted(message.guild)
 
                 if (blacklisted.length >= 75) {
-                    return message.channel.send(new ErrorEmbed("you have reached the maximum amount of blacklisted users (75)"))
+                    return message.channel.send(
+                        new ErrorEmbed(
+                            "you have reached the maximum amount of blacklisted users (75)"
+                        )
+                    )
                 }
 
                 blacklisted.push(user.id)
