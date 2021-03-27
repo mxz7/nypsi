@@ -166,8 +166,8 @@ async function run(message, args) {
                 `**automatic start** \`${settings.randomStart}\`\n` +
                     `**random channels** \`${channels}\`\n` +
                     `**time between events** \`${settings.timeBetweenEvents}s\`\n` +
-                    `**random offset** \`${settings.randomModifier}s\`\n` +
-                    `**game length** \`${settings.timeout}s\``
+                    `**max offset** \`${settings.randomModifier}s\`\n` +
+                    `**max game length** \`${settings.timeout}s\``
             )
 
             embed.setFooter(`use ${prefix}cr settings help to change this settings`)
