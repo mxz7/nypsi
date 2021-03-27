@@ -201,7 +201,23 @@ async function run(message, args) {
 
                 updateReactionSettings(message.guild, settings)
 
-                return message.channel.send(new CustomEmbed(message.member, false, "✅ automatic start has been enabled"))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ automatic start has been enabled")
+                )
+            } else if (args[1].toLowerCase() == "disable") {
+                const settings = getReactionSettings(message.guild)
+
+                if (!settings.randomStart) {
+                    return message.channel.send(new ErrorEmbed("already disabled"))
+                }
+
+                settings.randomStart = false
+
+                updateReactionSettings(message.guild, settings)
+
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ automatic start has been disabled")
+                )
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
