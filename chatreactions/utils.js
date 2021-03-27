@@ -73,7 +73,26 @@ setInterval(async () => {
 setInterval(async () => {
     let count = 0
 
+    /**
+     * @param {Guild} guild
+     * @param {TextChannel} channel
+     */
     const runGame = async (guild, channel) => {
+
+        const messages = await channel.messages.fetch({ limit: 10 })
+        let stop = false
+        
+        await messages.forEach(m => {
+            if (m.author.id == guild.client.user.id) {
+                if (m.embeds[0].title == "chat reaction") {
+                    stop = true
+                    return 
+                }
+            }
+        })
+
+        if (stop) return
+
         const a = await startReaction(guild, channel)
 
         if (a != "xoxo69") {
