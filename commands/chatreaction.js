@@ -12,6 +12,8 @@ const {
     updateWords,
     getReactionSettings,
     updateReactionSettings,
+    getBlacklisted,
+    setBlacklisted,
 } = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium } = require("../premium/utils")
@@ -141,6 +143,68 @@ async function run(message, args) {
         return showStats()
     } else if (args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "lb") {
         return showLeaderboard()
+    } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
+        if (!message.member.hasPermission("MANAGE_GUILD")) {
+            return message.channel.send(
+                new ErrorEmbed("you need the `manage server` permission to do this")
+            )
+        }
+
+        if (args.length == 1) {
+            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions |" + message.author.username)
+
+            const blacklisted = getBlacklisted(message.guild)
+
+            if (blacklisted.length == 0) {
+                embed.setDescription("❌ no blacklisted users")
+            } else {
+                embed.setDescription(`\`${blacklisted.join("`\n`")}\``)
+            }
+
+            embed.setFooter(`use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users`)
+
+            return message.channel.send(embed)
+        } else {
+            if (args[1].toLowerCase() == "add" || args[1].toLowerCase() == "+") {
+                if (args.length == 1) {
+                    return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist add/+ <@user>`))
+                }
+
+                let user = args[2]
+
+                if (user.length != 18) {
+                    if (!message.mentions.members.first()) {
+                        return message.channel.send(new ErrorEmbed("you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"))
+                    } else {
+                        user = message.mentions.members.first()
+                    }
+                } else {
+                    user = await message.guild.members.fetch(user)
+                }
+
+                if (!user) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                const blacklisted = getBlacklisted(message.guild)
+
+                if (blacklisted.length >= 75) {
+                    return message.channel.send(new ErrorEmbed("you have reached the maximum amount of blacklisted users (75)"))
+                }
+
+                blacklisted.push(user.id)
+
+                setBlacklisted(message.guild, blacklisted)
+
+                const embed = new CustomEmbed(
+                    message.member,
+                    false,
+                    `✅ ${user.toString()} has been blacklisted`
+                )
+
+                return message.channel.send(embed)
+            }
+        }
     } else if (args[0].toLowerCase() == "settings") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
