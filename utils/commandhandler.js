@@ -554,6 +554,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         embed.setDescription(msg)
         embed.setColor("#000001")
 
+        if (client.uptime < 86400 * 1000) {
+            embed.setFooter("data is from less than 24 hours")
+        }
+
         channel.send(embed)
 
         popularCommands.clear()
