@@ -10,6 +10,7 @@ const {
     getServerLeaderboard,
     getWordList,
     updateWords,
+    getReactionSettings,
 } = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium } = require("../premium/utils")
@@ -147,7 +148,31 @@ async function run(message, args) {
         }
 
         if (args.length == 1) {
-            //
+            const embed = new CustomEmbed(message.member, false)
+
+            embed.setTitle("chat reactions | " + message.author.username)
+
+            const settings = getReactionSettings(message.guild)
+
+            let channels
+
+            if (settings.randomChannels.length == 0) {
+                channels = "none"
+            } else {
+                channels = channels.join("` `")
+            }
+
+            embed.setDescription(
+                `**random start** \`${settings.randomStart}\`\n` +
+                    `**random channels** \`${channels}\`\n` +
+                    `**time between events** \`${settings.timeBetweenEvents}s\`\n` +
+                    `**random offset** \`${settings.randomModifier}s\`\n` +
+                    `**game length** \`${settings.timeout}s\``
+            )
+
+            embed.setFooter(`use ${prefix}cr settings help to change this settings`)
+
+            return message.channel.send(embed)
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
