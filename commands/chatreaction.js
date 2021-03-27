@@ -73,7 +73,6 @@ async function run(message, args) {
                 `${prefix}**cr settings** *view/modify the chat reaction settings for your server*\n` +
                 `${prefix}**cr words** *view/modify the chat reaction word list*\n` +
                 `${prefix}**cr blacklist** *add/remove people to the blacklist*\n` +
-                `${prefix}**cr deleteall** *delete all chat reaction data*\n` +
                 `${prefix}**cr stats** *view your chat reaction stats*\n` +
                 `${prefix}**cr lb** *view the server leaderboard*`
         )
