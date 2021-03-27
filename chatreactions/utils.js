@@ -327,12 +327,13 @@ async function startReaction(guild, channel) {
     const start = new Date().getTime()
 
     const winners = new Map()
+    const winnersIDs = []
 
     let waiting = false
 
     const filter = (m) =>
         m.content == chosenWord &&
-        !winners.get(m.author.id) &&
+        winnersIDs.indexOf(m.author.id) == -1 &&
         !m.member.user.bot &&
         getBlacklisted(guild).indexOf(m.author.id) == -1
 
@@ -399,6 +400,7 @@ async function startReaction(guild, channel) {
             time: time,
             member: message.member,
         })
+        winnersIDs.push(message.author.id)
         if (!waiting) {
             return await msg.edit(embed)
         }
