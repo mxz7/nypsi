@@ -205,10 +205,10 @@ async function run(message, args) {
             )
 
             embed.setDescription(
-                `**${prefix}cr words list** *view the current wordlist*\n` +
-                    `**${prefix}cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
-                    `**${prefix}cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
-                    `**${prefix}cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
+                `${prefix}**cr words list** *view the current wordlist*\n` +
+                    `${prefix}**cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
+                    `${prefix}**cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
+                    `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
             )
 
             return message.channel.send(embed)
