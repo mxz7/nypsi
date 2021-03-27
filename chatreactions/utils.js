@@ -332,7 +332,7 @@ async function startReaction(guild, channel) {
 
                         return await msg.edit(embed)
                     }
-                }, 1000)
+                }, 750)
             } else {
                 if (!waiting) {
                     const field = await embed.embed.fields.find((f) => f.name == "winners")
