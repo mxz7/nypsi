@@ -235,6 +235,79 @@ async function run(message, args) {
             } else {
                 return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
             }
+        } else if (args.length == 3) {
+            if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
+                let channel = args[2]
+
+                if (channel.length != 18) {
+                    if (!message.mentions.channels.first()) {
+                        return message.channel.send(
+                            new ErrorEmbed(
+                                "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel"
+                            )
+                        )
+                    } else {
+                        channel = message.mentions.channels.first()
+                    }
+                } else {
+                    channel = await message.guild.channels.cache.find((ch) => ch.id == channel)
+                }
+
+                if (!channel) {
+                    return message.channel.send(new ErrorEmbed("invalid channel"))
+                }
+
+                const settings = getReactionSettings(message.guild)
+
+                let added = false
+                let max = 1
+
+                if (isPremium(message.author.id)) {
+                    max = 5
+                }
+
+                if (settings.randomChannels.indexOf(channel.id) != -1) {
+                    settings.randomChannels.splice(settings.randomChannels.indexOf(channel.id), 1)
+                } else {
+                    if (settings.randomChannels.length >= max) {
+                        const embed = new ErrorEmbed(
+                            `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/nypsi) to have more`
+                        )
+
+                        if (max > 1) {
+                            embed.setDescription(
+                                `you have reached the maximum amount of random channels (${max})`
+                            )
+                        }
+
+                        return message.channel.send(embed)
+                    }
+                    settings.randomChannels.push(channel.id)
+                    added = true
+                }
+
+                updateReactionSettings(message.guild, settings)
+
+                const embed = new CustomEmbed(message.member, false)
+
+                if (added) {
+                    embed.setDescription(`${channel.name} has been added as a random channel`)
+                } else {
+                    embed.setDescription(`${channel.name} has been removed`)
+                }
+
+                return message.channel.send(embed)
+            } else if (args[1].toLowerCase() == "cooldown") {
+                return message.channel.send(
+                    new ErrorEmbed(`${prefix}cr settings cooldown <number>`)
+                )
+            } else if (args[1].toLowerCase() == "offset") {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings offset <number>`))
+            } else if (args[1].toLowerCase() == "length") {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings length <number>`))
+            } else {
+                return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
+            }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.hasPermission("MANAGE_GUILD")) {
