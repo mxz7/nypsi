@@ -3,19 +3,13 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getNews, formatDate, setNews } = require("../utils/utils")
 
-const cmd = new Command(
-    "news",
-    "set the news for the help command",
-    categories.NONE
-).setPermissions("bot owner")
+const cmd = new Command("news", "set the news for the help command", categories.INFO)
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    
-
     if (args.length == 0 || message.member.user.id != "672793821850894347") {
         const news = getNews()
 
