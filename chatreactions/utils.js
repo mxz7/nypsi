@@ -288,7 +288,7 @@ async function startReaction(guild, channel) {
     })
 
     collector.on("end", async () => {
-        if (winners.length == 0) {
+        if (winners.size == 0) {
             embed.setDescription(embed.embed.description + "\n\nnobody won ):")
         }
         await msg.edit(embed)
