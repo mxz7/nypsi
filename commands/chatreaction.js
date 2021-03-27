@@ -373,9 +373,7 @@ async function run(message, args) {
                 }
 
                 if (length < 30) {
-                    return message.channel.send(
-                        new ErrorEmbed("cannot be shorter than 30 seconds")
-                    )
+                    return message.channel.send(new ErrorEmbed("cannot be shorter than 30 seconds"))
                 }
 
                 const settings = getReactionSettings(message.guild)
@@ -385,11 +383,7 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send(
-                    new CustomEmbed(
-                        message.member,
-                        false,
-                        `✅ max length set to \`${length}s\``
-                    )
+                    new CustomEmbed(message.member, false, `✅ max length set to \`${length}s\``)
                 )
             } else {
                 return message.channel.send(new ErrorEmbed(`${prefix}cr settings help`))
