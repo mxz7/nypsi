@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("duck", "get a random picture of a duck", categories.ANIMALS)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
@@ -81,7 +80,6 @@ async function run(message, args) {
         .setImage(image)
 
     message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

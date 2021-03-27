@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {
@@ -48,7 +47,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member)
         .setTitle("<3")
         .setImage(wholesome[Math.floor(Math.random() * wholesome.length)])
-    
+
     message.channel.send(embed)
 }
 

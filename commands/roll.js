@@ -5,11 +5,10 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const cmd = new Command("roll", "roll a dice", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let range = 6
 
     if (args.length != 0) {
@@ -22,8 +21,13 @@ async function run(message, args) {
         }
     }
 
-    return message.channel.send(new CustomEmbed(message.member, false, "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"))
-
+    return message.channel.send(
+        new CustomEmbed(
+            message.member,
+            false,
+            "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
+        )
+    )
 }
 
 cmd.setRun(run)

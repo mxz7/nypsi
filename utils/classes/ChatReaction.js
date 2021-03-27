@@ -23,7 +23,7 @@ class ChatReactionProfile {
                 randomChannels: [],
                 timeBetweenEvents: 600,
                 randomModifier: 300,
-                timeout: 60
+                timeout: 60,
             }
         }
 

@@ -1,4 +1,15 @@
-const { getBalance, createUser, updateBalance, userExists, formatBet, getXp, updateXp, getMulti, calcMaxBet, getPrestige } = require("../economy/utils.js")
+const {
+    getBalance,
+    createUser,
+    updateBalance,
+    userExists,
+    formatBet,
+    getXp,
+    updateXp,
+    getMulti,
+    calcMaxBet,
+    getPrestige,
+} = require("../economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
@@ -8,14 +19,17 @@ const { isPremium, getTier } = require("../premium/utils.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("rockpaperscissors", "play rock paper scissors", categories.MONEY).setAliases(["rps"])
+const cmd = new Command(
+    "rockpaperscissors",
+    "play rock paper scissors",
+    categories.MONEY
+).setAliases(["rps"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 10
 
     if (isPremium(message.author.id)) {
@@ -53,9 +67,11 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("rockpaperscissors help")
             .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-            .addField("help", "rock paper scissors works exactly how this game does in real life\n" +
-                "**2**x multiplier for winning")
-
+            .addField(
+                "help",
+                "rock paper scissors works exactly how this game does in real life\n" +
+                    "**2**x multiplier for winning"
+            )
 
         return message.channel.send(embed)
     }
@@ -63,8 +79,17 @@ async function run(message, args) {
     let choice = args[0]
     let memberEmoji = ""
 
-    if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
-        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
+    if (
+        choice != "rock" &&
+        choice != "paper" &&
+        choice != "scissors" &&
+        choice != "r" &&
+        choice != "p" &&
+        choice != "s"
+    ) {
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
+        )
     }
 
     if (choice == "r") choice = "rock"
@@ -87,18 +112,24 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
+            return message.channel.send(
+                new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
+            )
         }
     }
 
-    const bet = (parseInt(args[1]))
+    const bet = parseInt(args[1])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
+        )
     }
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`))
+        return message.channel.send(
+            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
+        )
     }
 
     if (bet > getBalance(message.member)) {
@@ -108,7 +139,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -126,7 +161,7 @@ async function run(message, args) {
     if (index > -1) {
         values.splice(index, 1)
     }
-    
+
     const winning = shuffle(values)[Math.floor(Math.random() * values.length)]
     let winningEmoji = ""
 
@@ -165,23 +200,51 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(message.member, getBalance(message.member), + Math.round(winnings * voteMulti))
+            updateBalance(
+                message.member,
+                getBalance(message.member),
+                +Math.round(winnings * voteMulti)
+            )
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
 
-    const embed = new CustomEmbed(message.member, true, "*rock..paper..scissors..* **shoot!!**\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
-        .setTitle("rock paper scissors | " + message.member.user.username)
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "*rock..paper..scissors..* **shoot!!**\n\n**choice** " +
+            choice +
+            " " +
+            memberEmoji +
+            "\n**bet** $" +
+            bet.toLocaleString()
+    ).setTitle("rock paper scissors | " + message.member.user.username)
 
-    message.channel.send(embed).then(m => {
-
-        embed.setDescription("**threw** " + winning + " " + winningEmoji + "\n\n**choice** " + choice + " " + memberEmoji + "\n**bet** $" + bet.toLocaleString())
+    message.channel.send(embed).then((m) => {
+        embed.setDescription(
+            "**threw** " +
+                winning +
+                " " +
+                winningEmoji +
+                "\n\n**choice** " +
+                choice +
+                " " +
+                memberEmoji +
+                "\n**bet** $" +
+                bet.toLocaleString()
+        )
 
         if (win) {
-
             if (voted) {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString() + "\n" +
-                    "+**" + (voteMulti * 100).toString() + "**% bonus")
+                embed.addField(
+                    "**winner!!**",
+                    "**you win** $" +
+                        winnings.toLocaleString() +
+                        "\n" +
+                        "+**" +
+                        (voteMulti * 100).toString() +
+                        "**% bonus"
+                )
 
                 if (bet >= 1000) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
@@ -202,7 +265,6 @@ async function run(message, args) {
             m.edit(embed)
         }, 1500)
     })
-
 }
 
 cmd.setRun(run)

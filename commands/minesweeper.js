@@ -1,4 +1,15 @@
-const { userExists, createUser, getBalance, formatBet, updateBalance, updateXp, getXp, calcMaxBet, getMulti, getPrestige } = require("../economy/utils")
+const {
+    userExists,
+    createUser,
+    getBalance,
+    formatBet,
+    updateBalance,
+    updateXp,
+    getXp,
+    calcMaxBet,
+    getMulti,
+    getPrestige,
+} = require("../economy/utils")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -17,14 +28,16 @@ abcde.set("c", 2)
 abcde.set("d", 3)
 abcde.set("e", 4)
 
-const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
+const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases([
+    "sweeper",
+    "ms",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (games.has(message.author.id)) {
@@ -64,12 +77,18 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("minesweeper help")
             .addField("usage", `${prefix}ms <bet>`)
-            .addField("game rules", "a 5x5 grid of white squares will be created\n" +
-                "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
-                "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet")
-            .addField("help", "`a1` - this would be the most top left square\n" +
-                "`e5` - this would be the most bottom right square\n" +
-                "`finish` - this is used to end the game and collect your reward")
+            .addField(
+                "game rules",
+                "a 5x5 grid of white squares will be created\n" +
+                    "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
+                    "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet"
+            )
+            .addField(
+                "help",
+                "`a1` - this would be the most top left square\n" +
+                    "`e5` - this would be the most bottom right square\n" +
+                    "`finish` - this is used to end the game and collect your reward"
+            )
 
         return message.channel.send(embed)
     }
@@ -101,7 +120,11 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -121,12 +144,38 @@ async function run(message, args) {
             }
         }
     }, 180000)
-    
+
     updateBalance(message.member, getBalance(message.member) - bet)
 
     const id = Math.random()
 
-    const grid = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]
+    const grid = [
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+    ]
 
     const bombs = Math.floor(Math.random() * 3) + 4
 
@@ -149,21 +198,26 @@ async function run(message, args) {
         win: 0,
         grid: grid,
         id: id,
-        voted: voteMulti
+        voted: voteMulti,
     })
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+    const embed = new CustomEmbed(
+        message.member,
+        true,
+        "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
+    )
         .setTitle("minesweeper | " + message.author.username)
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
 
     const msg = await message.channel.send(embed)
 
-    playGame(message, msg).catch(e => {
+    playGame(message, msg).catch((e) => {
         console.error(e)
-        return message.channel.send(new ErrorEmbed("an error occured while running - join support server"))
+        return message.channel.send(
+            new ErrorEmbed("an error occured while running - join support server")
+        )
     })
-
 }
 
 cmd.setRun(run)
@@ -174,19 +228,19 @@ function getFront(grid) {
     const gridFront = []
 
     for (let item of grid) {
-        switch (item){
-        case "a":
-            gridFront.push(":white_large_square:")
-            break
-        case "b":
-            gridFront.push(":white_large_square:")
-            break
-        case "c":
-            gridFront.push(":blue_square:")
-            break
-        case "x":
-            gridFront.push(":red_square:")
-            break
+        switch (item) {
+            case "a":
+                gridFront.push(":white_large_square:")
+                break
+            case "b":
+                gridFront.push(":white_large_square:")
+                break
+            case "c":
+                gridFront.push(":blue_square:")
+                break
+            case "x":
+                gridFront.push(":red_square:")
+                break
         }
     }
 
@@ -197,19 +251,19 @@ function getExposedFront(grid) {
     const gridFront = []
 
     for (let item of grid) {
-        switch (item){
-        case "a":
-            gridFront.push(":white_large_square:")
-            break
-        case "b":
-            gridFront.push(":red_square:")
-            break
-        case "c":
-            gridFront.push(":blue_square:")
-            break
-        case "x":
-            gridFront.push(":red_square:")
-            break
+        switch (item) {
+            case "a":
+                gridFront.push(":white_large_square:")
+                break
+            case "b":
+                gridFront.push(":red_square:")
+                break
+            case "c":
+                gridFront.push(":blue_square:")
+                break
+            case "x":
+                gridFront.push(":red_square:")
+                break
         }
     }
 
@@ -217,32 +271,32 @@ function getExposedFront(grid) {
 }
 
 function toTable(grid) {
-    let table = ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
+    let table =
+        ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
     let count = 0
     let globalCount = 1
 
     grid = getFront(grid)
 
     for (let item of grid) {
-
         if (count == 5) {
             count = 0
-            
+
             let emoji
 
             switch (globalCount) {
-            case 1:
-                emoji = ":two:"
-                break
-            case 2:
-                emoji = ":three:"
-                break
-            case 3:
-                emoji = ":four:"
-                break
-            case 4:
-                emoji = ":five:"
-                break
+                case 1:
+                    emoji = ":two:"
+                    break
+                case 2:
+                    emoji = ":three:"
+                    break
+                case 3:
+                    emoji = ":four:"
+                    break
+                case 4:
+                    emoji = ":five:"
+                    break
             }
             globalCount++
 
@@ -257,32 +311,32 @@ function toTable(grid) {
 }
 
 function toExposedTable(grid) {
-    let table = ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
+    let table =
+        ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:"
     let count = 0
     let globalCount = 1
 
     grid = getExposedFront(grid)
 
     for (let item of grid) {
-
         if (count == 5) {
             count = 0
-            
+
             let emoji
 
             switch (globalCount) {
-            case 1:
-                emoji = ":two:"
-                break
-            case 2:
-                emoji = ":three:"
-                break
-            case 3:
-                emoji = ":four:"
-                break
-            case 4:
-                emoji = ":five:"
-                break
+                case 1:
+                    emoji = ":two:"
+                    break
+                case 2:
+                    emoji = ":three:"
+                    break
+                case 3:
+                    emoji = ":four:"
+                    break
+                case 4:
+                    emoji = ":five:"
+                    break
             }
             globalCount++
 
@@ -301,21 +355,20 @@ function toLocation(coordinate) {
     const number = coordinate.split("")[1]
 
     switch (number) {
-    case "1":
-        return abcde.get(letter)
-    case "2":
-        return abcde.get(letter) + 5
-    case "3":
-        return abcde.get(letter) + 10
-    case "4":
-        return abcde.get(letter) + 15
-    case "5":
-        return abcde.get(letter) + 20
+        case "1":
+            return abcde.get(letter)
+        case "2":
+            return abcde.get(letter) + 5
+        case "3":
+            return abcde.get(letter) + 10
+        case "4":
+            return abcde.get(letter) + 15
+        case "5":
+            return abcde.get(letter) + 20
     }
 }
 
 async function playGame(message, msg) {
-
     if (!games.has(message.author.id)) return
 
     const bet = games.get(message.author.id).bet
@@ -324,19 +377,27 @@ async function playGame(message, msg) {
 
     let table
 
-    const embed = new CustomEmbed(message.member, true)
-        .setTitle("minesweeper | " + message.author.username)
-    
+    const embed = new CustomEmbed(message.member, true).setTitle(
+        "minesweeper | " + message.author.username
+    )
+
     const lose = async () => {
         embed.setColor("#e4334f")
-        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")\n\n**you lose!!**")
+        embed.setDescription(
+            "**bet** $" +
+                bet.toLocaleString() +
+                "\n**" +
+                win +
+                "**x ($" +
+                Math.round(bet * win).toLocaleString() +
+                ")\n\n**you lose!!**"
+        )
         embed.addField("your grid", table)
         games.delete(message.author.id)
         return await msg.edit(embed)
     }
 
     const win1 = async () => {
-
         let winnings = Math.round(bet * win)
 
         embed.setColor("#5efb8f")
@@ -349,14 +410,35 @@ async function playGame(message, msg) {
                 embed.setFooter("+" + xpBonus + "xp")
             }
 
-            embed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString() + "\n" +
-                "+**" + (games.get(message.member.user.id).voted * 100).toString() + "**% bonus")
+            embed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n" +
+                    "**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")" +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString() +
+                    "\n" +
+                    "+**" +
+                    (games.get(message.member.user.id).voted * 100).toString() +
+                    "**% bonus"
+            )
         } else {
-            embed.setDescription("**bet** $" + bet.toLocaleString() + "\n" +
-                "**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" +
-                "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString())
+            embed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n" +
+                    "**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")" +
+                    "\n\n**winner!!**\n**you win** $" +
+                    winnings.toLocaleString()
+            )
         }
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + winnings)
@@ -366,7 +448,17 @@ async function playGame(message, msg) {
 
     const draw = async () => {
         embed.setColor("#e5ff00")
-        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")" + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
+        embed.setDescription(
+            "**bet** $" +
+                bet.toLocaleString() +
+                "\n**" +
+                win +
+                "**x ($" +
+                Math.round(bet * win).toLocaleString() +
+                ")" +
+                "\n\n**draw!!**\nyou win $" +
+                bet.toLocaleString()
+        )
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
@@ -377,17 +469,20 @@ async function playGame(message, msg) {
         return win1()
     }
 
-    const filter = m => m.author.id == message.author.id
+    const filter = (m) => m.author.id == message.author.id
     let fail = false
 
-    const response = await message.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] }).then(async collected => {
-        await collected.first().delete()
-        return collected.first().content.toLowerCase()
-    }).catch(() => {
-        fail = true
-        games.delete(message.author.id)
-        return message.channel.send(message.author.toString() + " minesweeper game expired")
-    })
+    const response = await message.channel
+        .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.first().delete()
+            return collected.first().content.toLowerCase()
+        })
+        .catch(() => {
+            fail = true
+            games.delete(message.author.id)
+            return message.channel.send(message.author.toString() + " minesweeper game expired")
+        })
 
     if (fail) return
 
@@ -416,18 +511,20 @@ async function playGame(message, msg) {
             if (n == letter) {
                 check = true
                 break
-            } 
+            }
         }
 
         for (let n of possibleNumbers) {
             if (n == number) {
                 check1 = true
                 break
-            } 
+            }
         }
 
         if (!check || !check1) {
-            await message.channel.send(message.author.toString() + " invalid coordinate, example: `a3`")
+            await message.channel.send(
+                message.author.toString() + " invalid coordinate, example: `a3`"
+            )
             return playGame(message, msg)
         }
     }
@@ -435,38 +532,45 @@ async function playGame(message, msg) {
     const location = toLocation(response)
 
     switch (grid[location]) {
-    case "b":
-        grid[location] = "x"
-        table = toExposedTable(grid)
-        return lose()
-    case "c":
-        return playGame(message, msg)
-    case "a":
-        grid[location] = "c"
+        case "b":
+            grid[location] = "x"
+            table = toExposedTable(grid)
+            return lose()
+        case "c":
+            return playGame(message, msg)
+        case "a":
+            grid[location] = "c"
 
-        if (win < 3) {
-            win += 0.5
-        } else {
-            win += 1
-        }
+            if (win < 3) {
+                win += 0.5
+            } else {
+                win += 1
+            }
 
-        games.set(message.author.id, {
-            bet: bet,
-            win: win,
-            grid: grid,
-            id: games.get(message.author.id).id,
-            voted: games.get(message.author.id).voted
-        })
+            games.set(message.author.id, {
+                bet: bet,
+                win: win,
+                grid: grid,
+                id: games.get(message.author.id).id,
+                voted: games.get(message.author.id).voted,
+            })
 
-        table = toTable(grid)
+            table = toTable(grid)
 
-        embed.setDescription("**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")")
-        embed.addField("your grid", table)
-        embed.addField("help", "type `finish` to stop playing")
+            embed.setDescription(
+                "**bet** $" +
+                    bet.toLocaleString() +
+                    "\n**" +
+                    win +
+                    "**x ($" +
+                    Math.round(bet * win).toLocaleString() +
+                    ")"
+            )
+            embed.addField("your grid", table)
+            embed.addField("help", "type `finish` to stop playing")
 
-        msg.edit(embed)
+            msg.edit(embed)
 
-        return playGame(message, msg)
+            return playGame(message, msg)
     }
-
 }

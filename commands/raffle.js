@@ -4,14 +4,17 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("raffle", "select a random user all server members or from a specific role", categories.FUN)
+const cmd = new Command(
+    "raffle",
+    "select a random user all server members or from a specific role",
+    categories.FUN
+)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -42,7 +45,7 @@ async function run(message, args) {
     if (args.length == 0) {
         const members1 = message.guild.members.cache
 
-        members1.forEach(m => {
+        members1.forEach((m) => {
             if (!m.user.bot) {
                 if (members.indexOf(m.user.id) == -1) {
                     members.push(m.user.id)
@@ -50,13 +53,15 @@ async function run(message, args) {
             }
         })
     } else {
-        const role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
+        const role = message.guild.roles.cache.find((r) =>
+            r.name.toLowerCase().includes(args.join(" ").toLowerCase())
+        )
 
         if (!role) {
             return await message.channel.send(new ErrorEmbed("i wasn't able to find that role"))
         }
 
-        role.members.forEach(m => {
+        role.members.forEach((m) => {
             members.push(m.user.id)
         })
 
@@ -74,7 +79,6 @@ async function run(message, args) {
         .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``)
 
     return message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

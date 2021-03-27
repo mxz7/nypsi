@@ -5,23 +5,40 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("lockdown", "lockdown a channel (will only work if permissions are setup correctly)", categories.MODERATION).setAliases(["lock"]).setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])
+const cmd = new Command(
+    "lockdown",
+    "lockdown a channel (will only work if permissions are setup correctly)",
+    categories.MODERATION
+)
+    .setAliases(["lock"])
+    .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-        
-    if (!message.member.hasPermission("MANAGE_CHANNELS") || !message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (
+        !message.member.hasPermission("MANAGE_CHANNELS") ||
+        !message.member.hasPermission("MANAGE_MESSAGES")
+    ) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("you need the `manage channels` and `manage messages` permission"))
+            return message.channel.send(
+                new ErrorEmbed("you need the `manage channels` and `manage messages` permission")
+            )
         }
-        return 
+        return
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_CHANNELS") || !message.guild.me.hasPermission("MANAGE_ROLES")) {
-        return message.channel.send(new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work"))
+    if (
+        !message.guild.me.hasPermission("MANAGE_CHANNELS") ||
+        !message.guild.me.hasPermission("MANAGE_ROLES")
+    ) {
+        return message.channel.send(
+            new ErrorEmbed(
+                "i need the `manage channels` and `manage roles` permission for this command to work"
+            )
+        )
     }
 
     if (cooldown.has(message.member.id)) {
@@ -56,7 +73,7 @@ async function run(message, args) {
 
     let locked = false
 
-    const role = message.guild.roles.cache.find(role => role.name == "@everyone")
+    const role = message.guild.roles.cache.find((role) => role.name == "@everyone")
 
     const a = channel.permissionOverwrites.get(role.id)
 
@@ -72,30 +89,35 @@ async function run(message, args) {
             locked = true
         }
     }
-    
+
     if (!locked) {
         await channel.updateOverwrite(role, {
-            SEND_MESSAGES: false
+            SEND_MESSAGES: false,
         })
 
-        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked")
-            .setTitle("lockdown | " + message.member.user.username)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "✅ " + channel.toString() + " has been locked"
+        ).setTitle("lockdown | " + message.member.user.username)
 
         return message.channel.send(embed).catch(() => {
             return message.member.send(embed).catch()
         })
     } else {
         await channel.updateOverwrite(role, {
-            SEND_MESSAGES: null
+            SEND_MESSAGES: null,
         })
-        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked")
-            .setTitle("lockdown | " + message.member.user.username)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "✅ " + channel.toString() + " has been unlocked"
+        ).setTitle("lockdown | " + message.member.user.username)
 
         return message.channel.send(embed).catch(() => {
             return message.member.send(embed)
         })
     }
-
 }
 
 cmd.setRun(run)

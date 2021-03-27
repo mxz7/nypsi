@@ -6,11 +6,10 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const cmd = new Command("color", "get a random hex color code", categories.INFO)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let color
     let member
 
@@ -22,7 +21,6 @@ async function run(message, args) {
     }
 
     if (args.length != 0) {
-
         if (!message.mentions.members.first()) {
             member = await getMember(message, args[0])
         } else {
@@ -39,9 +37,12 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, `[**#${color}**](https://color.tekoh.net/#${color})`)
-        .setColor(color)
-    
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `[**#${color}**](https://color.tekoh.net/#${color})`
+    ).setColor(color)
+
     if (member) {
         embed.setDescription(member.user.toString())
         embed.setTitle(member.displayHexColor)
@@ -51,7 +52,6 @@ async function run(message, args) {
     return await message.channel.send(embed).catch(() => {
         message.channel.send(new ErrorEmbed("invalid color"))
     })
-
 }
 
 cmd.setRun(run)

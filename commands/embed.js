@@ -5,16 +5,17 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions([
+    "MANAGE_MESSAGES",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-        return 
+        return
     }
 
     if (cooldown.has(message.member.id)) {
@@ -43,11 +44,17 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("embed help")
             .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
-            .addField("help", "with this command you can create a simple embed message\n" +
-                "**<>** required | **()** optional\n")
-            .addField("examples", `${prefix}embed hello\n` +
-                `${prefix}embed hello | this is a description\n` +
-                `${prefix}embed hello | this is a description | #13c696`)
+            .addField(
+                "help",
+                "with this command you can create a simple embed message\n" +
+                    "**<>** required | **()** optional\n"
+            )
+            .addField(
+                "examples",
+                `${prefix}embed hello\n` +
+                    `${prefix}embed hello | this is a description\n` +
+                    `${prefix}embed hello | this is a description | #13c696`
+            )
 
         return message.channel.send(embed)
     }
@@ -70,18 +77,17 @@ async function run(message, args) {
 
     const title = args.join(" ").split("|")[0]
     let description
-    
+
     if (mode.includes("desc")) {
         description = args.join(" ").split("|")[1]
-    } 
+    }
 
     if (mode.includes("color")) {
         color = args.join(" ").split("|")[2]
     }
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle(title)
-    
+    const embed = new CustomEmbed(message.member).setTitle(title)
+
     if (mode.includes("desc")) {
         embed.setDescription(description)
     }
@@ -90,11 +96,14 @@ async function run(message, args) {
         embed.setColor(color)
     }
 
-    message.channel.send(embed).then(() => {
-        message.delete()
-    }).catch((e) => {
-        message.channel.send(new ErrorEmbed(e))
-    })
+    message.channel
+        .send(embed)
+        .then(() => {
+            message.delete()
+        })
+        .catch((e) => {
+            message.channel.send(new ErrorEmbed(e))
+        })
 }
 
 cmd.setRun(run)

@@ -7,13 +7,12 @@ class CustomEmbed {
      * @returns {CustomEmbed}
      * @param {GuildMember} member
      * @param {Boolean} footer
-     * @param {String} text 
+     * @param {String} text
      */
     constructor(member, footer, text) {
         this.embed = new MessageEmbed()
 
         if (member) {
-
             if (isPremium(member.user.id)) {
                 if (getTier(member.user.id) >= 1) {
                     if (getEmbedColor(member.user.id) != "default") {
@@ -33,20 +32,20 @@ class CustomEmbed {
             if (text.length > 2000) {
                 text = text.substr(0, 2000)
             }
-    
+
             this.embed.setDescription(text)
         }
 
         if (footer) {
             this.embed.setFooter("nypsi.xyz")
         }
-        
+
         return this
     }
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setDescription(text) {
         if (text.length > 2000) {
@@ -59,8 +58,8 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} title 
-     * @param {String} text 
+     * @param {String} title
+     * @param {String} text
      * @param {Boolean} inline
      */
     addField(title, text, inline) {
@@ -75,7 +74,7 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {Sting} text 
+     * @param {Sting} text
      */
     setTitle(text) {
         this.embed.setTitle(text)
@@ -85,11 +84,10 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} url 
+     * @param {String} url
      */
     setImage(url) {
         this.embed.setImage(url)
-
 
         return this
     }
@@ -106,7 +104,7 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} url 
+     * @param {String} url
      */
     setURL(url) {
         this.embed.setURL(url)
@@ -116,17 +114,17 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setHeader(text) {
         this.embed.setAuthor(text)
 
         return this
     }
-    
+
     /**
      * @returns {CustomEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setFooter(text) {
         this.embed.setFooter(text)
@@ -136,7 +134,7 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} color 
+     * @param {String} color
      */
     setColor(color) {
         this.embed.setColor(color)
@@ -146,7 +144,7 @@ class CustomEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {Date} date 
+     * @param {Date} date
      */
     setTimestamp(date) {
         if (date) {
@@ -164,7 +162,7 @@ exports.CustomEmbed = CustomEmbed
 class ErrorEmbed {
     /**
      * @returns {ErrorEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     constructor(text) {
         this.embed = new MessageEmbed().setColor("#e31937")
@@ -176,7 +174,7 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setDescription(text) {
         if (text.length > 2000) {
@@ -189,8 +187,8 @@ class ErrorEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {String} title 
-     * @param {String} text 
+     * @param {String} title
+     * @param {String} text
      * @param {Boolean} inline
      */
     addField(title, text, inline) {
@@ -205,7 +203,7 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {Sting} text 
+     * @param {Sting} text
      */
     setTitle(text) {
         this.embed.setTitle(text)
@@ -215,11 +213,10 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {String} url 
+     * @param {String} url
      */
     setImage(url) {
         this.embed.setImage(url)
-
 
         return this
     }
@@ -236,7 +233,7 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {String} url 
+     * @param {String} url
      */
     setURL(url) {
         this.embed.setURL(url)
@@ -246,17 +243,17 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setHeader(text) {
         this.embed.setAuthor(text)
 
         return this
     }
-    
+
     /**
      * @returns {ErrorEmbed}
-     * @param {String} text 
+     * @param {String} text
      */
     setFooter(text) {
         this.embed.setFooter(text)
@@ -266,7 +263,7 @@ class ErrorEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {String} color 
+     * @param {String} color
      */
     setColor(color) {
         this.embed.setColor(color)
@@ -276,7 +273,7 @@ class ErrorEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {Date} date 
+     * @param {Date} date
      */
     setTimestamp(date) {
         if (date) {

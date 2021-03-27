@@ -4,14 +4,15 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATION).setAliases(["purge"]).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATION)
+    .setAliases(["purge"])
+    .setPermissions(["MANAGE_MESSAGES"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!message.member.hasPermission("MANAGE_MESSAGES")) {
         return
     }
@@ -53,14 +54,14 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, 30000)
     }
-    
+
     if (message.mentions.members.first()) {
         await message.delete()
         const target = message.mentions.members.first()
 
-        const collected = await message.channel.messages.fetch({limit: 100})
+        const collected = await message.channel.messages.fetch({ limit: 100 })
 
-        const collecteda = collected.filter(msg => {
+        const collecteda = collected.filter((msg) => {
             if (!msg.author) return
             return msg.author.id == target.user.id
         })
@@ -81,7 +82,7 @@ async function run(message, args) {
 
         return await message.channel.bulkDelete(collecteda)
     }
-    
+
     if (amount <= 100) {
         await message.channel.bulkDelete(amount, true).catch()
     } else {
@@ -95,22 +96,27 @@ async function run(message, args) {
             amount = 10000
         }
 
-        const embed = new CustomEmbed(message.member, false, "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message")
-            .setTitle("delete | " + message.member.user.tag)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "deleting `" +
+                amount +
+                "` messages..\n - if you'd like to cancel this operation, delete this message"
+        ).setTitle("delete | " + message.member.user.tag)
 
         const m = await message.channel.send(embed)
-        for (let i = 0; i < (amount1 / 100); i++) {
+        for (let i = 0; i < amount1 / 100; i++) {
             if (m.deleted) {
                 embed.setDescription("✅ operation cancelled")
                 return await message.channel.send(embed)
             }
 
             if (amount < 10) return await m.delete().catch()
-            
-            if (amount <= 100) {
-                let messages = await message.channel.messages.fetch({limit: amount, before: m.id})
 
-                messages = messages.filter(m => {
+            if (amount <= 100) {
+                let messages = await message.channel.messages.fetch({ limit: amount, before: m.id })
+
+                messages = messages.filter((m) => {
                     return timeSince(new Date(m.createdTimestamp)) < 14
                 })
 
@@ -118,16 +124,22 @@ async function run(message, args) {
                 return await m.delete().catch()
             }
 
-            let messages = await message.channel.messages.fetch({limit: 100, before: m.id})
+            let messages = await message.channel.messages.fetch({ limit: 100, before: m.id })
 
-            messages = messages.filter(m => {
+            messages = messages.filter((m) => {
                 return timeSince(new Date(m.createdTimestamp)) < 14
             })
 
             if (messages.size < 100) {
                 amount = messages.size
                 counter = 0
-                embed.setDescription("deleting `" + amount + " / " + amount1 + "` messages..\n - if you'd like to cancel this operation, delete this message")
+                embed.setDescription(
+                    "deleting `" +
+                        amount +
+                        " / " +
+                        amount1 +
+                        "` messages..\n - if you'd like to cancel this operation, delete this message"
+                )
                 await m.edit(embed)
             }
 
@@ -138,19 +150,24 @@ async function run(message, args) {
             if (fail) {
                 return
             }
-            
+
             amount = amount - 100
             counter++
 
             if (counter >= 2) {
                 counter = 0
-                embed.setDescription("deleting `" + amount + " / " + amount1 + "` messages..\n - if you'd like to cancel this operation, delete this message")
+                embed.setDescription(
+                    "deleting `" +
+                        amount +
+                        " / " +
+                        amount1 +
+                        "` messages..\n - if you'd like to cancel this operation, delete this message"
+                )
                 await m.edit(embed)
             }
         }
         return m.delete().catch()
     }
-
 }
 
 cmd.setRun(run)
@@ -158,8 +175,7 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-
-    const ms = Math.floor((new Date() - date))
+    const ms = Math.floor(new Date() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 

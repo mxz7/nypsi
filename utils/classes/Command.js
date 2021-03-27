@@ -18,7 +18,7 @@ class Command {
 
     /**
      * @returns {Command}
-     * @param {Array<String>} permissions 
+     * @param {Array<String>} permissions
      */
     setPermissions(permissions) {
         this.permissions = permissions
@@ -27,7 +27,7 @@ class Command {
 
     /**
      * @returns {Command}
-     * @param {Array<String>} aliases 
+     * @param {Array<String>} aliases
      */
     setAliases(aliases) {
         this.aliases = aliases
@@ -36,7 +36,7 @@ class Command {
 
     /**
      * @returns {Command}
-     * @param {Function} run 
+     * @param {Function} run
      */
     setRun(run) {
         this.run = run
@@ -56,7 +56,7 @@ const categories = {
     ADMIN: "admin",
     MINECRAFT: "minecraft",
     UTILITY: "utility",
-    NSFW: "nsfw"
+    NSFW: "nsfw",
 }
 
 exports.categories = categories

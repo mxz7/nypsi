@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("poll", "create a poll with a lot of customisation", categories.UTILITY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -48,13 +47,19 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("poll help")
             .addField("usage", `${prefix}poll (choices) <title> | (text) | (hex color)`)
-            .addField("help", "**<>** required | **()** optional\n" +
-                "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
-                "if a number isnt found for choices then 👍👎 emojis will be used\n" +
-                "largest number of choices is 10, and 1 is minimum")
-            .addField("examples", `${prefix}poll question?\n` +
-                `${prefix}poll 2 title | this is a description\n` +
-                `${prefix}poll 9 hello | this is a description | #13c696`)
+            .addField(
+                "help",
+                "**<>** required | **()** optional\n" +
+                    "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
+                    "if a number isnt found for choices then 👍👎 emojis will be used\n" +
+                    "largest number of choices is 10, and 1 is minimum"
+            )
+            .addField(
+                "examples",
+                `${prefix}poll question?\n` +
+                    `${prefix}poll 2 title | this is a description\n` +
+                    `${prefix}poll 9 hello | this is a description | #13c696`
+            )
 
         return message.channel.send(embed)
     }
@@ -78,7 +83,11 @@ async function run(message, args) {
             choices = num
         }
 
-        if (!message.member.hasPermission("MANAGE_MESSAGES") && !message.member.hasPermission("ADMINISTRATOR") && num > 2) {
+        if (
+            !message.member.hasPermission("MANAGE_MESSAGES") &&
+            !message.member.hasPermission("ADMINISTRATOR") &&
+            num > 2
+        ) {
             choices = 2
         }
         args.shift()
@@ -100,18 +109,17 @@ async function run(message, args) {
 
     const title = args.join(" ").split("|")[0]
     let description, color
-    
+
     if (mode.includes("desc")) {
         description = args.join(" ").split("|")[1]
-    } 
+    }
 
     if (mode.includes("color")) {
         color = args.join(" ").split("|")[2]
     }
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle(title)
-    
+    const embed = new CustomEmbed(message.member).setTitle(title)
+
     if (color) embed.setColor(color)
 
     if (mode.includes("desc")) {
@@ -121,10 +129,10 @@ async function run(message, args) {
     if (!message.member.hasPermission("ADMINISTRATOR")) {
         embed.setHeader(message.member.user.tag)
     }
-    
-    message.channel.send(embed).then(async m => {
+
+    message.channel.send(embed).then(async (m) => {
         await message.delete().catch()
-        
+
         if (choices == 0) {
             await m.react("👍")
             await m.react("👎")
@@ -141,9 +149,7 @@ async function run(message, args) {
         if (choices >= 8) await m.react("8️⃣")
         if (choices >= 9) await m.react("9️⃣")
         if (choices == 10) await m.react("🔟")
-
     })
-
 }
 
 cmd.setRun(run)
