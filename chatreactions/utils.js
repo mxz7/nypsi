@@ -106,8 +106,8 @@ setInterval(async () => {
             }
         }
 
-        const nextGame = new Date().getTime() + (final * 1000)
-        
+        const nextGame = new Date().getTime() + final * 1000
+
         return lastGame.set(channel.id, nextGame)
     }
 
