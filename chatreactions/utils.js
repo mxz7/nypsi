@@ -91,7 +91,6 @@ setInterval(async () => {
         })
 
         if (stop) {
-            console.log(`stopped ${channel.name} because recent message`)
             return
         }
 
@@ -164,8 +163,6 @@ setInterval(async () => {
                     }
 
                     await runGame(guild, channel)
-                } else {
-                    console.log(`stopped ${ch} because time`)
                 }
             } else {
                 const channel = await guild.channels.cache.find((cha) => cha.id == ch)
