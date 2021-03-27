@@ -8,6 +8,7 @@ const { getTimestamp } = require("../utils/utils")
 let data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
 
 const currentChannels = new Set()
+const lastGame = new Map()
 
 let timer = 0
 let timerCheck = true
@@ -56,7 +57,7 @@ setInterval(() => {
 }, 43200000)
 
 setInterval(async () => {
-    const { checkGuild } = require("../nypsi")
+    const { checkGuild, getGuild } = require("../nypsi")
 
     for (let guild in data) {
         const exists = await checkGuild(guild)
@@ -68,6 +69,58 @@ setInterval(async () => {
         }
     }
 }, 24 * 60 * 60 * 1000)
+
+setInterval(async () => {
+    const gamesToRun = new Map()
+    for (const guildID in data) {
+        const { getGuild } = require("../nypsi")
+        const guild = await getGuild(guildID)
+        const guildData = ChatReactionProfile.from(data[guildID])
+
+        if (!guildData.settings.randomStart) continue
+
+        if (!guild) {
+            console.log("no guild [chat reaction] ", guildID)
+            continue
+        }
+
+        const channels = guildData.settings.randomChannels
+
+        if (channels.length == 0) {
+            data[guildID].settings.randomStart = false
+        }
+
+        const now = new Date().getTime()
+
+        for (ch of channels) {
+            if (lastGame.has(ch)) {
+                if (now >= lastGame.get(ch)) {
+                    const channel = await guild.channels.cache.find(cha => cha.id == ch)
+
+                    if (!channel) {
+                        channels.splice(channels.indexOf(ch), 1)
+                        data[guildID].settings.randomChannels = channels
+                        continue
+                    }
+
+                    gamesToRun.set(guild, channel)
+                }
+            } else {
+                const channel = await guild.channels.cache.find((cha) => cha.id == ch)
+
+                if (!channel) {
+                    channels.splice(channels.indexOf(ch), 1)
+                    data[guildID].settings.randomChannels = channels
+                    continue
+                }
+
+                gamesToRun.set(guild, channel)
+            }
+        }
+    }
+    console.log("ran interval")
+    console.log(gamesToRun)
+}, 30000)
 
 /**
  * @param {Guild} guild
