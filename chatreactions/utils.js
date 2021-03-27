@@ -328,7 +328,11 @@ async function startReaction(guild, channel) {
 
     let waiting = false
 
-    const filter = (m) => m.content == chosenWord && !winners.get(m.author.id) && !m.member.user.bot
+    const filter = (m) =>
+        m.content == chosenWord &&
+        !winners.get(m.author.id) &&
+        !m.member.user.bot &&
+        getBlacklisted(guild).indexOf(m.author.id) == -1
 
     const timeout = getReactionSettings(guild).timeout
 
