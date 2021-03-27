@@ -5,14 +5,15 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("channel", "create, delete and modify channels", categories.ADMIN).setAliases(["ch"]).setPermissions(["MANAGE_CHANNELS"])
+const cmd = new Command("channel", "create, delete and modify channels", categories.ADMIN)
+    .setAliases(["ch"])
+    .setPermissions(["MANAGE_CHANNELS"])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-        
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -40,7 +41,9 @@ async function run(message, args) {
     }
 
     if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
-        return message.channel.send(new ErrorEmbed("i need the `manage channel` permission for this command to work"))
+        return message.channel.send(
+            new ErrorEmbed("i need the `manage channel` permission for this command to work")
+        )
     }
 
     let fail = false
@@ -50,28 +53,41 @@ async function run(message, args) {
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("channel help")
-            .addField("usage", `${prefix}channel create <name(s)>\n` +
-                `${prefix}channel delete <#channel(s)>\n` +
-                `${prefix}channel rename <#channel> <name>\n` +
-                `${prefix}channel nsfw <#channel>`)
-            .addField("help", "you can create/delete multiple channels at the same time, examples on this can be seen below")
-            .addField("examples", `${prefix}channel create channel\n` +
-                `${prefix}channel create channel1 channel2 channel3\n` +
-                `${prefix}channel delete #channel1 #channel2 #channel3`)
+            .addField(
+                "usage",
+                `${prefix}channel create <name(s)>\n` +
+                    `${prefix}channel delete <#channel(s)>\n` +
+                    `${prefix}channel rename <#channel> <name>\n` +
+                    `${prefix}channel nsfw <#channel>`
+            )
+            .addField(
+                "help",
+                "you can create/delete multiple channels at the same time, examples on this can be seen below"
+            )
+            .addField(
+                "examples",
+                `${prefix}channel create channel\n` +
+                    `${prefix}channel create channel1 channel2 channel3\n` +
+                    `${prefix}channel delete #channel1 #channel2 #channel3`
+            )
 
         return message.channel.send(embed)
     }
 
     if (args[0] == "create" || args[0] == "c") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${prefix}channel **c**reate <name1 name2>\nexample: ${prefix}channel c channel1 channel2`))
+            return message.channel.send(
+                new ErrorEmbed(
+                    `${prefix}channel **c**reate <name1 name2>\nexample: ${prefix}channel c channel1 channel2`
+                )
+            )
         }
         args.shift()
 
         let channels = ""
 
         for (let arg of args) {
-            const newChannel = await message.guild.channels.create(arg).catch(() => fail = true)
+            const newChannel = await message.guild.channels.create(arg).catch(() => (fail = true))
             if (fail) break
             channels = channels + "**" + newChannel.toString() + "** ✅\n"
         }
@@ -80,8 +96,9 @@ async function run(message, args) {
             return message.channel.send("❌ error creating channel(s)")
         }
 
-        const embed = new CustomEmbed(message.member, false, channels)
-            .setTitle("channel | " + message.member.user.username)
+        const embed = new CustomEmbed(message.member, false, channels).setTitle(
+            "channel | " + message.member.user.username
+        )
         return message.channel.send(embed)
     }
 
@@ -94,24 +111,31 @@ async function run(message, args) {
 
         let count = 0
 
-        message.mentions.channels.forEach(async channel => {
+        message.mentions.channels.forEach(async (channel) => {
             count++
             await channel.delete().catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("unable to delete channel: " + channel.name))
+                return message.channel.send(
+                    new ErrorEmbed("unable to delete channel: " + channel.name)
+                )
             })
         })
 
         if (fail) return
 
-        const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** channels deleted")
-            .setTitle("channel | " + message.member.user.username)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "✅ **" + count + "** channels deleted"
+        ).setTitle("channel | " + message.member.user.username)
         return message.channel.send(embed).catch()
     }
 
     if (args[0] == "rename" || args[0] == "r") {
         if (!args.length >= 3) {
-            return message.channel.send(new ErrorEmbed(`${prefix}channel **r**ename <channel> <name>`))
+            return message.channel.send(
+                new ErrorEmbed(`${prefix}channel **r**ename <channel> <name>`)
+            )
         }
         const channel = message.mentions.channels.first()
 
@@ -124,16 +148,21 @@ async function run(message, args) {
 
         const name = args.join("-")
 
-        await channel.edit({name: name}).then(() => {
-        }).catch(() => {
-            fail = true
-            return message.channel.send(new ErrorEmbed("unable to rename channel"))
-        })
+        await channel
+            .edit({ name: name })
+            .then(() => {})
+            .catch(() => {
+                fail = true
+                return message.channel.send(new ErrorEmbed("unable to rename channel"))
+            })
 
         if (fail) return
 
-        const embed = new CustomEmbed(message.member, false, "✅ channel renamed to " + name)
-            .setTitle("channel | " + message.member.user.username)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            "✅ channel renamed to " + name
+        ).setTitle("channel | " + message.member.user.username)
         return message.channel.send(embed)
     }
 
@@ -151,31 +180,39 @@ async function run(message, args) {
         let perms = true
 
         if (!channel.nsfw) {
-            await channel.edit({nsfw: true}).catch(() => {
+            await channel.edit({ nsfw: true }).catch(() => {
                 perms = false
                 return message.channel.send(new ErrorEmbed("unable to edit that channel"))
             })
             if (!perms) {
                 return
             }
-            const embed = new CustomEmbed(message.member, false, channel.toString() + "\n\n✅ channel is now nsfw")
-                .setTitle("channel | " + message.member.user.username)
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                channel.toString() + "\n\n✅ channel is now nsfw"
+            ).setTitle("channel | " + message.member.user.username)
             return message.channel.send(embed)
         } else {
-            await channel.edit({nsfw: false}).catch(() => {
+            await channel.edit({ nsfw: false }).catch(() => {
                 perms = false
                 return message.channel.send(new ErrorEmbed("unable to edit that channel"))
             })
             if (!perms) {
                 return
             }
-            const embed = new CustomEmbed(message.member, false, channel.toString() + "\n\n✅ channel is no longer nsfw")
-                .setTitle("channel")
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                channel.toString() + "\n\n✅ channel is no longer nsfw"
+            ).setTitle("channel")
             return message.channel.send(embed)
         }
     }
 
-    return message.channel.send("❌ $channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)")
+    return message.channel.send(
+        "❌ $channel <**c**reate/**del**ete/**r**ename/nsfw> <channel> (name)"
+    )
 }
 
 cmd.setRun(run)

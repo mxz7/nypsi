@@ -11,7 +11,15 @@ module.exports = async (message) => {
     if (message.author.bot) return
 
     if (!message.guild) {
-        console.log("\x1b[33m[" + getTimestamp() + "] message in DM from " + message.author.tag + ": '" + message.content + "'\x1b[37m")
+        console.log(
+            "\x1b[33m[" +
+                getTimestamp() +
+                "] message in DM from " +
+                message.author.tag +
+                ": '" +
+                message.content +
+                "'\x1b[37m"
+        )
 
         const embed = new MessageEmbed()
             .setTitle("support")
@@ -24,11 +32,11 @@ module.exports = async (message) => {
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
-    
+
         content = content.replace(/[^A-z0-9\s]/g, "")
 
         content = content.split(" ")
-    
+
         for (let word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
                 return await message.delete()
@@ -53,7 +61,7 @@ module.exports = async (message) => {
             user: message.author.tag,
             content: content,
             date: message.createdTimestamp,
-            link: message.url
+            link: message.url,
         }
 
         if (!mentions.has(message.guild.id)) {
@@ -81,20 +89,20 @@ module.exports = async (message) => {
     }
 
     if (message.mentions.everyone) {
-        let members = message.guild.members.cache
+        let members = message.channel.members
 
         if (!inCooldown(message.guild)) {
-            members = await message.guild.members.fetch()
+            await message.guild.members.fetch()
         }
 
         members.forEach((m) => addMention(m))
     } else if (message.mentions.roles.first()) {
-        message.mentions.roles.forEach(r => {
+        message.mentions.roles.forEach((r) => {
             r.members.forEach((m) => addMention(m))
         })
     } else if (message.mentions.members.first()) {
         message.mentions.members.forEach((m) => addMention(m))
-    } 
+    }
 
     let prefix = getPrefix(message.guild)
 

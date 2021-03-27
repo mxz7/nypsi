@@ -7,14 +7,15 @@ const { isPremium } = require("../premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases(["howgay"])
+const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases([
+    "howgay",
+])
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
     let cacheTime = 60
 
@@ -81,7 +82,7 @@ async function run(message, args) {
             cache.delete(member.user.id)
         }, cacheTime * 1000)
     }
-    
+
     let gayText = ""
     let gayEmoji = ""
 
@@ -99,11 +100,13 @@ async function run(message, args) {
         gayText = "thought we coulda had smth 🙄"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`)
-        .setTitle("gay calculator")
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
+    ).setTitle("gay calculator")
 
     return await message.channel.send(embed)
-
 }
 
 cmd.setRun(run)

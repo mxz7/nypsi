@@ -149,7 +149,7 @@ setInterval(async () => {
 
         const now = new Date().getTime()
 
-        for (ch of channels) {
+        for (const ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
                     const channel = await guild.channels.cache.find((cha) => cha.id == ch)

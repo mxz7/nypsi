@@ -9,11 +9,10 @@ const cooldown = new Map()
 const cmd = new Command("birb", "get a random picture of a birb", categories.ANIMALS)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 5
 
     if (isPremium(message.author.id)) {

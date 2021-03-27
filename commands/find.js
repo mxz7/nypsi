@@ -1,7 +1,17 @@
 const { Message, Guild } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../guilds/utils.js")
-const { getBalance, userExists, topAmount, topAmountGlobal, getBankBalance, getMaxBankBalance, getXp, hasVoted, getPrestige } = require("../economy/utils.js")
+const {
+    getBalance,
+    userExists,
+    topAmount,
+    topAmountGlobal,
+    getBankBalance,
+    getMaxBankBalance,
+    getXp,
+    hasVoted,
+    getPrestige,
+} = require("../economy/utils.js")
 const { categories, Command } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -13,20 +23,19 @@ _abc123.setPermissions(["bot owner"])
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args)  {
+async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) return
 
     if (args[0] == "id") {
         if (args.length == 1) return
-        
+
         const users = message.client.users.cache
         const guilds = message.client.guilds.cache
 
-        let user = users.find(u => u.id == args[1])
+        let user = users.find((u) => u.id == args[1])
         if (!user) {
-
             user = await message.client.users.fetch(args[1])
 
             if (!user) {
@@ -38,8 +47,8 @@ async function run(message, args)  {
 
         let guildNames = ""
 
-        guilds.forEach(g => {
-            const abc = g.members.cache.find(u => u.id == args[1])
+        guilds.forEach((g) => {
+            const abc = g.members.cache.find((u) => u.id == args[1])
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
@@ -56,17 +65,32 @@ async function run(message, args)  {
         if (userExists(user.id)) {
             let voted = false
             if (await hasVoted(user.id)) voted = true
-            embed.addField("economy", "💰 $**" + getBalance(user.id).toLocaleString() + "**\n" +
-                "💳 $**" + getBankBalance(user.id).toLocaleString() + "** / **" + getMaxBankBalance(user.id).toLocaleString() + "**\n" +
-                "**xp** " + getXp(user.id).toLocaleString() + "\n" +
-                "**voted** " + voted + "\n" +
-                "**prestige** " + getPrestige(user.id), true)
+            embed.addField(
+                "economy",
+                "💰 $**" +
+                    getBalance(user.id).toLocaleString() +
+                    "**\n" +
+                    "💳 $**" +
+                    getBankBalance(user.id).toLocaleString() +
+                    "** / **" +
+                    getMaxBankBalance(user.id).toLocaleString() +
+                    "**\n" +
+                    "**xp** " +
+                    getXp(user.id).toLocaleString() +
+                    "\n" +
+                    "**voted** " +
+                    voted +
+                    "\n" +
+                    "**prestige** " +
+                    getPrestige(user.id),
+                true
+            )
         }
 
         if (guildNames != "") {
             embed.addField("guilds", guildNames)
         }
-        
+
         message.channel.send(embed)
     } else if (args[0] == "tag") {
         if (args.length == 1) return
@@ -74,7 +98,9 @@ async function run(message, args)  {
         const users = message.client.users.cache
         const guilds = message.client.guilds.cache
 
-        let user = users.find(u => (u.username + "#" + u.discriminator).toLowerCase().includes(args[1]))
+        let user = users.find((u) =>
+            (u.username + "#" + u.discriminator).toLowerCase().includes(args[1])
+        )
 
         if (!user) {
             return message.react("❌")
@@ -84,8 +110,8 @@ async function run(message, args)  {
 
         let guildNames = ""
 
-        guilds.forEach(g => {
-            const abc = g.members.cache.find(u => u.user.tag.toLowerCase().includes(args[1]))
+        guilds.forEach((g) => {
+            const abc = g.members.cache.find((u) => u.user.tag.toLowerCase().includes(args[1]))
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
@@ -102,22 +128,37 @@ async function run(message, args)  {
         if (userExists(user.id)) {
             let voted = false
             if (await hasVoted(user.id)) voted = true
-            embed.addField("economy", "💰 $**" + getBalance(user.id).toLocaleString() + "**\n" +
-                "💳 $**" + getBankBalance(user.id).toLocaleString() + "** / **" + getMaxBankBalance(user.id).toLocaleString() + "**\n" +
-                "**xp** " + getXp(user.id).toLocaleString() + "\n" +
-                "**voted** " + voted + "\n" +
-                "**prestige** " + getPrestige(user.id), true)
+            embed.addField(
+                "economy",
+                "💰 $**" +
+                    getBalance(user.id).toLocaleString() +
+                    "**\n" +
+                    "💳 $**" +
+                    getBankBalance(user.id).toLocaleString() +
+                    "** / **" +
+                    getMaxBankBalance(user.id).toLocaleString() +
+                    "**\n" +
+                    "**xp** " +
+                    getXp(user.id).toLocaleString() +
+                    "\n" +
+                    "**voted** " +
+                    voted +
+                    "\n" +
+                    "**prestige** " +
+                    getPrestige(user.id),
+                true
+            )
         }
 
         if (guildNames != "") {
             embed.addField("guilds", guildNames)
         }
-        
+
         message.channel.send(embed)
     } else if (args[0] == "gid") {
         if (args.length == 1) return
 
-        const guild = message.client.guilds.cache.find(g => g.id == args[1])
+        const guild = message.client.guilds.cache.find((g) => g.id == args[1])
 
         if (!guild) {
             return message.react("❌")
@@ -128,7 +169,7 @@ async function run(message, args)  {
 
             const names = new Map()
 
-            members.forEach(m => {
+            members.forEach((m) => {
                 if (names.size == 0) {
                     const value1 = []
                     value1.push("`" + m.user.tag + "`")
@@ -146,32 +187,38 @@ async function run(message, args)  {
                 }
             })
 
-            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
-                .setTitle(guild.name)
-            
+            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n")).setTitle(
+                guild.name
+            )
+
             const msg = await message.channel.send(embed)
-    
+
             if (names.size >= 2) {
                 await msg.react("⬅")
                 await msg.react("➡")
-    
+
                 let currentPage = 1
                 const lastPage = names.size
-    
+
                 const filter = (reaction, user) => {
-                    return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                    return (
+                        ["⬅", "➡"].includes(reaction.emoji.name) &&
+                        user.id == message.member.user.id
+                    )
                 }
-    
+
                 const pageManager = async () => {
-                    const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                        .then(collected => {
+                    const reaction = await msg
+                        .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                        .then((collected) => {
                             return collected.first().emoji.name
-                        }).catch(async () => {
+                        })
+                        .catch(async () => {
                             await msg.reactions.removeAll()
                         })
-                    
+
                     if (!reaction) return
-            
+
                     if (reaction == "⬅") {
                         if (currentPage <= 1) {
                             return pageManager()
@@ -201,13 +248,15 @@ async function run(message, args)  {
 
         const msg = await guildInfo(guild)
 
-        message.channel.send(msg) 
+        message.channel.send(msg)
     } else if (args[0] == "gname") {
         if (args.length == 1) return
 
         args.shift()
 
-        const guild = message.client.guilds.cache.find(g => g.name.toLowerCase().includes(args.join(" ").replace("-m", "")))
+        const guild = message.client.guilds.cache.find((g) =>
+            g.name.toLowerCase().includes(args.join(" ").replace("-m", ""))
+        )
 
         if (!guild) {
             return message.react("❌")
@@ -218,7 +267,7 @@ async function run(message, args)  {
 
             const names = new Map()
 
-            members.forEach(m => {
+            members.forEach((m) => {
                 if (names.size == 0) {
                     const value1 = []
                     value1.push("`" + m.user.tag + "`")
@@ -236,32 +285,38 @@ async function run(message, args)  {
                 }
             })
 
-            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
-                .setTitle(guild.name)
-            
+            const embed = new CustomEmbed(message.member, false, names.get(1).join("\n")).setTitle(
+                guild.name
+            )
+
             const msg = await message.channel.send(embed)
-    
+
             if (names.size >= 2) {
                 await msg.react("⬅")
                 await msg.react("➡")
-    
+
                 let currentPage = 1
                 const lastPage = names.size
-    
+
                 const filter = (reaction, user) => {
-                    return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                    return (
+                        ["⬅", "➡"].includes(reaction.emoji.name) &&
+                        user.id == message.member.user.id
+                    )
                 }
-    
+
                 const pageManager = async () => {
-                    const reaction = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                        .then(collected => {
+                    const reaction = await msg
+                        .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                        .then((collected) => {
                             return collected.first().emoji.name
-                        }).catch(async () => {
+                        })
+                        .catch(async () => {
                             await msg.reactions.removeAll()
                         })
-                    
+
                     if (!reaction) return
-            
+
                     if (reaction == "⬅") {
                         if (currentPage <= 1) {
                             return pageManager()
@@ -291,9 +346,8 @@ async function run(message, args)  {
 
         const msg = await guildInfo(guild)
 
-        message.channel.send(msg)            
+        message.channel.send(msg)
     } else if (args[0] == "top") {
-
         let amount = 5
 
         if (args.length > 1 && parseInt(args[1])) {
@@ -306,8 +360,9 @@ async function run(message, args)  {
             return el != null
         })
 
-        const embed = new CustomEmbed(message.member, false, filtered)
-            .setTitle("top " + filtered.length)
+        const embed = new CustomEmbed(message.member, false, filtered).setTitle(
+            "top " + filtered.length
+        )
 
         message.channel.send(embed)
     }
@@ -318,8 +373,8 @@ _abc123.setRun(run)
 module.exports = _abc123
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  */
 async function guildInfo(guild) {
     const balTop = await topAmount(guild, 5)
@@ -347,17 +402,44 @@ async function guildInfo(guild) {
     const embed = new CustomEmbed()
         .setDescription("`" + guild.id + "`")
         .setTitle(guild.name)
-        .setThumbnail(guild.iconURL({format: "png", dynamic: true, size: 128}))
-        .addField("info", "**owner** " + owner + "\n" + 
-            "**created** " + formatDate(guild.createdAt) + "\n" +
-            "**region** " + guild.region, true)
-        .addField("info", "**roles** " + guild.roles.cache.size + "\n" + 
-            "**channels** " + guild.channels.cache.size, true)
-        .addField("member info", "**members** " + guild.memberCount.toLocaleString() + "\n" +
-            "**member peak** " + getPeaks(guild).members.toLocaleString(), true)
+        .setThumbnail(guild.iconURL({ format: "png", dynamic: true, size: 128 }))
+        .addField(
+            "info",
+            "**owner** " +
+                owner +
+                "\n" +
+                "**created** " +
+                formatDate(guild.createdAt) +
+                "\n" +
+                "**region** " +
+                guild.region,
+            true
+        )
+        .addField(
+            "info",
+            "**roles** " +
+                guild.roles.cache.size +
+                "\n" +
+                "**channels** " +
+                guild.channels.cache.size,
+            true
+        )
+        .addField(
+            "member info",
+            "**members** " +
+                guild.memberCount.toLocaleString() +
+                "\n" +
+                "**member peak** " +
+                getPeaks(guild).members.toLocaleString(),
+            true
+        )
 
     if (invites && invites.length > 0) {
-        embed.addField("invite (" + invites.length + ")", invites[Math.floor(Math.random() * invites.length)], true)
+        embed.addField(
+            "invite (" + invites.length + ")",
+            invites[Math.floor(Math.random() * invites.length)],
+            true
+        )
     }
 
     if (filtered.length > 0) {

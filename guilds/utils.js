@@ -12,7 +12,6 @@ setInterval(() => {
     const guilds1 = JSON.parse(fs.readFileSync("./guilds/data.json"))
 
     if (JSON.stringify(guilds) != JSON.stringify(guilds1)) {
-
         fs.writeFile("./guilds/data.json", JSON.stringify(guilds), (err) => {
             if (err) {
                 return console.log(err)
@@ -39,9 +38,11 @@ setInterval(async () => {
 
     const now = new Date().getTime()
 
-    let snipeCount, eSnipeCount, mentionsCount = 0
+    let snipeCount,
+        eSnipeCount,
+        mentionsCount = 0
 
-    await snipe.forEach(msg => {
+    await snipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp
 
         if (diff >= 43200000) {
@@ -51,10 +52,12 @@ setInterval(async () => {
     })
 
     if (snipeCount > 0) {
-        console.log("[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages")
+        console.log(
+            "[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages"
+        )
     }
 
-    await eSnipe.forEach(msg => {
+    await eSnipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp
 
         if (diff >= 43200000) {
@@ -64,13 +67,19 @@ setInterval(async () => {
     })
 
     if (eSnipeCount > 0) {
-        console.log("[" + getTimestamp() + "] deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
+        console.log(
+            "[" +
+                getTimestamp() +
+                "] deleted " +
+                eSnipeCount.toLocaleString() +
+                " edit sniped messages"
+        )
     }
 
     await mentions.forEach(async (guildData, key) => {
         await guildData.forEach((userData, key) => {
             for (let i of userData) {
-                const diff = now - i.date 
+                const diff = now - i.date
 
                 if (diff >= 86400000) {
                     userData.splice(userData.indexOf(i), 1)
@@ -88,15 +97,15 @@ setInterval(async () => {
     })
 
     if (mentionsCount > 0) {
-        console.log("[" + getTimestamp() + "] deleted " + mentionsCount.toLocaleString() + " mentions")
+        console.log(
+            "[" + getTimestamp() + "] deleted " + mentionsCount.toLocaleString() + " mentions"
+        )
     }
-
 }, 3600000)
 
 setInterval(async () => {
-
     const { checkGuild } = require("../nypsi")
-    
+
     for (let guild in guilds) {
         const exists = await checkGuild(guild)
 
@@ -106,14 +115,13 @@ setInterval(async () => {
             console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds data`)
         }
     }
-
 }, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
 const checkCooldown = new Set()
 
 /**
- * 
+ *
  * @param {Guild} guild run check for guild
  */
 async function runCheck(guild) {
@@ -131,7 +139,16 @@ async function runCheck(guild) {
 
     if (guild.memberCount > currentMembersPeak) {
         guilds[guild.id].peaks.members = guild.memberCount
-        console.log("[" + getTimestamp() + "] members peak updated for '" + guild.name + "' " + currentMembersPeak.toLocaleString() + " -> " + guild.memberCount.toLocaleString())
+        console.log(
+            "[" +
+                getTimestamp() +
+                "] members peak updated for '" +
+                guild.name +
+                "' " +
+                currentMembersPeak.toLocaleString() +
+                " -> " +
+                guild.memberCount.toLocaleString()
+        )
     }
 }
 
@@ -139,7 +156,7 @@ exports.runCheck = runCheck
 
 /**
  * @returns {Boolean}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function hasGuild(guild) {
     if (guilds[guild.id]) {
@@ -153,7 +170,7 @@ exports.hasGuild = hasGuild
 
 /**
  * @returns {JSON}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function getPeaks(guild) {
     return guilds[guild.id].peaks
@@ -162,11 +179,11 @@ function getPeaks(guild) {
 exports.getPeaks = getPeaks
 
 /**
- * 
+ *
  * @param {Guild} guild create guild profile
  */
 function createGuild(guild) {
-    const members = guild.members.cache.filter(member => !member.user.bot)
+    const members = guild.members.cache.filter((member) => !member.user.bot)
 
     guilds[guild.id] = new GuildStorage(members.size, 0)
 }
@@ -184,9 +201,9 @@ function getSnipeFilter(guild) {
 exports.getSnipeFilter = getSnipeFilter
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Array<String>} array 
+ *
+ * @param {Guild} guild
+ * @param {Array<String>} array
  */
 function updateFilter(guild, array) {
     guilds[guild.id].snipeFilter = array
@@ -196,7 +213,7 @@ exports.updateFilter = updateFilter
 
 /**
  * @returns {Boolean}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function hasStatsEnabled(guild) {
     if (guilds[guild.id].counter.enabled == true) {
@@ -209,15 +226,15 @@ function hasStatsEnabled(guild) {
 exports.hasStatsEnabled = hasStatsEnabled
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  */
 function createDefaultStatsProfile(guild) {
     guilds[guild.id].counter = {
         enabled: false,
         format: "members: %count% (%peak%)",
         filterBots: true,
-        channel: "none"
+        channel: "none",
     }
 }
 
@@ -225,7 +242,7 @@ exports.createDefaultStatsProfile = createDefaultStatsProfile
 
 /**
  * @returns {JSON}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function getStatsProfile(guild) {
     return guilds[guild.id].counter
@@ -234,9 +251,9 @@ function getStatsProfile(guild) {
 exports.getStatsProfile = getStatsProfile
 
 /**
- * 
- * @param {Guild} guild 
- * @param {JSON} profile 
+ *
+ * @param {Guild} guild
+ * @param {JSON} profile
  */
 function setStatsProfile(guild, profile) {
     guilds[guild.id].counter = profile
@@ -259,8 +276,8 @@ function getGuilds() {
 exports.getGuilds = getGuilds
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  */
 async function checkStats(guild) {
     let memberCount
@@ -269,7 +286,6 @@ async function checkStats(guild) {
         guilds[guild.id].counter.filterBots = false
         memberCount = guild.memberCount
     } else if (guilds[guild.id].counter.filterBots) {
-
         let members
 
         if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -280,7 +296,7 @@ async function checkStats(guild) {
         }
 
         if (members.size == guild.memberCount) {
-            members = members.filter(m => !m.user.bot)
+            members = members.filter((m) => !m.user.bot)
 
             memberCount = members.size
         } else {
@@ -292,7 +308,7 @@ async function checkStats(guild) {
 
     if (!memberCount) memberCount = guild.memberCount
 
-    const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].counter.channel)
+    const channel = guild.channels.cache.find((c) => c.id == guilds[guild.id].counter.channel)
 
     if (!channel) {
         guilds[guild.id].counter.enabled = false
@@ -307,22 +323,35 @@ async function checkStats(guild) {
     if (channel.name != format) {
         const old = channel.name
 
-        await channel.edit({name: format}).then(() => {
-            console.log("[" + getTimestamp() + "] counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
-        }).catch(() => {
-            console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
-            guilds[guild.id].counter.enabled = false
-            guilds[guild.id].counter.channel = "none"
-        })
+        await channel
+            .edit({ name: format })
+            .then(() => {
+                console.log(
+                    "[" +
+                        getTimestamp() +
+                        "] counter updated for '" +
+                        guild.name +
+                        "' ~ '" +
+                        old +
+                        "' -> '" +
+                        format +
+                        "'"
+                )
+            })
+            .catch(() => {
+                console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
+                guilds[guild.id].counter.enabled = false
+                guilds[guild.id].counter.channel = "none"
+            })
     }
 }
 
 exports.checkStats = checkStats
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Number} seconds 
+ *
+ * @param {Guild} guild
+ * @param {Number} seconds
  */
 function addCooldown(guild, seconds) {
     fetchCooldown.add(guild.id)
@@ -336,7 +365,7 @@ exports.addCooldown = addCooldown
 
 /**
  * @returns {Boolean}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function inCooldown(guild) {
     if (fetchCooldown.has(guild.id)) {
@@ -350,7 +379,7 @@ exports.inCooldown = inCooldown
 
 /**
  * @returns {String}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function getPrefix(guild) {
     try {
@@ -364,9 +393,9 @@ function getPrefix(guild) {
 exports.getPrefix = getPrefix
 
 /**
- * 
- * @param {Guild} guild 
- * @param {String} prefix 
+ *
+ * @param {Guild} guild
+ * @param {String} prefix
  */
 function setPrefix(guild, prefix) {
     guilds[guild.id].prefix = prefix
@@ -376,7 +405,7 @@ exports.setPrefix = setPrefix
 
 /**
  * @returns {Boolean}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function hasChristmasCountdown(guild) {
     if (!guilds[guild.id].xmas) {
@@ -392,7 +421,7 @@ function createNewChristmasCountdown(guild) {
     guilds[guild.id].xmas = {
         enabled: false,
         format: "`%days%` days until christmas",
-        channel: "none"
+        channel: "none",
     }
 }
 
@@ -400,7 +429,7 @@ exports.createNewChristmasCountdown = createNewChristmasCountdown
 
 /**
  * @returns {JSON}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function getChristmasCountdown(guild) {
     return guilds[guild.id].xmas
@@ -409,9 +438,9 @@ function getChristmasCountdown(guild) {
 exports.getChristmasCountdown = getChristmasCountdown
 
 /**
- * 
- * @param {Guild} guild 
- * @param {JSON} xmas 
+ *
+ * @param {Guild} guild
+ * @param {JSON} xmas
  */
 function setChristmasCountdown(guild, xmas) {
     guilds[guild.id].xmas = xmas
@@ -421,7 +450,7 @@ exports.setChristmasCountdown = setChristmasCountdown
 
 /**
  * @returns {Boolean}
- * @param {Guild} guild 
+ * @param {Guild} guild
  */
 function hasChristmasCountdownEnabled(guild) {
     if (!hasChristmasCountdown(guild)) return false
@@ -436,11 +465,11 @@ function hasChristmasCountdownEnabled(guild) {
 exports.hasChristmasCountdownEnabled = hasChristmasCountdownEnabled
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  */
 async function checkChristmasCountdown(guild) {
-    const channel = guild.channels.cache.find(c => c.id == guilds[guild.id].xmas.channel)
+    const channel = guild.channels.cache.find((c) => c.id == guilds[guild.id].xmas.channel)
 
     if (!channel) {
         guilds[guild.id].xmas.enabled = false
@@ -458,14 +487,19 @@ async function checkChristmasCountdown(guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
     }
 
-    await channel.send(new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")).then(() => {
-        console.log(`[${getTimestamp()}] sent christmas countdown in ${guild.name} ~ ${format}`)
-    }).catch(() => {
-        console.log(`[${getTimestamp()}] error sending christmas countdown in ${guild.name}`)
-        guilds[guild.id].xmas.enabled = false
-        guilds[guild.id].xmas.channel = "none"
-        return
-    })
+    await channel
+        .send(
+            new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")
+        )
+        .then(() => {
+            console.log(`[${getTimestamp()}] sent christmas countdown in ${guild.name} ~ ${format}`)
+        })
+        .catch(() => {
+            console.log(`[${getTimestamp()}] error sending christmas countdown in ${guild.name}`)
+            guilds[guild.id].xmas.enabled = false
+            guilds[guild.id].xmas.channel = "none"
+            return
+        })
 }
 
 exports.checkChristmasCountdown = checkChristmasCountdown
@@ -481,9 +515,9 @@ function getChatFilter(guild) {
 exports.getChatFilter = getChatFilter
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Array<String>} array 
+ *
+ * @param {Guild} guild
+ * @param {Array<String>} array
  */
 function updateChatFilter(guild, array) {
     guilds[guild.id].chatFilter = array
@@ -492,7 +526,7 @@ function updateChatFilter(guild, array) {
 exports.updateChatFilter = updateChatFilter
 
 /**
- * @param {Guild} guild 
+ * @param {Guild} guild
  * @returns {Array<String>}
  */
 function getDisabledCommands(guild) {
@@ -502,9 +536,9 @@ function getDisabledCommands(guild) {
 exports.getDisabledCommands = getDisabledCommands
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Array<String>} array 
+ *
+ * @param {Guild} guild
+ * @param {Array<String>} array
  */
 function updateDisabledCommands(guild, array) {
     guilds[guild.id].disabledCommands = array

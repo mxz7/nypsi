@@ -10,11 +10,10 @@ const cooldown = new Map()
 const cmd = new Command("skin", "view the skin of a minecraft account", categories.MINECRAFT)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
@@ -60,18 +59,22 @@ async function run(message, args) {
     let uuid
 
     try {
-        uuid = await fetch(uuidURL).then(uuidURL => uuidURL.json())
+        uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json())
     } catch (e) {
         return message.channel.send(new ErrorEmbed("invalid account"))
     }
 
     const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
 
-    const embed = new CustomEmbed(message.member, false, `[download](https://mc-heads.net/download/${uuid.id})`)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `[download](https://mc-heads.net/download/${uuid.id})`
+    )
         .setTitle(uuid.name)
         .setURL("https://namemc.com/profile/" + username)
         .setImage(skinIMG)
-    
+
     return message.channel.send(embed)
 }
 

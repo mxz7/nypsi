@@ -14,16 +14,25 @@ const lizardCache = new Map()
 const rabbitCache = new Map()
 const snekCache = new Map()
 
-const bdsmLinks = ["https://www.reddit.com/r/bdsm.json?limit=777", "https://www.reddit.com/r/bondage.json?limit=777", "https://www.reddit.com/r/dominated.json?limit=777"]
-const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777",
+const bdsmLinks = [
+    "https://www.reddit.com/r/bdsm.json?limit=777",
+    "https://www.reddit.com/r/bondage.json?limit=777",
+    "https://www.reddit.com/r/dominated.json?limit=777",
+]
+const thighsLinks = [
+    "https://www.reddit.com/r/legs.json?limit=777",
     "https://www.reddit.com/r/thickthighs.json?limit=777",
     "https://www.reddit.com/r/perfectthighs.json?limit=777",
-    "https://www.reddit.com/r/thighs.json?limit=777"]
-const boobLinks = ["https://www.reddit.com/r/Boobies.json?limit=777",
+    "https://www.reddit.com/r/thighs.json?limit=777",
+]
+const boobLinks = [
+    "https://www.reddit.com/r/Boobies.json?limit=777",
     "https://www.reddit.com/r/cleavage.json?limit=777",
     "https://www.reddit.com/r/tits.json?limit=777",
-    "https://www.reddit.com/r/TinyTits.json?limit=777"]
-const assLinks = ["https://www.reddit.com/r/ass.json?limit=777",
+    "https://www.reddit.com/r/TinyTits.json?limit=777",
+]
+const assLinks = [
+    "https://www.reddit.com/r/ass.json?limit=777",
     "https://www.reddit.com/r/asstastic.json?limit=777",
     "https://www.reddit.com/r/facedownassup.json?limit=777",
     "https://www.reddit.com/r/assinthong.json?limit=777",
@@ -35,9 +44,11 @@ const assLinks = ["https://www.reddit.com/r/ass.json?limit=777",
     "https://www.reddit.com/r/WhiteCheeks.json?limit=777",
     "https://www.reddit.com/r/AssholeBehindThong.json?limit=777",
     "https://www.reddit.com/r/WomenBendingOver.json?limit=777",
-    "https://www.reddit.com/r/thickwhitegirls.json?limit=777"]
-const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777", 
-    "https://www.reddit.com/r/realgirls.json?limit=777", 
+    "https://www.reddit.com/r/thickwhitegirls.json?limit=777",
+]
+const pornLinks = [
+    "https://www.reddit.com/r/collegesluts.json?limit=777",
+    "https://www.reddit.com/r/realgirls.json?limit=777",
     "https://www.reddit.com/r/legalteens.json?limit=777",
     "https://www.reddit.com/r/amateur.json?limit=777",
     "https://www.reddit.com/r/nsfw_snapchat.json?limit=777",
@@ -52,41 +63,54 @@ const pornLinks = ["https://www.reddit.com/r/collegesluts.json?limit=777",
     "https://www.reddit.com/r/cumsluts.json?limit=777",
     "https://www.reddit.com/r/cumfetish.json?limit=777",
     "https://www.reddit.com/r/creampies.json?limit=777",
-    "https://www.reddit.com/r/Phatasswhitegirls.json?limit=777"]
-const birbLinks = ["https://www.reddit.com/r/birb.json?limit=777", 
+    "https://www.reddit.com/r/Phatasswhitegirls.json?limit=777",
+]
+const birbLinks = [
+    "https://www.reddit.com/r/birb.json?limit=777",
     "https://www.reddit.com/r/budgies.json?limit=777",
-    "https://www.reddit.com/r/parrots.json?limit=777"]
-const catLinks = ["https://www.reddit.com/r/cat.json?limit=777",
-    "https://www.reddit.com/r/kittens.json?limit=777"]
-const dogLinks = ["https://www.reddit.com/r/dog.json?limit=777",
+    "https://www.reddit.com/r/parrots.json?limit=777",
+]
+const catLinks = [
+    "https://www.reddit.com/r/cat.json?limit=777",
+    "https://www.reddit.com/r/kittens.json?limit=777",
+]
+const dogLinks = [
+    "https://www.reddit.com/r/dog.json?limit=777",
     "https://www.reddit.com/r/corgi.json?limit=777",
     "https://www.reddit.com/r/dogpictures.json?limit=777",
     "https://www.reddit.com/r/goldenretrievers.json?limit=777",
-    "https://www.reddit.com/r/shiba.json?limit=777"]
-const duckLinks = ["https://www.reddit.com/r/duck.json?limit=777",
-    "https://www.reddit.com/r/BACKYARDDUCKS.json?limit=777"]
-const lizardLinks = ["https://www.reddit.com/r/Lizards.json?limit=777",
-    "https://www.reddit.com/r/BeardedDragons.json?limit=777"]
+    "https://www.reddit.com/r/shiba.json?limit=777",
+]
+const duckLinks = [
+    "https://www.reddit.com/r/duck.json?limit=777",
+    "https://www.reddit.com/r/BACKYARDDUCKS.json?limit=777",
+]
+const lizardLinks = [
+    "https://www.reddit.com/r/Lizards.json?limit=777",
+    "https://www.reddit.com/r/BeardedDragons.json?limit=777",
+]
 const rabbitLinks = ["https://www.reddit.com/r/rabbits.json?limit=777"]
 const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
 
 /**
- * 
- * @param {Array<String>} links 
- * @param {Map} imgs 
- * @param {String} name 
+ *
+ * @param {Array<String>} links
+ * @param {Map} imgs
+ * @param {String} name
  */
 async function cacheUpdate(links, imgs, name) {
     const start = new Date().getTime()
     for (let link of links) {
-        const res = await fetch(link).then(a => a.json())
-        
+        const res = await fetch(link).then((a) => a.json())
+
         if (res.message == "Forbidden") {
-            console.log(`\x1b[31m[${getTimestamp()}] skipped ${link} due to private subreddit\x1b[37m`)
+            console.log(
+                `\x1b[31m[${getTimestamp()}] skipped ${link} due to private subreddit\x1b[37m`
+            )
             continue
         }
 
-        const allowed = res.data.children.filter(post => !post.data.is_self)
+        const allowed = res.data.children.filter((post) => !post.data.is_self)
         if (allowed) {
             imgs.set(link, allowed)
         } else {
@@ -94,7 +118,7 @@ async function cacheUpdate(links, imgs, name) {
         }
     }
     const end = new Date().getTime()
-    const total = ((end - start) / 1000) + "s"
+    const total = (end - start) / 1000 + "s"
     console.log(`\x1b[32m[${getTimestamp()}] ${name} images loaded (${total})\x1b[37m`)
 }
 
@@ -126,7 +150,7 @@ async function updateCache() {
     await cacheUpdate(snekLinks, snekCache, "snek")
     exports.snekCache = snekCache
     const end = new Date().getTime()
-    const total = ((end - start) / 1000) + "s"
+    const total = (end - start) / 1000 + "s"
     console.log("\x1b[32m[" + getTimestamp() + "] images updated (" + total + ")\x1b[37m")
 }
 

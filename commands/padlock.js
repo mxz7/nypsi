@@ -1,4 +1,12 @@
-const { hasPadlock, setPadlock, getBalance, updateBalance, createUser, userExists, getPadlockPrice } = require("../economy/utils.js")
+const {
+    hasPadlock,
+    setPadlock,
+    getBalance,
+    updateBalance,
+    createUser,
+    userExists,
+    getPadlockPrice,
+} = require("../economy/utils.js")
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
@@ -11,16 +19,16 @@ const cooldown = new Map()
 const cmd = new Command("padlock", "buy a padlock to protect your wallet", categories.MONEY)
 
 /**
- * @param {Message} message 
- * @param {Array<String>} args 
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle("padlock | " + message.member.user.username)
-    
+    const embed = new CustomEmbed(message.member).setTitle(
+        "padlock | " + message.member.user.username
+    )
+
     const padlockPrice = getPadlockPrice()
     const prefix = getPrefix(message.guild)
 
@@ -32,7 +40,9 @@ async function run(message, args) {
         }
 
         if (getBalance(message.member) < padlockPrice) {
-            return await message.channel.send(new ErrorEmbed("you cannot currently afford a padlock"))
+            return await message.channel.send(
+                new ErrorEmbed("you cannot currently afford a padlock")
+            )
         }
 
         let cooldownLength = 30
@@ -70,19 +80,28 @@ async function run(message, args) {
 
         updateBalance(message.member, getBalance(message.member) - padlockPrice)
         setPadlock(message.member, true)
-        return await message.channel.send(new CustomEmbed(message.member, false, "✅ you have successfully bought a padlock for $**" + padlockPrice.toLocaleString() + "**"))
+        return await message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                "✅ you have successfully bought a padlock for $**" +
+                    padlockPrice.toLocaleString() +
+                    "**"
+            )
+        )
     } else {
         if (hasPadlock(message.member)) {
             embed.setColor("#5efb8f")
             embed.setDescription("**protected** 🔒\nyou currently have a padlock")
             return await message.channel.send(embed).catch()
         } else {
-            embed.setDescription(`**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**${padlockPrice.toLocaleString()}** with ${prefix}padlock buy`)
+            embed.setDescription(
+                `**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**${padlockPrice.toLocaleString()}** with ${prefix}padlock buy`
+            )
             embed.setColor("#e4334f")
             return await message.channel.send(embed).catch()
         }
     }
-
 }
 
 cmd.setRun(run)
