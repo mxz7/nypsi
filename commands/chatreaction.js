@@ -199,6 +199,10 @@ async function run(message, args) {
 
                 settings.randomStart = true
 
+                if (settings.randomChannels.length == 0) {
+                    settings.randomChannels.push(message.channel.id)
+                }
+
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send(
@@ -284,6 +288,10 @@ async function run(message, args) {
                     }
                     settings.randomChannels.push(channel.id)
                     added = true
+                }
+
+                if (settings.randomChannels.length == 0) {
+                    settings.randomStart = false
                 }
 
                 updateReactionSettings(message.guild, settings)
