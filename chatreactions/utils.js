@@ -165,7 +165,7 @@ function updateReactionSettings(guild, settings) {
     data[guild.id].settings = settings
 }
 
-exports.updateReactionSettings
+exports.updateReactionSettings = updateReactionSettings
 
 /**
  * @param {Guild} guild
