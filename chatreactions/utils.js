@@ -478,6 +478,30 @@ async function getServerLeaderboard(guild) {
 exports.getServerLeaderboard = getServerLeaderboard
 
 /**
+ * @param {Guild} guild
+ * @returns {Boolean}
+ */
+function hasRandomReactionsEnabled(guild) {
+    if (data[guild.id].settings.randomStart) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.hasRandomReactionsEnabled = hasRandomReactionsEnabled
+
+/**
+ * @param {Guild} guild
+ * @returns {Array<String>}
+ */
+function getRandomChannels(guild) {
+    return data[guild.id].settings.randomChannels
+}
+
+exports.getRandomChannels = getRandomChannels
+
+/**
  * @returns {Array<String>}
  */
 async function getDefaultWords() {
