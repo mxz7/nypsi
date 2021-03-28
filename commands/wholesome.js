@@ -44,9 +44,11 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
+    const imageNumber = Math.floor(Math.random() * wholesome.length)
+
     const embed = new CustomEmbed(message.member)
-        .setTitle("<3")
-        .setImage(wholesome[Math.floor(Math.random() * wholesome.length)])
+        .embed.setAuthor(`<3 | #${imageNumber}`)
+        .setImage(wholesome[imageNumber])
 
     message.channel.send(embed)
 }
