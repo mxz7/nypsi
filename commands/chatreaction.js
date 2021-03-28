@@ -132,11 +132,11 @@ async function run(message, args) {
         return message.channel.send(embed)
     }
 
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return showStats()
-
     if (args.length == 0) {
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return showStats()
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
@@ -149,6 +149,7 @@ async function run(message, args) {
     } else if (args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "lb") {
         return showLeaderboard()
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
@@ -261,6 +262,7 @@ async function run(message, args) {
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
@@ -517,6 +519,7 @@ async function run(message, args) {
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
