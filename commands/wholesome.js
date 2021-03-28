@@ -46,8 +46,8 @@ async function run(message, args) {
 
     const imageNumber = Math.floor(Math.random() * wholesome.length)
 
-    const embed = new CustomEmbed(message.member)
-        .embed.setAuthor(`<3 | #${imageNumber}`)
+    const embed = new CustomEmbed(message.member).embed
+        .setAuthor(`<3 | #${imageNumber}`)
         .setImage(wholesome[imageNumber])
 
     message.channel.send(embed)
