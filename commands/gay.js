@@ -16,7 +16,7 @@ const cmd = new Command("gay", "very accurate gay level calculator", categories.
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    let cooldownLength = 5
+    let cooldownLength = 7
     let cacheTime = 60
 
     if (isPremium(message.author.id)) {

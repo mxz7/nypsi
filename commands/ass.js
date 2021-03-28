@@ -13,7 +13,7 @@ const cmd = new Command("ass", "get a random ass image", categories.NSFW).setAli
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    let cooldownLength = 5
+    let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1

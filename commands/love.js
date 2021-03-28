@@ -15,7 +15,7 @@ const cmd = new Command("love", "calculate your love with another person", categ
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    let cooldownLength = 5
+    let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
