@@ -13,7 +13,7 @@ const cmd = new Command("bdsm", "get a random bdsm image", categories.NSFW)
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    let cooldownLength = 5
+    let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
