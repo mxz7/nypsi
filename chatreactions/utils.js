@@ -356,6 +356,12 @@ async function startReaction(guild, channel) {
             embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``)
 
             addWin(guild, message.member)
+
+            setTimeout(() => {
+                if (winners.size != 3) {
+                    return collector.stop()
+                }
+            }, 5000)
         } else {
             if (winners.size == 1) {
                 waiting = true
@@ -409,6 +415,10 @@ async function startReaction(guild, channel) {
     collector.on("end", async () => {
         if (winners.size == 0) {
             embed.setDescription(embed.embed.description + "\n\nnobody won ):")
+        } else if (winners.size == 1) {
+            embed.setFooter("ended with 1 winner")
+        } else {
+            embed.setFooter(`ended with ${winners.size} winners`)
         }
         await msg.edit(embed)
         currentChannels.delete(channel.id)
