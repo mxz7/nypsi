@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { wholesome } = require("../lists.json")
+let wholesome = require("../lists.json").wholesome
 const { isPremium } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -38,6 +38,14 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
+    if (args.length == 1 && args[0] == "refresh") {
+        if (message.author.id != "672793821850894347") return
+
+        reload()
+
+        return message.channel.send(new CustomEmbed(message.member, false, `✅ wholesome images reloaded\nsize: ${wholesome.length}`))
+    }
+
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
@@ -56,3 +64,8 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
+
+function reload() {
+    delete require.cache[require.resolve("../lists.json")]
+    wholesome = require("../lists.json").wholesome
+}
