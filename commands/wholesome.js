@@ -43,7 +43,13 @@ async function run(message, args) {
 
         reload()
 
-        return message.channel.send(new CustomEmbed(message.member, false, `✅ wholesome images reloaded\nsize: ${wholesome.length}`))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `✅ wholesome images reloaded\nsize: ${wholesome.length}`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
