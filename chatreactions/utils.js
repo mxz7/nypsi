@@ -346,8 +346,8 @@ async function startReaction(guild, channel) {
 
     collector.on("collect", async (message) => {
 
-        if (message.deleted) {
-            currentChannels.delete(message.channel.id)
+        if (msg.deleted) {
+            currentChannels.delete(channel.id)
             collector.stop()
             return
         }
@@ -394,7 +394,9 @@ async function startReaction(guild, channel) {
                             add3rdPlace(guild, winners.get(3).member)
                         }
 
-                        return await msg.edit(embed)
+                        return await msg.edit(embed).catch(() => {
+                            collector.stop()
+                        })
                     }
                 }, 750)
             } else {
@@ -415,7 +417,9 @@ async function startReaction(guild, channel) {
         })
         winnersIDs.push(message.author.id)
         if (!waiting) {
-            return await msg.edit(embed)
+            return await msg.edit(embed).catch(() => {
+                collector.stop()
+            })
         }
     })
 
@@ -427,8 +431,8 @@ async function startReaction(guild, channel) {
         } else {
             embed.setFooter(`ended with ${winners.size} winners`)
         }
-        await msg.edit(embed)
         currentChannels.delete(channel.id)
+        await msg.edit(embed).catch(() => {})
     })
 }
 
