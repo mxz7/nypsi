@@ -422,16 +422,18 @@ async function startReaction(guild, channel) {
         }
     })
 
-    collector.on("end", async () => {
-        if (winners.size == 0) {
-            embed.setDescription(embed.embed.description + "\n\nnobody won ):")
-        } else if (winners.size == 1) {
-            embed.setFooter("ended with 1 winner")
-        } else {
-            embed.setFooter(`ended with ${winners.size} winners`)
-        }
+    collector.on("end", () => {
         currentChannels.delete(channel.id)
-        await msg.edit(embed).catch(() => {})
+        setTimeout(async () => {
+            if (winners.size == 0) {
+                embed.setDescription(embed.embed.description + "\n\nnobody won ):")
+            } else if (winners.size == 1) {
+                embed.setFooter("ended with 1 winner")
+            } else {
+                embed.setFooter(`ended with ${winners.size} winners`)
+            }
+            await msg.edit(embed).catch(() => {})
+        }, 500)
     })
 }
 
