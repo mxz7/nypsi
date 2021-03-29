@@ -474,9 +474,10 @@ exports.add3rdPlace = add3rdPlace
 
 /**
  * @param {Guild} guild
+ * @param {Number} amount
  * @returns {Map}
  */
-async function getServerLeaderboard(guild) {
+async function getServerLeaderboard(guild, amount) {
     let members
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -496,25 +497,34 @@ async function getServerLeaderboard(guild) {
     const usersWins = []
     const usersSecond = []
     const usersThird = []
+    const overallWins = []
 
     for (const user in data[guild.id].stats) {
+        let overall = false
         if (
             members.find((member) => member.user.id == user) &&
             data[guild.id].stats[user].wins != 0
         ) {
             usersWins.push(user)
+            overall = true
         }
         if (
             members.find((member) => member.user.id == user) &&
             data[guild.id].stats[user].secondPlace != 0
         ) {
             usersSecond.push(user)
+            overall = true
         }
         if (
             members.find((member) => member.user.id == user) &&
             data[guild.id].stats[user].thirdPlace != 0
         ) {
             usersThird.push(user)
+            overall = true
+        }
+
+        if (overall) {
+            overallWins.push(user)
         }
     }
 
@@ -536,13 +546,28 @@ async function getServerLeaderboard(guild) {
         return data[guild.id].stats[b].thirdPlace - data[guild.id].stats[a].thirdPlace
     })
 
-    usersWins.splice(5, usersWins.length - 5)
-    usersSecond.splice(5, usersSecond.length - 5)
-    usersThird.splice(5, usersThird.length - 5)
+    overallWins.sort((a, b) => {
+        const aTotal =
+            data[guild.id].stats[a].wins +
+            data[guild.id].stats[a].secondPlace +
+            data[guild.id].stats[a].thirdPlace
+        
+        const bTotal =
+            data[guild.id].stats[b].wins +
+            data[guild.id].stats[b].secondPlace +
+            data[guild.id].stats[b].thirdPlace
+        
+        return bTotal - aTotal
+    })
+
+    usersWins.splice(amount, usersWins.length - amount)
+    usersSecond.splice(amount, usersSecond.length - amount)
+    usersThird.splice(amount, usersThird.length - amount)
 
     let winsMsg = ""
     let secondMsg = ""
     let thirdMsg = ""
+    let overallMsg = ""
 
     let count = 1
 
@@ -595,6 +620,25 @@ async function getServerLeaderboard(guild) {
 
         thirdMsg += `${pos} **${getMember(user).user.tag}** ${
             data[guild.id].stats[user].thirdPlace
+        }\n`
+        count++
+    }
+
+    count = 1
+
+    for (const user of overallWins) {
+        let pos = count
+
+        if (count == 1) {
+            pos = "🥇"
+        } else if (count == 2) {
+            pos = "🥈"
+        } else if (count == 3) {
+            pos = "🥉"
+        }
+
+        thirdMsg += `${pos} **${getMember(user).user.tag}** ${
+            (data[guild.id].stats[user].wins + data[guild.id].stats[user].secondPlace + data[guild.id].stats[user].thirdPlace).toLocaleString()
         }\n`
         count++
     }
