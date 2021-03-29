@@ -575,8 +575,20 @@ async function run(message, args) {
                 )
             }
 
-            if (words.length >= 100) {
-                return message.channel.send(new ErrorEmbed("wordlist is at max size (100)"))
+            let maxSize = 100
+
+            if (isPremium(message.author.id)) {
+                maxSize = 200
+            }
+
+            if (words.length >= maxSize) {
+                const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`)
+
+                if (maxSize == 100) {
+                    error.setFooter("become a patreon ($patreon) to double this limit")
+                }
+
+                return message.channel.send(error)
             }
 
             if (phrase.length >= 150) {
