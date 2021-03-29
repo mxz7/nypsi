@@ -638,13 +638,11 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        thirdMsg += `${pos} **${getMember(user).user.tag}** ${
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${
             (data[guild.id].stats[user].wins + data[guild.id].stats[user].secondPlace + data[guild.id].stats[user].thirdPlace).toLocaleString()
         }\n`
         count++
     }
-
-    const d = new Map()
 
     return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
 }
