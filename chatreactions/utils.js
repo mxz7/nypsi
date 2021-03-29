@@ -345,7 +345,6 @@ async function startReaction(guild, channel) {
     })
 
     collector.on("collect", async (message) => {
-
         if (msg.deleted) {
             currentChannels.delete(channel.id)
             collector.stop()
@@ -562,12 +561,12 @@ async function getServerLeaderboard(guild, amount) {
             data[guild.id].stats[a].wins +
             data[guild.id].stats[a].secondPlace +
             data[guild.id].stats[a].thirdPlace
-        
+
         const bTotal =
             data[guild.id].stats[b].wins +
             data[guild.id].stats[b].secondPlace +
             data[guild.id].stats[b].thirdPlace
-        
+
         return bTotal - aTotal
     })
 
@@ -649,13 +648,19 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        overallMsg += `${pos} **${getMember(user).user.tag}** ${
-            (data[guild.id].stats[user].wins + data[guild.id].stats[user].secondPlace + data[guild.id].stats[user].thirdPlace).toLocaleString()
-        }\n`
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${(
+            data[guild.id].stats[user].wins +
+            data[guild.id].stats[user].secondPlace +
+            data[guild.id].stats[user].thirdPlace
+        ).toLocaleString()}\n`
         count++
     }
 
-    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
+    return new Map()
+        .set("wins", winsMsg)
+        .set("second", secondMsg)
+        .set("third", thirdMsg)
+        .set("overall", overallMsg)
 }
 
 exports.getServerLeaderboard = getServerLeaderboard
