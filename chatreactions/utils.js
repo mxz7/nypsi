@@ -646,7 +646,7 @@ async function getServerLeaderboard(guild, amount) {
 
     const d = new Map()
 
-    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg)
+    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
 }
 
 exports.getServerLeaderboard = getServerLeaderboard
