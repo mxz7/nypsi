@@ -345,6 +345,13 @@ async function startReaction(guild, channel) {
     })
 
     collector.on("collect", async (message) => {
+
+        if (message.deleted) {
+            currentChannels.delete(message.channel.id)
+            collector.stop()
+            return
+        }
+
         let time = new Date().getTime()
 
         time = ((time - start) / 1000).toFixed(2)
