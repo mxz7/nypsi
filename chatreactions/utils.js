@@ -563,6 +563,7 @@ async function getServerLeaderboard(guild, amount) {
     usersWins.splice(amount, usersWins.length - amount)
     usersSecond.splice(amount, usersSecond.length - amount)
     usersThird.splice(amount, usersThird.length - amount)
+    overallWins.splice(amount, overallWins.length - amount)
 
     let winsMsg = ""
     let secondMsg = ""
