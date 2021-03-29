@@ -161,7 +161,11 @@ async function run(message, args) {
         }
     } else if (args[0].toLowerCase() == "stats") {
         return showStats()
-    } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
+    } else if (
+        args[0].toLowerCase() == "leaderboard" ||
+        args[0].toLowerCase() == "lb" ||
+        args[0].toLowerCase() == "top"
+    ) {
         return showLeaderboard()
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
         if (!message.member.hasPermission("MANAGE_MESSAGES")) return
