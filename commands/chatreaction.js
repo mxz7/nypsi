@@ -116,7 +116,17 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false).setTitle("chat reactions leaderboard")
 
-        const leaderboards = await getServerLeaderboard(message.guild)
+        let amount = 3
+
+        if (parseInt(args[1])) {
+            amount = parseInt(args[1])
+
+            if (amount > 10) {
+                if (!message.member.hasPermission("ADMINISTRATOR")) amount = 10
+            }
+        }
+
+        const leaderboards = await getServerLeaderboard(message.guild, amount)
 
         if (leaderboards.get("wins")) {
             embed.addField("first place", leaderboards.get("wins"), true)
@@ -125,8 +135,13 @@ async function run(message, args) {
         if (leaderboards.get("second")) {
             embed.addField("second place", leaderboards.get("second"), true)
         }
+
         if (leaderboards.get("third")) {
             embed.addField("third place", leaderboards.get("third"), true)
+        }
+
+        if (leaderboards.get("overall")) {
+            embed.addField("overall", leaderboards.get("overall"))
         }
 
         return message.channel.send(embed)
@@ -560,8 +575,20 @@ async function run(message, args) {
                 )
             }
 
-            if (words.length >= 100) {
-                return message.channel.send(new ErrorEmbed("wordlist is at max size (100)"))
+            let maxSize = 100
+
+            if (isPremium(message.author.id)) {
+                maxSize = 200
+            }
+
+            if (words.length >= maxSize) {
+                const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`)
+
+                if (maxSize == 100) {
+                    error.setFooter("become a patreon ($patreon) to double this limit")
+                }
+
+                return message.channel.send(error)
             }
 
             if (phrase.length >= 150) {
