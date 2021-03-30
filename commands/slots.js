@@ -198,56 +198,58 @@ async function run(message, args) {
     let two = reel2[Math.floor(Math.random() * reel2.length)]
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
-    if (one != two && one != three && two != three) {
-        const chance = Math.floor(Math.random() * 10)
-        let chanceScore = 5
+    if (getBalance(message.member) >= 5000000) {
+        if (one != two && one != three && two != three) {
+            const chance = Math.floor(Math.random() * 10)
+            let chanceScore = 5
 
-        if (getBalance(message.member) >= 1000000) {
-            chanceScore = 3
+            if (getBalance(message.member) >= 1000000) {
+                chanceScore = 3
+            }
+
+            if (chance < chanceScore) {
+                one = two
+            }
         }
 
-        if (chance < chanceScore) {
-            one = two
-        }
-    }
+        if (two == three && one != two) {
+            const chance = Math.floor(Math.random() * 10)
+            let chanceScore = 4
 
-    if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 10)
-        let chanceScore = 4
+            if (getBalance(message.member) >= 1000000) {
+                chanceScore = 2
+            }
 
-        if (getBalance(message.member) >= 1000000) {
-            chanceScore = 2
-        }
-
-        if (chance < chanceScore) {
-            one = two
-        }
-    }
-
-    if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 10)
-        let chanceScore = 4
-
-        if (getBalance(message.member) >= 1000000) {
-            chanceScore = 2
+            if (chance < chanceScore) {
+                one = two
+            }
         }
 
-        if (chance < chanceScore) {
-            three = two
+        if (one == two && one != three) {
+            const chance = Math.floor(Math.random() * 10)
+            let chanceScore = 4
+
+            if (getBalance(message.member) >= 1000000) {
+                chanceScore = 2
+            }
+
+            if (chance < chanceScore) {
+                three = two
+            }
         }
-    }
 
-    if (one == two && one == three && one != "🍒" && one != "🍋") {
-        const chance = Math.floor(Math.random() * 10)
+        if (one == two && one == three && one != "🍒" && one != "🍋") {
+            const chance = Math.floor(Math.random() * 10)
 
-        if (chance < 3) {
-            one == "🍋"
-            two == "🍋"
-            three == "🍋"
-        } else if (chance < 2) {
-            one == "🍒"
-            two == "🍒"
-            three == "🍒"
+            if (chance < 3) {
+                one == "🍋"
+                two == "🍋"
+                three == "🍋"
+            } else if (chance < 2) {
+                one == "🍒"
+                two == "🍒"
+                three == "🍒"
+            }
         }
     }
 
