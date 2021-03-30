@@ -440,6 +440,8 @@ async function startReaction(guild, channel) {
 exports.startReaction = startReaction
 
 function hasReactionStatsProfile(guild, member) {
+    if (!data[guild.id].stats) return false
+
     if (data[guild.id].stats[member.user.id]) {
         return true
     } else {
@@ -450,6 +452,9 @@ function hasReactionStatsProfile(guild, member) {
 exports.hasReactionStatsProfile = hasReactionStatsProfile
 
 function createReactionStatsProfile(guild, member) {
+    if (!data[guild.id].stats) {
+        data[guild.id].stats = {}
+    }
     data[guild.id].stats[member.user.id] = new StatsProfile()
 }
 
@@ -710,6 +715,16 @@ function setBlacklisted(guild, blacklisted) {
 }
 
 exports.setBlacklisted = setBlacklisted
+
+/**
+ * 
+ * @param {Guild} guild 
+ */
+function deleteStats(guild) {
+    delete data[guild.id].stats
+}
+
+exports.deleteStats = deleteStats
 
 /**
  * @returns {Array<String>}
