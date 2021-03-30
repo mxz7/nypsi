@@ -712,6 +712,16 @@ function setBlacklisted(guild, blacklisted) {
 exports.setBlacklisted = setBlacklisted
 
 /**
+ * 
+ * @param {Guild} guild 
+ */
+function deleteStats(guild) {
+    delete data[guild.id].stats
+}
+
+exports.deleteStats = deleteStats
+
+/**
  * @returns {Array<String>}
  */
 async function getDefaultWords() {
