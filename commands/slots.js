@@ -198,7 +198,7 @@ async function run(message, args) {
     let two = reel2[Math.floor(Math.random() * reel2.length)]
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
-    if (getBalance(message.member) >= 5000000) {
+    if (getBalance(message.member) >= 3000000) {
         if (one != two && one != three && two != three) {
             const chance = Math.floor(Math.random() * 10)
             let chanceScore = 5
