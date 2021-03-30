@@ -14,6 +14,7 @@ const {
     updateReactionSettings,
     getBlacklisted,
     setBlacklisted,
+    deleteStats,
 } = require("../chatreactions/utils")
 const { getPrefix } = require("../guilds/utils")
 const { isPremium } = require("../premium/utils")
@@ -160,6 +161,16 @@ async function run(message, args) {
             )
         }
     } else if (args[0].toLowerCase() == "stats") {
+        if (args.length == 2 && args[1].toLowerCase() == "reset") {
+            if (message.member.hasPermission("MANAGE_MESSAGES")) {
+                if (message.author.id != message.guild.owner.id) {
+                    return message.channel.send(new ErrorEmbed("you need the to be the server owner for this command"))
+                }
+                deleteStats(message.guild)
+
+                return message.channel.send(new CustomEmbed(message.member, false, "✅ stats have been deleted"))
+            }
+        }
         return showStats()
     } else if (
         args[0].toLowerCase() == "leaderboard" ||
