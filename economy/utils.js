@@ -276,9 +276,11 @@ async function getMulti(member) {
         }
     }
 
+    multi = Math.floor(multi)
+
     multi = multi / 100
 
-    return multi
+    return parseFloat(multi.toFixed(2))
 }
 
 exports.getMulti = getMulti
