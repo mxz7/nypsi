@@ -164,11 +164,15 @@ async function run(message, args) {
         if (args.length == 2 && args[1].toLowerCase() == "reset") {
             if (message.member.hasPermission("MANAGE_MESSAGES")) {
                 if (message.author.id != message.guild.owner.id) {
-                    return message.channel.send(new ErrorEmbed("you need the to be the server owner for this command"))
+                    return message.channel.send(
+                        new ErrorEmbed("you need the to be the server owner for this command")
+                    )
                 }
                 deleteStats(message.guild)
 
-                return message.channel.send(new CustomEmbed(message.member, false, "✅ stats have been deleted"))
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ stats have been deleted")
+                )
             }
         }
         return showStats()
