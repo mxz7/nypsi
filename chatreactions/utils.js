@@ -717,8 +717,8 @@ function setBlacklisted(guild, blacklisted) {
 exports.setBlacklisted = setBlacklisted
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  */
 function deleteStats(guild) {
     delete data[guild.id].stats
