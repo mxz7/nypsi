@@ -231,7 +231,7 @@ async function run(message, args) {
             "heads",
             "tails",
         ]
-        const choice = [Math.floor(Math.random() * lols.length)]
+        const choice = lols[Math.floor(Math.random() * lols.length)]
         let thingy = `${message.author.username}\n${target.user.username}`
 
         let winner
