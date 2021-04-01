@@ -53,9 +53,7 @@ setInterval(async () => {
     })
 
     if (snipeCount > 0) {
-        info(
-            "deleted " + snipeCount.toLocaleString() + " sniped messages", types.AUTOMATION
-        )
+        info("deleted " + snipeCount.toLocaleString() + " sniped messages", types.AUTOMATION)
     }
 
     await eSnipe.forEach((msg) => {
@@ -68,11 +66,7 @@ setInterval(async () => {
     })
 
     if (eSnipeCount > 0) {
-        info(
-            "deleted " +
-            eSnipeCount.toLocaleString() +
-            " edit sniped messages", types.AUTOMATION
-        )
+        info("deleted " + eSnipeCount.toLocaleString() + " edit sniped messages", types.AUTOMATION)
     }
 
     await mentions.forEach(async (guildData, key) => {
@@ -96,9 +90,7 @@ setInterval(async () => {
     })
 
     if (mentionsCount > 0) {
-        info(
-            "deleted " + mentionsCount.toLocaleString() + " mentions", types.AUTOMATION
-        )
+        info("deleted " + mentionsCount.toLocaleString() + " mentions", types.AUTOMATION)
     }
 }, 3600000)
 
@@ -140,11 +132,12 @@ async function runCheck(guild) {
         guilds[guild.id].peaks.members = guild.memberCount
         info(
             " members peak updated for '" +
-            guild.name +
-            "' " +
-            currentMembersPeak.toLocaleString() +
-            " -> " +
-            guild.memberCount.toLocaleString(), types.AUTOMATION
+                guild.name +
+                "' " +
+                currentMembersPeak.toLocaleString() +
+                " -> " +
+                guild.memberCount.toLocaleString(),
+            types.AUTOMATION
         )
     }
 }
@@ -324,13 +317,8 @@ async function checkStats(guild) {
             .edit({ name: format })
             .then(() => {
                 info(
-                    "counter updated for '" +
-                    guild.name +
-                    "' ~ '" +
-                    old +
-                    "' -> '" +
-                    format +
-                    "'", types.AUTOMATION
+                    "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
+                    types.AUTOMATION
                 )
             })
             .catch(() => {

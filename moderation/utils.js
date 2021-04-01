@@ -252,7 +252,10 @@ module.exports = {
                     for (let mute of mutes) {
                         if (mute.unmuteTime <= date) {
                             requestUnmute(guild, mute.user, client)
-                            info(`requested unmute in ${guild} for ${mute.user.id}`, types.AUTOMATION)
+                            info(
+                                `requested unmute in ${guild} for ${mute.user.id}`,
+                                types.AUTOMATION
+                            )
                         }
                     }
                 }
