@@ -2,15 +2,15 @@ const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client } = require("discord.js")
 const { info, types, getTimestamp } = require("../utils/logger")
-let data = JSON.parse(fs.readFileSync("./moderation/data.json"))
+let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./moderation/data.json"))
+    const data1 = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 
     if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./moderation/data.json", JSON.stringify(data), (err) => {
+        fs.writeFile("./utils/moderation/data.json", JSON.stringify(data), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -24,13 +24,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./moderation/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
         info("moderation data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./moderation/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
         info("moderation data refreshed", types.DATA)
         timer = 0
     }
@@ -60,7 +60,7 @@ setInterval(() => {
         date.getMonth() +
         "." +
         date.getFullYear()
-    fs.writeFileSync("./moderation/backup/" + date + ".json", JSON.stringify(data))
+    fs.writeFileSync("./utils/moderation/backup/" + date + ".json", JSON.stringify(data))
     info("moderation data backup complete", types.DATA)
 }, 43200000 * 2)
 

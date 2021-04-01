@@ -5,7 +5,7 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../utils/classes/ChatReaction")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../utils/logger")
-let data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
+let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 
 const currentChannels = new Set()
 const lastGame = new Map()
@@ -13,10 +13,10 @@ const lastGame = new Map()
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
+    const data1 = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 
     if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./chatreactions/data.json", JSON.stringify(data), (err) => {
+        fs.writeFile("./utils/chatreactions/data.json", JSON.stringify(data), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -30,13 +30,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
         info("chatreactions data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
         info("chatreactions data refreshed", types.DATA)
         timer = 0
     }
@@ -52,7 +52,7 @@ setInterval(() => {
         date.getMonth() +
         "." +
         date.getFullYear()
-    fs.writeFileSync("./chatreactions/backup/" + date + ".json", JSON.stringify(data))
+    fs.writeFileSync("./utils/chatreactions/backup/" + date + ".json", JSON.stringify(data))
     info("chatreactions data backup complete", types.DATA)
 }, 43200000)
 
