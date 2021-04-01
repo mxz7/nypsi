@@ -131,7 +131,7 @@ function addMember(member, level) {
 
     info(`premium level ${level} given to ${id}`)
 
-    const { requestDM } = require("../nypsi")
+    const { requestDM } = require("../../nypsi")
     requestDM(
         id,
         `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
@@ -171,7 +171,7 @@ function setTier(member, level) {
 
     info(`premium level updated to ${level} for ${id}`)
 
-    const { requestDM } = require("../nypsi")
+    const { requestDM } = require("../../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
 }
 
@@ -287,7 +287,7 @@ function renewUser(member) {
 
     data[member] = profile
 
-    const { requestDM } = require("../nypsi")
+    const { requestDM } = require("../../nypsi")
     requestDM(
         member,
         `your membership has been renewed until **${formatDate(profile.expireDate)}**`
@@ -322,7 +322,7 @@ function revokeUser(member, reason) {
 
     data[member] = profile
 
-    const { requestDM } = require("../nypsi")
+    const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")
 }
 
