@@ -37,7 +37,7 @@ setInterval(() => {
 }, 60000)
 
 setInterval(async () => {
-    const { checkGuild } = require("../nypsi")
+    const { checkGuild } = require("../../nypsi")
 
     for (let guild in data) {
         const exists = await checkGuild(guild)

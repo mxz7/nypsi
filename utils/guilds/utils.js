@@ -34,7 +34,7 @@ setInterval(() => {
 }, 120000)
 
 setInterval(async () => {
-    const { snipe, eSnipe, mentions } = require("../nypsi")
+    const { snipe, eSnipe, mentions } = require("../../nypsi")
 
     const now = new Date().getTime()
 
@@ -94,7 +94,7 @@ setInterval(async () => {
 }, 3600000)
 
 setInterval(async () => {
-    const { checkGuild } = require("../nypsi")
+    const { checkGuild } = require("../../nypsi")
 
     for (let guild in guilds) {
         const exists = await checkGuild(guild)
