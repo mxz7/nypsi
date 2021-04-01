@@ -1,6 +1,7 @@
 const { GuildMember, Message } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
+const { error } = require("./logger")
 
 const news = {
     text: "",
@@ -59,7 +60,7 @@ async function redditImage(post, allowed) {
 
     while (!isImageUrl(image)) {
         if (count >= 10) {
-            console.log("couldnt find image @ " + post.data.subreddit_name_prefixed)
+            error("couldnt find image @ " + post.data.subreddit_name_prefixed)
             return "lol"
         }
 

@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-const { getTimestamp } = require("./utils")
+const { error, info, types } = require("./logger")
 
 const pornCache = new Map()
 const bdsmCache = new Map()
@@ -100,12 +100,13 @@ const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
  */
 async function cacheUpdate(links, imgs, name) {
     const start = new Date().getTime()
+    let amount = 0
     for (let link of links) {
         const res = await fetch(link).then((a) => a.json())
 
         if (res.message == "Forbidden") {
-            console.log(
-                `\x1b[31m[${getTimestamp()}] skipped ${link} due to private subreddit\x1b[37m`
+            error(
+                `skipped ${link} due to private subreddit`
             )
             continue
         }
@@ -113,18 +114,19 @@ async function cacheUpdate(links, imgs, name) {
         const allowed = res.data.children.filter((post) => !post.data.is_self)
         if (allowed) {
             imgs.set(link, allowed)
+            amount += allowed.length
         } else {
-            console.log(`\x1b[31m[${getTimestamp()}] no images @ ${link}\x1b[37m`)
+            error(`no images @ ${link}`)
         }
     }
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    console.log(`\x1b[32m[${getTimestamp()}] ${name} images loaded (${total})\x1b[37m`)
+    info(`${amount} ${name} images loaded (${total})`, types.IMAGE)
 }
 
 async function updateCache() {
     const start = new Date().getTime()
-    console.log("\x1b[32m[" + getTimestamp() + "] img caches updating..\x1b[37m")
+    info("img caches updating..", types.IMAGE)
     await cacheUpdate(bdsmLinks, bdsmCache, "bdsm")
     exports.bdsmCache = bdsmCache
     await cacheUpdate(thighsLinks, thighsCache, "thighs")
@@ -151,7 +153,7 @@ async function updateCache() {
     exports.snekCache = snekCache
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    console.log("\x1b[32m[" + getTimestamp() + "] images updated (" + total + ")\x1b[37m")
+    info("images updated (" + total + ")", types.IMAGE)
 }
 
 exports.updateCache = updateCache
