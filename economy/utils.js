@@ -5,10 +5,10 @@ const { topgg } = require("../config.json")
 const DBL = require("dblapi.js")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
-const { getTimestamp } = require("../utils/utils")
 const { EconProfile } = require("../utils/classes/EconStorage")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
+const { info, types, error, getTimestamp } = require("../utils/logger")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -22,7 +22,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] economy data saved\x1b[37m")
+            info("economy data saved", types.DATA)
         })
 
         timer = 0
@@ -33,13 +33,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
+        info("economy data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         users = JSON.parse(fs.readFileSync("./economy/users.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] economy data refreshed\x1b[37m")
+        info("economy data refreshed")
         timer = 0
     }
 }, 60000)
@@ -55,7 +55,7 @@ setInterval(() => {
         "." +
         date.getFullYear()
     fs.writeFileSync("./economy/backup/" + date + ".json", JSON.stringify(users))
-    console.log("\x1b[32m[" + getTimestamp() + "] user data backup complete\x1b[37m")
+    info("user data backup complete", types.DATA)
 }, 43200000)
 
 setInterval(() => {
@@ -69,7 +69,7 @@ setInterval(() => {
         ) {
             users[user].money.balance = 0
 
-            console.log("[" + getTimestamp() + "] " + user + " set to 0 because NaN")
+            info(user + " set to 0 because NaN", types.ECONOMY)
         }
 
         if (
@@ -81,7 +81,7 @@ setInterval(() => {
         ) {
             users[user].money.bank = 0
 
-            console.log("[" + getTimestamp() + "] " + user + " bank set to 0 because NaN")
+            info(user + " bank set to 0 because NaN", types.ECONOMY)
         }
 
         if (
@@ -93,7 +93,7 @@ setInterval(() => {
         ) {
             users[user].xp = 0
 
-            console.log("[" + getTimestamp() + "] " + user + " xp set to 0 because NaN")
+            info(user + " xp set to 0 because NaN", types.ECONOMY)
         }
     }
 }, 120000)
@@ -106,12 +106,12 @@ let padlockPrice = 25000 + randomOffset()
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
-    console.log("[" + getTimestamp() + "] padlock price updated: $" + padlockPrice)
+    info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
 
 dbl.webhook.on("ready", (hook) => {
-    console.log(
-        `[${getTimestamp()}] webook running on http://${hook.hostname}:${hook.port}${hook.path}`
+    info(
+        `webook running on http://${hook.hostname}:${hook.port}${hook.path}`
     )
 })
 
@@ -166,6 +166,7 @@ async function doVote(client, vote) {
             )
 
         await member.send("thank you for voting!", embed)
+        info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
     }
 }
 
@@ -234,7 +235,7 @@ async function hasVoted(member) {
             setTimeout(() => {
                 voteCache.delete(id)
             }, 600000)
-            console.log("[" + getTimestamp() + "] dbl server error - 10 minute cache for " + id)
+            error("dbl server error - 10 minute cache for " + id)
             return false
         }
     }

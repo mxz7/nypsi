@@ -1,7 +1,8 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { PremUser, status } = require("../utils/classes/PremStorage")
-const { getTimestamp, formatDate } = require("../utils/utils")
+const { info, types, getTimestamp } = require("../utils/logger")
+const { formatDate } = require("../utils/utils")
 let data = JSON.parse(fs.readFileSync("./premium/data.json"))
 
 let timer = 0
@@ -14,7 +15,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] premium data saved\x1b[37m")
+            info("premium data saved", types.DATA)
         })
 
         timer = 0
@@ -25,13 +26,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         data = JSON.parse(fs.readFileSync("./premium/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] premium data refreshed\x1b[37m")
+        info("premium data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         data = JSON.parse(fs.readFileSync("./premium/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] premium data refreshed\x1b[37m")
+        info("premium data refreshed", types.DATA)
         timer = 0
     }
 }, 60000)
@@ -47,7 +48,7 @@ setInterval(() => {
         "." +
         date.getFullYear()
     fs.writeFileSync("./premium/backup/" + date + ".json", JSON.stringify(data))
-    console.log("\x1b[32m[" + getTimestamp() + "] premium data backup complete\x1b[37m")
+    info("premium data backup complete", types.DATA)
 }, 43200000)
 
 setInterval(async () => {
@@ -128,6 +129,8 @@ function addMember(member, level) {
 
     data[id] = profile
 
+    info(`premium level ${level} given to ${id}`)
+
     const { requestDM } = require("../nypsi")
     requestDM(
         id,
@@ -165,6 +168,8 @@ function setTier(member, level) {
     }
 
     data[id].level = level
+
+    info(`premium level updated to ${level} for ${id}`)
 
     const { requestDM } = require("../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)

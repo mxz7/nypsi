@@ -4,7 +4,8 @@ const { getPrefix } = require("../guilds/utils")
 const { isPremium, getTier } = require("../premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getTimestamp, formatDate } = require("../utils/utils")
+const { info, types } = require("../utils/logger")
+const { formatDate } = require("../utils/utils")
 
 const cooldown = new Map()
 const cache = new Map()
@@ -325,11 +326,11 @@ async function run(message, args) {
 setInterval(() => {
     if (cache.size > 7) {
         cache.clear()
-        console.log(`[${getTimestamp()}] minecraft username cache cleared`)
+        info("minecraft username cache cleared", types.AUTOMATION)
     }
     if (serverCache.size > 7) {
         serverCache.clear()
-        console.log(`[${getTimestamp()}] minecraft server cache cleared`)
+        info("minecraft server cache cleared", types.AUTOMATION)
     }
 }, 6 * 60 * 60 * 1000)
 
