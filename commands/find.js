@@ -1,6 +1,6 @@
 const { Message, Guild } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
-const { getPeaks } = require("../guilds/utils.js")
+const { getPeaks } = require("../utils/guilds/utils")
 const {
     getBalance,
     userExists,
@@ -11,7 +11,7 @@ const {
     getXp,
     hasVoted,
     getPrestige,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { categories, Command } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

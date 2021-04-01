@@ -1,7 +1,7 @@
 const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client } = require("discord.js")
-const { info, types, getTimestamp } = require("../utils/logger")
+const { info, types, getTimestamp } = require("../logger")
 let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 
 let timer = 0

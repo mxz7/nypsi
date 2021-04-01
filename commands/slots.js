@@ -11,12 +11,12 @@ const {
     calcMaxBet,
     getMulti,
     getPrestige,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils.js")
-const { isPremium, getTier } = require("../premium/utils.js")
+const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const reel1 = [
     "🍉",

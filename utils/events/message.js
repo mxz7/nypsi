@@ -1,6 +1,6 @@
 const { Message, MessageEmbed } = require("discord.js")
 const { mentions } = require("../../nypsi")
-const { getChatFilter, getPrefix, inCooldown } = require("../../guilds/utils")
+const { getChatFilter, getPrefix, inCooldown } = require("../guilds/utils")
 const { runCommand } = require("../commandhandler")
 const { info } = require("../logger")
 

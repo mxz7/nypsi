@@ -1,10 +1,9 @@
 const { Guild } = require("discord.js")
 const fs = require("fs")
-const { getPriority } = require("os")
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { GuildStorage } = require("../utils/classes/GuildStorage")
-const { info, types, error } = require("../utils/logger")
-const { daysUntilChristmas } = require("../utils/utils")
+const { CustomEmbed } = require("../classes/EmbedBuilders")
+const { GuildStorage } = require("../classes/GuildStorage")
+const { info, types, error } = require("../logger")
+const { daysUntilChristmas } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
 
 let timer = 0

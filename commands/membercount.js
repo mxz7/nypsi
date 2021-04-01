@@ -7,7 +7,7 @@ const {
     createGuild,
     getPeaks,
     getPrefix,
-} = require("../guilds/utils")
+} = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { info, types, getTimestamp, error } = require("../utils/logger")

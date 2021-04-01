@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getPrefix } = require("../guilds/utils")
+const { getPrefix } = require("../utils/guilds/utils")
 const {
     isPremium,
     getPremiumProfile,
@@ -11,7 +11,7 @@ const {
     renewUser,
     revokeUser,
     expireUser,
-} = require("../premium/utils")
+} = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")

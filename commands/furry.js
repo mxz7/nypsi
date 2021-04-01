@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { updateXp, getXp } = require("../economy/utils")
-const { isPremium } = require("../premium/utils")
+const { updateXp, getXp } = require("../utils/economy/utils.js")
+const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getMember } = require("../utils/utils")

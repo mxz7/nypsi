@@ -6,13 +6,13 @@ const {
     createUser,
     userExists,
     getPadlockPrice,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils.js")
-const { isPremium, getTier } = require("../premium/utils.js")
+const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 

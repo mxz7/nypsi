@@ -1,8 +1,8 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { PremUser, status } = require("../utils/classes/PremStorage")
-const { info, types, getTimestamp } = require("../utils/logger")
-const { formatDate } = require("../utils/utils")
+const { PremUser, status } = require("../classes/PremStorage")
+const { info, types, getTimestamp } = require("../logger")
+const { formatDate } = require("../utils")
 let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
 
 let timer = 0
