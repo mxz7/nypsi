@@ -151,6 +151,7 @@ exports.onVote = onVote
  * @param {String} id
  */
 async function requestDM(id, content) {
+    info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
     if (member) {
