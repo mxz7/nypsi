@@ -110,9 +110,7 @@ setInterval(() => {
 }, 3600000)
 
 dbl.webhook.on("ready", (hook) => {
-    info(
-        `webook running on http://${hook.hostname}:${hook.port}${hook.path}`
-    )
+    info(`webook running on http://${hook.hostname}:${hook.port}${hook.path}`)
 })
 
 dbl.webhook.on("vote", (vote) => {

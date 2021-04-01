@@ -11,12 +11,7 @@ module.exports = async (message) => {
     if (message.author.bot) return
 
     if (!message.guild) {
-        info(
-            "message in DM from " +
-                message.author.tag +
-                ": " +
-                message.content
-        )
+        info("message in DM from " + message.author.tag + ": " + message.content)
 
         const embed = new MessageEmbed()
             .setTitle("support")

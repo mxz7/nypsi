@@ -125,15 +125,11 @@ async function runChecks() {
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size)
-        info(
-            "guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION
-        )
+        info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
     }, 3600000)
 
     await updateStats(client.guilds.cache.size)
-    info(
-        "guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION
-    )
+    info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
 }
 
 /**
