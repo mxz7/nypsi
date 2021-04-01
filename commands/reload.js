@@ -1,6 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { info } = require("../utils/logger")
 
 const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions("bot owner")
 
@@ -15,7 +16,7 @@ async function run(message, args) {
     if (args.length == 0) {
         loadCommands()
         message.react("✅")
-        console.log("\x1b[32m[" + getTimeStamp() + "] commands reloaded\x1b[37m")
+        info("commands reloaded")
     } else {
         let msg
 
@@ -35,26 +36,3 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
-
-function getTimeStamp() {
-    const date = new Date()
-    let hours = date.getHours().toString()
-    let minutes = date.getMinutes().toString()
-    let seconds = date.getSeconds().toString()
-
-    if (hours.length == 1) {
-        hours = "0" + hours
-    }
-
-    if (minutes.length == 1) {
-        minutes = "0" + minutes
-    }
-
-    if (seconds.length == 1) {
-        seconds = "0" + seconds
-    }
-
-    const timestamp = hours + ":" + minutes + ":" + seconds
-
-    return timestamp
-}

@@ -5,7 +5,8 @@ const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../guilds/utils.js")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const { getTimestamp, MStoTime, getNews, formatDate } = require("./utils.js")
+const { MStoTime, getNews, formatDate } = require("./utils.js")
+const { info, types, error } = require("./logger.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -14,7 +15,7 @@ const xpCooldown = new Set()
 const cooldown = new Set()
 
 function loadCommands() {
-    console.log(`[${getTimestamp()}] loading commands..`)
+    info("loading commands..", types.INFO)
     const commandFiles = fs.readdirSync("./commands/").filter((file) => file.endsWith(".js"))
     const failedTable = []
 
@@ -46,7 +47,7 @@ function loadCommands() {
                 }
             } else {
                 failedTable.push([file, "❌"])
-                console.log(file + " missing name, description, category or run")
+                error(file + " missing name, description, category or run")
             }
         } catch (e) {
             failedTable.push([file, "❌"])
@@ -59,7 +60,7 @@ function loadCommands() {
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }))
     } else {
-        console.log(`[${getTimestamp()}] all commands loaded without error ✅`)
+        info("all commands loaded without error ✅")
     }
 }
 
@@ -79,7 +80,7 @@ function reloadCommand(commandsArray) {
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)]
             } catch (e) {
-                return console.log("error deleting from cache")
+                return error("error deleting from cache")
             }
 
             const commandData = require(`../commands/${cmd}`)
@@ -402,7 +403,7 @@ function runCommand(cmd, message, args) {
                             try {
                                 xpCooldown.delete(message.author.id)
                             } catch {
-                                console.log("error deleting from xpCooldown")
+                                error("error deleting from xpCooldown")
                             }
                         }, 60000)
                     }
@@ -479,11 +480,11 @@ function logCommand(message, args) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `\x1b[33m[${getTimestamp()}] [${message.guild.id} - ${message.author.id}] ${
+    const msg = `[${message.guild.id} - ${message.author.id}] ${
         message.author.tag
-    }: '${content}'\x1b[37m`
+    }: ${content}`
 
-    console.log(msg)
+    info(msg, types.COMMAND)
 }
 
 /**
@@ -517,13 +518,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         const guild = await client.guilds.fetch(serverID)
 
         if (!guild) {
-            return console.log("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+            return error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
 
         if (!channel) {
-            return console.log("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
+            return error("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
         }
 
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
@@ -570,7 +571,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         postPopularCommands()
     }, needed - now)
 
-    console.log(`[${getTimestamp()}] popular commands will run in ${MStoTime(needed - now)}`)
+    info(`popular commands will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 }
 
 exports.runPopularCommandsTimer = runPopularCommandsTimer

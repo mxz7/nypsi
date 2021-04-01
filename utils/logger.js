@@ -14,7 +14,7 @@ function info(string, type) {
             color = "\x1b[32m"
             break
         case types.DATA:
-            color = "\x1b[37m"
+            color = "\x1b[32m"
             break
         case types.AUTOMATION:
             color = "\x1b[34m"
@@ -23,7 +23,7 @@ function info(string, type) {
             color = "\x1b[33m"
             break
         case types.IMAGE:
-            color = "\x1b[37m"
+            color = "\x1b[32m"
             break
     }
 
