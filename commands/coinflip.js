@@ -5,14 +5,14 @@ const {
     userExists,
     formatBet,
     calcMaxBet,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const Discord = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils.js")
+const { getPrefix } = require("../utils/guilds/utils")
 const { getExactMember } = require("../utils/utils.js")
-const { isPremium, getTier } = require("../premium/utils.js")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 

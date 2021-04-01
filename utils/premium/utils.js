@@ -1,17 +1,17 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { PremUser, status } = require("../utils/classes/PremStorage")
-const { info, types, getTimestamp } = require("../utils/logger")
-const { formatDate } = require("../utils/utils")
-let data = JSON.parse(fs.readFileSync("./premium/data.json"))
+const { PremUser, status } = require("../classes/PremStorage")
+const { info, types, getTimestamp } = require("../logger")
+const { formatDate } = require("../utils")
+let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
 
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./premium/data.json"))
+    const data1 = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
 
     if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./premium/data.json", JSON.stringify(data), (err) => {
+        fs.writeFile("./utils/premium/data.json", JSON.stringify(data), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -25,13 +25,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./premium/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
         info("premium data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./premium/data.json"))
+        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
         info("premium data refreshed", types.DATA)
         timer = 0
     }
@@ -47,7 +47,7 @@ setInterval(() => {
         date.getMonth() +
         "." +
         date.getFullYear()
-    fs.writeFileSync("./premium/backup/" + date + ".json", JSON.stringify(data))
+    fs.writeFileSync("./utils/premium/backup/" + date + ".json", JSON.stringify(data))
     info("premium data backup complete", types.DATA)
 }, 43200000)
 

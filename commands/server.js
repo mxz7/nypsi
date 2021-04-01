@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { formatDate } = require("../utils/utils")
-const { getPeaks, inCooldown, addCooldown } = require("../guilds/utils.js")
+const { getPeaks, inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

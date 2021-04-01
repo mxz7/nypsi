@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 let wholesome = require("../lists.json").wholesome
-const { isPremium } = require("../premium/utils")
+const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

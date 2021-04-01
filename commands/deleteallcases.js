@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { deleteServer, profileExists } = require("../moderation/utils")
+const { deleteServer, profileExists } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

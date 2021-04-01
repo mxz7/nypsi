@@ -2,8 +2,8 @@ const ascii = require("figlet")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getDMsEnabled } = require("../economy/utils.js")
-const { getPrefix } = require("../guilds/utils.js")
+const { getDMsEnabled } = require("../utils/economy/utils.js")
+const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
