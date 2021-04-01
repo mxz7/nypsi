@@ -253,7 +253,7 @@ module.exports = {
                         if (mute.unmuteTime <= date) {
                             requestUnmute(guild, mute.user, client)
                             info(
-                                `requested unmute in ${guild} for ${mute.user.id}`,
+                                `requested unmute in ${guild} for ${mute.user}`,
                                 types.AUTOMATION
                             )
                         }
@@ -287,10 +287,16 @@ module.exports = {
 }
 
 function deleteMute(guild, member) {
+    let id = member.id
+
+    if (!id) {
+        id = member
+    }
+
     const currentMutes = data[guild.id].mutes
 
     for (let mute of currentMutes) {
-        if (mute.user == member.user.id) {
+        if (mute.user == id) {
             currentMutes.splice(currentMutes.indexOf(mute), 1)
         }
     }
@@ -315,7 +321,9 @@ async function requestUnmute(guild, member, client) {
 
     member = members.find((m) => m.id == member)
 
-    if (!member) return
+    if (!member) {
+        deleteMute(guild, member)
+    }
 
     const muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
