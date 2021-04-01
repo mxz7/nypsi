@@ -61,8 +61,8 @@ client.on("channelCreate", channelCreate.bind(null))
 
 client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
 
-process.on("unhandledRejection", (error) => {
-    let stack = error.stack.split("\n").join("\n\x1b[31m")
+process.on("unhandledRejection", (e) => {
+    let stack = e.stack.split("\n").join("\n\x1b[31m")
 
     if (stack.length > 200) {
         stack = stack.substr(0, 200) + "..."
