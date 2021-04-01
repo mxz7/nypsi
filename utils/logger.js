@@ -21,6 +21,10 @@ function info(string, type) {
             break
         case types.COMMAND:
             color = "\x1b[33m"
+            break
+        case types.IMAGE:
+            color = "\x1b[37m"
+            break
     }
 
     const out = `${color}[${getTimestamp()}] [${type}] ${string} \x1b[0m`
