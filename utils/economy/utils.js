@@ -1,6 +1,6 @@
 const fs = require("fs")
-let users = JSON.parse(fs.readFileSync("./economy/users.json"))
-const multiplier = JSON.parse(fs.readFileSync("./economy/slotsmulti.json"))
+let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg } = require("../config.json")
 const DBL = require("dblapi.js")
 const { inCooldown, addCooldown } = require("../guilds/utils")
@@ -15,10 +15,10 @@ const voteCache = new Map()
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./economy/users.json"))
+    const users1 = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
 
     if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./economy/users.json", JSON.stringify(users), (err) => {
+        fs.writeFile("./utils/economy/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -32,13 +32,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./economy/users.json"))
+        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
         info("economy data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./economy/users.json"))
+        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
         info("economy data refreshed")
         timer = 0
     }
@@ -54,7 +54,7 @@ setInterval(() => {
         date.getMonth() +
         "." +
         date.getFullYear()
-    fs.writeFileSync("./economy/backup/" + date + ".json", JSON.stringify(users))
+    fs.writeFileSync("./utils/economy/backup/" + date + ".json", JSON.stringify(users))
     info("user data backup complete", types.DATA)
 }, 43200000)
 

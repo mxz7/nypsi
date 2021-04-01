@@ -1,15 +1,15 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { info, types } = require("../utils/logger")
-let users = JSON.parse(fs.readFileSync("./socials/users.json"))
+let users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./socials/users.json"))
+    const users1 = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 
     if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./socials/users.json", JSON.stringify(users), (err) => {
+        fs.writeFile("./utils/socials/users.json", JSON.stringify(users), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -23,13 +23,13 @@ setInterval(() => {
     }
 
     if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./socials/users.json"))
+        users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
         info("socials data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./socials/users.json"))
+        users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
         info("socials data refreshed", types.DATA)
         timer = 0
     }
