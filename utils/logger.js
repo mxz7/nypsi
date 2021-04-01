@@ -31,7 +31,8 @@ const types = {
     GUILD: "guild",
     ECONOMY: "eco",
     AUTOMATION: "auto",
-    COMMAND: "command"
+    COMMAND: "command",
+    IMAGE: "image"
 }
 
 exports.types = types
