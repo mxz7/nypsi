@@ -292,13 +292,12 @@ async function run(message, args) {
                         old +
                         "' -> '" +
                         format +
-                        "'", types.AUTOMATION
+                        "'",
+                    types.AUTOMATION
                 )
             })
             .catch(() => {
-                error(
-                    "error updating counter in " + message.guild.name
-                )
+                error("error updating counter in " + message.guild.name)
                 fail = true
             })
 

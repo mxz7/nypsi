@@ -1,6 +1,6 @@
 function info(string, type) {
     let color
-    
+
     if (!type) type = types.INFO
 
     switch (type) {
@@ -46,7 +46,7 @@ const types = {
     ECONOMY: "eco",
     AUTOMATION: "auto",
     COMMAND: "command",
-    IMAGE: "image"
+    IMAGE: "image",
 }
 
 exports.types = types
