@@ -34,7 +34,7 @@ function info(string, type) {
 exports.info = info
 
 function error(string) {
-    console.error(`\x1B[31m[${getTimestamp()}] ${string}\x1B[0m`)
+    console.error(`[error] \x1B[31m[${getTimestamp()}] ${string}\x1B[0m`)
 }
 
 exports.error = error
