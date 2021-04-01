@@ -166,6 +166,7 @@ async function doVote(client, vote) {
             )
 
         await member.send("thank you for voting!", embed)
+        info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
     }
 }
 

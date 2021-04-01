@@ -129,6 +129,8 @@ function addMember(member, level) {
 
     data[id] = profile
 
+    info(`premium level ${level} given to ${id}`)
+
     const { requestDM } = require("../nypsi")
     requestDM(
         id,
@@ -166,6 +168,8 @@ function setTier(member, level) {
     }
 
     data[id].level = level
+
+    info(`premium level updated to ${level} for ${id}`)
 
     const { requestDM } = require("../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
