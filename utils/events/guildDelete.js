@@ -8,7 +8,12 @@ const { info, types } = require("../logger")
  */
 module.exports = async (client, guild) => {
     info(
-        "removed from server'" + guild.name + "' new count: " + client.guilds.cache.size,
+        "removed from server'" +
+            guild.name +
+            " (" +
+            guild.id +
+            ") ' new count: " +
+            client.guilds.cache.size,
         types.GUILD
     )
     setPrefix(guild, "$")
