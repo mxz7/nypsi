@@ -3,7 +3,8 @@ const fs = require("fs")
 const { getPriority } = require("os")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { GuildStorage } = require("../utils/classes/GuildStorage")
-const { daysUntilChristmas, getTimestamp } = require("../utils/utils")
+const { info, types, error } = require("../utils/logger")
+const { daysUntilChristmas } = require("../utils/utils")
 let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
 
 let timer = 0
@@ -16,7 +17,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] guilds saved\x1b[37m")
+            info("guilds saved", types.DATA)
         })
 
         timer = 0
@@ -27,7 +28,7 @@ setInterval(() => {
 
     if (timer >= 10 && !timerCheck) {
         guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] guild data refreshed\x1b[37m")
+        info("guild data refreshed", types.DATA)
         timerCheck = true
         timer = 0
     }
@@ -52,8 +53,8 @@ setInterval(async () => {
     })
 
     if (snipeCount > 0) {
-        console.log(
-            "[" + getTimestamp() + "] deleted " + snipeCount.toLocaleString() + " sniped messages"
+        info(
+            "deleted " + snipeCount.toLocaleString() + " sniped messages", types.AUTOMATION
         )
     }
 
@@ -67,12 +68,10 @@ setInterval(async () => {
     })
 
     if (eSnipeCount > 0) {
-        console.log(
-            "[" +
-                getTimestamp() +
-                "] deleted " +
-                eSnipeCount.toLocaleString() +
-                " edit sniped messages"
+        info(
+            "deleted " +
+            eSnipeCount.toLocaleString() +
+            " edit sniped messages", types.AUTOMATION
         )
     }
 
@@ -97,8 +96,8 @@ setInterval(async () => {
     })
 
     if (mentionsCount > 0) {
-        console.log(
-            "[" + getTimestamp() + "] deleted " + mentionsCount.toLocaleString() + " mentions"
+        info(
+            "deleted " + mentionsCount.toLocaleString() + " mentions", types.AUTOMATION
         )
     }
 }, 3600000)
@@ -112,7 +111,7 @@ setInterval(async () => {
         if (!exists) {
             delete guilds[guild]
 
-            console.log(`[${getTimestamp()}] deleted guild '${guild}' from guilds data`)
+            info(`deleted guild '${guild}' from guilds data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -139,15 +138,13 @@ async function runCheck(guild) {
 
     if (guild.memberCount > currentMembersPeak) {
         guilds[guild.id].peaks.members = guild.memberCount
-        console.log(
-            "[" +
-                getTimestamp() +
-                "] members peak updated for '" +
-                guild.name +
-                "' " +
-                currentMembersPeak.toLocaleString() +
-                " -> " +
-                guild.memberCount.toLocaleString()
+        info(
+            " members peak updated for '" +
+            guild.name +
+            "' " +
+            currentMembersPeak.toLocaleString() +
+            " -> " +
+            guild.memberCount.toLocaleString(), types.AUTOMATION
         )
     }
 }
@@ -326,20 +323,18 @@ async function checkStats(guild) {
         await channel
             .edit({ name: format })
             .then(() => {
-                console.log(
-                    "[" +
-                        getTimestamp() +
-                        "] counter updated for '" +
-                        guild.name +
-                        "' ~ '" +
-                        old +
-                        "' -> '" +
-                        format +
-                        "'"
+                info(
+                    "counter updated for '" +
+                    guild.name +
+                    "' ~ '" +
+                    old +
+                    "' -> '" +
+                    format +
+                    "'", types.AUTOMATION
                 )
             })
             .catch(() => {
-                console.log("[" + getTimestamp() + "] error updating counter in " + guild.name)
+                error("error updating counter in " + guild.name)
                 guilds[guild.id].counter.enabled = false
                 guilds[guild.id].counter.channel = "none"
             })
@@ -385,7 +380,7 @@ function getPrefix(guild) {
     try {
         return guilds[guild.id].prefix
     } catch (e) {
-        console.log("[" + getTimestamp() + "] couldn't fetch prefix for server " + guild.id)
+        error("couldn't fetch prefix for server " + guild.id)
         return "$"
     }
 }
@@ -492,10 +487,10 @@ async function checkChristmasCountdown(guild) {
             new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")
         )
         .then(() => {
-            console.log(`[${getTimestamp()}] sent christmas countdown in ${guild.name} ~ ${format}`)
+            info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
         })
         .catch(() => {
-            console.log(`[${getTimestamp()}] error sending christmas countdown in ${guild.name}`)
+            error(`error sending christmas countdown in ${guild.name}`)
             guilds[guild.id].xmas.enabled = false
             guilds[guild.id].xmas.channel = "none"
             return

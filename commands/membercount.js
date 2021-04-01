@@ -1,5 +1,4 @@
 const { Message } = require("discord.js")
-const { getTimestamp } = require("../utils/utils")
 const {
     createDefaultStatsProfile,
     setStatsProfile,
@@ -11,6 +10,7 @@ const {
 } = require("../guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { info, types, getTimestamp, error } = require("../utils/logger")
 
 const cmd = new Command(
     "membercount",
@@ -283,7 +283,7 @@ async function run(message, args) {
         await channel
             .edit({ name: format })
             .then(() => {
-                console.log(
+                info(
                     "[" +
                         getTimestamp() +
                         "] counter updated for '" +
@@ -292,12 +292,12 @@ async function run(message, args) {
                         old +
                         "' -> '" +
                         format +
-                        "'"
+                        "'", types.AUTOMATION
                 )
             })
             .catch(() => {
-                console.log(
-                    "[" + getTimestamp() + "] error updating counter in " + message.guild.name
+                error(
+                    "error updating counter in " + message.guild.name
                 )
                 fail = true
             })

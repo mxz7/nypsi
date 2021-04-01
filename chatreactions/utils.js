@@ -4,7 +4,7 @@ const fetch = require("node-fetch")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../utils/classes/ChatReaction")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getTimestamp } = require("../utils/utils")
+const { info, types, getTimestamp } = require("../utils/logger")
 let data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
 
 const currentChannels = new Set()
@@ -20,7 +20,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] chatreactions data saved\x1b[37m")
+            info("chatreactions data saved", types.DATA)
         })
 
         timer = 0
@@ -31,13 +31,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] chatreactions data refreshed\x1b[37m")
+        info("chatreactions data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         data = JSON.parse(fs.readFileSync("./chatreactions/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] chatreactions data refreshed\x1b[37m")
+        info("chatreactions data refreshed", types.DATA)
         timer = 0
     }
 }, 60000)
@@ -53,7 +53,7 @@ setInterval(() => {
         "." +
         date.getFullYear()
     fs.writeFileSync("./chatreactions/backup/" + date + ".json", JSON.stringify(data))
-    console.log("\x1b[32m[" + getTimestamp() + "] chatreactions data backup complete\x1b[37m")
+    info("chatreactions data backup complete", types.DATA)
 }, 43200000)
 
 setInterval(async () => {
@@ -65,7 +65,7 @@ setInterval(async () => {
         if (!exists) {
             delete data[guild]
 
-            console.log(`[${getTimestamp()}] deleted guild '${guild}' from chatreaction data`)
+            info(`deleted guild '${guild}' from chatreaction data`, types.DATA)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -178,7 +178,7 @@ setInterval(async () => {
         }
     }
     if (count > 0) {
-        console.log(`[${getTimestamp()}] ${count} chat reactions automatically started`)
+        info(`${count} chat reactions automatically started`, types.AUTOMATION)
     }
 }, 60000)
 

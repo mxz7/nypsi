@@ -20,7 +20,7 @@ const {
 } = require("./guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { getTimestamp, MStoTime } = require("./utils/utils")
+const { MStoTime } = require("./utils/utils")
 const { runUnmuteChecks } = require("./moderation/utils")
 
 const snipe = new Map()
@@ -42,6 +42,7 @@ const messageDelete = require("./utils/events/messageDelete")
 const messageUpdate = require("./utils/events/messageUpdate")
 const message = require("./utils/events/message")
 const channelCreate = require("./utils/events/channelCreate")
+const { info, types, error } = require("./utils/logger")
 
 client.once("ready", ready.bind(null, client, startUp))
 client.on("guildCreate", guildCreate.bind(null, client))
@@ -49,7 +50,7 @@ client.on("guildDelete", guildDelete.bind(null, client))
 client.on("rateLimit", (rate) => {
     const a = rate.route.split("/")
     const reason = a[a.length - 1]
-    console.log("\x1b[31m[" + getTimestamp() + "] rate limit: " + reason + "\x1b[37m")
+    error("rate limit: " + reason)
 })
 client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
 client.on("guildMemberAdd", guildMemberAdd.bind(null))
@@ -58,7 +59,7 @@ client.on("messageUpdate", messageUpdate.bind(null))
 client.on("message", message.bind(null))
 client.on("channelCreate", channelCreate.bind(null))
 
-client.on("shardReady", (shardID) => console.log(`[${getTimestamp()}] shard#${shardID} ready`))
+client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
 
 process.on("unhandledRejection", (error) => {
     let stack = error.stack.split("\n").join("\n\x1b[31m")
@@ -67,7 +68,7 @@ process.on("unhandledRejection", (error) => {
         stack = stack.substr(0, 200) + "..."
     }
 
-    console.log(`\x1b[31m[${getTimestamp()}] ${stack}\x1b[37m`)
+    error(stack)
 })
 
 async function checkGuild(guildID) {
@@ -118,20 +119,20 @@ async function runChecks() {
         })
     }, needed - now)
 
-    console.log(`[${getTimestamp()}] christmas countdowns will run in ${MStoTime(needed - now)}`)
+    info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 
     if (client.user.id != "678711738845102087") return
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size)
-        console.log(
-            "[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size
+        info(
+            "guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION
         )
     }, 3600000)
 
     await updateStats(client.guilds.cache.size)
-    console.log(
-        "[" + getTimestamp() + "] guild count posted to top.gg: " + client.guilds.cache.size
+    info(
+        "guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION
     )
 }
 
@@ -150,6 +151,7 @@ exports.onVote = onVote
  * @param {String} id
  */
 async function requestDM(id, content) {
+    info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
     if (member) {
@@ -217,7 +219,7 @@ async function getGuild(guildID) {
 exports.getGuild = getGuild
 
 setTimeout(() => {
-    console.log(`[${getTimestamp()}] logging in...`)
+    info("logging in...", types.INFO)
     client.login(token).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
