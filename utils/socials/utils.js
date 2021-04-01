@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { info, types } = require("../utils/logger")
+const { info, types } = require("../logger")
 let users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 
 let timer = 0

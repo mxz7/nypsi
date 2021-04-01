@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { isPremium, getTier } = require("../premium/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cache = new Map()
 const cooldown = new Map()

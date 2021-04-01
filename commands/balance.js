@@ -11,10 +11,10 @@ const {
     getPrestigeRequirement,
     getPrestigeRequirementBal,
     getPrestige,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils")
+const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases([
     "bal",

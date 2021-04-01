@@ -1,5 +1,5 @@
 const { MessageEmbed, GuildMember } = require("discord.js")
-const { isPremium, getTier, getEmbedColor } = require("../../premium/utils")
+const { isPremium, getTier, getEmbedColor } = require("../premium/utils")
 const { getColor } = require("../utils")
 
 class CustomEmbed {

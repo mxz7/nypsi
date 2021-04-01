@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getSnipeFilter, updateFilter, getPrefix } = require("../guilds/utils.js")
+const { getSnipeFilter, updateFilter, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

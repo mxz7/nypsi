@@ -9,11 +9,11 @@ const {
     getBankBalance,
     getXp,
     getPrestige,
-} = require("../economy/utils.js")
+} = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils")
-const { isPremium, getTier } = require("../premium/utils")
+const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 

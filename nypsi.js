@@ -10,18 +10,18 @@ const client = new Discord.Client({
     shards: "auto",
 })
 const { token } = require("./config.json")
-const { getUserCount, updateStats, doVote } = require("./economy/utils.js")
+const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
 const {
     runCheck,
     checkStats,
     hasStatsEnabled,
     checkChristmasCountdown,
     hasChristmasCountdownEnabled,
-} = require("./guilds/utils.js")
+} = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { MStoTime } = require("./utils/utils")
-const { runUnmuteChecks } = require("./moderation/utils")
+const { runUnmuteChecks } = require("./utils/moderation/utils")
 
 const snipe = new Map()
 const eSnipe = new Map()
