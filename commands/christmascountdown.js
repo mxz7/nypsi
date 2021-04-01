@@ -8,7 +8,7 @@ const {
     checkChristmasCountdown,
     hasChristmasCountdown,
     createNewChristmasCountdown,
-} = require("../guilds/utils")
+} = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { daysUntilChristmas } = require("../utils/utils")

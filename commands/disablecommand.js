@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getPrefix, getDisabledCommands, updateDisabledCommands } = require("../guilds/utils")
+const { getPrefix, getDisabledCommands, updateDisabledCommands } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { commandExists } = require("../utils/commandhandler")

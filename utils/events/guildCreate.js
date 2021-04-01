@@ -1,5 +1,5 @@
 const { Guild, Client } = require("discord.js")
-const { hasGuild, createGuild } = require("../../guilds/utils")
+const { hasGuild, createGuild } = require("../guilds/utils")
 const { info, types } = require("../logger")
 
 /**

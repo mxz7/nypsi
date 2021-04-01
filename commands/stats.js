@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../economy/utils.js")
+const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

@@ -12,7 +12,7 @@ const {
     createUser,
     getMulti,
     calcMaxBet,
-} = require("../economy/utils")
+} = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 

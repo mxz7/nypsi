@@ -1,4 +1,4 @@
-const { topAmount } = require("../economy/utils.js")
+const { topAmount } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")

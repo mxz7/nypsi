@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { getPrefix } = require("../guilds/utils")
-const { isPremium, getTier } = require("../premium/utils")
+const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

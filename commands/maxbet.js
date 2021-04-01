@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { calcMaxBet, userExists, createUser } = require("../economy/utils")
+const { calcMaxBet, userExists, createUser } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
