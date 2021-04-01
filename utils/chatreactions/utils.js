@@ -57,7 +57,7 @@ setInterval(() => {
 }, 43200000)
 
 setInterval(async () => {
-    const { checkGuild, getGuild } = require("../nypsi")
+    const { checkGuild, getGuild } = require("../../nypsi")
 
     for (let guild in data) {
         const exists = await checkGuild(guild)
@@ -132,7 +132,7 @@ setInterval(async () => {
     }
 
     for (const guildID in data) {
-        const { getGuild } = require("../nypsi")
+        const { getGuild } = require("../../nypsi")
         const guild = await getGuild(guildID)
         const guildData = ChatReactionProfile.from(data[guildID])
 

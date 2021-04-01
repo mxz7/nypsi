@@ -114,7 +114,7 @@ dbl.webhook.on("ready", (hook) => {
 })
 
 dbl.webhook.on("vote", (vote) => {
-    const { onVote } = require("../nypsi")
+    const { onVote } = require("../../nypsi")
     onVote(vote)
 })
 
