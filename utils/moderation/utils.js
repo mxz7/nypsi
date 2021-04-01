@@ -316,15 +316,15 @@ async function requestUnmute(guild, member, client) {
         addCooldown(guild, 3600)
     }
 
-    member = members.find((m) => m.id == member)
+    const newMember = members.find((m) => m.id == member)
 
-    if (!member) {
-        deleteMute(guild, member)
+    if (!newMember) {
+        return deleteMute(guild, member)
     }
 
     const muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
-    if (!muteRole) return deleteMute(guild, member)
+    if (!muteRole) return deleteMute(guild, newMember)
 
     deleteMute(guild, member)
 
