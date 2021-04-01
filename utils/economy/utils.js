@@ -662,7 +662,7 @@ function winBoard() {
             item +
             " | " +
             item +
-            "  **||** win: **" +
+            " **||** win: **" +
             multiplier[item] +
             "**x\n"
     }
