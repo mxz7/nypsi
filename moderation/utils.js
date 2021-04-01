@@ -1,7 +1,7 @@
 const fs = require("fs")
-const { getTimestamp } = require("../utils/utils")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client } = require("discord.js")
+const { info, types, getTimestamp } = require("../utils/logger")
 let data = JSON.parse(fs.readFileSync("./moderation/data.json"))
 
 let timer = 0
@@ -14,7 +14,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] moderation data saved\x1b[37m")
+            info("moderation data saved", types.DATA)
         })
 
         timer = 0
@@ -25,13 +25,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         data = JSON.parse(fs.readFileSync("./moderation/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] moderation data refreshed\x1b[37m")
+        info("moderation data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         data = JSON.parse(fs.readFileSync("./moderation/data.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] moderation data refreshed\x1b[37m")
+        info("moderation data refreshed", types.DATA)
         timer = 0
     }
 }, 60000)
@@ -45,7 +45,7 @@ setInterval(async () => {
         if (!exists) {
             delete data[guild]
 
-            console.log(`[${getTimestamp()}] deleted guild '${guild}' from moderation data`)
+            info(`deleted guild '${guild}' from moderation data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -61,7 +61,7 @@ setInterval(() => {
         "." +
         date.getFullYear()
     fs.writeFileSync("./moderation/backup/" + date + ".json", JSON.stringify(data))
-    console.log("\x1b[32m[" + getTimestamp() + "] moderation data backup complete\x1b[37m")
+    info("moderation data backup complete", types.DATA)
 }, 43200000 * 2)
 
 module.exports = {
@@ -252,6 +252,7 @@ module.exports = {
                     for (let mute of mutes) {
                         if (mute.unmuteTime <= date) {
                             requestUnmute(guild, mute.user, client)
+                            info(`requested unmute in ${guild} for ${mute.user.id}`, types.AUTOMATION)
                         }
                     }
                 }

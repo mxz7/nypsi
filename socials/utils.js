@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { getTimestamp } = require("../utils/utils")
+const { info, types } = require("../utils/logger")
 let users = JSON.parse(fs.readFileSync("./socials/users.json"))
 
 let timer = 0
@@ -13,7 +13,7 @@ setInterval(() => {
             if (err) {
                 return console.log(err)
             }
-            console.log("\x1b[32m[" + getTimestamp() + "] user data saved\x1b[37m")
+            info("socials data saved", types.DATA)
         })
 
         timer = 0
@@ -24,13 +24,13 @@ setInterval(() => {
 
     if (timer >= 5 && !timerCheck) {
         users = JSON.parse(fs.readFileSync("./socials/users.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
+        info("socials data refreshed", types.DATA)
         timerCheck = true
     }
 
     if (timer >= 30 && timerCheck) {
         users = JSON.parse(fs.readFileSync("./socials/users.json"))
-        console.log("\x1b[32m[" + getTimestamp() + "] user data refreshed\x1b[37m")
+        info("socials data refreshed", types.DATA)
         timer = 0
     }
 }, 60000)

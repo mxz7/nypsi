@@ -2,7 +2,7 @@ const { Message, MessageEmbed } = require("discord.js")
 const { mentions } = require("../../nypsi")
 const { getChatFilter, getPrefix, inCooldown } = require("../../guilds/utils")
 const { runCommand } = require("../commandhandler")
-const { getTimestamp } = require("../utils")
+const { info } = require("../logger")
 
 /**
  * @param {Message} message
@@ -11,14 +11,11 @@ module.exports = async (message) => {
     if (message.author.bot) return
 
     if (!message.guild) {
-        console.log(
-            "\x1b[33m[" +
-                getTimestamp() +
-                "] message in DM from " +
+        info(
+            "message in DM from " +
                 message.author.tag +
-                ": '" +
-                message.content +
-                "'\x1b[37m"
+                ": " +
+                message.content
         )
 
         const embed = new MessageEmbed()
