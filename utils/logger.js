@@ -1,5 +1,8 @@
 function info(string, type) {
     let color
+    
+    if (!type) type = types.INFO
+
     switch (type) {
         case types.INFO:
             color = "\x1b[37m"
@@ -24,6 +27,12 @@ function info(string, type) {
 }
 
 exports.info = info
+
+function error(string) {
+    console.error(`\x1B[31m[${getTimestamp()}] ${string}\x1B[0m`)
+}
+
+exports.error = error
 
 const types = {
     INFO: "info",
