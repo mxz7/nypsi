@@ -3,7 +3,7 @@ const { Message } = require("discord.js")
 const { redditImage } = require("../utils/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { isPremium } = require("../premium/utils")
+const { isPremium } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 

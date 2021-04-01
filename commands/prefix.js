@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getPrefix, setPrefix } = require("../guilds/utils")
+const { getPrefix, setPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 

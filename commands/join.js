@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { inCooldown, addCooldown } = require("../guilds/utils")
+const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 
 const cmd = new Command(
     "join",

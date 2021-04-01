@@ -7,10 +7,10 @@ const {
     getProfile,
     getProfileID,
     updateProfile,
-} = require("../socials/utils")
+} = require("../utils/socials/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getPrefix } = require("../guilds/utils")
+const { getPrefix } = require("../utils/guilds/utils")
 
 const regex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 

@@ -8,8 +8,8 @@ const {
     removeFromVoteCache,
     getPrestige,
     getMulti,
-} = require("../economy/utils.js")
-const { getPrefix } = require("../guilds/utils.js")
+} = require("../utils/economy/utils.js")
+const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
