@@ -1,6 +1,11 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../utils/economy/utils.js")
+const {
+    getDMsEnabled,
+    setDMsEnabled,
+    userExists,
+    createUser,
+} = require("../utils/economy/utils.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("dms", "enable/disable dms with the bot", categories.INFO).setAliases([

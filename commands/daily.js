@@ -1,5 +1,11 @@
 const { Message } = require("discord.js")
-const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
+const {
+    getBalance,
+    getMulti,
+    updateBalance,
+    userExists,
+    createUser,
+} = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getLastDaily, setLastDaily } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
