@@ -130,7 +130,7 @@ async function runCheck(guild) {
     if (guild.memberCount > currentMembersPeak) {
         guilds[guild.id].peaks.members = guild.memberCount
         info(
-            " members peak updated for '" +
+            "members peak updated for '" +
                 guild.name +
                 "' " +
                 currentMembersPeak.toLocaleString() +
