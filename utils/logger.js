@@ -28,6 +28,7 @@ function info(string, type) {
     }
 
     const out = `${color}[${getTimestamp()}] [${type}] ${string} \x1b[0m`
+    console.log(out)
 }
 
 exports.info = info
