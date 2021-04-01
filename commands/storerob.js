@@ -1,10 +1,10 @@
-const { getBalance, createUser, updateBalance, userExists } = require("../economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists } = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { isPremium, getTier } = require("../premium/utils.js")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 

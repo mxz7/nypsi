@@ -15,9 +15,9 @@ const {
     getBlacklisted,
     setBlacklisted,
     deleteStats,
-} = require("../chatreactions/utils")
-const { getPrefix } = require("../guilds/utils")
-const { isPremium } = require("../premium/utils")
+} = require("../utils/chatreactions/utils")
+const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 

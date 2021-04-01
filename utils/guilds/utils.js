@@ -1,19 +1,18 @@
 const { Guild } = require("discord.js")
 const fs = require("fs")
-const { getPriority } = require("os")
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { GuildStorage } = require("../utils/classes/GuildStorage")
-const { info, types, error } = require("../utils/logger")
-const { daysUntilChristmas } = require("../utils/utils")
-let guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
+const { CustomEmbed } = require("../classes/EmbedBuilders")
+const { GuildStorage } = require("../classes/GuildStorage")
+const { info, types, error } = require("../logger")
+const { daysUntilChristmas } = require("../utils")
+let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
 
 let timer = 0
 let timerCheck = true
 setInterval(() => {
-    const guilds1 = JSON.parse(fs.readFileSync("./guilds/data.json"))
+    const guilds1 = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
 
     if (JSON.stringify(guilds) != JSON.stringify(guilds1)) {
-        fs.writeFile("./guilds/data.json", JSON.stringify(guilds), (err) => {
+        fs.writeFile("./utils/guilds/data.json", JSON.stringify(guilds), (err) => {
             if (err) {
                 return console.log(err)
             }
@@ -27,7 +26,7 @@ setInterval(() => {
     }
 
     if (timer >= 10 && !timerCheck) {
-        guilds = JSON.parse(fs.readFileSync("./guilds/data.json"))
+        guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
         info("guild data refreshed", types.DATA)
         timerCheck = true
         timer = 0

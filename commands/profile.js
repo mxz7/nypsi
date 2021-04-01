@@ -10,9 +10,9 @@ const {
     calcMaxBet,
     getMulti,
     hasVoted,
-} = require("../economy/utils")
-const { isPremium, getPremiumProfile } = require("../premium/utils")
-const { profileExistsID, getProfileID } = require("../socials/utils")
+} = require("../utils/economy/utils.js")
+const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
+const { profileExistsID, getProfileID } = require("../utils/socials/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { daysAgo, daysUntil } = require("../utils/utils")

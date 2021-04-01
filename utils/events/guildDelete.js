@@ -1,5 +1,5 @@
 const { Guild, Client } = require("discord.js")
-const { setPrefix, updateDisabledCommands } = require("../../guilds/utils")
+const { setPrefix, updateDisabledCommands } = require("../guilds/utils")
 const { info, types } = require("../logger")
 
 /**

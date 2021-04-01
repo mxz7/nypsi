@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { getPrefix } = require("../guilds/utils")
-const { profileExists, createProfile, newCase } = require("../moderation/utils")
+const { getPrefix } = require("../utils/guilds/utils")
+const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 

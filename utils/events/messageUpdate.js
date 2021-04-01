@@ -1,5 +1,5 @@
 const { eSnipe } = require("../../nypsi")
-const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../../guilds/utils")
+const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../guilds/utils")
 const { Message } = require("discord.js")
 
 /**
