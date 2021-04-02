@@ -1,7 +1,7 @@
 const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client } = require("discord.js")
-const { info, types, getTimestamp } = require("../logger")
+const { info, types, getTimestamp, error } = require("../logger")
 let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 
 let timer = 0
@@ -257,7 +257,7 @@ module.exports = {
                     }
                 }
             }
-        }, 120000)
+        }, 30000)
     },
 
     /**
@@ -316,17 +316,25 @@ async function requestUnmute(guild, member, client) {
         addCooldown(guild, 3600)
     }
 
-    const newMember = members.find((m) => m.id == member)
+    const newMember = await members.find((m) => m.id == member)
 
     if (!newMember) {
         return deleteMute(guild, member)
     }
 
-    const muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    const muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
     if (!muteRole) return deleteMute(guild, newMember)
 
     deleteMute(guild, member)
 
-    return await newMember.roles.remove(muteRole).catch()
+    try {
+        return await newMember.roles.remove(muteRole).catch(e => {
+            error(newMember)
+            error(e + " hahaha")
+        })
+    } catch (e) {
+        error(newMember)
+        error(e + " hahaha")
+    }
 }
