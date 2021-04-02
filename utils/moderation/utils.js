@@ -332,7 +332,7 @@ async function requestUnmute(guild, member, client) {
     deleteMute(guild, member)
 
     try {
-        return await newMember.roles.remove(muteRole).catch(e => {
+        return await newMember.roles.remove(muteRole).catch((e) => {
             error(newMember)
             error(e + " hahaha")
         })
