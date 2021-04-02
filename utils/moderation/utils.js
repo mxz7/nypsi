@@ -319,7 +319,9 @@ async function requestUnmute(guild, member, client) {
     let newMember = await members.find((m) => m.id == member)
 
     if (!newMember) {
-        newMember = await guild.members.fetch(member)
+        newMember = await guild.members.fetch(member).catch(() => {
+            newMember = undefined
+        })
         if (!newMember) {
             return deleteMute(guild, member)
         }
