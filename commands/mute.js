@@ -98,11 +98,14 @@ async function run(message, args) {
     let muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
 
     if (!muteRole) {
+        let channelError = false
         try {
             muteRole = await message.guild.roles.create({
                 data: {
                     name: "muted",
                 },
+            }).catch(() => {
+                channelError = true
             })
 
             message.guild.channels.cache.forEach(async (channel) => {
@@ -110,9 +113,18 @@ async function run(message, args) {
                     SEND_MESSAGES: false,
                     SPEAK: false,
                     ADD_REACTIONS: false,
+                }).catch(() => {
+                    channelError =  true
                 })
             })
         } catch (e) {
+            return message.channel.send(
+                new ErrorEmbed(
+                    "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+                )
+            )
+        }
+        if (channelError) {
             return message.channel.send(
                 new ErrorEmbed(
                     "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
