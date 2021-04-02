@@ -313,9 +313,11 @@ async function helpCmd(message, args) {
  */
 function runCommand(cmd, message, args) {
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
-        return message.member.send(
-            "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
-        ).catch(() => {})
+        return message.member
+            .send(
+                "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
+            )
+            .catch(() => {})
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {

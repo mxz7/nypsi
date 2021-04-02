@@ -100,22 +100,26 @@ async function run(message, args) {
     if (!muteRole) {
         let channelError = false
         try {
-            muteRole = await message.guild.roles.create({
-                data: {
-                    name: "muted",
-                },
-            }).catch(() => {
-                channelError = true
-            })
+            muteRole = await message.guild.roles
+                .create({
+                    data: {
+                        name: "muted",
+                    },
+                })
+                .catch(() => {
+                    channelError = true
+                })
 
             message.guild.channels.cache.forEach(async (channel) => {
-                await channel.updateOverwrite(muteRole, {
-                    SEND_MESSAGES: false,
-                    SPEAK: false,
-                    ADD_REACTIONS: false,
-                }).catch(() => {
-                    channelError =  true
-                })
+                await channel
+                    .updateOverwrite(muteRole, {
+                        SEND_MESSAGES: false,
+                        SPEAK: false,
+                        ADD_REACTIONS: false,
+                    })
+                    .catch(() => {
+                        channelError = true
+                    })
             })
         } catch (e) {
             return message.channel.send(
