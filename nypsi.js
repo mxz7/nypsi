@@ -207,7 +207,9 @@ exports.requestRemoveRole = requestRemoveRole
  * @returns {Discord.Guild}
  */
 async function getGuild(guildID) {
-    const guild = await client.guilds.fetch(guildID)
+    let guild = await client.guilds.fetch(guildID).catch(() => {
+        guild = undefined
+    })
 
     return guild
 }
