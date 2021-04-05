@@ -9,6 +9,7 @@ const cooldown = new Map()
 
 const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases([
     "howgay",
+    "lgbtdetector"
 ])
 
 /**

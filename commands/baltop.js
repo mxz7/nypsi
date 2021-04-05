@@ -7,6 +7,7 @@ const cooldown = new Map()
 
 const cmd = new Command("baltop", "view top balances in the server", categories.MONEY).setAliases([
     "top",
+    "gangsters"
 ])
 
 /**

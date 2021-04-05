@@ -7,7 +7,7 @@ const cmd = new Command(
     "addemoji",
     "add an emoji from a different server to your server",
     categories.UTILITY
-).setPermissions(["MANAGE_EMOJIS"])
+).setPermissions(["MANAGE_EMOJIS"]).setAliases(["stealemoji"])
 
 const cooldown = new Map()
 
