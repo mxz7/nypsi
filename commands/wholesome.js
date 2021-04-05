@@ -6,7 +6,11 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN).setAliases(["iloveyou", "loveyou", "loveu"])
+const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN).setAliases([
+    "iloveyou",
+    "loveyou",
+    "loveu",
+])
 
 /**
  * @param {Message} message
