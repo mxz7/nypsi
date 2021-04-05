@@ -19,7 +19,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases([
     "bal",
     "money",
-    "wallet"
+    "wallet",
 ])
 
 /**
