@@ -6,7 +6,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("kick", "kick one or more users", categories.MODERATION).setPermissions([
     "KICK_MEMBERS",
-])
+]).setAliases(["fuckoff"])
 
 /**
  * @param {Message} message
