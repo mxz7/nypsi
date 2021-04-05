@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
 
-avatar.setAliases(["av"])
+avatar.setAliases(["av", "pfp", "picture"])
 
 /**
  * @param {Message} message

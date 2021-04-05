@@ -11,6 +11,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const cmd = new Command("dms", "enable/disable dms with the bot", categories.INFO).setAliases([
     "optout",
     "optin",
+    "stopmessagingme"
 ])
 
 const cooldown = new Map()
