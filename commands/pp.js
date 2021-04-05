@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cmd = new Command("pp", "accurate prediction of your pp size", categories.FUN).setAliases([
     "penis",
     "12inchmonster",
-    "1inchwarrior"
+    "1inchwarrior",
 ])
 
 /**
