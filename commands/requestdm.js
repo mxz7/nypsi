@@ -2,7 +2,11 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("requestdm", "attempt to send a DM to a given user (this is my way of having fun leave me alone)", categories.NONE)
+const cmd = new Command(
+    "requestdm",
+    "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
+    categories.NONE
+)
 
 /**
  * @param {Message} message
@@ -14,7 +18,7 @@ async function run(message, args) {
     if (args.length < 2) {
         return message.channel.send(new ErrorEmbed("$requestdm <id> <content>"))
     }
-    
+
     const { requestDM } = require("../nypsi")
 
     const user = args[0]
