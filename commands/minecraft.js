@@ -5,10 +5,9 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { info, types } = require("../utils/logger")
-const { formatDate } = require("../utils/utils")
+const { getNameHistory } = require("mc-names")
 
 const cooldown = new Map()
-const cache = new Map()
 const serverCache = new Map()
 
 const cmd = new Command(
@@ -61,26 +60,6 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    if (args[0] == "-cache") {
-        if (cache.size > 100) {
-            return message.channel.send("more than 100 items in cache")
-        } else {
-            const names = cache.keys()
-            const names1 = []
-
-            for (let n of names) {
-                names1.push(n)
-            }
-
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "`" + names1.join("`\n`") + "`"
-            ).setTitle("minecraft cache")
-            return message.channel.send(embed)
-        }
-    }
-
     if (args[0].includes(".")) {
         const serverIP = args[0]
         const url = "https://api.mcsrvstat.us/2/" + serverIP.toLowerCase()
@@ -120,153 +99,22 @@ async function run(message, args) {
 
     let username = args[0]
 
-    let url1 = "https://mc-heads.net/minecraft/profile/" + username
-    let url2 = "https://apimon.de/mcuser/" + username + "/old"
-    let invalid = false
-    let oldName = false
-    let res
-    let res2
-
-    if (cache.has(username.toLowerCase())) {
-        try {
-            if (cache.get(username.toLowerCase()).invalid) {
-                return message.channel.send(new ErrorEmbed("invalid account"))
-            }
-            if (cache.get(username.toLowerCase()).oldName) {
-                res2 = cache.get(username.toLowerCase()).response
-                oldName = true
-                res2.history.reverse()
-            } else {
-                res = cache.get(username.toLowerCase()).response
-                res.name_history.reverse()
-            }
-        } catch {
-            console.log(username)
-            console.log(cache.get(username.toLowerCase()))
-            cache.delete(username.toLowerCase())
-            return await message.channel.send(new ErrorEmbed("error fetching from cache"))
-        }
-    } else {
-        res = await fetch(url1)
-            .then((url) => url.json())
-            .catch(() => {
-                invalid = true
-            })
-
-        if (invalid) {
-            res2 = await fetch(url2)
-                .then((url) => {
-                    oldName = true
-                    invalid = false
-                    return url.json()
-                })
-                .catch(() => {
-                    invalid = true
-                    return message.channel.send(new ErrorEmbed("invalid account"))
-                })
-        }
-
-        if (!oldName) {
-            cache.set(username.toLowerCase(), {
-                invalid: invalid,
-                oldName: false,
-                response: res,
-            })
-        } else {
-            cache.set(username.toLowerCase(), {
-                invalid: invalid,
-                oldName: true,
-                response: res2,
-            })
-        }
-
-        setTimeout(() => {
-            try {
-                cache.delete(username.toLowerCase())
-            } catch {
-                cache.clear()
-            }
-        }, 600000)
-
-        if (invalid) return
-    }
-
-    let uuid
-    let nameHistory
-
-    if (oldName) {
-        uuid = res2.id
-        nameHistory = res2.history
-        username = res2.name
-    } else {
-        uuid = res.id
-        username = res.name
-        nameHistory = res.name_history
-    }
-
-    const skin = `https://mc-heads.net/avatar/${uuid}/256`
-
-    const names = new Map()
+    const nameHistory = await getNameHistory(username)
 
     if (!nameHistory) {
-        await message.channel.send(new ErrorEmbed("error fetching data"))
-        console.log("error fetching data")
-        console.log(res)
+        return await message.channel.send(new ErrorEmbed("invalid account"))
     }
 
-    try {
-        nameHistory.reverse()
-    } catch (e) {
-        console.error(e)
-        return console.log(res)
-    }
+    const skin = `https://mc-heads.net/avatar/${nameHistory.uuid}/256`
 
-    const BreakException = {}
+    username = nameHistory.username
 
-    try {
-        nameHistory.forEach((item) => {
-            let value = ""
-
-            if (item.timestamp) {
-                const timestamp = formatDate(new Date(item.timestamp))
-
-                value = "`" + item.name + "` | `" + timestamp + "`"
-            } else if (item.changedToAt) {
-                const timestamp = formatDate(new Date(item.changedToAt))
-
-                value = "`" + item.name + "` | `" + timestamp + "`"
-            } else {
-                value = "`" + item.name + "`"
-            }
-
-            if (names.size == 0) {
-                const value1 = []
-                value1.push(value)
-                names.set(1, value1)
-            } else {
-                const lastPage = names.size
-
-                if (names.get(lastPage).length >= 10) {
-                    const value1 = []
-                    value1.push(value)
-                    names.set(lastPage + 1, value1)
-                } else {
-                    names.get(lastPage).push(value)
-                }
-            }
-        })
-    } catch (e) {
-        if (e != BreakException) throw e
-    }
+    const names = nameHistory.toPages(7, "`$username` | `$date`")
 
     const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
         .setTitle(username)
         .setURL("https://namemc.com/profile/" + username)
         .setThumbnail(skin)
-
-    if (oldName) {
-        embed.setHeader("match found as an old username")
-    }
 
     if (names.size >= 2) {
         embed.setFooter(`page 1/${names.size}`)
@@ -324,10 +172,6 @@ async function run(message, args) {
 }
 
 setInterval(() => {
-    if (cache.size > 7) {
-        cache.clear()
-        info("minecraft username cache cleared", types.AUTOMATION)
-    }
     if (serverCache.size > 7) {
         serverCache.clear()
         info("minecraft server cache cleared", types.AUTOMATION)
