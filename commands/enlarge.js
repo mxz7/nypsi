@@ -7,7 +7,7 @@ const cmd = new Command(
     "enlarge",
     "enlarge a custom emoji to its full size",
     categories.UTILITY
-).setAliases(["emoji"])
+).setAliases(["emoji", "makebig"])
 
 const cooldown = new Map()
 

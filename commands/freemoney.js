@@ -6,7 +6,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY)
+const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY).setAliases(["poor", "imbroke"])
 
 /**
  * @param {Message} message

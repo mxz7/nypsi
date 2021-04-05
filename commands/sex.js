@@ -8,6 +8,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
     "findhornymilfsinmyarea",
     "milffinder",
     "findamilf",
+    "letsfuck"
 ])
 
 const cooldown = new Map()

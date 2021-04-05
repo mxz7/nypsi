@@ -10,7 +10,7 @@ const cmd = new Command(
     "lockdown a channel (will only work if permissions are setup correctly)",
     categories.MODERATION
 )
-    .setAliases(["lock"])
+    .setAliases(["lock", "shutup"])
     .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])
 
 /**
