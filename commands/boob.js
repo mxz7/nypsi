@@ -7,7 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN)
+const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
 
 /**
  * @param {Message} message

@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("ddos", "ddos other users (fake)", categories.FUN)
+const cmd = new Command("ddos", "ddos other users (fake)", categories.FUN).setAliases(["hitoff"])
 
 /**
  * @param {Message} message
