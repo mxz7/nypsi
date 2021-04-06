@@ -84,8 +84,8 @@ async function run(message, args) {
                 amount = amount + Math.round(amount * multi)
                 description = `$${getBalance(
                     message.member
-                ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${(
-                    Math.floor(multi * 100)
+                ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
+                    multi * 100
                 ).toLocaleString()}**% bonus)`
             }
 
