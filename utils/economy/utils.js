@@ -150,7 +150,7 @@ async function doVote(client, vote) {
     }
 
     const amount = 15000 * (getPrestige(memberID) + 1)
-    const multi = (await getMulti(memberID)) * 100
+    const multi = Math.floor((await getMulti(memberID)) * 100)
 
     updateBalance(memberID, getBalance(memberID) + amount)
 

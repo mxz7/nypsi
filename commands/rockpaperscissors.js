@@ -202,8 +202,7 @@ async function run(message, args) {
         if (voted) {
             updateBalance(
                 message.member,
-                getBalance(message.member),
-                +Math.round(winnings * voteMulti)
+                getBalance(message.member) + Math.round(winnings * voteMulti)
             )
             winnings = winnings + Math.round(winnings * voteMulti)
         }
@@ -242,7 +241,7 @@ async function run(message, args) {
                         winnings.toLocaleString() +
                         "\n" +
                         "+**" +
-                        (voteMulti * 100).toString() +
+                        Math.round(voteMulti * 100).toString() +
                         "**% bonus"
                 )
 
