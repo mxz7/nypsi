@@ -482,7 +482,7 @@ async function playGame(message, m) {
                     winnings.toLocaleString() +
                     "\n" +
                     "+**" +
-                    (games.get(message.member.user.id).voted * 100).toString() +
+                    Math.floor(games.get(message.member.user.id).voted * 100).toString() +
                     "**% bonus"
             )
         } else {
