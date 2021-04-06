@@ -143,9 +143,9 @@ async function run(message, args) {
                     15000 *
                     (getPrestige(message.member) + 1)
                 ).toLocaleString()}**\n` +
-                `your new multiplier: **${
-                    Math.floor(multi * 100)
-                }**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`
+                `your new multiplier: **${Math.floor(
+                    multi * 100
+                )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`
         )
         await msg.edit(embed)
     }
