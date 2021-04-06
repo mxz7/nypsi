@@ -85,7 +85,7 @@ async function run(message, args) {
                 description = `$${getBalance(
                     message.member
                 ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${(
-                    multi * 100
+                    Math.floor(multi * 100)
                 ).toLocaleString()}**% bonus)`
             }
 
