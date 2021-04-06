@@ -107,7 +107,7 @@ async function run(message, args) {
         hornyText = "hehe u can do better than that"
     } else if (hornyAmount >= 15) {
         hornyEmoji = "😐"
-        hornyText = "come on man."
+        hornyText = "cum on man."
     } else {
         hornyEmoji = "🙄"
         hornyText = "ur so innocent. boring."
