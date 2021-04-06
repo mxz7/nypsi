@@ -279,7 +279,7 @@ async function run(message, args) {
                         winnings.toLocaleString() +
                         "\n" +
                         "+**" +
-                        (voteMulti * 100).toString() +
+                        Math.floor(voteMulti * 100).toString() +
                         "**% bonus"
                 )
 
