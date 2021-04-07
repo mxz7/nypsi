@@ -11,7 +11,6 @@ const {
     getPrestige,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -19,42 +18,42 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const values = [
     "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
-    "b",
+    "r",
     "b",
     "r",
+    "b",
     "r",
+    "b",
     "r",
+    "b",
     "r",
+    "b",
     "r",
+    "b",
     "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
-    "r",
+    "b",
     "r",
     "g",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
+    "b",
+    "r",
 ]
 
 const cooldown = new Map()
@@ -104,12 +103,12 @@ async function run(message, args) {
                     (values.length - 1) / 2 +
                     "/" +
                     values.length +
-                    " win **2**x\n" +
+                    " win **1.5**x\n" +
                     "⚫ " +
                     (values.length - 1) / 2 +
                     "/" +
                     values.length +
-                    " win **2**x\n" +
+                    " win **1.5**x\n" +
                     "🟢 1/" +
                     values.length +
                     " win **17**x"
@@ -129,7 +128,7 @@ async function run(message, args) {
             .addField(
                 "help",
                 "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
-                    "red and black give a **2x** win and green gives a **17**x win"
+                    "red and black give a **1.5x** win and green gives a **17**x win"
             )
 
         return message.channel.send(embed)
@@ -220,7 +219,7 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) - bet)
 
-    let roll = shuffle(values)[Math.floor(Math.random() * values.length)]
+    let roll = values[Math.floor(Math.random() * values.length)]
 
     let win = false
     let winnings = 0
@@ -230,7 +229,7 @@ async function run(message, args) {
         if (roll == "g") {
             winnings = Math.round(bet * 17)
         } else {
-            winnings = Math.round(bet * 2)
+            winnings = Math.round(bet * 1.5)
         }
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
