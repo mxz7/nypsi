@@ -11,7 +11,6 @@ const {
     getPrestige,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -220,7 +219,7 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) - bet)
 
-    let roll = shuffle(values)[Math.floor(Math.random() * values.length)]
+    let roll = values[Math.floor(Math.random() * values.length)]
 
     let win = false
     let winnings = 0
