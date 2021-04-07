@@ -908,3 +908,5 @@ function emptyWorkersStored(member) {
         users[memberID].workers[worker.id] = worker
     }
 }
+
+exports.emptyWorkersStored = emptyWorkersStored
