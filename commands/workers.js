@@ -45,7 +45,13 @@ async function run(message, args) {
     const listPersonalWorkers = () => {
         const personalWorkers = getWorkers(message.member)
 
-        const embed = new CustomEmbed(message.member, false).setTitle("your workers")
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `you have ${Object.keys(getWorkers(message.member)).length} worker${
+                (Object.keys(getWorkers(message.member)).length == 1) ? "" : "s"
+            }`
+        ).setTitle("your workers")
 
         for (let worker of Object.keys(getWorkers(message.member))) {
             worker = Worker.fromJSON(personalWorkers[worker])
