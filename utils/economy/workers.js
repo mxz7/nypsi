@@ -40,6 +40,8 @@ class Worker {
     }
 }
 
+exports.Worker = Worker
+
 class PotatoFarmer extends Worker {
     /**
      * @returns {PotatoFarmer}
