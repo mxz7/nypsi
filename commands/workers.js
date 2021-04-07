@@ -63,7 +63,8 @@ async function run(message, args) {
                     .getUpgradeCost()
                     .toLocaleString()}\n**item worth** $${worker.perItem.toLocaleString()} / ${
                     worker.itemName
-                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
+                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour\n\n` +
+                `**inventory** ${worker.stored.toLocaleString()} ${worker.itemName} / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})`,
                 true
             )
         }
