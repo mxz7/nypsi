@@ -893,3 +893,18 @@ function addWorker(member, id) {
 }
 
 exports.addWorker = addWorker
+
+function emptyWorkersStored(member) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    const workers = getWorkers(memberID)
+
+    for (let worker of Object.keys(getWorkers(member))) {
+        worker = users[memberID].workers[worker]
+
+        worker.stored = 0
+
+        users[memberID].workers[worker.id] = worker
+    }
+}
