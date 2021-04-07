@@ -104,12 +104,12 @@ async function run(message, args) {
                     (values.length - 1) / 2 +
                     "/" +
                     values.length +
-                    " win **2**x\n" +
+                    " win **1.5**x\n" +
                     "⚫ " +
                     (values.length - 1) / 2 +
                     "/" +
                     values.length +
-                    " win **2**x\n" +
+                    " win **1.5**x\n" +
                     "🟢 1/" +
                     values.length +
                     " win **17**x"
@@ -129,7 +129,7 @@ async function run(message, args) {
             .addField(
                 "help",
                 "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
-                    "red and black give a **2x** win and green gives a **17**x win"
+                    "red and black give a **1.5x** win and green gives a **17**x win"
             )
 
         return message.channel.send(embed)
@@ -230,7 +230,7 @@ async function run(message, args) {
         if (roll == "g") {
             winnings = Math.round(bet * 17)
         } else {
-            winnings = Math.round(bet * 2)
+            winnings = Math.round(bet * 1.5)
         }
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
