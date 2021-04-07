@@ -8,7 +8,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command(
     "workers",
-    "view all of the available workers",
+    "view the available workers and manage your own",
     categories.MONEY
 ).setAliases(["worker", "minion", "minions"])
 
