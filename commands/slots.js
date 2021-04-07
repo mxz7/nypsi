@@ -131,9 +131,7 @@ async function run(message, args) {
     if (args.length == 1 && args[0] == "info") {
         const embed = new CustomEmbed(message.member)
             .setTitle("win board")
-            .setDescription(
-                winBoard()
-            )
+            .setDescription(winBoard())
 
         return message.channel.send(embed)
     }
@@ -225,7 +223,13 @@ async function run(message, args) {
             }
         }
 
-        if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
+        if (
+            one == two &&
+            one == three &&
+            one != "🍒" &&
+            one != "🍋" &&
+            getBalance(message.member) < 1000000
+        ) {
             const chance = Math.floor(Math.random() * 10)
 
             if (chance < 3) {

@@ -32,7 +32,7 @@ class Worker {
     }
 
     /**
-     * 
+     *
      * @returns {Number}
      */
     getHourlyRate() {
@@ -65,7 +65,7 @@ exports.PotatoFarmer = PotatoFarmer
 workers.push(new PotatoFarmer())
 
 /**
- * 
+ *
  * @returns {Array<Worker>}
  */
 function getWorkers() {
