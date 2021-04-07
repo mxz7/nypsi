@@ -1,9 +1,10 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
-const { getPrestige, getWorkers } = require("../utils/economy/utils")
-const { getAllWorkers } = require("../utils/economy/workers")
+const { getPrestige, getWorkers, getBalance, addWorker, updateBalance } = require("../utils/economy/utils")
+const { getAllWorkers, Worker } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command(
     "workers",
@@ -46,8 +47,8 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false).setTitle("your workers")
 
-        for (let worker of Array.from(personalWorkers.keys())) {
-            worker = personalWorkers.get(worker)
+        for (let worker of Object.keys(getWorkers(message.member))) {
+            worker = Worker.fromJSON(personalWorkers[worker])
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**level** ${
@@ -104,15 +105,27 @@ async function run(message, args) {
                 )
             }
 
-            if (worker.prestige > getPrestige(message.member)) {
-                return message.channel.send(
-                    new ErrorEmbed(
-                        `you need to be prestige **${
-                            worker.prestige
-                        }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
+            if (!isPremium(message.author.id) && !getTier(message.author.id) >= 3) {
+                if (worker.prestige > getPrestige(message.member)) {
+                    return message.channel.send(
+                        new ErrorEmbed(
+                            `you need to be prestige **${
+                                worker.prestige
+                            }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
+                        )
                     )
-                )
+                }
             }
+
+            if (getBalance(message.member) < worker.cost) {
+                return message.channel.send(new ErrorEmbed("you cannot afford this worker"))
+            }
+
+            updateBalance(message.member, getBalance(message.member) - worker.cost)
+
+            addWorker(message.member, worker.id)
+
+            return message.channel.send(new CustomEmbed(message.member, false, `✅ you have bought a **${worker.name}**`))
         }
     }
 }
