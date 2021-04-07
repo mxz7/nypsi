@@ -132,7 +132,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("win board")
             .setDescription(
-                winBoard() + "\nhaving any two same fruits in reel 1 & 2 gives a **1.2**x win"
+                winBoard()
             )
 
         return message.channel.send(embed)
@@ -199,19 +199,6 @@ async function run(message, args) {
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     if (getBalance(message.member) >= 3000000) {
-        if (one != two && one != three && two != three) {
-            const chance = Math.floor(Math.random() * 10)
-            let chanceScore = 5
-
-            if (getBalance(message.member) >= 1000000) {
-                chanceScore = 3
-            }
-
-            if (chance < chanceScore) {
-                one = two
-            }
-        }
-
         if (two == three && one != two) {
             const chance = Math.floor(Math.random() * 10)
             let chanceScore = 4
@@ -238,7 +225,7 @@ async function run(message, args) {
             }
         }
 
-        if (one == two && one == three && one != "🍒" && one != "🍋") {
+        if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
             const chance = Math.floor(Math.random() * 10)
 
             if (chance < 3) {
@@ -261,11 +248,6 @@ async function run(message, args) {
 
         win = true
         winnings = Math.round(multiplier * bet)
-
-        updateBalance(message.member, getBalance(message.member) + winnings)
-    } else if (one == two) {
-        win = true
-        winnings = Math.round(bet * 1.2)
 
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
