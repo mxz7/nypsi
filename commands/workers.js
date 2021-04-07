@@ -44,16 +44,17 @@ async function run(message, args) {
     const listPersonalWorkers = () => {
         const personalWorkers = getWorkers(message.member)
 
-        const embed = new CustomEmbed(
-            message.member,
-            false
-        ).setTitle("your workers")
+        const embed = new CustomEmbed(message.member, false).setTitle("your workers")
 
         for (let worker of Array.from(personalWorkers.keys())) {
             worker = personalWorkers.get(worker)
             embed.addField(
                 `${worker.name} [${worker.id}]`,
-                `**level** ${worker.level}\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}\n**item worth** $${worker.perItem.toLocaleString()} / ${
+                `**level** ${
+                    worker.level
+                }\n**upgrade cost** $${worker
+                    .getUpgradeCost()
+                    .toLocaleString()}\n**item worth** $${worker.perItem.toLocaleString()} / ${
                     worker.itemName
                 }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
                 true
