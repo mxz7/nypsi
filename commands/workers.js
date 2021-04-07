@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
-const { getPrestige, getWorkers, getBalance, addWorker, updateBalance } = require("../utils/economy/utils")
+const { getPrestige, getWorkers, getBalance, addWorker, updateBalance, userExists, createUser } = require("../utils/economy/utils")
 const { getAllWorkers, Worker } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -18,6 +18,8 @@ const cmd = new Command(
  */
 async function run(message, args) {
     const workers = getAllWorkers()
+
+    if (!userExists(message.member)) createUser(message.member)
 
     const listAllWorkers = () => {
         const embed = new CustomEmbed(
@@ -112,7 +114,7 @@ async function run(message, args) {
                 )
             }
 
-            if (!isPremium(message.author.id) && !getTier(message.author.id) >= 3) {
+            if (!isPremium(message.author.id) || !getTier(message.author.id) >= 3) {
                 if (worker.prestige > getPrestige(message.member)) {
                     return message.channel.send(
                         new ErrorEmbed(
