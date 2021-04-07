@@ -1,4 +1,4 @@
-const workers = []
+const workers = new Map()
 
 class Worker {
     /**
@@ -64,7 +64,7 @@ class PotatoFarmer extends Worker {
 
 exports.PotatoFarmer = PotatoFarmer
 
-workers.push(new PotatoFarmer())
+workers.set(0, new PotatoFarmer())
 
 /**
  * 
