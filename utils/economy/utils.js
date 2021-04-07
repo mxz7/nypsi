@@ -724,7 +724,7 @@ async function updateStats(guildCount) {
 exports.updateStats = updateStats
 
 /**
- *
+ * @returns {Number}
  * @param {Guildmember} member
  */
 function getPrestige(member) {
