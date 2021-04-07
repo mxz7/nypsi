@@ -99,6 +99,24 @@ setInterval(() => {
     }
 }, 120000)
 
+setInterval(() => {
+    for (const user in users) {
+        for (let worker in users[user].workers) {
+            worker = users[user].workers[worker]
+
+            if (worker.stored < worker.maxStorage) {
+                if (worker.stored + worker.perInterval > worker.maxStorage) {
+                    worker.stored = worker.maxStorage
+                } else {
+                    worker.stored += worker.perInterval
+                }
+            }
+
+            users[user].workers[worker.id] = worker
+        }
+    }
+}, 5 * 60 * 1000)
+
 function randomOffset() {
     return parseInt(Math.floor(Math.random() * 50000))
 }
