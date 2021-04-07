@@ -82,9 +82,9 @@ async function run(message, args) {
             if (worker.prestige > getPrestige(message.member)) {
                 return message.channel.send(
                     new ErrorEmbed(
-                        `you need to be prestige ${
+                        `you need to be prestige **${
                             worker.prestige
-                        } to buy this worker, you are prestige ${getPrestige(message.member)}`
+                        }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
                     )
                 )
             }
