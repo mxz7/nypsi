@@ -14,9 +14,16 @@ class Worker {
         this.name = settings.name
         this.id = settings.id
         this.itemName = settings.itemName
+        this.level = settings.level
+        this.stored = settings.stored
 
-        this.level = 1
-        this.stored = 0
+        if (!this.level) {
+            this.level = 1
+        }
+
+        if (!this.stored) {
+            this.stored = 0
+        }
 
         return this
     }
@@ -53,6 +60,8 @@ class Worker {
             name: json.name,
             id: json.id,
             itemName: json.itemName,
+            stored: json.stored,
+            level: json.level
         })
 
         return a
