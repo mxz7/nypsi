@@ -482,7 +482,7 @@ function logCommand(message, args) {
         content = content.substr(0, 75) + "..."
     }
 
-    const msg = `${message.guild.id} -  ${message.author.tag}: ${content}`
+    const msg = `${message.guild.id} - ${message.author.tag}: ${content}`
 
     info(msg, types.COMMAND)
 }
