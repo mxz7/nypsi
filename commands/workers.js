@@ -130,6 +130,16 @@ async function run(message, args) {
                 return message.channel.send(new ErrorEmbed("you cannot afford this worker"))
             }
 
+            const personalWorkers = getWorkers(message.member)
+
+            for (let worker1 of Object.keys(personalWorkers)) {
+                worker1 = personalWorkers[worker1]
+
+                if (worker1.id == worker.id) {
+                    return message.channel.send(new ErrorEmbed("you already have this worker"))
+                }
+            }
+
             updateBalance(message.member, getBalance(message.member) - worker.cost)
 
             addWorker(message.member, worker.id)
