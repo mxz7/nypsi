@@ -25,18 +25,37 @@ class Worker {
      * @returns {Number}
      */
     getUpgradeCost() {
-        const base = this.getCost()
+        const base = this.cost
         const currentLevel = this.level
 
         return base + base * currentLevel
     }
 
     /**
-     * 
+     *
      * @returns {Number}
      */
     getHourlyRate() {
         return this.perInterval * 12
+    }
+
+    /**
+     * @returns {Worker}
+     * @param {Worker} json
+     */
+    static fromJSON(json) {
+        const a = new Worker({
+            maxStorage: json.maxStorage,
+            perItem: json.perItem,
+            perInterval: json.perInterval,
+            cost: json.cost,
+            prestige: json.prestige,
+            name: json.name,
+            id: json.id,
+            itemName: json.itemName,
+        })
+
+        return a
     }
 }
 
