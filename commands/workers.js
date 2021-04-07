@@ -1,21 +1,24 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
-const { getPrestige } = require("../utils/economy/utils")
+const { getPrestige, getWorkers } = require("../utils/economy/utils")
 const { getAllWorkers } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("workers", "view all of the available workers", categories.MONEY).setAliases(["worker", "minion", "minions"])
+const cmd = new Command(
+    "workers",
+    "view all of the available workers",
+    categories.MONEY
+).setAliases(["worker", "minion", "minions"])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-
     const workers = getAllWorkers()
 
-    if (args.length == 0) {
+    const listAllWorkers = () => {
         const embed = new CustomEmbed(
             message.member,
             false,
@@ -24,14 +27,30 @@ async function run(message, args) {
 
         for (let worker of Array.from(workers.keys())) {
             worker = workers.get(worker)
-            embed.addField(`${worker.name} [${worker.id}]`, `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${worker.prestige}\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`, true)
+            embed.addField(
+                `${worker.name} [${worker.id}]`,
+                `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
+                    worker.prestige
+                }\n**item worth** $${worker.perItem.toLocaleString()} / ${
+                    worker.itemName
+                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
+                true
+            )
         }
 
         return message.channel.send(embed)
+    }
+
+    if (args.length == 0) {
+        if (Object.keys(getWorkers(message.member)).length == 0) {
+            return listAllWorkers()
+        }
     } else {
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
-                return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`))
+                return message.channel.send(
+                    new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`)
+                )
             }
 
             let worker
@@ -55,14 +74,21 @@ async function run(message, args) {
             }
 
             if (!worker) {
-                return message.channel.send(new ErrorEmbed("invalid worker, please use the worker ID or worker name"))
+                return message.channel.send(
+                    new ErrorEmbed("invalid worker, please use the worker ID or worker name")
+                )
             }
 
             if (worker.prestige > getPrestige(message.member)) {
-                return message.channel.send(new ErrorEmbed(`you need to be prestige ${worker.prestige} to buy this worker, you are prestige ${getPrestige(message.member)}`))
+                return message.channel.send(
+                    new ErrorEmbed(
+                        `you need to be prestige ${
+                            worker.prestige
+                        } to buy this worker, you are prestige ${getPrestige(message.member)}`
+                    )
+                )
             }
         }
-
     }
 }
 
