@@ -68,10 +68,10 @@ workers.set(0, new PotatoFarmer())
 
 /**
  * 
- * @returns {Array<Worker>}
+ * @returns {Map<Number, Worker>}
  */
-function getWorkers() {
+function getAllWorkers() {
     return workers
 }
 
-exports.getWorkers = getWorkers
+exports.getAllWorkers = getAllWorkers
