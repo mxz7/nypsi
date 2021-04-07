@@ -23,7 +23,7 @@ async function run(message, args) {
             message.member,
             false,
             "workers create items over time, which you can sell for money"
-        ).setTitle("workers")
+        ).setTitle("workers | " + message.author.username)
 
         for (let worker of Array.from(workers.keys())) {
             worker = workers.get(worker)
@@ -41,9 +41,33 @@ async function run(message, args) {
         return message.channel.send(embed)
     }
 
+    const listPersonalWorkers = () => {
+        const personalWorkers = getWorkers(message.member)
+
+        const embed = new CustomEmbed(
+            message.member,
+            false
+        ).setTitle("your workers")
+
+        for (let worker of Array.from(personalWorkers.keys())) {
+            worker = personalWorkers.get(worker)
+            embed.addField(
+                `${worker.name} [${worker.id}]`,
+                `**level** ${worker.level}\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}\n**item worth** $${worker.perItem.toLocaleString()} / ${
+                    worker.itemName
+                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
+                true
+            )
+        }
+
+        return message.channel.send(embed)
+    }
+
     if (args.length == 0) {
         if (Object.keys(getWorkers(message.member)).length == 0) {
             return listAllWorkers()
+        } else {
+            return listPersonalWorkers()
         }
     } else {
         if (args[0].toLowerCase() == "buy") {
