@@ -9,6 +9,7 @@ const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
+const { Worker, getAllWorkers } = require("./workers")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -823,3 +824,54 @@ async function calcMaxBet(member) {
 }
 
 exports.calcMaxBet = calcMaxBet
+
+/**
+ * @returns {JSON}
+ * @param {GuildMember} member
+ * @param {String} member
+ */
+function getWorkers(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    return users[id].workers
+}
+
+exports.getWorkers = getWorkers
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} id 
+ * @returns {Worker}
+ */
+function getWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    return users[memberID].workers[id]
+}
+
+exports.getWorker = getWorker
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Number} id 
+ * @returns 
+ */
+function addWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    const workers = getAllWorkers()
+
+    const worker = workers.get(id)
+
+    if (!worker) return
+
+    return users[memberID].workers[id] = worker
+}
+
+exports.addWorker = addWorker
