@@ -75,6 +75,7 @@ async function run(message, args) {
 
         for (let worker of Array.from(workers.keys())) {
             worker = workers.get(worker)
+            worker = new worker()
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
@@ -151,11 +152,16 @@ async function run(message, args) {
                 }
             }
 
+            if (worker) {
+                worker = new worker()
+            } 
+
             if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
                 for (let worker1 of Array.from(workers.keys())) {
                     worker1 = workers.get(worker1)
+                    worker1 = new worker1()
                     if (worker1.name == name) {
                         worker = worker1
                         break
@@ -248,11 +254,16 @@ async function run(message, args) {
                 }
             }
 
+            if (worker) {
+                worker = new worker()
+            }
+
             if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
                 for (let worker1 of Array.from(workers.keys())) {
                     worker1 = workers.get(worker1)
+                    worker1 = new worker1()
                     if (worker1.name == name) {
                         worker = worker1
                         break
@@ -341,7 +352,9 @@ async function run(message, args) {
                 }
                 if (!has) {
                     addWorker(message.member, 1)
-                    msg += "+ " + workers.get(1).name + "\n"
+                    let name = workers.get(1)
+                    name = new name().name
+                    msg += "+ " + name + "\n"
                 }
             }
 
@@ -357,7 +370,9 @@ async function run(message, args) {
                 }
                 if (!has) {
                     addWorker(message.member, 3)
-                    msg += "+ " + workers.get(3).name + "\n"
+                    let name = workers.get(3)
+                    name = new name().name
+                    msg += "+ " + name + "\n"
                 }
             }
 
