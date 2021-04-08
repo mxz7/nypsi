@@ -911,6 +911,11 @@ function emptyWorkersStored(member) {
 
 exports.emptyWorkersStored = emptyWorkersStored
 
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} id 
+ */
 function upgradeWorker(member, id) {
     let memberID = member
     if (member.user) memberID = member.user.id
