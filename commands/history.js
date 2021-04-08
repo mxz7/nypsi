@@ -12,7 +12,7 @@ const cmd = new Command(
     "view punishment history for a given user",
     categories.MODERATION
 )
-    .setAliases(["modlogs"])
+    .setAliases(["modlogs", "hist"])
     .setPermissions(["MANAGE_MESSAGES"])
 
 /**
