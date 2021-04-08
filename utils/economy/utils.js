@@ -115,16 +115,6 @@ setInterval(() => {
             users[user].workers[worker.id] = worker
         }
     }
-
-    const workers = getAllWorkers()
-
-    for (let worker of Array.from(workers.keys())) {
-        worker = workers.get(worker)
-
-        worker.stored = 0
-
-        workers.set(worker.id, worker)
-    }
 }, 5 * 60 * 1000)
 
 function randomOffset() {
@@ -895,9 +885,11 @@ function addWorker(member, id) {
 
     const workers = getAllWorkers()
 
-    const worker = workers.get(id)
+    let worker = workers.get(id)
 
     if (!worker) return
+
+    worker = new worker()
 
     return (users[memberID].workers[id] = worker)
 }
