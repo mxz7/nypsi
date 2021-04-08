@@ -212,7 +212,7 @@ async function run(message, args) {
                 amountEarned += Math.floor(worker.perItem * worker.stored)
                 earnedBreakdown += `\n${worker.name} +$${Math.floor(
                     worker.perItem * worker.stored
-                ).toLocaleString()} (${worker.stored} ${worker.itemName})`
+                ).toLocaleString()} (${worker.stored.toLocaleString()} ${worker.itemName})`
             }
 
             if (amountEarned == 0) {
