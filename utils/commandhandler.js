@@ -5,7 +5,7 @@ const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const { MStoTime, getNews, formatDate } = require("./utils.js")
+const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
 
 const commands = new Map()
@@ -13,6 +13,8 @@ const aliases = new Map()
 const popularCommands = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
+
+const beingChecked = []
 
 function loadCommands() {
     info("loading commands..", types.INFO)
@@ -311,7 +313,7 @@ async function helpCmd(message, args) {
  * @param {Message} message
  * @param {Array<String>} args
  */
-function runCommand(cmd, message, args) {
+async function runCommand(cmd, message, args) {
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
         return message.member
             .send(
@@ -363,6 +365,52 @@ function runCommand(cmd, message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 500)
+
+    if (isLockedOut(message.author.id)) {
+        if (beingChecked.indexOf(message.author.id) != -1) return
+
+        const captcha = createCaptcha()
+
+        const embed = new CustomEmbed(message.member, false).setTitle("you have been locked")
+
+        embed.setDescription(`type: \`${captcha.display}\``)
+
+        beingChecked.push(message.author.id)
+
+        await message.channel.send(embed)
+
+        info(`sent captcha (${message.author.id}) - awaiting reply`)
+
+        const filter = (m) => m.author.id == message.author.id
+
+        let fail = false
+
+        const response = await message.channel
+            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                return collected.first().content.toLowerCase()
+            })
+            .catch(() => {
+                fail = true
+                return message.channel.send(message.author.toString() + " captcha failed, please **type** the letter/number combination shown")
+            })
+        
+        beingChecked.splice(beingChecked.indexOf(message.author.id), 1)
+        
+        if (fail) {
+            return
+        }
+
+        if (response == captcha.answer) {
+            toggleLock(message.author.id)
+            return message.channel.send("✅ you passed the captcha")
+        } else {
+            return message.channel.send(
+                message.author.toString() +
+                    " captcha failed, please **type** the letter/number combination shown"
+            )
+        }
+    }
 
     try {
         logCommand(message, args)
