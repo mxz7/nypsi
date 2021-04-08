@@ -169,18 +169,14 @@ async function run(message, args) {
                 )
             }
 
-            if (!isPremium(message.author.id) || !getTier(message.author.id) >= 3) {
-                if (worker.prestige > getPrestige(message.member)) {
-                    return message.channel.send(
-                        new ErrorEmbed(
-                            `you need to be prestige **${
-                                worker.prestige
-                            }** to buy this worker, you are prestige **${getPrestige(
-                                message.member
-                            )}**`
-                        )
+            if (worker.prestige > getPrestige(message.member)) {
+                return message.channel.send(
+                    new ErrorEmbed(
+                        `you need to be prestige **${
+                            worker.prestige
+                        }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
                     )
-                }
+                )
             }
 
             if (getBalance(message.member) < worker.cost) {
