@@ -222,7 +222,13 @@ async function run(message, args) {
         }
     }
 
-    if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
+    if (
+        one == two &&
+        one == three &&
+        one != "🍒" &&
+        one != "🍋" &&
+        getBalance(message.member) < 1000000
+    ) {
         const chance = Math.floor(Math.random() * 10)
 
         if (chance < 3) {
