@@ -82,7 +82,7 @@ class PotatoFarmer extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 30000,
+            maxStorage: 300,
             perItem: 1,
             perInterval: 7,
             cost: 75000,
@@ -106,7 +106,7 @@ class Fisherman extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 20000,
+            maxStorage: 200,
             perItem: 4,
             perInterval: 5,
             cost: 300000,
@@ -130,7 +130,7 @@ class Miner extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 15000,
+            maxStorage: 175,
             perItem: 5,
             perInterval: 7,
             cost: 400000,
@@ -154,7 +154,7 @@ class LumberJack extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 10000,
+            maxStorage: 150,
             perItem: 8,
             perInterval: 5,
             cost: 500000,
@@ -178,7 +178,7 @@ class Butcher extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 10000,
+            maxStorage: 125,
             perItem: 10,
             perInterval: 6,
             cost: 600000,
@@ -202,7 +202,7 @@ class Tailor extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 5000,
+            maxStorage: 100,
             perItem: 12,
             perInterval: 7,
             cost: 700000,
