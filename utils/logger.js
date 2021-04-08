@@ -27,7 +27,10 @@ function info(string, type) {
             break
     }
 
-    const out = `${color}[${getTimestamp()}] [${type}] ${string} \x1b[0m`
+    const day = new Date().getDate()
+    const month = new Date().getMonth() + 1
+
+    const out = `${color}[${day}/${month} ${getTimestamp()}] [${type}] ${string} \x1b[0m`
     console.log(out)
 }
 
