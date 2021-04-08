@@ -115,6 +115,16 @@ setInterval(() => {
             users[user].workers[worker.id] = worker
         }
     }
+
+    const workers = getAllWorkers()
+
+    for (let worker of Array.from(workers.keys())) {
+        worker = workers.get(worker)
+
+        worker.stored = 0
+
+        workers.set(worker.id, worker)
+    }
 }, 5 * 60 * 1000)
 
 function randomOffset() {
