@@ -312,6 +312,52 @@ async function run(message, args) {
             return message.channel.send(embed)
         } else if (args[0].toLowerCase() == "list") {
             return listAllWorkers()
+        } else if (args[0].toLowerCase() == "reclaim" || args[0].toLowerCase() == "patreon" || args[0].toLowerCase() == "premium") {
+            if (!isPremium(message.author.id)) {
+                return message.channel.send(new ErrorEmbed("you must have a premium membership for this").setFooter(`${getPrefix(message.guild)}patreon`))
+            }
+
+            let msg = ""
+
+            const personalWorkers = getWorkers(message.member)
+
+            if (getTier(message.author.id) >= 2) {
+                let has = false
+                for (let worker1 of Object.keys(personalWorkers)) {
+                    worker1 = personalWorkers[worker1]
+
+                    if (worker1.id == 1) {
+                        has = true
+                        break
+                    }
+                }
+                if (!has) {
+                    addWorker(message.member, 1)
+                    msg += "+ " + workers.get(1).name + "\n"
+                }
+            }
+
+            if (getTier(message.author.id) >= 3) {
+                let has = false
+                for (let worker1 of Object.keys(personalWorkers)) {
+                    worker1 = personalWorkers[worker1]
+
+                    if (worker1.id == 3) {
+                        has = true
+                        break
+                    }
+                }
+                if (!has) {
+                    addWorker(message.member, 3)
+                    msg += "+ " + workers.get(3).name + "\n"
+                }
+            }
+
+            if (msg == "") {
+                msg = "you weren't able to claim any free workers"
+            }
+
+            return message.channel.send(new CustomEmbed(message.member, false, msg))
         } else {
             const embed = new CustomEmbed(message.member, false).setTitle(
                 "workers | " + message.author.username
