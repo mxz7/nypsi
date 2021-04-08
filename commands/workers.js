@@ -154,7 +154,7 @@ async function run(message, args) {
 
             if (worker) {
                 worker = new worker()
-            } 
+            }
 
             if (!worker) {
                 args.shift()
