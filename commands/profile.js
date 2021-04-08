@@ -10,6 +10,8 @@ const {
     calcMaxBet,
     getMulti,
     hasVoted,
+    hasPadlock,
+    getWorkers,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 const { profileExistsID, getProfileID } = require("../utils/socials/utils")
@@ -70,7 +72,8 @@ async function run(message, args) {
     embed.addField(
         "💰 economy",
         `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}`,
+    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(message.member)}
+    **workers** ${Object.keys(getWorkers(message.member)).length}`,
         true
     )
 
