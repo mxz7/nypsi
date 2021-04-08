@@ -9,6 +9,7 @@ const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
+const { Worker, getAllWorkers } = require("./workers")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -97,6 +98,34 @@ setInterval(() => {
         }
     }
 }, 120000)
+
+setInterval(() => {
+    for (const user in users) {
+        for (let worker in users[user].workers) {
+            worker = users[user].workers[worker]
+
+            if (worker.stored < worker.maxStorage) {
+                if (worker.stored + worker.perInterval > worker.maxStorage) {
+                    worker.stored = worker.maxStorage
+                } else {
+                    worker.stored += worker.perInterval
+                }
+            }
+
+            users[user].workers[worker.id] = worker
+        }
+    }
+
+    const workers = getAllWorkers()
+
+    for (let worker of Array.from(workers.keys())) {
+        worker = workers.get(worker)
+
+        worker.stored = 0
+
+        workers.set(worker.id, worker)
+    }
+}, 5 * 60 * 1000)
 
 function randomOffset() {
     return parseInt(Math.floor(Math.random() * 50000))
@@ -723,7 +752,7 @@ async function updateStats(guildCount) {
 exports.updateStats = updateStats
 
 /**
- *
+ * @returns {Number}
  * @param {Guildmember} member
  */
 function getPrestige(member) {
@@ -823,3 +852,91 @@ async function calcMaxBet(member) {
 }
 
 exports.calcMaxBet = calcMaxBet
+
+/**
+ * @returns {JSON}
+ * @param {GuildMember} member
+ * @param {String} member
+ */
+function getWorkers(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    return users[id].workers
+}
+
+exports.getWorkers = getWorkers
+
+/**
+ *
+ * @param {GuildMember} member
+ * @param {String} id
+ * @returns {Worker}
+ */
+function getWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    return users[memberID].workers[id]
+}
+
+exports.getWorker = getWorker
+
+/**
+ *
+ * @param {GuildMember} member
+ * @param {Number} id
+ * @returns
+ */
+function addWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    const workers = getAllWorkers()
+
+    const worker = workers.get(id)
+
+    if (!worker) return
+
+    return (users[memberID].workers[id] = worker)
+}
+
+exports.addWorker = addWorker
+
+function emptyWorkersStored(member) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    const workers = getWorkers(memberID)
+
+    for (let worker of Object.keys(getWorkers(member))) {
+        worker = users[memberID].workers[worker]
+
+        worker.stored = 0
+
+        users[memberID].workers[worker.id] = worker
+    }
+}
+
+exports.emptyWorkersStored = emptyWorkersStored
+
+/**
+ *
+ * @param {GuildMember} member
+ * @param {String} id
+ */
+function upgradeWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    let worker = getWorkers(memberID)[id]
+
+    worker = Worker.fromJSON(worker)
+
+    worker.upgrade()
+
+    users[memberID].workers[worker.id] = worker
+}
+
+exports.upgradeWorker = upgradeWorker
