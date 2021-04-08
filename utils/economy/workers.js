@@ -67,7 +67,7 @@ class Worker {
             id: json.id,
             itemName: json.itemName,
             stored: json.stored,
-            level: json.level
+            level: json.level,
         })
 
         return a
@@ -221,7 +221,7 @@ exports.Tailor = Tailor
 workers.set(5, new Tailor())
 
 /**
- * 
+ *
  * @returns {Map<Number, Worker>}
  */
 function getAllWorkers() {
