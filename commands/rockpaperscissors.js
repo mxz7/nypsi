@@ -175,17 +175,17 @@ async function run(message, args) {
     if (choice == "rock" && winning == "scissors") {
         win = true
 
-        winnings = Math.round(bet * 2)
+        winnings = Math.round(bet * 1.5)
         updateBalance(message.member, getBalance(message.member) + winnings)
     } else if (choice == "paper" && winning == "rock") {
         win = true
 
-        winnings = Math.round(bet * 2)
+        winnings = Math.round(bet * 1.5)
         updateBalance(message.member, getBalance(message.member) + winnings)
     } else if (choice == "scissors" && winning == "paper") {
         win = true
 
-        winnings = Math.round(bet * 2)
+        winnings = Math.round(bet * 1.5)
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
 

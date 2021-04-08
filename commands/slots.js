@@ -131,9 +131,7 @@ async function run(message, args) {
     if (args.length == 1 && args[0] == "info") {
         const embed = new CustomEmbed(message.member)
             .setTitle("win board")
-            .setDescription(
-                winBoard() + "\nhaving any two same fruits in reel 1 & 2 gives a **1.2**x win"
-            )
+            .setDescription(winBoard())
 
         return message.channel.send(embed)
     }
@@ -246,11 +244,6 @@ async function run(message, args) {
 
         win = true
         winnings = Math.round(multiplier * bet)
-
-        updateBalance(message.member, getBalance(message.member) + winnings)
-    } else if (one == two) {
-        win = true
-        winnings = Math.round(bet * 1.2)
 
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
