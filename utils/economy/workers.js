@@ -98,7 +98,7 @@ class PotatoFarmer extends Worker {
 
 exports.PotatoFarmer = PotatoFarmer
 
-workers.set(0, new PotatoFarmer())
+workers.set(0, PotatoFarmer)
 
 class Fisherman extends Worker {
     /**
@@ -122,7 +122,7 @@ class Fisherman extends Worker {
 
 exports.Fisherman = Fisherman
 
-workers.set(1, new Fisherman())
+workers.set(1, Fisherman)
 
 class Miner extends Worker {
     /**
@@ -146,7 +146,7 @@ class Miner extends Worker {
 
 exports.Miner = Miner
 
-workers.set(2, new Miner())
+workers.set(2, Miner)
 
 class LumberJack extends Worker {
     /**
@@ -170,7 +170,7 @@ class LumberJack extends Worker {
 
 exports.LumberJack = LumberJack
 
-workers.set(3, new LumberJack())
+workers.set(3, LumberJack)
 
 class Butcher extends Worker {
     /**
@@ -194,7 +194,7 @@ class Butcher extends Worker {
 
 exports.Butcher = Butcher
 
-workers.set(4, new Butcher())
+workers.set(4, Butcher)
 
 class Tailor extends Worker {
     /**
@@ -218,7 +218,7 @@ class Tailor extends Worker {
 
 exports.Tailor = Tailor
 
-workers.set(5, new Tailor())
+workers.set(5, Tailor)
 
 /**
  *
