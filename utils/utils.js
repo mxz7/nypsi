@@ -1,12 +1,15 @@
 const { GuildMember, Message } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
+const { getZeroWidth } = require("./classes/ChatReaction")
 const { error } = require("./logger")
 
 const news = {
     text: "",
     date: new Date().getTime(),
 }
+
+const locked = []
 
 /**
  * @returns {String}
@@ -362,3 +365,68 @@ function setNews(string) {
 }
 
 exports.setNews = setNews
+
+/**
+ *
+ * @param {String} string user id
+ * @returns {Boolean}
+ */
+function isLockedOut(string) {
+    if (locked.indexOf(string) == -1) {
+        return false
+    } else {
+        return true
+    }
+}
+
+exports.isLockedOut = isLockedOut
+
+/**
+ *
+ * @param {String} string user id
+ */
+function toggleLock(string) {
+    if (isLockedOut(string)) {
+        locked.splice(locked.indexOf(string), 1)
+    } else {
+        locked.push(string)
+    }
+}
+
+exports.toggleLock = toggleLock
+
+/**
+ * @returns {captcha}
+ */
+function createCaptcha() {
+    return new captcha(Math.floor(Math.random() * 16777215).toString(16))
+}
+
+exports.createCaptcha = createCaptcha
+
+class captcha {
+    /**
+     *
+     * @param {String} d random letters
+     * @returns {captcha}
+     */
+    constructor(d) {
+        this.answer = d
+
+        const zeroWidthCount = d.length / 2
+
+        const zeroWidthChar = getZeroWidth()
+
+        let displayWord = d
+
+        for (let i = 0; i < zeroWidthCount; i++) {
+            const pos = Math.floor(Math.random() * d.length + 1)
+
+            displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
+        }
+
+        this.display = displayWord
+
+        return this
+    }
+}
