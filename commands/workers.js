@@ -12,6 +12,8 @@ const cmd = new Command(
     categories.MONEY
 ).setAliases(["worker", "minion", "minions"])
 
+const cooldown = new Map()
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
