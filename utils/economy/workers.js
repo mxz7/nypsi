@@ -82,10 +82,10 @@ class PotatoFarmer extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 300,
-            perItem: 1,
-            perInterval: 7,
-            cost: 75000,
+            maxStorage: 600,
+            perItem: 4,
+            perInterval: 17,
+            cost: 100000,
             prestige: 1,
             name: "potato farmer",
             id: 0,
@@ -106,10 +106,10 @@ class Fisherman extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 200,
-            perItem: 4,
-            perInterval: 5,
-            cost: 300000,
+            maxStorage: 350,
+            perItem: 15,
+            perInterval: 10,
+            cost: 250000,
             prestige: 2,
             name: "fisherman",
             id: 1,
@@ -130,9 +130,9 @@ class Miner extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 175,
-            perItem: 5,
-            perInterval: 7,
+            maxStorage: 400,
+            perItem: 22,
+            perInterval: 14,
             cost: 400000,
             prestige: 2,
             name: "miner",
@@ -154,9 +154,9 @@ class LumberJack extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 150,
-            perItem: 8,
-            perInterval: 5,
+            maxStorage: 350,
+            perItem: 35,
+            perInterval: 10,
             cost: 500000,
             prestige: 3,
             name: "lumberjack",
@@ -178,11 +178,11 @@ class Butcher extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 125,
-            perItem: 10,
-            perInterval: 6,
+            maxStorage: 600,
+            perItem: 17,
+            perInterval: 25,
             cost: 600000,
-            prestige: 3,
+            prestige: 4,
             name: "butcher",
             id: 4,
             itemName: "🥓",
@@ -202,11 +202,11 @@ class Tailor extends Worker {
      */
     constructor() {
         super({
-            maxStorage: 100,
-            perItem: 12,
-            perInterval: 7,
+            maxStorage: 750,
+            perItem: 20,
+            perInterval: 30,
             cost: 700000,
-            prestige: 4,
+            prestige: 5,
             name: "tailor",
             id: 5,
             itemName: "👕",
