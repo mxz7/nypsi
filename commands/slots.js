@@ -198,58 +198,43 @@ async function run(message, args) {
     let two = reel2[Math.floor(Math.random() * reel2.length)]
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
-    if (getBalance(message.member) >= 3000000) {
-        if (one != two && one != three && two != three) {
-            const chance = Math.floor(Math.random() * 10)
-            let chanceScore = 5
+    if (two == three && one != two) {
+        const chance = Math.floor(Math.random() * 10)
+        let chanceScore = 4
 
-            if (getBalance(message.member) >= 1000000) {
-                chanceScore = 3
-            }
-
-            if (chance < chanceScore) {
-                one = two
-            }
+        if (getBalance(message.member) >= 1000000) {
+            chanceScore = 2
         }
 
-        if (two == three && one != two) {
-            const chance = Math.floor(Math.random() * 10)
-            let chanceScore = 4
+        if (chance < chanceScore) {
+            one = two
+        }
+    }
 
-            if (getBalance(message.member) >= 1000000) {
-                chanceScore = 2
-            }
+    if (one == two && one != three) {
+        const chance = Math.floor(Math.random() * 10)
+        let chanceScore = 4
 
-            if (chance < chanceScore) {
-                one = two
-            }
+        if (getBalance(message.member) >= 1000000) {
+            chanceScore = 2
         }
 
-        if (one == two && one != three) {
-            const chance = Math.floor(Math.random() * 10)
-            let chanceScore = 4
-
-            if (getBalance(message.member) >= 1000000) {
-                chanceScore = 2
-            }
-
-            if (chance < chanceScore) {
-                three = two
-            }
+        if (chance < chanceScore) {
+            three = two
         }
+    }
 
-        if (one == two && one == three && one != "🍒" && one != "🍋") {
-            const chance = Math.floor(Math.random() * 10)
+    if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
+        const chance = Math.floor(Math.random() * 10)
 
-            if (chance < 3) {
-                one == "🍋"
-                two == "🍋"
-                three == "🍋"
-            } else if (chance < 2) {
-                one == "🍒"
-                two == "🍒"
-                three == "🍒"
-            }
+        if (chance < 3) {
+            one == "🍋"
+            two == "🍋"
+            three == "🍋"
+        } else if (chance < 2) {
+            one == "🍒"
+            two == "🍒"
+            three == "🍒"
         }
     }
 
