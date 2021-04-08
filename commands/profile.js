@@ -72,7 +72,9 @@ async function run(message, args) {
     embed.addField(
         "💰 economy",
         `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(message.member)}
+    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(
+            message.member
+        )}
     **workers** ${Object.keys(getWorkers(message.member)).length}`,
         true
     )
