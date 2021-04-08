@@ -107,7 +107,7 @@ async function run(message, args) {
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**level** ${worker.level}${
-                    worker.level >= 10
+                    worker.level >= 5
                         ? ""
                         : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
                 }\n**item worth** $${worker.perItem.toLocaleString()} / ${
@@ -274,7 +274,7 @@ async function run(message, args) {
 
             worker = Worker.fromJSON(worker)
 
-            if (worker.level >= 10) {
+            if (worker.level >= 5) {
                 return message.channel.send(new ErrorEmbed("this worker is already max level"))
             }
 
