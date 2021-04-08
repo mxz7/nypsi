@@ -367,7 +367,7 @@ function setNews(string) {
 exports.setNews = setNews
 
 /**
- * 
+ *
  * @param {String} string user id
  * @returns {Boolean}
  */
@@ -382,7 +382,7 @@ function isLockedOut(string) {
 exports.isLockedOut = isLockedOut
 
 /**
- * 
+ *
  * @param {String} string user id
  */
 function toggleLock(string) {
@@ -406,7 +406,7 @@ exports.createCaptcha = createCaptcha
 
 class captcha {
     /**
-     * 
+     *
      * @param {String} d random letters
      * @returns {captcha}
      */
