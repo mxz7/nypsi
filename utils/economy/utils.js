@@ -869,9 +869,9 @@ function getWorkers(member) {
 exports.getWorkers = getWorkers
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {String} id 
+ *
+ * @param {GuildMember} member
+ * @param {String} id
  * @returns {Worker}
  */
 function getWorker(member, id) {
@@ -884,10 +884,10 @@ function getWorker(member, id) {
 exports.getWorker = getWorker
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Number} id 
- * @returns 
+ *
+ * @param {GuildMember} member
+ * @param {Number} id
+ * @returns
  */
 function addWorker(member, id) {
     let memberID = member
@@ -899,7 +899,7 @@ function addWorker(member, id) {
 
     if (!worker) return
 
-    return users[memberID].workers[id] = worker
+    return (users[memberID].workers[id] = worker)
 }
 
 exports.addWorker = addWorker
@@ -922,9 +922,9 @@ function emptyWorkersStored(member) {
 exports.emptyWorkersStored = emptyWorkersStored
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {String} id 
+ *
+ * @param {GuildMember} member
+ * @param {String} id
  */
 function upgradeWorker(member, id) {
     let memberID = member

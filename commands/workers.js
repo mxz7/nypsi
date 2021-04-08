@@ -312,9 +312,17 @@ async function run(message, args) {
             return message.channel.send(embed)
         } else if (args[0].toLowerCase() == "list") {
             return listAllWorkers()
-        } else if (args[0].toLowerCase() == "reclaim" || args[0].toLowerCase() == "patreon" || args[0].toLowerCase() == "premium") {
+        } else if (
+            args[0].toLowerCase() == "reclaim" ||
+            args[0].toLowerCase() == "patreon" ||
+            args[0].toLowerCase() == "premium"
+        ) {
             if (!isPremium(message.author.id)) {
-                return message.channel.send(new ErrorEmbed("you must have a premium membership for this").setFooter(`${getPrefix(message.guild)}patreon`))
+                return message.channel.send(
+                    new ErrorEmbed("you must have a premium membership for this").setFooter(
+                        `${getPrefix(message.guild)}patreon`
+                    )
+                )
             }
 
             let msg = ""
