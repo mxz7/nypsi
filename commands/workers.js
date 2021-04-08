@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
-const { getPrestige, getWorkers, getBalance, addWorker, updateBalance, userExists, createUser, emptyWorkersStored } = require("../utils/economy/utils")
+const { getPrestige, getWorkers, getBalance, addWorker, updateBalance, userExists, createUser, emptyWorkersStored, upgradeWorker } = require("../utils/economy/utils")
 const { getAllWorkers, Worker } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -92,14 +92,20 @@ async function run(message, args) {
             worker = Worker.fromJSON(personalWorkers[worker])
             embed.addField(
                 `${worker.name} [${worker.id}]`,
-                `**level** ${
-                    worker.level
-                }\n**upgrade cost** $${worker
-                    .getUpgradeCost()
-                    .toLocaleString()}\n**item worth** $${worker.perItem.toLocaleString()} / ${
+                `**level** ${worker.level}${
+                    worker.level >= 5
+                        ? ""
+                        : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
+                }\n**item worth** $${worker.perItem.toLocaleString()} / ${
                     worker.itemName
-                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour\n\n` +
-                `**inventory** ${worker.stored.toLocaleString()} ${worker.itemName} / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})`,
+                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${
+                    worker.itemName
+                } / hour\n\n` +
+                    `**inventory** ${worker.stored.toLocaleString()} ${
+                        worker.itemName
+                    } / ${worker.maxStorage.toLocaleString()} ($${(
+                        worker.stored * worker.perItem
+                    ).toLocaleString()})`,
                 true
             )
         }
@@ -201,6 +207,71 @@ async function run(message, args) {
             updateBalance(message.member, getBalance(message.member) + amountEarned)
 
             const embed = new CustomEmbed(message.member, false, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`).setTitle("workers | " + message.author.username)
+
+            return message.channel.send(embed)
+        } else if (args[0].toLowerCase() == "upgrade") {
+            if (args.length == 1) {
+                return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}workers upgrade <id or name>`))
+            }
+
+            let worker
+
+            if (args.length == 2) {
+                if (args[1].length == 1) {
+                    if (workers.get(parseInt(args[1]))) {
+                        worker = workers.get(parseInt(args[1]))
+                    }
+                }
+            } else {
+                args.shift()
+                const name = args.join(" ").toLowerCase()
+                for (let worker1 of Array.from(workers.keys())) {
+                    worker1 = workers.get(worker1)
+                    if (worker1.name == name) {
+                        worker = worker1
+                        break
+                    }
+                }
+            }
+
+            if (!worker) {
+                return message.channel.send(
+                    new ErrorEmbed("invalid worker, please use the worker ID or worker name")
+                )
+            }
+
+            if (worker.level >= 5) {
+                return message.channel.send(new ErrorEmbed("this worker is already max level"))
+            }
+
+            worker = Worker.fromJSON(worker)
+
+            if (getBalance(message.member) < worker.getUpgradeCost()) {
+                return message.channel.send(
+                    new ErrorEmbed(
+                        `the upgrade cost for \`${
+                            worker.name
+                        }\` is $${worker.getUpgradeCost().toLocaleString()}, you can't afford this`
+                    )
+                )
+            }
+
+            updateBalance(message.member, getBalance(message.member) - worker.getUpgradeCost())
+
+            upgradeWorker(message.member, worker.id)
+
+            const embed = new CustomEmbed(message.member, true)
+
+            embed.setTitle("workers | " + message.author.username)
+
+            worker = getWorkers(message.member)[worker.id]
+
+            worker = Worker.fromJSON(worker)
+
+            embed.setDescription(`your ${worker.name} has been upgraded to level ${worker.level}\n\n` +
+                `**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n` +
+                `**rate** ${worker.getHourlyRate()} ${worker.itemName} / hour\n` +
+                `**inventory** ${worker.stored.toLocaleString()} ${worker.itemName} / ${worker.maxStorage.toLocaleString()}`)
 
             return message.channel.send(embed)
         }
