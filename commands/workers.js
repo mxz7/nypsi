@@ -21,6 +21,37 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
+    let cooldownLength = 5
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 2
+    }
+
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = cooldownLength - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, cooldownLength * 1000)
+
     const listAllWorkers = () => {
         const embed = new CustomEmbed(
             message.member,
