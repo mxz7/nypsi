@@ -47,7 +47,7 @@ async function run(message, args) {
 
     if (!userExists(message.member)) createUser(message.member)
 
-    if (getPrestige(message.member) >= 100) {
+    if (getPrestige(message.member) >= 35) {
         return message.channel.send(
             new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage(
                 "https://i.imgur.com/vB3UGgi.png"
