@@ -910,3 +910,18 @@ function emptyWorkersStored(member) {
 }
 
 exports.emptyWorkersStored = emptyWorkersStored
+
+function upgradeWorker(member, id) {
+    let memberID = member
+    if (member.user) memberID = member.user.id
+
+    let worker = getWorkers(memberID)[id]
+
+    worker = Worker.fromJSON(worker)
+
+    worker.upgrade()
+
+    users[memberID].workers[worker.id] = worker
+}
+
+exports.upgradeWorker = upgradeWorker
