@@ -46,6 +46,12 @@ class Worker {
         return this.perInterval * 12
     }
 
+    upgrade() {
+        this.level++
+        this.perItem = this.perItem * 2
+        this.maxStorage = Math.floor(this.maxStorage * 1.5)
+    }
+
     /**
      * @returns {Worker}
      * @param {Worker} json
