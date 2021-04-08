@@ -932,3 +932,26 @@ function upgradeWorker(member, id) {
 }
 
 exports.upgradeWorker = upgradeWorker
+
+// for (const user in users) {
+//     for (let worker in getWorkers(user)) {
+//         worker = parseInt(worker)
+//         const level = users[user].workers[worker].level
+//         const stored = users[user].workers[worker].stored
+
+//         const allWorkers = getAllWorkers()
+
+//         let newWorker = allWorkers.get(parseInt(worker))
+
+//         newWorker = new newWorker()
+
+//         newWorker.stored = stored
+
+//         for (let i = 1; i < level; i++) {
+//             newWorker.upgrade()
+//         }
+
+//         users[user].workers[worker] = newWorker
+//         info(`${user} ${worker} ${level}`)
+//     }
+// }
