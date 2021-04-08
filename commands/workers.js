@@ -149,7 +149,9 @@ async function run(message, args) {
                         worker = workers.get(parseInt(args[1]))
                     }
                 }
-            } else {
+            }
+
+            if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
                 for (let worker1 of Array.from(workers.keys())) {
@@ -248,7 +250,9 @@ async function run(message, args) {
                         worker = workers.get(parseInt(args[1]))
                     }
                 }
-            } else {
+            }
+
+            if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
                 for (let worker1 of Array.from(workers.keys())) {
@@ -266,11 +270,17 @@ async function run(message, args) {
                 )
             }
 
-            if (worker.level >= 5) {
-                return message.channel.send(new ErrorEmbed("this worker is already max level"))
+            worker = getWorkers(message.member)[worker.id]
+
+            if (!worker) {
+                return message.channel.send(new ErrorEmbed("you don't have this worker"))
             }
 
             worker = Worker.fromJSON(worker)
+
+            if (worker.level >= 5) {
+                return message.channel.send(new ErrorEmbed("this worker is already max level"))
+            }
 
             if (getBalance(message.member) < worker.getUpgradeCost()) {
                 return message.channel.send(
