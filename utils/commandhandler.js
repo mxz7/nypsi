@@ -5,7 +5,14 @@ const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
+const {
+    MStoTime,
+    getNews,
+    formatDate,
+    isLockedOut,
+    createCaptcha,
+    toggleLock,
+} = require("./utils.js")
 const { info, types, error } = require("./logger.js")
 
 const commands = new Map()
@@ -392,11 +399,14 @@ async function runCommand(cmd, message, args) {
             })
             .catch(() => {
                 fail = true
-                return message.channel.send(message.author.toString() + " captcha failed, please **type** the letter/number combination shown")
+                return message.channel.send(
+                    message.author.toString() +
+                        " captcha failed, please **type** the letter/number combination shown"
+                )
             })
-        
+
         beingChecked.splice(beingChecked.indexOf(message.author.id), 1)
-        
+
         if (fail) {
             return
         }
