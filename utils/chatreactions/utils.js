@@ -731,7 +731,7 @@ exports.deleteStats = deleteStats
  */
 async function getDefaultWords() {
     const res = await fetch(
-        "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt"
+        "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"
     )
     const body = await res.text()
 
