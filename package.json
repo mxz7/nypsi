@@ -18,7 +18,8 @@
     "node-fetch": "^2.6.1",
     "relevant-urban": "^2.0.0",
     "shuffle-array": "^1.0.1",
-    "table": "^6.0.9"
+    "table": "^6.0.9",
+    "timsort": "^0.3.0"
   },
   "devDependencies": {
     "eslint": "^7.23.0",
