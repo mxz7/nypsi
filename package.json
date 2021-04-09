@@ -12,6 +12,7 @@
   "dependencies": {
     "dblapi.js": "^2.4.1",
     "discord.js": "^12.5.3",
+    "fast-sort": "^3.0.1",
     "figlet": "^1.5.0",
     "is-image-url": "^1.1.8",
     "mc-names": "^1.0.1",
