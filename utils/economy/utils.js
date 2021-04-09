@@ -10,7 +10,7 @@ const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
-const { sort } = require("fast-sort")
+const { sort } = require("timsort")
 const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
 const voteCache = new Map()
 
@@ -473,7 +473,9 @@ function topAmountGlobal(amount) {
     //     return users[b].money.balance - users[a].money.balance
     // })
 
-    sort(users1).asc((u) => users[u].money.balance)
+    sort(users1, (a, b) => {
+        return users[b].money.balance - users[a].money.balance
+    })
 
     let usersFinal = []
 
@@ -524,7 +526,9 @@ async function topAmount(guild, amount) {
         }
     }
 
-    sort(users1).asc(u => users[u].money.balance)
+    sort(users1, (a, b) => {
+        return users[b].money.balance - users[a].money.balance
+    })
 
     // users1.sort(function (a, b) {
     //     return users[b].money.balance - users[a].money.balance
