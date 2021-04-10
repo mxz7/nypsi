@@ -5,6 +5,7 @@ const {
     userExists,
     formatBet,
     calcMaxBet,
+    isEcoBanned,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const Discord = require("discord.js")
@@ -97,6 +98,10 @@ async function run(message, args) {
     }
 
     if (target.user.bot) {
+        return message.channel.send(new ErrorEmbed("invalid user"))
+    }
+
+    if (isEcoBanned(target.user.id)) {
         return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
