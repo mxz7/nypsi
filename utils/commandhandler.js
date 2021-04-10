@@ -1,5 +1,5 @@
 const { table, getBorderCharacters } = require("table")
-const { updateXp, getXp, userExists } = require("../utils/economy/utils.js")
+const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
 const { Message, Client } = require("discord.js")
 const { getPrefix, getDisabledCommands } = require("../utils/guilds/utils")
@@ -425,13 +425,27 @@ async function runCommand(cmd, message, args) {
     try {
         logCommand(message, args)
         if (alias) {
+            if (isEcoBanned(message.author.id)) {
+                if (commands.get(aliases.get(cmd)).category == "money") {
+                    return
+                }
+            }
+
             updatePopularCommands(commands.get(aliases.get(cmd)).name)
+
             if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
                 return message.channel.send(new ErrorEmbed("that command has been disabled"))
             }
             commands.get(aliases.get(cmd)).run(message, args)
         } else {
+            if (isEcoBanned(message.author.id)) {
+                if (commands.get(cmd).category == "money") {
+                    return
+                }
+            }
+
             updatePopularCommands(commands.get(cmd).name)
+
             if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
                 return message.channel.send(new ErrorEmbed("that command has been disabled"))
             }

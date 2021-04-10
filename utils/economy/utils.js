@@ -1,5 +1,6 @@
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg } = require("../../config.json")
 const DBL = require("dblapi.js")
@@ -941,6 +942,37 @@ function upgradeWorker(member, id) {
 }
 
 exports.upgradeWorker = upgradeWorker
+
+function isEcoBanned(id) {
+    if (banned.banned.indexOf(id) != -1) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.isEcoBanned = isEcoBanned
+
+function toggleBan(id) {
+    if (banned.banned.indexOf(id) != -1) {
+        banned.banned.splice(banned.banned.indexOf(id), 1)
+    } else {
+        banned.banned.push(id)
+    }
+
+    const banned1 = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
+
+    if (JSON.stringify(banned) != JSON.stringify(banned1)) {
+        fs.writeFile("./utils/economy/ban.json", JSON.stringify(banned), (err) => {
+            if (err) {
+                return console.log(err)
+            }
+            info("banned data saved", types.DATA)
+        })
+    }
+}
+
+exports.toggleBan = toggleBan
 
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
