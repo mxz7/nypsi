@@ -963,7 +963,7 @@ function toggleBan(id) {
     const banned1 = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 
     if (JSON.stringify(banned) != JSON.stringify(banned1)) {
-        fs.writeFile("./utils/economy/ban.json", JSON.stringify(users), (err) => {
+        fs.writeFile("./utils/economy/ban.json", JSON.stringify(banned), (err) => {
             if (err) {
                 return console.log(err)
             }
