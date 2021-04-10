@@ -9,6 +9,7 @@ const {
     getBankBalance,
     getXp,
     getPrestige,
+    isEcoBanned,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -80,6 +81,10 @@ async function run(message, args) {
     }
 
     if (target.user.bot) {
+        return message.channel.send(new ErrorEmbed("invalid user"))
+    }
+
+    if (isEcoBanned(target.user.id)) {
         return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
