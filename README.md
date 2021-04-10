@@ -1,5 +1,9 @@
 # nypsi
 
+<p align="center">
+  <a href="https://discord.gg/vpEv3HJ"><img src="https://img.shields.io/discord/591914197219016707.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge"></a>
+</p>
+
 ### 🍟 invite / use in your server
 
 invite link can be found at: [`invite.nypsi.xyz`](http://invite.nypsi.xyz)
