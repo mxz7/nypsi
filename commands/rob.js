@@ -10,6 +10,7 @@ const {
     updateXp,
     getDMsEnabled,
     hasVoted,
+    isEcoBanned,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -87,6 +88,10 @@ async function run(message, args) {
     }
 
     if (target.user.bot) {
+        return message.channel.send(new ErrorEmbed("invalid user"))
+    }
+
+    if (isEcoBanned(target.user.id)) {
         return message.channel.send(new ErrorEmbed("invalid user"))
     }
 
