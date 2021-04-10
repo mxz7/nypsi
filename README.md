@@ -1,7 +1,7 @@
 # nypsi
 
 <p align="center">
-  <a href="https://discord.gg/vpEv3HJ"><img src="https://img.shields.io/discord/591914197219016707.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge"></a>
+  <a href="https://discord.gg/hJTDNST"><img src="https://badgen.net/discord/members/hJTDNST"></a>
 </p>
 
 ### 🍟 invite / use in your server
