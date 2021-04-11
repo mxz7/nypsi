@@ -1,3 +1,12 @@
+const { Client, Webhook } = require("discord.js")
+
+/**
+ * @type {Webhook}
+ */
+let webhook
+let nextLogMsg = ""
+let logsRunning = false
+
 function info(string, type) {
     let color
 
@@ -32,12 +41,14 @@ function info(string, type) {
 
     const out = `${color}[${day}/${month} ${getTimestamp()}] [${type}] ${string} \x1b[0m`
     console.log(out)
+    nextLogMsg += `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
 }
 
 exports.info = info
 
 function error(string) {
     console.error(`\x1B[31m[${getTimestamp()}] [error] ${string}\x1B[0m`)
+    nextLogMsg += `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``
 }
 
 exports.error = error
@@ -81,3 +92,40 @@ function getTimestamp() {
 }
 
 exports.getTimestamp = getTimestamp
+
+/**
+ * 
+ * @param {Client} client 
+ */
+async function getWebhook(client) {
+    if (client.user.id != "678711738845102087") return
+
+    const guild = await client.guilds.fetch("747056029795221513")
+
+    if (!guild) {
+        return error("UNABLE TO GET GUILD FOR LOGS")
+    }
+
+    const webhooks = await guild.fetchWebhooks()
+
+    webhook = await webhooks.find((w) => w.id == "830799277407600640")
+
+    runLogs()
+
+    info(`logs webhook running ${webhook.id}`)
+}
+
+exports.getWebhook = getWebhook
+
+function runLogs() {
+    if (logsRunning) return
+
+    setInterval(() => {
+        if (nextLogMsg == "") {
+            return
+        }
+        webhook.send(nextLogMsg)
+
+        nextLogMsg = ""
+    }, 2500)
+}
