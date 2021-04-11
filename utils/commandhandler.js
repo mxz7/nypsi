@@ -481,8 +481,9 @@ async function runCommand(cmd, message, args) {
                                     error("error deleting from xpCooldown")
                                 }
                             }, 60000)
-                        } catch {/*keeps lint happy*/}
-                        
+                        } catch {
+                            /*keeps lint happy*/
+                        }
                     }
                 } catch (e) {
                     console.log(e)
