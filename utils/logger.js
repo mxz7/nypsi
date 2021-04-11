@@ -120,6 +120,8 @@ exports.getWebhook = getWebhook
 function runLogs() {
     if (logsRunning) return
 
+    logsRunning = true
+
     setInterval(() => {
         if (nextLogMsg == "") {
             return
