@@ -123,7 +123,7 @@ async function run(message, args) {
 
         let payLimit = 100000
 
-        let xpBonus = Math.floor(targetXp / 100) * 100000
+        let xpBonus = targetXp * 1000
 
         if (xpBonus > 1000000) xpBonus = 1000000
 
