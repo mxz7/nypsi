@@ -94,8 +94,8 @@ function getTimestamp() {
 exports.getTimestamp = getTimestamp
 
 /**
- * 
- * @param {Client} client 
+ *
+ * @param {Client} client
  */
 async function getWebhook(client) {
     if (client.user.id != "678711738845102087") return
