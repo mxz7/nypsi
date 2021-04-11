@@ -116,54 +116,25 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
 
-    if (amount >= 200000 || getBalance(target) + amount >= 2000000) {
-        const targetXP = getXp(target)
-        const targetPrestige = getPrestige(target)
+    const targetPrestige = getPrestige(target)
 
-        if (targetPrestige == 0) {
-            if (targetXP <= 25) {
-                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
-            } else if (targetXP <= 100) {
-                if (amount >= 500000 || getBalance(target) + amount >= 2500000) {
-                    return message.channel.send(
-                        new ErrorEmbed("you can't pay this user that much yet")
-                    )
-                }
-            } else if (targetXP <= 500) {
-                if (amount >= 1000000 || getBalance(target) + amount >= 3000000) {
-                    return message.channel.send(
-                        new ErrorEmbed("you can't pay this user that much yet")
-                    )
-                }
-            } else {
-                if (amount >= 5000000 || getBalance(target) + amount >= 10000000) {
-                    return message.channel.send(
-                        new ErrorEmbed("you can't pay this user that much yet")
-                    )
-                }
-            }
-        } else if (targetPrestige == 1) {
-            if (targetXP <= 100) {
-                if (amount >= 10000000 || getBalance(target) + amount >= 20000000) {
-                    return message.channel.send(
-                        new ErrorEmbed("you can't pay this user that much yet")
-                    )
-                }
-            } else {
-                if (amount >= 5000000 || getBalance(target) + amount >= 30000000) {
-                    return message.channel.send(
-                        new ErrorEmbed("you can't pay this user that much yet")
-                    )
-                }
-            }
-        } else if (targetPrestige < 4) {
-            if (amount >= 15000000 || getBalance(target) + amount >= 50000000) {
-                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
-            }
-        } else if (targetPrestige < 6) {
-            if (amount >= 1000000000 || getBalance(target) + amount >= 10000000000) {
-                return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
-            }
+    if (targetPrestige < 4) {
+        const targetXp = getXp(target)
+
+        let payLimit = 100000
+
+        let xpBonus = Math.floor(targetXp / 100) * 100000
+
+        if (xpBonus > 1000000) xpBonus = 1000000
+
+        payLimit += xpBonus
+
+        const prestigeBonus = targetPrestige * 1000000
+
+        payLimit += prestigeBonus
+
+        if (amount > payLimit) {
+            return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
         }
     }
 
