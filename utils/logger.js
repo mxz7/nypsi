@@ -1,3 +1,11 @@
+const { Client, Webhook } = require("discord.js")
+
+/**
+ * @type {Webhook}
+ */
+let webhook
+let nextLogMsg
+
 function info(string, type) {
     let color
 
@@ -81,3 +89,23 @@ function getTimestamp() {
 }
 
 exports.getTimestamp = getTimestamp
+
+/**
+ * 
+ * @param {Client} client 
+ */
+async function getWebhook(client) {
+    const guild = await client.guilds.fetch("747056029795221513")
+
+    if (!guild) {
+        return error("UNABLE TO GET GUILD FOR LOGS")
+    }
+
+    const webhooks = await guild.fetchWebhooks()
+
+    webhook = await webhooks.find((w) => w.id == "830799277407600640")
+
+    info(`logs webhook running ${webhook.id}`)
+}
+
+exports.getWebhook = getWebhook
