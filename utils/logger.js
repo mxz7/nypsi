@@ -5,6 +5,7 @@ const { Client, Webhook } = require("discord.js")
  */
 let webhook
 let nextLogMsg
+let logsRunning = false
 
 function info(string, type) {
     let color
@@ -40,6 +41,7 @@ function info(string, type) {
 
     const out = `${color}[${day}/${month} ${getTimestamp()}] [${type}] ${string} \x1b[0m`
     console.log(out)
+    nextLogMsg += `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
 }
 
 exports.info = info
@@ -105,7 +107,22 @@ async function getWebhook(client) {
 
     webhook = await webhooks.find((w) => w.id == "830799277407600640")
 
+    runLogs()
+
     info(`logs webhook running ${webhook.id}`)
 }
 
 exports.getWebhook = getWebhook
+
+function runLogs() {
+    if (logsRunning) return
+
+    setInterval(() => {
+        if (nextLogMsg == "") {
+            return
+        }
+        webhook.send(nextLogMsg)
+        
+        nextLogMsg = ""
+    }, 2500)
+}
