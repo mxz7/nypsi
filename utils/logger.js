@@ -4,7 +4,7 @@ const { Client, Webhook } = require("discord.js")
  * @type {Webhook}
  */
 let webhook
-let nextLogMsg
+let nextLogMsg = ""
 let logsRunning = false
 
 function info(string, type) {
