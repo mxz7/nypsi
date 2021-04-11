@@ -469,17 +469,20 @@ async function runCommand(cmd, message, args) {
             setTimeout(() => {
                 try {
                     if (!xpCooldown.has(message.author.id)) {
-                        updateXp(message.member, getXp(message.member) + 1)
+                        try {
+                            updateXp(message.member, getXp(message.member) + 1)
 
-                        xpCooldown.add(message.author.id)
+                            xpCooldown.add(message.author.id)
 
-                        setTimeout(() => {
-                            try {
-                                xpCooldown.delete(message.author.id)
-                            } catch {
-                                error("error deleting from xpCooldown")
-                            }
-                        }, 60000)
+                            setTimeout(() => {
+                                try {
+                                    xpCooldown.delete(message.author.id)
+                                } catch {
+                                    error("error deleting from xpCooldown")
+                                }
+                            }, 60000)
+                        } catch {/*keeps lint happy*/}
+                        
                     }
                 } catch (e) {
                     console.log(e)
