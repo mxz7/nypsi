@@ -48,7 +48,7 @@ exports.info = info
 
 function error(string) {
     console.error(`\x1B[31m[${getTimestamp()}] [error] ${string}\x1B[0m`)
-    nextLogMsg(`[${getTimestamp()}] [error] ${string}`)
+    nextLogMsg += `[${getTimestamp()}] [error] ${string}`
 }
 
 exports.error = error
