@@ -525,7 +525,7 @@ async function topAmount(guild, amount) {
         }
     }
 
-    inPlaceSort(users1).desc(i => users[i].money.balance)
+    inPlaceSort(users1).desc((i) => users[i].money.balance)
 
     // users1.sort(function (a, b) {
     //     return users[b].money.balance - users[a].money.balance
@@ -606,7 +606,7 @@ async function topAmountPrestige(guild, amount) {
     //     return users[b].prestige - users[a].prestige
     // })
 
-    inPlaceSort(users1).desc(i => users[i].prestige)
+    inPlaceSort(users1).desc((i) => users[i].prestige)
 
     let usersFinal = []
 
