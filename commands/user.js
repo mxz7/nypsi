@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { sort } = require("timsort")
+const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(
     "user",
@@ -62,9 +62,7 @@ async function run(message, args) {
     //     return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
     // })
 
-    sort(membersSorted, (a, b) => {
-        return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
-    })
+    inPlaceSort(membersSorted).asc(i => members.find(m => m.id == i).joinedAt)
 
     let joinPos = membersSorted.indexOf(member.id) + 1
 
