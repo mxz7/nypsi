@@ -64,7 +64,7 @@ async function run(message, args) {
     // sort(membersSorted, (a, b) => {
     //     return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
     // })
-    inPlaceSort(membersSorted).asc(i => members.find(m => m.id == i).joinedAt)
+    inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
 
     let joinPos = membersSorted.indexOf(member.id) + 1
 
