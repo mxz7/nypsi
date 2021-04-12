@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const { sort } = require("timsort")
+const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(
     "join",
@@ -61,10 +61,10 @@ async function run(message, args) {
     // })
 
     // sort(membersSorted).desc(u => u.joinedAt)
-
-    sort(membersSorted, (a, b) => {
-        return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
-    })
+    // sort(membersSorted, (a, b) => {
+    //     return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
+    // })
+    inPlaceSort(membersSorted).asc(i => members.find(m => m.id == i).joinedAt)
 
     let joinPos = membersSorted.indexOf(member.id) + 1
 
