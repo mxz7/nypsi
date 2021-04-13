@@ -3,6 +3,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(
     "createpalette",
@@ -71,15 +72,23 @@ async function run(message, args) {
     let roles = await message.guild.roles.fetch()
     roles = roles.cache
 
+    const sortedRoleIDs = []
+
+    await roles.forEach((r) => sortedRoleIDs.push(r.id))
+
+    inPlaceSort(sortedRoleIDs).desc(i => roles.find(r => r.id == i).position)
+
     const colors = []
 
-    await roles.forEach((r) => {
+    for (let i = 0; i < sortedRoleIDs.length; i++) {
         if (colors.length >= 100) return
-        if (r.hexColor != "#000000") {
-            if (colors.indexOf(r.hexColor.substr(1, 7)) != -1) return
-            colors.push(r.hexColor.substr(1, 7))
+        const role = await roles.find(r => r.id == sortedRoleIDs[i])
+
+        if (role.hexColor != "#000000") {
+            if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) return
+            colors.push(role.hexColor.substr(1, 7))
         }
-    })
+    }
 
     if (colors.length < 3) {
         return message.channel.send(
