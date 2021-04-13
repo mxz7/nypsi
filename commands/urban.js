@@ -60,7 +60,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("unknown definition"))
     })
 
-    inPlaceSort(results).desc(i => i.thumbs_up)
+    inPlaceSort(results).desc((i) => i.thumbs_up)
 
     const result = results[0]
 
