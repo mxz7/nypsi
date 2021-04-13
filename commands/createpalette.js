@@ -76,13 +76,13 @@ async function run(message, args) {
 
     await roles.forEach((r) => sortedRoleIDs.push(r.id))
 
-    inPlaceSort(sortedRoleIDs).desc(i => roles.find(r => r.id == i).position)
+    inPlaceSort(sortedRoleIDs).desc((i) => roles.find((r) => r.id == i).position)
 
     const colors = []
 
     for (let i = 0; i < sortedRoleIDs.length; i++) {
         if (colors.length >= 100) return
-        const role = await roles.find(r => r.id == sortedRoleIDs[i])
+        const role = await roles.find((r) => r.id == sortedRoleIDs[i])
 
         if (role.hexColor != "#000000") {
             if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) return
