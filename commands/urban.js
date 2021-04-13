@@ -1,9 +1,10 @@
-const urban = require("relevant-urban")
+const urban = require("urban-dictionary")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
+const { inPlaceSort } = require("fast-sort")
 
 const cooldown = new Map()
 
@@ -55,9 +56,13 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    const result = await urban(args.join()).catch(() => {
+    const results = await urban.define(args.join()).catch(() => {
         return message.channel.send(new ErrorEmbed("unknown definition"))
     })
+
+    inPlaceSort(results).desc(i => i.thumbs_up)
+
+    const result = results[0]
 
     if (!result.word) return
 
@@ -68,11 +73,11 @@ async function run(message, args) {
     )
         .setTitle(result.word)
         .setHeader("published by " + result.author)
-        .addField("👍", result.thumbsUp.toLocaleString(), true)
-        .addField("👎", result.thumbsDown.toLocaleString(), true)
-        .setURL(result.urbanURL)
+        .addField("👍", result.thumbs_up.toLocaleString(), true)
+        .addField("👎", result.thumbs_down.toLocaleString(), true)
+        .setURL(result.permalink)
 
-    message.channel.send(embed)
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)
