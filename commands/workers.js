@@ -111,13 +111,16 @@ async function run(message, args) {
                     worker.itemName
                 } / ${worker.maxStorage.toLocaleString()} ($${(
                     worker.stored * worker.perItem
-                ).toLocaleString()})\n` + `**level** ${worker.level}${
-                    worker.level >= 5
-                        ? ""
-                        : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
-                }\n**item worth** $${worker.perItem.toLocaleString()} / ${
-                    worker.itemName
-                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
+                ).toLocaleString()})\n` +
+                    `**level** ${worker.level}${
+                        worker.level >= 5
+                            ? ""
+                            : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
+                    }\n**item worth** $${worker.perItem.toLocaleString()} / ${
+                        worker.itemName
+                    }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${
+                        worker.itemName
+                    } / hour`,
                 true
             )
         }
