@@ -107,20 +107,17 @@ async function run(message, args) {
             worker = Worker.fromJSON(personalWorkers[worker])
             embed.addField(
                 `${worker.name} [${worker.id}]`,
-                `**level** ${worker.level}${
+                `**inventory** ${worker.stored.toLocaleString()} ${
+                    worker.itemName
+                } / ${worker.maxStorage.toLocaleString()} ($${(
+                    worker.stored * worker.perItem
+                ).toLocaleString()})\n` + `**level** ${worker.level}${
                     worker.level >= 5
                         ? ""
                         : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
                 }\n**item worth** $${worker.perItem.toLocaleString()} / ${
                     worker.itemName
-                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${
-                    worker.itemName
-                } / hour\n\n` +
-                    `**inventory** ${worker.stored.toLocaleString()} ${
-                        worker.itemName
-                    } / ${worker.maxStorage.toLocaleString()} ($${(
-                        worker.stored * worker.perItem
-                    ).toLocaleString()})`,
+                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
                 true
             )
         }
