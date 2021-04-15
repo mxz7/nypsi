@@ -15,6 +15,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const { gamble } = require("../utils/logger.js")
 
 const values = [
     "b",
@@ -318,6 +319,7 @@ async function run(message, args) {
             m.edit(embed)
         }, 2000)
     })
+    gamble(message.author, "roulette", bet, win, winnings)
 }
 
 cmd.setRun(run)
