@@ -138,6 +138,10 @@ async function run(message, args) {
 
         if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
 
+        if (hypixelData.player.prefix) {
+            rank = hypixelData.player.prefix.substr(3, hypixelData.player.prefix.length - 4)
+        }
+
         if (!streak) {
             streak = 0
         } else {
