@@ -45,9 +45,16 @@ function info(string, type) {
     console.log(out)
 
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``)
+        nextLogMsg.set(
+            "logs",
+            `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
+        )
     } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``)
+        nextLogMsg.set(
+            "logs",
+            nextLogMsg.get("logs") +
+                `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
+        )
     }
 }
 
@@ -58,26 +65,36 @@ function error(string) {
     if (!nextLogMsg.get("logs")) {
         nextLogMsg.set("logs", `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``)
     } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``)
+        nextLogMsg.set(
+            "logs",
+            nextLogMsg.get("logs") + `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``
+        )
     }
 }
 
 exports.error = error
 
 /**
- * 
- * @param {User} from 
- * @param {User} to 
- * @param {Number} amount 
+ *
+ * @param {User} from
+ * @param {User} to
+ * @param {Number} amount
  */
 function payment(from, to, amount) {
     if (!nextLogMsg.get("pay")) {
-        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`)
+        nextLogMsg.set(
+            "pay",
+            `**${from.tag}** (${from.id}) -> **${to.tag}** (${
+                to.id
+            }) - $**${amount.toLocaleString()}**\n`
+        )
     } else {
         nextLogMsg.set(
             "pay",
             nextLogMsg.get("pay") +
-                `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
+                `**${from.tag}** (${from.id}) -> **${to.tag}** (${
+                    to.id
+                }) - $**${amount.toLocaleString()}**\n`
         )
     }
 }
@@ -85,21 +102,28 @@ function payment(from, to, amount) {
 exports.payment = payment
 
 /**
- * 
- * @param {User} user 
- * @param {String} game 
- * @param {Number} amount 
- * @param {Boolean} win 
+ *
+ * @param {User} user
+ * @param {String} game
+ * @param {Number} amount
+ * @param {Boolean} win
  * @param {Number} winAmount
  */
 function gamble(user, game, amount, win, winAmount) {
     if (!nextLogMsg.get("gamble")) {
-        nextLogMsg.set("gamble", `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""} - $**${amount.toLocaleString()}**\n`)
+        nextLogMsg.set(
+            "gamble",
+            `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
+                win ? ` ($**${winAmount.toLocaleString()}**)` : ""
+            } - $**${amount.toLocaleString()}**\n`
+        )
     } else {
         nextLogMsg.set(
             "gamble",
             nextLogMsg.get("gamble") +
-                `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""} - $**${amount.toLocaleString()}**\n`
+                `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
+                    win ? ` ($**${winAmount.toLocaleString()}**)` : ""
+                } - $**${amount.toLocaleString()}**\n`
         )
     }
 }
