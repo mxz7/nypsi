@@ -1,11 +1,13 @@
-const { Client, Webhook } = require("discord.js")
+const { Client, Webhook, User } = require("discord.js")
 
 /**
- * @type {Webhook}
+ * @type {Map<String, Webhook>}
  */
-let webhook
-let nextLogMsg = ""
-let logsRunning = false
+let webhook = new Map()
+/**
+ * @type {Map<String, Webhook>}
+ */
+let nextLogMsg = new Map()
 
 function info(string, type) {
     let color
@@ -41,17 +43,46 @@ function info(string, type) {
 
     const out = `${color}[${day}/${month} ${getTimestamp()}] [${type}] ${string} \x1b[0m`
     console.log(out)
-    nextLogMsg += `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
+
+    if (!nextLogMsg.get("logs")) {
+        nextLogMsg.set("logs", `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``)
+    } else {
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``)
+    }
 }
 
 exports.info = info
 
 function error(string) {
     console.error(`\x1B[31m[${getTimestamp()}] [error] ${string}\x1B[0m`)
-    nextLogMsg += `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``
+    if (!nextLogMsg.get("logs")) {
+        nextLogMsg.set("logs", `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``)
+    } else {
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``)
+    }
 }
 
 exports.error = error
+
+/**
+ * 
+ * @param {User} from 
+ * @param {User} to 
+ * @param {Number} amount 
+ */
+function payment(from, to, amount) {
+    if (!nextLogMsg.get("pay")) {
+        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**`)
+    } else {
+        nextLogMsg.set(
+            "pay",
+            nextLogMsg.get("pay") +
+                `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**`
+        )
+    }
+}
+
+exports.payment = payment
 
 const types = {
     INFO: "info",
@@ -97,8 +128,8 @@ exports.getTimestamp = getTimestamp
  *
  * @param {Client} client
  */
-async function getWebhook(client) {
-    if (client.user.id != "678711738845102087") return
+async function getWebhooks(client) {
+    // if (client.user.id != "678711738845102087") return
 
     const guild = await client.guilds.fetch("747056029795221513")
 
@@ -108,26 +139,35 @@ async function getWebhook(client) {
 
     const webhooks = await guild.fetchWebhooks()
 
-    webhook = await webhooks.find((w) => w.id == "830799277407600640")
+    const allLogs = await webhooks.find((w) => w.id == "830799277407600640")
+
+    webhook.set("logs", allLogs)
+    info(`logs webhook running ${allLogs.id}`)
+
+    const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266")
+
+    webhook.set("pay", paymentLogs)
+    info(`payment logs webhook running ${paymentLogs.id}`)
+
+    const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333")
+
+    webhook.set("gamble", gambleLogs)
+    info(`gamble logs webhook running ${gambleLogs.id}`)
 
     runLogs()
-
-    info(`logs webhook running ${webhook.id}`)
 }
 
-exports.getWebhook = getWebhook
+exports.getWebhooks = getWebhooks
 
 function runLogs() {
-    if (logsRunning) return
-
-    logsRunning = true
-
     setInterval(() => {
-        if (nextLogMsg == "") {
-            return
-        }
-        webhook.send(nextLogMsg)
+        webhook.forEach((v, k) => {
+            let msg = nextLogMsg.get(k)
 
-        nextLogMsg = ""
+            if (msg != "" && msg) {
+                v.send(msg)
+                nextLogMsg.set(k, "")
+            }
+        })
     }, 2500)
 }
