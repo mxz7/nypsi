@@ -72,17 +72,39 @@ exports.error = error
  */
 function payment(from, to, amount) {
     if (!nextLogMsg.get("pay")) {
-        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**`)
+        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`)
     } else {
         nextLogMsg.set(
             "pay",
             nextLogMsg.get("pay") +
-                `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**`
+                `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
         )
     }
 }
 
 exports.payment = payment
+
+/**
+ * 
+ * @param {User} user 
+ * @param {String} game 
+ * @param {Number} amount 
+ * @param {Boolean} win 
+ * @param {Number} winAmount
+ */
+function gamble(user, game, amount, win, winAmount) {
+    if (!nextLogMsg.get("gamble")) {
+        nextLogMsg.set("gamble", `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""} - $**${amount.toLocaleString()}**\n`)
+    } else {
+        nextLogMsg.set(
+            "gamble",
+            nextLogMsg.get("gamble") +
+                `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""} - $**${amount.toLocaleString()}**\n`
+        )
+    }
+}
+
+exports.gamble = gamble
 
 const types = {
     INFO: "info",
