@@ -16,6 +16,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const { gamble } = require("../utils/logger.js")
 
 const cooldown = new Map()
 const games = new Map()
@@ -447,6 +448,7 @@ async function playGame(message, m) {
     ).setTitle("blackjack | " + message.member.user.username)
 
     const lose = async () => {
+        gamble(message.author, "blackjack", bet, false, 0)
         newEmbed.setColor("#e4334f")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField(
@@ -494,6 +496,8 @@ async function playGame(message, m) {
             )
         }
 
+        gamble(message.author, "blackjack", bet, true, winnings)
+
         newEmbed.addField(
             "dealer",
             getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
@@ -509,6 +513,7 @@ async function playGame(message, m) {
     }
 
     const draw = async () => {
+        gamble(message.author, "blackjack", bet, true, bet)
         newEmbed.setColor("#E5FF00")
         newEmbed.setDescription(
             "**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString()
