@@ -151,7 +151,7 @@ exports.getTimestamp = getTimestamp
  * @param {Client} client
  */
 async function getWebhooks(client) {
-    // if (client.user.id != "678711738845102087") return
+    if (client.user.id != "678711738845102087") return
 
     const guild = await client.guilds.fetch("747056029795221513")
 
