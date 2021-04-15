@@ -117,6 +117,8 @@ async function run(message, args) {
 
     let lastLog, firstLog, level, rank, streak, topStreak, karma, challenges, quests
 
+    console.log(hypixelData.player.rank)
+
     try {
         lastLog = timeSince(new Date(hypixelData.player.lastLogin))
         firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0]
@@ -137,6 +139,10 @@ async function run(message, args) {
         if (!rank) rank = "Default"
 
         if (hypixelData.player.monthlyPackageRank == "SUPERSTAR") rank = "MVP++"
+
+        if (hypixelData.player.rank) {
+            rank = hypixelData.player.rank
+        }
 
         if (hypixelData.player.prefix) {
             rank = hypixelData.player.prefix.substr(3, hypixelData.player.prefix.length - 4)
