@@ -135,6 +135,10 @@ class PremUser {
         this.expireDate = new Date().setDate(new Date().getDate() + 35)
     }
 
+    /**
+     * 
+     * @returns {PremUser}
+     */
     async expire() {
         const { requestDM, requestRemoveRole } = require("../../nypsi")
         const d = await requestDM(
@@ -165,6 +169,8 @@ class PremUser {
 
         this.status = status.INACTIVE
         this.level = 0
+
+        return this
     }
 
     /**
