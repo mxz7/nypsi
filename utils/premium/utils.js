@@ -62,6 +62,7 @@ setInterval(async () => {
             user = PremUser.fromData(user)
 
             await user.expire()
+            data[user.id] = user
         }
     }
 }, 300000)
