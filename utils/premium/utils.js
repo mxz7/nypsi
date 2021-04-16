@@ -56,6 +56,9 @@ setInterval(async () => {
 
     for (let user in data) {
         user = data[user]
+
+        if (user.level == 0) continue
+
         const expiry = user.expireDate
 
         if (expiry <= now) {
