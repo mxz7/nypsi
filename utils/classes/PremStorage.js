@@ -136,7 +136,7 @@ class PremUser {
     }
 
     /**
-     * 
+     *
      * @returns {PremUser}
      */
     async expire() {
