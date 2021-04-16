@@ -52,7 +52,7 @@ setInterval(() => {
 }, 43200000)
 
 setInterval(async () => {
-    const now = new Date().getDate()
+    const now = new Date().getTime()
 
     for (let user in data) {
         user = data[user]
@@ -64,7 +64,7 @@ setInterval(async () => {
             await user.expire()
         }
     }
-}, 3600000)
+}, 300000)
 
 /**
  * @returns {Boolean}
