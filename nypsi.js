@@ -225,11 +225,11 @@ setTimeout(() => {
     client.login(token).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
+            showTopGlobalBal(client)
             runChecks()
             updateCache()
             runUnmuteChecks(client)
             getWebhooks(client)
-            showTopGlobalBal(client)
         }, 2000)
     })
 }, 1000)
