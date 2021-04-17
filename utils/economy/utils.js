@@ -462,8 +462,9 @@ exports.getMaxBankBalance = getMaxBankBalance
 /**
  * @returns {Array<String>} global bal top
  * @param {Number} amount of people to pull
+ * @param {Client} client
  */
-function topAmountGlobal(amount) {
+async function topAmountGlobal(amount, client) {
     const users1 = []
 
     for (let user in users) {
@@ -484,9 +485,28 @@ function topAmountGlobal(amount) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].money.balance == 0) {
+        if (users[user].money.balance != 0) {
+
+            let pos = count + 1
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            const member = await client.users.fetch(user)
+
+            let username = user
+
+            if (member) {
+                username = member.tag
+            }
+
             usersFinal[count] =
-                count + 1 + " `" + user + "` $" + users[user].money.balance.toLocaleString()
+                pos + " `" + user + "` $" + users[user].money.balance.toLocaleString()
             count++
         }
     }
