@@ -506,7 +506,7 @@ async function topAmountGlobal(amount, client) {
             }
 
             usersFinal[count] =
-                pos + " `" + user + "` $" + users[user].money.balance.toLocaleString()
+                pos + " `" + username + "` $" + users[user].money.balance.toLocaleString()
             count++
         }
     }
