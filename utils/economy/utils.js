@@ -980,17 +980,17 @@ function reset() {
     let deleted = 0
     let updated = 0
     for (const id in users) {
-        const user = users[id]
-        if (user.xp < 10 && user.money.balance <= 500 && user.prestige == 0) {
+        let user = users[id]
+
+        const prestige = user.prestige
+
+        if (prestige == 0) {
             delete users[id]
             info("deleted " + id)
             deleted++
         } else {
-            user.xp = 0
-            user.money.balance = 500
-            user.money.bank = 4500
-            user.padlock = false
-            user.workers = {}
+            user = new EconProfile()
+            user.prestige = prestige
 
             users[id] = user
             info("updated " + id)
