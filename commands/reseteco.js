@@ -41,3 +41,7 @@ async function run(message, args) {
         return message.channel.send(new CustomEmbed(message.member, false, `${c.deleted} users deleted\n${c.updated}users updated`))
     }
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
