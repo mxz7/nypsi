@@ -2,8 +2,6 @@ const { GuildMember, Message, Client } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./classes/ChatReaction")
-const { CustomEmbed } = require("./classes/EmbedBuilders")
-const { topAmountGlobal } = require("./economy/utils")
 const { error, info, types } = require("./logger")
 
 const news = {
@@ -413,6 +411,8 @@ async function showTopGlobalBal(client) {
     const needed = new Date(Date.parse(d) + 10800000)
 
     const postGlobalBalTop = async () => {
+        const { topAmountGlobal } = require("./economy/utils")
+        const { CustomEmbed } = require("./classes/EmbedBuilders")
         const guild = await client.guilds.fetch("747056029795221513")
 
         if (!guild) {
@@ -433,7 +433,8 @@ async function showTopGlobalBal(client) {
         embed.setDescription(baltop)
         embed.setColor("#000001")
 
-        channel.send(embed)
+        await channel.send(embed)
+        info("sent global bal top", types.AUTOMATION)
     }
 
     setTimeout(async () => {
