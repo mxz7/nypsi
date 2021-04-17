@@ -973,7 +973,7 @@ function toggleBan(id) {
 exports.toggleBan = toggleBan
 
 /**
- * 
+ *
  * @returns {{ deleted: Number, updated: Number }}
  */
 function reset() {

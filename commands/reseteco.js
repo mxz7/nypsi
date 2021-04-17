@@ -7,9 +7,9 @@ const { createCaptcha } = require("../utils/utils")
 const cmd = new Command("reseteco", "reset economy except prestige", categories.NONE)
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (message.author.id != "672793821850894347") return
@@ -20,9 +20,9 @@ async function run(message, args) {
 
     console.log(
         "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---\n" +
-        "captcha generated to reset economy\n" +
-        captcha.display +
-        "\n--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---"
+            "captcha generated to reset economy\n" +
+            captcha.display +
+            "\n--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---"
     )
 
     await message.channel.send(embed)
@@ -30,7 +30,7 @@ async function run(message, args) {
     const filter = (msg) => message.author.id == msg.author.id
 
     let response = await message.channel.awaitMessages(filter, {
-        max: 1
+        max: 1,
     })
 
     response = response.first().content
@@ -40,7 +40,13 @@ async function run(message, args) {
     } else {
         const c = reset()
 
-        return message.channel.send(new CustomEmbed(message.member, false, `${c.deleted} users deleted\n${c.updated} users updated`))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `${c.deleted} users deleted\n${c.updated} users updated`
+            )
+        )
     }
 }
 
