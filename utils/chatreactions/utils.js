@@ -367,7 +367,7 @@ async function startReaction(guild, channel) {
                 if (winners.size != 3) {
                     return collector.stop()
                 }
-            }, 5000)
+            }, 10000)
         } else {
             if (winners.size == 1) {
                 waiting = true
