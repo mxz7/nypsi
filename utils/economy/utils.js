@@ -972,6 +972,36 @@ function toggleBan(id) {
 
 exports.toggleBan = toggleBan
 
+/**
+ * 
+ * @returns {{ deleted: Number, updated: Number }}
+ */
+function reset() {
+    let deleted = 0
+    let updated = 0
+    for (const id in users) {
+        const user = users[id]
+        if (user.xp < 10 && user.money.balance <= 500 && user.prestige == 0) {
+            delete users[id]
+            info("deleted " + id)
+            deleted++
+        } else {
+            user.xp = 0
+            user.money.balance = 500
+            user.money.bank = 4500
+            user.padlock = false
+            user.workers = {}
+
+            users[id] = user
+            info("updated " + id)
+            updated++
+        }
+    }
+    return { deleted: deleted, updated: updated }
+}
+
+exports.reset = reset
+
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
 //         worker = parseInt(worker)
