@@ -982,7 +982,9 @@ function reset() {
     for (const id in users) {
         let user = users[id]
 
-        const prestige = user.prestige
+        let prestige = user.prestige
+
+        if (prestige > 10) prestige = 10 // REMOVE AFTER FIRST RESET
 
         if (prestige == 0) {
             delete users[id]
