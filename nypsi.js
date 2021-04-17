@@ -20,7 +20,7 @@ const {
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { MStoTime } = require("./utils/utils")
+const { MStoTime, showTopGlobalBal } = require("./utils/utils")
 const { runUnmuteChecks } = require("./utils/moderation/utils")
 const { info, types, error, getWebhooks } = require("./utils/logger")
 
@@ -229,6 +229,7 @@ setTimeout(() => {
             updateCache()
             runUnmuteChecks(client)
             getWebhooks(client)
+            showTopGlobalBal(client)
         }, 2000)
     })
 }, 1000)
