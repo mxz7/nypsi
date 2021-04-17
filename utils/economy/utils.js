@@ -449,7 +449,7 @@ exports.updateXp = updateXp
  */
 function getMaxBankBalance(member) {
     const xp = getXp(member)
-    const constant = 250
+    const constant = 500
     const starting = 15000
     const bonus = xp * constant
     const max = bonus + starting
