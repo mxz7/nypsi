@@ -375,7 +375,7 @@ function getCommand(name) {
         cmd = commands[cmd]
 
         if (cmd.trigger == name) {
-            if (getTier(cmd.owner) < 3) {
+            if (!isPremium(cmd.owner) || getTier(cmd.owner) < 3) {
                 delete commands[cmd]
                 return false
             }
