@@ -375,6 +375,12 @@ function getCommand(name) {
         cmd = commands[cmd]
 
         if (cmd.trigger == name) {
+            
+            if (getTier(cmd.owner) < 3) {
+                delete commands[cmd]
+                return false
+            }
+
             return cmd.content
         }
     }
@@ -392,6 +398,7 @@ exports.getCommand = getCommand
 function setCommand(id, trigger, content) {
     commands[id].trigger = trigger
     commands[id].content = content
+    commands[id].owner = id
 }
 
 exports.setCommand = setCommand
