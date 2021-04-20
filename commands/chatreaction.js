@@ -687,9 +687,9 @@ async function run(message, args) {
                 embed.setDescription(`${pages.get(1).join("\n")}`)
                 embed.setFooter(`page 1/${pages.size}`)
 
-                const msg = await message.channel.send(embed)
-
                 if (pages.size > 1) {
+                    const msg = await message.channel.send(embed)
+
                     await msg.react("⬅")
                     await msg.react("➡")
 
