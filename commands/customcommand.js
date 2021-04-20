@@ -46,6 +46,7 @@ async function run(message, args) {
         if (cmd) {
             if (cmd.content) {
                 content = cmd.content
+                content += "\ntrigger: " + cmd.trigger
             }
         }
         
