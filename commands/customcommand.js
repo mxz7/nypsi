@@ -3,11 +3,11 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { commandExists } = require("../utils/commandhandler")
 const { getPrefix } = require("../utils/guilds/utils")
-const { getTier, getUserCommand, getCommand, setCommand } = require("../utils/premium/utils")
+const { getTier, getUserCommand, getCommand, setCommand, isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("customcommand", "create a custom command", categories.FUN).setAliases(["mycommand", "mycmd"])
 
-const filter = [
+const filterxd = [
     "nigger",
     "nigga",
     "faggot",
@@ -30,6 +30,10 @@ const filter = [
  */
 async function run(message, args) {
 
+    if (!isPremium(message.author.id)) {
+        return message.channel.send(new ErrorEmbed("you must be at least GOLD tier for this command"))
+    }
+
     if (getTier(message.author.id) < 3) {
         return message.channel.send(new ErrorEmbed("you must be at least GOLD tier for this command"))
     }
@@ -39,11 +43,15 @@ async function run(message, args) {
 
         let content = "you don't have a command"
 
-        if (cmd.content) {
-            content = cmd.content
+        if (cmd) {
+            if (cmd.content) {
+                content = cmd.content
+            }
         }
-
+        
         content += "\n\n" + `use ${getPrefix(message.guild)}**mycmd <content>** to set the content of your custom command`
+
+        return message.channel.send(new CustomEmbed(message.member, false, content).setTitle("your custom command"))
     } else {
         const content = args.join(" ")
 
@@ -59,7 +67,7 @@ async function run(message, args) {
 
         contentToTest = content.replace(/[^A-z0-9\s]/g, "")
 
-        for (const word of filter) {
+        for (const word of filterxd) {
             if (contentToTest.includes(word)) {
                 return message.channel.send(new ErrorEmbed("explicit content 🙄"))
             }
@@ -67,11 +75,16 @@ async function run(message, args) {
 
         await message.channel.send(new CustomEmbed(message.member, false, "please enter your command name / trigger"))
 
-        const filter = (msg) => {
-            message.author.id == msg.author.id
-        }
+        const filter = (msg) => message.author.id == msg.author.id
 
-        let res = await message.channel.awaitMessages(filter, { max: 1 })
+        let fail = false
+
+        let res = await message.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] }).catch(() => {
+            fail = true
+            return message.channel.send(new ErrorEmbed("you took too long"))
+        })
+
+        if (fail) return
 
         res = res.first().content
 
