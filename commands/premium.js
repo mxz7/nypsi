@@ -11,6 +11,7 @@ const {
     renewUser,
     revokeUser,
     expireUser,
+    getUserCommand,
 } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
@@ -42,6 +43,11 @@ async function run(message, args) {
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`
 
             description += `\n\n**color** #${embedColor} - ${getPrefix(message.guild)}setcolor`
+
+            if (profile.level > 2) {
+                const cmd = getUserCommand(message.author.id)
+                description += `\n**custom command** ${cmd ? cmd.content : "none"}`
+            }
 
             if (profile.level < 4) {
                 description += "\n\nyou can upgrade your tier at https://www.patreon.com/nypsi"
