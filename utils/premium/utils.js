@@ -367,15 +367,14 @@ function getLastWeekly(member) {
 exports.getLastWeekly = getLastWeekly
 
 /**
- * 
- * @param {String} name 
+ *
+ * @param {String} name
  */
 function getCommand(name) {
     for (let cmd in commands) {
         cmd = commands[cmd]
 
         if (cmd.trigger == name) {
-            
             if (getTier(cmd.owner) < 3) {
                 delete commands[cmd]
                 return false
@@ -390,8 +389,8 @@ function getCommand(name) {
 exports.getCommand = getCommand
 
 /**
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  * @returns {{ trigger: String, content: String, owner: String }}
  */
 function getUserCommand(id) {
@@ -401,16 +400,16 @@ function getUserCommand(id) {
 exports.getUserCommand = getUserCommand
 
 /**
- * 
- * @param {String} id 
- * @param {String} trigger 
- * @param {String} content 
+ *
+ * @param {String} id
+ * @param {String} trigger
+ * @param {String} content
  */
 function setCommand(id, trigger, content) {
     commands[id] = {
         trigger: trigger,
         content: content,
-        owner: id
+        owner: id,
     }
 }
 
