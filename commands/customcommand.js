@@ -125,11 +125,13 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("this command already exists"))
         }
 
-        if (getCommand(res)) {
+        const trigger = getUserCommand(message.author.id).trigger
+
+        if (getCommand(res) && trigger != res) {
             return message.channel.send(new ErrorEmbed("this command already exists"))
         }
 
-        setCommand(message.author.id, res, content)
+        setCommand(message.author.id, res.toLowerCase(), content)
 
         return message.channel.send(
             new CustomEmbed(message.member, false, "✅ your custom command has been updated")
