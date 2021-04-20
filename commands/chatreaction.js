@@ -684,7 +684,7 @@ async function run(message, args) {
                 }
 
                 embed.setTitle(`word list [${words.length}]`)
-                embed.setDescription(`\`${pages.get(1).join("\n")}\``)
+                embed.setDescription(`${pages.get(1).join("\n")}`)
                 embed.setFooter(`page 1/${pages.size}`)
 
                 const msg = await message.channel.send(embed)
