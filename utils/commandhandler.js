@@ -14,6 +14,7 @@ const {
     toggleLock,
 } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
+const { getCommand } = require("./premium/utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -359,7 +360,23 @@ async function runCommand(cmd, message, args) {
     let alias = false
     if (!commandExists(cmd)) {
         if (!aliases.has(cmd)) {
-            return
+            const content = getCommand(cmd)
+
+            if (!content) {
+                return
+            }
+
+            if (cooldown.has(message.author.id)) return
+
+            cooldown.add(message.author.id)
+
+            setTimeout(() => {
+                cooldown.delete(message.author.id)
+            }, 1500)
+
+            const embed = new CustomEmbed(message.member, false, content)
+
+            return message.channel.send(embed)
         } else {
             alias = true
         }
@@ -422,37 +439,33 @@ async function runCommand(cmd, message, args) {
         }
     }
 
-    try {
-        logCommand(message, args)
-        if (alias) {
-            if (isEcoBanned(message.author.id)) {
-                if (commands.get(aliases.get(cmd)).category == "money") {
-                    return
-                }
+    logCommand(message, args)
+    if (alias) {
+        if (isEcoBanned(message.author.id)) {
+            if (commands.get(aliases.get(cmd)).category == "money") {
+                return
             }
-
-            updatePopularCommands(commands.get(aliases.get(cmd)).name)
-
-            if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
-                return message.channel.send(new ErrorEmbed("that command has been disabled"))
-            }
-            commands.get(aliases.get(cmd)).run(message, args)
-        } else {
-            if (isEcoBanned(message.author.id)) {
-                if (commands.get(cmd).category == "money") {
-                    return
-                }
-            }
-
-            updatePopularCommands(commands.get(cmd).name)
-
-            if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
-                return message.channel.send(new ErrorEmbed("that command has been disabled"))
-            }
-            commands.get(cmd).run(message, args)
         }
-    } catch (e) {
-        console.log(e)
+
+        updatePopularCommands(commands.get(aliases.get(cmd)).name)
+
+        if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
+            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+        }
+        commands.get(aliases.get(cmd)).run(message, args)
+    } else {
+        if (isEcoBanned(message.author.id)) {
+            if (commands.get(cmd).category == "money") {
+                return
+            }
+        }
+
+        updatePopularCommands(commands.get(cmd).name)
+
+        if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
+            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+        }
+        commands.get(cmd).run(message, args)
     }
 
     let cmdName = cmd
@@ -462,36 +475,32 @@ async function runCommand(cmd, message, args) {
     }
 
     if (getCmdCategory(cmdName) == "money") {
-        try {
-            if (!message.member) return
-            if (!userExists(message.member)) return
+        if (!message.member) return
+        if (!userExists(message.member)) return
 
-            setTimeout(() => {
-                try {
-                    if (!xpCooldown.has(message.author.id)) {
-                        try {
-                            updateXp(message.member, getXp(message.member) + 1)
+        setTimeout(() => {
+            try {
+                if (!xpCooldown.has(message.author.id)) {
+                    try {
+                        updateXp(message.member, getXp(message.member) + 1)
 
-                            xpCooldown.add(message.author.id)
+                        xpCooldown.add(message.author.id)
 
-                            setTimeout(() => {
-                                try {
-                                    xpCooldown.delete(message.author.id)
-                                } catch {
-                                    error("error deleting from xpCooldown")
-                                }
-                            }, 60000)
-                        } catch {
-                            /*keeps lint happy*/
-                        }
+                        setTimeout(() => {
+                            try {
+                                xpCooldown.delete(message.author.id)
+                            } catch {
+                                error("error deleting from xpCooldown")
+                            }
+                        }, 60000)
+                    } catch {
+                        /*keeps lint happy*/
                     }
-                } catch (e) {
-                    console.log(e)
                 }
-            }, 10000)
-        } catch (e) {
-            console.log(e)
-        }
+            } catch (e) {
+                console.log(e)
+            }
+        }, 10000)
     }
 }
 
