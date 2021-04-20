@@ -407,9 +407,11 @@ exports.getUserCommand = getUserCommand
  * @param {String} content 
  */
 function setCommand(id, trigger, content) {
-    commands[id].trigger = trigger
-    commands[id].content = content
-    commands[id].owner = id
+    commands[id] = {
+        trigger: trigger,
+        content: content,
+        owner: id
+    }
 }
 
 exports.setCommand = setCommand
