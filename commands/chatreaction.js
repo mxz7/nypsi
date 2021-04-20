@@ -664,7 +664,78 @@ async function run(message, args) {
                 )
                 embed.setTitle("chat reactions | " + message.author.username)
             } else {
+                /**
+                 * @type {Map<Number, Array<String>>}
+                 */
+                const pages = new Map()
+
+                for (let word of words) {
+                    if (pages.size == 0) {
+                        pages.set(1, [`\`${word}\``])
+                    } else if (pages.get(pages.size).length >= 10) {
+                        pages.set(pages.size + 1, [`\`${word}\``])
+                    } else {
+                        const d = pages.get(pages.size)
+
+                        d.push(`\`${word}\``)
+
+                        pages.set(pages.size, d)
+                    }
+                }
+
+                embed.setTitle(`word list [${words.length}]`)
                 embed.setDescription(`\`${words.join("`\n`")}\``)
+                embed.setFooter(`page 1/${pages.size}`)
+
+                const msg = await message.channel.send(embed)
+
+                if (pages.size > 1) {
+                    await msg.react("⬅")
+                    await msg.react("➡")
+
+                    let currentPage = 1
+                    const lastPage = pages.size
+
+                    const filter = (reaction, user) => {
+                        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+                    }
+
+                    const pageManager = async () => {
+                        const reaction = await msg
+                            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                            .then((collected) => {
+                                return collected.first().emoji.name
+                            })
+                            .catch(async () => {
+                                await msg.reactions.removeAll()
+                            })
+
+                        if (!reaction) return
+
+                        if (reaction == "⬅") {
+                            if (currentPage <= 1) {
+                                return pageManager()
+                            } else {
+                                currentPage--
+                                embed.setDescription(pages.get(currentPage).join("\n"))
+                                embed.setFooter("page " + currentPage + "/" + lastPage)
+                                await msg.edit(embed)
+                                return pageManager()
+                            }
+                        } else if (reaction == "➡") {
+                            if (currentPage >= lastPage) {
+                                return pageManager()
+                            } else {
+                                currentPage++
+                                embed.setDescription(pages.get(currentPage).join("\n"))
+                                embed.setFooter("page " + currentPage + "/" + lastPage)
+                                await msg.edit(embed)
+                                return pageManager()
+                            }
+                        }
+                    }
+                    return pageManager()
+                }
             }
 
             return message.channel.send(embed)
