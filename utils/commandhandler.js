@@ -635,7 +635,8 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             embed.setFooter("data is from less than 24 hours")
         }
 
-        channel.send(embed)
+        await channel.send(embed)
+        info("sent popular commands", types.AUTOMATION)
 
         popularCommands.clear()
     }

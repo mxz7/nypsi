@@ -20,7 +20,7 @@ const {
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { MStoTime } = require("./utils/utils")
+const { MStoTime, showTopGlobalBal } = require("./utils/utils")
 const { runUnmuteChecks } = require("./utils/moderation/utils")
 const { info, types, error, getWebhooks } = require("./utils/logger")
 
@@ -225,6 +225,7 @@ setTimeout(() => {
     client.login(token).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
+            showTopGlobalBal(client)
             runChecks()
             updateCache()
             runUnmuteChecks(client)
