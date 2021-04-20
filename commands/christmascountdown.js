@@ -164,10 +164,18 @@ async function run(message, args) {
 
         profile = getChristmasCountdown(message.guild)
 
-        if (!profile.enabled) {
-            return message.channel.send(
-                new ErrorEmbed("error sending message: check permissions for nypsi")
-            )
+        setChristmasCountdown(message.guild, profile)
+
+        if (profile.enabled) {
+            await checkChristmasCountdown(message.guild)
+
+            profile = getChristmasCountdown(message.guild)
+
+            if (!profile.enabled) {
+                return message.channel.send(
+                    new ErrorEmbed("error sending message: check permissions for nypsi")
+                )
+            }
         }
 
         const embed = new CustomEmbed(message.member, false, "✅ format updated").setTitle(
@@ -217,14 +225,16 @@ async function run(message, args) {
 
         setChristmasCountdown(message.guild, profile)
 
-        await checkChristmasCountdown(message.guild)
+        if (profile.enabled) {
+            await checkChristmasCountdown(message.guild)
 
-        profile = getChristmasCountdown(message.guild)
+            profile = getChristmasCountdown(message.guild)
 
-        if (!profile.enabled) {
-            return message.channel.send(
-                new ErrorEmbed("error sending message: check permissions for nypsi")
-            )
+            if (!profile.enabled) {
+                return message.channel.send(
+                    new ErrorEmbed("error sending message: check permissions for nypsi")
+                )
+            }
         }
 
         const embed = new CustomEmbed(message.member, false, "✅ channel updated").setTitle(
