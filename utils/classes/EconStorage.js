@@ -13,12 +13,6 @@ class EconProfile {
         this.prestige = 0
         this.padlock = false
         this.dms = true
-        this.usedItem = null
-        this.inventory = {
-            vote: 0,
-            prestige: 0,
-            basic: 0,
-        }
         this.workers = {}
         return this
     }

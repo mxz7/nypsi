@@ -449,7 +449,7 @@ exports.updateXp = updateXp
  */
 function getMaxBankBalance(member) {
     const xp = getXp(member)
-    const constant = 250
+    const constant = 500
     const starting = 15000
     const bonus = xp * constant
     const max = bonus + starting
@@ -462,8 +462,9 @@ exports.getMaxBankBalance = getMaxBankBalance
 /**
  * @returns {Array<String>} global bal top
  * @param {Number} amount of people to pull
+ * @param {Client} client
  */
-function topAmountGlobal(amount) {
+async function topAmountGlobal(amount, client) {
     const users1 = []
 
     for (let user in users) {
@@ -484,9 +485,28 @@ function topAmountGlobal(amount) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].money.balance == 0) {
+        if (users[user].money.balance != 0) {
+
+            let pos = count + 1
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            const member = await client.users.fetch(user)
+
+            let username = user
+
+            if (member) {
+                username = member.tag
+            }
+
             usersFinal[count] =
-                count + 1 + " `" + user + "` $" + users[user].money.balance.toLocaleString()
+                pos + " `" + username + "` $" + users[user].money.balance.toLocaleString()
             count++
         }
     }
@@ -971,6 +991,38 @@ function toggleBan(id) {
 }
 
 exports.toggleBan = toggleBan
+
+/**
+ *
+ * @returns {{ deleted: Number, updated: Number }}
+ */
+function reset() {
+    let deleted = 0
+    let updated = 0
+    for (const id in users) {
+        let user = users[id]
+
+        let prestige = user.prestige
+
+        if (prestige > 10) prestige = 10 // REMOVE AFTER FIRST RESET
+
+        if (prestige == 0) {
+            delete users[id]
+            info("deleted " + id)
+            deleted++
+        } else {
+            user = new EconProfile()
+            user.prestige = prestige
+
+            users[id] = user
+            info("updated " + id)
+            updated++
+        }
+    }
+    return { deleted: deleted, updated: updated }
+}
+
+exports.reset = reset
 
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
