@@ -486,7 +486,6 @@ async function topAmountGlobal(amount, client) {
         if (usersFinal.join().length >= 1500) break
 
         if (users[user].money.balance != 0) {
-
             let pos = count + 1
 
             if (pos == 1) {

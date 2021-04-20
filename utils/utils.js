@@ -396,8 +396,8 @@ function toggleLock(string) {
 exports.toggleLock = toggleLock
 
 /**
- * 
- * @param {Client} client 
+ *
+ * @param {Client} client
  */
 async function showTopGlobalBal(client) {
     const now = new Date()
