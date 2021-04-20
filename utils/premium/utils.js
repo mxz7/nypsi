@@ -392,6 +392,17 @@ exports.getCommand = getCommand
 /**
  * 
  * @param {String} id 
+ * @returns {{ trigger: String, content: String, owner: String }}
+ */
+function getUserCommand(id) {
+    return commands[id]
+}
+
+exports.getUserCommand = getUserCommand
+
+/**
+ * 
+ * @param {String} id 
  * @param {String} trigger 
  * @param {String} content 
  */
