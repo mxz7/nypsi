@@ -4,6 +4,7 @@ const { PremUser, status } = require("../classes/PremStorage")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
 let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
+let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 
 let timer = 0
 let timerCheck = true
@@ -34,6 +35,19 @@ setInterval(() => {
         data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
         info("premium data refreshed", types.DATA)
         timer = 0
+    }
+}, 60000)
+
+setInterval(() => {
+    const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
+
+    if (JSON.stringify(commands) != JSON.stringify(data1)) {
+        fs.writeFile("./utils/premium/commands.json", JSON.stringify(commands), (err) => {
+            if (err) {
+                return console.log(err)
+            }
+            info("premium commands data saved", types.DATA)
+        })
     }
 }, 60000)
 
@@ -351,3 +365,53 @@ function getLastWeekly(member) {
 }
 
 exports.getLastWeekly = getLastWeekly
+
+/**
+ * 
+ * @param {String} name 
+ */
+function getCommand(name) {
+    for (let cmd in commands) {
+        cmd = commands[cmd]
+
+        if (cmd.trigger == name) {
+            
+            if (getTier(cmd.owner) < 3) {
+                delete commands[cmd]
+                return false
+            }
+
+            return cmd.content
+        }
+    }
+    return false
+}
+
+exports.getCommand = getCommand
+
+/**
+ * 
+ * @param {String} id 
+ * @returns {{ trigger: String, content: String, owner: String }}
+ */
+function getUserCommand(id) {
+    return commands[id]
+}
+
+exports.getUserCommand = getUserCommand
+
+/**
+ * 
+ * @param {String} id 
+ * @param {String} trigger 
+ * @param {String} content 
+ */
+function setCommand(id, trigger, content) {
+    commands[id] = {
+        trigger: trigger,
+        content: content,
+        owner: id
+    }
+}
+
+exports.setCommand = setCommand
