@@ -113,7 +113,7 @@ async function run(message, args) {
 
         if (fail) return
 
-        res = res.first().content
+        res = res.first().content.toLowerCase()
 
         if (res.length > 25) {
             return message.channel.send(
@@ -131,7 +131,7 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("this command already exists"))
         }
 
-        setCommand(message.author.id, res.toLowerCase(), content)
+        setCommand(message.author.id, res, content)
 
         return message.channel.send(
             new CustomEmbed(message.member, false, "✅ your custom command has been updated")
