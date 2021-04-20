@@ -1,8 +1,8 @@
-const { GuildMember, Message } = require("discord.js")
+const { GuildMember, Message, Client } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./classes/ChatReaction")
-const { error } = require("./logger")
+const { error, info, types } = require("./logger")
 
 const news = {
     text: "",
@@ -394,6 +394,60 @@ function toggleLock(string) {
 }
 
 exports.toggleLock = toggleLock
+
+/**
+ * 
+ * @param {Client} client 
+ */
+async function showTopGlobalBal(client) {
+    const now = new Date()
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000)
+
+    const postGlobalBalTop = async () => {
+        const { topAmountGlobal } = require("./economy/utils")
+        const { CustomEmbed } = require("./classes/EmbedBuilders")
+        const guild = await client.guilds.fetch("747056029795221513")
+
+        if (!guild) {
+            return error("UNABLE TO FETCH GUILD FOR GLOBAL BAL TOP")
+        }
+
+        const channel = await guild.channels.cache.find((ch) => ch.id == "833052442069434429")
+
+        if (!channel) {
+            return error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP")
+        }
+
+        const baltop = await topAmountGlobal(10, client)
+
+        const embed = new CustomEmbed()
+
+        embed.setTitle("top 10 richest users")
+        embed.setDescription(baltop)
+        embed.setColor("#000001")
+
+        await channel.send(embed)
+        info("sent global bal top", types.AUTOMATION)
+    }
+
+    setTimeout(async () => {
+        setInterval(() => {
+            postGlobalBalTop()
+        }, 86400000)
+        postGlobalBalTop()
+    }, needed - now)
+
+    info(`global bal top will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+}
+
+exports.showTopGlobalBal = showTopGlobalBal
 
 /**
  * @returns {captcha}
