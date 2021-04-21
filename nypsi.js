@@ -198,7 +198,10 @@ async function requestRemoveRole(id, roleID) {
     }
 
     if (roleID == "819870846536646666") {
-        if (user.roles.cache.find((r) => r.id == "747066190530347089") && !user.roles.cache.find((r) => r.id == "819870846536646666")) {
+        if (
+            user.roles.cache.find((r) => r.id == "747066190530347089") &&
+            !user.roles.cache.find((r) => r.id == "819870846536646666")
+        ) {
             return "boost"
         }
     }
