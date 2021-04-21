@@ -376,7 +376,9 @@ async function runCommand(cmd, message, args) {
             }, 1500)
 
             if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
-                return message.channel.send(new ErrorEmbed("this custom command is not allowed in this server"))
+                return message.channel.send(
+                    new ErrorEmbed("this custom command is not allowed in this server")
+                )
             }
 
             const filter = getChatFilter(message.guild)
@@ -389,7 +391,9 @@ async function runCommand(cmd, message, args) {
 
             for (const word of filter) {
                 if (content.indexOf(word.toLowerCase()) != -1) {
-                    return message.channel.send(new ErrorEmbed("this custom command is not allowed in this server"))
+                    return message.channel.send(
+                        new ErrorEmbed("this custom command is not allowed in this server")
+                    )
                 }
             }
 
