@@ -35,6 +35,8 @@ const filterxd = [
     "xvideos",
     "xhamster",
     "redtube",
+    "grabify",
+    "bitly"
 ]
 
 /**
