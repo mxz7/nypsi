@@ -10,12 +10,11 @@ const cmd = new Command("roast", "roast people since you cant do it yourself", c
 const cooldown = new Map()
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
@@ -65,9 +64,13 @@ async function run(message, args) {
 
     const roastIndex = Math.floor(Math.random() * roasts.length)
 
-    const roast = roasts[roastIndex].replace("%t", target.user.toString()).replace("%m", message.author.toString())
+    const roast = roasts[roastIndex]
+        .replace("%t", target.user.toString())
+        .replace("%m", message.author.toString())
 
-    return message.channel.send(new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`))
+    return message.channel.send(
+        new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`)
+    )
 }
 
 cmd.setRun(run)
