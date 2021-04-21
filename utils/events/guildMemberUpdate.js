@@ -1,5 +1,5 @@
 const { GuildMember } = require("discord.js")
-const { isPremium, setTier, renewUser, addMember, getTier } = require("../premium/utils")
+const { isPremium, setTier, renewUser, addMember, getTier, expireUser } = require("../premium/utils")
 
 /**
  * @param {GuildMember} oldMember
@@ -15,6 +15,9 @@ module.exports = async (oldMember, newMember) => {
                 tier = 4
             } else if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) {
                 // gold
+                tier = 3
+            } else if (newMember.roles.cache.find((r) => r.id == "747066190530347089")) {
+                // boost
                 tier = 3
             } else if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) {
                 // silver
@@ -33,6 +36,13 @@ module.exports = async (oldMember, newMember) => {
                 renewUser(newMember.user.id)
             } else {
                 addMember(newMember.user.id, tier)
+            }
+        } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+            if (oldMember.roles.cache.find((r) => r.id == "747066190530347089") && !newMember.roles.cache.find((r) => r.id == "747066190530347089")) {
+                if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return
+                if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return
+
+                expireUser(newMember.id)
             }
         }
     }
