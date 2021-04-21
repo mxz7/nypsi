@@ -117,8 +117,6 @@ async function run(message, args) {
 
     let lastLog, firstLog, level, rank, streak, topStreak, karma, challenges, quests
 
-    console.log(hypixelData.player.rank)
-
     try {
         lastLog = timeSince(new Date(hypixelData.player.lastLogin))
         firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0]
