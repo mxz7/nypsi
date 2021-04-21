@@ -197,6 +197,12 @@ async function requestRemoveRole(id, roleID) {
         return await tekoh.send(`failed to fetch role - user: ${id} role: ${roleID}`)
     }
 
+    if (roleID == "819870846536646666") {
+        if (user.roles.cache.find((r) => r.id == "747066190530347089") && !user.roles.cache.find((r) => r.id == "819870846536646666")) {
+            return "boost"
+        }
+    }
+
     return await user.roles.remove(role)
 }
 
