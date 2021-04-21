@@ -60,24 +60,26 @@ async function run(message, args) {
     if (args.length == 0) {
         const cmd = getUserCommand(message.author.id)
 
-        let content = "you don't have a command"
+        const embed = new CustomEmbed(message.member, false)
 
         if (cmd) {
             if (cmd.content) {
-                content = cmd.content
-                content += "\ntrigger: " + cmd.trigger
+                embed.addField("content", cmd.content, true)
+                embed.addField("trigger", cmd.trigger, true)
+            } else {
+                embed.setDescription("you don't have a custom command")
             }
+        } else {
+            embed.setDescription("you don't have a custom command")
         }
 
-        content +=
-            "\n\n" +
+        embed.setFooter(
             `use ${getPrefix(
                 message.guild
-            )}**mycmd <content>** to set the content of your custom command`
-
-        return message.channel.send(
-            new CustomEmbed(message.member, false, content).setTitle("your custom command")
+            )}mycmd <content> to set the content of your custom command`
         )
+
+        return message.channel.send(embed)
     } else {
         const content = args.join(" ")
 
