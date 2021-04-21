@@ -1,5 +1,12 @@
 const { GuildMember } = require("discord.js")
-const { isPremium, setTier, renewUser, addMember, getTier, expireUser } = require("../premium/utils")
+const {
+    isPremium,
+    setTier,
+    renewUser,
+    addMember,
+    getTier,
+    expireUser,
+} = require("../premium/utils")
 
 /**
  * @param {GuildMember} oldMember
@@ -38,7 +45,10 @@ module.exports = async (oldMember, newMember) => {
                 addMember(newMember.user.id, tier)
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
-            if (oldMember.roles.cache.find((r) => r.id == "747066190530347089") && !newMember.roles.cache.find((r) => r.id == "747066190530347089")) {
+            if (
+                oldMember.roles.cache.find((r) => r.id == "747066190530347089") &&
+                !newMember.roles.cache.find((r) => r.id == "747066190530347089")
+            ) {
                 if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return
                 if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return
 
