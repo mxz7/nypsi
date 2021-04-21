@@ -125,7 +125,11 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("this command already exists"))
         }
 
-        const trigger = getUserCommand(message.author.id).trigger
+        let trigger = getUserCommand(message.author.id)
+
+        if (trigger) {
+            trigger = trigger.trigger
+        }
 
         if (getCommand(res) && trigger != res) {
             return message.channel.send(new ErrorEmbed("this command already exists"))
