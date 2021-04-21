@@ -170,6 +170,7 @@ async function run(message, args) {
 
     newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
 
+    if (args.join(" ").includes("-s")) return
     for (let member of members1) {
         const m = members.get(member)
 

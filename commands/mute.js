@@ -286,6 +286,7 @@ async function run(message, args) {
         newMute(message.guild, members1, 9999999999999)
     }
 
+    if (args.join(" ").includes("-s")) return
     for (let m of members1) {
         m = members.get(m)
         if (!timedMute) {
