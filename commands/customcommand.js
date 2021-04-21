@@ -30,6 +30,11 @@ const filterxd = [
     "tranny",
     "cracker",
     "chink",
+    "pornhub",
+    "porn",
+    "xvideos",
+    "xhamster",
+    "redtube",
 ]
 
 /**
@@ -88,7 +93,7 @@ async function run(message, args) {
 
         let contentToTest = message.content.toLowerCase().normalize("NFD")
 
-        contentToTest = content.replace(/[^A-z0-9\s]/g, "")
+        contentToTest = contentToTest.replace(/[^A-z0-9\s]/g, "")
 
         for (const word of filterxd) {
             if (contentToTest.includes(word)) {
@@ -119,6 +124,16 @@ async function run(message, args) {
             return message.channel.send(
                 new ErrorEmbed("trigger cannot be longer than 25 characters")
             )
+        }
+
+        let resToTest = res.normalize("NFD")
+
+        resToTest = resToTest.replace(/[^A-z0-9\s]/g, "")
+
+        for (const word of filterxd) {
+            if (resToTest.includes(word)) {
+                return message.channel.send(new ErrorEmbed("explicit content 🙄"))
+            }
         }
 
         if (commandExists(res)) {
