@@ -120,7 +120,7 @@ async function run(message, args) {
 
         if (fail) return
 
-        res = res.first().content.toLowerCase()
+        res = res.first().content.split(" ")[0].toLowerCase()
 
         if (res.length > 25) {
             return message.channel.send(
