@@ -64,10 +64,7 @@ async function run(message, args) {
 
     const result = results[0]
 
-    if (!result) {
-        return message.channel.send(new ErrorEmbed("unknown definition"))
-    }
-
+    if (!result) return
     if (!result.word) return
 
     const embed = new CustomEmbed(
