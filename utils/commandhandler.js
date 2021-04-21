@@ -2,7 +2,7 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
 const { Message, Client } = require("discord.js")
-const { getPrefix, getDisabledCommands } = require("../utils/guilds/utils")
+const { getPrefix, getDisabledCommands, getChatFilter } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const {
@@ -360,6 +360,7 @@ async function runCommand(cmd, message, args) {
     let alias = false
     if (!commandExists(cmd)) {
         if (!aliases.has(cmd)) {
+            if (isLockedOut(message.author.id)) return
             const content = getCommand(cmd)
 
             if (!content) {
@@ -373,6 +374,24 @@ async function runCommand(cmd, message, args) {
             setTimeout(() => {
                 cooldown.delete(message.author.id)
             }, 1500)
+
+            if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
+                return message.channel.send(new ErrorEmbed("this custom command is not allowed in this server"))
+            }
+
+            const filter = getChatFilter(message.guild)
+
+            let contentToCheck = content.toLowerCase().normalize("NFD")
+
+            contentToCheck = contentToCheck.replace(/[^A-z0-9\s]/g, "")
+
+            contentToCheck = contentToCheck.split(" ")
+
+            for (const word of filter) {
+                if (content.indexOf(word.toLowerCase()) != -1) {
+                    return message.channel.send(new ErrorEmbed("this custom command is not allowed in this server"))
+                }
+            }
 
             const embed = new CustomEmbed(message.member, false, content)
 
