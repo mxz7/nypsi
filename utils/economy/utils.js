@@ -1060,7 +1060,7 @@ function createStatsProfile(member) {
         gamble: {},
         padlock: 0,
         rob: {
-            win: 0,
+            wins: 0,
             lose: 0
         },
     }
