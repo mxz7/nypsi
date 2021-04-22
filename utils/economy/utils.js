@@ -1047,6 +1047,25 @@ function getStats(member) {
 
 exports.getStats = getStats
 
+function hasStatsProfile(member) {
+    if (stats[member.user.id]) {
+        return true
+    } else {
+        return false
+    }
+}
+
+function createStatsProfile(member) {
+    stats[member.user.id] = {
+        gamble: {},
+        padlock: 0,
+        rob: {
+            win: 0,
+            lose: 0
+        },
+    }
+}
+
 /**
  * 
  * @param {GuildMember} member 
@@ -1054,6 +1073,9 @@ exports.getStats = getStats
  * @param {Boolean} win 
  */
 function addGamble(member, game, win) {
+
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
     if (stats[member.user.id].gamble[game]) {
         if (win) {
             stats[member.user.id].gamble[game].wins++
