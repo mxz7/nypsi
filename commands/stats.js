@@ -51,7 +51,9 @@ async function run(message, args) {
             gambleLoses += stats.gamble[gambleStats].lose
         }
 
-        const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
+        const embed = new CustomEmbed(message.member, true).setTitle(
+            "stats | " + message.author.username
+        )
 
         embed.addField(
             "gamble",
@@ -79,7 +81,9 @@ async function run(message, args) {
     const gambleStats = () => {
         const stats = getStats(message.member).gamble
 
-        const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
+        const embed = new CustomEmbed(message.member, true).setTitle(
+            "stats | " + message.author.username
+        )
 
         for (const gambleStat in stats) {
             embed.addField(
