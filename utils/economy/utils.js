@@ -1040,7 +1040,7 @@ exports.reset = reset
 
 /**
  * @returns {{}}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function getStats(member) {
     return stats[member.user.id]
@@ -1064,7 +1064,7 @@ function createStatsProfile(member) {
         padlock: 0,
         rob: {
             wins: 0,
-            lose: 0
+            lose: 0,
         },
     }
 }
@@ -1072,13 +1072,12 @@ function createStatsProfile(member) {
 exports.createStatsProfile = createStatsProfile
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {String} game 
- * @param {Boolean} win 
+ *
+ * @param {GuildMember} member
+ * @param {String} game
+ * @param {Boolean} win
  */
 function addGamble(member, game, win) {
-
     if (!hasStatsProfile(member)) createStatsProfile(member)
 
     if (stats[member.user.id].gamble[game]) {
@@ -1091,12 +1090,12 @@ function addGamble(member, game, win) {
         if (win) {
             stats[member.user.id].gamble[game] = {
                 wins: 1,
-                lose: 0
+                lose: 0,
             }
         } else {
             stats[member.user.id].gamble[game] = {
                 wins: 0,
-                lose: 1
+                lose: 1,
             }
         }
     }
@@ -1105,9 +1104,9 @@ function addGamble(member, game, win) {
 exports.addGamble = addGamble
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Boolean} win 
+ *
+ * @param {GuildMember} member
+ * @param {Boolean} win
  */
 function addRob(member, win) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
@@ -1122,8 +1121,8 @@ function addRob(member, win) {
 exports.addRob = addRob
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function addPadlock(member) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
