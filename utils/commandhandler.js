@@ -366,7 +366,7 @@ async function runCommand(cmd, message, args) {
             if (!customCommand) {
                 return
             }
-            
+
             const content = customCommand.content
 
             if (cooldown.has(message.author.id)) return
