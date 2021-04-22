@@ -1099,6 +1099,11 @@ function addGamble(member, game, win) {
 
 exports.addGamble = addGamble
 
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Boolean} win 
+ */
 function addRob(member, win) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
 
@@ -1111,7 +1116,11 @@ function addRob(member, win) {
 
 exports.addRob = addRob
 
-function addPadlock(member, win) {
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function addPadlock(member) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
 
     stats[member.user.id].padlock++
