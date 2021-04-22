@@ -167,7 +167,10 @@ class PremUser {
             console.log(e)
         })
 
-        if (e == "boost") return
+        if (e == "boost") {
+            this.renew()
+            return
+        }
 
         this.status = status.INACTIVE
         this.level = 0
