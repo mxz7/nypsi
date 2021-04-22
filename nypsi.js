@@ -17,6 +17,7 @@ const {
     hasStatsEnabled,
     checkChristmasCountdown,
     hasChristmasCountdownEnabled,
+    runCountdowns,
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
@@ -234,6 +235,7 @@ setTimeout(() => {
     client.login(token).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
+            runCountdowns(client)
             showTopGlobalBal(client)
             runChecks()
             updateCache()
