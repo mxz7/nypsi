@@ -400,7 +400,9 @@ async function runCommand(cmd, message, args) {
 
             addUse(customCommand.owner)
 
-            const embed = new CustomEmbed(message.member, false, content).setFooter(`${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`)
+            const embed = new CustomEmbed(message.member, false, content).setFooter(
+                `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
+            )
 
             return message.channel.send(embed)
         } else {
