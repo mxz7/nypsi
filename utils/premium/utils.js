@@ -391,7 +391,7 @@ exports.getCommand = getCommand
 /**
  *
  * @param {String} id
- * @returns {{ trigger: String, content: String, owner: String }}
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  */
 function getUserCommand(id) {
     return commands[id]
@@ -404,13 +404,21 @@ exports.getUserCommand = getUserCommand
  * @param {String} id
  * @param {String} trigger
  * @param {String} content
+ * @param {Number} uses
  */
-function setCommand(id, trigger, content) {
+function setCommand(id, trigger, content, uses) {
     commands[id] = {
         trigger: trigger,
         content: content,
         owner: id,
+        uses: uses,
     }
 }
 
 exports.setCommand = setCommand
+
+function addUse(id) {
+    commands[id].uses++
+}
+
+exports.addUse = addUse
