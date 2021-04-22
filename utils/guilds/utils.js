@@ -1,9 +1,9 @@
-const { Guild } = require("discord.js")
+const { Guild, Client } = require("discord.js")
 const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { GuildStorage, Countdown } = require("../classes/GuildStorage")
 const { info, types, error } = require("../logger")
-const { daysUntilChristmas } = require("../utils")
+const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
 
 let timer = 0
@@ -573,3 +573,69 @@ function deleteCountdown(guild, id) {
 }
 
 exports.deleteCountdown = deleteCountdown
+
+/**
+ * 
+ * @param {Client} client 
+ */
+function runCountdowns(client) {
+    const now = new Date()
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000)
+
+    const runCountdowns = async () => {
+        for (let guild in guilds) {
+            const guildID = guild
+            guild = guilds[guild]
+
+            if (!guild.countdowns) continue
+            if (Object.keys(guild.countdowns).length == 0) continue
+
+            for (let countdown in guild.countdowns) {
+                countdown = guild.countdowns[countdown]
+
+                const days = daysUntil(new Date(countdown.date))
+
+                let message = countdown.format.split("%days%").join(days.toLocaleString())
+
+                if (days == 0) {
+                    message = countdown.finalFormat
+                }
+
+                const embed = new CustomEmbed()
+
+                embed.setDescription(message)
+                embed.setColor("#37393f")
+
+                const guildToSend = await client.guilds.fetch(guildID)
+
+                if (!guildToSend) return
+
+                const channel = guildToSend.channels.cache.find(ch => ch.id == countdown.channel)
+
+                await channel.send(embed).then(() => {
+                    info(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`)
+                }).catch(() => {
+                    error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
+                })
+            }
+        }
+    }
+
+    setTimeout(async () => {
+        setInterval(() => {
+            runCountdowns()
+        }, 86400000)
+        runCountdowns()
+    }, 15000)
+
+    info(`custom countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+}
+
+exports.runCountdowns = runCountdowns
