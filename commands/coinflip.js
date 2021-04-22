@@ -6,6 +6,7 @@ const {
     formatBet,
     calcMaxBet,
     isEcoBanned,
+    addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const Discord = require("discord.js")
@@ -14,6 +15,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getExactMember } = require("../utils/utils.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const { gamble } = require("../utils/logger.js")
 
 const cooldown = new Map()
 
@@ -249,6 +251,11 @@ async function run(message, args) {
             winner = target
             loser = message.member
         }
+
+        gamble(winner.user, "coinflip", bet, true, bet * 2)
+        gamble(loser.user, "coinflip", bet, false)
+        addGamble(winner, "coinflip", true)
+        addGamble(loser, "coinflip", false)
 
         updateBalance(winner, getBalance(winner) + bet * 2)
 
