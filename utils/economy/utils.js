@@ -62,6 +62,19 @@ setInterval(() => {
 }, 43200000)
 
 setInterval(() => {
+    const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+
+    if (JSON.stringify(stats) != JSON.stringify(stats1)) {
+        fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
+            if (err) {
+                return console.log(err)
+            }
+            info("economy stats data saved", types.DATA)
+        })
+    }
+}, 120000)
+
+setInterval(() => {
     for (let user in users) {
         if (
             isNaN(users[user].money.balance) ||
