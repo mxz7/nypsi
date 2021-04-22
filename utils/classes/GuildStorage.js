@@ -36,9 +36,9 @@ exports.GuildStorage = GuildStorage
 class Countdown {
     /**
      * @returns {Countdown}
-     * @param {Date} date 
-     * @param {String} format 
-     * @param {String} finalFormat 
+     * @param {Date} date
+     * @param {String} format
+     * @param {String} finalFormat
      * @param {String} channel
      * @param {String} id
      */
