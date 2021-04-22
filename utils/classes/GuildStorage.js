@@ -25,6 +25,7 @@ class GuildStorage {
             snipeFilter: ["discordgg", "discordcom"],
             chatFilter: [],
             prefix: "$",
+            countdowns: [],
         }
         return this.guild
     }
