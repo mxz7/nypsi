@@ -10,6 +10,7 @@ const {
     calcMaxBet,
     getMulti,
     getPrestige,
+    addGamble,
 } = require("../utils/economy/utils.js")
 const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
@@ -302,6 +303,7 @@ async function playGame(message, m) {
 
     const lose = async () => {
         gamble(message.author, "highlow", bet, false, 0)
+        addGamble(message.member, "highlow", false)
         newEmbed.setColor("#e4334f")
         newEmbed.setDescription(
             "**bet** $" +
@@ -363,6 +365,7 @@ async function playGame(message, m) {
             )
         }
         gamble(message.author, "highlow", bet, true, winnings)
+        addGamble(message.member, "highlow", true)
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
@@ -372,6 +375,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "highlow", bet, true, bet)
+        addGamble(message.member, "highlow", true)
         newEmbed.setColor("#E5FF00")
         newEmbed.setDescription(
             "**bet** $" +

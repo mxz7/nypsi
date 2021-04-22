@@ -1,22 +1,23 @@
 const { Message } = require("discord.js")
-const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { getStats } = require("../utils/economy/utils")
+
+const cmd = new Command("stats", "view your economy stats", categories.MONEY)
 
 const cooldown = new Map()
 
-const cmd = new Command("stats", "view stats for the bot", categories.INFO)
-
 /**
- * @param {Message} message
- * @param {Array<String>} args
+ * 
+ * @param {Message} message 
+ * @param {Array<String>} args 
  */
 async function run(message, args) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = 15 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -35,150 +36,49 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, 15000)
 
-    const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-    const { snipe, eSnipe, mentions } = require("../nypsi.js")
-    const snipedMessages = snipe.size + eSnipe.size
-    const uptime = getUptime(message.client.uptime)
-    const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
-    const {
-        bdsmCache,
-        thighsCache,
-        pornCache,
-        assCache,
-        birbCache,
-        catCache,
-        dogCache,
-        rabbitCache,
-        snekCache,
-    } = require("../utils/imghandler")
-    let imgCache = 0
-    let mentionsSize = 0
+    const normalStats = () => {
+        const stats = getStats(message.member)
 
-    try {
-        for (let link of Array.from(bdsmCache.keys())) {
-            imgCache = imgCache + bdsmCache.get(link).length
+        let gambleWins = 0
+        let gambleLoses = 0
+
+        for (const gambleStats in stats.gamble) {
+            gambleWins += stats.gamble[gambleStats].wins
+            gambleLoses += stats.gamble[gambleStats].lose
         }
-        for (let link of Array.from(assCache.keys())) {
-            imgCache = imgCache + assCache.get(link).length
-        }
-        for (let link of Array.from(thighsCache.keys())) {
-            imgCache = imgCache + thighsCache.get(link).length
-        }
-        for (let link of Array.from(pornCache.keys())) {
-            imgCache = imgCache + pornCache.get(link).length
-        }
-        for (let link of Array.from(birbCache.keys())) {
-            imgCache = imgCache + birbCache.get(link).length
-        }
-        for (let link of Array.from(catCache.keys())) {
-            imgCache = imgCache + catCache.get(link).length
-        }
-        for (let link of Array.from(dogCache.keys())) {
-            imgCache = imgCache + dogCache.get(link).length
-        }
-        for (let link of Array.from(rabbitCache.keys())) {
-            imgCache = imgCache + rabbitCache.get(link).length
-        }
-        for (let link of Array.from(snekCache.keys())) {
-            imgCache = imgCache + snekCache.get(link).length
-        }
-    } catch (error) {
-        console.error("error counting image cache")
-        console.error(error)
+
+        const embed = new CustomEmbed(message.member, true)
+
+        embed.addField("gamble", `**${gambleWins.toLocaleString()}** win${gambleWins == 1 ? "" : "s"}\n**${gambleLoses.toLocaleString()}** loss${gambleLoses == 1 ? "" : "es"}`, true)
+        embed.addField("rob", `**${stats.rob.wins.toLocaleString()}** win${stats.rob.wins == 1 ? "" : "s"}\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`, true)
+        embed.addField("padlock", `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} bought`, true)
+
+        return message.channel.send(embed)
     }
 
-    await mentions.forEach(async (guildData) => {
-        await guildData.forEach((userData) => {
-            mentionsSize += userData.length
-        })
-    })
+    const gambleStats = () => {
+        const stats = getStats(message.member).gamble
 
-    let memberCount = 0
+        const embed = new CustomEmbed(message.member, true)
 
-    const guilds = message.client.guilds.cache
-    await guilds.forEach((g) => {
-        memberCount = memberCount + g.memberCount
-    })
+        for (const gambleStat in stats) {
+            embed.addField(gambleStat, `**${stats[gambleStat].wins.toLocaleString()}** win${stats[gambleStat].wins == 1 ? "" : "s"}\n**${stats[gambleStat].lose.toLocaleString()}** loss${stats[gambleStat].lose == 1 ? "" : "es"}`, true)
+        }
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle("stats")
-        .addField(
-            "bot",
-            "**server count** " +
-                guilds.size.toLocaleString() +
-                "\n" +
-                "**user count** " +
-                memberCount.toLocaleString() +
-                "\n" +
-                "**total commands** " +
-                commandsSize +
-                "\n" +
-                "**total aliases** " +
-                aliasesSize +
-                "\n" +
-                "**uptime** " +
-                uptime,
-            true
-        )
-        .addField(
-            "cache",
-            "**users (econ)** " +
-                getUserCount().toLocaleString() +
-                "\n" +
-                " -- **this server** " +
-                getUserCountGuild(message.guild) +
-                "\n" +
-                "**vote** " +
-                getVoteCacheSize().toLocaleString() +
-                "\n" +
-                "**snipe** " +
-                snipedMessages.toLocaleString() +
-                "\n" +
-                "**imgs** " +
-                imgCache.toLocaleString() +
-                "\n" +
-                "**mentions** " +
-                mentionsSize.toLocaleString() +
-                "\n",
-            true
-        )
-        .addField("usage", "**memory** " + memUsage + "mb", true)
+        return message.channel.send(embed)
+    }
 
-    message.channel.send(embed)
+    if (args.length == 0) {
+        return normalStats()
+    } else if (args[0].toLowerCase() == "gamble") {
+        return gambleStats()
+    } else {
+        return normalStats()
+    }
 }
 
 cmd.setRun(run)
 
 module.exports = cmd
-
-function getUptime(ms) {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor(daysms / (60 * 60 * 1000))
-    const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor(hoursms / (60 * 1000))
-    const minutesms = ms % (60 * 1000)
-    const sec = Math.floor(minutesms / 1000)
-
-    let output = ""
-
-    if (days > 0) {
-        output = output + days + "d "
-    }
-
-    if (hours > 0) {
-        output = output + hours + "h "
-    }
-
-    if (minutes > 0) {
-        output = output + minutes + "m "
-    }
-
-    if (sec > 0) {
-        output = output + sec + "s"
-    }
-
-    return output
-}

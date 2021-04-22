@@ -9,6 +9,7 @@ const {
     calcMaxBet,
     getMulti,
     getPrestige,
+    addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -320,6 +321,7 @@ async function run(message, args) {
         }, 2000)
     })
     gamble(message.author, "roulette", bet, win, winnings)
+    addGamble(message.member, "roulette", win)
 }
 
 cmd.setRun(run)
