@@ -14,7 +14,7 @@ const {
     toggleLock,
 } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
-const { getCommand } = require("./premium/utils.js")
+const { getCommand, addUse } = require("./premium/utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -361,7 +361,8 @@ async function runCommand(cmd, message, args) {
     if (!commandExists(cmd)) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return
-            const content = getCommand(cmd)
+            const customCommand = getCommand(cmd)
+            const content = customCommand.content
 
             if (!content) {
                 return
@@ -397,7 +398,9 @@ async function runCommand(cmd, message, args) {
                 }
             }
 
-            const embed = new CustomEmbed(message.member, false, content)
+            addUse(customCommand.owner)
+
+            const embed = new CustomEmbed(message.member, false, content).setFooter(`${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`)
 
             return message.channel.send(embed)
         } else {
