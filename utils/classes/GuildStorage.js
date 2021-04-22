@@ -25,7 +25,7 @@ class GuildStorage {
             snipeFilter: ["discordgg", "discordcom"],
             chatFilter: [],
             prefix: "$",
-            countdowns: [],
+            countdowns: {},
         }
         return this.guild
     }
@@ -40,12 +40,14 @@ class Countdown {
      * @param {String} format 
      * @param {String} finalFormat 
      * @param {String} channel
+     * @param {Number} id
      */
-    constructor(date, format, finalFormat, channel) {
+    constructor(date, format, finalFormat, channel, id) {
         this.date = date
         this.format = format
         this.finalFormat = finalFormat
         this.channel = channel
+        this.id = id
 
         return this
     }
