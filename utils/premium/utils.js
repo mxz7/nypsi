@@ -418,7 +418,11 @@ function setCommand(id, trigger, content, uses) {
 exports.setCommand = setCommand
 
 function addUse(id) {
-    commands[id].uses++
+    if (!commands[id].uses) {
+        commands[id].uses = 1
+    } else {
+        commands[id].uses++
+    }
 }
 
 exports.addUse = addUse
