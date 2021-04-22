@@ -1017,7 +1017,7 @@ function reset() {
 
         let prestige = user.prestige
 
-        if (prestige > 10) prestige = 10 // REMOVE AFTER FIRST RESET
+        if (prestige > 14) prestige = 10 // REMOVE AFTER FIRST RESET
 
         if (prestige == 0) {
             delete users[id]
