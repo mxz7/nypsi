@@ -556,7 +556,11 @@ function addCountdown(guild, date, format, finalFormat, channel) {
         guilds[guild.id].countdowns = {}
     }
 
-    const id = (Object.keys(guilds[guild.id].countdowns).length + 1).toString()
+    let id = 1
+
+    while (Object.keys(guilds[guild.id].countdowns).indexOf(id) != -1) {
+        id++
+    }
 
     guilds[guild.id].countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
 }
