@@ -1,7 +1,7 @@
 const { Guild } = require("discord.js")
 const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
-const { GuildStorage } = require("../classes/GuildStorage")
+const { GuildStorage, Countdown } = require("../classes/GuildStorage")
 const { info, types, error } = require("../logger")
 const { daysUntilChristmas } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
@@ -527,3 +527,49 @@ function updateDisabledCommands(guild, array) {
 }
 
 exports.updateDisabledCommands = updateDisabledCommands
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @returns {Array<Countdown>}
+ */
+function getCountdowns(guild) {
+    if (!guilds[guild.id].countdowns) {
+        guilds[guild.id].countdowns = {}
+    }
+
+    return guilds[guild.id].countdowns
+}
+
+exports.getCountdowns = getCountdowns
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Date} date 
+ * @param {String} format 
+ * @param {String} finalFormat 
+ * @param {String} channel 
+ */
+function addCountdown(guild, date, format, finalFormat, channel) {
+    if (!guilds[guild.id].countdowns) {
+        guilds[guild.id].countdowns = {}
+    }
+
+    const id = (guilds[guild.id].countdowns.length + 1).toString()
+
+    guilds[guild.id].countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
+}
+
+exports.addCountdown = addCountdown
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {String} id 
+ */
+function deleteCountdown(guild, id) {
+    delete guilds[guild.id].countdowns[id]
+}
+
+exports.deleteCountdown = deleteCountdown
