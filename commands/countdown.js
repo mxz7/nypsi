@@ -31,7 +31,7 @@ async function run(message, args) {
         } else {
             for (let countdown in countdowns) {
                 countdown = countdowns[countdown]
-                const date = formatDate(countdown.date)
+                const date = formatDate(new Date(countdown.date).getTime())
 
                 embed.addField(countdown.id, `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** ${countdown.format}\n**final format** ${countdown.finalFormat}\n**date** ${date}`)
             }
