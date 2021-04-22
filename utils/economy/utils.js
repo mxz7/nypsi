@@ -1099,6 +1099,18 @@ function addGamble(member, game, win) {
 
 exports.addGamble = addGamble
 
+function addRob(member, win) {
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
+    if (win) {
+        stats[member.user.id].rob.wins++
+    } else {
+        stats[member.user.id].rob.lose++
+    }
+}
+
+exports.addRob = addRob
+
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
 //         worker = parseInt(worker)
