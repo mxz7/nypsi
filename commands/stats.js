@@ -8,9 +8,9 @@ const cmd = new Command("stats", "view your economy stats", categories.MONEY)
 const cooldown = new Map()
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (cooldown.has(message.member.id)) {
@@ -53,9 +53,25 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
 
-        embed.addField("gamble", `**${gambleWins.toLocaleString()}** win${gambleWins == 1 ? "" : "s"}\n**${gambleLoses.toLocaleString()}** loss${gambleLoses == 1 ? "" : "es"}`, true)
-        embed.addField("rob", `**${stats.rob.wins.toLocaleString()}** win${stats.rob.wins == 1 ? "" : "s"}\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`, true)
-        embed.addField("padlock", `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} bought`, true)
+        embed.addField(
+            "gamble",
+            `**${gambleWins.toLocaleString()}** win${
+                gambleWins == 1 ? "" : "s"
+            }\n**${gambleLoses.toLocaleString()}** loss${gambleLoses == 1 ? "" : "es"}`,
+            true
+        )
+        embed.addField(
+            "rob",
+            `**${stats.rob.wins.toLocaleString()}** win${
+                stats.rob.wins == 1 ? "" : "s"
+            }\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`,
+            true
+        )
+        embed.addField(
+            "padlock",
+            `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} bought`,
+            true
+        )
 
         return message.channel.send(embed)
     }
@@ -66,7 +82,15 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
 
         for (const gambleStat in stats) {
-            embed.addField(gambleStat, `**${stats[gambleStat].wins.toLocaleString()}** win${stats[gambleStat].wins == 1 ? "" : "s"}\n**${stats[gambleStat].lose.toLocaleString()}** loss${stats[gambleStat].lose == 1 ? "" : "es"}`, true)
+            embed.addField(
+                gambleStat,
+                `**${stats[gambleStat].wins.toLocaleString()}** win${
+                    stats[gambleStat].wins == 1 ? "" : "s"
+                }\n**${stats[gambleStat].lose.toLocaleString()}** loss${
+                    stats[gambleStat].lose == 1 ? "" : "es"
+                }`,
+                true
+            )
         }
 
         return message.channel.send(embed)
