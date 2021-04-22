@@ -9,6 +9,7 @@ const {
     calcMaxBet,
     getMulti,
     getPrestige,
+    addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -384,6 +385,7 @@ async function playGame(message, msg) {
 
     const lose = async () => {
         gamble(message.author, "minesweeper", bet, false, 0)
+        addGamble(message.member, "minesweeper", false)
         embed.setColor("#e4334f")
         embed.setDescription(
             "**bet** $" +
@@ -443,6 +445,7 @@ async function playGame(message, msg) {
             )
         }
         gamble(message.author, "minesweeper", bet, true, winnings)
+        addGamble(message.member, "minesweeper", true)
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
@@ -451,6 +454,7 @@ async function playGame(message, msg) {
 
     const draw = async () => {
         gamble(message.author, "minesweeper", bet, true, bet)
+        addGamble(message.member, "minesweeper", true)
         embed.setColor("#e5ff00")
         embed.setDescription(
             "**bet** $" +
