@@ -367,7 +367,7 @@ function getLastWeekly(member) {
 exports.getLastWeekly = getLastWeekly
 
 /**
- *
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  * @param {String} name
  */
 function getCommand(name) {
@@ -377,13 +377,13 @@ function getCommand(name) {
         if (cmd.trigger == name) {
             if (!isPremium(cmd.owner) || getTier(cmd.owner) < 3) {
                 delete commands[cmd]
-                return false
+                return null
             }
 
-            return cmd.content
+            return cmd
         }
     }
-    return false
+    return null
 }
 
 exports.getCommand = getCommand
@@ -391,7 +391,7 @@ exports.getCommand = getCommand
 /**
  *
  * @param {String} id
- * @returns {{ trigger: String, content: String, owner: String }}
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  */
 function getUserCommand(id) {
     return commands[id]
@@ -404,13 +404,25 @@ exports.getUserCommand = getUserCommand
  * @param {String} id
  * @param {String} trigger
  * @param {String} content
+ * @param {Number} uses
  */
 function setCommand(id, trigger, content) {
     commands[id] = {
         trigger: trigger,
         content: content,
         owner: id,
+        uses: 0,
     }
 }
 
 exports.setCommand = setCommand
+
+function addUse(id) {
+    if (!commands[id].uses) {
+        commands[id].uses = 1
+    } else {
+        commands[id].uses++
+    }
+}
+
+exports.addUse = addUse
