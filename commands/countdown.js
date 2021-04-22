@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
-const { getCountdowns, getPrefix, addCountdown } = require("../utils/guilds/utils")
+const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { formatDate } = require("../utils/utils")
 
@@ -165,6 +165,20 @@ async function run(message, args) {
         embed.setDescription("✅ countdown added")
 
         return message.channel.send(embed)
+    } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-" || args[0].toLowerCase() == "delete") {
+        if (args.length == 1) {
+            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}countdown delete <countdown id>`))
+        }
+
+        const countdowns = getCountdowns(message.guild)
+
+        if (Object.keys(countdowns).indexOf(args[1].toString()) == -1) {
+            return message.channel.send(new ErrorEmbed("invalid countdown use the countdown id"))
+        }
+
+        deleteCountdown(message.guild, args[1].toString())
+
+        return message.channel.send(new CustomEmbed(message.member, false, "✅ countdown deleted"))
     }
 
 }
