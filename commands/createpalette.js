@@ -85,7 +85,7 @@ async function run(message, args) {
         const role = await roles.find((r) => r.id == sortedRoleIDs[i])
 
         if (role.hexColor != "#000000") {
-            if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) break
+            if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) continue
             colors.push(role.hexColor.substr(1, 7))
         }
     }
