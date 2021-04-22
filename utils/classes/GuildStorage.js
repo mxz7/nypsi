@@ -40,7 +40,7 @@ class Countdown {
      * @param {String} format 
      * @param {String} finalFormat 
      * @param {String} channel
-     * @param {Number} id
+     * @param {String} id
      */
     constructor(date, format, finalFormat, channel, id) {
         this.date = date
