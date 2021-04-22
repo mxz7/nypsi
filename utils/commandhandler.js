@@ -362,11 +362,12 @@ async function runCommand(cmd, message, args) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return
             const customCommand = getCommand(cmd)
-            const content = customCommand.content
 
-            if (!content) {
+            if (!customCommand) {
                 return
             }
+            
+            const content = customCommand.content
 
             if (cooldown.has(message.author.id)) return
 
