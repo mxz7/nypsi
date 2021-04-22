@@ -1,5 +1,6 @@
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg } = require("../../config.json")
@@ -60,6 +61,19 @@ setInterval(() => {
     fs.writeFileSync("./utils/economy/backup/" + date + ".json", JSON.stringify(users))
     info("user data backup complete", types.DATA)
 }, 43200000)
+
+setInterval(() => {
+    const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+
+    if (JSON.stringify(stats) != JSON.stringify(stats1)) {
+        fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
+            if (err) {
+                return console.log(err)
+            }
+            info("economy stats data saved", types.DATA)
+        })
+    }
+}, 120000)
 
 setInterval(() => {
     for (let user in users) {
@@ -1003,7 +1017,7 @@ function reset() {
 
         let prestige = user.prestige
 
-        if (prestige > 10) prestige = 10 // REMOVE AFTER FIRST RESET
+        if (prestige > 14) prestige = 10 // REMOVE AFTER FIRST RESET
 
         if (prestige == 0) {
             delete users[id]
@@ -1018,10 +1032,106 @@ function reset() {
             updated++
         }
     }
+    stats = {}
     return { deleted: deleted, updated: updated }
 }
 
 exports.reset = reset
+
+/**
+ * @returns {{}}
+ * @param {GuildMember} member 
+ */
+function getStats(member) {
+    return stats[member.user.id]
+}
+
+exports.getStats = getStats
+
+function hasStatsProfile(member) {
+    if (stats[member.user.id]) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.hasStatsProfile = hasStatsProfile
+
+function createStatsProfile(member) {
+    stats[member.user.id] = {
+        gamble: {},
+        padlock: 0,
+        rob: {
+            wins: 0,
+            lose: 0
+        },
+    }
+}
+
+exports.createStatsProfile = createStatsProfile
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} game 
+ * @param {Boolean} win 
+ */
+function addGamble(member, game, win) {
+
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
+    if (stats[member.user.id].gamble[game]) {
+        if (win) {
+            stats[member.user.id].gamble[game].wins++
+        } else {
+            stats[member.user.id].gamble[game].lose++
+        }
+    } else {
+        if (win) {
+            stats[member.user.id].gamble[game] = {
+                wins: 1,
+                lose: 0
+            }
+        } else {
+            stats[member.user.id].gamble[game] = {
+                wins: 0,
+                lose: 1
+            }
+        }
+    }
+}
+
+exports.addGamble = addGamble
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Boolean} win 
+ */
+function addRob(member, win) {
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
+    if (win) {
+        stats[member.user.id].rob.wins++
+    } else {
+        stats[member.user.id].rob.lose++
+    }
+}
+
+exports.addRob = addRob
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function addPadlock(member) {
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
+    stats[member.user.id].padlock++
+}
+
+exports.addPadlock = addPadlock
 
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {

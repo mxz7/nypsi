@@ -49,7 +49,7 @@ setInterval(() => {
             info("premium commands data saved", types.DATA)
         })
     }
-}, 60000)
+}, 120000)
 
 setInterval(() => {
     let date = new Date()
