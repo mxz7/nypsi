@@ -9,6 +9,7 @@ const {
     getMulti,
     calcMaxBet,
     getPrestige,
+    addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
@@ -267,6 +268,7 @@ async function run(message, args) {
     })
 
     gamble(message.author, "rock paper scissors", bet, win, winnings)
+    addGamble(message.member, "rps", win)
 }
 
 cmd.setRun(run)
