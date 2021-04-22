@@ -81,7 +81,7 @@ async function run(message, args) {
     const colors = []
 
     for (let i = 0; i < sortedRoleIDs.length; i++) {
-        if (colors.length >= 100) return
+        if (colors.length >= 100) break
         const role = await roles.find((r) => r.id == sortedRoleIDs[i])
 
         if (role.hexColor != "#000000") {
