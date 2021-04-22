@@ -635,7 +635,7 @@ function runCountdowns(client) {
             runCountdowns()
         }, 86400000)
         runCountdowns()
-    }, 15000)
+    }, needed - now)
 
     info(`custom countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 }
