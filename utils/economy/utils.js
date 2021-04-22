@@ -1047,7 +1047,35 @@ function getStats(member) {
 
 exports.getStats = getStats
 
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} game 
+ * @param {Boolean} win 
+ */
+function addGamble(member, game, win) {
+    if (stats[member.user.id].gamble[game]) {
+        if (win) {
+            stats[member.user.id].gamble[game].wins++
+        } else {
+            stats[member.user.id].gamble[game].lose++
+        }
+    } else {
+        if (win) {
+            stats[member.user.id].gamble[game] = {
+                wins: 1,
+                lose: 0
+            }
+        } else {
+            stats[member.user.id].gamble[game] = {
+                wins: 0,
+                lose: 1
+            }
+        }
+    }
+}
 
+exports.addGamble = addGamble
 
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
