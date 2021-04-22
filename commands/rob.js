@@ -11,6 +11,7 @@ const {
     getDMsEnabled,
     hasVoted,
     isEcoBanned,
+    addRob,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -264,8 +265,10 @@ async function run(message, args) {
 
             if (getDMsEnabled(message.member)) {
                 if (robberySuccess) {
+                    addRob(message.member, true)
                     target.send("you have been robbed!!", embed3).catch(() => {})
                 } else {
+                    addRob(message.member, false)
                     target.send("you were nearly robbed!!", embed3).catch(() => {})
                 }
             }
