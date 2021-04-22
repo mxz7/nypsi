@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getStats } = require("../utils/economy/utils")
+const { getStats, hasStatsProfile, createStatsProfile } = require("../utils/economy/utils")
 
 const cmd = new Command("stats", "view your economy stats", categories.MONEY)
 
@@ -38,6 +38,8 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 15000)
 
+    if (!hasStatsProfile(message.member)) createStatsProfile(message.member)
+
     const normalStats = () => {
         const stats = getStats(message.member)
 
@@ -49,7 +51,7 @@ async function run(message, args) {
             gambleLoses += stats.gamble[gambleStats].lose
         }
 
-        const embed = new CustomEmbed(message.member, true)
+        const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
 
         embed.addField("gamble", `**${gambleWins.toLocaleString()}** win${gambleWins == 1 ? "" : "s"}\n**${gambleLoses.toLocaleString()}** loss${gambleLoses == 1 ? "" : "es"}`, true)
         embed.addField("rob", `**${stats.rob.wins.toLocaleString()}** win${stats.rob.wins == 1 ? "" : "s"}\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`, true)
@@ -61,7 +63,7 @@ async function run(message, args) {
     const gambleStats = () => {
         const stats = getStats(message.member).gamble
 
-        const embed = new CustomEmbed(message.member, true)
+        const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
 
         for (const gambleStat in stats) {
             embed.addField(gambleStat, `**${stats[gambleStat].wins.toLocaleString()}** win${stats[gambleStat].wins == 1 ? "" : "s"}\n**${stats[gambleStat].lose.toLocaleString()}** loss${stats[gambleStat].lose == 1 ? "" : "es"}`, true)
