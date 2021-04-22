@@ -600,12 +600,14 @@ function runCountdowns(client) {
             for (let countdown in guild.countdowns) {
                 countdown = guild.countdowns[countdown]
 
-                const days = daysUntil(new Date(countdown.date))
+                let days = daysUntil(new Date(countdown.date))
 
-                let message = countdown.format.split("%days%").join(days.toLocaleString())
+                let message
 
                 if (days == 0) {
                     message = countdown.finalFormat
+                } else {
+                    let message = countdown.format.split("%days%").join((days + 1).toLocaleString())
                 }
 
                 const embed = new CustomEmbed()
