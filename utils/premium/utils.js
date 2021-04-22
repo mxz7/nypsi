@@ -367,7 +367,7 @@ function getLastWeekly(member) {
 exports.getLastWeekly = getLastWeekly
 
 /**
- *
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  * @param {String} name
  */
 function getCommand(name) {
@@ -377,13 +377,13 @@ function getCommand(name) {
         if (cmd.trigger == name) {
             if (!isPremium(cmd.owner) || getTier(cmd.owner) < 3) {
                 delete commands[cmd]
-                return false
+                return null
             }
 
             return cmd
         }
     }
-    return false
+    return null
 }
 
 exports.getCommand = getCommand
