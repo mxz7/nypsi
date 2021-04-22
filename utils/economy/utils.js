@@ -1111,6 +1111,14 @@ function addRob(member, win) {
 
 exports.addRob = addRob
 
+function addPadlock(member, win) {
+    if (!hasStatsProfile(member)) createStatsProfile(member)
+
+    stats[member.user.id].padlock++
+}
+
+exports.addPadlock = addPadlock
+
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
 //         worker = parseInt(worker)
