@@ -1,5 +1,6 @@
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg } = require("../../config.json")
@@ -1035,6 +1036,18 @@ function reset() {
 }
 
 exports.reset = reset
+
+/**
+ * @returns {{}}
+ * @param {GuildMember} member 
+ */
+function getStats(member) {
+    return stats[member.user.id]
+}
+
+exports.getStats = getStats
+
+
 
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
