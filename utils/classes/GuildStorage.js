@@ -32,3 +32,21 @@ class GuildStorage {
 }
 
 exports.GuildStorage = GuildStorage
+
+class Countdown {
+    /**
+     * @returns {Countdown}
+     * @param {Date} date 
+     * @param {String} format 
+     * @param {String} finalFormat 
+     */
+    constructor(date, format, finalFormat) {
+        this.date = date
+        this.format = format
+        this.finalFormat = finalFormat
+
+        return this
+    }
+}
+
+exports.Countdown = Countdown
