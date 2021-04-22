@@ -1032,6 +1032,7 @@ function reset() {
             updated++
         }
     }
+    stats = {}
     return { deleted: deleted, updated: updated }
 }
 
