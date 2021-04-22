@@ -529,8 +529,8 @@ function updateDisabledCommands(guild, array) {
 exports.updateDisabledCommands = updateDisabledCommands
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  * @returns {{}}
  */
 function getCountdowns(guild) {
@@ -544,12 +544,12 @@ function getCountdowns(guild) {
 exports.getCountdowns = getCountdowns
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Date} date 
- * @param {String} format 
- * @param {String} finalFormat 
- * @param {String} channel 
+ *
+ * @param {Guild} guild
+ * @param {Date} date
+ * @param {String} format
+ * @param {String} finalFormat
+ * @param {String} channel
  */
 function addCountdown(guild, date, format, finalFormat, channel) {
     if (!guilds[guild.id].countdowns) {
@@ -568,9 +568,9 @@ function addCountdown(guild, date, format, finalFormat, channel) {
 exports.addCountdown = addCountdown
 
 /**
- * 
- * @param {Guild} guild 
- * @param {String} id 
+ *
+ * @param {Guild} guild
+ * @param {String} id
  */
 function deleteCountdown(guild, id) {
     delete guilds[guild.id].countdowns[id]
@@ -579,8 +579,8 @@ function deleteCountdown(guild, id) {
 exports.deleteCountdown = deleteCountdown
 
 /**
- * 
- * @param {Client} client 
+ *
+ * @param {Client} client
  */
 function runCountdowns(client) {
     const now = new Date()
@@ -623,13 +623,20 @@ function runCountdowns(client) {
 
                 if (!guildToSend) return
 
-                const channel = guildToSend.channels.cache.find(ch => ch.id == countdown.channel)
+                const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel)
 
-                await channel.send(embed).then(() => {
-                    info(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`)
-                }).catch(() => {
-                    error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
-                })
+                await channel
+                    .send(embed)
+                    .then(() => {
+                        info(
+                            `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`
+                        )
+                    })
+                    .catch(() => {
+                        error(
+                            `error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`
+                        )
+                    })
             }
         }
     }
