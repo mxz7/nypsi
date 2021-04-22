@@ -380,7 +380,7 @@ function getCommand(name) {
                 return false
             }
 
-            return cmd.content
+            return cmd
         }
     }
     return false
