@@ -6,6 +6,7 @@ const {
     createUser,
     userExists,
     getPadlockPrice,
+    addPadlock,
 } = require("../utils/economy/utils.js")
 const { getColor } = require("../utils/utils")
 const { MessageEmbed, Message } = require("discord.js")
@@ -78,6 +79,7 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
 
+        addPadlock(message.member)
         updateBalance(message.member, getBalance(message.member) - padlockPrice)
         setPadlock(message.member, true)
         return await message.channel.send(
