@@ -558,7 +558,7 @@ function addCountdown(guild, date, format, finalFormat, channel) {
 
     let id = 1
 
-    while (Object.keys(guilds[guild.id].countdowns).indexOf(id) != -1) {
+    while (Object.keys(guilds[guild.id].countdowns).indexOf(id.toString()) != -1) {
         id++
     }
 
