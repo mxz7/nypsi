@@ -11,6 +11,7 @@ const {
     getPrestigeRequirement,
     getPrestigeRequirementBal,
     getPrestige,
+    createStatsProfile,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -43,6 +44,7 @@ async function run(message, args) {
 
         if (args[1] == "reset") {
             createUser(target)
+            createStatsProfile(target)
             return message.react("✅")
         }
 
