@@ -531,7 +531,7 @@ exports.updateDisabledCommands = updateDisabledCommands
 /**
  * 
  * @param {Guild} guild 
- * @returns {Array<Countdown>}
+ * @returns {{}}
  */
 function getCountdowns(guild) {
     if (!guilds[guild.id].countdowns) {
