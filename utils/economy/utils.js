@@ -1056,6 +1056,8 @@ function hasStatsProfile(member) {
     }
 }
 
+exports.hasStatsProfile = hasStatsProfile
+
 function createStatsProfile(member) {
     stats[member.user.id] = {
         gamble: {},
@@ -1066,6 +1068,8 @@ function createStatsProfile(member) {
         },
     }
 }
+
+exports.createStatsProfile = createStatsProfile
 
 /**
  * 
