@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("stats", "view stats for the bot", categories.INFO)
+const cmd = new Command("botstats", "view stats for the bot", categories.INFO)
 
 /**
  * @param {Message} message
