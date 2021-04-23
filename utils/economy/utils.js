@@ -267,7 +267,7 @@ async function getMulti(member) {
 
     let multi = 0
 
-    const voted = await hasVoted(id)
+    const voted = hasVoted(id)
 
     if (voted) {
         multi += 10
@@ -859,7 +859,7 @@ exports.setDMsEnabled = setDMsEnabled
  */
 async function calcMaxBet(member) {
     const base = 100000
-    const voted = await hasVoted(member)
+    const voted = hasVoted(member)
     const bonus = 50000
 
     let total = base
