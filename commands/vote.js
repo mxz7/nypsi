@@ -56,7 +56,7 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
     const amount = 15000 * (getPrestige(message.member) + 1)
-    const voted = await hasVoted(message.member)
+    const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)
 
     const embed = new CustomEmbed(

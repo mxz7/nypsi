@@ -64,7 +64,7 @@ async function run(message, args) {
 
         if (userExists(user.id)) {
             let voted = false
-            if (await hasVoted(user.id)) voted = true
+            if (hasVoted(user.id)) voted = true
             embed.addField(
                 "economy",
                 "💰 $**" +
@@ -127,7 +127,7 @@ async function run(message, args) {
 
         if (userExists(user.id)) {
             let voted = false
-            if (await hasVoted(user.id)) voted = true
+            if (hasVoted(user.id)) voted = true
             embed.addField(
                 "economy",
                 "💰 $**" +
