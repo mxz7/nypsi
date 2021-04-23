@@ -3,8 +3,9 @@ let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
-const { topgg } = require("../../config.json")
-const DBL = require("dblapi.js")
+const { topgg: topggToken } = require("../../config.json")
+const topgg = require("@top-gg/sdk")
+const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
 const { EconProfile } = require("../classes/EconStorage")
@@ -13,8 +14,19 @@ const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
-const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
+
+const webhook = new topgg.Webhook("123")
+const topggStats = new topgg.Api(topggToken)
+const app = express()
 const voteCache = new Map()
+
+app.post("/dblwebhook", webhook.listener(vote => {
+    info(`received vote: ${vote.user}`)
+    const { onVote } = require("../../nypsi")
+    onVote(vote)
+}))
+
+app.listen(5000)
 
 let timer = 0
 let timerCheck = true
@@ -144,15 +156,6 @@ setInterval(() => {
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
 
-dbl.webhook.on("ready", (hook) => {
-    info(`webook running on http://${hook.hostname}:${hook.port}${hook.path}`)
-})
-
-dbl.webhook.on("vote", (vote) => {
-    const { onVote } = require("../../nypsi")
-    onVote(vote)
-})
-
 /**
  *
  * @param {Client} client
@@ -162,15 +165,11 @@ async function doVote(client, vote) {
     const { user } = vote
     const members = client.users.cache
 
-    voteCache.set(user, true)
-
-    setTimeout(() => {
-        if (voteCache.has(user)) {
-            voteCache.delete(user)
-        }
-    }, 21600000)
-
     if (!userExists(user)) return
+
+    const now = new Date().getTime()
+
+    users[user].lastVote = now
 
     let member = await members.find((m) => m.id == user)
 
@@ -179,6 +178,7 @@ async function doVote(client, vote) {
 
     if (!member) {
         member = user
+        memberID = user
         id = true
     } else {
         memberID = member.id
@@ -235,42 +235,24 @@ function removeFromVoteCache(member) {
 
 exports.removeFromVoteCache = removeFromVoteCache
 
-async function hasVoted(member) {
+function hasVoted(member) {
     let id = member
 
     if (member.user) id = member.user.id
 
-    if (voteCache.has(id)) {
-        return voteCache.get(id)
-    } else {
-        try {
-            const voted = await dbl.hasVoted(id)
+    const now = new Date().getTime()
 
-            if (voted) {
-                voteCache.set(id, true)
-                setTimeout(() => {
-                    if (voteCache.has(id)) {
-                        voteCache.delete(id)
-                    }
-                }, 900000)
-                return true
-            } else {
-                voteCache.set(id, false)
-                setTimeout(() => {
-                    if (voteCache.has(id)) {
-                        voteCache.delete(id)
-                    }
-                }, 60000)
-                return false
-            }
-        } catch {
-            voteCache.set(id, false)
-            setTimeout(() => {
-                voteCache.delete(id)
-            }, 600000)
-            error("dbl server error - 10 minute cache for " + id)
-            return false
-        }
+    let lastVote = users[id].lastVote
+
+    if (!lastVote) {
+        lastVote = 0
+        users[id].lastVote = 0
+    }
+
+    if (now - lastVote < 43200000) {
+        return true
+    } else {
+        return false
     }
 }
 
@@ -287,7 +269,7 @@ async function getMulti(member) {
 
     let multi = 0
 
-    const voted = await hasVoted(id)
+    const voted = hasVoted(id)
 
     if (voted) {
         multi += 10
@@ -780,9 +762,13 @@ exports.setPadlock = setPadlock
 /**
  *
  * @param {Number} guildCount guild count
+ * @param {Number} shardCount
  */
-async function updateStats(guildCount) {
-    return await dbl.postStats(guildCount)
+function updateStats(guildCount, shardCount) {
+    topggStats.postStats({
+        serverCount: guildCount,
+        shardCount: shardCount
+    })
 }
 
 exports.updateStats = updateStats
@@ -875,7 +861,7 @@ exports.setDMsEnabled = setDMsEnabled
  */
 async function calcMaxBet(member) {
     const base = 100000
-    const voted = await hasVoted(member)
+    const voted = hasVoted(member)
     const bonus = 50000
 
     let total = base

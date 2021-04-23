@@ -7,15 +7,7 @@ const { info, types } = require("../utils/logger")
  * @param {Guild} guild
  */
 module.exports = async (client, guild) => {
-    info(
-        "removed from server'" +
-            guild.name +
-            " (" +
-            guild.id +
-            ") ' new count: " +
-            client.guilds.cache.size,
-        types.GUILD
-    )
+    info(`removed from ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`, types.GUILD)
     setPrefix(guild, "$")
     updateDisabledCommands(guild, [])
 }
