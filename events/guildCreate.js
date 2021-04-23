@@ -1,6 +1,6 @@
 const { Guild, Client } = require("discord.js")
-const { setPrefix, updateDisabledCommands } = require("../guilds/utils")
-const { info, types } = require("../logger")
+const { hasGuild, createGuild } = require("../utils/guilds/utils")
+const { info, types } = require("../utils/logger")
 
 /**
  * @param {Client} client
@@ -8,7 +8,7 @@ const { info, types } = require("../logger")
  */
 module.exports = async (client, guild) => {
     info(
-        "removed from server'" +
+        "added to server '" +
             guild.name +
             " (" +
             guild.id +
@@ -16,6 +16,7 @@ module.exports = async (client, guild) => {
             client.guilds.cache.size,
         types.GUILD
     )
-    setPrefix(guild, "$")
-    updateDisabledCommands(guild, [])
+    if (!hasGuild(guild)) {
+        createGuild(guild)
+    }
 }
