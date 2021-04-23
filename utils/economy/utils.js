@@ -236,42 +236,24 @@ function removeFromVoteCache(member) {
 
 exports.removeFromVoteCache = removeFromVoteCache
 
-async function hasVoted(member) {
+function hasVoted(member) {
     let id = member
 
     if (member.user) id = member.user.id
 
-    if (voteCache.has(id)) {
-        return voteCache.get(id)
-    } else {
-        try {
-            const voted = await dbl.hasVoted(id)
+    const now = new Date().getTime()
 
-            if (voted) {
-                voteCache.set(id, true)
-                setTimeout(() => {
-                    if (voteCache.has(id)) {
-                        voteCache.delete(id)
-                    }
-                }, 900000)
-                return true
-            } else {
-                voteCache.set(id, false)
-                setTimeout(() => {
-                    if (voteCache.has(id)) {
-                        voteCache.delete(id)
-                    }
-                }, 60000)
-                return false
-            }
-        } catch {
-            voteCache.set(id, false)
-            setTimeout(() => {
-                voteCache.delete(id)
-            }, 600000)
-            error("dbl server error - 10 minute cache for " + id)
-            return false
-        }
+    let lastVote = users[id].lastVote
+
+    if (!lastVote) {
+        lastVote = 0
+        users[id].lastVote = 0
+    }
+
+    if (now - lastVote < 43200000) {
+        return true
+    } else {
+        return false
     }
 }
 
