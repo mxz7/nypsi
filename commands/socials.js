@@ -251,7 +251,7 @@ async function run(message, args) {
                         )
                     }
 
-                    const index = args[2].search(regex)
+                    const index = args[2].search(regex) // eslint-disable-line
 
                     if (index == -1) {
                         return message.channel.send(new ErrorEmbed("invalid email address"))
