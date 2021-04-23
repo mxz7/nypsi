@@ -9,7 +9,7 @@ const cmd = new Command(
     "countdown",
     "create and manage your server countdowns",
     categories.UTILITY
-).setAliases(["countdowns"])
+).setAliases(["countdowns"]).setPermissions(["MANAGE_SERVER"])
 
 /**
  *
