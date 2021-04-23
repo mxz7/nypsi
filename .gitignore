@@ -2,3 +2,5 @@ node_modules/
 backup/
 *.json
 !lists.json
+!package.json
+!package-lock.json
