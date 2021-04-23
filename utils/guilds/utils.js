@@ -645,7 +645,7 @@ function runCountdowns(client) {
                             `error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`
                         )
                     })
-                
+
                 if (days == 0) {
                     deleteCountdown(guildID, countdown.id)
                 }
