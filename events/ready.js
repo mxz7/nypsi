@@ -1,7 +1,7 @@
 const { Client } = require("discord.js")
-const { getRandomCommand } = require("../commandhandler")
-const { info, types } = require("../logger")
-const { daysUntilChristmas } = require("../utils")
+const { getRandomCommand } = require("../utils/commandhandler")
+const { info, types } = require("../utils/logger")
+const { daysUntilChristmas } = require("../utils/utils")
 
 /**
  * @param {Client} client
@@ -59,7 +59,7 @@ module.exports = async (client, startUp) => {
         })
     }, 15 * 60 * 1000)
 
-    const { commandsSize } = require("../commandhandler")
+    const { commandsSize } = require("../utils/commandhandler")
 
     let memberCount = 0
 

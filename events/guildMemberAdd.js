@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
-const { runCheck } = require("../guilds/utils")
-const { profileExists, isMuted, deleteMute } = require("../moderation/utils")
+const { runCheck } = require("../utils/guilds/utils")
+const { profileExists, isMuted, deleteMute } = require("../utils/moderation/utils")
 
 /**
  * @param {GuildMember} member

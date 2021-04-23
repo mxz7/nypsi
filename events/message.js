@@ -1,8 +1,8 @@
 const { Message, MessageEmbed } = require("discord.js")
-const { mentions } = require("../../nypsi")
-const { getChatFilter, getPrefix, inCooldown } = require("../guilds/utils")
-const { runCommand } = require("../commandhandler")
-const { info } = require("../logger")
+const { mentions } = require("../nypsi")
+const { getChatFilter, getPrefix, inCooldown } = require("../utils/guilds/utils")
+const { runCommand } = require("../utils/commandhandler")
+const { info } = require("../utils/logger")
 
 /**
  * @param {Message} message
