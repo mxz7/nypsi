@@ -11,7 +11,7 @@ const {
     isPremium,
 } = require("../utils/premium/utils")
 
-const cmd = new Command("customcommand", "create a custom command", categories.FUN).setAliases([
+const cmd = new Command("customcommand", "create a custom command", categories.ADMIN).setAliases([
     "mycommand",
     "mycmd",
 ])
