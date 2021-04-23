@@ -477,8 +477,9 @@ exports.getMaxBankBalance = getMaxBankBalance
  * @returns {Array<String>} global bal top
  * @param {Number} amount of people to pull
  * @param {Client} client
+ * @param {Boolean} anon
  */
-async function topAmountGlobal(amount, client) {
+async function topAmountGlobal(amount, client, anon) {
     const users1 = []
 
     for (let user in users) {
@@ -515,7 +516,11 @@ async function topAmountGlobal(amount, client) {
             let username = user
 
             if (member) {
-                username = member.tag
+                if (anon) {
+                    username = member.username
+                } else {
+                    username = member.tag
+                }
             }
 
             usersFinal[count] =
