@@ -5,11 +5,9 @@ const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { formatDate, daysUntil } = require("../utils/utils")
 
-const cmd = new Command(
-    "countdown",
-    "create and manage your server countdowns",
-    categories.UTILITY
-).setAliases(["countdowns"]).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("countdown", "create and manage your server countdowns", categories.UTILITY)
+    .setAliases(["countdowns"])
+    .setPermissions(["MANAGE_SERVER"])
 
 /**
  *
