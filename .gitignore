@@ -1,10 +1,4 @@
 node_modules/
-users.json
-data.json
 backup/
-config.json
-slotsmulti.json
-lists.json
-ban.json
-commands.json
-stats.json
+*.json
+!lists.json
