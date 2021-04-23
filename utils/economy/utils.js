@@ -3,8 +3,9 @@ let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
-const { topgg } = require("../../config.json")
-const DBL = require("dblapi.js")
+const { topggToken } = require("../../config.json")
+const topgg = require("@top-gg/sdk")
+const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
 const { EconProfile } = require("../classes/EconStorage")
@@ -13,8 +14,17 @@ const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
-const dbl = new DBL(topgg, { webhookPort: 5000, webhookAuth: "123" })
+
+const webhook = new topgg.Webhook("123")
+const app = express()
 const voteCache = new Map()
+
+app.post("/dblwebhook", webhook.listener(vote => {
+    const { onVote } = require("../../nypsi")
+    onVote(vote)
+}))
+
+app.listen(5000)
 
 let timer = 0
 let timerCheck = true
@@ -143,15 +153,6 @@ setInterval(() => {
     padlockPrice = 25000 + randomOffset()
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
-
-dbl.webhook.on("ready", (hook) => {
-    info(`webook running on http://${hook.hostname}:${hook.port}${hook.path}`)
-})
-
-dbl.webhook.on("vote", (vote) => {
-    const { onVote } = require("../../nypsi")
-    onVote(vote)
-})
 
 /**
  *
