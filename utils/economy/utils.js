@@ -178,6 +178,7 @@ async function doVote(client, vote) {
 
     if (!member) {
         member = user
+        memberID = user
         id = true
     } else {
         memberID = member.id
