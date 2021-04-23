@@ -399,8 +399,10 @@ async function runCommand(cmd, message, args) {
                 }
             }
 
+            message.content += ` [custom cmd - ${customCommand.owner}]`
+
             addUse(customCommand.owner)
-            logCommand(message, ["", `[custom cmd - ${customCommand.owner}]`])
+            logCommand(message, ["", "", ""])
 
             const embed = new CustomEmbed(message.member, false, content).setFooter(
                 `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
