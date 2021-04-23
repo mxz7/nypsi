@@ -6,7 +6,7 @@ const {
     addMember,
     getTier,
     expireUser,
-} = require("../premium/utils")
+} = require("../utils/premium/utils")
 
 /**
  * @param {GuildMember} oldMember

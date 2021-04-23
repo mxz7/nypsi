@@ -1,14 +1,29 @@
-const { snipe } = require("../../nypsi")
-const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../guilds/utils")
+const { eSnipe } = require("../nypsi")
+const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../utils/guilds/utils")
 const { Message } = require("discord.js")
 
 /**
  * @param {Message} message
+ * @param {Message} newMessage
  */
-module.exports = (message) => {
+module.exports = async (message, newMessage) => {
     if (!message) return
 
     if (!message.member) return
+
+    if (!message.member.hasPermission("ADMINISTRATOR")) {
+        const filter = getChatFilter(message.guild)
+
+        let content = newMessage.content.toLowerCase().normalize("NFD")
+
+        content = content.replace(/[^A-z0-9\s]/g, "")
+
+        for (let word of filter) {
+            if (content.includes(word.toLowerCase())) {
+                return await message.delete()
+            }
+        }
+    }
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
         if (!hasGuild(message.guild)) createGuild(message.guild)
@@ -29,7 +44,7 @@ module.exports = (message) => {
             if (content.includes(word.toLowerCase())) return
         }
 
-        snipe.set(message.channel.id, {
+        eSnipe.set(message.channel.id, {
             content: message.content,
             member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
@@ -38,6 +53,6 @@ module.exports = (message) => {
             },
         })
 
-        exports.snipe = snipe
+        exports.eSnipe = eSnipe
     }
 }
