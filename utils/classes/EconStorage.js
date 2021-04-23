@@ -14,6 +14,7 @@ class EconProfile {
         this.padlock = false
         this.dms = true
         this.workers = {}
+        this.lastVote = 0
         return this
     }
 }
