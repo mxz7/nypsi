@@ -1,0 +1,18 @@
+name: Linting
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: bahmutov/npm-install@v1
+
+      - run: npx eslint ./
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
