@@ -354,14 +354,10 @@ async function run(message, args) {
             amount = parseInt(args[1])
         }
 
-        const balTop = topAmountGlobal(amount)
+        const balTop = await topAmountGlobal(amount, message.client, false)
 
-        const filtered = balTop.filter(function (el) {
-            return el != null
-        })
-
-        const embed = new CustomEmbed(message.member, false, filtered).setTitle(
-            "top " + filtered.length
+        const embed = new CustomEmbed(message.member, false, balTop).setTitle(
+            "top " + balTop.length
         )
 
         message.channel.send(embed)
