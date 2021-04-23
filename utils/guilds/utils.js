@@ -573,6 +573,14 @@ exports.addCountdown = addCountdown
  * @param {String} id
  */
 function deleteCountdown(guild, id) {
+    let guildID
+
+    if (!guild.id) {
+        guildID = guild
+    } else {
+        guildID = guild.id
+    }
+
     delete guilds[guild.id].countdowns[id]
 }
 
@@ -637,6 +645,10 @@ function runCountdowns(client) {
                             `error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`
                         )
                     })
+                
+                if (days == 0) {
+                    deleteCountdown(guildID, countdown.id)
+                }
             }
         }
     }
