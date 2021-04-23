@@ -204,7 +204,7 @@ async function run(message, args) {
                 "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
             )
 
-            const voted = await hasVoted(message.member)
+            const voted = hasVoted(message.member)
 
             if (voted) {
                 updateXp(message.member, getXp(message.member) + 1)

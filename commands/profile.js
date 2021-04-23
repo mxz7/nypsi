@@ -67,7 +67,7 @@ async function run(message, args) {
     const prestige = getPrestige(message.member).toLocaleString()
     const maxBet = await calcMaxBet(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%"
-    const voted = await hasVoted(message.member)
+    const voted = hasVoted(message.member)
 
     embed.addField(
         "💰 economy",
