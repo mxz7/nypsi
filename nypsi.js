@@ -128,11 +128,11 @@ async function runChecks() {
     if (client.user.id != "678711738845102087") return
 
     setInterval(async () => {
-        await updateStats(client.guilds.cache.size)
+        await updateStats(client.guilds.cache.size, client.options.shardCount)
         info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
     }, 3600000)
 
-    await updateStats(client.guilds.cache.size)
+    await updateStats(client.guilds.cache.size, client.options.shardCount)
     info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
 }
 
