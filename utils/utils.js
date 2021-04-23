@@ -425,7 +425,7 @@ async function showTopGlobalBal(client) {
             return error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP")
         }
 
-        const baltop = await topAmountGlobal(10, client)
+        const baltop = await topAmountGlobal(10, client, true)
 
         const embed = new CustomEmbed()
 
