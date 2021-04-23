@@ -61,6 +61,9 @@ client.on("message", message.bind(null))
 client.on("channelCreate", channelCreate.bind(null))
 
 client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
+client.on("shardDisconnect", (s, shardID) => info(`shard#${shardID} disconnected`))
+client.on("shardError", (error, shardID) => error(`shard#${shardID} error: ${error}`))
+client.on("shardReconnecting", (shardID) => info(`shard#${shardID} connecting`))
 
 process.on("unhandledRejection", (e) => {
     let stack = e.stack.split("\n").join("\n\x1b[31m")
