@@ -21,6 +21,7 @@ const app = express()
 const voteCache = new Map()
 
 app.post("/dblwebhook", webhook.listener(vote => {
+    info(`received vote: ${vote.user}`)
     const { onVote } = require("../../nypsi")
     onVote(vote)
 }))
