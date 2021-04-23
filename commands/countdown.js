@@ -139,7 +139,7 @@ async function run(message, args) {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
             })
-        
+
         if (fail) return
 
         res = res.first()
@@ -164,7 +164,7 @@ async function run(message, args) {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
             })
-        
+
         if (fail) return
 
         res = res.first().content
@@ -191,7 +191,7 @@ async function run(message, args) {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
             })
-        
+
         if (fail) return
 
         res = res.first().content
@@ -209,7 +209,9 @@ async function run(message, args) {
 
         await channel.send(embedd).catch(() => {
             fail = true
-            return message.channel.send(new ErrorEmbed("failed to send countdown - check my permissions"))
+            return message.channel.send(
+                new ErrorEmbed("failed to send countdown - check my permissions")
+            )
         })
 
         if (fail) return
@@ -243,7 +245,13 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, true)
 
         embed.setTitle("countdown | " + message.author.username)
-        embed.setDescription(`${getPrefix(message.guild)}**countdown create** *create a countdown*\n${getPrefix(message.guild)}**countdown del <id>** *delete a countdown*\n${getPrefix(message.guild)}**countdown** *list all active countdowns*`)
+        embed.setDescription(
+            `${getPrefix(message.guild)}**countdown create** *create a countdown*\n${getPrefix(
+                message.guild
+            )}**countdown del <id>** *delete a countdown*\n${getPrefix(
+                message.guild
+            )}**countdown** *list all active countdowns*`
+        )
 
         return message.channel.send(embed)
     }
