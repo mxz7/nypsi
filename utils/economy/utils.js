@@ -20,11 +20,14 @@ const topggStats = new topgg.Api(topggToken)
 const app = express()
 const voteCache = new Map()
 
-app.post("/dblwebhook", webhook.listener(vote => {
-    info(`received vote: ${vote.user}`)
-    const { onVote } = require("../../nypsi")
-    onVote(vote)
-}))
+app.post(
+    "/dblwebhook",
+    webhook.listener((vote) => {
+        info(`received vote: ${vote.user}`)
+        const { onVote } = require("../../nypsi")
+        onVote(vote)
+    })
+)
 
 app.listen(5000)
 
@@ -767,7 +770,7 @@ exports.setPadlock = setPadlock
 function updateStats(guildCount, shardCount) {
     topggStats.postStats({
         serverCount: guildCount,
-        shardCount: shardCount
+        shardCount: shardCount,
     })
 }
 
