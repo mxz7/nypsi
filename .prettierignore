@@ -1,4 +1,4 @@
 *.json
 *.yml
-*.json
 *.md
+!lists.json
