@@ -16,6 +16,7 @@ const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 
 const webhook = new topgg.Webhook("123")
+const topggStats = new topgg.Api(topggToken)
 const app = express()
 const voteCache = new Map()
 
@@ -163,15 +164,11 @@ async function doVote(client, vote) {
     const { user } = vote
     const members = client.users.cache
 
-    voteCache.set(user, true)
-
-    setTimeout(() => {
-        if (voteCache.has(user)) {
-            voteCache.delete(user)
-        }
-    }, 21600000)
-
     if (!userExists(user)) return
+
+    const now = new Date().getTime()
+
+    users[user].lastVote = now
 
     let member = await members.find((m) => m.id == user)
 
@@ -763,9 +760,13 @@ exports.setPadlock = setPadlock
 /**
  *
  * @param {Number} guildCount guild count
+ * @param {Number} shardCount
  */
-async function updateStats(guildCount) {
-    return await dbl.postStats(guildCount)
+function updateStats(guildCount, shardCount) {
+    topggStats.postStats({
+        serverCount: guildCount,
+        shardCount: shardCount
+    })
 }
 
 exports.updateStats = updateStats
