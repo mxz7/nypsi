@@ -619,7 +619,7 @@ function runCountdowns(client) {
                 if (days == 0) {
                     message = countdown.finalFormat
                 } else {
-                    let message = countdown.format.split("%days%").join((days + 1).toLocaleString())
+                    message = countdown.format.split("%days%").join((days + 1).toLocaleString())
                 }
 
                 const embed = new CustomEmbed()
