@@ -166,7 +166,6 @@ setInterval(() => {
  */
 async function doVote(client, vote) {
     const { user } = vote
-    const members = client.users.cache
 
     if (!userExists(user)) return
 
@@ -174,7 +173,7 @@ async function doVote(client, vote) {
 
     users[user].lastVote = now
 
-    let member = await members.find((m) => m.id == user)
+    let member = await client.users.fetch(user)
 
     let id = false
     let memberID
