@@ -625,7 +625,7 @@ function runCountdowns(client) {
                 const embed = new CustomEmbed()
 
                 embed.setDescription(message)
-                embed.setColor("#37393f")
+                embed.setColor("#111111")
 
                 const guildToSend = await client.guilds.fetch(guildID)
 
