@@ -637,7 +637,8 @@ function runCountdowns(client) {
                     .send(embed)
                     .then(() => {
                         info(
-                            `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`, types.AUTOMATION
+                            `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`,
+                            types.AUTOMATION
                         )
                     })
                     .catch(() => {
