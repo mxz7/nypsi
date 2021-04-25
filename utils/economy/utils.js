@@ -1009,16 +1009,20 @@ function reset() {
         let user = users[id]
 
         let prestige = user.prestige
+        let lastVote = user.lastVote
+
+        if (!lastVote) lastVote = 0
 
         if (prestige > 14) prestige = 10 // REMOVE AFTER FIRST RESET
 
-        if (prestige == 0) {
+        if (prestige == 0 && lastVote == 0) {
             delete users[id]
             info("deleted " + id)
             deleted++
         } else {
             user = new EconProfile()
             user.prestige = prestige
+            user.lastVote = lastVote
 
             users[id] = user
             info("updated " + id)
