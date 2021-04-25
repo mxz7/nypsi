@@ -9,10 +9,14 @@ const cmd = new Command("servericon", "get the server icon", categories.INFO)
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    return message.channel.send(new CustomEmbed(message.member, false).setImage(message.guild.iconURL({
-        size: 256,
-        dynamic: true,
-    })))
+    return message.channel.send(
+        new CustomEmbed(message.member, false).setImage(
+            message.guild.iconURL({
+                size: 256,
+                dynamic: true,
+            })
+        )
+    )
 }
 
 cmd.setRun(run)
