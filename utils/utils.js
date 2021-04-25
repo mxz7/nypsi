@@ -17,7 +17,7 @@ const locked = []
  */
 function getColor(member) {
     if (member.displayHexColor == "#ffffff") {
-        return "#f8f8ff"
+        return "#111111"
     } else {
         return member.displayHexColor
     }
@@ -431,7 +431,7 @@ async function showTopGlobalBal(client) {
 
         embed.setTitle("top 10 richest users")
         embed.setDescription(baltop)
-        embed.setColor("#000001")
+        embed.setColor("#111111")
 
         await channel.send(embed)
         info("sent global bal top", types.AUTOMATION)
