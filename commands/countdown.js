@@ -40,7 +40,7 @@ async function run(message, args) {
 
                 embed.addField(
                     countdown.id,
-                    `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** ${countdown.format}\n**final format** ${countdown.finalFormat}\n**date** ${date}`
+                    `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** \`${countdown.format}\`\n**final format** \`${countdown.finalFormat}\`\n**date** \`${date}\``
                 )
             }
         }
