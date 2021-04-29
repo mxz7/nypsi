@@ -263,7 +263,7 @@ async function run(message, args) {
         setTimeout(async () => {
             await m.edit(embed2)
 
-            if (getDMsEnabled(message.member)) {
+            if (getDMsEnabled(target)) {
                 if (robberySuccess) {
                     addRob(message.member, true)
                     target.send("you have been robbed!!", embed3).catch(() => {})
