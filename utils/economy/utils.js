@@ -167,15 +167,12 @@ async function updateBitcoinWorth() {
     const worth = Math.floor(res.bpi.USD.rate_float)
 
     items["bitcoin"].worth = worth
-    return info("bitcoin worth set: $" + items["bitcoin"].worth, types.ECONOMY)
+    return info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
 }
 
 updateBitcoinWorth()
 
-setInterval(async () => {
-    await updateBitcoinWorth()
-    info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
-}, 3600000)
+setInterval(updateBitcoinWorth, 1500000)
 
 /**
  *
