@@ -163,7 +163,9 @@ setInterval(() => {
 }, 3600000)
 
 async function updateBitcoinWorth() {
-    const res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then(res => res.json())
+    const res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) =>
+        res.json()
+    )
 
     const worth = Math.floor(res.bpi.USD.rate_float)
 
@@ -1146,9 +1148,9 @@ function addPadlock(member) {
 exports.addPadlock = addPadlock
 
 /**
- * 
- * @param {GuildMember} member 
- * @returns 
+ *
+ * @param {GuildMember} member
+ * @returns
  */
 function getInventory(member) {
     if (!users[member.user.id].inventory) {
@@ -1161,9 +1163,9 @@ function getInventory(member) {
 exports.getInventory = getInventory
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Object} inventory 
+ *
+ * @param {GuildMember} member
+ * @param {Object} inventory
  */
 function setInventory(member, inventory) {
     users[member.user.id].inventory = inventory
