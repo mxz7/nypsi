@@ -15,6 +15,7 @@ class EconProfile {
         this.dms = true
         this.workers = {}
         this.lastVote = 0
+        this.inventory = {}
         return this
     }
 }
