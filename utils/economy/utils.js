@@ -1,6 +1,7 @@
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
@@ -14,6 +15,7 @@ const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
+const fetch = require("node-fetch")
 
 const webhook = new topgg.Webhook("123")
 const topggStats = new topgg.Api(topggToken)
@@ -157,6 +159,22 @@ let padlockPrice = 25000 + randomOffset()
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
+}, 3600000)
+
+async function updateBitcoinWorth() {
+    const res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then(res => res.json())
+
+    const worth = Math.floor(res.bpi.USD.rate_float)
+
+    items["bitcoin"].worth = worth
+    return info("bitcoin worth set: $" + items["bitcoin"].worth, types.ECONOMY)
+}
+
+updateBitcoinWorth()
+
+setInterval(async () => {
+    await updateBitcoinWorth()
+    info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
 }, 3600000)
 
 /**
