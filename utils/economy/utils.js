@@ -1129,6 +1129,32 @@ function addPadlock(member) {
 
 exports.addPadlock = addPadlock
 
+/**
+ * 
+ * @param {GuildMember} member 
+ * @returns 
+ */
+function getInventory(member) {
+    if (!users[member.user.id].inventory) {
+        users[member.user.id].inventory = {}
+        return {}
+    }
+    return users[member.user.id].inventory
+}
+
+exports.getInventory = getInventory
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Object} inventory 
+ */
+function setInventory(member, inventory) {
+    users[member.user.id].inventory = inventory
+}
+
+exports.setInventory = setInventory
+
 // for (const user in users) {
 //     for (let worker in getWorkers(user)) {
 //         worker = parseInt(worker)
