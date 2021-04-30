@@ -1170,3 +1170,9 @@ function setInventory(member, inventory) {
 }
 
 exports.setInventory = setInventory
+
+function getItems() {
+    return items
+}
+
+exports.getItems = getItems
