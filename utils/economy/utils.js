@@ -155,10 +155,12 @@ function randomOffset() {
 }
 
 let padlockPrice = 25000 + randomOffset()
+items["padlock"].worth = padlockPrice
 info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
+    items["padlock"].worth = padlockPrice
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
 
