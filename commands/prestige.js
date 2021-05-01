@@ -142,7 +142,7 @@ async function run(message, args) {
                 `new vote rewards: $**${(
                     15000 *
                     (getPrestige(message.member) + 1)
-                ).toLocaleString()}**\n` +
+                ).toLocaleString()}**, **${getPrestige(message.member) + 1}** vote crates\n` +
                 `your new multiplier: **${Math.floor(
                     multi * 100
                 )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`
