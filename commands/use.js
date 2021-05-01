@@ -1,7 +1,7 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock } = require("../utils/economy/utils")
+const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock, getMaxBitcoin, getMaxDogecoin } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -255,6 +255,24 @@ function openCrate(member, item) {
         }
 
         const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)]
+
+        if (chosen == "bitcoin") {
+            const owned = inventory["bitcoin"] || 0
+            const max = getMaxBitcoin(member)
+
+            if (owned + 1 > max) {
+                i--
+                continue
+            }
+        } else if (chosen == "dogecoin") {
+            const owned = inventory["dogecoin"] || 0
+            const max = getMaxDogecoin(member)
+
+            if (owned + 1 > max) {
+                i--
+                continue
+            }
+        }
 
         if (chosen.includes("money:") || chosen.includes("xp:")) {
             if (chosen.includes("money:")) {
