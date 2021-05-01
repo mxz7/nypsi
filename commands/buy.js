@@ -62,6 +62,10 @@ async function run(message, args) {
 
     selected = items[selected]
 
+    if (!selected) {
+        return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
+    }
+
     if (!selected.worth || selected.role == "collectable" || selected.role == "prey" || selected.role == "fish") {
         return message.channel.send(new ErrorEmbed("you cannot buy this item"))
     }
