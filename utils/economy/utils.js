@@ -1223,4 +1223,4 @@ function getMaxDogecoin(member) {
     return (base + prestigeBonus + xpBonus) * 100
 }
 
-exports.getMaxBitcoin = getMaxBitcoin
+exports.getMaxDogecoin = getMaxDogecoin
