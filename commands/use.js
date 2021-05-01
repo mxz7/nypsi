@@ -1,7 +1,7 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser } = require("../utils/economy/utils")
+const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -183,14 +183,14 @@ function openCrate(member, item) {
     setInventory(member, inventory)
 
     let times = 2
+    const names = []
 
     if (item.id.includes("vote")) {
         times = 1
     } else if (item.id.includes("69420")) {
         updateBalance(member, getBalance(member) + 69420)
+        names.push("$69,420")
     }
-
-    const names = []
 
     for (let i = 0; i < times; i++) {
         const crateItemsModified = []
@@ -225,13 +225,26 @@ function openCrate(member, item) {
 
         const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)]
 
-        if (inventory[chosen]) {
-            inventory[chosen]++
-        } else {
-            inventory[chosen] = 1
-        }
+        if (chosen.includes("money:") || chosen.includes("xp:")) {
+            if (chosen.includes("money:")) {
+                const amount = parseInt(chosen.substr(6))
 
-        names.push(`${items[chosen].emoji} ${items[chosen].name}`)
+                updateBalance(member, getBalance(member) + amount)
+                names.push("$" + amount.toLocaleString())
+            } else if (chosen.includes("xp:")) {
+                const amount = parseInt(chosen.substr(3))
+
+                updateXp(member, getXp(member) + amount)
+                names.push(amount + "xp")
+            }
+        } else {
+            if (inventory[chosen]) {
+                inventory[chosen]++
+            } else {
+                inventory[chosen] = 1
+            }
+            names.push(`${items[chosen].emoji} ${items[chosen].name}`)
+        }
     }
 
     setInventory(member, inventory)
