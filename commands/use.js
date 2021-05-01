@@ -1,7 +1,7 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp } = require("../utils/economy/utils")
+const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -163,6 +163,23 @@ async function run(message, args) {
         embed.setDescription("you look at your calendar to check the date..")
 
         laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
+    } else if (selected.id == "padlock") {
+        if (hasPadlock(message.member)) {
+            return message.channel.send(new ErrorEmbed("you already have a padlock on your balance"))
+        }
+
+        setPadlock(message.member, true)
+        inventory["padlock"]--
+
+        if (inventory["padlock"] == 0) {
+            delete inventory["padlock"]
+        }
+
+        setInventory(message.member, inventory)
+        
+        addPadlock(message.member)
+
+        embed.setDescription("✅ your padlock has been applied")
     }
 
     const msg = await message.channel.send(embed)
