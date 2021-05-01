@@ -30,7 +30,7 @@ async function run(message, args) {
         `**worth** $${dogecoin.worth.toLocaleString()}\n**owned** ${dogecoinAmount.toLocaleString()} ($${(
             dogecoinAmount * dogecoin.worth
         ).toLocaleString()})`
-    ).setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
+    ).setFooter("not real dogecoin, although it reflects current worth in USD x 1000").setTitle("dogecoin | " + message.author.username)
 
     return message.channel.send(embed)
 }
