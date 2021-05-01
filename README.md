@@ -29,7 +29,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 ##### 💸 gambling / economy
 
--   nypsi has a decent economy system mainly focused on gambling and working as a team to rob people who find themselves with a lot of money. i'd like to think that the `$blackjack` command is as realistic as you can get with a discord bot
+-   nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
 
 ##### 🛠 moderation
 
