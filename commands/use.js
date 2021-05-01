@@ -141,6 +141,8 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`))
     } else if (selected.id.includes("fishing")) {
         return message.channel.send(new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`))
+    } else if (selected.id.includes("coin")) {
+        return message.channel.send(new ErrorEmbed("you cant use a coin 🙄"))
     }
 
     const embed = new CustomEmbed(message.member).setTitle("use | " + message.author.username)
@@ -153,6 +155,14 @@ async function run(message, args) {
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
 
         laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
+    } else if (selected.id.includes("watch")) {
+        embed.setDescription("you look down at your watch to check the time..")
+
+        laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
+    } else if (selected.id.includes("calendar")) {
+        embed.setDescription("you look at your calendar to check the date..")
+
+        laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
     }
 
     const msg = await message.channel.send(embed)
@@ -242,10 +252,20 @@ function openCrate(member, item) {
                 names.push(amount + "xp")
             }
         } else {
+            let amount = 1
+
+            if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun") {
+                amount = 25
+            } else if (chosen == "fishing_rod" || chosen == "gun") {
+                amount = 50
+            } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun") {
+                amount = 100
+            }
+
             if (inventory[chosen]) {
-                inventory[chosen]++
+                inventory[chosen] += amount
             } else {
-                inventory[chosen] = 1
+                inventory[chosen] = amount
             }
             names.push(`${items[chosen].emoji} ${items[chosen].name}`)
         }
