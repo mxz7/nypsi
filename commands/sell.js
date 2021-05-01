@@ -10,10 +10,11 @@ const {
     getMaxDogecoin,
     updateBalance,
     setInventory,
+    getMulti,
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("buy", "buy items from the shop", categories.MONEY)
+const cmd = new Command("sell", "sell items", categories.MONEY)
 
 const cooldown = new Map()
 
@@ -87,6 +88,8 @@ async function run(message, args) {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             }
+        } else if (args[1].toLowerCase() == "all") {
+            args[1] = inventory[selected.id]
         }
         amount = parseInt(args[1])
     }
@@ -109,7 +112,29 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`you don't have enough ${selected.name}`))
     }
 
-    
+    inventory[selected.id] -= amount
+
+    if (inventory[selected.id] == 0) {
+        delete inventory[selected.id]
+    }
+
+    setInventory(message.member, inventory)
+
+    let sellWorth = selected.worth * 0.5
+
+    const multi = await getMulti(message.member)
+
+    if (selected.role == "fish" || selected.role == "prey") {
+        sellWorth = sellWorth + sellWorth * multi
+    }
+
+    updateBalance(message.member, getBalance(message.member) + sellWorth)
+
+    const embed = new CustomEmbed(message.member, false)
+
+    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 ? `(+**${multi}**% bonus)` : ""}`)
+
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)
