@@ -142,9 +142,11 @@ async function run(message, args) {
     let laterDescription
 
     if (selected.role == "crate") {
-        const items = openCrate(message.member, selected)
+        const itemsFound = openCrate(message.member, selected)
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
+
+        laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     }
 
     const msg = await message.channel.send(embed)
@@ -227,7 +229,7 @@ function openCrate(member, item) {
             inventory[chosen] = 1
         }
 
-        names.push(chosen)
+        names.push(`${items[chosen].emoji} ${items[chosen].name}`)
     }
 
     setInventory(member, inventory)
