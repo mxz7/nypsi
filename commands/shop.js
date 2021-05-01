@@ -62,7 +62,7 @@ async function run(message, args) {
     let pageOfItems = []
     for (const item of itemIDs) {
         if (!items[item].worth) continue
-        if (items[item].role && (items[item].role == "prey" || items[item].role == "fish")) continue
+        if (items[item].role == "prey" || items[item].role == "fish" || items[item].role == "collectable") continue
         if (pageOfItems.length == 5) {
             pages.push(pageOfItems)
             pageOfItems = [item]
