@@ -60,7 +60,7 @@ async function run(message, args) {
     const itemIDs = Array.from(Object.keys(inventory))
 
     if (itemIDs.length == 0) {
-        return message.channel.send(new CustomEmbed("your inventory is empty").setTitle("inventory | " + message.author.username))
+        return message.channel.send(new CustomEmbed(message.member, false, "your inventory is empty").setTitle("inventory | " + message.author.username))
     }
 
     inPlaceSort(itemIDs).asc()
