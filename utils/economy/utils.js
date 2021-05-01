@@ -14,6 +14,7 @@ const { isPremium, getTier } = require("../premium/utils")
 const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
+const fetch = require("node-fetch")
 
 const webhook = new topgg.Webhook("123")
 const topggStats = new topgg.Api(topggToken)
@@ -771,6 +772,12 @@ function updateStats(guildCount, shardCount) {
         serverCount: guildCount,
         shardCount: shardCount,
     })
+
+    // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
+    //     method: "POST",
+    //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
+    //     headers: { "Content-Type": "application/json", "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGkiOnRydWUsImlkIjoiNjcyNzkzODIxODUwODk0MzQ3IiwiaWF0IjoxNjE5ODc1NzIxfQ.1O-6p6QRaSnj4jS0nnRLP33_jpxaljJT65n_-LQ3BDw" }
+    // }) FOR POSTING TO DISCORD.BOTS.GG
 }
 
 exports.updateStats = updateStats
