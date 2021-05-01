@@ -59,6 +59,10 @@ if (cooldown.has(message.member.id)) {
 
     selected = items[selected]
 
+    if (!selected.worth || selected.role == "collectable" || selected.role == "prey" || selected.role == "fish") {
+        return message.channel.send(new ErrorEmbed("you cannot buy this item"))
+    }
+
     let amount = 1
 
     if (args.length != 1) {
