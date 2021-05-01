@@ -47,9 +47,7 @@ async function run(message, args) {
             new CustomEmbed(
                 message.member,
                 false,
-                `buy items from ${getPrefix(
-                    message.guild
-                )}shop by using the item id or item name without spaces`
+                "sell items from your inventory\n\ncoins have a set fee of **10**% per coin, while standard items have a **40**% fee"
             )
         )
     }
@@ -84,13 +82,13 @@ async function run(message, args) {
     let amount = 1
 
     if (args.length != 1) {
-        if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
+        if (args[1].toLowerCase() == "all") {
+            args[1] = inventory[selected.id]
+        } else if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             }
-        } else if (args[1].toLowerCase() == "all") {
-            args[1] = inventory[selected.id]
-        }
+        } 
         amount = parseInt(args[1])
     }
 
@@ -120,19 +118,21 @@ async function run(message, args) {
 
     setInventory(message.member, inventory)
 
-    let sellWorth = selected.worth * 0.5
+    let sellWorth = Math.floor((selected.worth * 0.5) * amount)
 
     const multi = await getMulti(message.member)
 
     if (selected.role == "fish" || selected.role == "prey") {
-        sellWorth = sellWorth + sellWorth * multi
+        sellWorth = Math.floor(sellWorth + sellWorth * multi)
+    } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
+        sellWorth = Math.floor((selected.worth * 0.5) * amount)
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 ? `(+**${multi}**% bonus)` : ""}`)
+    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 && (selected.role == "fish" || selected.role == "prey") ? `(+**${multi}**% bonus)` : selected.id == "bitcoin" || selected.id == "dogecoin" ? "(-**10**% fee)" : ""}`)
 
     return message.channel.send(embed)
 }
