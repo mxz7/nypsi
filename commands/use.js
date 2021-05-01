@@ -119,6 +119,10 @@ async function run(message, args) {
 
     selected = items[selected]
 
+    if (!selected) {
+        return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
+    }
+
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
         return message.channel.send(new ErrorEmbed(`you dont have a ${selected.name}`))
     }
