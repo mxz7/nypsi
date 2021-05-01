@@ -59,12 +59,6 @@ if (cooldown.has(message.member.id)) {
 
     selected = items[selected]
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
-
     let amount = 1
 
     if (args.length != 1) {
@@ -74,6 +68,12 @@ if (cooldown.has(message.member.id)) {
     if (!amount) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     if (amount > 50) amount = 50
 
