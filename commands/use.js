@@ -139,7 +139,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`))
     }
 
-    const embed = new CustomEmbed(message.member, true).setTitle("use | " + message.author.username)
+    const embed = new CustomEmbed(message.member).setTitle("use | " + message.author.username)
 
     let laterDescription
 
