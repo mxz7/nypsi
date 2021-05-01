@@ -164,20 +164,32 @@ setInterval(() => {
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
 
-async function updateBitcoinWorth() {
-    const res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) =>
+async function updateCryptoWorth() {
+    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) =>
         res.json()
     )
 
-    const worth = Math.floor(res.bpi.USD.rate_float)
+    const btcworth = Math.floor(res.bpi.USD.rate_float)
 
-    items["bitcoin"].worth = worth
-    return info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
+    items["bitcoin"].worth = btcworth
+    info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
+
+    res = await fetch("https://api.cryptonator.com/api/ticker/doge-usd").then((res) => res.json())
+
+    const dogeworth = Math.floor(res.price * 100)
+
+    if (!dogeworth) {
+        error("INVALID DOGECOIN WORTH")
+        return console.error(res)
+    }
+
+    items["dogecoin"].worth = dogeworth
+    info("dogecoin worth updated: $" + items["dogeworth"].worth, types.ECONOMY)
 }
 
-updateBitcoinWorth()
+updateCryptoWorth()
 
-setInterval(updateBitcoinWorth, 1500000)
+setInterval(updateCryptoWorth, 1500000)
 
 /**
  *
