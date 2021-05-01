@@ -1220,7 +1220,7 @@ function getMaxDogecoin(member) {
 
     if (xpBonus > 10) xpBonus = 10
 
-    return (base + prestigeBonus + xpBonus) * 100
+    return (base + prestigeBonus + xpBonus) * 10
 }
 
 exports.getMaxDogecoin = getMaxDogecoin
