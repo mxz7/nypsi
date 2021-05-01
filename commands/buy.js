@@ -68,17 +68,14 @@ if (cooldown.has(message.member.id)) {
     let amount = 1
 
     if (args.length != 1) {
-        if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-                args[1] = formatBet(args[1])
-            }
-        }
         amount = parseInt(args[1])
     }
 
-    if (!parseInt(amount)) {
+    if (!amount) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
+
+    if (amount > 50) amount = 50
 
     if (getBalance(message.member) < selected.worth * amount) {
         return message.channel.send(new ErrorEmbed("you cannot afford this"))
