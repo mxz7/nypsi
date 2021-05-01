@@ -5,7 +5,7 @@ const { getItems, getInventory } = require("../utils/economy/utils")
 
 const cmd = new Command(
     "dogecoin",
-    "view the current dogecoin value (reflects real life USD x 100)",
+    "view the current dogecoin value (reflects real life USD x 1000)",
     categories.MONEY
 )
 
@@ -30,7 +30,7 @@ async function run(message, args) {
         `**worth** $${dogecoin.worth.toLocaleString()}\n**owned** ${dogecoinAmount} ($${(
             dogecoinAmount * dogecoin.worth
         ).toLocaleString()})`
-    ).setFooter("not real dogecoin, although it reflects current worth in USD x 100")
+    ).setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
 
     return message.channel.send(embed)
 }
