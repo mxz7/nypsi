@@ -27,7 +27,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        `**worth** $${dogecoin.worth.toLocaleString()}\n**owned** ${dogecoinAmount} ($${(
+        `**worth** $${dogecoin.worth.toLocaleString()}\n**owned** ${dogecoinAmount.toLocaleString()} ($${(
             dogecoinAmount * dogecoin.worth
         ).toLocaleString()})`
     ).setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
