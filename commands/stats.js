@@ -71,7 +71,7 @@ async function run(message, args) {
         )
         embed.addField(
             "padlock",
-            `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} bought`,
+            `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} used`,
             true
         )
 
