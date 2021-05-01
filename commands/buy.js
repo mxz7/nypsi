@@ -82,14 +82,14 @@ if (cooldown.has(message.member.id)) {
     }
 
     if (selected.id == "bitcoin") {
-        const owned = inventory["bitcoin"] ? inventory["bitcoin"] : 0
+        const owned = inventory["bitcoin"] || 0
         const max = getMaxBitcoin(message.member)
 
         if (owned + amount > max) {
             return message.channel.send(new ErrorEmbed("you cannot buy this much bitcoin yet"))
         }
     } else if (selected.id == "dogecoin") {
-        const owned = inventory["dogecoin"] ? inventory["dogecoin"] : 0
+        const owned = inventory["dogecoin"] || 0
         const max = getMaxDogecoin(message.member)
 
         if (owned + amount > max) {
