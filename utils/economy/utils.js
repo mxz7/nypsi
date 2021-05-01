@@ -176,7 +176,7 @@ async function updateCryptoWorth() {
 
     res = await fetch("https://api.cryptonator.com/api/ticker/doge-usd").then((res) => res.json())
 
-    const dogeworth = Math.floor(res.ticker.price * 100)
+    const dogeworth = Math.floor(res.ticker.price * 1000)
 
     if (!dogeworth) {
         error("INVALID DOGECOIN WORTH")
