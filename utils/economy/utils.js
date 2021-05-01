@@ -220,8 +220,15 @@ async function doVote(client, vote) {
 
     const amount = 15000 * (getPrestige(memberID) + 1)
     const multi = Math.floor((await getMulti(memberID)) * 100)
+    const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
+    
+    if (inventory["vote_crate"]) {
+        inventory["vote_crate"] += getPrestige(memberID) + 1
+    } else {
+        inventory["vote_crate"] = getPrestige(memberID) + 1
+    }
 
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed()
@@ -229,7 +236,8 @@ async function doVote(client, vote) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
-                    `+ **10**% multiplier, total: **${multi}**%`
+                    `+ **10**% multiplier, total: **${multi}**%\n` +
+                    `+ **${getPrestige(memberID) + 1}** vote crates`
             )
 
         await member.send("thank you for voting!", embed)
@@ -1167,11 +1175,15 @@ exports.addPadlock = addPadlock
  * @returns
  */
 function getInventory(member) {
-    if (!users[member.user.id].inventory) {
-        users[member.user.id].inventory = {}
+    let id = member
+
+    if (member.user) id = member.user.id
+    
+    if (!users[id].inventory) {
+        users[id].inventory = {}
         return {}
     }
-    return users[member.user.id].inventory
+    return users[id].inventory
 }
 
 exports.getInventory = getInventory
@@ -1182,7 +1194,11 @@ exports.getInventory = getInventory
  * @param {Object} inventory
  */
 function setInventory(member, inventory) {
-    users[member.user.id].inventory = inventory
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    users[id].inventory = inventory
 }
 
 exports.setInventory = setInventory
