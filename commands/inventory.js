@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getInventory, getItems } = require("../utils/economy/utils")
+const { getInventory, getItems, createUser, userExists } = require("../utils/economy/utils")
 
 const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
 
@@ -13,6 +13,9 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
+
+    if (!userExists(message.member)) createUser(message.member)
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
