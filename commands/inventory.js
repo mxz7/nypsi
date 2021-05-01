@@ -129,7 +129,7 @@ async function run(message, args) {
                     currentPage--
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** (${inventory[item.id]})\n${item.description}${item.worth ? `\n**worth** $${item.worth.toLocaleString()}` : ""}`, true)
+                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""}`, true)
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
@@ -142,7 +142,7 @@ async function run(message, args) {
                     currentPage++
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** (${inventory[item.id]})\n${item.description}${item.worth ? `\n**worth** $${item.worth.toLocaleString()}` : ""}`, true)
+                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""}`, true)
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
