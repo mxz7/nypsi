@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, formatBet, getBalance, getInventory, getMaxBitcoin, getMaxDogecoin, updateBalance, setInventory } = require("../utils/economy/utils")
+const { getItems, formatBet, getBalance, getInventory, getMaxBitcoin, getMaxDogecoin, updateBalance, setInventory, userExists, createUser } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("buy", "buy items from the shop", categories.MONEY)
@@ -13,7 +13,10 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-if (cooldown.has(message.member.id)) {
+
+    if (!userExists(message.member)) createUser(message.member)
+
+    if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)

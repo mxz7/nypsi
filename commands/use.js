@@ -1,7 +1,7 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance } = require("../utils/economy/utils")
+const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -62,6 +62,8 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
+
+    if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 30
 

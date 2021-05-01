@@ -11,6 +11,8 @@ const {
     updateBalance,
     setInventory,
     getMulti,
+    userExists,
+    createUser,
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
@@ -23,6 +25,9 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
+
+    if (!userExists(message.member)) createUser(message.member)
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
