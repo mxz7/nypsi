@@ -63,7 +63,7 @@ async function run(message, args) {
     for (const item of itemIDs) {
         if (!items[item].worth) continue
         if (items[item].role == "prey" || items[item].role == "fish" || items[item].role == "collectable") continue
-        if (pageOfItems.length == 5) {
+        if (pageOfItems.length == 6) {
             pages.push(pageOfItems)
             pageOfItems = [item]
         } else {
@@ -85,7 +85,7 @@ async function run(message, args) {
 
     for (let item of pages[page]) {
         item = items[item]
-        embed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`)
+        embed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
     }
 
     const msg = await message.channel.send(embed)
@@ -123,7 +123,7 @@ async function run(message, args) {
                     currentPage--
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`)
+                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
@@ -136,7 +136,7 @@ async function run(message, args) {
                     currentPage++
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`)
+                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
