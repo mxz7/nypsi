@@ -76,11 +76,9 @@ async function run(message, args) {
 
     selected = items[selected]
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
+    if (!selected.worth || selected.role == "collectable") {
+        return message.channel.send(new ErrorEmbed("you cannot sell this item"))
+    }
 
     let amount = 1
 
