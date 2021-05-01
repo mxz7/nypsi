@@ -1192,3 +1192,35 @@ function getItems() {
 }
 
 exports.getItems = getItems
+
+/**
+ * @returns {Number}
+ * @param {Guildmember} member 
+ */
+function getMaxBitcoin(member) {
+    const base = 10
+    const prestigeBonus = 25 * getPrestige(member)
+    let xpBonus = 1 * Math.floor(getXp(member) / 100)
+
+    if (xpBonus > 10) xpBonus = 10
+
+    return base + prestigeBonus + xpBonus
+}
+
+exports.getMaxBitcoin = getMaxBitcoin
+
+/**
+ * @returns {Number}
+ * @param {Guildmember} member 
+ */
+function getMaxDogecoin(member) {
+    const base = 10
+    const prestigeBonus = 25 * getPrestige(member)
+    let xpBonus = 1 * Math.floor(getXp(member) / 100)
+
+    if (xpBonus > 10) xpBonus = 10
+
+    return (base + prestigeBonus + xpBonus) * 100
+}
+
+exports.getMaxBitcoin = getMaxBitcoin
