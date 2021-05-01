@@ -27,7 +27,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        `**worth** $${bitcoin.worth.toLocaleString()}\n**owned** ${bitcoinAmount} ($${(
+        `**worth** $${bitcoin.worth.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
             bitcoinAmount * bitcoin.worth
         ).toLocaleString()})`
     ).setFooter("not real bitcoin, although it reflects current worth in USD")
