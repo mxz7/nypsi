@@ -366,11 +366,11 @@ function openCrate(member, item) {
             let amount = 1
 
             if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun") {
-                amount = 25
+                amount = 5
             } else if (chosen == "fishing_rod" || chosen == "gun") {
-                amount = 50
+                amount = 10
             } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun") {
-                amount = 100
+                amount = 25
             }
 
             if (inventory[chosen]) {
