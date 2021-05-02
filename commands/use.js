@@ -54,6 +54,8 @@ const crateItems = [
     "toyota_supra",
     "lawyer",
     "minecraft_account",
+    "ring",
+    "radio"
 ]
 
 const cooldown = new Map()
