@@ -4,7 +4,9 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getInventory, getItems, createUser, userExists } = require("../utils/economy/utils")
 
-const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
+const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases([
+    "inv",
+])
 
 const cooldown = new Map()
 
@@ -13,7 +15,6 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (cooldown.has(message.member.id)) {
@@ -60,7 +61,11 @@ async function run(message, args) {
     const itemIDs = Array.from(Object.keys(inventory))
 
     if (itemIDs.length == 0) {
-        return message.channel.send(new CustomEmbed(message.member, false, "your inventory is empty").setTitle("inventory | " + message.author.username))
+        return message.channel.send(
+            new CustomEmbed(message.member, false, "your inventory is empty").setTitle(
+                "inventory | " + message.author.username
+            )
+        )
     }
 
     inPlaceSort(itemIDs).asc()
@@ -91,7 +96,13 @@ async function run(message, args) {
 
     for (let item of pages[page]) {
         item = items[item]
-        embed.addField(item.id, `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""}`, true)
+        embed.addField(
+            item.id,
+            `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${
+                item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""
+            }`,
+            true
+        )
     }
 
     const msg = await message.channel.send(embed)
@@ -129,7 +140,19 @@ async function run(message, args) {
                     currentPage--
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""}`, true)
+                        newEmbed.addField(
+                            item.id,
+                            `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${
+                                item.description
+                            }${
+                                item.worth
+                                    ? "\n*can be sold*"
+                                    : item.role == "collectable"
+                                    ? "\n*collectable*"
+                                    : ""
+                            }`,
+                            true
+                        )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
@@ -142,7 +165,19 @@ async function run(message, args) {
                     currentPage++
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${item.description}${item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""}`, true)
+                        newEmbed.addField(
+                            item.id,
+                            `${item.emoji} **${item.name}** -- ${inventory[item.id]}\n${
+                                item.description
+                            }${
+                                item.worth
+                                    ? "\n*can be sold*"
+                                    : item.role == "collectable"
+                                    ? "\n*collectable*"
+                                    : ""
+                            }`,
+                            true
+                        )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)

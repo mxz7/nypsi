@@ -1,7 +1,18 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { isEcoBanned, userExists, createUser, getItems, getInventory, getMaxBitcoin, getMaxDogecoin, getPrestige, getXp, setInventory } = require("../utils/economy/utils")
+const {
+    isEcoBanned,
+    userExists,
+    createUser,
+    getItems,
+    getInventory,
+    getMaxBitcoin,
+    getMaxDogecoin,
+    getPrestige,
+    getXp,
+    setInventory,
+} = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { payment } = require("../utils/logger")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -44,7 +55,9 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false).setTitle("give | " + message.author.tag)
+        const embed = new CustomEmbed(message.member, false).setTitle(
+            "give | " + message.author.tag
+        )
 
         embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
         embed.addField("help", "give members items from your inventory")
@@ -129,14 +142,18 @@ async function run(message, args) {
         const max = getMaxBitcoin(target)
 
         if (owned + amount > max) {
-            return message.channel.send(new ErrorEmbed("you cannot give this person that much bitcoin"))
+            return message.channel.send(
+                new ErrorEmbed("you cannot give this person that much bitcoin")
+            )
         }
     } else if (selected.id == "dogecoin") {
         const owned = targetInventory["dogecoin"] || 0
         const max = getMaxDogecoin(target)
 
         if (owned + amount > max) {
-            return message.channel.send(new ErrorEmbed("you cannot give this person that much dogecoin"))
+            return message.channel.send(
+                new ErrorEmbed("you cannot give this person that much dogecoin")
+            )
         }
     }
 
@@ -185,7 +202,13 @@ async function run(message, args) {
 
     payment(message.author, target.user, selected.worth * amount)
 
-    return message.channel.send(new CustomEmbed(message.member, false, `you have given **${amount}** ${selected.name} to **${target.toString()}**`))
+    return message.channel.send(
+        new CustomEmbed(
+            message.member,
+            false,
+            `you have given **${amount}** ${selected.name} to **${target.toString()}**`
+        )
+    )
 }
 
 cmd.setRun(run)

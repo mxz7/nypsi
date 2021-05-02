@@ -1,7 +1,19 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { userExists, createUser, getInventory, getItems, setInventory, getMaxBitcoin, getMaxDogecoin, updateBalance, getBalance, updateXp, getXp } = require("../utils/economy/utils")
+const {
+    userExists,
+    createUser,
+    getInventory,
+    getItems,
+    setInventory,
+    getMaxBitcoin,
+    getMaxDogecoin,
+    updateBalance,
+    getBalance,
+    updateXp,
+    getXp,
+} = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("hunt", "go to a field and hunt", categories.MONEY)
@@ -86,7 +98,7 @@ async function run(message, args) {
     for (let i = 0; i < 13; i++) {
         huntItems.push("nothing")
     }
-    
+
     const foundItems = []
 
     for (let i = 0; i < times; i++) {
@@ -191,11 +203,23 @@ async function run(message, args) {
     }
     setInventory(message.member, inventory)
 
-    const embed = new CustomEmbed(message.member, false, `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
+            items[gun].name
+        }**`
+    )
 
     const msg = await message.channel.send(embed)
 
-    embed.setDescription(`you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**\n\nyou killed${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`)
+    embed.setDescription(
+        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
+            items[gun].name
+        }**\n\nyou killed${
+            foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
+        }`
+    )
 
     setTimeout(() => {
         msg.edit(embed)
