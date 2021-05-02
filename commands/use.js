@@ -203,6 +203,7 @@ async function run(message, args) {
 
         embed.setDescription("you're wearing your **mask** and can now rob someone again")
     } else if (selected.id == "radio") {
+        const { onRadioCooldown, addRadioCooldown } = require("./rob")
         if (args.length == 1) {
             return message.channel.send(
                 new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)
@@ -221,9 +222,7 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("invalid user"))
         }
 
-        const { onRadioCooldown, addRadioCooldown } = require("./rob")
-
-        if (!onRadioCooldown(target)) {
+        if (onRadioCooldown(target)) {
             return message.channel.send(new ErrorEmbed(`the police are already looking for **${target.user.tag}**`))
         }
 
