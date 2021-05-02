@@ -1052,12 +1052,21 @@ function reset() {
 
         let prestige = user.prestige
         let lastVote = user.lastVote
+        let inventory = inventory
 
         if (!lastVote) lastVote = 0
 
-        if (prestige > 14) prestige = 10 // REMOVE AFTER FIRST RESET
+        if (Array.from(Object.keys(inventory)).length == 0) {
+            inventory = undefined
+        } else {
+            for (let item of Array.from(Object.keys(inventory))) {
+                if (items[item].role != "collectable") {
+                    delete inventory[item]
+                }
+            }
+        }
 
-        if (prestige == 0 && lastVote == 0) {
+        if (prestige == 0 && lastVote == 0 && !inventory) {
             delete users[id]
             info("deleted " + id)
             deleted++
@@ -1065,6 +1074,7 @@ function reset() {
             user = new EconProfile()
             user.prestige = prestige
             user.lastVote = lastVote
+            user.inventory = inventory
 
             users[id] = user
             info("updated " + id)
