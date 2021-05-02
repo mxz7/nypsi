@@ -15,7 +15,7 @@ const {
     getInventory,
     setInventory,
 } = require("../utils/economy/utils.js")
-const { Message } = require("discord.js")
+const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -110,10 +110,14 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you need $750 in your wallet to rob someone"))
     }
 
-    cooldown.set(message.member.user.id, new Date())
+    const date = new Date()
+
+    cooldown.set(message.member.user.id, date)
 
     setTimeout(() => {
-        cooldown.delete(message.author.id)
+        if (cooldown.has(message.author.id) && cooldown.get(message.author.id) == date) {
+            cooldown.delete(message.author.id)
+        }
     }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(
@@ -299,3 +303,23 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function deleteRobCooldown(member) {
+    cooldown.delete(member.user.id)
+}
+
+exports.deleteRobCooldown = deleteRobCooldown
+
+/**
+ * @returns {Boolean}
+ * @param {GuildMember} member 
+ */
+function onRobCooldown(member) {
+    return cooldown.has(member.user.id)
+}
+
+exports.onRobCooldown = onRobCooldown
