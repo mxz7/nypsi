@@ -250,6 +250,43 @@ async function run(message, args) {
         setInventory(message.member, inventory)
 
         embed.setDescription("you're wearing your **mask** and can now rob someone again")
+    } else if (selected.id == "radio") {
+        if (args.length == 1) {
+            return message.channel.send(
+                new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)
+            )
+        }
+
+        let target
+
+        if (!message.mentions.members.first()) {
+            target = await getMember(message, args[1])
+        } else {
+            target = message.mentions.members.first()
+        }
+
+        if (!target) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+
+        const { onRadioCooldown, addRadioCooldown } = require("./rob")
+
+        if (!onRadioCooldown(target)) {
+            return message.channel.send(new ErrorEmbed(`the police are already looking for **${target.user.tag}**`))
+        }
+
+        addRadioCooldown(target.id)
+
+        inventory["radio"]--
+
+        if (inventory["radio"] <= 0) {
+            delete inventory["radio"]
+        }
+
+        setInventory(message.member, inventory)
+
+        embed.setDescription("putting report out on police scanner...")
+        laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${target.user.tag}**`
     }
 
     const msg = await message.channel.send(embed)
