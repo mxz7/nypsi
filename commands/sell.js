@@ -145,7 +145,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 && (selected.role == "fish" || selected.role == "prey") ? `(+**${multi}**% bonus)` : selected.id == "bitcoin" || selected.id == "dogecoin" ? "(-**10**% fee)" : ""}`)
+    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 && (selected.role == "fish" || selected.role == "prey") ? `(+**${Math.floor(multi * 100).toString()}**% bonus)` : selected.id == "bitcoin" || selected.id == "dogecoin" ? "(-**10**% fee)" : ""}`)
 
     return message.channel.send(embed)
 }
