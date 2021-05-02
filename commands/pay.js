@@ -61,7 +61,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}pay <user> <amount>`)
             .addField(
                 "help",
-                "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment"
+                "the payment will be taxxed at certain amounts"
             )
 
         return message.channel.send(embed)
