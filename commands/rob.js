@@ -23,6 +23,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 const playerCooldown = new Set()
+const radioCooldown = new Map()
 
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
 
@@ -56,6 +57,25 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    if (radioCooldown.has(message.member.user.id)) {
+        const init = radioCooldown.get(message.member.user.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 900 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new ErrorEmbed(`someone has reported you to the police, they will continue looking for you for **${remaining}**`))
     }
 
     const prefix = getPrefix(message.guild)
@@ -323,3 +343,28 @@ function onRobCooldown(member) {
 }
 
 exports.onRobCooldown = onRobCooldown
+
+/**
+ * 
+ * @param {String} id 
+ */
+function addRadioCooldown(id) {
+    radioCooldown.set(id, new Date())
+
+    setTimeout(() => {
+        radioCooldown.delete(id)
+    }, 900000)
+}
+
+exports.addRadioCooldown = addRadioCooldown
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @returns {Boolean}
+ */
+function onRadioCooldown(member) {
+    return radioCooldown.has(member.user.id)
+}
+
+exports.onRadioCooldown = onRadioCooldown
