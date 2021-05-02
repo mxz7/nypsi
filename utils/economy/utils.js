@@ -1,7 +1,10 @@
+const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`, types.ECONOMY)
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
+info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`, types.ECONOMY)
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
@@ -12,7 +15,6 @@ const { GuildMember, Guild, Client } = require("discord.js")
 const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
-const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
@@ -223,7 +225,7 @@ async function doVote(client, vote) {
     const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
-    
+
     if (inventory["vote_crate"]) {
         inventory["vote_crate"] += getPrestige(memberID) + 1
     } else {
@@ -1178,7 +1180,7 @@ function getInventory(member) {
     let id = member
 
     if (member.user) id = member.user.id
-    
+
     if (!users[id].inventory) {
         users[id].inventory = {}
         return {}
@@ -1211,7 +1213,7 @@ exports.getItems = getItems
 
 /**
  * @returns {Number}
- * @param {Guildmember} member 
+ * @param {Guildmember} member
  */
 function getMaxBitcoin(member) {
     const base = 10
@@ -1227,7 +1229,7 @@ exports.getMaxBitcoin = getMaxBitcoin
 
 /**
  * @returns {Number}
- * @param {Guildmember} member 
+ * @param {Guildmember} member
  */
 function getMaxDogecoin(member) {
     const base = 10
