@@ -1,7 +1,23 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock, getMaxBitcoin, getMaxDogecoin, getDMsEnabled } = require("../utils/economy/utils")
+const {
+    getItems,
+    getInventory,
+    setInventory,
+    updateBalance,
+    getBalance,
+    userExists,
+    createUser,
+    updateXp,
+    getXp,
+    hasPadlock,
+    setPadlock,
+    addPadlock,
+    getMaxBitcoin,
+    getMaxDogecoin,
+    getDMsEnabled,
+} = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { getMember } = require("../utils/utils")
@@ -15,7 +31,6 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 30
@@ -46,7 +61,15 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send(new CustomEmbed(message.member, false, `${getPrefix(message.guild)}use <item>\n\nuse items to open crates or to simply use the item's function`).setTitle("use | " + message.author.username))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `${getPrefix(
+                    message.guild
+                )}use <item>\n\nuse items to open crates or to simply use the item's function`
+            ).setTitle("use | " + message.author.username)
+        )
     }
 
     const items = getItems()
@@ -91,9 +114,13 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     if (selected.id.includes("gun")) {
-        return message.channel.send(new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`))
+        return message.channel.send(
+            new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`)
+        )
     } else if (selected.id.includes("fishing")) {
-        return message.channel.send(new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`))
+        return message.channel.send(
+            new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`)
+        )
     } else if (selected.id.includes("coin")) {
         return message.channel.send(new ErrorEmbed("you cant use a coin 🙄"))
     }
@@ -107,7 +134,9 @@ async function run(message, args) {
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
 
-        laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
+        laterDescription = `opening ${selected.emoji} ${
+            selected.name
+        }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else if (selected.id.includes("watch")) {
         embed.setDescription("you look down at your watch to check the time..")
 
@@ -118,7 +147,9 @@ async function run(message, args) {
         laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
     } else if (selected.id == "padlock") {
         if (hasPadlock(message.member)) {
-            return message.channel.send(new ErrorEmbed("you already have a padlock on your balance"))
+            return message.channel.send(
+                new ErrorEmbed("you already have a padlock on your balance")
+            )
         }
 
         setPadlock(message.member, true)
@@ -129,7 +160,7 @@ async function run(message, args) {
         }
 
         setInventory(message.member, inventory)
-        
+
         addPadlock(message.member)
 
         embed.setDescription("✅ your padlock has been applied")
@@ -137,7 +168,9 @@ async function run(message, args) {
         embed.setDescription("lawyers will be used automatically when you rob someone")
     } else if (selected.id == "lock_pick") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`))
+            return message.channel.send(
+                new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)
+            )
         }
 
         let target
@@ -186,7 +219,7 @@ async function run(message, args) {
         laterDescription = `picking **${target.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
     } else if (selected.id == "mask") {
         const { onRobCooldown, deleteRobCooldown } = require("./rob")
-        
+
         if (!onRobCooldown(message.member)) {
             return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
         }
@@ -223,7 +256,9 @@ async function run(message, args) {
         }
 
         if (onRadioCooldown(target)) {
-            return message.channel.send(new ErrorEmbed(`the police are already looking for **${target.user.tag}**`))
+            return message.channel.send(
+                new ErrorEmbed(`the police are already looking for **${target.user.tag}**`)
+            )
         }
 
         addRadioCooldown(target.id)
@@ -257,9 +292,9 @@ cmd.setRun(run)
 module.exports = cmd
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {JSON} item 
+ *
+ * @param {GuildMember} member
+ * @param {JSON} item
  */
 function openCrate(member, item) {
     const inventory = getInventory(member)

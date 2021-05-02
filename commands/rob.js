@@ -75,7 +75,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`you have been reported to the police, they will continue looking for you for **${remaining}**`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `you have been reported to the police, they will continue looking for you for **${remaining}**`
+            )
+        )
     }
 
     const prefix = getPrefix(message.guild)
@@ -283,11 +287,10 @@ async function run(message, args) {
                     "fail!!",
                     "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
                 )
-
             }
 
             embed2.setColor("#e4334f")
-        
+
             embed3.setTitle("you were nearly robbed")
             embed3.setColor("#5efb8f")
             embed3.setDescription(
@@ -323,8 +326,8 @@ async function run(message, args) {
 cmd.setRun(run)
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function deleteRobCooldown(member) {
     cooldown.delete(member.user.id)
@@ -334,7 +337,7 @@ cmd.deleteRobCooldown = deleteRobCooldown
 
 /**
  * @returns {Boolean}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function onRobCooldown(member) {
     return cooldown.has(member.user.id)
@@ -343,8 +346,8 @@ function onRobCooldown(member) {
 cmd.onRobCooldown = onRobCooldown
 
 /**
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  */
 function addRadioCooldown(id) {
     radioCooldown.set(id, new Date())
@@ -357,8 +360,8 @@ function addRadioCooldown(id) {
 cmd.addRadioCooldown = addRadioCooldown
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @returns {Boolean}
  */
 function onRadioCooldown(member) {

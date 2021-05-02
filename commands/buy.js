@@ -1,7 +1,18 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, formatBet, getBalance, getInventory, getMaxBitcoin, getMaxDogecoin, updateBalance, setInventory, userExists, createUser } = require("../utils/economy/utils")
+const {
+    getItems,
+    formatBet,
+    getBalance,
+    getInventory,
+    getMaxBitcoin,
+    getMaxDogecoin,
+    updateBalance,
+    setInventory,
+    userExists,
+    createUser,
+} = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("buy", "buy items from the shop", categories.MONEY)
@@ -13,7 +24,6 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (cooldown.has(message.member.id)) {
@@ -36,7 +46,15 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send(new CustomEmbed(message.member, false, `buy items from ${getPrefix(message.guild)}shop by using the item id or item name without spaces`))
+        return message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `buy items from ${getPrefix(
+                    message.guild
+                )}shop by using the item id or item name without spaces`
+            )
+        )
     }
 
     const items = getItems()
@@ -66,7 +84,12 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
     }
 
-    if (!selected.worth || selected.role == "collectable" || selected.role == "prey" || selected.role == "fish") {
+    if (
+        !selected.worth ||
+        selected.role == "collectable" ||
+        selected.role == "prey" ||
+        selected.role == "fish"
+    ) {
         return message.channel.send(new ErrorEmbed("you cannot buy this item"))
     }
 
@@ -112,7 +135,7 @@ async function run(message, args) {
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) - (selected.worth * amount))
+    updateBalance(message.member, getBalance(message.member) - selected.worth * amount)
     inventory[selected.id] + amount
 
     if (inventory[selected.id]) {
@@ -123,7 +146,15 @@ async function run(message, args) {
 
     setInventory(message.member, inventory)
 
-    return message.channel.send(new CustomEmbed(message.member, false, `you have bought **${amount.toLocaleString()}** ${selected.name} for $${(selected.worth * amount).toLocaleString()}`))
+    return message.channel.send(
+        new CustomEmbed(
+            message.member,
+            false,
+            `you have bought **${amount.toLocaleString()}** ${selected.name} for $${(
+                selected.worth * amount
+            ).toLocaleString()}`
+        )
+    )
 }
 
 cmd.setRun(run)

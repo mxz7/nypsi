@@ -31,7 +31,9 @@ async function run(message, args) {
         `**worth** $${bitcoin.worth.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
             bitcoinAmount * bitcoin.worth
         ).toLocaleString()})`
-    ).setFooter("not real bitcoin, although it reflects current worth in USD").setTitle("bitcoin | " + message.author.username)
+    )
+        .setFooter("not real bitcoin, although it reflects current worth in USD")
+        .setTitle("bitcoin | " + message.author.username)
 
     return message.channel.send(embed)
 }
