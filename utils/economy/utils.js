@@ -1052,7 +1052,7 @@ function reset() {
 
         let prestige = user.prestige
         let lastVote = user.lastVote
-        let inventory = inventory
+        let inventory = user.inventory
 
         if (!lastVote) lastVote = 0
 
