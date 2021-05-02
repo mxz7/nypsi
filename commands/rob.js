@@ -12,8 +12,10 @@ const {
     hasVoted,
     isEcoBanned,
     addRob,
+    getInventory,
+    setInventory,
 } = require("../utils/economy/utils.js")
-const { Message } = require("discord.js")
+const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -21,6 +23,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 const playerCooldown = new Set()
+const radioCooldown = new Map()
 
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
 
@@ -54,6 +57,29 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    if (radioCooldown.has(message.member.user.id)) {
+        const init = radioCooldown.get(message.member.user.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 900 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(
+            new ErrorEmbed(
+                `you have been reported to the police, they will continue looking for you for **${remaining}**`
+            )
+        )
     }
 
     const prefix = getPrefix(message.guild)
@@ -108,10 +134,14 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you need $750 in your wallet to rob someone"))
     }
 
-    cooldown.set(message.member.user.id, new Date())
+    const date = new Date()
+
+    cooldown.set(message.member.user.id, date)
 
     setTimeout(() => {
-        cooldown.delete(message.author.id)
+        if (cooldown.has(message.author.id) && cooldown.get(message.author.id) == date) {
+            cooldown.delete(message.author.id)
+        }
     }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(
@@ -235,14 +265,31 @@ async function run(message, args) {
             const amount = Math.floor(Math.random() * 20) + 5
             const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
 
-            updateBalance(target, getBalance(target) + amountMoney)
-            updateBalance(message.member, getBalance(message.member) - amountMoney)
+            const inventory = getInventory(message.member)
+
+            if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+                inventory["lawyer"]--
+
+                if (inventory["lawyer"] == 0) {
+                    delete inventory["lawyer"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed2.addField(
+                    "fail!!",
+                    `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
+                )
+            } else {
+                updateBalance(target, getBalance(target) + amountMoney)
+                updateBalance(message.member, getBalance(message.member) - amountMoney)
+                embed2.addField(
+                    "fail!!",
+                    "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
+                )
+            }
 
             embed2.setColor("#e4334f")
-            embed2.addField(
-                "fail!!",
-                "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
-            )
 
             embed3.setTitle("you were nearly robbed")
             embed3.setColor("#5efb8f")
@@ -277,5 +324,50 @@ async function run(message, args) {
 }
 
 cmd.setRun(run)
+
+/**
+ *
+ * @param {GuildMember} member
+ */
+function deleteRobCooldown(member) {
+    cooldown.delete(member.user.id)
+}
+
+cmd.deleteRobCooldown = deleteRobCooldown
+
+/**
+ * @returns {Boolean}
+ * @param {GuildMember} member
+ */
+function onRobCooldown(member) {
+    return cooldown.has(member.user.id)
+}
+
+cmd.onRobCooldown = onRobCooldown
+
+/**
+ *
+ * @param {String} id
+ */
+function addRadioCooldown(id) {
+    radioCooldown.set(id, new Date())
+
+    setTimeout(() => {
+        radioCooldown.delete(id)
+    }, 900000)
+}
+
+cmd.addRadioCooldown = addRadioCooldown
+
+/**
+ *
+ * @param {GuildMember} member
+ * @returns {Boolean}
+ */
+function onRadioCooldown(member) {
+    return radioCooldown.has(member.user.id)
+}
+
+cmd.onRadioCooldown = onRadioCooldown
 
 module.exports = cmd
