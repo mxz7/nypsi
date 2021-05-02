@@ -25,7 +25,6 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-
     if (!userExists(message.member)) createUser(message.member)
 
     if (cooldown.has(message.member.id)) {
@@ -97,7 +96,7 @@ async function run(message, args) {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             }
-        } 
+        }
         amount = parseInt(args[1])
     }
 
@@ -131,21 +130,29 @@ async function run(message, args) {
 
     setInventory(message.member, inventory)
 
-    let sellWorth = Math.floor((selected.worth * 0.5) * amount)
+    let sellWorth = Math.floor(selected.worth * 0.5 * amount)
 
     const multi = await getMulti(message.member)
 
     if (selected.role == "fish" || selected.role == "prey") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
-        sellWorth = Math.floor((selected.worth * 0.5) * amount)
+        sellWorth = Math.floor(selected.worth * 0.5 * amount)
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setDescription(`you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${multi > 0 && (selected.role == "fish" || selected.role == "prey") ? `(+**${Math.floor(multi * 100).toString()}**% bonus)` : selected.id == "bitcoin" || selected.id == "dogecoin" ? "(-**10**% fee)" : ""}`)
+    embed.setDescription(
+        `you sold **${amount}** ${selected.name} for $${sellWorth.toLocaleString()} ${
+            multi > 0 && (selected.role == "fish" || selected.role == "prey")
+                ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
+                : selected.id == "bitcoin" || selected.id == "dogecoin"
+                ? "(-**10**% fee)"
+                : ""
+        }`
+    )
 
     return message.channel.send(embed)
 }

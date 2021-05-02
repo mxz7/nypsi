@@ -1,7 +1,19 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { userExists, createUser, getInventory, getItems, setInventory, getMaxBitcoin, getMaxDogecoin, updateBalance, getBalance, updateXp, getXp } = require("../utils/economy/utils")
+const {
+    userExists,
+    createUser,
+    getInventory,
+    getItems,
+    setInventory,
+    getMaxBitcoin,
+    getMaxDogecoin,
+    updateBalance,
+    getBalance,
+    updateXp,
+    getXp,
+} = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("fish", "go to a pond and fish", categories.MONEY)
@@ -265,11 +277,19 @@ async function run(message, args) {
     }
     setInventory(message.member, inventory)
 
-    const embed = new CustomEmbed(message.member, false, `you go to the pond and cast your **${items[fishingRod].name}**`)
+    const embed = new CustomEmbed(
+        message.member,
+        false,
+        `you go to the pond and cast your **${items[fishingRod].name}**`
+    )
 
     const msg = await message.channel.send(embed)
 
-    embed.setDescription(`you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`)
+    embed.setDescription(
+        `you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${
+            foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
+        }`
+    )
 
     setTimeout(() => {
         msg.edit(embed)

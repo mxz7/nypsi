@@ -4,7 +4,11 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems } = require("../utils/economy/utils")
 
-const cmd = new Command("shop", "view current items that are available to buy/sell", categories.MONEY).setAliases(["store"])
+const cmd = new Command(
+    "shop",
+    "view current items that are available to buy/sell",
+    categories.MONEY
+).setAliases(["store"])
 
 const cooldown = new Map()
 
@@ -62,7 +66,12 @@ async function run(message, args) {
     let pageOfItems = []
     for (const item of itemIDs) {
         if (!items[item].worth) continue
-        if (items[item].role == "prey" || items[item].role == "fish" || items[item].role == "collectable") continue
+        if (
+            items[item].role == "prey" ||
+            items[item].role == "fish" ||
+            items[item].role == "collectable"
+        )
+            continue
         if (pageOfItems.length == 6) {
             pages.push(pageOfItems)
             pageOfItems = [item]
@@ -85,7 +94,13 @@ async function run(message, args) {
 
     for (let item of pages[page]) {
         item = items[item]
-        embed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
+        embed.addField(
+            item.id,
+            `${item.emoji} **${item.name}**\n${
+                item.description
+            }\n**worth** $${item.worth.toLocaleString()}`,
+            true
+        )
     }
 
     const msg = await message.channel.send(embed)
@@ -123,7 +138,13 @@ async function run(message, args) {
                     currentPage--
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
+                        newEmbed.addField(
+                            item.id,
+                            `${item.emoji} **${item.name}**\n${
+                                item.description
+                            }\n**worth** $${item.worth.toLocaleString()}`,
+                            true
+                        )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)
@@ -136,7 +157,13 @@ async function run(message, args) {
                     currentPage++
                     for (let item of pages[currentPage]) {
                         item = items[item]
-                        newEmbed.addField(item.id, `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`, true)
+                        newEmbed.addField(
+                            item.id,
+                            `${item.emoji} **${item.name}**\n${
+                                item.description
+                            }\n**worth** $${item.worth.toLocaleString()}`,
+                            true
+                        )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
                     await msg.edit(newEmbed)

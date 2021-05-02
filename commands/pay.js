@@ -59,10 +59,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("pay help")
             .addField("usage", `${prefix}pay <user> <amount>`)
-            .addField(
-                "help",
-                "the payment will be taxxed at certain amounts"
-            )
+            .addField("help", "the payment will be taxxed at certain amounts")
 
         return message.channel.send(embed)
     }
