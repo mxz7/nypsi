@@ -19,43 +19,6 @@ const crateItems = [
     "xp:15",
     "xp:25",
     "xp:50",
-    "basic_crate",
-    "69420_crate",
-    "large_fish",
-    "terrible_fishing_rod",
-    "fishing_rod",
-    "incredible_fishing_rod",
-    "standard_watch",
-    "golden_watch",
-    "diamond_watch",
-    "bitcoin",
-    "dogecoin",
-    "terrible_gun",
-    "gun",
-    "incredible_gun",
-    "normal_rabbit",
-    "large_rabbit",
-    "deer",
-    "rat",
-    "mouse",
-    "kangaroo",
-    "calendar",
-    "padlock",
-    "lock_pick",
-    "mask",
-    "tooth",
-    "clover",
-    "teddy",
-    "floppy_disk",
-    "test_tube",
-    "match_attax",
-    "pokemon_card",
-    "skyline_r34",
-    "toyota_supra",
-    "lawyer",
-    "minecraft_account",
-    "ring",
-    "radio"
 ]
 
 const cooldown = new Map()
@@ -315,6 +278,10 @@ module.exports = cmd
 function openCrate(member, item) {
     const inventory = getInventory(member)
     const items = getItems()
+
+    for (const i of Array.from(Object.keys(items))) {
+        crateItems.push(i)
+    }
 
     inventory[item.id] -= 1
 
