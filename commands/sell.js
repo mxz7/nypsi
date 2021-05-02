@@ -109,12 +109,6 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
-
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
         return message.channel.send(new ErrorEmbed("you dont have any " + selected.name))
     }
@@ -122,6 +116,12 @@ async function run(message, args) {
     if (amount > inventory[selected.id]) {
         return message.channel.send(new ErrorEmbed(`you don't have enough ${selected.name}`))
     }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     inventory[selected.id] -= amount
 

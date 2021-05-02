@@ -84,17 +84,17 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
-
     if (amount > 50) amount = 50
 
     if (getBalance(message.member) < selected.worth * amount) {
         return message.channel.send(new ErrorEmbed("you cannot afford this"))
     }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, 5000)
 
     if (selected.id == "bitcoin") {
         const owned = inventory["bitcoin"] || 0
