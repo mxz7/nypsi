@@ -12,6 +12,8 @@ const {
     hasVoted,
     isEcoBanned,
     addRob,
+    getInventory,
+    setInventory,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -235,15 +237,33 @@ async function run(message, args) {
             const amount = Math.floor(Math.random() * 20) + 5
             const amountMoney = Math.round(getBalance(message.member) * (amount / 100))
 
-            updateBalance(target, getBalance(target) + amountMoney)
-            updateBalance(message.member, getBalance(message.member) - amountMoney)
+            const inventory = getInventory(message.member)
+
+            if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+                inventory["lawyer"]--
+
+                if (inventory["lawyer"] == 0) {
+                    delete inventory["lawyer"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed2.addField(
+                    "fail!!",
+                    `you were caught by the police, but your lawyer stopped you losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
+                )
+            } else {
+                updateBalance(target, getBalance(target) + amountMoney)
+                updateBalance(message.member, getBalance(message.member) - amountMoney)
+                embed2.addField(
+                    "fail!!",
+                    "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
+                )
+
+            }
 
             embed2.setColor("#e4334f")
-            embed2.addField(
-                "fail!!",
-                "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
-            )
-
+        
             embed3.setTitle("you were nearly robbed")
             embed3.setColor("#5efb8f")
             embed3.setDescription(
