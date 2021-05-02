@@ -3,6 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { isEcoBanned, userExists, createUser, getItems, getInventory, getMaxBitcoin, getMaxDogecoin, getPrestige, getXp, setInventory } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
+const { payment } = require("../utils/logger")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { getMember } = require("../utils/utils")
 
@@ -181,6 +182,8 @@ async function run(message, args) {
 
     setInventory(message.member, inventory)
     setInventory(target, targetInventory)
+
+    payment(message.author, target.user, selected.worth * amount)
 
     return message.channel.send(new CustomEmbed(message.member, false, `you have given **${amount}** ${selected.name} to **${target.toString()}**`))
 }
