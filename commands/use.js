@@ -287,6 +287,8 @@ async function run(message, args) {
 
         embed.setDescription("putting report out on police scanner...")
         laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${target.user.tag}**`
+    } else {
+        return message.channel.send(new ErrorEmbed("you cannot use this item"))
     }
 
     const msg = await message.channel.send(embed)
