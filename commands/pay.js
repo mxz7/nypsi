@@ -19,7 +19,7 @@ const { payment } = require("../utils/logger")
 
 const cooldown = new Map()
 
-const cmd = new Command("pay", "give other users money", categories.MONEY).setAliases(["give"])
+const cmd = new Command("pay", "give other users money", categories.MONEY)
 
 /**
  * @param {Message} message
