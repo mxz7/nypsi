@@ -137,7 +137,7 @@ async function run(message, args) {
     if (selected.role == "fish" || selected.role == "prey") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
-        sellWorth = Math.floor(selected.worth * 0.5 * amount)
+        sellWorth = Math.floor(selected.worth * 0.9 * amount)
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
