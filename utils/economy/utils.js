@@ -860,7 +860,7 @@ exports.getPrestigeRequirement = getPrestigeRequirement
  * @param {Number} xp
  */
 function getPrestigeRequirementBal(xp) {
-    const constant = 500
+    const constant = 250
     const bonus = xp * constant
 
     return bonus
