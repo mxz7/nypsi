@@ -254,6 +254,11 @@ async function run(message, args) {
         winnings = Math.round(multiplier * bet)
 
         updateBalance(message.member, getBalance(message.member) + winnings)
+    } else if (one == two) {
+        win = true
+        winnings = Math.round(bet * 1.2)
+
+        updateBalance(message.member, getBalance(message.member) + winnings)
     }
 
     let voted = false
