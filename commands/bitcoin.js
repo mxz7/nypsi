@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory } = require("../utils/economy/utils")
+const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
 const cmd = new Command(
     "bitcoin",
@@ -15,6 +15,7 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    if (!userExists(message.member)) createUser(message.member)
     const bitcoin = getItems()["bitcoin"]
     const inventory = getInventory(message.member)
 
