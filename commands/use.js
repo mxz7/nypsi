@@ -342,9 +342,7 @@ function openCrate(member, item) {
                 i--
                 continue
             }
-        }
-
-        if (chosen.includes("money:") || chosen.includes("xp:")) {
+        } else if (chosen.includes("money:") || chosen.includes("xp:")) {
             if (chosen.includes("money:")) {
                 const amount = parseInt(chosen.substr(6))
 
