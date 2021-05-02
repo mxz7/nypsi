@@ -384,7 +384,7 @@ function openCrate(member, item) {
             } else if (chosen == "fishing_rod" || chosen == "gun") {
                 amount = 10
             } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun") {
-                amount = 25
+                amount = 10
             }
 
             if (inventory[chosen]) {
