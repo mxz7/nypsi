@@ -341,6 +341,13 @@ function openCrate(member, item) {
             if (owned + 1 > max) {
                 i--
                 continue
+            } else {
+                if (inventory[chosen]) {
+                    inventory[chosen] += 1
+                } else {
+                    inventory[chosen] = 1
+                }
+                names.push(`${items[chosen].emoji} ${items[chosen].name}`)
             }
         } else if (chosen == "dogecoin") {
             const owned = inventory["dogecoin"] || 0
@@ -349,6 +356,13 @@ function openCrate(member, item) {
             if (owned + 1 > max) {
                 i--
                 continue
+            } else {
+                if (inventory[chosen]) {
+                    inventory[chosen] += 1
+                } else {
+                    inventory[chosen] = 1
+                }
+                names.push(`${items[chosen].emoji} ${items[chosen].name}`)
             }
         } else if (chosen.includes("money:") || chosen.includes("xp:")) {
             if (chosen.includes("money:")) {
