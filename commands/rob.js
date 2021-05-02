@@ -280,6 +280,14 @@ async function run(message, args) {
                     "fail!!",
                     `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
                 )
+                embed3.setDescription(
+                    "**" +
+                        message.member.user.tag +
+                        "** tried to rob you in **" +
+                        message.guild.name +
+                        "**\n" +
+                        "they were caught by the police, but a lawyer protected their money"
+                )
             } else {
                 updateBalance(target, getBalance(target) + amountMoney)
                 updateBalance(message.member, getBalance(message.member) - amountMoney)
@@ -287,13 +295,7 @@ async function run(message, args) {
                     "fail!!",
                     "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
                 )
-            }
-
-            embed2.setColor("#e4334f")
-
-            embed3.setTitle("you were nearly robbed")
-            embed3.setColor("#5efb8f")
-            embed3.setDescription(
+                embed3.setDescription(
                 "**" +
                     message.member.user.tag +
                     "** tried to rob you in **" +
@@ -302,7 +304,13 @@ async function run(message, args) {
                     "they were caught by the police and you received $**" +
                     amountMoney.toLocaleString() +
                     "**"
-            )
+                )  
+            }
+
+            embed2.setColor("#e4334f")
+
+            embed3.setTitle("you were nearly robbed")
+            embed3.setColor("#5efb8f")
         }
     }
 
