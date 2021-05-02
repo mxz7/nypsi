@@ -180,7 +180,7 @@ async function run(message, args) {
         addPadlock(message.member)
 
         embed.setDescription("✅ your padlock has been applied")
-    }
+    } //DO LOCKPICK, LAWYER AND MASK AND RING
 
     const msg = await message.channel.send(embed)
 
