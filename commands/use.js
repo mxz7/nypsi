@@ -206,10 +206,10 @@ async function run(message, args) {
 
         setPadlock(target, false)
 
-        inventory["padlock"]--
+        inventory["lock_pick"]--
 
-        if (inventory["padlock"] <= 0) {
-            delete inventory["padlock"]
+        if (inventory["lock_pick"] <= 0) {
+            delete inventory["lock_pick"]
         }
 
         setInventory(message.member, inventory)
