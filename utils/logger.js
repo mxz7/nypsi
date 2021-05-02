@@ -41,19 +41,19 @@ function info(string, type) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    const out = `${color}[${day}/${month} ${getTimestamp()}] [${type}] ${string} \x1b[0m`
+    const out = `${color}${day}/${month} ${getTimestamp()} [${type}] ${string} \x1b[0m`
     console.log(out)
 
     if (!nextLogMsg.get("logs")) {
         nextLogMsg.set(
             "logs",
-            `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
+            `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``
         )
     } else {
         nextLogMsg.set(
             "logs",
             nextLogMsg.get("logs") +
-                `\`\`\`[${day}/${month} ${getTimestamp()}] [${type}] ${string}\`\`\``
+                `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``
         )
     }
 }
