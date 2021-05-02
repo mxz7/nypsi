@@ -250,7 +250,7 @@ async function run(message, args) {
 
                 embed2.addField(
                     "fail!!",
-                    `you were caught by the police, but your lawyer stopped you losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
+                    `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
                 )
             } else {
                 updateBalance(target, getBalance(target) + amountMoney)
