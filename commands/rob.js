@@ -75,7 +75,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`someone has reported you to the police, they will continue looking for you for **${remaining}**`))
+        return message.channel.send(new ErrorEmbed(`you have been reported to the police, they will continue looking for you for **${remaining}**`))
     }
 
     const prefix = getPrefix(message.guild)
@@ -322,8 +322,6 @@ async function run(message, args) {
 
 cmd.setRun(run)
 
-module.exports = cmd
-
 /**
  * 
  * @param {GuildMember} member 
@@ -332,7 +330,7 @@ function deleteRobCooldown(member) {
     cooldown.delete(member.user.id)
 }
 
-exports.deleteRobCooldown = deleteRobCooldown
+cmd.deleteRobCooldown = deleteRobCooldown
 
 /**
  * @returns {Boolean}
@@ -342,7 +340,7 @@ function onRobCooldown(member) {
     return cooldown.has(member.user.id)
 }
 
-exports.onRobCooldown = onRobCooldown
+cmd.onRobCooldown = onRobCooldown
 
 /**
  * 
@@ -356,7 +354,7 @@ function addRadioCooldown(id) {
     }, 900000)
 }
 
-exports.addRadioCooldown = addRadioCooldown
+cmd.addRadioCooldown = addRadioCooldown
 
 /**
  * 
@@ -367,4 +365,6 @@ function onRadioCooldown(member) {
     return radioCooldown.has(member.user.id)
 }
 
-exports.onRadioCooldown = onRadioCooldown
+cmd.onRadioCooldown = onRadioCooldown
+
+module.exports = cmd
