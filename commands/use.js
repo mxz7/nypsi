@@ -1,9 +1,10 @@
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock, getMaxBitcoin, getMaxDogecoin } = require("../utils/economy/utils")
+const { getItems, getInventory, setInventory, updateBalance, getBalance, userExists, createUser, updateXp, getXp, hasPadlock, setPadlock, addPadlock, getMaxBitcoin, getMaxDogecoin, getDMsEnabled } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const { getMember } = require("../utils/utils")
 
 const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
 
@@ -171,7 +172,7 @@ async function run(message, args) {
         setPadlock(message.member, true)
         inventory["padlock"]--
 
-        if (inventory["padlock"] == 0) {
+        if (inventory["padlock"] <= 0) {
             delete inventory["padlock"]
         }
 
@@ -181,7 +182,56 @@ async function run(message, args) {
 
         embed.setDescription("✅ your padlock has been applied")
     } else if (selected.id == "lawyer") {
-        return message.channel.send(new CustomEmbed(message.member, false, "lawyers will be used automatically when you rob someone"))
+        embed.setDescription("lawyers will be used automatically when you rob someone")
+    } else if (selected.id == "lock_pick") {
+        if (args.length == 1) {
+            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`))
+        }
+
+        let target
+
+        if (!message.mentions.members.first()) {
+            target = await getMember(message, args[1])
+        } else {
+            target = message.mentions.members.first()
+        }
+
+        if (!target) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+
+        if (!hasPadlock(target)) {
+            return message.channel.send(new ErrorEmbed("this member doesn't have a padlock"))
+        }
+
+        setPadlock(target, false)
+
+        inventory["padlock"]--
+
+        if (inventory["padlock"] <= 0) {
+            delete inventory["padlock"]
+        }
+
+        setInventory(message.member, inventory)
+
+        const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms")
+
+        targetEmbed.setColor("#e4334f")
+        targetEmbed.setTitle("your padlock has been picked")
+        targetEmbed.setDescription(
+            "**" +
+                message.member.user.tag +
+                "** has picked your padlock in **" +
+                message.guild.name +
+                "**\n" +
+                "your money is no longer protected by a padlock"
+        )
+
+        if (getDMsEnabled(target)) {
+            await target.send(targetEmbed)
+        }
+        embed.setDescription(`picking ${target.user.tag}'s lock...`)
+        laterDescription = `picking ${target.user.tag}'s lock...\n\nyou have successfully picked their lock`
     }
     //DO LOCKPICK, LAWYER AND MASK AND RING
 
