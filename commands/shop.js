@@ -127,7 +127,9 @@ async function run(message, args) {
                     await msg.reactions.removeAll()
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle("shop | " + message.author.username)
+            const newEmbed = new CustomEmbed(message.member).setTitle(
+                "shop | " + message.author.username
+            )
 
             if (!reaction) return
 
