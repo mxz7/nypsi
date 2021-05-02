@@ -45,10 +45,7 @@ function info(string, type) {
     console.log(out)
 
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set(
-            "logs",
-            `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``
-        )
+        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``)
     } else {
         nextLogMsg.set(
             "logs",
