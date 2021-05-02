@@ -19,7 +19,7 @@ const { payment } = require("../utils/logger")
 
 const cooldown = new Map()
 
-const cmd = new Command("pay", "give other users money", categories.MONEY).setAliases(["give"])
+const cmd = new Command("pay", "give other users money", categories.MONEY)
 
 /**
  * @param {Message} message
@@ -59,10 +59,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("pay help")
             .addField("usage", `${prefix}pay <user> <amount>`)
-            .addField(
-                "help",
-                "if you or the the receiving member have more than $**500k** there will be a **15**% tax deduction from the payment"
-            )
+            .addField("help", "the payment will be taxxed at certain amounts")
 
         return message.channel.send(embed)
     }

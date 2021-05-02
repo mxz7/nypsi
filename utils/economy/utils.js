@@ -1,6 +1,16 @@
+const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
+info(
+    `${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`,
+    types.ECONOMY
+)
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
+info(
+    `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`,
+    types.ECONOMY
+)
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
@@ -11,7 +21,6 @@ const { GuildMember, Guild, Client } = require("discord.js")
 const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
-const { info, types, error, getTimestamp } = require("../logger")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
@@ -154,11 +163,41 @@ function randomOffset() {
 }
 
 let padlockPrice = 25000 + randomOffset()
+items["padlock"].worth = padlockPrice
+info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
+    items["padlock"].worth = padlockPrice
     info("padlock price updated: $" + padlockPrice, types.ECONOMY)
 }, 3600000)
+
+async function updateCryptoWorth() {
+    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) =>
+        res.json()
+    )
+
+    const btcworth = Math.floor(res.bpi.USD.rate_float)
+
+    items["bitcoin"].worth = btcworth
+    info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
+
+    res = await fetch("https://api.cryptonator.com/api/ticker/doge-usd").then((res) => res.json())
+
+    const dogeworth = Math.floor(res.ticker.price * 1000)
+
+    if (!dogeworth) {
+        error("INVALID DOGECOIN WORTH")
+        return console.error(res)
+    }
+
+    items["dogecoin"].worth = dogeworth
+    info("dogecoin worth updated: $" + items["dogecoin"].worth, types.ECONOMY)
+}
+
+updateCryptoWorth()
+
+setInterval(updateCryptoWorth, 1500000)
 
 /**
  *
@@ -189,8 +228,15 @@ async function doVote(client, vote) {
 
     const amount = 15000 * (getPrestige(memberID) + 1)
     const multi = Math.floor((await getMulti(memberID)) * 100)
+    const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
+
+    if (inventory["vote_crate"]) {
+        inventory["vote_crate"] += getPrestige(memberID) + 1
+    } else {
+        inventory["vote_crate"] = getPrestige(memberID) + 1
+    }
 
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed()
@@ -198,7 +244,8 @@ async function doVote(client, vote) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
-                    `+ **10**% multiplier, total: **${multi}**%`
+                    `+ **10**% multiplier, total: **${multi}**%\n` +
+                    `+ **${getPrestige(memberID) + 1}** vote crates`
             )
 
         await member.send("thank you for voting!", embed)
@@ -448,7 +495,7 @@ exports.updateXp = updateXp
  */
 function getMaxBankBalance(member) {
     const xp = getXp(member)
-    const constant = 500
+    const constant = 250
     const starting = 15000
     const bonus = xp * constant
     const max = bonus + starting
@@ -825,7 +872,7 @@ exports.getPrestigeRequirement = getPrestigeRequirement
  * @param {Number} xp
  */
 function getPrestigeRequirementBal(xp) {
-    const constant = 500
+    const constant = 250
     const bonus = xp * constant
 
     return bonus
@@ -1017,12 +1064,21 @@ function reset() {
 
         let prestige = user.prestige
         let lastVote = user.lastVote
+        let inventory = user.inventory
 
         if (!lastVote) lastVote = 0
 
-        if (prestige > 14) prestige = 10 // REMOVE AFTER FIRST RESET
+        if (Array.from(Object.keys(inventory)).length == 0) {
+            inventory = undefined
+        } else {
+            for (let item of Array.from(Object.keys(inventory))) {
+                if (items[item].role != "collectable") {
+                    delete inventory[item]
+                }
+            }
+        }
 
-        if (prestige == 0 && lastVote == 0) {
+        if (prestige == 0 && lastVote == 0 && !inventory) {
             delete users[id]
             info("deleted " + id)
             deleted++
@@ -1030,6 +1086,7 @@ function reset() {
             user = new EconProfile()
             user.prestige = prestige
             user.lastVote = lastVote
+            user.inventory = inventory
 
             users[id] = user
             info("updated " + id)
@@ -1136,25 +1193,74 @@ function addPadlock(member) {
 
 exports.addPadlock = addPadlock
 
-// for (const user in users) {
-//     for (let worker in getWorkers(user)) {
-//         worker = parseInt(worker)
-//         const level = users[user].workers[worker].level
-//         const stored = users[user].workers[worker].stored
+/**
+ *
+ * @param {GuildMember} member
+ * @returns
+ */
+function getInventory(member) {
+    let id = member
 
-//         const allWorkers = getAllWorkers()
+    if (member.user) id = member.user.id
 
-//         let newWorker = allWorkers.get(parseInt(worker))
+    if (!users[id].inventory) {
+        users[id].inventory = {}
+        return {}
+    }
+    return users[id].inventory
+}
 
-//         newWorker = new newWorker()
+exports.getInventory = getInventory
 
-//         newWorker.stored = stored
+/**
+ *
+ * @param {GuildMember} member
+ * @param {Object} inventory
+ */
+function setInventory(member, inventory) {
+    let id = member
 
-//         for (let i = 1; i < level; i++) {
-//             newWorker.upgrade()
-//         }
+    if (member.user) id = member.user.id
 
-//         users[user].workers[worker] = newWorker
-//         info(`${user} ${worker} ${level}`)
-//     }
-// }
+    users[id].inventory = inventory
+}
+
+exports.setInventory = setInventory
+
+function getItems() {
+    return items
+}
+
+exports.getItems = getItems
+
+/**
+ * @returns {Number}
+ * @param {Guildmember} member
+ */
+function getMaxBitcoin(member) {
+    const base = 10
+    const prestigeBonus = 25 * getPrestige(member)
+    let xpBonus = 1 * Math.floor(getXp(member) / 100)
+
+    if (xpBonus > 10) xpBonus = 10
+
+    return base + prestigeBonus + xpBonus
+}
+
+exports.getMaxBitcoin = getMaxBitcoin
+
+/**
+ * @returns {Number}
+ * @param {Guildmember} member
+ */
+function getMaxDogecoin(member) {
+    const base = 10
+    const prestigeBonus = 25 * getPrestige(member)
+    let xpBonus = 1 * Math.floor(getXp(member) / 100)
+
+    if (xpBonus > 10) xpBonus = 10
+
+    return (base + prestigeBonus + xpBonus) * 10
+}
+
+exports.getMaxDogecoin = getMaxDogecoin

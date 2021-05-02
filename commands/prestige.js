@@ -12,6 +12,7 @@ const {
     createUser,
     getMulti,
     calcMaxBet,
+    getInventory,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
@@ -137,15 +138,32 @@ async function run(message, args) {
         const multi = await getMulti(message.member)
         const maxBet = await calcMaxBet(message.member)
 
+        const inventory = getInventory(message.member)
+
+        let amount = 1
+
+        if (getPrestige(message.member) > 5) {
+            amount = 2
+        } else if (getPrestige(message.member > 10)) {
+            amount = 3
+        }
+
+        if (inventory["basic_crate"]) {
+            inventory["basic_crate"] += amount
+        } else {
+            inventory["basic_crate"] = amount
+        }
+
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
                 `new vote rewards: $**${(
                     15000 *
                     (getPrestige(message.member) + 1)
-                ).toLocaleString()}**\n` +
+                ).toLocaleString()}**, **${getPrestige(message.member) + 1}** vote crates\n` +
                 `your new multiplier: **${Math.floor(
                     multi * 100
-                )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**`
+                )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
+                `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
         await msg.edit(embed)
     }

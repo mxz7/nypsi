@@ -79,7 +79,9 @@ async function run(message, args) {
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**10**% multiplier, current: **${multi}**%\n× **xp** gambling bonus\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward`
+            `× +**10**% multiplier, current: **${multi}**%\n× **xp** gambling bonus\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${
+                getPrestige(message.member) + 1
+            }** vote crate${getPrestige(message.member) > 0 ? "s" : ""}`
         )
         embed.setFooter("you get increased rewards for prestiging")
         removeFromVoteCache(message.member)
