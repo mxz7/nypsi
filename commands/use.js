@@ -230,8 +230,8 @@ async function run(message, args) {
         if (getDMsEnabled(target)) {
             await target.send(targetEmbed)
         }
-        embed.setDescription(`picking ${target.user.tag}'s lock...`)
-        laterDescription = `picking ${target.user.tag}'s lock...\n\nyou have successfully picked their lock`
+        embed.setDescription(`picking **${target.user.tag}**'s padlock...`)
+        laterDescription = `picking **${target.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
     }
     //DO LOCKPICK, LAWYER AND MASK AND RING
 
