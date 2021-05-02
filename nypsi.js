@@ -246,4 +246,4 @@ setTimeout(() => {
             getWebhooks(client)
         }, 2000)
     })
-}, 250)
+}, 500)
