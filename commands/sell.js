@@ -105,6 +105,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
+    if (amount < 1) {
+        return message.channel.send(new ErrorEmbed("invalid amount"))
+    }
+
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
