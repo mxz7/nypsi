@@ -8,19 +8,6 @@ const { getMember } = require("../utils/utils")
 
 const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
 
-const crateItems = [
-    "money:10000",
-    "money:15000",
-    "money:20000",
-    "money:50000",
-    "money:100000",
-    "xp:5",
-    "xp:10",
-    "xp:15",
-    "xp:25",
-    "xp:50",
-]
-
 const cooldown = new Map()
 
 /**
@@ -278,6 +265,19 @@ module.exports = cmd
 function openCrate(member, item) {
     const inventory = getInventory(member)
     const items = getItems()
+
+    const crateItems = [
+        "money:10000",
+        "money:15000",
+        "money:20000",
+        "money:50000",
+        "money:100000",
+        "xp:5",
+        "xp:10",
+        "xp:15",
+        "xp:25",
+        "xp:50",
+    ]
 
     for (const i of Array.from(Object.keys(items))) {
         crateItems.push(i)
