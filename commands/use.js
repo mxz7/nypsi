@@ -232,8 +232,25 @@ async function run(message, args) {
         }
         embed.setDescription(`picking **${target.user.tag}**'s padlock...`)
         laterDescription = `picking **${target.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
+    } else if (selected.id == "mask") {
+        const { onRobCooldown, deleteRobCooldown } = require("./rob")
+        
+        if (!onRobCooldown(message.member)) {
+            return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
+        }
+
+        deleteRobCooldown(message.member)
+
+        inventory["mask"]--
+
+        if (inventory["mask"] <= 0) {
+            delete inventory["mask"]
+        }
+
+        setInventory(message.member, inventory)
+
+        embed.setDescription("you're wearing your **mask** and can now rob someone again")
     }
-    //DO LOCKPICK, LAWYER AND MASK AND RING
 
     const msg = await message.channel.send(embed)
 
