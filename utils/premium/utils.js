@@ -4,10 +4,7 @@ const { PremUser, status } = require("../classes/PremStorage")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
 let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-info(
-    `${Array.from(Object.keys(data)).length.toLocaleString()} premium users loaded`,
-    types.DATA
-)
+info(`${Array.from(Object.keys(data)).length.toLocaleString()} premium users loaded`, types.DATA)
 let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 info(
     `${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`,

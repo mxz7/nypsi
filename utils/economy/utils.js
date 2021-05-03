@@ -1,17 +1,14 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-info(
-    `${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`,
-    types.DATA
-)
+info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`, types.DATA)
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`, types.DATA)
-const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
 info(
-    `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`,
+    `${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`,
     types.DATA
 )
+const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
+info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`, types.DATA)
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
