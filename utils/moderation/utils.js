@@ -370,6 +370,8 @@ function requestUnban(guild, member, client) {
 
     if (!guild) return
 
+    deleteBan(guild, member)
+
     guild.members.unban(member, "ban expired")
 }
 
