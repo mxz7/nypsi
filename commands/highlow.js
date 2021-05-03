@@ -328,10 +328,15 @@ async function playGame(message, m) {
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
+            let requiredBet = 1000
+            if (getPrestige(message.member) > 1) requiredBet = 10000
             if (bet >= 10000) {
-                const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
-                updateXp(message.member, getXp(message.member) + xpBonus)
-                newEmbed.setFooter("+" + xpBonus + "xp")
+                const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
+
+                const givenXp = xpBonus > 7 ? 7 : xpBonus
+
+                updateXp(message.member, getXp(message.member) + givenXp)
+                newEmbed.setFooter("+" + givenXp + "xp")
             }
 
             newEmbed.setDescription(
