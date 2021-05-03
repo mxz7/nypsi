@@ -71,8 +71,10 @@ setInterval(() => {
 function createProfile(guild) {
     data[guild.id] = {
         caseCount: 0,
+        muteRole: "",
         cases: [],
         mutes: [],
+        bans: []
     }
 }
 
@@ -219,6 +221,32 @@ function newMute(guild, userIDs, date) {
 exports.newMute = newMute
 
 /**
+ *
+ * @param {Guild} guild
+ * @param {Array<String>} userIDs
+ * @param {Date} date
+ * @param {Number} caseNumber
+ */
+function newBan(guild, userIDs, date, caseNumber) {
+    if (!(userIDs instanceof Array)) {
+        userIDs = [userIDs]
+    }
+
+    for (let userID of userIDs) {
+        const currentBans = data[guild.id].bans
+        const d = {
+            user: userID,
+            unbanTime: date,
+            caseNumber: caseNumber
+        }
+        currentBans.push(d)
+        data[guild.id].bans = currentBans
+    }
+}
+
+exports.newBan = newBan
+
+/**
  * @returns {Boolean}
  * @param {Guild} guild
  * @param {GuildMember} member
@@ -236,10 +264,27 @@ function isMuted(guild, member) {
 exports.isMuted = isMuted
 
 /**
+ * @returns {Boolean}
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ */
+function isBanned(guild, member) {
+    const currentBans = data[guild.id].bans
+    for (let ban of currentBans) {
+        if (ban.user == member.user.id) {
+            return true
+        }
+    }
+    return false
+}
+
+exports.isBanned = isBanned
+
+/**
  *
  * @param {Client} client
  */
-function runUnmuteChecks(client) {
+function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
         for (let guild in data) {
@@ -252,21 +297,21 @@ function runUnmuteChecks(client) {
                     }
                 }
             }
+            if (!data[guild].bans) data[guild].bans = [] // can remove after being in prod
+            const bans = data[guild].bans
+            if (bans.length > 0) {
+                for (let ban of bans) {
+                    if (ban.unbanTime <= date) {
+                        requestUnmute(guild, ban.user, client)
+                        info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
+                    }
+                }
+            }
         }
     }, 30000)
 }
 
-exports.runUnmuteChecks = runUnmuteChecks
-
-/**
- * @returns {JSON}
- * @param {Guild} guild
- */
-function getMutes(guild) {
-    return data[guild.id].mutes
-}
-
-exports.getMutes = getMutes
+exports.runModerationChecks = runModerationChecks
 
 /**
  *
@@ -301,6 +346,34 @@ function deleteMute(guild, member) {
 }
 
 exports.deleteMute = deleteMute
+
+function deleteBan(guild, member) {
+    let id = member.id
+
+    if (!id) {
+        id = member
+    }
+
+    const currentBans = data[guild.id].bans
+
+    for (let ban of currentBans) {
+        if (ban.user == id) {
+            currentBans.splice(currentBans.indexOf(ban), 1)
+        }
+    }
+
+    data[guild.id].bans = currentBans
+}
+
+exports.deleteBan = deleteBan
+
+function requestUnban(guild, member, client, caseNumber) {
+    guild = client.guilds.cache.find((g) => g.id == guild)
+
+    if (!guild) return
+
+    guild.members.unban(member, `case ${caseNumber}: ban expired`)
+}
 
 async function requestUnmute(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
