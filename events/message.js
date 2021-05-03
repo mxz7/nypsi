@@ -41,7 +41,7 @@ module.exports = async (message) => {
             return
         }
 
-        if (!message.channel.members.find(mm => mm.id == m.user.id)) return
+        if (!message.channel.members.find((mm) => mm.id == m.user.id)) return
 
         let content = message.content
 
