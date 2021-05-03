@@ -3,6 +3,10 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
 const { info, types, getTimestamp, error } = require("../logger")
 let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
+info(
+    `${Array.from(Object.keys(data)).length.toLocaleString()} moderation guilds loaded`,
+    types.DATA
+)
 
 let timer = 0
 let timerCheck = true

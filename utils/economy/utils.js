@@ -3,13 +3,14 @@ const fs = require("fs")
 let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
 info(
     `${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`,
-    types.ECONOMY
+    types.DATA
 )
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`, types.DATA)
 const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
 info(
     `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`,
-    types.ECONOMY
+    types.DATA
 )
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))

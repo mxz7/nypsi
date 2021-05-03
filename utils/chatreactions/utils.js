@@ -6,6 +6,7 @@ const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
+info(`${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`, types.DATA)
 
 const currentChannels = new Set()
 const lastGame = new Map()
