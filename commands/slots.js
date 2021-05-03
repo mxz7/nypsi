@@ -306,10 +306,15 @@ async function run(message, args) {
                         "**% bonus"
                 )
 
+                let requiredBet = 1000
+                if (getPrestige(message.member) > 1) requiredBet = 10000
                 if (bet >= 10000) {
-                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member) + 1
-                    updateXp(message.member, getXp(message.member) + xpBonus)
-                    embed.setFooter("+" + xpBonus + "xp")
+                    const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
+
+                    const givenXp = xpBonus > 7 ? 7 : xpBonus
+
+                    updateXp(message.member, getXp(message.member) + givenXp)
+                    embed.setFooter("+" + givenXp + "xp")
                 }
             } else {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
