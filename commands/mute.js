@@ -6,6 +6,7 @@ const {
     newMute,
     isMuted,
     deleteMute,
+    getMuteRole,
 } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -95,7 +96,11 @@ async function run(message, args) {
     let count = 0
     let failed = []
 
-    let muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
+
+    if (getMuteRole(message.guild) == "") {
+        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    }
 
     if (!muteRole) {
         let channelError = false
