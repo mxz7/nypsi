@@ -22,7 +22,7 @@ const {
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { MStoTime, showTopGlobalBal } = require("./utils/utils")
-const { runUnmuteChecks } = require("./utils/moderation/utils")
+const { runModerationChecks } = require("./utils/moderation/utils")
 const { info, types, error, getWebhooks } = require("./utils/logger")
 
 const snipe = new Map()
@@ -242,7 +242,7 @@ setTimeout(() => {
             showTopGlobalBal(client)
             runChecks()
             updateCache()
-            runUnmuteChecks(client)
+            runModerationChecks(client)
             getWebhooks(client)
         }, 2000)
     })
