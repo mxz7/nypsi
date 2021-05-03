@@ -296,15 +296,15 @@ async function run(message, args) {
                     "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
                 )
                 embed3.setDescription(
-                "**" +
-                    message.member.user.tag +
-                    "** tried to rob you in **" +
-                    message.guild.name +
-                    "**\n" +
-                    "they were caught by the police and you received $**" +
-                    amountMoney.toLocaleString() +
-                    "**"
-                )  
+                    "**" +
+                        message.member.user.tag +
+                        "** tried to rob you in **" +
+                        message.guild.name +
+                        "**\n" +
+                        "they were caught by the police and you received $**" +
+                        amountMoney.toLocaleString() +
+                        "**"
+                )
             }
 
             embed2.setColor("#e4334f")
