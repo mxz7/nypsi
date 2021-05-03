@@ -2,6 +2,7 @@ const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { info, types } = require("../logger")
 let users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
+info(`${Array.from(Object.keys(users)).length.toLocaleString()} socials users loaded`, types.DATA)
 
 let timer = 0
 let timerCheck = true

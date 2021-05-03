@@ -25,7 +25,6 @@ const cooldown = new Set()
 const beingChecked = []
 
 function loadCommands() {
-    info("loading commands..", types.INFO)
     const commandFiles = fs.readdirSync("./commands/").filter((file) => file.endsWith(".js"))
     const failedTable = []
 
@@ -69,9 +68,10 @@ function loadCommands() {
 
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }))
-    } else {
-        info("all commands loaded without error ✅")
     }
+
+    info(`${commands.size.toLocaleString()} commands loaded`)
+    info(`${aliases.size.toLocaleString()} aliases loaded`)
 }
 
 /**
