@@ -1,6 +1,7 @@
 const { Guild, Client } = require("discord.js")
 const { setPrefix, updateDisabledCommands } = require("../utils/guilds/utils")
 const { info, types } = require("../utils/logger")
+const { setMuteRole } = require("../utils/moderation/utils")
 
 /**
  * @param {Client} client
@@ -13,4 +14,5 @@ module.exports = async (client, guild) => {
     )
     setPrefix(guild, "$")
     updateDisabledCommands(guild, [])
+    setMuteRole(guild, "")
 }
