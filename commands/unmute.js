@@ -82,7 +82,13 @@ async function run(message, args) {
     }
 
     if (!muteRole) {
-        return message.channel.send(new ErrorEmbed(`no mute role could be found, set one with ${getPrefix(message.guild)}muterole, or create a role called "muted"`))
+        return message.channel.send(
+            new ErrorEmbed(
+                `no mute role could be found, set one with ${getPrefix(
+                    message.guild
+                )}muterole, or create a role called "muted"`
+            )
+        )
     }
 
     let count = 0
