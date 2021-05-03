@@ -47,9 +47,12 @@ async function run(message, args) {
     }
 
     if (selected.role == "collectable") {
-        return message.channel.send(new ErrorEmbed("collectables can't be sold, although there are some incredibly rare collectables"))
+        return message.channel.send(
+            new ErrorEmbed(
+                "collectables can't be sold, although there are some incredibly rare collectables"
+            )
+        )
     }
-    
 
     if (!selected.worth) {
         return message.channel.send(new ErrorEmbed("this item can not be bought or sold"))
