@@ -74,7 +74,7 @@ function createProfile(guild) {
         muteRole: "",
         cases: [],
         mutes: [],
-        bans: []
+        bans: [],
     }
 }
 
@@ -367,8 +367,8 @@ function deleteBan(guild, member) {
 exports.deleteBan = deleteBan
 
 /**
- * 
- * @param {Guild} guild 
+ *
+ * @param {Guild} guild
  * @returns {String}
  */
 function getMuteRole(guild) {
@@ -378,9 +378,9 @@ function getMuteRole(guild) {
 exports.getMuteRole = getMuteRole
 
 /**
- * 
- * @param {Guild} guild 
- * @param {Role} role 
+ *
+ * @param {Guild} guild
+ * @param {Role} role
  */
 function setMuteRole(guild, role) {
     if (role == "") {
