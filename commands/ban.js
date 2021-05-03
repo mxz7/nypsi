@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { newCase, profileExists, createProfile } = require("../utils/moderation/utils")
+const { newCase, profileExists, createProfile, newBan } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -80,11 +80,24 @@ async function run(message, args) {
     const members = message.mentions.members
     let reason = message.member.user.tag + ": "
     let days = 1
+    let unbanDate
+    let temporary = false
+    let duration
 
     if (args.length != members.size) {
         for (let i = 0; i < members.size; i++) {
             args.shift()
         }
+
+        duration = getDuration(args[0].toLowerCase())
+
+        unbanDate = new Date().getTime() + duration * 1000
+
+        if (duration) {
+            temporary = true
+            args.shift()
+        }
+
         reason = reason + args.join(" ")
     } else {
         reason = reason + "no reason given"
@@ -143,11 +156,16 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("i was unable to ban any users"))
     }
 
+    let banLength = ""
+
     const embed = new CustomEmbed(message.member)
         .setTitle("ban | " + message.member.user.username)
         .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
 
-    if (reason.split(": ")[1] == "no reason given") {
+    if (temporary) {
+        banLength = getTime(duration * 1000)
+        embed.setDescription(`✅ **${count}** members banned for: **${banLength}**`)
+    } else if (reason.split(": ")[1] == "no reason given") {
         embed.setDescription(`✅ **${count}** members banned`)
     } else {
         embed.setDescription(`✅ **${count}** members banned for: ${reason.split(": ")[1]}`)
@@ -155,7 +173,9 @@ async function run(message, args) {
 
     if (count == 1 && failed.length == 0) {
         if (idOnly) {
-            if (reason.split(": ")[1] == "no reason given") {
+            if (temporary) {
+                embed.setDescription(`✅ \`${members.first()}\` has been banned for: **${banLength}**`)
+            } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription(`✅ \`${members.first()}\` has been banned`)
             } else {
                 embed.setDescription(
@@ -163,7 +183,9 @@ async function run(message, args) {
                 )
             }
         } else {
-            if (reason.split(": ")[1] == "no reason given") {
+            if (temporary) {
+                embed.setDescription(`✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`)
+            } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription("✅ `" + members.first().user.tag + "` has been banned")
             } else {
                 embed.setDescription(
@@ -202,6 +224,9 @@ async function run(message, args) {
             message.member.user.tag,
             reason.split(": ")[1]
         )
+        if (temporary) {
+            newBan(message.guild, members.first(), unbanDate)
+        }
     } else {
         const members1 = members.keyArray()
 
@@ -215,17 +240,27 @@ async function run(message, args) {
 
         newCase(message.guild, "ban", members1, message.author.tag, reason.split(": ")[1])
 
+        if (temporary) {
+            newBan(message.guild, members1, unbanDate)
+        }
+
         if (args.join(" ").includes("-s")) return
         for (let member of members1) {
             const m = members.get(member)
 
             if (reason.split(": ")[1] == "no reason given") {
-                await m.send(`you have been banned from ${message.guild.name}`)
+                await m.send(`you have been banned from ${message.guild.name}${temporary ? `\n\nexpires in **${banLength}**}` : ""}`)
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
-                    .addField("reason", `\`${reason.split(": ")[1]}\``)
+                    .addField("reason", `\`${reason.split(": ")[1]}\``, true)
 
+                if (temporary) {
+                    embed.addField("length", `\`${banLength}\``, true)
+                    embed.setFooter("unbanned at:")
+                    embed.setTimestamp(unbanDate)
+                }
+                
                 await m.send(`you have been banned from ${message.guild.name}`, embed)
             }
         }
@@ -235,3 +270,89 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
+
+function getDuration(duration) {
+    duration.toLowerCase()
+
+    if (duration.includes("d")) {
+        if (!parseInt(duration.split("d")[0])) return undefined
+
+        const num = duration.split("d")[0]
+
+        return num * 86400
+    } else if (duration.includes("h")) {
+        if (!parseInt(duration.split("h")[0])) return undefined
+
+        const num = duration.split("h")[0]
+
+        return num * 3600
+    } else if (duration.includes("m")) {
+        if (!parseInt(duration.split("m")[0])) return undefined
+
+        const num = duration.split("m")[0]
+
+        return num * 60
+    } else if (duration.includes("s")) {
+        if (!parseInt(duration.split("s")[0])) return undefined
+
+        const num = duration.split("s")[0]
+
+        return num
+    }
+}
+
+function getTime(ms) {
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    const daysms = ms % (24 * 60 * 60 * 1000)
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
+    const hoursms = ms % (60 * 60 * 1000)
+    const minutes = Math.floor(hoursms / (60 * 1000))
+    const minutesms = ms % (60 * 1000)
+    const sec = Math.floor(minutesms / 1000)
+
+    let output = ""
+
+    if (days > 0) {
+        let a = " days"
+
+        if (days == 1) {
+            a = " day"
+        }
+
+        output = days + a
+    }
+
+    if (hours > 0) {
+        let a = " hours"
+
+        if (hours == 1) {
+            a = " hour"
+        }
+
+        if (output == "") {
+            output = hours + a
+        } else {
+            output = `${output} ${hours}${a}`
+        }
+    }
+
+    if (minutes > 0) {
+        let a = " mins"
+
+        if (minutes == 1) {
+            a = " min"
+        }
+
+        if (output == "") {
+            output = minutes + a
+        } else {
+            output = `${output} ${minutes}${a}`
+        }
+    }
+
+    if (sec > 0) {
+        output = output + sec + "s"
+    }
+
+    return output
+}
