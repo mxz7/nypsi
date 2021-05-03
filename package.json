@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write ."
   },
-  "author": "",
+  "author": "tekoh",
   "license": "ISC",
   "dependencies": {
     "@top-gg/sdk": "^3.1.1",
@@ -25,5 +25,13 @@
   "devDependencies": {
     "eslint": "^7.25.0",
     "prettier": "2.2.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekoh/nypsi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tekoh/nypsi/issues"
+  },
+  "homepage": "https://github.com/tekoh/nypsi#readme"
 }
