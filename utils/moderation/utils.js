@@ -383,7 +383,11 @@ exports.getMuteRole = getMuteRole
  * @param {Role} role 
  */
 function setMuteRole(guild, role) {
-    data[guild.id].muteRole = role.id
+    if (role == "") {
+        data[guild.id].muteRole = ""
+    } else {
+        data[guild.id].muteRole = role.id
+    }
 }
 
 exports.setMuteRole = setMuteRole
