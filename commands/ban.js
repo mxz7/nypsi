@@ -174,7 +174,9 @@ async function run(message, args) {
     if (count == 1 && failed.length == 0) {
         if (idOnly) {
             if (temporary) {
-                embed.setDescription(`✅ \`${members.first()}\` has been banned for: **${banLength}**`)
+                embed.setDescription(
+                    `✅ \`${members.first()}\` has been banned for: **${banLength}**`
+                )
             } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription(`✅ \`${members.first()}\` has been banned`)
             } else {
@@ -184,7 +186,9 @@ async function run(message, args) {
             }
         } else {
             if (temporary) {
-                embed.setDescription(`✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`)
+                embed.setDescription(
+                    `✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`
+                )
             } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription("✅ `" + members.first().user.tag + "` has been banned")
             } else {
@@ -249,7 +253,11 @@ async function run(message, args) {
             const m = members.get(member)
 
             if (reason.split(": ")[1] == "no reason given") {
-                await m.send(`you have been banned from ${message.guild.name}${temporary ? `\n\nexpires in **${banLength}**}` : ""}`)
+                await m.send(
+                    `you have been banned from ${message.guild.name}${
+                        temporary ? `\n\nexpires in **${banLength}**}` : ""
+                    }`
+                )
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
@@ -260,7 +268,7 @@ async function run(message, args) {
                     embed.setFooter("unbanned at:")
                     embed.setTimestamp(unbanDate)
                 }
-                
+
                 await m.send(`you have been banned from ${message.guild.name}`, embed)
             }
         }
