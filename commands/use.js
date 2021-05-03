@@ -185,6 +185,10 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("invalid user"))
         }
 
+        if (message.member == target) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+
         if (!hasPadlock(target)) {
             return message.channel.send(new ErrorEmbed("this member doesn't have a padlock"))
         }
@@ -252,6 +256,10 @@ async function run(message, args) {
         }
 
         if (!target) {
+            return message.channel.send(new ErrorEmbed("invalid user"))
+        }
+
+        if (message.member == target) {
             return message.channel.send(new ErrorEmbed("invalid user"))
         }
 
