@@ -6,6 +6,7 @@ const {
     newCase,
     isMuted,
     deleteMute,
+    getMuteRole,
 } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -74,10 +75,14 @@ async function run(message, args) {
 
     const members = message.mentions.members
 
-    let muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
+
+    if (getMuteRole(message.guild) == "") {
+        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    }
 
     if (!muteRole) {
-        return message.channel.send(new ErrorEmbed("there is no 'muted' role"))
+        return message.channel.send(new ErrorEmbed(`no mute role could be found, set one with ${getPrefix(message.guild)}muterole, or create a role called "muted"`))
     }
 
     let count = 0
