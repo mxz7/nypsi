@@ -5,6 +5,7 @@ const { GuildStorage, Countdown } = require("../classes/GuildStorage")
 const { info, types, error } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
+info(`${Array.from(Object.keys(guilds)).length.toLocaleString()} guilds loaded`, types.DATA)
 
 let timer = 0
 let timerCheck = true
