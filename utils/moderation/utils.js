@@ -225,9 +225,8 @@ exports.newMute = newMute
  * @param {Guild} guild
  * @param {Array<String>} userIDs
  * @param {Date} date
- * @param {Number} caseNumber
  */
-function newBan(guild, userIDs, date, caseNumber) {
+function newBan(guild, userIDs, date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
@@ -237,7 +236,6 @@ function newBan(guild, userIDs, date, caseNumber) {
         const d = {
             user: userID,
             unbanTime: date,
-            caseNumber: caseNumber
         }
         currentBans.push(d)
         data[guild.id].bans = currentBans
@@ -302,7 +300,7 @@ function runModerationChecks(client) {
             if (bans.length > 0) {
                 for (let ban of bans) {
                     if (ban.unbanTime <= date) {
-                        requestUnban(guild, ban.user, client, ban.caseNumber)
+                        requestUnban(guild, ban.user, client)
                         info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
                     }
                 }
@@ -367,12 +365,12 @@ function deleteBan(guild, member) {
 
 exports.deleteBan = deleteBan
 
-function requestUnban(guild, member, client, caseNumber) {
+function requestUnban(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
     if (!guild) return
 
-    guild.members.unban(member, `case ${caseNumber}: ban expired`)
+    guild.members.unban(member, "ban expired")
 }
 
 async function requestUnmute(guild, member, client) {
