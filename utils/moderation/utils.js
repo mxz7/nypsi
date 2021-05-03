@@ -302,7 +302,7 @@ function runModerationChecks(client) {
             if (bans.length > 0) {
                 for (let ban of bans) {
                     if (ban.unbanTime <= date) {
-                        requestUnmute(guild, ban.user, client)
+                        requestUnban(guild, ban.user, client, ban.caseNumber)
                         info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
                     }
                 }
