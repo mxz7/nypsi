@@ -46,7 +46,7 @@ async function run(message, args) {
             )
             .addField(
                 "examples",
-                `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s`
+                `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s\n${prefix}ban @member 1d annoying`
             )
 
         return message.channel.send(embed)
