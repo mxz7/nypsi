@@ -1,6 +1,6 @@
 const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
-const { Guild, Message, GuildMember, Client } = require("discord.js")
+const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
 const { info, types, getTimestamp, error } = require("../logger")
 let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 
@@ -286,6 +286,8 @@ function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
         for (let guild in data) {
+            if (!data[guild].bans) data[guild].bans = [] // can remove after being in prod
+            if (!data[guild].muteRole) data[guild].muteRole = "" // can remove after being in prod
             const mutes = data[guild].mutes
             if (mutes.length > 0) {
                 for (let mute of mutes) {
@@ -295,7 +297,6 @@ function runModerationChecks(client) {
                     }
                 }
             }
-            if (!data[guild].bans) data[guild].bans = [] // can remove after being in prod
             const bans = data[guild].bans
             if (bans.length > 0) {
                 for (let ban of bans) {
@@ -365,6 +366,28 @@ function deleteBan(guild, member) {
 
 exports.deleteBan = deleteBan
 
+/**
+ * 
+ * @param {Guild} guild 
+ * @returns {String}
+ */
+function getMuteRole(guild) {
+    return data[guild.id].muteRole
+}
+
+exports.getMuteRole = getMuteRole
+
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {Role} role 
+ */
+function setMuteRole(guild, role) {
+    data[guild.id].muteRole = role.id
+}
+
+exports.setMuteRole = setMuteRole
+
 function requestUnban(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
@@ -401,7 +424,11 @@ async function requestUnmute(guild, member, client) {
         }
     }
 
-    const muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    let muteRole = await guild.roles.cache.find((r) => r.id == data[guild.id].muteRole)
+
+    if (data[guild.id].muteRole == "") {
+        muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    }
 
     if (!muteRole) return deleteMute(guild, newMember)
 
