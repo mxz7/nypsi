@@ -5,7 +5,11 @@ const { getItems, userExists, getInventory, setInventory } = require("../utils/e
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { info } = require("../utils/logger")
 
-const cmd = new Command("crateall", "give every user in the current message.guild a crate", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command(
+    "crateall",
+    "give every user in the current message.guild a crate",
+    categories.NONE
+).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message
@@ -75,13 +79,19 @@ async function run(message, args) {
         } else {
             inventory[selected.id] = 1
         }
-        
+
         setInventory(m, inventory)
         info(`${selected.id} given to ${m.user.tag} (${m.user.id})`)
         count++
     }
 
-    return message.channel.send(new CustomEmbed(message.member, false, `**${count}** ${selected.name}${count != 1 ? "s": ""} given`))
+    return message.channel.send(
+        new CustomEmbed(
+            message.member,
+            false,
+            `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`
+        )
+    )
 }
 
 cmd.setRun(run)

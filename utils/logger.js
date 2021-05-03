@@ -67,7 +67,8 @@ function error(string) {
     } else {
         nextLogMsg.set(
             "logs",
-            nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``
+            nextLogMsg.get("logs") +
+                `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``
         )
     }
 }
