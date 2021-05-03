@@ -20,7 +20,7 @@ const cmd = new Command(
     "workers",
     "view the available workers and manage your own",
     categories.MONEY
-).setAliases(["worker", "minion", "minions"])
+).setAliases(["worker", "minion", "minions", "slave", "slaves"])
 
 const cooldown = new Map()
 
