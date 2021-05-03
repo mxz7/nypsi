@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
-const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
+const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -57,6 +57,7 @@ async function run(message, args) {
                 .unban(arg, message.member.user.tag)
                 .then((user) => {
                     members.push(user)
+                    deleteBan(message.guild, arg)
                 })
                 .catch(() => {
                     failed.push(arg)
@@ -75,6 +76,7 @@ async function run(message, args) {
                         .unban(id, message.member.user.tag)
                         .then((user) => {
                             members.push(user)
+                            deleteBan(message.guild, user)
                         })
                         .catch(() => {
                             failed.push(arg)
