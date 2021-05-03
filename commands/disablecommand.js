@@ -8,7 +8,7 @@ const cmd = new Command(
     "disablecommand",
     "disable certain commands in your server",
     categories.ADMIN
-).setAliases(["disablecmd", "disable"])
+).setAliases(["disablecmd", "disable"]).setPermissions("MANAGE_SERVER")
 
 /**
  * @param {Message} message
