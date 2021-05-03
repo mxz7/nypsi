@@ -58,13 +58,16 @@ function info(string, type) {
 exports.info = info
 
 function error(string) {
-    console.error(`\x1B[31m[${getTimestamp()}] [error] ${string}\x1B[0m`)
+    const day = new Date().getDate()
+    const month = new Date().getMonth() + 1
+
+    console.error(`\x1B[31m${day}/${month} ${getTimestamp()} [error] ${string}\x1B[0m`)
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``)
+        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``)
     } else {
         nextLogMsg.set(
             "logs",
-            nextLogMsg.get("logs") + `\`\`\`[${getTimestamp()}] [error] ${string}\`\`\``
+            nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``
         )
     }
 }
