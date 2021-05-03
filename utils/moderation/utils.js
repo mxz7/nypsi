@@ -428,6 +428,8 @@ async function requestUnmute(guild, member, client) {
         }
     }
 
+    await guild.roles.fetch()
+
     let muteRole = await guild.roles.cache.find((r) => r.id == data[guild.id].muteRole)
 
     if (data[guild.id].muteRole == "") {
