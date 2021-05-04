@@ -106,6 +106,10 @@ async function run(message, args) {
 
     let amount = parseInt(args[1])
 
+    if (!amount) {
+        return message.channel.send(new ErrorEmbed("invalid payment"))
+    }
+
     if (amount > getBalance(message.member)) {
         return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
     }
