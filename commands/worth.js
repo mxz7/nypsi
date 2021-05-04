@@ -17,7 +17,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}worth <item>`))
+        return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}worth <item> (amount)\n\ncalculates the worth of an item`))
     }
 
     const items = getItems()
