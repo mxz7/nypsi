@@ -123,6 +123,10 @@ async function run(message, args) {
     const bet = parseInt(args[1])
 
     if (!bet) {
+        return message.channel.send(new ErrorEmbed("invalid bet"))
+    }
+
+    if (!bet) {
         return message.channel.send(
             new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
         )

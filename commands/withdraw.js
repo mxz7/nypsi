@@ -96,6 +96,10 @@ async function run(message, args) {
         )
     }
 
+    if (!amount) {
+        return message.channel.send(new ErrorEmbed("invalid payment"))
+    }
+
     if (amount <= 0) {
         return message.channel.send(new ErrorEmbed("invalid payment"))
     }
