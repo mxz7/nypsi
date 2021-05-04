@@ -3,7 +3,8 @@ const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getMember } = require("../utils/utils")
-const { updateBalance, getBalance } = require("../utils/economy/utils")
+const { updateBalance, getBalance, userExists } = require("../utils/economy/utils")
+const { createProfile } = require("../utils/moderation/utils")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -94,6 +95,7 @@ async function run(message, args) {
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id)
+            if (!userExists(member)) createProfile(member)
             updateBalance(member, getBalance(member) + 1069)
         }
     } else if (hotAmount >= 80) {
