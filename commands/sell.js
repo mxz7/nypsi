@@ -51,7 +51,7 @@ async function run(message, args) {
             new CustomEmbed(
                 message.member,
                 false,
-                "sell items from your inventory\n\ncoins have a set fee of **10**% per coin, while standard items have a **40**% fee"
+                "sell items from your inventory\n\ncoins have a set fee of **10**% per coin, while standard items have a **50**% fee"
             )
         )
     }
