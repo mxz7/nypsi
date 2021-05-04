@@ -108,6 +108,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("invalid amount"))
     }
 
+    if (!amount) {
+        return message.channel.send(new ErrorEmbed("invalid amount"))
+    }
+
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
         return message.channel.send(new ErrorEmbed("you dont have any " + selected.name))
     }

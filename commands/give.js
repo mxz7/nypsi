@@ -139,6 +139,10 @@ async function run(message, args) {
         }
     }
 
+    if (!amount) {
+        return message.channel.send(new ErrorEmbed("invalid amount"))
+    }
+
     if (selected.id == "bitcoin") {
         const owned = targetInventory["bitcoin"] || 0
         const max = getMaxBitcoin(target)

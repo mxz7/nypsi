@@ -125,6 +125,10 @@ async function run(message, args) {
 
     const bet = parseInt(args[1])
 
+    if (!bet) {
+        return message.channel.send(new ErrorEmbed("invalid bet"))
+    }
+
     if (bet <= 0) {
         return message.channel.send(new ErrorEmbed(`${prefix}coinflip @user 100`))
     }
