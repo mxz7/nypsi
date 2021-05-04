@@ -61,6 +61,8 @@ async function run(message, args) {
 
         embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
         embed.addField("help", "give members items from your inventory")
+
+        return message.channel.send(embed)
     }
 
     let target = message.mentions.members.first()
