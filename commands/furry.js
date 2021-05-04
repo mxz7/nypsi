@@ -1,9 +1,10 @@
 const { Message } = require("discord.js")
-const { updateXp, getXp } = require("../utils/economy/utils.js")
+const { updateXp, getXp, userExists } = require("../utils/economy/utils.js")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getMember } = require("../utils/utils")
+const { createProfile } = require("../utils/moderation/utils.js")
 
 const cache = new Map()
 const cooldown = new Map()
@@ -116,6 +117,7 @@ async function run(message, args) {
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id)
+            if (!userExists(member)) createProfile(member)
             updateXp(member, getXp(member) + 1)
         }
     }
