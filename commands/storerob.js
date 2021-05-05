@@ -1,4 +1,11 @@
-const { getBalance, createUser, updateBalance, userExists, setInventory, getInventory } = require("../utils/economy/utils.js")
+const {
+    getBalance,
+    createUser,
+    updateBalance,
+    userExists,
+    setInventory,
+    getInventory,
+} = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")

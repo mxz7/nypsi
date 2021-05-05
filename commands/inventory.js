@@ -102,7 +102,9 @@ async function run(message, args) {
         pages.push(pageOfItems)
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
+    const embed = new CustomEmbed(message.member).setFooter(
+        `page ${page + 1}/${pages.length} | worth: $${worth.toLocaleString()}`
+    )
 
     embed.setTitle("inventory | " + message.author.username)
 
@@ -172,7 +174,11 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
+                    newEmbed.setFooter(
+                        `page ${currentPage + 1}/${
+                            pages.length
+                        } | worth: $${worth.toLocaleString()}`
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
@@ -197,7 +203,11 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
+                    newEmbed.setFooter(
+                        `page ${currentPage + 1}/${
+                            pages.length
+                        } | worth: $${worth.toLocaleString()}`
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
