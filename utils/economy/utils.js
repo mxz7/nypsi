@@ -1252,7 +1252,7 @@ exports.getMaxBitcoin = getMaxBitcoin
  * @param {Guildmember} member
  */
 function getMaxDogecoin(member) {
-    return (getMaxBitcoin(member)) * 10
+    return getMaxBitcoin(member) * 10
 }
 
 exports.getMaxDogecoin = getMaxDogecoin
