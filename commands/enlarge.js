@@ -69,7 +69,9 @@ async function run(message, args) {
         url = url + ".png"
     }
 
-    return message.channel.send(new CustomEmbed(message.member).setImage(url).setFooter(`id: ${emojiID}`))
+    return message.channel.send(
+        new CustomEmbed(message.member).setImage(url).setFooter(`id: ${emojiID}`)
+    )
 }
 
 cmd.setRun(run)
