@@ -58,8 +58,22 @@ async function run(message, args) {
     }
 
     if (chastityCooldown.has(message.member.user.id)) {
-        const remaining = timeUntil(chastityCooldown.get(message.author.id))
+        const init = chastityCooldown.get(message.member.user.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 10800 - diff
 
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        
         return message.channel.send(
             new ErrorEmbed(
                 `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
@@ -232,41 +246,3 @@ function onChastityCooldown(id) {
 }
 
 cmd.onChastityCooldown = onChastityCooldown
-
-function timeUntil(date) {
-    const ms = Math.floor(date - new Date())
-
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor(daysms / (60 * 60 * 1000))
-    const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor(hoursms / (60 * 1000))
-    const minutesms = ms % (60 * 1000)
-    const sec = Math.floor(minutesms / 1000)
-
-    let output = ""
-
-    if (days > 0) {
-        output = output + days + "d "
-    }
-
-    if (hours > 0) {
-        output = output + hours + "h "
-    }
-
-    if (minutes > 0) {
-        output = output + minutes + "m "
-    }
-
-    if (sec > 0) {
-        output = output + sec + "s"
-    } else if (output != "") {
-        output = output.substr(0, output.length - 1)
-    }
-
-    if (output == "") {
-        output = "0s"
-    }
-
-    return output
-}
