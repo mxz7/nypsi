@@ -12,6 +12,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
 ])
 
 const cooldown = new Map()
+const chastityCooldown = new Map()
 const looking = new Map()
 
 const descFilter = [
@@ -54,6 +55,30 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    if (chastityCooldown.has(message.member.user.id)) {
+        const init = chastityCooldown.get(message.member.user.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 10800 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+
+        return message.channel.send(
+            new ErrorEmbed(
+                `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -192,3 +217,42 @@ setInterval(() => {
         }
     })
 }, 600000)
+
+/**
+ *
+ * @param {String} id
+ */
+function addChastityCooldown(id) {
+    if (looking.has(id)) {
+        looking.delete(id)
+    }
+
+    chastityCooldown.set(id, new Date())
+
+    setTimeout(() => {
+        chastityCooldown.delete(id)
+    }, 10800000)
+}
+
+cmd.addChastityCooldown = addChastityCooldown
+
+/**
+ *
+ * @param {String} id
+ * @returns {Boolean}
+ */
+function onChastityCooldown(id) {
+    return chastityCooldown.has(id)
+}
+
+cmd.onChastityCooldown = onChastityCooldown
+
+/**
+ *
+ * @param {String} id
+ */
+function deleteChastityCooldown(id) {
+    chastityCooldown.delete(id)
+}
+
+cmd.deleteChastityCooldown = deleteChastityCooldown
