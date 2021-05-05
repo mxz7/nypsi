@@ -73,7 +73,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        
+
         return message.channel.send(
             new ErrorEmbed(
                 `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
@@ -219,8 +219,8 @@ setInterval(() => {
 }, 600000)
 
 /**
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  */
 function addChastityCooldown(id) {
     if (looking.has(id)) {
@@ -237,8 +237,8 @@ function addChastityCooldown(id) {
 cmd.addChastityCooldown = addChastityCooldown
 
 /**
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  * @returns {Boolean}
  */
 function onChastityCooldown(id) {
@@ -248,8 +248,8 @@ function onChastityCooldown(id) {
 cmd.onChastityCooldown = onChastityCooldown
 
 /**
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  */
 function deleteChastityCooldown(id) {
     chastityCooldown.delete(id)
