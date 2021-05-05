@@ -7,8 +7,6 @@ info(
     `${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`,
     types.DATA
 )
-const items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
-info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`, types.DATA)
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
@@ -155,6 +153,45 @@ setInterval(() => {
         }
     }
 }, 5 * 60 * 1000)
+
+let items
+
+/**
+ * 
+ * @returns {String}
+ */
+function loadItems() {
+    let txt = ""
+    items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
+    info(
+        `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`,
+        types.DATA
+    )
+
+    txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`
+
+    let deleted = 0
+    
+    for (let user of Array.from(Object.keys(users))) {
+        for (let item of Array.from(Object.keys(users[user].inventory))) {
+            if (!Array.from(Object.keys(items)).includes(item)) {
+                delete users[user].inventory[item]
+                deleted++
+            }
+        }
+    }
+
+    if (deleted != 0) {
+        info(`${deleted} items deleted from inventories`)
+        txt += `\n${deleted.toLocaleString()} items deleted from inventories`
+    }
+    
+    return txt
+}
+
+exports.loadItems = loadItems
+
+loadItems()
 
 function randomOffset() {
     return parseInt(Math.floor(Math.random() * 50000))
