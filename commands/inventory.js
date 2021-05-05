@@ -2,7 +2,13 @@ const { Message } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getInventory, getItems, createUser, userExists, getMulti } = require("../utils/economy/utils")
+const {
+    getInventory,
+    getItems,
+    createUser,
+    userExists,
+    getMulti,
+} = require("../utils/economy/utils")
 
 const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases([
     "inv",
