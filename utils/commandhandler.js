@@ -51,7 +51,11 @@ function loadCommands() {
                 commands.set(command.name, command)
                 if (command.aliases) {
                     for (let a of command.aliases) {
-                        aliases.set(a, command.name)
+                        if (aliases.has(a)) {
+                            error(`duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`)
+                        } else {
+                            aliases.set(a, command.name)
+                        }
                     }
                 }
             } else {
@@ -84,9 +88,6 @@ function reloadCommand(commandsArray) {
     for (let cmd of commandsArray) {
         try {
             commands.delete(cmd)
-            if (aliases.has(cmd)) {
-                aliases.delete(cmd)
-            }
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)]
             } catch (e) {
@@ -110,7 +111,11 @@ function reloadCommand(commandsArray) {
                 commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
                     for (let a of commandData.aliases) {
-                        aliases.set(a, commandData.name)
+                        if (aliases.has(a)) {
+                            error(`duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${commandData.name}] - not overwriting`)
+                        } else {
+                            aliases.set(a, commandData.name)
+                        }
                     }
                 }
                 reloadTable.push([commandData.name, "✅"])
