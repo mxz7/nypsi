@@ -71,8 +71,9 @@ async function run(message, args) {
     inPlaceSort(itemIDs).asc()
 
     const pages = []
-
     let pageOfItems = []
+    let worth = 0
+
     for (const item of itemIDs) {
         if (pageOfItems.length == 6) {
             pages.push(pageOfItems)
@@ -80,13 +81,22 @@ async function run(message, args) {
         } else {
             pageOfItems.push(item)
         }
+        if (items[item].worth) {
+            let fee = 0.5
+            if (items[item].emoji == ":coin:") {
+                fee = 0.95
+            }
+            const amount = inventory[item]
+
+            worth += Math.floor(items[item].worth * fee * amount)
+        }
     }
 
     if (pageOfItems.length != 0) {
         pages.push(pageOfItems)
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
+    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
 
     embed.setTitle("inventory | " + message.author.username)
 
@@ -156,7 +166,7 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
@@ -181,7 +191,7 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
