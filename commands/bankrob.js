@@ -1,4 +1,4 @@
-const { getBalance, createUser, updateBalance, userExists } = require("../utils/economy/utils.js")
+const { getBalance, createUser, updateBalance, userExists, getInventory, setInventory } = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
@@ -99,54 +99,69 @@ async function run(message, args) {
     const amount = Math.floor(Math.random() * 60) + 15
     const caught = Math.floor(Math.random() * 15)
 
-    let robberySuccess = true
     let robbedAmount = 0
 
     let percentLost
     let amountLost
 
-    if (caught <= 10) {
-        robberySuccess = false
-
-        percentLost = Math.floor(Math.random() * 50) + 10
-        amountLost = Math.round((percentLost / 100) * getBalance(message.member))
-
-        updateBalance(message.member, getBalance(message.member) - amountLost)
-    } else {
-        robberySuccess = true
-
-        robbedAmount = Math.round((amount / 100) * bankWorth.get(bank))
-
-        updateBalance(message.member, getBalance(message.member) + robbedAmount)
-    }
-
-    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
+    const embed = new CustomEmbed(message.member, true, "robbing " + bank +     "..").setTitle(
         "bank robbery | " + message.member.user.username
     )
 
-    message.channel.send(embed).then((m) => {
-        if (robberySuccess) {
-            embed.addField(
-                "**success!!**",
-                "**you stole** $" +
-                    robbedAmount.toLocaleString() +
-                    " (" +
-                    amount +
-                    "%) from **" +
-                    bank +
-                    "**"
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
+        "bank robbery | " + message.member.user.username
+    )
+
+    if (caught <= 10) {
+        percentLost = Math.floor(Math.random() * 50) + 10
+        amountLost = Math.round((percentLost / 100) * getBalance(message.member))
+
+        const inventory = getInventory(message.member)
+
+        if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+            inventory["lawyer"]--
+
+            if (inventory["lawyer"] == 0) {
+                delete inventory["lawyer"]
+            }
+
+            setInventory(message.member, inventory)
+
+            embed2.addField(
+                "**you were caught**",
+                "your lawyer stopped you from losing any money\nyou would have lost $" + amountLost.toLocaleString() + " (" + percentLost + "%)"
             )
-            embed.setColor("#5efb8f")
+            embed2.setColor("#e4334f")
         } else {
-            embed.addField(
+            updateBalance(message.member, getBalance(message.member) - amountLost)
+
+            embed2.addField(
                 "**you were caught**",
                 "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)"
             )
-            embed.setColor("#e4334f")
+            embed2.setColor("#e4334f")
         }
+    } else {
+        robbedAmount = Math.round((amount / 100) * bankWorth.get(bank))
 
+        updateBalance(message.member, getBalance(message.member) + robbedAmount)
+
+        embed2.addField(
+            "**success!!**",
+            "**you stole** $" +
+                robbedAmount.toLocaleString() +
+                " (" +
+                amount +
+                "%) from **" +
+                bank +
+                "**"
+        )
+        embed2.setColor("#5efb8f")
+    }
+
+    message.channel.send(embed).then((m) => {
         setTimeout(() => {
-            m.edit(embed)
+            m.edit(embed2)
         }, 1500)
     })
 }
