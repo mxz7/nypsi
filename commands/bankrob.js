@@ -1,4 +1,11 @@
-const { getBalance, createUser, updateBalance, userExists, getInventory, setInventory } = require("../utils/economy/utils.js")
+const {
+    getBalance,
+    createUser,
+    updateBalance,
+    userExists,
+    getInventory,
+    setInventory,
+} = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
@@ -104,7 +111,7 @@ async function run(message, args) {
     let percentLost
     let amountLost
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + bank +     "..").setTitle(
+    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
         "bank robbery | " + message.member.user.username
     )
 
@@ -129,7 +136,11 @@ async function run(message, args) {
 
             embed2.addField(
                 "**you were caught**",
-                "your lawyer stopped you from losing any money\nyou would have lost $" + amountLost.toLocaleString() + " (" + percentLost + "%)"
+                "your lawyer stopped you from losing any money\nyou would have lost $" +
+                    amountLost.toLocaleString() +
+                    " (" +
+                    percentLost +
+                    "%)"
             )
             embed2.setColor("#e4334f")
         } else {
