@@ -124,15 +124,7 @@ async function run(message, args) {
 
     const m = await message.channel.send(embed)
 
-    let taxEnabled = false
-
     updateBankBalance(message.member, getBankBalance(message.member) - amount)
-
-    if (amount >= 200000) {
-        taxEnabled = true
-        amount = amount - amount * tax
-    }
-
     updateBalance(message.member, getBalance(message.member) + amount)
 
     const embed1 = new CustomEmbed(message.member, true)
@@ -147,14 +139,7 @@ async function run(message, args) {
                 "**"
         )
 
-    if (taxEnabled) {
-        embed1.addField(
-            "transaction amount",
-            "-$**" + Math.round(amount).toLocaleString() + "** (**5**% taxxed)"
-        )
-    } else {
-        embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
-    }
+    embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")  
 
     setTimeout(() => m.edit(embed1), 1500)
 }
