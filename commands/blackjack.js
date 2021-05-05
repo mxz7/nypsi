@@ -74,9 +74,9 @@ async function run(message, args) {
             .addField(
                 "game rules",
                 "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
-                "the dealer will always stand on or above **17**\n" +
-                "**2**x multiplier for winning, on a draw you receive your bet back\n" +
-                "if your first 2 cards add up to 21, you get a **2.5**x win"
+                    "the dealer will always stand on or above **17**\n" +
+                    "**2**x multiplier for winning, on a draw you receive your bet back\n" +
+                    "if your first 2 cards add up to 21, you get a **2.5**x win"
             )
             .addField(
                 "help",
