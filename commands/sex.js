@@ -246,3 +246,13 @@ function onChastityCooldown(id) {
 }
 
 cmd.onChastityCooldown = onChastityCooldown
+
+/**
+ * 
+ * @param {String} id 
+ */
+function deleteChastityCooldown(id) {
+    chastityCooldown.delete(id)
+}
+
+cmd.deleteChastityCooldown = deleteChastityCooldown
