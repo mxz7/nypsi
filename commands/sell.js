@@ -15,6 +15,7 @@ const {
     createUser,
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
+const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("sell", "sell items", categories.MONEY)
 
@@ -27,11 +28,17 @@ const cooldown = new Map()
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
+    let cooldownLength = 10
+
+    if (isPremium(message.author.id)) {
+        cooldownLength = 2
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 5 - diff
+        const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -124,7 +131,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 5000)
+    }, cooldownLength * 1000)
 
     inventory[selected.id] -= amount
 
