@@ -33,6 +33,7 @@ function loadCommands() {
             delete require.cache[require.resolve(`../commands/${command}.js`)]
         }
         commands.clear()
+        aliases.clear()
     }
 
     for (let file of commandFiles) {
