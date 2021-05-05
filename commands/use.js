@@ -134,155 +134,213 @@ async function run(message, args) {
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
 
-        laterDescription = `opening ${selected.emoji} ${
-            selected.name
-        }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
-    } else if (selected.id.includes("watch")) {
-        embed.setDescription("you look down at your watch to check the time..")
-
-        laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
-    } else if (selected.id.includes("calendar")) {
-        embed.setDescription("you look at your calendar to check the date..")
-
-        laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
-    } else if (selected.id == "padlock") {
-        if (hasPadlock(message.member)) {
-            return message.channel.send(
-                new ErrorEmbed("you already have a padlock on your balance")
-            )
-        }
-
-        setPadlock(message.member, true)
-        inventory["padlock"]--
-
-        if (inventory["padlock"] <= 0) {
-            delete inventory["padlock"]
-        }
-
-        setInventory(message.member, inventory)
-
-        addPadlock(message.member)
-
-        embed.setDescription("✅ your padlock has been applied")
-    } else if (selected.id == "lawyer") {
-        embed.setDescription("lawyers will be used automatically when you rob someone")
-    } else if (selected.id == "lock_pick") {
-        if (args.length == 1) {
-            return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)
-            )
-        }
-
-        let target
-
-        if (!message.mentions.members.first()) {
-            target = await getMember(message, args[1])
-        } else {
-            target = message.mentions.members.first()
-        }
-
-        if (!target) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
-        }
-
-        if (message.member == target) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
-        }
-
-        if (!hasPadlock(target)) {
-            return message.channel.send(new ErrorEmbed("this member doesn't have a padlock"))
-        }
-
-        setPadlock(target, false)
-
-        inventory["lock_pick"]--
-
-        if (inventory["lock_pick"] <= 0) {
-            delete inventory["lock_pick"]
-        }
-
-        setInventory(message.member, inventory)
-
-        const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms")
-
-        targetEmbed.setColor("#e4334f")
-        targetEmbed.setTitle("your padlock has been picked")
-        targetEmbed.setDescription(
-            "**" +
-                message.member.user.tag +
-                "** has picked your padlock in **" +
-                message.guild.name +
-                "**\n" +
-                "your money is no longer protected by a padlock"
-        )
-
-        if (getDMsEnabled(target)) {
-            await target.send(targetEmbed)
-        }
-        embed.setDescription(`picking **${target.user.tag}**'s padlock...`)
-        laterDescription = `picking **${target.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
-    } else if (selected.id == "mask") {
-        const { onRobCooldown, deleteRobCooldown } = require("./rob")
-
-        if (!onRobCooldown(message.member)) {
-            return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
-        }
-
-        deleteRobCooldown(message.member)
-
-        inventory["mask"]--
-
-        if (inventory["mask"] <= 0) {
-            delete inventory["mask"]
-        }
-
-        setInventory(message.member, inventory)
-
-        embed.setDescription("you're wearing your **mask** and can now rob someone again")
-    } else if (selected.id == "radio") {
-        const { onRadioCooldown, addRadioCooldown } = require("./rob")
-        if (args.length == 1) {
-            return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)
-            )
-        }
-
-        let target
-
-        if (!message.mentions.members.first()) {
-            target = await getMember(message, args[1])
-        } else {
-            target = message.mentions.members.first()
-        }
-
-        if (!target) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
-        }
-
-        if (message.member == target) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
-        }
-
-        if (onRadioCooldown(target)) {
-            return message.channel.send(
-                new ErrorEmbed(`the police are already looking for **${target.user.tag}**`)
-            )
-        }
-
-        addRadioCooldown(target.id)
-
-        inventory["radio"]--
-
-        if (inventory["radio"] <= 0) {
-            delete inventory["radio"]
-        }
-
-        setInventory(message.member, inventory)
-
-        embed.setDescription("putting report out on police scanner...")
-        laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${target.user.tag}**`
+        laterDescription = `opening ${selected.emoji} ${selected.name
+            }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
-        return message.channel.send(new ErrorEmbed("you cannot use this item"))
+        switch (selected.id) {
+            case "watch":
+                embed.setDescription("you look down at your watch to check the time..")
+                laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
+                break
+            
+            case "calendar":
+                embed.setDescription("you look at your calendar to check the date..")
+                laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
+                break
+            
+            case "padlock":
+                if (hasPadlock(message.member)) {
+                    return message.channel.send(
+                        new ErrorEmbed("you already have a padlock on your balance")
+                    )
+                }
+
+                setPadlock(message.member, true)
+                inventory["padlock"]--
+
+                if (inventory["padlock"] <= 0) {
+                    delete inventory["padlock"]
+                }
+
+                setInventory(message.member, inventory)
+
+                addPadlock(message.member)
+
+                embed.setDescription("✅ your padlock has been applied")
+                break
+            
+            case "lawyer":
+                embed.setDescription("lawyers will be used automatically when you rob someone")
+                break
+            
+            case "lock_pick":
+                if (args.length == 1) {
+                    return message.channel.send(
+                        new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)
+                    )
+                }
+
+                let lockPickTarget // eslint-disable-line
+
+                if (!message.mentions.members.first()) {
+                    lockPickTarget = await getMember(message, args[1])
+                } else {
+                    lockPickTarget = message.mentions.members.first()
+                }
+
+                if (!lockPickTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (message.member == lockPickTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (!hasPadlock(lockPickTarget)) {
+                    return message.channel.send(new ErrorEmbed("this member doesn't have a padlock"))
+                }
+
+                setPadlock(lockPickTarget, false)
+
+                inventory["lock_pick"]--
+
+                if (inventory["lock_pick"] <= 0) {
+                    delete inventory["lock_pick"]
+                }
+
+                setInventory(message.member, inventory)
+
+                const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms") // eslint-disable-line
+
+                targetEmbed.setColor("#e4334f")
+                targetEmbed.setTitle("your padlock has been picked")
+                targetEmbed.setDescription(
+                    "**" +
+                    message.member.user.tag +
+                    "** has picked your padlock in **" +
+                    message.guild.name +
+                    "**\n" +
+                    "your money is no longer protected by a padlock"
+                )
+
+                if (getDMsEnabled(lockPickTarget)) {
+                    await lockPickTarget.send(targetEmbed)
+                }
+                embed.setDescription(`picking **${lockPickTarget.user.tag}**'s padlock...`)
+                laterDescription = `picking **${lockPickTarget.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
+                break
+            
+            case "mask":
+                const { onRobCooldown, deleteRobCooldown } = require("./rob") // eslint-disable-line
+
+                if (!onRobCooldown(message.member)) {
+                    return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
+                }
+
+                deleteRobCooldown(message.member)
+
+                inventory["mask"]--
+
+                if (inventory["mask"] <= 0) {
+                    delete inventory["mask"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed.setDescription("you're wearing your **mask** and can now rob someone again")
+                break
+            
+            case "radio":
+                const { onRadioCooldown, addRadioCooldown } = require("./rob") // eslint-disable-line
+                if (args.length == 1) {
+                    return message.channel.send(
+                        new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)
+                    )
+                }
+
+                let radioTarget // eslint-disable-line
+
+                if (!message.mentions.members.first()) {
+                    radioTarget = await getMember(message, args[1])
+                } else {
+                    radioTarget = message.mentions.members.first()
+                }
+
+                if (!radioTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (message.member == radioTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (onRadioCooldown(radioTarget)) {
+                    return message.channel.send(
+                        new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)
+                    )
+                }
+
+                addRadioCooldown(radioTarget.id)
+
+                inventory["radio"]--
+
+                if (inventory["radio"] <= 0) {
+                    delete inventory["radio"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed.setDescription("putting report out on police scanner...")
+                laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`
+                break
+            
+            case "chastity_cage":
+                const { onChastityCooldown, addChastityCooldown } = require("./sex") // eslint-disable-line
+                if (args.length == 1) {
+                    return message.channel.send(
+                        new ErrorEmbed(`${getPrefix(message.guild)}use chastity <member>`)
+                    )
+                }
+
+                let chastityTarget // eslint-disable-line
+
+                if (!message.mentions.members.first()) {
+                    chastityTarget = await getMember(message, args[1])
+                } else {
+                    chastityTarget = message.mentions.members.first()
+                }
+
+                if (!chastityTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (message.member == chastityTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (addChastityCooldown(chastityTarget)) {
+                    return message.channel.send(
+                        new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)
+                    )
+                }
+
+                addChastityCooldown(chastityTarget.id)
+
+                inventory["chastity_cage"]--
+
+                if (inventory["chastity_cage"] <= 0) {
+                    delete inventory["chastity_cage"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed.setDescription("locking chastity cage...")
+                laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`
+                break
+            
+            default:
+                return message.channel.send(new ErrorEmbed("you cannot use this item"))
+        }
     }
 
     const msg = await message.channel.send(embed)
