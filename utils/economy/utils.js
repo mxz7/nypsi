@@ -1236,11 +1236,11 @@ exports.getItems = getItems
  * @param {Guildmember} member
  */
 function getMaxBitcoin(member) {
-    const base = 10
-    const prestigeBonus = 25 * getPrestige(member)
+    const base = 2
+    const prestigeBonus = 5 * getPrestige(member)
     let xpBonus = 1 * Math.floor(getXp(member) / 100)
 
-    if (xpBonus > 10) xpBonus = 10
+    if (xpBonus > 5) xpBonus = 5
 
     return base + prestigeBonus + xpBonus
 }
@@ -1252,13 +1252,7 @@ exports.getMaxBitcoin = getMaxBitcoin
  * @param {Guildmember} member
  */
 function getMaxDogecoin(member) {
-    const base = 10
-    const prestigeBonus = 25 * getPrestige(member)
-    let xpBonus = 1 * Math.floor(getXp(member) / 100)
-
-    if (xpBonus > 10) xpBonus = 10
-
-    return (base + prestigeBonus + xpBonus) * 10
+    return (getMaxBitcoin(member)) * 10
 }
 
 exports.getMaxDogecoin = getMaxDogecoin
