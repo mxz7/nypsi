@@ -246,8 +246,11 @@ async function doVote(client, vote) {
                     `+ **${getPrestige(memberID) + 1}** vote crates`
             )
 
-        await member.send("thank you for voting!", embed)
-        info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
+        await member.send("thank you for voting!", embed).then(() => {
+            info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
+        }).catch(() => {
+            error(`failed to send vote confirmation to ${member.tag}`)
+        })
     }
 }
 
