@@ -139,7 +139,7 @@ async function run(message, args) {
                 "**"
         )
 
-    embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")  
+    embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
     setTimeout(() => m.edit(embed1), 1500)
 }
