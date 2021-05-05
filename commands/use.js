@@ -137,6 +137,9 @@ async function run(message, args) {
         laterDescription = `opening ${selected.emoji} ${selected.name
             }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
+        const { onRadioCooldown, addRadioCooldown, onRobCooldown, deleteRobCooldown } = require("./rob")
+        const { onChastityCooldown, addChastityCooldown } = require("./sex")
+
         switch (selected.id) {
             case "watch":
                 embed.setDescription("you look down at your watch to check the time..")
@@ -231,8 +234,6 @@ async function run(message, args) {
                 break
             
             case "mask":
-                const { onRobCooldown, deleteRobCooldown } = require("./rob") // eslint-disable-line
-
                 if (!onRobCooldown(message.member)) {
                     return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
                 }
@@ -251,7 +252,6 @@ async function run(message, args) {
                 break
             
             case "radio":
-                const { onRadioCooldown, addRadioCooldown } = require("./rob") // eslint-disable-line
                 if (args.length == 1) {
                     return message.channel.send(
                         new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)
@@ -295,7 +295,6 @@ async function run(message, args) {
                 break
             
             case "chastity_cage":
-                const { onChastityCooldown, addChastityCooldown } = require("./sex") // eslint-disable-line
                 if (args.length == 1) {
                     return message.channel.send(
                         new ErrorEmbed(`${getPrefix(message.guild)}use chastity <member>`)
