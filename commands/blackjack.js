@@ -473,6 +473,10 @@ async function playGame(message, m) {
     const win = async () => {
         let winnings = bet * 2
 
+        if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
+            winnings = Math.floor(bet * 2.5)
+        }
+
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
