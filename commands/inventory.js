@@ -122,7 +122,9 @@ async function run(message, args) {
         item = items[item]
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}${
+            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${
+                item.description
+            }${
                 item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""
             }`,
             true
@@ -168,9 +170,9 @@ async function run(message, args) {
                         item = items[item]
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${
-                                item.description
-                            }${
+                            `${item.emoji} **${item.name}** -- ${inventory[
+                                item.id
+                            ].toLocaleString()}\n${item.description}${
                                 item.worth
                                     ? "\n*can be sold*"
                                     : item.role == "collectable"
@@ -197,9 +199,9 @@ async function run(message, args) {
                         item = items[item]
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${
-                                item.description
-                            }${
+                            `${item.emoji} **${item.name}** -- ${inventory[
+                                item.id
+                            ].toLocaleString()}\n${item.description}${
                                 item.worth
                                     ? "\n*can be sold*"
                                     : item.role == "collectable"
