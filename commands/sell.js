@@ -58,7 +58,7 @@ async function run(message, args) {
             new CustomEmbed(
                 message.member,
                 false,
-                "sell items from your inventory\n\ncoins have a set fee of **10**% per coin, while standard items have a **50**% fee"
+                "sell items from your inventory\n\ncoins have a set fee of **5**% per coin, while standard items have a **50**% fee"
             )
         )
     }
@@ -148,7 +148,7 @@ async function run(message, args) {
     if (selected.role == "fish" || selected.role == "prey") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
-        sellWorth = Math.floor(selected.worth * 0.9 * amount)
+        sellWorth = Math.floor(selected.worth * 0.95 * amount)
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
@@ -160,7 +160,7 @@ async function run(message, args) {
             multi > 0 && (selected.role == "fish" || selected.role == "prey")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
                 : selected.id == "bitcoin" || selected.id == "dogecoin"
-                ? "(-**10**% fee)"
+                ? "(-**5**% fee)"
                 : ""
         }`
     )
