@@ -12,6 +12,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
 ])
 
 const cooldown = new Map()
+const chastityCooldown = new Map()
 const looking = new Map()
 
 const descFilter = [
@@ -54,6 +55,16 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
+
+    if (chastityCooldown.has(message.member.user.id)) {
+        const remaining = timeUntil(chastityCooldown.get(message.author.id))
+
+        return message.channel.send(
+            new ErrorEmbed(
+                `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
+            )
+        )
     }
 
     cooldown.set(message.member.id, new Date())
@@ -192,3 +203,70 @@ setInterval(() => {
         }
     })
 }, 600000)
+
+/**
+ * 
+ * @param {String} id 
+ */
+function addChastityCooldown(id) {
+    if (looking.has(id)) {
+        looking.delete(id)
+    }
+
+    chastityCooldown.set(id, new Date())
+
+    setTimeout(() => {
+        chastityCooldown.delete(id)
+    }, 10800000)
+}
+
+cmd.addChastityCooldown = addChastityCooldown
+
+/**
+ * 
+ * @param {String} id 
+ * @returns {Boolean}
+ */
+function onChastityCooldown(id) {
+    return chastityCooldown.has(id)
+}
+
+cmd.onChastityCooldown = onChastityCooldown
+
+function timeUntil(date) {
+    const ms = Math.floor(date - new Date())
+
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    const daysms = ms % (24 * 60 * 60 * 1000)
+    const hours = Math.floor(daysms / (60 * 60 * 1000))
+    const hoursms = ms % (60 * 60 * 1000)
+    const minutes = Math.floor(hoursms / (60 * 1000))
+    const minutesms = ms % (60 * 1000)
+    const sec = Math.floor(minutesms / 1000)
+
+    let output = ""
+
+    if (days > 0) {
+        output = output + days + "d "
+    }
+
+    if (hours > 0) {
+        output = output + hours + "h "
+    }
+
+    if (minutes > 0) {
+        output = output + minutes + "m "
+    }
+
+    if (sec > 0) {
+        output = output + sec + "s"
+    } else if (output != "") {
+        output = output.substr(0, output.length - 1)
+    }
+
+    if (output == "") {
+        output = "0s"
+    }
+
+    return output
+}
