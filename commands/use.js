@@ -315,7 +315,7 @@ async function run(message, args) {
                 }
 
                 if (message.member == chastityTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send(new ErrorEmbed("why would you do that to yourself."))
                 }
 
                 if (addChastityCooldown(chastityTarget)) {
