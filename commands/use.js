@@ -138,7 +138,7 @@ async function run(message, args) {
             }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
         const { onRadioCooldown, addRadioCooldown, onRobCooldown, deleteRobCooldown } = require("./rob")
-        const { onChastityCooldown, addChastityCooldown } = require("./sex")
+        const { onChastityCooldown, addChastityCooldown, deleteChastityCooldown } = require("./sex")
 
         switch (selected.id) {
             case "watch":
@@ -196,6 +196,13 @@ async function run(message, args) {
                 }
 
                 if (message.member == lockPickTarget) {
+                    if (onChastityCooldown(message.author.id)) {
+                        deleteChastityCooldown(message.author.id)
+
+                        embed.setDescription("picking chastity cage...")
+                        laterDescription = "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
+                        break
+                    }
                     return message.channel.send(new ErrorEmbed("invalid user"))
                 }
 
