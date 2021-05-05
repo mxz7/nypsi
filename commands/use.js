@@ -134,10 +134,16 @@ async function run(message, args) {
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
 
-        laterDescription = `opening ${selected.emoji} ${selected.name
-            }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
+        laterDescription = `opening ${selected.emoji} ${
+            selected.name
+        }...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
-        const { onRadioCooldown, addRadioCooldown, onRobCooldown, deleteRobCooldown } = require("./rob")
+        const {
+            onRadioCooldown,
+            addRadioCooldown,
+            onRobCooldown,
+            deleteRobCooldown,
+        } = require("./rob")
         const { onChastityCooldown, addChastityCooldown, deleteChastityCooldown } = require("./sex")
 
         switch (selected.id) {
@@ -145,12 +151,12 @@ async function run(message, args) {
                 embed.setDescription("you look down at your watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
-            
+
             case "calendar":
                 embed.setDescription("you look at your calendar to check the date..")
                 laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
                 break
-            
+
             case "padlock":
                 if (hasPadlock(message.member)) {
                     return message.channel.send(
@@ -171,11 +177,11 @@ async function run(message, args) {
 
                 embed.setDescription("✅ your padlock has been applied")
                 break
-            
+
             case "lawyer":
                 embed.setDescription("lawyers will be used automatically when you rob someone")
                 break
-            
+
             case "lock_pick":
                 if (args.length == 1) {
                     return message.channel.send(
@@ -200,14 +206,17 @@ async function run(message, args) {
                         deleteChastityCooldown(message.author.id)
 
                         embed.setDescription("picking chastity cage...")
-                        laterDescription = "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
+                        laterDescription =
+                            "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
                         break
                     }
                     return message.channel.send(new ErrorEmbed("invalid user"))
                 }
 
                 if (!hasPadlock(lockPickTarget)) {
-                    return message.channel.send(new ErrorEmbed("this member doesn't have a padlock"))
+                    return message.channel.send(
+                        new ErrorEmbed("this member doesn't have a padlock")
+                    )
                 }
 
                 setPadlock(lockPickTarget, false)
@@ -226,11 +235,11 @@ async function run(message, args) {
                 targetEmbed.setTitle("your padlock has been picked")
                 targetEmbed.setDescription(
                     "**" +
-                    message.member.user.tag +
-                    "** has picked your padlock in **" +
-                    message.guild.name +
-                    "**\n" +
-                    "your money is no longer protected by a padlock"
+                        message.member.user.tag +
+                        "** has picked your padlock in **" +
+                        message.guild.name +
+                        "**\n" +
+                        "your money is no longer protected by a padlock"
                 )
 
                 if (getDMsEnabled(lockPickTarget)) {
@@ -239,10 +248,12 @@ async function run(message, args) {
                 embed.setDescription(`picking **${lockPickTarget.user.tag}**'s padlock...`)
                 laterDescription = `picking **${lockPickTarget.user.tag}'**s padlock...\n\nyou have successfully picked their padlock`
                 break
-            
+
             case "mask":
                 if (!onRobCooldown(message.member)) {
-                    return message.channel.send(new ErrorEmbed("you are currently not on rob cooldown"))
+                    return message.channel.send(
+                        new ErrorEmbed("you are currently not on rob cooldown")
+                    )
                 }
 
                 deleteRobCooldown(message.member)
@@ -257,7 +268,7 @@ async function run(message, args) {
 
                 embed.setDescription("you're wearing your **mask** and can now rob someone again")
                 break
-            
+
             case "radio":
                 if (args.length == 1) {
                     return message.channel.send(
@@ -283,7 +294,9 @@ async function run(message, args) {
 
                 if (onRadioCooldown(radioTarget)) {
                     return message.channel.send(
-                        new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)
+                        new ErrorEmbed(
+                            `the police are already looking for **${radioTarget.user.tag}**`
+                        )
                     )
                 }
 
@@ -300,7 +313,7 @@ async function run(message, args) {
                 embed.setDescription("putting report out on police scanner...")
                 laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`
                 break
-            
+
             case "chastity_cage":
                 if (args.length == 1) {
                     return message.channel.send(
@@ -321,12 +334,16 @@ async function run(message, args) {
                 }
 
                 if (message.member == chastityTarget) {
-                    return message.channel.send(new ErrorEmbed("why would you do that to yourself."))
+                    return message.channel.send(
+                        new ErrorEmbed("why would you do that to yourself.")
+                    )
                 }
 
                 if (addChastityCooldown(chastityTarget)) {
                     return message.channel.send(
-                        new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)
+                        new ErrorEmbed(
+                            `**${chastityTarget.user.tag}** is already equipped with a chastity cage`
+                        )
                     )
                 }
 
@@ -343,7 +360,7 @@ async function run(message, args) {
                 embed.setDescription("locking chastity cage...")
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`
                 break
-            
+
             default:
                 return message.channel.send(new ErrorEmbed("you cannot use this item"))
         }
