@@ -92,7 +92,7 @@ async function run(message, args) {
     if (selected.role == "fish" || selected.role == "prey") {
         worth = Math.floor(worth + worth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
-        worth = Math.floor(selected.worth * 0.9 * amount)
+        worth = Math.floor(selected.worth * 0.95 * amount)
     }
 
     const embed = new CustomEmbed(message.member, false)
@@ -102,7 +102,7 @@ async function run(message, args) {
             multi > 0 && (selected.role == "fish" || selected.role == "prey")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
                 : selected.id == "bitcoin" || selected.id == "dogecoin"
-                ? "(-**10**% fee)"
+                ? "(-**5**% fee)"
                 : ""
         }`
     )
