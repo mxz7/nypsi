@@ -22,7 +22,10 @@ const { gamble } = require("../utils/logger.js")
 const cooldown = new Map()
 const games = new Map()
 
-const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj", "blowjob"])
+const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases([
+    "bj",
+    "blowjob",
+])
 
 /**
  * @param {Message} message
