@@ -52,7 +52,11 @@ function loadCommands() {
                 if (command.aliases) {
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
-                            error(`duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`)
+                            error(
+                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
+                                    command.name
+                                }] - not overwriting`
+                            )
                         } else {
                             aliases.set(a, command.name)
                         }
@@ -112,7 +116,11 @@ function reloadCommand(commandsArray) {
                 if (commandData.aliases) {
                     for (let a of commandData.aliases) {
                         if (aliases.has(a)) {
-                            error(`duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${commandData.name}] - not overwriting`)
+                            error(
+                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
+                                    commandData.name
+                                }] - not overwriting`
+                            )
                         } else {
                             aliases.set(a, commandData.name)
                         }
