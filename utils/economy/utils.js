@@ -157,7 +157,7 @@ setInterval(() => {
 let items
 
 /**
- * 
+ *
  * @returns {String}
  */
 function loadItems() {
@@ -171,7 +171,7 @@ function loadItems() {
     txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`
 
     let deleted = 0
-    
+
     for (let user of Array.from(Object.keys(users))) {
         for (let item of Array.from(Object.keys(users[user].inventory))) {
             if (!Array.from(Object.keys(items)).includes(item)) {
@@ -185,7 +185,7 @@ function loadItems() {
         info(`${deleted} items deleted from inventories`)
         txt += `\n${deleted.toLocaleString()} items deleted from inventories`
     }
-    
+
     return txt
 }
 
