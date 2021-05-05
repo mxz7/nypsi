@@ -116,7 +116,7 @@ function reloadCommand(commandsArray) {
                 commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
                     for (let a of commandData.aliases) {
-                        if (aliases.has(a)) {
+                        if (aliases.has(a) && aliases.get(a) != commandData.name) {
                             error(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
                                     commandData.name
