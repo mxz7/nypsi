@@ -64,8 +64,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}withdraw <amount>`)
             .addField(
                 "help",
-                "you can withdraw money from your bank aslong as you have that amount available in your bank\n" +
-                    "there will be a tax of **5**% when withdrawing $**100,000** or more in funds"
+                "you can withdraw money from your bank aslong as you have that amount available in your bank"
             )
         return message.channel.send(embed)
     }
