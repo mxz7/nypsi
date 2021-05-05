@@ -22,7 +22,10 @@ const { gamble } = require("../utils/logger.js")
 const cooldown = new Map()
 const games = new Map()
 
-const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj"])
+const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases([
+    "bj",
+    "blowjob",
+])
 
 /**
  * @param {Message} message
@@ -472,6 +475,10 @@ async function playGame(message, m) {
 
     const win = async () => {
         let winnings = bet * 2
+
+        if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
+            winnings = Math.floor(bet * 2.5)
+        }
 
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
