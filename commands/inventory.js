@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getInventory, getItems, createUser, userExists } = require("../utils/economy/utils")
+const { getInventory, getItems, createUser, userExists, getMulti } = require("../utils/economy/utils")
 
 const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases([
     "inv",
@@ -73,6 +73,7 @@ async function run(message, args) {
     const pages = []
     let pageOfItems = []
     let worth = 0
+    const multi = await getMulti(message.member)
 
     for (const item of itemIDs) {
         if (pageOfItems.length == 6) {
@@ -88,7 +89,12 @@ async function run(message, args) {
             }
             const amount = inventory[item]
 
-            worth += Math.floor(items[item].worth * fee * amount)
+            if (items[item].role == "fish" || items[item].role == "prey") {
+                let worth1 = Math.floor(items[item].worth * fee * amount)
+                worth += Math.floor(worth1 + worth1 * multi)
+            } else {
+                worth += Math.floor(items[item].worth * fee * amount)
+            }
         }
     }
 
