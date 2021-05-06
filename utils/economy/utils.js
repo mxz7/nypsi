@@ -186,6 +186,10 @@ function loadItems() {
         txt += `\n${deleted.toLocaleString()} items deleted from inventories`
     }
 
+    setTimeout(() => {
+        updateCryptoWorth()
+    }, 50)
+
     return txt
 }
 
@@ -229,8 +233,6 @@ async function updateCryptoWorth() {
     items["dogecoin"].worth = dogeworth
     info("dogecoin worth updated: $" + items["dogecoin"].worth, types.ECONOMY)
 }
-
-updateCryptoWorth()
 
 setInterval(updateCryptoWorth, 1500000)
 
