@@ -150,7 +150,7 @@ async function run(message, args) {
         new CustomEmbed(
             message.member,
             false,
-            `you have bought **${amount.toLocaleString()}** ${selected.name} for $${(
+            `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
                 selected.worth * amount
             ).toLocaleString()}`
         )

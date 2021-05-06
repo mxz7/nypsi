@@ -98,7 +98,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false)
 
     embed.setDescription(
-        `${amount} **${selected.name}** is worth $${worth.toLocaleString()} ${
+        `${amount} ${selected.emoji} **${selected.name}** is worth $${worth.toLocaleString()} ${
             multi > 0 && (selected.role == "fish" || selected.role == "prey")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
                 : selected.id == "bitcoin" || selected.id == "dogecoin"
