@@ -2,10 +2,21 @@ const { Message, User } = require("discord.js")
 const { getBorderCharacters } = require("table")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { userExists, createUser, getInventory, getItems, formatBet, getBalance, calcMaxBet, updateBalance } = require("../utils/economy/utils")
+const {
+    userExists,
+    createUser,
+    getInventory,
+    getItems,
+    formatBet,
+    getBalance,
+    calcMaxBet,
+    updateBalance,
+} = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
+const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases([
+    "sr",
+])
 
 const races = new Map()
 const carCooldown = new Map()
@@ -19,13 +30,17 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     const help = () => {
-        const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
+        const embed = new CustomEmbed(message.member, false).setTitle(
+            "street race | " + message.author.username
+        )
 
         embed.setFooter("you must have a car to join a street race")
 
-        embed.setDescription(`${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
-            `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`)
-        
+        embed.setDescription(
+            `${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
+                `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
+        )
+
         return message.channel.send(embed)
     }
 
@@ -52,11 +67,15 @@ async function run(message, args) {
         }
 
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`))
+            return message.channel.send(
+                new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`)
+            )
         }
 
         if (races.has(message.channel.id)) {
-            return message.channel.send(new ErrorEmbed("there is already a street race in this channel"))
+            return message.channel.send(
+                new ErrorEmbed("there is already a street race in this channel")
+            )
         }
 
         if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
@@ -64,9 +83,7 @@ async function run(message, args) {
                 args[1] = formatBet(args[1])
             } else {
                 return message.channel.send(
-                    new ErrorEmbed(
-                       `${getPrefix(message.guild)}sr start <entry fee>`
-                    )
+                    new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`)
                 )
             }
         }
@@ -96,7 +113,7 @@ async function run(message, args) {
         setTimeout(() => {
             cooldown.delete(message.author.id)
         }, 300 * 1000)
-        
+
         const id = Math.random()
 
         const game = {
@@ -107,7 +124,7 @@ async function run(message, args) {
             id: id,
             start: new Date().getTime() + 30000,
             embed: undefined,
-            started: false
+            started: false,
         }
 
         const embed = new CustomEmbed(message.member).setTitle("street race")
@@ -223,7 +240,13 @@ async function run(message, args) {
             let current = carCooldown.get(message.author.id)
 
             if (current.includes(car.id)) {
-                return message.channel.send(new ErrorEmbed(`your ${car.name} is on cooldown, select another with ${getPrefix(message.guild)}**sr join <car>**`))
+                return message.channel.send(
+                    new ErrorEmbed(
+                        `your ${car.name} is on cooldown, select another with ${getPrefix(
+                            message.guild
+                        )}**sr join <car>**`
+                    )
+                )
             } else {
                 current.push(car.id)
                 carCooldown.set(message.author.id, current)
@@ -259,7 +282,7 @@ async function run(message, args) {
         race.users.set(message.author.id, {
             user: message.author,
             car: car,
-            position: 0
+            position: 0,
         })
 
         const embed = race.embed
@@ -293,7 +316,7 @@ module.exports = cmd
 /**
  * @returns {Number}
  * @param {Number} current
- * @param {Number} speed 
+ * @param {Number} speed
  */
 function getNewPosition(current, speed) {
     const randomness = Math.floor(Math.random() * 12) - 4
@@ -305,8 +328,8 @@ function getNewPosition(current, speed) {
 
 /**
  * @returns {String}
- * @param {String} emoji 
- * @param {Number} position 
+ * @param {String} emoji
+ * @param {Number} position
  */
 function getRacePosition(emoji, position) {
     let racePos = Math.floor(position / 5)
@@ -375,9 +398,11 @@ async function startRace(id) {
 
         updateBalance(winner.id, getBalance(winner.id) + race.bet * race.users.size)
 
-        description += `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${race.users.get(winner.id).car.emoji}\n` +
-            `+$${winnings.toLocaleString()}`
-        
+        description +=
+            `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${
+                race.users.get(winner.id).car.emoji
+            }\n` + `+$${winnings.toLocaleString()}`
+
         embed.setDescription(description)
         embed.setFooter("race has ended")
 
