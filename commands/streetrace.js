@@ -259,6 +259,7 @@ async function run(message, args) {
         embed.setDescription(description)
 
         await race.message.edit(embed)
+        await message.react("✅")
 
         if (race.users.size >= 25) {
             race.started = true
