@@ -374,6 +374,7 @@ exports.deleteBan = deleteBan
  * @returns {String}
  */
 function getMuteRole(guild) {
+    if (!data[guild]) return undefined
     if (!data[guild].muteRole) return undefined
     return data[guild.id].muteRole
 }
