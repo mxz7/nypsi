@@ -1,4 +1,5 @@
 const { Message } = require("discord.js")
+const { getBorderCharacters } = require("table")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { userExists, createUser, getInventory, getItems, formatBet, getBalance, calcMaxBet, updateBalance } = require("../utils/economy/utils")
@@ -6,7 +7,6 @@ const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
 
-const cooldown = new Map()
 const races = new Map()
 
 /**
@@ -15,25 +15,6 @@ const races = new Map()
  */
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
-        const time = 10 - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
-    }
 
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
@@ -94,14 +75,15 @@ async function run(message, args) {
             message: undefined,
             id: id,
             start: new Date().getTime() + 30000,
-            embed: undefined
+            embed: undefined,
+            started: false
         }
 
         const embed = new CustomEmbed(message.member).setTitle("street race")
 
         embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`)
 
-        embed.setDescription(`0 racers\n\nentry fee: $${bet.toLocaleString()}`)
+        embed.setDescription(`no racers\n\nentry fee: $${bet.toLocaleString()}`)
 
         const msg = await message.channel.send(embed)
 
@@ -123,6 +105,12 @@ async function run(message, args) {
                     updateBalance(user.user.id, getBalance(user.user.id) + bet)
                 }
                 races.delete(message.channel.id)
+            } else {
+                if (races.get(message.channel.id).started) return
+                startRace(message.channel.id)
+                const d = races.get(message.channel.id)
+                d.started = true
+                races.set(message.channel.id, d)
             }
         }, 30000)
     } else if (args[0].toLowerCase() == "join") {
@@ -134,6 +122,10 @@ async function run(message, args) {
 
         if (races.get(message.channel.id).users.has(message.author.id)) {
             return
+        }
+
+        if (races.get(message.channel.id).started) {
+            return message.channel.send(new ErrorEmbed("this race has already started"))
         }
 
         const race = races.get(message.channel.id)
@@ -208,10 +200,10 @@ async function run(message, args) {
         for (let user of race.users.keys()) {
             user = race.users.get(user)
 
-            description += `**${user.user.tag}** - ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`
+            description += `\n\`${user.user.tag}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`
         }
 
-        description += `\n\nentry fee: ${race.bet.toLocaleString()}`
+        description += `\n\nentry fee: $${race.bet.toLocaleString()}`
 
         embed.setDescription(description)
 
@@ -223,6 +215,74 @@ cmd.setRun(run)
 
 module.exports = cmd
 
+/**
+ * @returns {Number}
+ * @param {Number} current
+ * @param {Number} speed 
+ */
+function getNewPosition(current, speed) {
+    const randomness = Math.floor(Math.random() * 5) - 2
+
+    const movement = speed * 1.4 + randomness
+
+    return current + movement
+}
+
+/**
+ * @returns {String}
+ * @param {String} emoji 
+ * @param {Number} position 
+ */
+function getRacePosition(emoji, position) {
+    const racePos = Math.floor(position / 5)
+
+    let line = ""
+    let underscores = 0
+
+    for (underscores; underscores < racePos; underscores++) {
+        line += "\\_"
+    }
+
+    line += emoji
+
+    for (underscores; underscores < 9; underscores++) {
+        line += "\\_"
+    }
+
+    return line
+}
+
 async function startRace(id) {
-    
+    const race = races.get(id)
+    const users = race.users
+
+    for (let user of race.users.keys()) {
+        user = race.users.get(user)
+
+        let newPos = getNewPosition(user.position, user.car.speed)
+
+        user.position = newPos
+
+        race.users.set(user.user.id, user)
+    }
+
+    const embed = race.embed
+
+    let description = ""
+
+    for (let user of race.users.keys()) {
+        user = race.users.get(user)
+
+        description += `\n\`${user.user.tag}\` ${getRacePosition(user.car.emoji, user.position)} 🏁`
+    }
+
+    embed.setDescription(description)
+
+    await race.message.edit(embed)
+
+    races.set(id, race)
+
+    setTimeout(() => {
+        return startRace(id)
+    }, 1000)
 }
