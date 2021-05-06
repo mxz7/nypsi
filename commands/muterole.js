@@ -2,7 +2,12 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
-const { setMuteRole, getMuteRole, createProfile, profileExists } = require("../utils/moderation/utils")
+const {
+    setMuteRole,
+    getMuteRole,
+    createProfile,
+    profileExists,
+} = require("../utils/moderation/utils")
 
 const cmd = new Command(
     "muterole",
