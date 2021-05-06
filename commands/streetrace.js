@@ -280,7 +280,7 @@ async function startRace(id) {
 
     await race.message.edit(embed)
 
-    races.set(id, race)
+    races.set(id, race) // do win thing
 
     setTimeout(() => {
         return startRace(id)
