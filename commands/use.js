@@ -104,7 +104,9 @@ async function run(message, args) {
     }
 
     if (selected.role == "car") {
-        return message.channel.send(new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`))
+        return message.channel.send(
+            new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`)
+        )
     }
 
     if (selected.role != "item" && selected.role != "tool" && selected.role != "crate") {
