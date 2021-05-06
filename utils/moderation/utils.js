@@ -374,8 +374,8 @@ exports.deleteBan = deleteBan
  * @returns {String}
  */
 function getMuteRole(guild) {
-    if (!data[guild]) return undefined
-    if (!data[guild].muteRole) return undefined
+    if (!data[guild.id]) return undefined
+    if (!data[guild.id].muteRole) return undefined
     return data[guild.id].muteRole
 }
 
@@ -387,7 +387,7 @@ exports.getMuteRole = getMuteRole
  * @param {Role} role
  */
 function setMuteRole(guild, role) {
-    if (role == "") {
+    if (role == "default") {
         data[guild.id].muteRole = ""
     } else {
         data[guild.id].muteRole = role.id
