@@ -145,6 +145,7 @@ async function run(message, args) {
             deleteRobCooldown,
         } = require("./rob")
         const { onChastityCooldown, addChastityCooldown, deleteChastityCooldown } = require("./sex")
+        const { isHandcuffed, addHandcuffs } = require("../utils/commandhandler")
 
         switch (selected.id) {
             case "watch":
@@ -359,6 +360,53 @@ async function run(message, args) {
 
                 embed.setDescription("locking chastity cage...")
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`
+                break
+            
+            case "handcuffs":
+                if (args.length == 1) {
+                    return message.channel.send(
+                        new ErrorEmbed(`${getPrefix(message.guild)}use handcuffs <member>`)
+                    )
+                }
+
+                let handcuffsTarget // eslint-disable-line
+
+                if (!message.mentions.members.first()) {
+                    handcuffsTarget = await getMember(message, args[1])
+                } else {
+                    handcuffsTarget = message.mentions.members.first()
+                }
+
+                if (!handcuffsTarget) {
+                    return message.channel.send(new ErrorEmbed("invalid user"))
+                }
+
+                if (message.member == handcuffsTarget) {
+                    return message.channel.send(
+                        new ErrorEmbed("bit of self bondage huh")
+                    )
+                }
+
+                if (isHandcuffed(handcuffsTarget.user.id)) {
+                    return message.channel.send(
+                        new ErrorEmbed(
+                            `**${handcuffsTarget.user.tag}** is already restrained`
+                        )
+                    )
+                }
+
+                addHandcuffs(handcuffsTarget.id)
+
+                inventory["handcuffs"]--
+
+                if (inventory["handcuffs"] <= 0) {
+                    delete inventory["handcuffs"]
+                }
+
+                setInventory(message.member, inventory)
+
+                embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`)
+                laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for two minutes`
                 break
 
             default:
