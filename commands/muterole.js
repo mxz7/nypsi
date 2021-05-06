@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
-const { setMuteRole, getMuteRole } = require("../utils/moderation/utils")
+const { setMuteRole, getMuteRole, createProfile, profileExists } = require("../utils/moderation/utils")
 
 const cmd = new Command(
     "muterole",
@@ -21,6 +21,8 @@ async function run(message, args) {
         }
         return
     }
+
+    if (!profileExists(message.guild)) createProfile(message.guild)
 
     const help = async () => {
         const current = getMuteRole(message.guild)
@@ -74,9 +76,10 @@ async function run(message, args) {
 
         if (message.mentions.roles.first()) {
             role = message.mentions.roles.first()
-        } else if (args[0].length == 18 && parseInt(args[0])) {
-            role = roles.find((r) => r.id == args[0])
+        } else if (args[1].length == 18 && parseInt(args[1])) {
+            role = roles.find((r) => r.id == args[1])
         } else {
+            args.shift()
             role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
         }
 
@@ -96,7 +99,7 @@ async function run(message, args) {
             )
         )
     } else if (args[0].toLowerCase() == "reset") {
-        setMuteRole(message.guild, "")
+        setMuteRole(message.guild, "default")
 
         return message.channel.send(
             new CustomEmbed(message.member, false, "✅ muterole has been reset")
