@@ -18,25 +18,6 @@ const cooldown = new Map()
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
-        const time = 300 - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
-    }
-
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
 
@@ -51,6 +32,25 @@ async function run(message, args) {
     if (args.length == 0) {
         return help()
     } else if (args[0].toLowerCase() == "start") {
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 300 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        }
+
         if (args.length == 1) {
             return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`))
         }
