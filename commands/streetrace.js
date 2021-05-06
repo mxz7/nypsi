@@ -209,7 +209,7 @@ async function run(message, args) {
 
         await race.message.edit(embed)
 
-        if (race.users.size >= 10) {
+        if (race.users.size >= 25) {
             return startRace(message.channel.id)
         }
     }
@@ -225,7 +225,7 @@ module.exports = cmd
  * @param {Number} speed 
  */
 function getNewPosition(current, speed) {
-    const randomness = Math.floor(Math.random() * 9) - 4
+    const randomness = Math.floor(Math.random() * 12) - 4
 
     const movement = speed + randomness
 
@@ -311,7 +311,8 @@ async function startRace(id) {
         embed.setFooter("race has ended")
 
         return setTimeout(async () => {
-            return await race.message.edit(embed)
+            await race.message.edit(embed)
+            return races.delete(id)
         }, 500)
     }
 
