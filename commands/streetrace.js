@@ -8,6 +8,8 @@ const { getPrefix } = require("../utils/guilds/utils")
 const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
 
 const races = new Map()
+const carCooldown = new Map()
+const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -15,6 +17,25 @@ const races = new Map()
  */
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
+
+    if (cooldown.has(message.member.id)) {
+        const init = cooldown.get(message.member.id)
+        const curr = new Date()
+        const diff = Math.round((curr - init) / 1000)
+        const time = 300 - diff
+
+        const minutes = Math.floor(time / 60)
+        const seconds = time - minutes * 60
+
+        let remaining
+
+        if (minutes != 0) {
+            remaining = `${minutes}m${seconds}s`
+        } else {
+            remaining = `${seconds}s`
+        }
+        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+    }
 
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
@@ -69,6 +90,12 @@ async function run(message, args) {
         if (bet > 500000) {
             return message.channel.send(new ErrorEmbed("entry fee cannot be over $500k"))
         }
+
+        cooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, 300 * 1000)
         
         const id = Math.random()
 
@@ -189,6 +216,23 @@ async function run(message, args) {
 
             if (!inventory[car.id] || inventory[car.id] == 0) {
                 return message.channel.send(new ErrorEmbed(`you don't have a ${car.name}`))
+            }
+        }
+
+        if (carCooldown.has(message.author.id)) {
+            let current = carCooldown.get(message.author.id)
+
+            if (current.includes(car.id)) {
+                return message.channel.send(new ErrorEmbed(`your ${car.name} is on cooldown, select another with ${getPrefix(message.guild)}**sr join <car>**`))
+            } else {
+                current.push(car.id)
+                carCooldown.set(message.author.id, current)
+
+                setTimeout(() => {
+                    current = carCooldown.get(message.author.id)
+                    current.splice(current.indexOf(car.id), 1)
+                    carCooldown.set(message.author.id, current)
+                }, 120000)
             }
         }
 
