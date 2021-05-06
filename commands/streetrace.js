@@ -97,6 +97,7 @@ async function run(message, args) {
             if (races.get(message.channel.id).id != id) return
             if (races.get(message.channel.id).users.size < 2) {
                 embed.setDescription("race cancelled ):")
+                embed.setFooter("race cancelled")
                 msg.edit(embed)
 
                 for (let user of races.get(message.channel.id).users.keys()) {
@@ -176,8 +177,10 @@ async function run(message, args) {
                 }
             }
 
+            car = items[car]
+
             if (!car) {
-                return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
+                return message.channel.send(new ErrorEmbed(`couldnt find \`${args[1]}\``))
             }
 
             if (!inventory[car.id] || inventory[car.id] == 0) {
@@ -210,6 +213,7 @@ async function run(message, args) {
         await race.message.edit(embed)
 
         if (race.users.size >= 25) {
+            race.started = true
             return startRace(message.channel.id)
         }
     }
