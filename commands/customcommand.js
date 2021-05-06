@@ -66,7 +66,7 @@ async function run(message, args) {
             if (cmd.content) {
                 embed.addField("content", cmd.content, true)
                 embed.addField("trigger", cmd.trigger, true)
-                embed.addField("uses", cmd.uses.toLocaleString(), true)
+                embed.addField("uses", cmd.uses ? cmd.uses.toLocaleString() : "0", true)
             } else {
                 embed.setDescription("you don't have a custom command")
             }
