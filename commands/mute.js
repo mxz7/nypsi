@@ -98,7 +98,7 @@ async function run(message, args) {
 
     let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
 
-    if (getMuteRole(message.guild) == "") {
+    if (!getMuteRole(message.guild)) {
         muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
