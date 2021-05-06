@@ -125,7 +125,7 @@ async function run(message, args) {
             `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${
                 item.description
             }${
-                item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : ""
+                item.worth ? "\n*can be sold*" : item.role == "collectable" ? "\n*collectable*" : item.role == "car" ? "\n*car*" : ""
             }`,
             true
         )
@@ -177,6 +177,12 @@ async function run(message, args) {
                                     ? "\n*can be sold*"
                                     : item.role == "collectable"
                                     ? "\n*collectable*"
+                                    : item.worth
+                                    ? "\n*can be sold*"
+                                    : item.role == "collectable"
+                                    ? "\n*collectable*"
+                                    : item.role == "car"
+                                    ? "\n*car*"
                                     : ""
                             }`,
                             true
@@ -206,6 +212,12 @@ async function run(message, args) {
                                     ? "\n*can be sold*"
                                     : item.role == "collectable"
                                     ? "\n*collectable*"
+                                    : item.worth
+                                    ? "\n*can be sold*"
+                                    : item.role == "collectable"
+                                    ? "\n*collectable*"
+                                    : item.role == "car"
+                                    ? "\n*car*"
                                     : ""
                             }`,
                             true
