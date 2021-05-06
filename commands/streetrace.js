@@ -208,6 +208,10 @@ async function run(message, args) {
         embed.setDescription(description)
 
         await race.message.edit(embed)
+
+        if (race.users.size >= 10) {
+            return startRace(message.channel.id)
+        }
     }
 }
 
@@ -221,9 +225,9 @@ module.exports = cmd
  * @param {Number} speed 
  */
 function getNewPosition(current, speed) {
-    const randomness = Math.floor(Math.random() * 5) - 2
+    const randomness = Math.floor(Math.random() * 9) - 4
 
-    const movement = speed * 1.4 + randomness
+    const movement = speed + randomness
 
     return current + movement
 }
@@ -234,7 +238,9 @@ function getNewPosition(current, speed) {
  * @param {Number} position 
  */
 function getRacePosition(emoji, position) {
-    const racePos = Math.floor(position / 5)
+    let racePos = Math.floor(position / 5)
+
+    if (racePos > 9) racePos = 9
 
     let line = ""
     let underscores = 0
@@ -287,6 +293,7 @@ async function startRace(id) {
     }
 
     embed.setDescription(description)
+    embed.setFooter("race has started")
 
     await race.message.edit(embed)
 
@@ -301,6 +308,7 @@ async function startRace(id) {
             `+$${winnings.toLocaleString()}`
         
         embed.setDescription(description)
+        embed.setFooter("race has ended")
 
         return setTimeout(async () => {
             return await race.message.edit(embed)
