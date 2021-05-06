@@ -231,9 +231,27 @@ async function run(message, args) {
                 setTimeout(() => {
                     current = carCooldown.get(message.author.id)
                     current.splice(current.indexOf(car.id), 1)
-                    carCooldown.set(message.author.id, current)
+
+                    if (current.length == 0) {
+                        carCooldown.delete(message.author.id)
+                    } else {
+                        carCooldown.set(message.author.id, current)
+                    }
                 }, 120000)
             }
+        } else {
+            carCooldown.set(message.author.id, [car.id])
+
+            setTimeout(() => {
+                const current = carCooldown.get(message.author.id)
+                current.splice(current.indexOf(car.id), 1)
+
+                if (current.length == 0) {
+                    carCooldown.delete(message.author.id)
+                } else {
+                    carCooldown.set(message.author.id, current)
+                }
+            }, 120000)
         }
 
         updateBalance(message.member, getBalance(message.member) - race.bet)
