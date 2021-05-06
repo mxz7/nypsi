@@ -496,7 +496,7 @@ async function runCommand(cmd, message, args) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 10800 - diff
+            const time = 120 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
@@ -527,6 +527,28 @@ async function runCommand(cmd, message, args) {
             if (commands.get(cmd).category == "money") {
                 return
             }
+        } else if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
+            const init = handcuffs.get(message.member.user.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 120 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+
+            return message.channel.send(
+                new ErrorEmbed(
+                    `you have been handcuffed, they will be removed in **${remaining}**`
+                )
+            )
         }
 
         updatePopularCommands(commands.get(cmd).name)
