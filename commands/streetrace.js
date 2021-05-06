@@ -62,6 +62,10 @@ async function run(message, args) {
             )
         }
 
+        if (bet < 1000) {
+            return message.channel.send(new ErrorEmbed("entry fee cannot be less than $1k"))
+        }
+
         if (bet > 500000) {
             return message.channel.send(new ErrorEmbed("entry fee cannot be over $500k"))
         }
