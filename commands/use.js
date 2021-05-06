@@ -361,7 +361,7 @@ async function run(message, args) {
                 embed.setDescription("locking chastity cage...")
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`
                 break
-            
+
             case "handcuffs":
                 if (args.length == 1) {
                     return message.channel.send(
@@ -382,16 +382,12 @@ async function run(message, args) {
                 }
 
                 if (message.member == handcuffsTarget) {
-                    return message.channel.send(
-                        new ErrorEmbed("bit of self bondage huh")
-                    )
+                    return message.channel.send(new ErrorEmbed("bit of self bondage huh"))
                 }
 
                 if (isHandcuffed(handcuffsTarget.user.id)) {
                     return message.channel.send(
-                        new ErrorEmbed(
-                            `**${handcuffsTarget.user.tag}** is already restrained`
-                        )
+                        new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)
                     )
                 }
 

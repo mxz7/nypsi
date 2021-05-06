@@ -492,7 +492,10 @@ async function runCommand(cmd, message, args) {
             if (commands.get(aliases.get(cmd)).category == "money") {
                 return
             }
-        } else if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
+        } else if (
+            commands.get(aliases.get(cmd)).category == "money" &&
+            handcuffs.has(message.author.id)
+        ) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
@@ -510,9 +513,7 @@ async function runCommand(cmd, message, args) {
             }
 
             return message.channel.send(
-                new ErrorEmbed(
-                    `you have been handcuffed, they will be removed in **${remaining}**`
-                )
+                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
             )
         }
 
@@ -545,9 +546,7 @@ async function runCommand(cmd, message, args) {
             }
 
             return message.channel.send(
-                new ErrorEmbed(
-                    `you have been handcuffed, they will be removed in **${remaining}**`
-                )
+                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
             )
         }
 
