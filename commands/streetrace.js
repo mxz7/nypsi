@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, User } = require("discord.js")
 const { getBorderCharacters } = require("table")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
@@ -256,6 +256,11 @@ async function startRace(id) {
     const race = races.get(id)
     const users = race.users
 
+    /**
+     * @type {User}
+     */
+    let winner
+
     for (let user of race.users.keys()) {
         user = race.users.get(user)
 
@@ -264,6 +269,11 @@ async function startRace(id) {
         user.position = newPos
 
         race.users.set(user.user.id, user)
+
+        if (newPos >= 50) {
+            winner = user.user
+            break
+        }
     }
 
     const embed = race.embed
@@ -280,7 +290,22 @@ async function startRace(id) {
 
     await race.message.edit(embed)
 
-    races.set(id, race) // do win thing
+    races.set(id, race)
+
+    if (winner) {
+        let winnings = race.bet * race.users.size
+
+        updateBalance(winner.id, getBalance(winner.id) + race.bet * race.users.size)
+
+        description += `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${race.users.get(winner.id).car.emoji}\n` +
+            `+$${winnings.toLocaleString()}`
+        
+        embed.setDescription(description)
+
+        return setTimeout(async () => {
+            return await race.message.edit(embed)
+        }, 500)
+    }
 
     setTimeout(() => {
         return startRace(id)
