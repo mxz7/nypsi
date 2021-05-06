@@ -29,7 +29,7 @@ async function run(message, args) {
 
         let role
 
-        if (current != "") {
+        if (current != "" && current) {
             role = await message.guild.roles.fetch(current)
 
             if (!role) {
