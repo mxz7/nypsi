@@ -290,8 +290,6 @@ function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
         for (let guild in data) {
-            if (!data[guild].bans) data[guild].bans = [] // can remove after being in prod
-            if (!data[guild].muteRole) data[guild].muteRole = "" // can remove after being in prod
             const mutes = data[guild].mutes
             if (mutes.length > 0) {
                 for (let mute of mutes) {
@@ -376,6 +374,7 @@ exports.deleteBan = deleteBan
  * @returns {String}
  */
 function getMuteRole(guild) {
+    if (!data[guild].muteRole) return undefined
     return data[guild.id].muteRole
 }
 
