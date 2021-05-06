@@ -103,6 +103,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`you dont have a ${selected.name}`))
     }
 
+    if (selected.role == "car") {
+        return message.channel.send(new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`))
+    }
+
     if (selected.role != "item" && selected.role != "tool" && selected.role != "crate") {
         return message.channel.send(new ErrorEmbed("you cannot use this item"))
     }
