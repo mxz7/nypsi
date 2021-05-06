@@ -130,6 +130,7 @@ async function run(message, args) {
         for (const i of fishItems) {
             if (items[i]) {
                 if (items[i].role == "prey") continue
+                if (items[i].role == "tool") continue
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15)
                     if (chance == 4 && fishingRod == "incredible_fishing_rod") {
