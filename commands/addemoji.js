@@ -105,6 +105,15 @@ async function run(message, args) {
         } else {
             url = url + ".png"
         }
+    } else if (mode == "url") {
+        let url = args[0]
+        if (args[1]) {
+            name = args[1]
+        } else {
+            const a = url.split("/")
+            name = a[a.length - 1]
+            name = name.split(".")[0]
+        }
     }
 
     cooldown.set(message.member.id, new Date())
