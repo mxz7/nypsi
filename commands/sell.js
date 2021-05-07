@@ -90,10 +90,6 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
     }
 
-    if ((!selected.worth && selected.role != "car") || selected.role == "collectable") {
-        return message.channel.send(new ErrorEmbed("you cannot sell this item"))
-    }
-
     let amount = 1
 
     if (args.length != 1) {
@@ -149,8 +145,8 @@ async function run(message, args) {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
         sellWorth = Math.floor(selected.worth * 0.95 * amount)
-    } else if (selected.role == "car") {
-        sellWorth = 0
+    } else if (!selected.worth) {
+        sellWorth = 1000
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
