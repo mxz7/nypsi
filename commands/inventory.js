@@ -101,6 +101,8 @@ async function run(message, args) {
             } else {
                 worth += Math.floor(items[item].worth * fee * amount)
             }
+        } else {
+            worth += 1000
         }
     }
 
