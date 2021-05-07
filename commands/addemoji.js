@@ -106,7 +106,7 @@ async function run(message, args) {
             url = url + ".png"
         }
     } else if (mode == "url") {
-        let url = args[0]
+        url = args[0]
         if (args[1]) {
             name = args[1]
         } else {
