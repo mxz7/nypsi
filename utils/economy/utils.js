@@ -221,9 +221,9 @@ async function updateCryptoWorth() {
     items["bitcoin"].worth = btcworth
     info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
 
-    res = await fetch("https://api.cryptonator.com/api/ticker/doge-usd").then((res) => res.json())
+    res = await fetch("https://sochain.com/api/v2/get_price/DOGE/USD").then((res) => res.json())
 
-    const dogeworth = Math.floor(res.ticker.price * 1000)
+    const dogeworth = Math.floor(res.data.prices[0].price * 1000)
 
     if (!dogeworth) {
         error("INVALID DOGECOIN WORTH")
