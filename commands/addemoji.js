@@ -54,18 +54,66 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0) {
+    if (args.length == 0 && !message.attachments.first()) {
         return message.channel.send(
             new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")
         )
     }
 
-    let emoji = args[0]
+    let mode = "arg"
+    let url
+    let name
 
-    emoji = emoji.split(":")
+    if (args.length == 0 || message.attachments.first()) {
+        mode = "attachment"
+    } else if (args[0]) {
+        if (args[0].startsWith("http")) {
+            mode = "url"
+        } else {
+            mode = "emoji"
+        }
+    }
 
-    if (!emoji[2]) {
-        return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
+    if (mode == "attachment") {
+        url = message.attachments.first().attachment
+        if (args.length != 0) {
+            name = args[0]
+        } else {
+            name = message.attachments.first().name.split(".")[0]
+        }
+    } else if (mode == "emoji") {
+        let emoji = args[0]
+
+        emoji = emoji.split(":")
+
+        if (!emoji[2]) {
+            return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
+        }
+
+        const emojiID = emoji[2].slice(0, emoji[2].length - 1)
+
+        if (args[1]) {
+            name = args[1]
+        } else {
+            name = emoji[1]
+        }
+
+        url = `https://cdn.discordapp.com/emojis/${emojiID}`
+
+        if (emoji[0].includes("a")) {
+            url = url + ".gif"
+        } else {
+            url = url + ".png"
+        }
+    } else if (mode == "url") {
+        url = args[0]
+        if (args[1]) {
+            name = args[1]
+        } else {
+            const a = url.split("/")
+            name = a[a.length - 1]
+            name = name.split(".")[0]
+        }
     }
 
     cooldown.set(message.member.id, new Date())
@@ -74,27 +122,18 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 3000)
 
-    const emojiID = emoji[2].slice(0, emoji[2].length - 1)
-    const emojiName = emoji[1]
-
-    let url = `https://cdn.discordapp.com/emojis/${emojiID}`
-
-    if (emoji[0].includes("a")) {
-        url = url + ".gif"
-    } else {
-        url = url + ".png"
-    }
-
     let fail = false
 
-    await message.guild.emojis.create(url, emojiName).catch(() => {
-        return message.channel.send(
-            new ErrorEmbed("error adding emoji - have you reached the emoji cap?")
-        )
+    await message.guild.emojis.create(url, name).catch((e) => {
+        fail = true
+
+        return message.channel.send(new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``))
     })
 
+    if (fail) return
+
     return message.channel.send(
-        new CustomEmbed(message.member, false, `✅ emoji added as \`:${emojiName}:\``)
+        new CustomEmbed(message.member, false, `✅ emoji added as \`:${name}:\``)
     )
 }
 
