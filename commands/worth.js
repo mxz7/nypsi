@@ -81,7 +81,9 @@ async function run(message, args) {
         worth = Math.floor(worth + worth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
         if (!selected.worth) {
-            return message.channel.send(new ErrorEmbed(`you cannot currently sell ${selected.name}`))
+            return message.channel.send(
+                new ErrorEmbed(`you cannot currently sell ${selected.name}`)
+            )
         }
         worth = Math.floor(selected.worth * 0.95 * amount)
     } else if (!selected.worth) {
