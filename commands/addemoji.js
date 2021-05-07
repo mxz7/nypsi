@@ -105,11 +105,18 @@ async function run(message, args) {
     let fail = false
 
     await message.guild.emojis.create(url, name).catch((e) => {
-        console.log(e)
+        fail = true
+
+        let msg = "error adding emoji - have you reached the emoji cap?"
+
+        if (e.includes("cannot be larger than 256")) msg = "this image is too large, the limit is 256kb"
+
         return message.channel.send(
-            new ErrorEmbed("error adding emoji - have you reached the emoji cap?")
+            new ErrorEmbed(msg)
         )
     })
+
+    if (fail) return
 
     return message.channel.send(
         new CustomEmbed(message.member, false, `✅ emoji added as \`:${name}:\``)
