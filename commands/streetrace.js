@@ -323,6 +323,8 @@ function getNewPosition(current, speed) {
 
     const movement = speed + randomness
 
+    if (current + movement < current) return current
+
     return current + movement
 }
 
