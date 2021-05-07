@@ -54,8 +54,6 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    console.log(message)
-
     if (args.length == 0 && !message.attachments.first()) {
         return message.channel.send(
             new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")
@@ -66,15 +64,23 @@ async function run(message, args) {
     let url
     let name
 
-    if (args.length == 0) {
+    if (args.length == 0 || message.attachments.first()) {
         mode = "attachment"
     } else if (args[0]) {
-        mode = "emoji"
+        if (args[0].startsWith("http")) {
+            mode = "url"
+        } else {
+            mode = "emoji"
+        }
     }
 
     if (mode == "attachment") {
         url = message.attachments.first().attachment
-        name = message.attachments.first().name.split(".")[0]
+        if (args.length != 0) {
+            name = args[0]
+        } else {
+            name = message.attachments.first().name.split(".")[0]
+        }
     } else if (mode == "emoji") {
         let emoji = args[0]
 
@@ -85,7 +91,12 @@ async function run(message, args) {
         }
 
         const emojiID = emoji[2].slice(0, emoji[2].length - 1)
-        name = emoji[1]
+
+        if (args[1]) {
+            name = args[1]
+        } else {
+            name = emoji[1]
+        }
 
         url = `https://cdn.discordapp.com/emojis/${emojiID}`
 
@@ -107,12 +118,8 @@ async function run(message, args) {
     await message.guild.emojis.create(url, name).catch((e) => {
         fail = true
 
-        let msg = "error adding emoji - have you reached the emoji cap?"
-
-        if (e.includes("cannot be larger than 256")) msg = "this image is too large, the limit is 256kb"
-
         return message.channel.send(
-            new ErrorEmbed(msg)
+            new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)
         )
     })
 
