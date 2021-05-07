@@ -54,18 +54,46 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0) {
+    console.log(message)
+
+    if (args.length == 0 && !message.attachments.first()) {
         return message.channel.send(
             new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")
         )
     }
+    
+    let mode = "arg"
+    let url
+    let name
 
-    let emoji = args[0]
+    if (args.length == 0) {
+        mode = "attachment"
+    } else if (args[0]) {
+        mode = "emoji"
+    }
 
-    emoji = emoji.split(":")
+    if (mode == "attachment") {
+        url = message.attachments.first().attachment
+        name = message.attachments.first().name.split(".")[0]
+    } else if (mode == "emoji") {
+        let emoji = args[0]
 
-    if (!emoji[2]) {
-        return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
+        emoji = emoji.split(":")
+
+        if (!emoji[2]) {
+            return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
+        }
+
+        const emojiID = emoji[2].slice(0, emoji[2].length - 1)
+        name = emoji[1]
+
+        url = `https://cdn.discordapp.com/emojis/${emojiID}`
+
+        if (emoji[0].includes("a")) {
+            url = url + ".gif"
+        } else {
+            url = url + ".png"
+        }
     }
 
     cooldown.set(message.member.id, new Date())
@@ -74,27 +102,17 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 3000)
 
-    const emojiID = emoji[2].slice(0, emoji[2].length - 1)
-    const emojiName = emoji[1]
-
-    let url = `https://cdn.discordapp.com/emojis/${emojiID}`
-
-    if (emoji[0].includes("a")) {
-        url = url + ".gif"
-    } else {
-        url = url + ".png"
-    }
-
     let fail = false
 
-    await message.guild.emojis.create(url, emojiName).catch(() => {
+    await message.guild.emojis.create(url, name).catch((e) => {
+        console.log(e)
         return message.channel.send(
             new ErrorEmbed("error adding emoji - have you reached the emoji cap?")
         )
     })
 
     return message.channel.send(
-        new CustomEmbed(message.member, false, `✅ emoji added as \`:${emojiName}:\``)
+        new CustomEmbed(message.member, false, `✅ emoji added as \`:${name}:\``)
     )
 }
 
