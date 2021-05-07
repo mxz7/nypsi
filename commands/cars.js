@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getItems } = require("../utils/economy/utils")
+const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
 const cmd = new Command("cars", "view the current cars available", categories.MONEY).setAliases([
     "car",
@@ -53,7 +53,10 @@ async function run(message, args) {
         }
     }
 
+    if (!userExists(message.member)) createUser(message.member)
+
     const items = getItems()
+    const inventory = getInventory(message.member)
 
     const itemIDs = Array.from(Object.keys(items))
 
@@ -86,10 +89,16 @@ async function run(message, args) {
     }
 
     for (let item of pages[page]) {
+        let owned = false
         item = items[item]
+
+        if (inventory[item.id] && inventory[item.id] > 0) owned = true
+
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}`,
+            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}${
+                owned ? "\n*owned*" : ""
+            }`,
             true
         )
     }
@@ -128,10 +137,16 @@ async function run(message, args) {
                 } else {
                     currentPage--
                     for (let item of pages[currentPage]) {
+                        let owned = false
                         item = items[item]
+
+                        if (inventory[item.id] && inventory[item.id] > 0) owned = true
+
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${
+                                item.speed
+                            }${owned ? "\n*owned*" : ""}`,
                             true
                         )
                     }
@@ -145,10 +160,16 @@ async function run(message, args) {
                 } else {
                     currentPage++
                     for (let item of pages[currentPage]) {
+                        let owned = false
                         item = items[item]
+
+                        if (inventory[item.id] && inventory[item.id] > 0) owned = true
+
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${
+                                item.speed
+                            }${owned ? "\n*owned*" : ""}`,
                             true
                         )
                     }
