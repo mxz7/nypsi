@@ -22,7 +22,7 @@ class GuildStorage {
                 channel: "none",
             },
             disabledCommands: [],
-            snipeFilter: ["discordgg", "discordcom"],
+            snipeFilter: [],
             chatFilter: [],
             prefix: "$",
             countdowns: {},
