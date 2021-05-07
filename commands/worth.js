@@ -52,18 +52,6 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
     }
 
-    if (selected.role == "collectable") {
-        return message.channel.send(
-            new ErrorEmbed(
-                "collectables can't be sold, although there are some incredibly rare collectables"
-            )
-        )
-    }
-
-    if (!selected.worth) {
-        return message.channel.send(new ErrorEmbed("this item can not be bought or sold"))
-    }
-
     let amount = 1
 
     if (args.length != 1) {
@@ -92,7 +80,12 @@ async function run(message, args) {
     if (selected.role == "fish" || selected.role == "prey") {
         worth = Math.floor(worth + worth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
+        if (!selected.worth) {
+            return message.channel.send(new ErrorEmbed(`you cannot currently sell ${selected.name}`))
+        }
         worth = Math.floor(selected.worth * 0.95 * amount)
+    } else if (!selected.worth) {
+        worth = 1000
     }
 
     const embed = new CustomEmbed(message.member, false)
