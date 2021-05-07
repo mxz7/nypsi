@@ -4,11 +4,9 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems } = require("../utils/economy/utils")
 
-const cmd = new Command(
-    "cars",
-    "view the current cars available",
-    categories.MONEY
-).setAliases(["car"])
+const cmd = new Command("cars", "view the current cars available", categories.MONEY).setAliases([
+    "car",
+])
 
 const cooldown = new Map()
 
@@ -91,9 +89,7 @@ async function run(message, args) {
         item = items[item]
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${
-                item.description
-            }\n**speed** ${item.speed}`,
+            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}`,
             true
         )
     }
@@ -122,9 +118,7 @@ async function run(message, args) {
                     await msg.reactions.removeAll()
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle(
-                "car magazine"
-            )
+            const newEmbed = new CustomEmbed(message.member).setTitle("car magazine")
 
             if (!reaction) return
 
