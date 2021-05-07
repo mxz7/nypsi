@@ -154,7 +154,17 @@ async function run(message, args) {
         const { isHandcuffed, addHandcuffs } = require("../utils/commandhandler")
 
         switch (selected.id) {
-            case "watch":
+            case "standard_watch":
+                embed.setDescription("you look down at your watch to check the time..")
+                laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
+                break
+
+            case "golden_watch":
+                embed.setDescription("you look down at your watch to check the time..")
+                laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
+                break
+
+            case "diamond_watch":
                 embed.setDescription("you look down at your watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
