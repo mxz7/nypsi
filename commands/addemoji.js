@@ -59,7 +59,7 @@ async function run(message, args) {
             new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")
         )
     }
-    
+
     let mode = "arg"
     let url
     let name
@@ -127,9 +127,7 @@ async function run(message, args) {
     await message.guild.emojis.create(url, name).catch((e) => {
         fail = true
 
-        return message.channel.send(
-            new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)
-        )
+        return message.channel.send(new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``))
     })
 
     if (fail) return
