@@ -4,13 +4,13 @@ const { getMuteRole } = require("../utils/moderation/utils")
 /**
  * @param {GuildChannel} channel
  */
-module.exports = (channel) => {
+module.exports = async (channel) => {
     if (!channel.guild) return
 
-    let muteRole = channel.guild.roles.fetch(getMuteRole(channel.guild))
+    let muteRole = await channel.guild.roles.fetch(getMuteRole(channel.guild))
 
-    if (getMuteRole(channel.guild) == "") {
-        muteRole = channel.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+    if (!getMuteRole(channel.guild)) {
+        muteRole = await channel.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
     if (!muteRole) return
