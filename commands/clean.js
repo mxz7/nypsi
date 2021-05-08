@@ -4,7 +4,11 @@ const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("clean", "clean up bot commands and responses", categories.MODERATION)
+const cmd = new Command(
+    "clean",
+    "clean up bot commands and responses",
+    categories.MODERATION
+).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
