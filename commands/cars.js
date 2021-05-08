@@ -63,10 +63,15 @@ async function run(message, args) {
     inPlaceSort(itemIDs).asc()
 
     const pages = []
+    let totalCars = 0
+    let totalOwned = 0
 
     let pageOfItems = []
     for (const item of itemIDs) {
         if (items[item].role != "car") continue
+        totalCars++
+
+        if (inventory[items[item].id] && inventory[items[item].id] > 0) totalOwned++
 
         if (pageOfItems.length == 6) {
             pages.push(pageOfItems)
@@ -80,7 +85,9 @@ async function run(message, args) {
         pages.push(pageOfItems)
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
+    const embed = new CustomEmbed(message.member).setFooter(
+        `page ${page + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`
+    )
 
     embed.setTitle("car magazine")
 
@@ -150,7 +157,11 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(
+                        `page ${currentPage + 1}/${
+                            pages.length
+                        } | owned: ${totalOwned}/${totalCars}`
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
@@ -173,7 +184,11 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(
+                        `page ${currentPage + 1}/${
+                            pages.length
+                        } | owned: ${totalOwned}/${totalCars}`
+                    )
                     await msg.edit(newEmbed)
                     return pageManager()
                 }
