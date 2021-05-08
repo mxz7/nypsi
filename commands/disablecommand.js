@@ -10,7 +10,7 @@ const cmd = new Command(
     categories.ADMIN
 )
     .setAliases(["disablecmd", "disable"])
-    .setPermissions("MANAGE_SERVER")
+    .setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message
