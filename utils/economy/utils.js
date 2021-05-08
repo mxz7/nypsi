@@ -1108,6 +1108,7 @@ function reset() {
         let prestige = user.prestige
         let lastVote = user.lastVote
         let inventory = user.inventory
+        const dms = user.dms
 
         if (!lastVote) lastVote = 0
 
@@ -1121,7 +1122,7 @@ function reset() {
             }
         }
 
-        if (prestige == 0 && lastVote == 0 && !inventory) {
+        if (prestige == 0 && lastVote == 0 && !inventory && !dms) {
             delete users[id]
             info("deleted " + id)
             deleted++
@@ -1130,6 +1131,7 @@ function reset() {
             user.prestige = prestige
             user.lastVote = lastVote
             user.inventory = inventory
+            user.dms = dms
 
             users[id] = user
             info("updated " + id)
