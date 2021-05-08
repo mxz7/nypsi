@@ -146,7 +146,7 @@ async function run(message, args) {
             if (races.get(message.channel.id).users.size < 2) {
                 embed.setDescription("race cancelled ):")
                 embed.setFooter("race cancelled")
-                msg.edit(embed)
+                msg.edit(embed).catch(() => {})
 
                 for (let user of races.get(message.channel.id).users.keys()) {
                     user = races.get(message.channel.id).users.get(user)
@@ -160,6 +160,11 @@ async function run(message, args) {
                 const d = races.get(message.channel.id)
                 d.started = true
                 races.set(message.channel.id, d)
+                setTimeout(() => {
+                    if (races.has(message.channel.id) && races.get(message.channel.id).id == id) {
+                        races.delete(message.channel.id)
+                    }
+                }, 300000)
             }
         }, 30000)
     } else if (args[0].toLowerCase() == "join") {
@@ -304,6 +309,12 @@ async function run(message, args) {
 
         if (race.users.size >= 25) {
             race.started = true
+            const id = races.get(message.channel.id).id
+            setTimeout(() => {
+                if (races.has(message.channel.id) && races.get(message.channel.id).id == id) {
+                    races.delete(message.channel.id)
+                }
+            }, 300000)
             return startRace(message.channel.id)
         }
     }
