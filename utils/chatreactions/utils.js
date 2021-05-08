@@ -336,7 +336,7 @@ async function startReaction(guild, channel) {
     let waiting = false
 
     const filter = (m) =>
-        m.content == chosenWord &&
+        m.content.toLowerCase() == chosenWord.toLowerCase() &&
         winnersIDs.indexOf(m.author.id) == -1 &&
         !m.member.user.bot &&
         getBlacklisted(guild).indexOf(m.author.id) == -1
