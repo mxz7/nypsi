@@ -18,13 +18,13 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        "**bot** - `" +
-            (msg.createdTimestamp - message.createdTimestamp) +
+        "**bot** `~ " +
+            (new Date().getTime() - now) +
             "ms`\n" +
-            "**api** - `" +
+            "**api** `~ " +
             Math.round(message.client.ws.ping) +
             "ms`"
-    ).setFooter("nypsi is hosted in New Jersey - US East")
+    ).setFooter("nypsi is hosted in new jersey - us east")
 
     return await msg.edit(embed)
 }
