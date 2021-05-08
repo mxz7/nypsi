@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("ping", "get ping/latency of the bot and api", categories.INFO).setAliases([
+const cmd = new Command("ping", "measured by timing how long it takes for a message to be sent - rate limiting can affect this", categories.INFO).setAliases([
     "latency",
 ])
 
