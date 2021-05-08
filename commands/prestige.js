@@ -144,7 +144,7 @@ async function run(message, args) {
 
         if (getPrestige(message.member) > 5) {
             amount = 2
-        } else if (getPrestige(message.member > 10)) {
+        } else if (getPrestige(message.member) > 10) {
             amount = 3
         }
 
