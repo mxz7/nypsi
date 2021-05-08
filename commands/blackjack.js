@@ -597,7 +597,7 @@ async function playGame(message, m) {
 
         let filter
 
-        if (getBalance(message.member) >= bet) {
+        if (getBalance(message.member) >= bet && first) {
             filter = (reaction, user) => {
                 return (
                     ["1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name) &&
