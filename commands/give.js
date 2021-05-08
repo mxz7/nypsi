@@ -212,7 +212,7 @@ async function run(message, args) {
         new CustomEmbed(
             message.member,
             false,
-            `you have given **${amount}** ${selected.name} to **${target.toString()}**`
+            `you have given **${amount}** ${selected.emoji} ${selected.name} to **${target.toString()}**`
         )
     )
 }
