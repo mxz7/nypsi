@@ -391,7 +391,7 @@ async function startRace(id) {
     embed.setDescription(description)
     embed.setFooter("race has started")
 
-    await race.message.edit(embed)
+    await race.message.edit(embed).catch(() => {})
 
     races.set(id, race)
 
@@ -409,7 +409,7 @@ async function startRace(id) {
         embed.setFooter("race has ended")
 
         return setTimeout(async () => {
-            await race.message.edit(embed)
+            await race.message.edit(embed).catch(() => {})
             return races.delete(id)
         }, 500)
     }
