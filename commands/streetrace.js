@@ -68,7 +68,7 @@ async function run(message, args) {
 
         if (args.length == 1) {
             return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`)
+                new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)
             )
         }
 
@@ -83,7 +83,7 @@ async function run(message, args) {
                 args[1] = formatBet(args[1])
             } else {
                 return message.channel.send(
-                    new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`)
+                    new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)
                 )
             }
         }
@@ -96,7 +96,7 @@ async function run(message, args) {
 
         if (bet <= 0) {
             return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee>`)
+                new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)
             )
         }
 
@@ -106,6 +106,23 @@ async function run(message, args) {
 
         if (bet > 500000) {
             return message.channel.send(new ErrorEmbed("entry fee cannot be over $500k"))
+        }
+
+        let speedLimit = 0
+
+        if (args[2]) {
+            if (!parseInt(args[2])) {
+                return message.channel.send(new ErrorEmbed("speed limit must be a number 1-6"))
+            }
+            speedLimit = parseInt(args[2])
+
+            if (!speedLimit) {
+                return message.channel.send(new ErrorEmbed("invalid speed limit"))
+            }
+
+            if (speedLimit > 6 || speedLimit < 1) {
+                return message.channel.send(new ErrorEmbed("speed limit must be a number 1-6"))
+            }
         }
 
         cooldown.set(message.member.id, new Date())
@@ -125,13 +142,18 @@ async function run(message, args) {
             start: new Date().getTime() + 30000,
             embed: undefined,
             started: false,
+            speedLimit: speedLimit,
         }
 
         const embed = new CustomEmbed(message.member).setTitle("street race")
 
         embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`)
 
-        embed.setDescription(`no racers\n\nentry fee: $${bet.toLocaleString()}`)
+        embed.setDescription(
+            `no racers\n\nentry fee: $${bet.toLocaleString()}${
+                speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""
+            }`
+        )
 
         const msg = await message.channel.send(embed)
 
@@ -241,6 +263,16 @@ async function run(message, args) {
             }
         }
 
+        if (race.speedLimit > 0 && car.speed > race.speedLimit) {
+            return message.channel.send(
+                new ErrorEmbed(
+                    `your ${car.name} is too fast for this race, select another with ${getPrefix(
+                        message.guild
+                    )}**sr join <car>**`
+                )
+            )
+        }
+
         if (carCooldown.has(message.author.id)) {
             let current = carCooldown.get(message.author.id)
 
@@ -300,7 +332,11 @@ async function run(message, args) {
             description += `\n\`${user.user.tag}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`
         }
 
-        description += `\n\nentry fee: $${race.bet.toLocaleString()}`
+        const speedLimit = race.speedLimit
+
+        description += `\n\nentry fee: $${race.bet.toLocaleString()}${
+            speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""
+        }`
 
         embed.setDescription(description)
 
