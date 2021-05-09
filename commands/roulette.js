@@ -306,8 +306,12 @@ async function run(message, args) {
                 )
 
                 let requiredBet = 1000
-                if (getPrestige(message.member) > 1) requiredBet = 10000
-                if (bet >= 10000) {
+
+                if (getPrestige(message.member) > 2) requiredBet = 10000
+
+                requiredBet += getPrestige(message.member) * 1000
+
+                if (bet >= requiredBet) {
                     const xpBonus = Math.floor(Math.random() * 2) + getPrestige(message.member)
 
                     const givenXp = xpBonus > 7 ? 7 : xpBonus
