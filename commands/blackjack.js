@@ -240,7 +240,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setTitle("blackjack | " + message.member.user.username)
-        .addField("dealer", games.get(message.member.user.id).dealerCards[0])
+        .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
         .addField(
             message.member.user.tag,
             getCards(message.member) + " **" + calcTotal(message.member) + "**"
@@ -422,25 +422,13 @@ function calcTotalDealer(member) {
 function getCards(member) {
     const cards = games.get(member.user.id).cards
 
-    let message = ""
-
-    for (let card of cards) {
-        message = message + "| " + card + " "
-    }
-
-    return message.substr(1)
+    return "| " + cards.join(" | ") + " |"
 }
 
 function getDealerCards(member) {
     const cards = games.get(member.user.id).dealerCards
 
-    let message = ""
-
-    for (let card of cards) {
-        message = message + "| " + card + " "
-    }
-
-    return message.substr(1)
+    return "| " + cards.join(" | ") + " |"
 }
 
 async function playGame(message, m) {
@@ -640,7 +628,7 @@ async function playGame(message, m) {
                 message.member.user.toString() + "\n\n**bet** $" + bet.toLocaleString()
             )
                 .setTitle("blackjack")
-                .addField("dealer", games.get(message.member.user.id).dealerCards[0])
+                .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
                 .addField(
                     message.member.user.tag,
                     getCards(message.member) + " **" + calcTotal(message.member) + "**"
