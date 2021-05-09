@@ -36,7 +36,7 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
-            cooldownLength = 2
+            cooldownLength = 3
         } else {
             cooldownLength = 6
         }
