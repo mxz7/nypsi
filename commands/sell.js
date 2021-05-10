@@ -151,7 +151,7 @@ async function run(message, args) {
         }
         sellWorth = Math.floor(selected.worth * 0.95 * amount)
     } else if (!selected.worth) {
-        sellWorth = 1000
+        sellWorth = 1000 * amount
     }
 
     updateBalance(message.member, getBalance(message.member) + sellWorth)
