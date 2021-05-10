@@ -87,7 +87,7 @@ async function run(message, args) {
         }
         worth = Math.floor(selected.worth * 0.95 * amount)
     } else if (!selected.worth) {
-        worth = 1000
+        worth = 1000 * amount
     }
 
     const embed = new CustomEmbed(message.member, false)
