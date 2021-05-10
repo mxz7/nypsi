@@ -23,8 +23,8 @@
     "urban-dictionary": "^3.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.25.0",
-    "prettier": "2.2.1"
+    "eslint": "^7.26.0",
+    "prettier": "2.3.0"
   },
   "repository": {
     "type": "git",
