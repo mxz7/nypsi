@@ -4,10 +4,16 @@ const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
     disableMentions: "everyone",
-    messageCacheMaxSize: 150,
-    messageSweepInterval: 10800,
-    messageCacheLifetime: 9000,
+    messageCacheMaxSize: 100,
+    messageSweepInterval: 1800,
+    messageCacheLifetime: 3600,
     shards: "auto",
+    presence: {
+        status: "dnd",
+        activity: {
+            name: "nypsi.xyz",
+        },
+    },
 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
