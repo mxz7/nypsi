@@ -7,7 +7,7 @@ const { info } = require("../utils/logger")
 
 const cmd = new Command(
     "crateall",
-    "give every user in the current message.guild a crate",
+    "give every user in the current guild a crate",
     categories.NONE
 ).setPermissions(["bot owner"])
 
