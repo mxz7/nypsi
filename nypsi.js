@@ -7,7 +7,6 @@ const client = new Discord.Client({
     messageCacheMaxSize: 100,
     messageSweepInterval: 1800,
     messageCacheLifetime: 3600,
-    shards: "auto",
     presence: {
         status: "dnd",
         activity: {
