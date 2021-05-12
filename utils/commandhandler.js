@@ -477,7 +477,7 @@ async function runCommand(cmd, message, args) {
 
         if (response == captcha.answer) {
             toggleLock(message.author.id)
-            return message.channel.send("✅ you passed the captcha")
+            return message.react("✅")
         } else {
             return message.channel.send(
                 message.author.toString() +
