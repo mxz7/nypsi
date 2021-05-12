@@ -273,6 +273,20 @@ async function helpCmd(message, args) {
 
             embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
+        } else if (getCommand(args[0].toLowerCase())) {
+            const member = await message.guild.members.cache.find(
+                (m) => m.id == getCommand(args[0].toLowerCase()).owner
+            )
+            embed.setTitle("custom command")
+            embed.setDescription(
+                `this is a custom command${
+                    member ? ` owned by ${member.toString()}` : ""
+                }\n\nto disable custom commands in your server you can do:\n${getPrefix(
+                    message.guild
+                )}disablecmd + customcommand`
+            )
+        } else {
+            return message.channel.send(new ErrorEmbed("unknown command"))
         }
     }
 
