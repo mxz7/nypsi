@@ -32,7 +32,23 @@ async function run(message, args) {
 
     const bankWorth = new Discord.Collection()
 
-    if (getBalance(message.member) > 500000) {
+    if (getBalance(message.member > 100000000)) {
+        bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.01))
+        bankWorth.set("santander", Math.round(getBalance(message.member) * 0.008))
+        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 0.0125))
+        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.0075))
+        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.009))
+        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.005))
+        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 0.01))
+    } else if (getBalance(message.member) > 10000000) {
+        bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.1))
+        bankWorth.set("santander", Math.round(getBalance(message.member) * 0.08))
+        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 0.125))
+        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.075))
+        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.09))
+        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.05))
+        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 0.1))
+    } else if (getBalance(message.member) > 500000) {
         bankWorth.set("barclays", Math.round(getBalance(message.member) * 1))
         bankWorth.set("santander", Math.round(getBalance(message.member) * 0.8))
         bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 1.25))
