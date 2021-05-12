@@ -36,7 +36,23 @@ async function run(message, args) {
 
     const shopWorth = new Discord.Collection()
 
-    if (getBalance(message.member) > 500000) {
+    if (getBalance(message.member > 100000000)) {
+        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.0005))
+        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.005))
+        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.002))
+        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.001))
+        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.005))
+        shopWorth.set("target", Math.round(getBalance(message.member) * 0.002))
+        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.001))
+    } else if (getBalance(message.member) > 10000000) {
+        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.005))
+        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.05))
+        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.02))
+        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.01))
+        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.05))
+        shopWorth.set("target", Math.round(getBalance(message.member) * 0.02))
+        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.01))
+    } else if (getBalance(message.member) > 500000) {
         shopWorth.set("primark", Math.round(getBalance(message.member) * 0.05))
         shopWorth.set("asda", Math.round(getBalance(message.member) * 0.5))
         shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.2))
