@@ -123,7 +123,7 @@ function newCase(guild, caseType, userIDs, moderator, command) {
     }
     for (let userID of userIDs) {
         const caseCount = getCaseCount(guild)
-        db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)").run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
+        db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
         db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)    
     }
 }
@@ -136,9 +136,7 @@ exports.newCase = newCase
  * @param {String} caseID case to delete
  */
 function deleteCase(guild, caseID) {
-    const caseInfo = data[guild.id].cases[caseID]
-    caseInfo.deleted = true
-    data[guild.id].cases[caseID] = caseInfo
+    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ?, case_id = ?").run(guild.id, caseID)
 }
 
 exports.deleteCase = deleteCase
