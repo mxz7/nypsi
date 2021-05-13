@@ -32,7 +32,7 @@ async function run(message, args) {
 
     const bankWorth = new Discord.Collection()
 
-    if (getBalance(message.member > 100000000)) {
+    if (getBalance(message.member) > 100000000) {
         bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.01))
         bankWorth.set("santander", Math.round(getBalance(message.member) * 0.008))
         bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 0.0125))

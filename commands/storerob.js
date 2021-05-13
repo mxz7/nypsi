@@ -36,7 +36,7 @@ async function run(message, args) {
 
     const shopWorth = new Discord.Collection()
 
-    if (getBalance(message.member > 100000000)) {
+    if (getBalance(message.member) > 100000000) {
         shopWorth.set("primark", Math.round(getBalance(message.member) * 0.0005))
         shopWorth.set("asda", Math.round(getBalance(message.member) * 0.005))
         shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.002))
