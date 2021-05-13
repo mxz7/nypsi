@@ -2,11 +2,14 @@ const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
 const { info, types, getTimestamp, error } = require("../logger")
+const { getDatabase } = require("../database/database")
 let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
 info(
     `${Array.from(Object.keys(data)).length.toLocaleString()} moderation guilds loaded`,
     types.DATA
 )
+
+const db = getDatabase()
 
 let timer = 0
 let timerCheck = true
@@ -73,13 +76,7 @@ setInterval(() => {
  * @param {Guild} guild guild to create profile for
  */
 function createProfile(guild) {
-    data[guild.id] = {
-        caseCount: 0,
-        muteRole: "",
-        cases: [],
-        mutes: [],
-        bans: [],
-    }
+    const query = db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id)
 }
 
 exports.createProfile = createProfile
@@ -89,10 +86,12 @@ exports.createProfile = createProfile
  * @param {Guild} guild check if profile exists for this guild
  */
 function profileExists(guild) {
-    if (data[guild.id]) {
-        return true
-    } else {
+    const query = db.prepare("SELECT * FROM moderation WHERE id = ?").get(guild.id)
+
+    if (!query) {
         return false
+    } else {
+        return true
     }
 }
 
