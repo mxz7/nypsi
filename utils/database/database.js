@@ -1,4 +1,5 @@
-const db = require("better-sqlite3")("./utils/database/storage.db")
+const Database = require("better-sqlite3")
+const db = new Database("./utils/database/storage.db")
 
 function createTables() {
     db.prepare(
@@ -38,3 +39,12 @@ function toArray(string, seperator) {
 }
 
 exports.toArray = toArray
+
+/**
+ * @returns {Database}
+ */
+function getDatabase() {
+    return db
+}
+
+exports.getDatabase = getDatabase
