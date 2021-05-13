@@ -12,9 +12,11 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(
-    ["MANAGE_MESSAGES"]
-)
+const cmd = new Command(
+    "unmute",
+    "unmute one or more users",
+    categories.MODERATION
+).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message

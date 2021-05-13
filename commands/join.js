@@ -11,6 +11,8 @@ const cmd = new Command(
     categories.INFO
 ).setAliases(["joined"])
 
+const sortCache = new Map()
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -50,21 +52,24 @@ async function run(message, args) {
 
     let membersSorted = []
 
-    members.forEach((m) => {
-        if (m.joinedTimestamp) {
-            membersSorted.push(m.id)
-        }
-    })
+    if (
+        sortCache.has(message.guild.id) &&
+        sortCache.get(message.guild.id).length == message.guild.memberCount
+    ) {
+        membersSorted = sortCache.get(message.guild.id)
+    } else {
+        members.forEach((m) => {
+            if (m.joinedTimestamp) {
+                membersSorted.push(m.id)
+            }
+        })
 
-    // membersSorted.sort(function (a, b) {
-    //     return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
-    // })
+        inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
 
-    // sort(membersSorted).desc(u => u.joinedAt)
-    // sort(membersSorted, (a, b) => {
-    //     return members.find((m) => m.id == a).joinedAt - members.find((m) => m.id == b).joinedAt
-    // })
-    inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
+        sortCache.set(message.guild.id, membersSorted)
+
+        setTimeout(() => sortCache.delete(message.guild.id), 60000)
+    }
 
     let joinPos = membersSorted.indexOf(member.id) + 1
 

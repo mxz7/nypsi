@@ -8,6 +8,9 @@ const { setMuteRole, profileExists } = require("../utils/moderation/utils")
  * @param {Guild} guild
  */
 module.exports = async (client, guild) => {
+    if (!guild.name) {
+        return console.log(guild)
+    }
     info(
         `removed from ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
         types.GUILD
