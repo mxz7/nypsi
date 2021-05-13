@@ -88,7 +88,8 @@ async function run(message, args) {
         !selected.worth ||
         selected.role == "collectable" ||
         selected.role == "prey" ||
-        selected.role == "fish"
+        selected.role == "fish" ||
+        selected.role == "car"
     ) {
         return message.channel.send(new ErrorEmbed("you cannot buy this item"))
     }
