@@ -252,20 +252,6 @@ function setStatsProfile(guild, profile) {
 exports.setStatsProfile = setStatsProfile
 
 /**
- * @returns {Array<JSON>}
- */
-function getGuilds() {
-    const guilds1 = []
-
-    for (let g in guilds) {
-        guilds1.push(g)
-    }
-    return guilds1
-}
-
-exports.getGuilds = getGuilds
-
-/**
  *
  * @param {Guild} guild
  */
