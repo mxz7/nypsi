@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@top-gg/sdk": "^3.1.1",
+    "better-sqlite3": "^7.3.1",
     "discord.js": "^12.5.3",
     "express": "^4.17.1",
     "fast-sort": "^3.0.2",
