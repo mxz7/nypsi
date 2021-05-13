@@ -162,13 +162,17 @@ async function requestDM(id, content) {
     const member = await client.users.fetch(id)
 
     if (member) {
-        await member.send(content).catch(async () => {
+        await member.send(content).then(() => {
+            info(`successfully sent DM to ${member.tag} (${member.id})`)
+        }).catch(async () => {
+            error(`failed to send DM to ${member.tag} (${member.id})`)
             const tekoh = await client.users.fetch("672793821850894347")
 
             await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
         })
         return true
     } else {
+        error(`failed to send DM to ${member.id}`)
         const tekoh = await client.users.fetch("672793821850894347")
 
         await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
