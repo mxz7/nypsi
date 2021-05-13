@@ -249,7 +249,7 @@ exports.setStatsProfile = setStatsProfile
 async function checkStats(guild) {
     let memberCount
 
-    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 2500) {
+    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 500) {
         guilds[guild.id].counter.filterBots = false
         memberCount = guild.memberCount
     } else if (guilds[guild.id].counter.filterBots) {
