@@ -47,9 +47,9 @@ async function redditImage(post, allowed) {
     }
 
     if (image.includes("gfycat")) {
-        const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-            (url) => url.json()
-        )
+        const link = await fetch(
+            "https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]
+        ).then((url) => url.json())
 
         if (link.gfyItem) {
             image = link.gfyItem.max5mbGif

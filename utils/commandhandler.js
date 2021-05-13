@@ -2,7 +2,13 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
 const { Message, Client } = require("discord.js")
-const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
+const {
+    getPrefix,
+    getDisabledCommands,
+    getChatFilter,
+    hasGuild,
+    createGuild,
+} = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const {
