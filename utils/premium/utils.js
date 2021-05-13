@@ -41,7 +41,7 @@ setInterval(() => {
         info("premium data refreshed", types.DATA)
         timer = 0
     }
-}, 60000)
+}, 60000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
     const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
@@ -54,7 +54,7 @@ setInterval(() => {
             info("premium commands data saved", types.DATA)
         })
     }
-}, 120000)
+}, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
     let date = new Date()

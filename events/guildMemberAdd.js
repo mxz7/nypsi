@@ -1,11 +1,13 @@
 const { GuildMember } = require("discord.js")
-const { runCheck } = require("../utils/guilds/utils")
+const { runCheck, hasGuild, createGuild } = require("../utils/guilds/utils")
 const { profileExists, isMuted, deleteMute, getMuteRole } = require("../utils/moderation/utils")
 
 /**
  * @param {GuildMember} member
  */
 module.exports = async (member) => {
+    if (!hasGuild(member.guild)) createGuild(member.guild)
+
     runCheck(member.guild)
 
     if (!profileExists(member.guild)) return

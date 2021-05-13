@@ -34,7 +34,7 @@ setInterval(() => {
         info("socials data refreshed", types.DATA)
         timer = 0
     }
-}, 60000)
+}, 180000 + Math.floor(Math.random() * 60) * 1000)
 
 module.exports = {
     /**
