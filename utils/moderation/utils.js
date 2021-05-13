@@ -172,7 +172,9 @@ exports.getCases = getCases
  * @param {Guild} guild guild to get cases of
  */
 function getAllCases(guild) {
-    return data[guild.id].cases
+    const query = db.prepare("SELECT user, moderator FROM moderation_cases WHERE guild_id = ?").all(guild.id)
+
+    return query.reverse()
 }
 
 exports.getAllCases = getAllCases
