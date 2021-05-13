@@ -38,7 +38,7 @@ setInterval(() => {
         info("moderation data refreshed", types.DATA)
         timer = 0
     }
-}, 60000)
+}, 60000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")

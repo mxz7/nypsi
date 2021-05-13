@@ -32,7 +32,7 @@ setInterval(() => {
         timerCheck = true
         timer = 0
     }
-}, 120000)
+}, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(async () => {
     const { snipe, eSnipe, mentions } = require("../../nypsi")
