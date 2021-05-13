@@ -323,7 +323,8 @@
         "rarity": 4,
         "role": "car",
         "speed": 6,
-        "aliases": ["r34", "gtr"]
+        "aliases": ["r34", "gtr"],
+        "worth": 230000
     },
     "toyota_supra": {
         "id": "toyota_supra",
@@ -333,7 +334,8 @@
         "rarity": 3,
         "role": "car",
         "speed": 5,
-        "aliases": ["supra"]
+        "aliases": ["supra"],
+        "worth": 170000
     },
     "lawyer": {
         "id": "lawyer",
@@ -381,7 +383,8 @@
         "rarity": 2,
         "role": "car",
         "speed": 3,
-        "aliases": ["evox", "evo"]
+        "aliases": ["evox", "evo"],
+        "worth": 40000
     },
     "subaru_wrx": {
         "id": "subaru_wrx",
@@ -391,7 +394,8 @@
         "rarity": 2,
         "role": "car",
         "speed": 3,
-        "aliases": ["subuwu"]
+        "aliases": ["subuwu"],
+        "worth": 30000
     },
     "flappy_bird": {
         "id": "flappy_bird",
@@ -420,7 +424,8 @@
         "rarity": 2,
         "role": "car",
         "speed": 3,
-        "aliases": ["tesla"]
+        "aliases": ["tesla"],
+        "worth": 85000
     },
     "handcuffs": {
         "id": "handcuffs",
@@ -440,7 +445,8 @@
         "rarity": 1,
         "role": "car",
         "speed": 1,
-        "aliases": ["smart"]
+        "aliases": ["smart"],
+        "worth": 15000
     },
     "lightning_mcqueen": {
         "id": "lightning_mcqueen",
@@ -450,7 +456,8 @@
         "rarity": 2,
         "role": "car",
         "speed": 4,
-        "aliases": ["mcqueen", "lightning"]
+        "aliases": ["mcqueen", "lightning"],
+        "worth": 60000
     },
     "fiat": {
         "id": "fiat",
@@ -460,7 +467,8 @@
         "rarity": 1,
         "role": "car",
         "speed": 1,
-        "aliases": ["inbetweeners"]
+        "aliases": ["inbetweeners"],
+        "worth": 15000
     },
     "ford_fiesta": {
         "id": "ford_fiesta",
@@ -470,7 +478,8 @@
         "rarity": 1,
         "role": "car",
         "speed": 2,
-        "aliases": ["fiesta"]
+        "aliases": ["fiesta"],
+        "worth": 17500
     },
     "vauxhall_corsa": {
         "id": "vauxhall_corsa",
@@ -480,6 +489,7 @@
         "rarity": 1,
         "role": "car",
         "speed": 1,
-        "aliases": ["chav", "corsa"]
+        "aliases": ["chav", "corsa"],
+        "worth": 5000
     }
 }
