@@ -122,20 +122,9 @@ function newCase(guild, caseType, userIDs, moderator, command) {
         userIDs = [userIDs]
     }
     for (let userID of userIDs) {
-        const currentCases = data[guild.id].cases
-        const count = data[guild.id].caseCount
-        const case0 = {
-            id: count,
-            type: caseType,
-            user: userID,
-            moderator: moderator,
-            command: command,
-            time: new Date().getTime(),
-            deleted: false,
-        }
-        currentCases.push(case0)
-        data[guild.id].cases = currentCases
-        data[guild.id].caseCount = count + 1
+        const caseCount = getCaseCount(guild)
+        db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)").run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0)
+        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)    
     }
 }
 
