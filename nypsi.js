@@ -75,8 +75,8 @@ client.on("shardReconnecting", (shardID) => info(`shard#${shardID} connecting`))
 process.on("unhandledRejection", (e) => {
     let stack = e.stack.split("\n").join("\n\x1b[31m")
 
-    if (stack.length > 200) {
-        stack = stack.substr(0, 200) + "..."
+    if (stack.length > 500) {
+        stack = stack.substr(0, 500) + "..."
     }
 
     error(stack)
