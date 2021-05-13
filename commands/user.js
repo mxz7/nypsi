@@ -4,11 +4,9 @@ const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inPlaceSort } = require("fast-sort")
 
-const cmd = new Command(
-    "user",
-    "view info about a user in the server",
-    categories.INFO
-).setAliases(["whois", "who"])
+const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(
+    ["whois", "who"]
+)
 
 const sortCache = new Map()
 
