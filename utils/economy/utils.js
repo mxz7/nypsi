@@ -248,6 +248,10 @@ async function doVote(client, vote) {
 
     const now = new Date().getTime()
 
+    if (now - users[user].lastVote < 43200000) {
+        return error(`${user} already voted`)
+    }
+
     users[user].lastVote = now
 
     let member = await client.users.fetch(user)
