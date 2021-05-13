@@ -32,7 +32,7 @@ setInterval(() => {
         timerCheck = true
         timer = 0
     }
-}, 120000)
+}, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(async () => {
     const { snipe, eSnipe, mentions } = require("../../nypsi")
@@ -109,21 +109,12 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
-const checkCooldown = new Set()
 
 /**
  *
  * @param {Guild} guild run check for guild
  */
-async function runCheck(guild) {
-    if (checkCooldown.has(guild.id)) return
-
-    checkCooldown.add(guild.id)
-
-    setTimeout(() => {
-        checkCooldown.delete(guild.id)
-    }, 60 * 1000)
-
+function runCheck(guild) {
     if (!hasGuild(guild)) createGuild(guild)
 
     const currentMembersPeak = guilds[guild.id].peaks.members
@@ -250,20 +241,6 @@ function setStatsProfile(guild, profile) {
 }
 
 exports.setStatsProfile = setStatsProfile
-
-/**
- * @returns {Array<JSON>}
- */
-function getGuilds() {
-    const guilds1 = []
-
-    for (let g in guilds) {
-        guilds1.push(g)
-    }
-    return guilds1
-}
-
-exports.getGuilds = getGuilds
 
 /**
  *

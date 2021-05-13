@@ -96,15 +96,9 @@ exports.checkGuild = checkGuild
 
 async function runChecks() {
     setInterval(async () => {
-        client.guilds.cache.forEach(async (guild) => {
-            await runCheck(guild)
-        })
-    }, 180000)
-
-    setInterval(async () => {
-        client.guilds.cache.forEach(async (guild) => {
+        client.guilds.cache.forEach((guild) => {
             if (hasStatsEnabled(guild)) {
-                await checkStats(guild)
+                checkStats(guild)
             }
         })
     }, 600000)
@@ -120,13 +114,13 @@ async function runChecks() {
     const needed = new Date(Date.parse(d) + 10800000)
 
     setTimeout(() => {
-        setInterval(async () => {
-            client.guilds.cache.forEach(async (guild) => {
-                if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
+        setInterval(() => {
+            client.guilds.cache.forEach((guild) => {
+                if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
             })
         }, 86400000)
-        client.guilds.cache.forEach(async (guild) => {
-            if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
+        client.guilds.cache.forEach((guild) => {
+            if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
         })
     }, needed - now)
 
