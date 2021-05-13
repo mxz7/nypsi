@@ -67,7 +67,7 @@ setInterval(() => {
         info("economy data refreshed")
         timer = 0
     }
-}, 60000)
+}, 60000 + (Math.floor(Math.random() * 60) * 1000))
 
 setInterval(() => {
     let date = new Date()
@@ -94,7 +94,7 @@ setInterval(() => {
             info("economy stats data saved", types.DATA)
         })
     }
-}, 120000)
+}, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
     for (let user in users) {
