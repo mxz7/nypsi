@@ -136,7 +136,7 @@ exports.newCase = newCase
  * @param {String} caseID case to delete
  */
 function deleteCase(guild, caseID) {
-    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ?, case_id = ?").run(guild.id, caseID)
+    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(guild.id, caseID)
 }
 
 exports.deleteCase = deleteCase
@@ -160,13 +160,9 @@ exports.deleteServer = deleteServer
  * @param {String} userID user to get cases of
  */
 function getCases(guild, userID) {
-    const cases = []
-    for (let case0 of data[guild.id].cases) {
-        if (case0.user == userID) {
-            cases.push(case0)
-        }
-    }
-    return cases.reverse()
+    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?").all(guild.id, userID)
+
+    return query.reverse()
 }
 
 exports.getCases = getCases
