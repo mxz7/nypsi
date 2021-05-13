@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { formatDate } = require("../utils/utils")
-const { getPeaks, inCooldown, addCooldown } = require("../utils/guilds/utils")
+const { getPeaks, inCooldown, addCooldown, runCheck } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -15,6 +15,8 @@ const cmd = new Command("server", "view information about the server", categorie
  */
 async function run(message, args) {
     const server = message.guild
+
+    runCheck(server)
 
     const created = formatDate(server.createdAt).toLowerCase()
 
