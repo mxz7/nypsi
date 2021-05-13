@@ -146,7 +146,10 @@ exports.deleteCase = deleteCase
  * @param {Guild} guild guild to delete data for
  */
 function deleteServer(guild) {
-    delete data[guild.id]
+    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(guild.id)
+    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(guild.id)
+    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(guild.id)
+    db.prepare("DELETE FROM moderation WHERE id = ?").run(guild.id)
 }
 
 exports.deleteServer = deleteServer
