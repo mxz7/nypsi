@@ -292,9 +292,9 @@ async function run(message, args) {
             if (getBalance(message.member) < worker.getUpgradeCost()) {
                 return message.channel.send(
                     new ErrorEmbed(
-                        `the upgrade cost for \`${worker.name}\` is $${worker
-                            .getUpgradeCost()
-                            .toLocaleString()}, you can't afford this`
+                        `the upgrade cost for \`${
+                            worker.name
+                        }\` is $${worker.getUpgradeCost().toLocaleString()}, you can't afford this`
                     )
                 )
             }

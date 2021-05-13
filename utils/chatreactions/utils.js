@@ -44,7 +44,7 @@ setInterval(() => {
         info("chatreactions data refreshed", types.DATA)
         timer = 0
     }
-}, 60000 + (Math.floor(Math.random() * 60) * 1000))
+}, 60000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
     let date = new Date()

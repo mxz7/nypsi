@@ -52,7 +52,10 @@ async function run(message, args) {
 
     let membersSorted = []
 
-    if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
+    if (
+        sortCache.has(message.guild.id) &&
+        sortCache.get(message.guild.id).length == message.guild.memberCount
+    ) {
         membersSorted = sortCache.get(message.guild.id)
     } else {
         members.forEach((m) => {
