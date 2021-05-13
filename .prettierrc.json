@@ -1,6 +1,6 @@
 {
     "semi": false,
     "tabWidth": 4,
-    "printWidth": 125,
+    "printWidth": 100,
     "endOfLine": "crlf"
 }
