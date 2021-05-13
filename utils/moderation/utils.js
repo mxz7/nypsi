@@ -76,7 +76,7 @@ setInterval(() => {
  * @param {Guild} guild guild to create profile for
  */
 function createProfile(guild) {
-    const query = db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id)
+    db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id)
 }
 
 exports.createProfile = createProfile
@@ -102,7 +102,9 @@ exports.profileExists = profileExists
  * @param {Guild} guild guild to get case count of
  */
 function getCaseCount(guild) {
-    return data[guild.id].caseCount
+    const query = db.prepare("SELECT case_count FROM moderation WHERE id = ?").get(guild.id)
+
+    return query.case_count
 }
 
 exports.getCaseCount = getCaseCount
