@@ -111,6 +111,7 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
+const prefixCache = new Map()
 
 /**
  *
@@ -250,10 +251,13 @@ exports.setStatsProfile = setStatsProfile
 async function checkStats(guild) {
     let memberCount
 
-    if (guilds[guild.id].counter.filterBots && guild.memberCount >= 500) {
-        guilds[guild.id].counter.filterBots = false
+    const profile = db.prepare("SELECT * FROM guilds_counters WHERE guild_id = ?").get(guild.id)
+
+    if (profile.filter_bots && guild.memberCount >= 500) {
+        profile.filter_bots = 0
+        setStatsProfile(guild, profile)
         memberCount = guild.memberCount
-    } else if (guilds[guild.id].counter.filterBots) {
+    } else if (profile.filter_bots) {
         let members
 
         if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -276,17 +280,18 @@ async function checkStats(guild) {
 
     if (!memberCount) memberCount = guild.memberCount
 
-    const channel = guild.channels.cache.find((c) => c.id == guilds[guild.id].counter.channel)
+    const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
     if (!channel) {
-        guilds[guild.id].counter.enabled = false
-        guilds[guild.id].counter.channel = "none"
+        profile.enabled = false
+        profile.channel = "none"
+        setStatsProfile(guild, profile)
         return
     }
 
-    let format = guilds[guild.id].counter.format
+    let format = profile.format
     format = format.split("%count%").join(memberCount.toLocaleString())
-    format = format.split("%peak%").join(guilds[guild.id].peaks.members)
+    format = format.split("%peak%").join(getPeaks(guild).toLocaleString())
 
     if (channel.name != format) {
         const old = channel.name
@@ -301,8 +306,9 @@ async function checkStats(guild) {
             })
             .catch(() => {
                 error("error updating counter in " + guild.name)
-                guilds[guild.id].counter.enabled = false
-                guilds[guild.id].counter.channel = "none"
+                profile.enabled = false
+                profile.channel = "none"
+                setStatsProfile(guild, profile)
             })
     }
 }
@@ -344,8 +350,22 @@ exports.inCooldown = inCooldown
  */
 function getPrefix(guild) {
     try {
-        return guilds[guild.id].prefix
+        if (prefixCache.has(guild.id)) {
+            return prefixCache.get(guild.id)
+        }
+
+        const query = db.prepare("SELECT prefix FROM guilds WHERE id = ?").get(guild.id)
+
+        prefixCache.set(guild.id, query.prefix)
+
+        setTimeout(() => {
+            if (!prefixCache.has(guild.id)) return
+            prefixCache.delete(guild.id)
+        }, 3600000)
+
+        return query.prefix
     } catch (e) {
+        if (!hasGuild(guild)) createGuild(guild)
         error("couldn't fetch prefix for server " + guild.id)
         return "$"
     }
@@ -359,7 +379,9 @@ exports.getPrefix = getPrefix
  * @param {String} prefix
  */
 function setPrefix(guild, prefix) {
-    guilds[guild.id].prefix = prefix
+    db.prepare("UPDATE guilds SET prefix = ? WHERE id = ?").run(prefix, guild.id)
+
+    if (prefixCache.has(guild.id)) prefixCache.delete(guild.id)
 }
 
 exports.setPrefix = setPrefix
