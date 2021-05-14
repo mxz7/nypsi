@@ -2,7 +2,7 @@ const { Guild, Client } = require("discord.js")
 const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { GuildStorage, Countdown } = require("../classes/GuildStorage")
-const { getDatabase } = require("../database/database")
+const { getDatabase, toArray, toStorage } = require("../database/database")
 const { info, types, error } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
@@ -180,7 +180,11 @@ exports.createGuild = createGuild
  * @returns {Array<String>}
  */
 function getSnipeFilter(guild) {
-    return guilds[guild.id].snipeFilter
+    const query = db.prepare("SELECT snipe_filter FROM guilds WHERE id = ?").get(guild.id)
+
+    const filter = toArray(query.snipe_filter)
+
+    return filter
 }
 
 exports.getSnipeFilter = getSnipeFilter
@@ -191,7 +195,9 @@ exports.getSnipeFilter = getSnipeFilter
  * @param {Array<String>} array
  */
 function updateFilter(guild, array) {
-    guilds[guild.id].snipeFilter = array
+    const filter = toStorage(array)
+
+    db.prepare("UPDATE guilds SET snipe_filter = ? WHERE id = ").run(filter, guild.id)
 }
 
 exports.updateFilter = updateFilter
