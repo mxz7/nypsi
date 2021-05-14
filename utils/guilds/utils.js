@@ -238,7 +238,7 @@ exports.getStatsProfile = getStatsProfile
  * @param {JSON} profile
  */
 function setStatsProfile(guild, profile) {
-    guilds[guild.id].counter = profile
+    db.prepare("UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?").run(profile.enabled ? 1 : 0, profile.format, profile.filter_bots, profile.channel, guild.id)
 }
 
 exports.setStatsProfile = setStatsProfile
