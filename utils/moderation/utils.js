@@ -36,7 +36,7 @@ exports.createProfile = createProfile
  * @param {Guild} guild check if profile exists for this guild
  */
 function profileExists(guild) {
-    const query = db.prepare("SELECT * FROM moderation WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT id FROM moderation WHERE id = ?").get(guild.id)
 
     if (!query) {
         return false
