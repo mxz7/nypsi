@@ -90,6 +90,9 @@ setInterval(async () => {
 const fetchCooldown = new Set()
 const prefixCache = new Map()
 const existsCooldown = new Set()
+const disableCache = new Map()
+const chatFilterCache = new Map()
+const snipeFilterCache = new Map()
 
 /**
  *
@@ -175,9 +178,19 @@ exports.createGuild = createGuild
  * @returns {Array<String>}
  */
 function getSnipeFilter(guild) {
+    if (snipeFilterCache.has(guild.id)) {
+        return snipeFilterCache.get(guild.id)
+    }
+
     const query = db.prepare("SELECT snipe_filter FROM guilds WHERE id = ?").get(guild.id)
 
     const filter = toArray(query.snipe_filter)
+
+    snipeFilterCache.set(guild.id, filter)
+
+    setTimeout(() => {
+        if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id)
+    }, 43200000)
 
     return filter
 }
@@ -193,6 +206,7 @@ function updateFilter(guild, array) {
     const filter = toStorage(array)
 
     db.prepare("UPDATE guilds SET snipe_filter = ? WHERE id = ?").run(filter, guild.id)
+    if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id)
 }
 
 exports.updateFilter = updateFilter
@@ -498,9 +512,19 @@ exports.checkChristmasCountdown = checkChristmasCountdown
  * @returns {Array<String>}
  */
 function getChatFilter(guild) {
+    if (chatFilterCache.has(guild.id)) {
+        return chatFilterCache.get(guild.id)
+    }
+
     const query = db.prepare("SELECT chat_filter FROM guilds WHERE id = ?").get(guild.id)
 
     const filter = toArray(query.chat_filter)
+
+    chatFilterCache.set(guild.id, filter)
+
+    setTimeout(() => {
+        if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id)
+    }, 43200000)
 
     return filter
 }
@@ -516,6 +540,8 @@ function updateChatFilter(guild, array) {
     const filter = toStorage(array)
 
     db.prepare("UPDATE guilds SET chat_filter = ? WHERE id = ?").run(filter, guild.id)
+
+    if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id)
 }
 
 exports.updateChatFilter = updateChatFilter
@@ -525,9 +551,19 @@ exports.updateChatFilter = updateChatFilter
  * @returns {Array<String>}
  */
 function getDisabledCommands(guild) {
+    if (disableCache.has(guild.id)) {
+        return disableCache.get(guild.id)
+    }
+
     const query = db.prepare("SELECT disabled_commands FROM guilds WHERE id = ?").get(guild.id)
 
     const disabled = toArray(query.disabled_commands)
+
+    disableCache.set(guild.id, disabled)
+
+    setTimeout(() => {
+        if (disableCache.has(guild.id)) disableCache.delete(guild.id)
+    }, 43200000)
 
     return disabled
 }
@@ -543,6 +579,7 @@ function updateDisabledCommands(guild, array) {
     const disabled = toStorage(array)
 
     db.prepare("UPDATE guilds SET disabled_commands = ? WHERE id = ?").run(disabled, guild.id)
+    if (disableCache.has(guild.id)) disableCache.delete(guild.id)
 }
 
 exports.updateDisabledCommands = updateDisabledCommands
