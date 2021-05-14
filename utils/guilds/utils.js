@@ -171,6 +171,8 @@ exports.getPeaks = getPeaks
  */
 function createGuild(guild) {
     db.prepare("INSERT INTO guilds (id) VALUES (?)").run(guild.id)
+    db.prepare("INSERT INTO guilds_counters (guild_id) VALUES (?)").run(guild.id)
+    db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
 }
 
 exports.createGuild = createGuild
@@ -207,7 +209,9 @@ exports.updateFilter = updateFilter
  * @param {Guild} guild
  */
 function hasStatsEnabled(guild) {
-    if (guilds[guild.id].counter.enabled == true) {
+    const query = db.prepare("SELECT enabled FROM guilds_counters WHERE guild_id = ?").get(guild.id)
+
+    if (query.enabled === 1) {
         return true
     } else {
         return false
