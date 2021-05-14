@@ -36,7 +36,7 @@ createTables()
  * @param {String} seperator optional seperator
  */
 function toArray(string, seperator) {
-    return string.split(seperator || "|")
+    return string.split(seperator || "#@|@#")
 }
 
 exports.toArray = toArray
