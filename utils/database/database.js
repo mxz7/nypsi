@@ -24,6 +24,8 @@ function createTables() {
     db.prepare(
         "CREATE TABLE IF NOT EXISTS moderation_bans ('user' TEXT, 'unban_time' NUMBER, 'guild_id' TEXT, FOREIGN KEY (guild_id) REFERENCES moderation (id))"
     ).run()
+
+    db.prepare("CREATE TABLE IF NOT EXISTS premium ('id' TEXT PRIMARY KEY, 'level' INTEGER, 'embed_color' TEXT DEFAULT 'default', 'last_daily' NUMBER DEFAULT 0, 'last_weekly' NUMBER DEFAULT 0, 'status' NUMBER DEFAULT 1, 'revokeReason' TEXT DEFAULT 'none', 'start_date' NUMBER, 'expire_date' NUMBER)")
 }
 
 createTables()
