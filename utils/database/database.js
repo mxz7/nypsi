@@ -42,6 +42,18 @@ function toArray(string, seperator) {
 exports.toArray = toArray
 
 /**
+ * 
+ * @param {Array<String>} array 
+ * @param {String} seperator 
+ * @returns 
+ */
+function toStorage(array, seperator) {
+    return array.join(seperator || "#@|@#")
+}
+
+exports.toStorage = toStorage
+
+/**
  * @returns {Database}
  */
 function getDatabase() {
