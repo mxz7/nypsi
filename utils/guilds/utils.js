@@ -101,10 +101,12 @@ const snipeFilterCache = new Map()
 function runCheck(guild) {
     if (!hasGuild(guild)) createGuild(guild)
 
-    const currentMembersPeak = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
+
+    const currentMembersPeak = query.peak
 
     if (guild.memberCount > currentMembersPeak) {
-        db.prepare("UPDATE guilds SET peak = ? WHERE id = ?").run(currentMembersPeak, guild.id)
+        db.prepare("UPDATE guilds SET peak = ? WHERE id = ?").run(guild.memberCount, guild.id)
         info(
             "members peak updated for '" +
                 guild.name +
