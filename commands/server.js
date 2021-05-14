@@ -95,7 +95,7 @@ async function run(message, args) {
             `**total** ${server.memberCount.toLocaleString()}\n` +
                 `**humans** ${users.size.toLocaleString()}\n` +
                 `**bots** ${bots.size.toLocaleString()}\n` +
-                `**member peak** ${getPeaks(message.guild).members.toLocaleString()}`
+                `**member peak** ${getPeaks(message.guild).toLocaleString()}`
         )
 
     if (server.memberCount >= 25000) {
