@@ -25,6 +25,7 @@ const {
     runCountdowns,
     hasGuild,
     createGuild,
+    runChristmas,
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
@@ -113,23 +114,6 @@ async function runChecks() {
     if (now.getHours() < 3) {
         d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
     }
-
-    const needed = new Date(Date.parse(d) + 10800000)
-
-    setTimeout(() => {
-        setInterval(() => {
-            client.guilds.cache.forEach(async (guild) => {
-                if (!hasGuild(guild)) return createGuild(guild)
-                if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
-            })
-        }, 86400000)
-        client.guilds.cache.forEach(async (guild) => {
-            if (!hasGuild(guild)) return createGuild(guild)
-            if (hasChristmasCountdownEnabled(guild)) await checkChristmasCountdown(guild)
-        })
-    }, needed - now)
-
-    info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 
     if (client.user.id != "678711738845102087") return
 
@@ -252,6 +236,7 @@ setTimeout(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
             runCountdowns(client)
+            runChristmas(client)
             showTopGlobalBal(client)
             runChecks()
             updateCache()

@@ -712,3 +712,76 @@ function runCountdowns(client) {
 }
 
 exports.runCountdowns = runCountdowns
+
+/**
+ *
+ * @param {Client} client
+ */
+function runChristmas(client) {
+    const now = new Date()
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000)
+
+    const runChristmasThing = async () => {
+        const query = db.prepare("SELECT * FROM guilds_christmas").all()
+
+        for (const profile in query) {
+            const guild = client.guilds.cache.find(g => g.id == profile.guild_id)
+            const channel = guild.channels.cache.find((c) => c.id == profile.channel)
+
+            if (!channel) {
+                profile.enabled = false
+                profile.channel = "none"
+                setChristmasCountdown(guild, profile)
+                return
+            }
+
+            let format = profile.format
+
+            const days = daysUntilChristmas()
+
+            format = format.split("%days%").join(daysUntilChristmas().toString())
+
+            if (days == "ITS CHRISTMAS") {
+                format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
+            }
+
+            return await channel
+                .send(
+                    new CustomEmbed()
+                        .setDescription(format)
+                        .setColor("#ff0000")
+                        .setTitle(":santa_tone1:")
+                )
+                .then(() => {
+                    info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
+                })
+                .catch(() => {
+                    error(`error sending christmas countdown in ${guild.name}`)
+                    profile.enabled = false
+                    profile.channel = "none"
+                    setChristmasCountdown(guild, profile)
+                    return
+                })
+        }
+
+        
+    }
+
+    setTimeout(async () => {
+        setInterval(() => {
+            runChristmasThing()
+        }, 86400000)
+        runChristmasThing()
+    }, needed - now)
+
+    info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+}
+
+exports.runChristmas = runChristmas
