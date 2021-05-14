@@ -295,7 +295,7 @@ exports.runModerationChecks = runModerationChecks
  * @param {String} reason
  */
 function setReason(guild, caseID, reason) {
-    db.prepare("UPDATE moderation_cases SET command = ? WHERE id = ? AND guild_id = ?").run(reason, caseID, guild.id)
+    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(reason, caseID, guild.id)
 }
 
 exports.setReason = setReason
