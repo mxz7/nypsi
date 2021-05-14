@@ -1,11 +1,13 @@
 const { GuildChannel } = require("discord.js")
-const { getMuteRole } = require("../utils/moderation/utils")
+const { getMuteRole, profileExists } = require("../utils/moderation/utils")
 
 /**
  * @param {GuildChannel} channel
  */
 module.exports = async (channel) => {
     if (!channel.guild) return
+
+    if (!profileExists(channel.guild)) return
 
     let muteRole = await channel.guild.roles.fetch(getMuteRole(channel.guild))
 
