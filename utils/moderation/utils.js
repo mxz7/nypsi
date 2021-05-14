@@ -319,15 +319,7 @@ function deleteBan(guild, member) {
         id = member
     }
 
-    const currentBans = data[guild.id].bans
-
-    for (let ban of currentBans) {
-        if (ban.user == id) {
-            currentBans.splice(currentBans.indexOf(ban), 1)
-        }
-    }
-
-    data[guild.id].bans = currentBans
+    db.prepare("DELETE FROM moderation_bans WHERE user = ? AND guild_id = ?").run(id, guild.id)
 }
 
 exports.deleteBan = deleteBan
