@@ -220,13 +220,7 @@ function newBan(guild, userIDs, date) {
     }
 
     for (let userID of userIDs) {
-        const currentBans = data[guild.id].bans
-        const d = {
-            user: userID,
-            unbanTime: date,
-        }
-        currentBans.push(d)
-        data[guild.id].bans = currentBans
+        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
     }
 }
 
