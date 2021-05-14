@@ -82,7 +82,7 @@ async function run(message, args) {
         let format = ""
 
         format = profile.format.split("%count%").join(memberCount.size.toLocaleString())
-        format = format.split("%peak%").join(getPeaks(message.guild).members)
+        format = format.split("%peak%").join(getPeaks(message.guild).toLocaleString())
 
         let fail = false
 
