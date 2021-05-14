@@ -239,7 +239,9 @@ exports.getStatsProfile = getStatsProfile
  * @param {JSON} profile
  */
 function setStatsProfile(guild, profile) {
-    db.prepare("UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?").run(profile.enabled ? 1 : 0, profile.format, profile.filter_bots, profile.channel, guild.id)
+    db.prepare(
+        "UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?"
+    ).run(profile.enabled ? 1 : 0, profile.format, profile.filter_bots, profile.channel, guild.id)
 }
 
 exports.setStatsProfile = setStatsProfile
@@ -296,7 +298,7 @@ async function checkStats(guild) {
     if (channel.name != format) {
         const old = channel.name
 
-        await channel
+        return await channel
             .edit({ name: format })
             .then(() => {
                 info(
@@ -310,6 +312,8 @@ async function checkStats(guild) {
                 profile.channel = "none"
                 setStatsProfile(guild, profile)
             })
+    } else {
+        return
     }
 }
 
@@ -391,7 +395,9 @@ exports.setPrefix = setPrefix
  * @param {Guild} guild
  */
 function hasChristmasCountdown(guild) {
-    const query = db.prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
+    const query = db
+        .prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?")
+        .get(guild.id)
 
     if (query) {
         return true
@@ -426,7 +432,9 @@ exports.getChristmasCountdown = getChristmasCountdown
  * @param {JSON} xmas
  */
 function setChristmasCountdown(guild, xmas) {
-    db.prepare("UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?").run(xmas.enabled, xmas.format, xmas.channel, guild.id)
+    db.prepare(
+        "UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?"
+    ).run(xmas.enabled, xmas.format, xmas.channel, guild.id)
 }
 
 exports.setChristmasCountdown = setChristmasCountdown
@@ -436,7 +444,9 @@ exports.setChristmasCountdown = setChristmasCountdown
  * @param {Guild} guild
  */
 function hasChristmasCountdownEnabled(guild) {
-    const query = db.prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
+    const query = db
+        .prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?")
+        .get(guild.id)
 
     if (query.enabled) {
         return true
@@ -473,7 +483,7 @@ async function checkChristmasCountdown(guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
     }
 
-    await channel
+    return await channel
         .send(
             new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")
         )
@@ -559,7 +569,6 @@ function getCountdowns(guild) {
         guildID = guild.id
     }
 
-
     const query = db.prepare("SELECT countdowns FROM guilds WHERE id = ?").get(guildID)
 
     const countdowns = JSON.parse(query.countdowns)
@@ -588,7 +597,10 @@ function addCountdown(guild, date, format, finalFormat, channel) {
 
     countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
 
-    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(
+        JSON.stringify(countdowns),
+        guild.id
+    )
 }
 
 exports.addCountdown = addCountdown
@@ -611,7 +623,10 @@ function deleteCountdown(guild, id) {
 
     delete countdowns[id]
 
-    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(
+        JSON.stringify(countdowns),
+        guild.id
+    )
 }
 
 exports.deleteCountdown = deleteCountdown
@@ -632,15 +647,17 @@ function runCountdowns(client) {
     const needed = new Date(Date.parse(d) + 10800000)
 
     const runCountdowns = async () => {
-        for (let guild in guilds) {
-            const guildID = guild
-            guild = guilds[guild]
+        const query = db.prepare("SELECT id, countdowns FROM guilds").all()
 
-            if (!guild.countdowns) continue
-            if (Object.keys(guild.countdowns).length == 0) continue
+        for (const guild of query) {
+            const guildID = guild.id
+            const countdowns = JSON.parse(guild.countdowns)
 
-            for (let countdown in guild.countdowns) {
-                countdown = guild.countdowns[countdown]
+            if (!countdowns) continue
+            if (Object.keys(countdowns).length == 0) continue
+
+            for (let countdown in countdowns) {
+                countdown = countdowns[countdown]
 
                 let days = daysUntil(new Date(countdown.date)) + 1
 
