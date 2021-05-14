@@ -4,7 +4,7 @@ const db = new Database("./utils/database/storage.db", { verbose: info })
 
 function createTables() {
     db.prepare(
-        "CREATE TABLE IF NOT EXISTS economy ('id' TEXT PRIMARY KEY, 'money' INTEGER DEFAULT 500, 'bank' INTEGER DEFAULT 4500, 'xp' INTEGER DEFAULT 0, 'prestige' INTEGER DEFAULT 0, 'padlock' BOOLEAN DEFAULT FALSE, 'dms' BOOLEAN DEFAULT FALSE, 'last_vote' BOOLEAN DEFAULSE FALSE, 'inventory' TEXT DEFAULT '{}', 'workers' TEXT DEFAULT '{}')"
+        "CREATE TABLE IF NOT EXISTS economy ('id' TEXT PRIMARY KEY, 'money' INTEGER NOT NULL DEFAULT 500, 'bank' INTEGER NOT NULL DEFAULT 4500, 'xp' INTEGER NOT NULL DEFAULT 0, 'prestige' INTEGER DEFAULT NOT NULL 0, 'padlock' BOOLEAN DEFAULT FALSE, 'dms' BOOLEAN DEFAULT FALSE, 'last_vote' BOOLEAN DEFAULSE FALSE, 'inventory' TEXT DEFAULT '{}', 'workers' TEXT DEFAULT '{}')"
     ).run()
 
     db.prepare("CREATE TABLE IF NOT EXISTS guilds ('id' TEXT PRIMARY KEY, 'peak' INTEGER DEFAULT 0, 'counter' TEXT DEFAULT '{}', 'xmas' TEXT DEFAULT '{}', 'disabled_commands' TEXT DEFAULT '', 'snipe_filter' TEXT DEFAULT '', 'chat_filter' TEXT DEFAULT '', 'prefix' TEXT DEFAULT '$', 'countdowns' TEXT DEFAULT '{}')").run()
