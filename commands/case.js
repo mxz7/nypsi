@@ -43,6 +43,8 @@ async function run(message, args) {
         )
     }
 
+    case0.deleted = case0.deleted === 0 ? false : true
+
     const date = new Date(case0.time).toLocaleString()
 
     const members = message.guild.members.cache
@@ -55,7 +57,7 @@ async function run(message, args) {
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle("case " + case0.id + " | " + message.member.user.username)
+        .setTitle("case " + case0.case_id + " | " + message.member.user.username)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
         .addField("date/time", date, true)
@@ -89,12 +91,12 @@ async function run(message, args) {
         })
 
     if (reaction == "❌") {
-        deleteCase(message.guild, case0.id)
+        deleteCase(message.guild, case0.case_id)
 
         const newEmbed = new CustomEmbed(
             message.member,
             false,
-            "✅ case `" + case0.id + "` successfully deleted by " + message.member.toString()
+            "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
         await msg.edit(newEmbed)
