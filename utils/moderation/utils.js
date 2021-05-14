@@ -1,75 +1,25 @@
-const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
 const { info, types, getTimestamp, error } = require("../logger")
 const { getDatabase } = require("../database/database")
-let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-info(
-    `${Array.from(Object.keys(data)).length.toLocaleString()} moderation guilds loaded`,
-    types.DATA
-)
 
 const db = getDatabase()
-
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/moderation/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("moderation data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-        info("moderation data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-        info("moderation data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    for (let guild in data) {
+    const query = db.prepare("SELECT id FROM moderation")
+
+    for (let guild of query.iterate()) {
         const exists = await checkGuild(guild)
 
         if (!exists) {
-            delete data[guild]
+            deleteServer(guild)
 
             info(`deleted guild '${guild}' from moderation data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/moderation/backup/" + date + ".json", JSON.stringify(data))
-    info("moderation data backup complete", types.DATA)
-}, 43200000 * 2)
 
 /**
  *
@@ -146,10 +96,18 @@ exports.deleteCase = deleteCase
  * @param {Guild} guild guild to delete data for
  */
 function deleteServer(guild) {
-    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(guild.id)
-    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(guild.id)
-    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(guild.id)
-    db.prepare("DELETE FROM moderation WHERE id = ?").run(guild.id)
+    let id
+
+    if (!guild.id) {
+        id = guild
+    } else {
+        id = guild.id
+    }
+
+    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation WHERE id = ?").run(id)
 }
 
 exports.deleteServer = deleteServer
@@ -396,9 +354,11 @@ async function requestUnmute(guild, member, client) {
 
     await guild.roles.fetch()
 
-    let muteRole = await guild.roles.cache.find((r) => r.id == data[guild.id].muteRole)
+    const muteRoleID = getMuteRole(guild)
 
-    if (data[guild.id].muteRole == "") {
+    let muteRole = await guild.roles.cache.find((r) => r.id == muteRole)
+
+    if (muteRoleID == "") {
         muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
