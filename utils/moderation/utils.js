@@ -185,7 +185,8 @@ exports.getAllCases = getAllCases
  * @param {Number} caseID case to fetch
  */
 function getCase(guild, caseID) {
-    return data[guild.id].cases[caseID]
+    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?").get(guild.id, caseID)
+    return query
 }
 
 exports.getCase = getCase
