@@ -170,9 +170,7 @@ exports.getPeaks = getPeaks
  * @param {Guild} guild create guild profile
  */
 function createGuild(guild) {
-    const members = guild.members.cache.filter((member) => !member.user.bot)
-
-    guilds[guild.id] = new GuildStorage(members.size, 0)
+    db.prepare("INSERT INTO guilds (id) VALUES (?)").run(guild.id)
 }
 
 exports.createGuild = createGuild
