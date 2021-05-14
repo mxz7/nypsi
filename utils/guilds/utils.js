@@ -200,7 +200,7 @@ exports.getSnipeFilter = getSnipeFilter
 function updateFilter(guild, array) {
     const filter = toStorage(array)
 
-    db.prepare("UPDATE guilds SET snipe_filter = ? WHERE id = ").run(filter, guild.id)
+    db.prepare("UPDATE guilds SET snipe_filter = ? WHERE id = ?").run(filter, guild.id)
 }
 
 exports.updateFilter = updateFilter
@@ -513,7 +513,7 @@ exports.getChatFilter = getChatFilter
 function updateChatFilter(guild, array) {
     const filter = toStorage(array)
 
-    db.prepare("UPDATE guilds SET chat_filter = ? WHERE id = ").run(filter, guild.id)
+    db.prepare("UPDATE guilds SET chat_filter = ? WHERE id = ?").run(filter, guild.id)
 }
 
 exports.updateChatFilter = updateChatFilter
@@ -523,7 +523,11 @@ exports.updateChatFilter = updateChatFilter
  * @returns {Array<String>}
  */
 function getDisabledCommands(guild) {
-    return guilds[guild.id].disabledCommands
+    const query = db.prepare("SELECT disabled_commands FROM guilds WHERE id = ?").get(guild.id)
+
+    const disabled = toArray(query.disabled_commands)
+
+    return disabled
 }
 
 exports.getDisabledCommands = getDisabledCommands
@@ -534,7 +538,9 @@ exports.getDisabledCommands = getDisabledCommands
  * @param {Array<String>} array
  */
 function updateDisabledCommands(guild, array) {
-    guilds[guild.id].disabledCommands = array
+    const disabled = toStorage(array)
+
+    db.prepare("UPDATE guilds SET disabled_commands = ? WHERE id = ?").run(disabled, guild.id)
 }
 
 exports.updateDisabledCommands = updateDisabledCommands
