@@ -551,11 +551,20 @@ exports.updateDisabledCommands = updateDisabledCommands
  * @returns {{}}
  */
 function getCountdowns(guild) {
-    if (!guilds[guild.id].countdowns) {
-        guilds[guild.id].countdowns = {}
+    let guildID
+
+    if (!guild.id) {
+        guildID = guild
+    } else {
+        guildID = guild.id
     }
 
-    return guilds[guild.id].countdowns
+
+    const query = db.prepare("SELECT countdowns FROM guilds WHERE id = ?").get(guildID)
+
+    const countdowns = JSON.parse(query.countdowns)
+
+    return countdowns
 }
 
 exports.getCountdowns = getCountdowns
@@ -569,17 +578,17 @@ exports.getCountdowns = getCountdowns
  * @param {String} channel
  */
 function addCountdown(guild, date, format, finalFormat, channel) {
-    if (!guilds[guild.id].countdowns) {
-        guilds[guild.id].countdowns = {}
-    }
+    const countdowns = getCountdowns(guild)
 
     let id = 1
 
-    while (Object.keys(guilds[guild.id].countdowns).indexOf(id.toString()) != -1) {
+    while (Object.keys(countdowns).indexOf(id.toString()) != -1) {
         id++
     }
 
-    guilds[guild.id].countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
+    countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
+
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
 }
 
 exports.addCountdown = addCountdown
@@ -598,7 +607,11 @@ function deleteCountdown(guild, id) {
         guildID = guild.id
     }
 
-    delete guilds[guildID].countdowns[id]
+    const countdowns = getCountdowns(guildID)
+
+    delete countdowns[id]
+
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
 }
 
 exports.deleteCountdown = deleteCountdown
