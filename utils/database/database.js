@@ -46,7 +46,17 @@ createTables()
  * @param {String} seperator optional seperator
  */
 function toArray(string, seperator) {
-    return string.split(seperator || "#@|@#")
+    const d = string.split(seperator || "#@|@#")
+
+    if (d.length == 2 && d[0] == "") {
+        d.splice(0, 1)
+    }
+
+    if (string == "") {
+        return []
+    }
+
+    return d
 }
 
 exports.toArray = toArray
