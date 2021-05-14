@@ -23,6 +23,7 @@ const {
     checkChristmasCountdown,
     hasChristmasCountdownEnabled,
     runCountdowns,
+    hasGuild,
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
@@ -97,6 +98,7 @@ exports.checkGuild = checkGuild
 async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach((guild) => {
+            if (!hasGuild(guild)) return
             if (hasStatsEnabled(guild)) {
                 checkStats(guild)
             }
