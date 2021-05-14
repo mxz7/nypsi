@@ -202,13 +202,7 @@ function newMute(guild, userIDs, date) {
         userIDs = [userIDs]
     }
     for (let userID of userIDs) {
-        const currentMutes = data[guild.id].mutes
-        const d = {
-            user: userID,
-            unmuteTime: date,
-        }
-        currentMutes.push(d)
-        data[guild.id].mutes = currentMutes
+        db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
     }
 }
 
