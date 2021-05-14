@@ -60,7 +60,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            `**enabled** \`${profile.enabled}\`\n` +
+            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n` +
                 `**format** ${profile.format}\n**channel** \`${profile.channel}\``
         )
             .setTitle("christmas countdown")
@@ -98,7 +98,7 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("error creating/getting channel"))
         }
 
-        profile.enabled = true
+        profile.enabled = 1
         profile.channel = channel.id
 
         setChristmasCountdown(message.guild, profile)
@@ -121,8 +121,10 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("already disabled"))
         }
 
-        profile.enabled = false
+        profile.enabled = 0
         profile.channel = "none"
+
+        setChristmasCountdown(message.guild, profile)
 
         return await message.channel.send(
             new CustomEmbed(message.member, false, "✅ christmas countdown disabled")
