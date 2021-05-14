@@ -1,6 +1,5 @@
 const { Message } = require("discord.js")
 const {
-    createDefaultStatsProfile,
     setStatsProfile,
     getStatsProfile,
     hasGuild,

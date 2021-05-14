@@ -221,21 +221,6 @@ function hasStatsEnabled(guild) {
 exports.hasStatsEnabled = hasStatsEnabled
 
 /**
- *
- * @param {Guild} guild
- */
-function createDefaultStatsProfile(guild) {
-    guilds[guild.id].counter = {
-        enabled: false,
-        format: "members: %count% (%peak%)",
-        filterBots: true,
-        channel: "none",
-    }
-}
-
-exports.createDefaultStatsProfile = createDefaultStatsProfile
-
-/**
  * @returns {JSON}
  * @param {Guild} guild
  */
