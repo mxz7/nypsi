@@ -5,36 +5,7 @@ const { GuildStorage, Countdown } = require("../classes/GuildStorage")
 const { getDatabase, toArray, toStorage } = require("../database/database")
 const { info, types, error } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
-let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
-info(`${Array.from(Object.keys(guilds)).length.toLocaleString()} guilds loaded`, types.DATA)
 const db = getDatabase()
-
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const guilds1 = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
-
-    if (JSON.stringify(guilds) != JSON.stringify(guilds1)) {
-        fs.writeFile("./utils/guilds/data.json", JSON.stringify(guilds), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("guilds saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 10 && !timerCheck) {
-        guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
-        info("guild data refreshed", types.DATA)
-        timerCheck = true
-        timer = 0
-    }
-}, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(async () => {
     const { snipe, eSnipe, mentions } = require("../../nypsi")
@@ -99,19 +70,26 @@ setInterval(async () => {
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    for (let guild in guilds) {
+    const query = db.prepare("SELECT id FROM moderation").all()
+
+    for (let guild of query) {
         const exists = await checkGuild(guild)
 
         if (!exists) {
-            delete guilds[guild]
+            db.prepare("DELETE FROM guilds WHERE id = ?").run(guild)
+            db.prepare("DELETE FROM guilds_counters WHERE guild_id = ?").run(guild)
+            db.prepare("DELETE FROM guilds_christmas WHERE guild_id = ?").run(guild)
 
-            info(`deleted guild '${guild}' from guilds data`, types.GUILD)
+            if (existsCooldown.has(guild)) existsCooldown.delete(guild)
+
+            info(`deleted guild '${guild}' from guild data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
 const prefixCache = new Map()
+const existsCooldown = new Set()
 
 /**
  *
@@ -143,9 +121,16 @@ exports.runCheck = runCheck
  * @param {Guild} guild
  */
 function hasGuild(guild) {
+    if (existsCooldown.has(guild.id)) return true
     const query = db.prepare("SELECT id FROM guilds WHERE id = ?").get(guild.id)
 
     if (query) {
+        existsCooldown.set(guild.id)
+
+        setTimeout(() => {
+            if (!existsCooldown.has(guild.id)) return
+            existsCooldown.delete(guild.id)
+        }, 43200000)
         return true
     } else {
         return false
@@ -174,6 +159,13 @@ function createGuild(guild) {
     db.prepare("INSERT INTO guilds (id) VALUES (?)").run(guild.id)
     db.prepare("INSERT INTO guilds_counters (guild_id) VALUES (?)").run(guild.id)
     db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
+
+    existsCooldown.set(guild)
+
+    setTimeout(() => {
+        if (!existsCooldown.has(guild.id)) return
+        existsCooldown.delete(guild.id)
+    }, 43200000)
 }
 
 exports.createGuild = createGuild
