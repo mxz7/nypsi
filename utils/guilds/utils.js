@@ -125,7 +125,7 @@ function hasGuild(guild) {
     const query = db.prepare("SELECT id FROM guilds WHERE id = ?").get(guild.id)
 
     if (query) {
-        existsCooldown.set(guild.id)
+        existsCooldown.add(guild.id)
 
         setTimeout(() => {
             if (!existsCooldown.has(guild.id)) return
@@ -160,7 +160,7 @@ function createGuild(guild) {
     db.prepare("INSERT INTO guilds_counters (guild_id) VALUES (?)").run(guild.id)
     db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
 
-    existsCooldown.set(guild)
+    existsCooldown.add(guild)
 
     setTimeout(() => {
         if (!existsCooldown.has(guild.id)) return
