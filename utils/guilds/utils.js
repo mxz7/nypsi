@@ -391,21 +391,19 @@ exports.setPrefix = setPrefix
  * @param {Guild} guild
  */
 function hasChristmasCountdown(guild) {
-    if (!guilds[guild.id].xmas) {
-        return false
-    } else {
+    const query = db.prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
+
+    if (query) {
         return true
+    } else {
+        return false
     }
 }
 
 exports.hasChristmasCountdown = hasChristmasCountdown
 
 function createNewChristmasCountdown(guild) {
-    guilds[guild.id].xmas = {
-        enabled: false,
-        format: "`%days%` days until christmas",
-        channel: "none",
-    }
+    db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
 }
 
 exports.createNewChristmasCountdown = createNewChristmasCountdown
@@ -415,7 +413,9 @@ exports.createNewChristmasCountdown = createNewChristmasCountdown
  * @param {Guild} guild
  */
 function getChristmasCountdown(guild) {
-    return guilds[guild.id].xmas
+    const query = db.prepare("SELECT * FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
+
+    return query
 }
 
 exports.getChristmasCountdown = getChristmasCountdown
@@ -426,7 +426,7 @@ exports.getChristmasCountdown = getChristmasCountdown
  * @param {JSON} xmas
  */
 function setChristmasCountdown(guild, xmas) {
-    guilds[guild.id].xmas = xmas
+    db.prepare("UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?").run(xmas.enabled, xmas.format, xmas.channel, guild.id)
 }
 
 exports.setChristmasCountdown = setChristmasCountdown
@@ -436,9 +436,9 @@ exports.setChristmasCountdown = setChristmasCountdown
  * @param {Guild} guild
  */
 function hasChristmasCountdownEnabled(guild) {
-    if (!hasChristmasCountdown(guild)) return false
+    const query = db.prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
-    if (guilds[guild.id].xmas.enabled == true) {
+    if (query.enabled) {
         return true
     } else {
         return false
@@ -452,15 +452,18 @@ exports.hasChristmasCountdownEnabled = hasChristmasCountdownEnabled
  * @param {Guild} guild
  */
 async function checkChristmasCountdown(guild) {
-    const channel = guild.channels.cache.find((c) => c.id == guilds[guild.id].xmas.channel)
+    const profile = db.prepare("SELECT * FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
+
+    const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
     if (!channel) {
-        guilds[guild.id].xmas.enabled = false
-        guilds[guild.id].xmas.channel = "none"
+        profile.enabled = false
+        profile.channel = "none"
+        setChristmasCountdown(guild, profile)
         return
     }
 
-    let format = guilds[guild.id].xmas.format
+    let format = profile.format
 
     const days = daysUntilChristmas()
 
@@ -479,8 +482,9 @@ async function checkChristmasCountdown(guild) {
         })
         .catch(() => {
             error(`error sending christmas countdown in ${guild.name}`)
-            guilds[guild.id].xmas.enabled = false
-            guilds[guild.id].xmas.channel = "none"
+            profile.enabled = false
+            profile.channel = "none"
+            setChristmasCountdown(guild, profile)
             return
         })
 }
