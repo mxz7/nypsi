@@ -492,11 +492,15 @@ async function checkChristmasCountdown(guild) {
 exports.checkChristmasCountdown = checkChristmasCountdown
 
 /**
- * @param {Guild} guild get snipe filter
+ * @param {Guild} guild get chat filter
  * @returns {Array<String>}
  */
 function getChatFilter(guild) {
-    return guilds[guild.id].chatFilter
+    const query = db.prepare("SELECT chat_filter FROM guilds WHERE id = ?").get(guild.id)
+
+    const filter = toArray(query.chat_filter)
+
+    return filter
 }
 
 exports.getChatFilter = getChatFilter
@@ -507,7 +511,9 @@ exports.getChatFilter = getChatFilter
  * @param {Array<String>} array
  */
 function updateChatFilter(guild, array) {
-    guilds[guild.id].chatFilter = array
+    const filter = toStorage(array)
+
+    db.prepare("UPDATE guilds SET chat_filter = ? WHERE id = ").run(filter, guild.id)
 }
 
 exports.updateChatFilter = updateChatFilter
