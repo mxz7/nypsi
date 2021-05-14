@@ -269,25 +269,19 @@ exports.isBanned = isBanned
 function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
-        for (let guild in data) {
-            const mutes = data[guild].mutes
-            if (mutes.length > 0) {
-                for (let mute of mutes) {
-                    if (mute.unmuteTime <= date) {
-                        requestUnmute(guild, mute.user, client)
-                        info(`requested unmute in ${guild} for ${mute.user}`, types.AUTOMATION)
-                    }
-                }
-            }
-            const bans = data[guild].bans
-            if (bans.length > 0) {
-                for (let ban of bans) {
-                    if (ban.unbanTime <= date) {
-                        requestUnban(guild, ban.user, client)
-                        info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
-                    }
-                }
-            }
+
+        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?")
+
+        for (let unmute of query.iterate(date)) {
+            requestUnmute(unmute.guild_id, unmute.user, client)
+            info(`requested unmute in ${unmute.guild_id} for ${unmute.user}`, types.AUTOMATION)
+        }
+
+        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?")
+
+        for (let unban of query.iterate(date)) {
+            requestUnmute(unban.guild_id, unban.user, client)
+            info(`requested unmute in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
         }
     }, 30000)
 }
