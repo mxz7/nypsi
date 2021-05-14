@@ -249,13 +249,15 @@ exports.isMuted = isMuted
  * @param {GuildMember} member
  */
 function isBanned(guild, member) {
-    const currentBans = data[guild.id].bans
-    for (let ban of currentBans) {
-        if (ban.user == member.user.id) {
-            return true
-        }
+    const query = db
+        .prepare("SELECT user FROM moderation_bans WHERE guild_id = ? AND user = ?")
+        .get(guild.id, member.user.id)
+
+    if (query) {
+        return true
+    } else {
+        return false
     }
-    return false
 }
 
 exports.isBanned = isBanned
