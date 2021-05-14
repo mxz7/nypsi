@@ -330,9 +330,13 @@ exports.deleteBan = deleteBan
  * @returns {String}
  */
 function getMuteRole(guild) {
-    if (!data[guild.id]) return undefined
-    if (!data[guild.id].muteRole) return undefined
-    return data[guild.id].muteRole
+    const query = db.prepare("SELECT mute_role FROM moderation WHERE id = ?").get(guild.id)
+
+    if (query.mute_role == "") {
+        return undefined
+    } else {
+        return query.mute_role
+    }
 }
 
 exports.getMuteRole = getMuteRole
