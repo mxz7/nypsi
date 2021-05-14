@@ -731,7 +731,8 @@ function runChristmas(client) {
     const runChristmasThing = async () => {
         const query = db.prepare("SELECT * FROM guilds_christmas").all()
 
-        for (const profile in query) {
+        for (const profile of query) {
+            if (!profile.enabled) continue
             const guild = client.guilds.cache.find(g => g.id == profile.guild_id)
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
