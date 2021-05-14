@@ -347,10 +347,12 @@ exports.getMuteRole = getMuteRole
  * @param {Role} role
  */
 function setMuteRole(guild, role) {
+    const query = db.prepare("UPDATE moderation SET mute_role = ? WHERE id = ?")
+
     if (role == "default") {
-        data[guild.id].muteRole = ""
+        query.run("", guild.id)
     } else {
-        data[guild.id].muteRole = role.id
+        query.run(role.id, guild.id)
     }
 }
 
