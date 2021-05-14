@@ -307,15 +307,7 @@ function deleteMute(guild, member) {
         id = member
     }
 
-    const currentMutes = data[guild.id].mutes
-
-    for (let mute of currentMutes) {
-        if (mute.user == id) {
-            currentMutes.splice(currentMutes.indexOf(mute), 1)
-        }
-    }
-
-    data[guild.id].mutes = currentMutes
+    db.prepare("DELETE FROM moderation_mutes WHERE user = ? AND guild_id = ?").run(id, guild.id)
 }
 
 exports.deleteMute = deleteMute
