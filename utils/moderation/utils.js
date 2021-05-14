@@ -8,9 +8,9 @@ const db = getDatabase()
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    const query = db.prepare("SELECT id FROM moderation")
+    const query = db.prepare("SELECT id FROM moderation").all()
 
-    for (let guild of query.iterate()) {
+    for (let guild of query) {
         const exists = await checkGuild(guild)
 
         if (!exists) {
