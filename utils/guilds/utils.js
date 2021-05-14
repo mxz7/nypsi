@@ -2,10 +2,12 @@ const { Guild, Client } = require("discord.js")
 const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { GuildStorage, Countdown } = require("../classes/GuildStorage")
+const { getDatabase } = require("../database/database")
 const { info, types, error } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 let guilds = JSON.parse(fs.readFileSync("./utils/guilds/data.json"))
 info(`${Array.from(Object.keys(guilds)).length.toLocaleString()} guilds loaded`, types.DATA)
+const db = getDatabase()
 
 let timer = 0
 let timerCheck = true
@@ -117,10 +119,10 @@ const fetchCooldown = new Set()
 function runCheck(guild) {
     if (!hasGuild(guild)) createGuild(guild)
 
-    const currentMembersPeak = guilds[guild.id].peaks.members
+    const currentMembersPeak = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
 
     if (guild.memberCount > currentMembersPeak) {
-        guilds[guild.id].peaks.members = guild.memberCount
+        db.prepare("UPDATE guilds SET peak = ? WHERE id = ?").run(currentMembersPeak, guild.id)
         info(
             "members peak updated for '" +
                 guild.name +
@@ -140,7 +142,9 @@ exports.runCheck = runCheck
  * @param {Guild} guild
  */
 function hasGuild(guild) {
-    if (guilds[guild.id]) {
+    const query = db.prepare("SELECT id FROM guilds WHERE id = ?").get(guild.id)
+
+    if (query) {
         return true
     } else {
         return false
@@ -154,7 +158,9 @@ exports.hasGuild = hasGuild
  * @param {Guild} guild
  */
 function getPeaks(guild) {
-    return guilds[guild.id].peaks
+    const query = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
+
+    return query.peak
 }
 
 exports.getPeaks = getPeaks
