@@ -225,7 +225,9 @@ exports.hasStatsEnabled = hasStatsEnabled
  * @param {Guild} guild
  */
 function getStatsProfile(guild) {
-    return guilds[guild.id].counter
+    const query = db.prepare("SELECT * FROM guilds_counters WHERE guild_id = ?").get(guild.id)
+
+    return query
 }
 
 exports.getStatsProfile = getStatsProfile
