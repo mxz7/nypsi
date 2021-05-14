@@ -46,18 +46,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            "**enabled** `" +
-                profile.enabled +
-                "`\n" +
-                "**filter bots** `" +
-                profile.filterBots +
-                "`\n" +
-                "**channel** `" +
-                profile.channel +
-                "`\n" +
-                "**format** `" +
-                profile.format +
-                "`"
+            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n**filter bots** \`${profile.filter_bots == 1 ? "true" : "false"}\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
             .setTitle("member count")
             .setFooter(`use ${prefix}counter help to view additional commands`)
@@ -86,7 +75,7 @@ async function run(message, args) {
 
         let memberCount = await message.guild.members.fetch()
 
-        if (profile.filterBots) {
+        if (profile.filter_bots) {
             memberCount = memberCount.filter((m) => !m.user.bot)
         }
 
@@ -193,7 +182,7 @@ async function run(message, args) {
                 "if this is true, bots will not be counted towards the member count"
             )
                 .setTitle("member count")
-                .addField("current value", "`" + profile.filterBots + "`")
+                .addField("current value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
                 .addField(
                     "help",
                     `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`
@@ -207,10 +196,12 @@ async function run(message, args) {
         }
 
         if (args[1].toLowerCase() == "true") {
-            profile.filterBots = true
+            profile.filter_bots = 1
         } else {
-            profile.filterBots = false
+            profile.filter_bots = 0
         }
+
+        setStatsProfile(message.guild, profile)
 
         const embed = new CustomEmbed(
             message.member,
@@ -218,7 +209,7 @@ async function run(message, args) {
             "✅ value updated - will update channel on next interval"
         )
             .setTitle("member count")
-            .addField("new value", "`" + profile.filterBots + "`")
+            .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
 
         return message.channel.send(embed)
     } else if (args[0].toLowerCase() == "channel") {
@@ -264,9 +255,11 @@ async function run(message, args) {
 
         profile.channel = channel.id
 
+        setStatsProfile(message.guild, profile)
+
         let memberCount = await message.guild.members.fetch()
 
-        if (profile.filterBots) {
+        if (profile.filter_bots) {
             memberCount = memberCount.filter((m) => !m.user.bot)
         }
 
@@ -303,6 +296,7 @@ async function run(message, args) {
         if (fail) {
             profile.enabled = false
             profile.channel = "none"
+            setStatsProfile(message.guild, profile)
             return message.channel.send(new ErrorEmbed("error updating channel"))
         }
 
