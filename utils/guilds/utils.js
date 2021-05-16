@@ -582,7 +582,7 @@ function deleteCountdown(guild, id) {
         guildID = guild.id
     }
 
-    delete guilds[guild.id].countdowns[id]
+    delete guilds[guildID].countdowns[id]
 }
 
 exports.deleteCountdown = deleteCountdown
@@ -613,14 +613,14 @@ function runCountdowns(client) {
             for (let countdown in guild.countdowns) {
                 countdown = guild.countdowns[countdown]
 
-                let days = daysUntil(new Date(countdown.date))
+                let days = daysUntil(new Date(countdown.date)) + 1
 
                 let message
 
                 if (days == 0) {
                     message = countdown.finalFormat
                 } else {
-                    message = countdown.format.split("%days%").join((days + 1).toLocaleString())
+                    message = countdown.format.split("%days%").join(days.toLocaleString())
                 }
 
                 const embed = new CustomEmbed()
