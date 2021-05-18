@@ -36,13 +36,18 @@ function loadCommands() {
     const failedTable = []
 
     if (commands.size > 0) {
+        console.log("for7")
+        console.time("for7")
         for (let command of commands.keys()) {
             delete require.cache[require.resolve(`../commands/${command}.js`)]
         }
+        console.timeEnd("for7")
         commands.clear()
         aliases.clear()
     }
 
+    console.log("for8")
+    console.time("for8")
     for (let file of commandFiles) {
         let command
 
@@ -58,6 +63,8 @@ function loadCommands() {
             if (enabled) {
                 commands.set(command.name, command)
                 if (command.aliases) {
+                    console.log("for9")
+                    console.time("for9")
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
                             error(
@@ -69,6 +76,7 @@ function loadCommands() {
                             aliases.set(a, command.name)
                         }
                     }
+                    console.timeEnd("for9")
                 }
             } else {
                 failedTable.push([file, "❌"])
@@ -79,6 +87,7 @@ function loadCommands() {
             console.log(e)
         }
     }
+    console.timeEnd("for8")
     exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
 
@@ -97,6 +106,8 @@ function loadCommands() {
 function reloadCommand(commandsArray) {
     const reloadTable = []
 
+    console.log("for10")
+    console.time("for10")
     for (let cmd of commandsArray) {
         try {
             commands.delete(cmd)
@@ -122,6 +133,8 @@ function reloadCommand(commandsArray) {
             if (enabled) {
                 commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
+                    console.log("for11")
+                    console.time("for11")
                     for (let a of commandData.aliases) {
                         if (aliases.has(a) && aliases.get(a) != commandData.name) {
                             error(
@@ -133,6 +146,7 @@ function reloadCommand(commandsArray) {
                             aliases.set(a, commandData.name)
                         }
                     }
+                    console.timeEnd("for11")
                 }
                 reloadTable.push([commandData.name, "✅"])
                 exports.commandsSize = commands.size
@@ -145,6 +159,7 @@ function reloadCommand(commandsArray) {
             console.log(e)
         }
     }
+    console.timeEnd("for10")
     exports.aliasesSize = aliases.size
     exports.commandsSize = commands.size
     console.log(table(reloadTable, { border: getBorderCharacters("ramac") }))
@@ -163,6 +178,8 @@ async function helpCmd(message, args) {
 
     const prefix = getPrefix(message.guild)
 
+    console.log("for12")
+    console.time("for12")
     for (let cmd of commands.keys()) {
         const category = getCmdCategory(cmd)
 
@@ -192,6 +209,7 @@ async function helpCmd(message, args) {
             helpCategories.set(category, pages)
         }
     }
+    console.timeEnd("for12")
 
     const embed = new CustomEmbed(message.member).setFooter(
         prefix + "help <command> | get info about a command"
@@ -209,9 +227,12 @@ async function helpCmd(message, args) {
         let categoriesMsg = ""
         let categoriesMsg2 = ""
 
+        console.log("for13")
+        console.time("for13")
         for (const category of categories) {
             categoriesMsg += `» ${prefix}help **${category}**\n`
         }
+        console.timeEnd("for13")
 
         const news = getNews()
 
@@ -428,6 +449,8 @@ async function runCommand(cmd, message, args) {
 
             contentToCheck = contentToCheck.split(" ")
 
+            console.log("for14")
+            console.time("for14")
             for (const word of filter) {
                 if (content.indexOf(word.toLowerCase()) != -1) {
                     return message.channel.send(
@@ -435,6 +458,7 @@ async function runCommand(cmd, message, args) {
                     )
                 }
             }
+            console.timeEnd("for14")
 
             message.content += ` [custom cmd - ${customCommand.owner}]`
 
@@ -729,6 +753,8 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         let msg = ""
         let count = 1
 
+        console.log("for15")
+        console.time("for15")
         for (let [key, value] of sortedCommands) {
             if (count >= 11) break
 
@@ -745,6 +771,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`
             count++
         }
+        console.timeEnd("for16")
 
         const embed = new CustomEmbed()
 

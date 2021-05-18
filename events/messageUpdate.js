@@ -18,11 +18,14 @@ module.exports = async (message, newMessage) => {
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
+        console.log("for4")
+        console.time("for4")
         for (let word of filter) {
             if (content.includes(word.toLowerCase())) {
                 return await message.delete()
             }
         }
+        console.timeEnd("for4")
     }
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
@@ -34,15 +37,21 @@ module.exports = async (message, newMessage) => {
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
+        console.log("for5")
+        console.time("for5")
         for (let word of filter) {
             if (content.includes(word.toLowerCase())) return
         }
+        console.timeEnd("for5")
 
         const chatFilter = getChatFilter(message.guild)
 
+        console.log("for6")
+        console.time("for6")
         for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
+        console.timeEnd("for6")
 
         eSnipe.set(message.channel.id, {
             content: message.content,
