@@ -71,6 +71,8 @@ setInterval(async () => {
 
     await mentions.forEach(async (guildData, key) => {
         await guildData.forEach((userData, key) => {
+            console.log("for48")
+            console.time("for48")
             for (let i of userData) {
                 const diff = now - i.date
 
@@ -79,6 +81,7 @@ setInterval(async () => {
                     mentionsCount++
                 }
             }
+            console.timeEnd("for48")
 
             if (userData.length == 0) {
                 guildData.delete(key)
@@ -97,6 +100,8 @@ setInterval(async () => {
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
+    console.log("for49")
+    console.time("for49")
     for (let guild in guilds) {
         const exists = await checkGuild(guild)
 
@@ -106,6 +111,7 @@ setInterval(async () => {
             info(`deleted guild '${guild}' from guilds data`, types.GUILD)
         }
     }
+    console.timeEnd("for49")
 }, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
@@ -536,9 +542,12 @@ function addCountdown(guild, date, format, finalFormat, channel) {
 
     let id = 1
 
+    console.log("while2")
+    console.time("while2")
     while (Object.keys(guilds[guild.id].countdowns).indexOf(id.toString()) != -1) {
         id++
     }
+    console.timeEnd("while2")
 
     guilds[guild.id].countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
 }
@@ -580,6 +589,8 @@ function runCountdowns(client) {
     const needed = new Date(Date.parse(d) + 10800000)
 
     const runCountdowns = async () => {
+        console.log("for50")
+        console.time("for50")
         for (let guild in guilds) {
             const guildID = guild
             guild = guilds[guild]
@@ -587,6 +598,8 @@ function runCountdowns(client) {
             if (!guild.countdowns) continue
             if (Object.keys(guild.countdowns).length == 0) continue
 
+            console.log("for51")
+            console.time("for51")
             for (let countdown in guild.countdowns) {
                 countdown = guild.countdowns[countdown]
 
@@ -629,7 +642,9 @@ function runCountdowns(client) {
                     deleteCountdown(guildID, countdown.id)
                 }
             }
+            console.timeEnd("51")
         }
+        console.timeEnd("for50")
     }
 
     setTimeout(async () => {
