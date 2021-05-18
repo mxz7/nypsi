@@ -97,6 +97,8 @@ setInterval(() => {
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
+    console.log("for31")
+    console.time("for31")
     for (let user in users) {
         if (
             isNaN(users[user].money.balance) ||
@@ -134,10 +136,15 @@ setInterval(() => {
             info(user + " xp set to 0 because NaN", types.ECONOMY)
         }
     }
+    console.timeEnd("for31")
 }, 120000)
 
 setInterval(() => {
+    console.log("for32")
+    console.time("for32")
     for (const user in users) {
+        console.log("for33")
+        console.time("for33")
         for (let worker in users[user].workers) {
             worker = users[user].workers[worker]
 
@@ -151,7 +158,9 @@ setInterval(() => {
 
             users[user].workers[worker.id] = worker
         }
+        console.timeEnd("for33")
     }
+    console.timeEnd("for32")
 }, 5 * 60 * 1000)
 
 let items
@@ -172,14 +181,20 @@ function loadItems() {
 
     let deleted = 0
 
+    console.log("for34")
+    console.time("for34")
     for (let user of Array.from(Object.keys(users))) {
+        console.log("for35")
+        console.time("for35")
         for (let item of Array.from(Object.keys(users[user].inventory))) {
             if (!Array.from(Object.keys(items)).includes(item)) {
                 delete users[user].inventory[item]
                 deleted++
             }
         }
+        console.timeEnd("for35")
     }
+    console.timeEnd("for34")
 
     if (deleted != 0) {
         info(`${deleted} items deleted from inventories`)
@@ -413,11 +428,14 @@ exports.getUserCount = getUserCount
 function getUserCountGuild(guild) {
     let count = 0
 
+    console.log("for36")
+    console.time("for36")
     for (let user in users) {
         if (guild.members.cache.find((member) => member.user.id == user)) {
             count++
         }
     }
+    console.timeEnd("for36")
 
     return count
 }
@@ -561,9 +579,12 @@ exports.getMaxBankBalance = getMaxBankBalance
 async function topAmountGlobal(amount, client, anon) {
     const users1 = []
 
+    console.log("for37")
+    console.time("for37")
     for (let user in users) {
         users1.push(user)
     }
+    console.timeEnd("for37")
 
     // users1.sort(function (a, b) {
     //     return users[b].money.balance - users[a].money.balance
@@ -575,6 +596,8 @@ async function topAmountGlobal(amount, client, anon) {
 
     let count = 0
 
+    console.log("for38")
+    console.time("for38")
     for (let user of users1) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
@@ -607,6 +630,7 @@ async function topAmountGlobal(amount, client, anon) {
             count++
         }
     }
+    console.timeEnd("for38")
     return usersFinal
 }
 
@@ -636,11 +660,14 @@ async function topAmount(guild, amount) {
 
     const users1 = []
 
+    console.log("for39")
+    console.time("for39")
     for (let user in users) {
         if (members.find((member) => member.user.id == user) && users[user].money.balance != 0) {
             users1.push(user)
         }
     }
+    console.timeEnd("for39")
 
     inPlaceSort(users1).desc((i) => users[i].money.balance)
 
@@ -660,6 +687,8 @@ async function topAmount(guild, amount) {
         return target
     }
 
+    console.log("for40")
+    console.time("for40")
     for (let user of users1) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
@@ -684,6 +713,7 @@ async function topAmount(guild, amount) {
             count++
         }
     }
+    console.timeEnd("for40")
     return usersFinal
 }
 
@@ -713,11 +743,14 @@ async function topAmountPrestige(guild, amount) {
 
     const users1 = []
 
+    console.log("for41")
+    console.time("for41")
     for (let user in users) {
         if (members.find((member) => member.user.id == user) && users[user].prestige != 0) {
             users1.push(user)
         }
     }
+    console.timeEnd("for41")
 
     // users1.sort(function (a, b) {
     //     return users[b].prestige - users[a].prestige
@@ -737,6 +770,8 @@ async function topAmountPrestige(guild, amount) {
         return target
     }
 
+    console.log("for42")
+    console.time("for42")
     for (let user of users1) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
@@ -773,6 +808,7 @@ async function topAmountPrestige(guild, amount) {
             count++
         }
     }
+    console.timeEnd("42")
     return usersFinal
 }
 
@@ -798,6 +834,8 @@ exports.createUser = createUser
 function winBoard() {
     let lol = ""
 
+    console.log("for44")
+    console.time("for44")
     for (let item in multiplier) {
         lol =
             lol +
@@ -810,6 +848,7 @@ function winBoard() {
             multiplier[item] +
             "**x\n"
     }
+    console.timeEnd("for44")
 
     return lol
 }
@@ -1037,6 +1076,8 @@ function emptyWorkersStored(member) {
 
     const workers = getWorkers(memberID)
 
+    console.log("for45")
+    console.time("for45")
     for (let worker of Object.keys(getWorkers(member))) {
         worker = users[memberID].workers[worker]
 
@@ -1044,6 +1085,7 @@ function emptyWorkersStored(member) {
 
         users[memberID].workers[worker.id] = worker
     }
+    console.timeEnd("for45")
 }
 
 exports.emptyWorkersStored = emptyWorkersStored
@@ -1106,6 +1148,8 @@ exports.toggleBan = toggleBan
 function reset() {
     let deleted = 0
     let updated = 0
+    console.log("for46")
+    console.time("for46")
     for (const id in users) {
         let user = users[id]
 
@@ -1119,11 +1163,14 @@ function reset() {
         if (Array.from(Object.keys(inventory)).length == 0) {
             inventory = undefined
         } else {
+            console.log("for47")
+            console.time("for47")
             for (let item of Array.from(Object.keys(inventory))) {
                 if (items[item].role != "collectable") {
                     delete inventory[item]
                 }
             }
+            console.timeEnd("for47")
         }
 
         if (prestige == 0 && lastVote == 0 && !inventory && !dms) {
@@ -1142,6 +1189,7 @@ function reset() {
             updated++
         }
     }
+    console.timeEnd("46")
     stats = {}
     return { deleted: deleted, updated: updated }
 }
