@@ -101,8 +101,6 @@ const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
 async function cacheUpdate(links, imgs, name) {
     const start = new Date().getTime()
     let amount = 0
-    console.log("for17")
-    console.time("for17")
     for (let link of links) {
         const res = await fetch(link).then((a) => a.json())
 
@@ -119,7 +117,6 @@ async function cacheUpdate(links, imgs, name) {
             error(`no images @ ${link}`)
         }
     }
-    console.timeEnd("for17")
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
     info(`${amount} ${name} images loaded (${total})`, types.IMAGE)
