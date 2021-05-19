@@ -20,6 +20,8 @@ const { isPremium, getTier } = require("../premium/utils")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
+const { getDatabase } = require("../database/database")
+const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
 const topggStats = new topgg.Api(topggToken)
@@ -248,11 +250,15 @@ async function doVote(client, vote) {
 
     const now = new Date().getTime()
 
-    if (now - users[user].lastVote < 43200000) {
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(user)
+
+    const lastVote = query.lastVote
+
+    if (now - lastVote < 43200000) {
         return error(`${user} already voted`)
     }
 
-    users[user].lastVote = now
+    db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
 
     let member = await client.users.fetch(user)
 
@@ -278,6 +284,8 @@ async function doVote(client, vote) {
     } else {
         inventory["vote_crate"] = getPrestige(memberID) + 1
     }
+
+    setInventory(memberID, inventory)
 
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed()
