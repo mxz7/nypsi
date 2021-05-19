@@ -491,7 +491,9 @@ function userExists(member) {
 
     if (member.user) id = member.user.id
 
-    if (users[id]) {
+    const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
+
+    if (query) {
         return true
     } else {
         return false
