@@ -512,7 +512,8 @@ function updateBalance(member, amount) {
     if (member.user) id = member.user.id
 
     const amount1 = parseInt(amount)
-    users[id].money.balance = amount1
+
+    db.prepare("UPDATE economy SET money = ? WHERE id = ?").run(amount1, id)
 }
 
 exports.updateBalance = updateBalance
