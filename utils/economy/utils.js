@@ -877,7 +877,7 @@ exports.formatBet = formatBet
 function hasPadlock(member) {
     const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id)
 
-    return query.padlock
+    return query.padlock == 1 ? true : false
 }
 
 exports.hasPadlock = hasPadlock
