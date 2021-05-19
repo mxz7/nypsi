@@ -359,12 +359,9 @@ function hasVoted(member) {
 
     const now = new Date().getTime()
 
-    let lastVote = users[id].lastVote
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(id)
 
-    if (!lastVote) {
-        lastVote = 0
-        users[id].lastVote = 0
-    }
+    const lastVote = query.lastVote
 
     if (now - lastVote < 43200000) {
         voteCache.set(id, true)
