@@ -888,7 +888,9 @@ exports.hasPadlock = hasPadlock
  * @param {Boolean} setting padlock to true or false
  */
 function setPadlock(member, setting) {
-    users[member.user.id].padlock = setting
+    setting = setting ? 1 : 0
+
+    db.prepare("UPDATE economy SET padlock = ? WHERE id = ?").run(setting, member.user.id)
 }
 
 exports.setPadlock = setPadlock
