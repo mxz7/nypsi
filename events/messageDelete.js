@@ -19,21 +19,15 @@ module.exports = (message) => {
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
-        console.log("for2")
-        console.time("for2")
         for (let word of filter) {
             if (content.includes(word.toLowerCase())) return
         }
-        console.timeEnd("for2")
 
         const chatFilter = getChatFilter(message.guild)
 
-        console.log("for3")
-        console.time("for3")
         for (let word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
-        console.timeEnd("for3")
 
         snipe.set(message.channel.id, {
             content: message.content,

@@ -43,8 +43,6 @@ setInterval(() => {
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    console.log("for52")
-    console.time("for52")
     for (let guild in data) {
         const exists = await checkGuild(guild)
 
@@ -54,7 +52,6 @@ setInterval(async () => {
             info(`deleted guild '${guild}' from moderation data`, types.GUILD)
         }
     }
-    console.timeEnd("for52")
 }, 24 * 60 * 60 * 1000)
 
 setInterval(() => {
@@ -123,9 +120,6 @@ function newCase(guild, caseType, userIDs, moderator, command) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
-
-    console.log("for53")
-    console.time("for53")
     for (let userID of userIDs) {
         const currentCases = data[guild.id].cases
         const count = data[guild.id].caseCount
@@ -142,8 +136,6 @@ function newCase(guild, caseType, userIDs, moderator, command) {
         data[guild.id].cases = currentCases
         data[guild.id].caseCount = count + 1
     }
-    console.log("for54")
-    console.time("for54")
 }
 
 exports.newCase = newCase
@@ -178,14 +170,11 @@ exports.deleteServer = deleteServer
  */
 function getCases(guild, userID) {
     const cases = []
-    console.log("for55")
-    console.time("for55")
     for (let case0 of data[guild.id].cases) {
         if (case0.user == userID) {
             cases.push(case0)
         }
     }
-    console.timeEnd("for55")
     return cases.reverse()
 }
 
@@ -222,8 +211,6 @@ function newMute(guild, userIDs, date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
-    console.log("for56")
-    console.time("for56")
     for (let userID of userIDs) {
         const currentMutes = data[guild.id].mutes
         const d = {
@@ -233,7 +220,6 @@ function newMute(guild, userIDs, date) {
         currentMutes.push(d)
         data[guild.id].mutes = currentMutes
     }
-    console.timeEnd("for56")
 }
 
 exports.newMute = newMute
@@ -249,8 +235,6 @@ function newBan(guild, userIDs, date) {
         userIDs = [userIDs]
     }
 
-    console.log("for57")
-    console.time("for57")
     for (let userID of userIDs) {
         const currentBans = data[guild.id].bans
         const d = {
@@ -260,7 +244,6 @@ function newBan(guild, userIDs, date) {
         currentBans.push(d)
         data[guild.id].bans = currentBans
     }
-    console.timeEnd("for57")
 }
 
 exports.newBan = newBan
@@ -272,14 +255,11 @@ exports.newBan = newBan
  */
 function isMuted(guild, member) {
     const currentMutes = data[guild.id].mutes
-    console.log("for58")
-    console.time("for58")
     for (let mute of currentMutes) {
         if (mute.user == member.user.id) {
             return true
         }
     }
-    console.timeEnd("for58")
     return false
 }
 
@@ -292,14 +272,11 @@ exports.isMuted = isMuted
  */
 function isBanned(guild, member) {
     const currentBans = data[guild.id].bans
-    console.log("for59")
-    console.time("for59")
     for (let ban of currentBans) {
         if (ban.user == member.user.id) {
             return true
         }
     }
-    console.timeEnd("for59")
     return false
 }
 
@@ -312,35 +289,26 @@ exports.isBanned = isBanned
 function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
-        console.log("for60")
-        console.time("for60")
         for (let guild in data) {
             const mutes = data[guild].mutes
             if (mutes.length > 0) {
-                console.log("for61")
-                console.time("for61")
                 for (let mute of mutes) {
                     if (mute.unmuteTime <= date) {
                         requestUnmute(guild, mute.user, client)
                         info(`requested unmute in ${guild} for ${mute.user}`, types.AUTOMATION)
                     }
                 }
-                console.timeEnd("for61")
             }
             const bans = data[guild].bans
             if (bans.length > 0) {
-                console.log("for62")
-                console.time("for62")
                 for (let ban of bans) {
                     if (ban.unbanTime <= date) {
                         requestUnban(guild, ban.user, client)
                         info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
                     }
                 }
-                console.timeEnd("for62")
             }
         }
-        console.timeEnd("for60")
     }, 30000)
 }
 
@@ -369,14 +337,11 @@ function deleteMute(guild, member) {
 
     const currentMutes = data[guild.id].mutes
 
-    console.log("for63")
-    console.time("for63")
     for (let mute of currentMutes) {
         if (mute.user == id) {
             currentMutes.splice(currentMutes.indexOf(mute), 1)
         }
     }
-    console.timeEnd("for63")
 
     data[guild.id].mutes = currentMutes
 }
@@ -392,14 +357,11 @@ function deleteBan(guild, member) {
 
     const currentBans = data[guild.id].bans
 
-    console.log("for64")
-    console.time("for64")
     for (let ban of currentBans) {
         if (ban.user == id) {
             currentBans.splice(currentBans.indexOf(ban), 1)
         }
     }
-    console.timeEnd("for64")
 
     data[guild.id].bans = currentBans
 }

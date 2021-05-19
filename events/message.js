@@ -29,14 +29,11 @@ module.exports = async (message) => {
 
         content = content.split(" ")
 
-        console.log("for1")
-        console.time("for1")
         for (let word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
                 return await message.delete()
             }
         }
-        console.timeEnd("for1")
     }
 
     const addMention = (m) => {

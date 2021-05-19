@@ -63,8 +63,6 @@ setInterval(() => {
 setInterval(async () => {
     const { checkGuild, getGuild } = require("../../nypsi")
 
-    console.log("for21")
-    console.time("for21")
     for (let guild in data) {
         const exists = await checkGuild(guild)
 
@@ -74,7 +72,6 @@ setInterval(async () => {
             info(`deleted guild '${guild}' from chatreaction data`, types.DATA)
         }
     }
-    console.timeEnd("for21")
 }, 24 * 60 * 60 * 1000)
 
 setInterval(async () => {
@@ -138,8 +135,6 @@ setInterval(async () => {
         return lastGame.set(channel.id, nextGame)
     }
 
-    console.log("for22")
-    console.time("for22")
     for (const guildID in data) {
         const { getGuild } = require("../../nypsi")
         const guild = await getGuild(guildID)
@@ -160,8 +155,6 @@ setInterval(async () => {
 
         const now = new Date().getTime()
 
-        console.log("for23")
-        console.time("for23")
         for (const ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
@@ -187,9 +180,7 @@ setInterval(async () => {
                 await runGame(guild, channel)
             }
         }
-        console.timeEnd("for23")
     }
-    console.timeEnd("for22")
     if (count > 0) {
         info(`${count} chat reactions automatically started`, types.AUTOMATION)
     }
@@ -324,14 +315,11 @@ async function startReaction(guild, channel) {
 
     const zeroWidthChar = getZeroWidth()
 
-    console.log("for24")
-    console.time("for24")
     for (let i = 0; i < zeroWidthCount; i++) {
         const pos = Math.floor(Math.random() * chosenWord.length + 1)
 
         displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
     }
-    console.timeEnd("for24")
 
     const embed = new CustomEmbed().setColor("#5efb8f")
 
@@ -532,8 +520,6 @@ async function getServerLeaderboard(guild, amount) {
     const usersThird = []
     const overallWins = []
 
-    console.log("for25")
-    console.time("for25")
     for (const user in data[guild.id].stats) {
         let overall = false
         if (
@@ -562,7 +548,6 @@ async function getServerLeaderboard(guild, amount) {
             overallWins.push(user)
         }
     }
-    console.timeEnd("for25")
 
     const getMember = (id) => {
         const target = members.find((member) => member.user.id == id)
@@ -608,8 +593,6 @@ async function getServerLeaderboard(guild, amount) {
 
     let count = 1
 
-    console.log("for26")
-    console.time("for26")
     for (const user of usersWins) {
         let pos = count
 
@@ -624,12 +607,9 @@ async function getServerLeaderboard(guild, amount) {
         winsMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].wins}\n`
         count++
     }
-    console.timeEnd("for26")
 
     count = 1
 
-    console.log("for27")
-    console.time("for27")
     for (const user of usersSecond) {
         let pos = count
 
@@ -646,12 +626,9 @@ async function getServerLeaderboard(guild, amount) {
         }\n`
         count++
     }
-    console.timeEnd("for27")
 
     count = 1
 
-    console.log("for28")
-    console.time("for28")
     for (const user of usersThird) {
         let pos = count
 
@@ -668,12 +645,9 @@ async function getServerLeaderboard(guild, amount) {
         }\n`
         count++
     }
-    console.timeEnd("for29")
 
     count = 1
 
-    console.log("for30")
-    console.time("for30")
     for (const user of overallWins) {
         let pos = count
 
@@ -692,7 +666,6 @@ async function getServerLeaderboard(guild, amount) {
         ).toLocaleString()}\n`
         count++
     }
-    console.timeEnd("for30")
 
     return new Map()
         .set("wins", winsMsg)
