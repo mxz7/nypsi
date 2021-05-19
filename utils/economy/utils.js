@@ -734,12 +734,10 @@ exports.topAmount = topAmount
 async function topAmountPrestige(guild, amount) {
     let members
 
-    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+    if (guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
     } else {
         members = await guild.members.fetch()
-
-        addCooldown(guild, 3600)
     }
 
     if (!members) members = guild.members.cache
@@ -748,19 +746,19 @@ async function topAmountPrestige(guild, amount) {
         return !m.user.bot
     })
 
-    const users1 = []
+    const query = db.prepare("SELECT id, prestige FROM economy").all()
 
-    for (let user in users) {
-        if (members.find((member) => member.user.id == user) && users[user].prestige != 0) {
-            users1.push(user)
+    const userIDs = []
+    const prestiges = new Map()
+
+    for (const user of query) {
+        if (members.find((member) => member.user.id == user.id) && user.prestige != 0) {
+            userIDs.push(user.id)
+            prestiges.set(user.id, user.prestige)
         }
     }
 
-    // users1.sort(function (a, b) {
-    //     return users[b].prestige - users[a].prestige
-    // })
-
-    inPlaceSort(users1).desc((i) => users[i].prestige)
+    inPlaceSort(userIDs).desc((i) => prestiges.get(i))
 
     let usersFinal = []
 
@@ -774,11 +772,11 @@ async function topAmountPrestige(guild, amount) {
         return target
     }
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].prestige == 0) {
+        if (prestiges.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -791,11 +789,11 @@ async function topAmountPrestige(guild, amount) {
 
             let thing = "th"
 
-            if (users[user].prestige == 1) {
+            if (prestiges.get(user) == 1) {
                 thing = "st"
-            } else if (users[user].prestige == 2) {
+            } else if (prestiges.get(user) == 2) {
                 thing = "nd"
-            } else if (users[user].prestige == 3) {
+            } else if (prestiges.get(user) == 3) {
                 thing = "rd"
             }
 
@@ -804,7 +802,7 @@ async function topAmountPrestige(guild, amount) {
                 " **" +
                 getMemberID(guild, user).user.tag +
                 "** " +
-                users[user].prestige +
+                prestiges.get(user) +
                 thing +
                 " prestige"
             count++
