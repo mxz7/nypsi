@@ -1082,7 +1082,11 @@ function addWorker(member, id) {
 
     worker = new worker()
 
-    return (users[memberID].workers[id] = worker)
+    const memberWorkers = getWorkers(member)
+
+    memberWorkers[id] = worker
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers))
 }
 
 exports.addWorker = addWorker
