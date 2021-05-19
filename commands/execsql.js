@@ -4,7 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getDatabase } = require("../utils/database/database")
 const { createCaptcha } = require("../utils/utils")
 
-const cmd = new Command("execsql", "execute sql on the database", categories.ADMIN).setPermissions(["bot owner"])
+const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions(["bot owner"])
 
 /**
  * 
