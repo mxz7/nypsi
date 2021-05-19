@@ -931,7 +931,9 @@ function getPrestige(member) {
 
     if (member.user) id = member.user.id
 
-    return users[id].prestige
+    const query = db.prepare("SELECT prestige FROM economy WHERE id = ?").get(id)
+
+    return query.prestige
 }
 
 exports.getPrestige = getPrestige
@@ -942,7 +944,7 @@ exports.getPrestige = getPrestige
  * @param {Number} amount
  */
 function setPrestige(member, amount) {
-    users[member.user.id].prestige = amount
+    db.prepare("UPDATE economy SET prestige = ? WHERE id = ?").run(amount, member.user.id)
 }
 
 exports.setPrestige = setPrestige
