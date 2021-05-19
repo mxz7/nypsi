@@ -527,7 +527,9 @@ function getBankBalance(member) {
 
     if (member.user) id = member.user.id
 
-    return parseInt(users[id].money.bank)
+    const query = db.prepare("SELECT bank FROM economy WHERE id = ?").get(id)
+
+    return parseInt(query.bank)
 }
 
 exports.getBankBalance = getBankBalance
