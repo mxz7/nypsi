@@ -986,7 +986,9 @@ function getDMsEnabled(member) {
 
     if (!userExists(id)) createUser(id)
 
-    if (users[id].dms == true) {
+    const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id)
+
+    if (query.dms == 1) {
         return true
     } else {
         return false
