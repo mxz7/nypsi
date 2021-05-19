@@ -1232,11 +1232,9 @@ function getInventory(member) {
 
     if (member.user) id = member.user.id
 
-    if (!users[id].inventory) {
-        users[id].inventory = {}
-        return {}
-    }
-    return users[id].inventory
+    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id)
+
+    return JSON.parse(query.inventory)
 }
 
 exports.getInventory = getInventory
