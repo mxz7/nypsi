@@ -95,15 +95,12 @@ async function checkGuild(guildID) {
 exports.checkGuild = checkGuild
 
 async function runChecks() {
-    setInterval(() => {
-        console.log("for69")
-        console.time("for69")
+    setInterval(async () => {
         client.guilds.cache.forEach((guild) => {
             if (hasStatsEnabled(guild)) {
                 checkStats(guild)
             }
         })
-        console.timeEnd("for69")
     }, 600000)
 
     const now = new Date()
@@ -118,19 +115,13 @@ async function runChecks() {
 
     setTimeout(() => {
         setInterval(() => {
-            console.log("for70")
-            console.time("for70")
             client.guilds.cache.forEach((guild) => {
                 if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
             })
-            console.timeEnd("for70")
         }, 86400000)
-        console.log("for71")
-        console.time("for71")
         client.guilds.cache.forEach((guild) => {
             if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
         })
-        console.timeEnd("for71")
     }, needed - now)
 
     info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)

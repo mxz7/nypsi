@@ -61,8 +61,6 @@ async function redditImage(post, allowed) {
 
     let count = 0
 
-    console.log("while1")
-    console.time("while1")
     while (!isImageUrl(image)) {
         if (count >= 10) {
             error("couldnt find image @ " + post.data.subreddit_name_prefixed)
@@ -115,7 +113,6 @@ async function redditImage(post, allowed) {
             }
         }
     }
-    console.timeEnd("while1")
 
     let title = post.data.title
 
@@ -124,8 +121,6 @@ async function redditImage(post, allowed) {
         let newTitle = ""
         let count = 0
 
-        console.log("for18")
-        console.time("for18")
         for (let char of a) {
             if (count == 145) {
                 newTitle = newTitle + "..."
@@ -135,7 +130,6 @@ async function redditImage(post, allowed) {
                 newTitle = newTitle + char
             }
         }
-        console.timeEnd("for18")
 
         title = newTitle
     }
@@ -167,8 +161,6 @@ async function getMember(message, memberName) {
     let target
     let possible = new Map()
 
-    console.log("for19")
-    console.time("for19")
     for (let member of members.keyArray()) {
         member = members.get(member)
 
@@ -204,7 +196,6 @@ async function getMember(message, memberName) {
             }
         }
     }
-    console.timeEnd("for19")
 
     if (!target) {
         if (possible.get(0)) {
@@ -482,14 +473,11 @@ class captcha {
 
         let displayWord = d
 
-        console.log("for20")
-        console.time("for20")
         for (let i = 0; i < zeroWidthCount; i++) {
             const pos = Math.floor(Math.random() * d.length + 1)
 
             displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
         }
-        console.timeEnd("for20")
 
         this.display = displayWord
 
