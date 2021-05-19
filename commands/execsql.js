@@ -16,7 +16,7 @@ async function run(message, args) {
 
     const db = getDatabase()
 
-    const query = db.prepare(message.content)
+    const query = db.prepare(args.join(" "))
 
     const captcha = createCaptcha()
 
