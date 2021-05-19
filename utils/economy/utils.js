@@ -1249,7 +1249,7 @@ function setInventory(member, inventory) {
 
     if (member.user) id = member.user.id
 
-    users[id].inventory = inventory
+    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id)
 }
 
 exports.setInventory = setInventory
