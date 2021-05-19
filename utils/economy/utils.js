@@ -554,7 +554,9 @@ function getXp(member) {
 
     if (member.user) id = member.user.id
 
-    return parseInt(users[id].xp)
+    const query = db.prepare("SELECT xp FROM economy WHERE id = ?").get(id)
+
+    return parseInt(query.xp)
 }
 
 exports.getXp = getXp
