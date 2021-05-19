@@ -26,7 +26,9 @@ const db = getDatabase()
 const webhook = new topgg.Webhook("123")
 const topggStats = new topgg.Api(topggToken)
 const app = express()
+
 const voteCache = new Map()
+const existsCache = new Set()
 
 app.post(
     "/dblwebhook",
@@ -491,9 +493,14 @@ function userExists(member) {
 
     if (member.user) id = member.user.id
 
+    if (existsCache.has(id)) {
+        return true
+    }
+
     const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
 
     if (query) {
+        existsCache.set(id)
         return true
     } else {
         return false
