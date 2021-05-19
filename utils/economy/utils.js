@@ -429,7 +429,9 @@ exports.getMulti = getMulti
  * @returns {Number}
  */
 function getUserCount() {
-    return Object.keys(users).length
+    const query = db.prepare("SELECT id FROM economy").all()
+
+    return query.length
 }
 
 exports.getUserCount = getUserCount
