@@ -42,13 +42,15 @@ async function run(message, args) {
     if (response != captcha.answer) {
         return message.channel.send(new ErrorEmbed("captcha failed"))
     } else {
-        query.run()
+        const d = query.run()
+
+        console.log(d)
 
         return message.channel.send(
             new CustomEmbed(
                 message.member,
                 false,
-                `\`\`\`${query}\`\`\``
+                `made \`${d.changes}\` changes`
             )
         )
     }
