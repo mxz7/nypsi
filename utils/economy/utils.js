@@ -260,6 +260,14 @@ async function doVote(client, vote) {
 
     db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
 
+    voteCache.set(user, true)
+
+    setTimeout(() => {
+        if (voteCache.has(user)) {
+            voteCache.delete(user)
+        }
+    }, 43200000)
+
     let member = await client.users.fetch(user)
 
     let id = false
@@ -345,6 +353,10 @@ function hasVoted(member) {
 
     if (member.user) id = member.user.id
 
+    if (voteCache.has(id)) {
+        return voteCache.get(id)
+    }
+
     const now = new Date().getTime()
 
     let lastVote = users[id].lastVote
@@ -355,8 +367,18 @@ function hasVoted(member) {
     }
 
     if (now - lastVote < 43200000) {
+        voteCache.set(id, true)
+
+        setTimeout(() => {
+            voteCache.delete(id)
+        }, 3600)
         return true
     } else {
+        voteCache.set(id, false)
+
+        setTimeout(() => {
+            voteCache.delete(id)
+        }, 3600)
         return false
     }
 }
