@@ -1057,7 +1057,9 @@ function getWorker(member, id) {
     let memberID = member
     if (member.user) memberID = member.user.id
 
-    return users[memberID].workers[id]
+    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID)
+
+    return query.workers[id]
 }
 
 exports.getWorker = getWorker
