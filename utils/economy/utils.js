@@ -1097,13 +1097,15 @@ function emptyWorkersStored(member) {
 
     const workers = getWorkers(memberID)
 
-    for (let worker of Object.keys(getWorkers(member))) {
-        worker = users[memberID].workers[worker]
+    for (let worker of Object.keys(workers)) {
+        worker = workers[worker]
 
         worker.stored = 0
 
-        users[memberID].workers[worker.id] = worker
+        workers[worker.id] = worker
     }
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers))
 }
 
 exports.emptyWorkersStored = emptyWorkersStored
