@@ -41,52 +41,6 @@ app.post(
 
 app.listen(5000)
 
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-
-    if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./utils/economy/users.json", JSON.stringify(users), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("economy data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-        info("economy data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-        info("economy data refreshed")
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/economy/backup/" + date + ".json", JSON.stringify(users))
-    info("user data backup complete", types.DATA)
-}, 43200000)
-
 setInterval(() => {
     const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 
@@ -101,46 +55,8 @@ setInterval(() => {
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
-    for (let user in users) {
-        if (
-            isNaN(users[user].money.balance) ||
-            users[user].money.balance == null ||
-            users[user].money.balance == undefined ||
-            users[user].money.balance == -NaN ||
-            users[user].money.balance < 0
-        ) {
-            users[user].money.balance = 0
+    const query = db.prepare("SELECT workers FROM economy WHERE workers != '{}'").all()
 
-            info(user + " set to 0 because NaN", types.ECONOMY)
-        }
-
-        if (
-            isNaN(users[user].money.bank) ||
-            users[user].money.bank == null ||
-            users[user].money.bank == undefined ||
-            users[user].money.bank == -NaN ||
-            users[user].money.bank < 0
-        ) {
-            users[user].money.bank = 0
-
-            info(user + " bank set to 0 because NaN", types.ECONOMY)
-        }
-
-        if (
-            isNaN(users[user].xp) ||
-            users[user].xp == null ||
-            users[user].xp == undefined ||
-            users[user].xp == -NaN ||
-            users[user].xp < 0
-        ) {
-            users[user].xp = 0
-
-            info(user + " xp set to 0 because NaN", types.ECONOMY)
-        }
-    }
-}, 120000)
-
-setInterval(() => {
     for (const user in users) {
         for (let worker in users[user].workers) {
             worker = users[user].workers[worker]
@@ -687,7 +603,6 @@ async function topAmount(guild, amount) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
-        
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i))
@@ -1086,7 +1001,10 @@ function addWorker(member, id) {
 
     memberWorkers[id] = worker
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID)
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
+        JSON.stringify(memberWorkers),
+        memberID
+    )
 }
 
 exports.addWorker = addWorker
@@ -1196,7 +1114,9 @@ function reset() {
             info("deleted " + user.id)
             deleted++
         } else {
-            db.prepare("UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?").run(prestige, dms, lastVote, inventory, user.id)
+            db.prepare(
+                "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+            ).run(prestige, dms, lastVote, inventory, user.id)
 
             info("updated " + user.id)
             updated++

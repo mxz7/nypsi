@@ -764,7 +764,7 @@ function runChristmas(client) {
 
         for (const profile of query) {
             if (!profile.enabled) continue
-            const guild = client.guilds.cache.find(g => g.id == profile.guild_id)
+            const guild = client.guilds.cache.find((g) => g.id == profile.guild_id)
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
             if (!channel) {
@@ -802,8 +802,6 @@ function runChristmas(client) {
                     return
                 })
         }
-
-        
     }
 
     setTimeout(async () => {
