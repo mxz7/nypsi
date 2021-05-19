@@ -875,11 +875,9 @@ exports.formatBet = formatBet
  * @param {GuildMember} member to check
  */
 function hasPadlock(member) {
-    if (users[member.user.id].padlock) {
-        return true
-    } else {
-        return false
-    }
+    const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id)
+
+    return query.padlock
 }
 
 exports.hasPadlock = hasPadlock
