@@ -13,6 +13,7 @@ const client = new Discord.Client({
             name: "nypsi.xyz",
         },
     },
+    restTimeOffset: 169
 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
