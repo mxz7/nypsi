@@ -676,7 +676,7 @@ async function topAmount(guild, amount) {
     const balances = new Map()
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user) && users[user].money.balance != 0) {
+        if (members.find((member) => member.user.id == user.id) && user.money != 0) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
