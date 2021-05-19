@@ -73,8 +73,19 @@ function newCase(guild, caseType, userIDs, moderator, command) {
     }
     for (let userID of userIDs) {
         const caseCount = getCaseCount(guild)
-        db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
-        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)    
+        db.prepare(
+            "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            caseCount.toString(),
+            caseType,
+            userID,
+            moderator,
+            command,
+            new Date().getTime(),
+            0,
+            guild.id
+        )
+        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
     }
 }
 
@@ -86,7 +97,10 @@ exports.newCase = newCase
  * @param {String} caseID case to delete
  */
 function deleteCase(guild, caseID) {
-    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(guild.id, caseID)
+    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(
+        guild.id,
+        caseID
+    )
 }
 
 exports.deleteCase = deleteCase
@@ -118,7 +132,9 @@ exports.deleteServer = deleteServer
  * @param {String} userID user to get cases of
  */
 function getCases(guild, userID) {
-    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?").all(guild.id, userID)
+    const query = db
+        .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?")
+        .all(guild.id, userID)
 
     return query.reverse()
 }
@@ -130,7 +146,9 @@ exports.getCases = getCases
  * @param {Guild} guild guild to get cases of
  */
 function getAllCases(guild) {
-    const query = db.prepare("SELECT user, moderator FROM moderation_cases WHERE guild_id = ?").all(guild.id)
+    const query = db
+        .prepare("SELECT user, moderator FROM moderation_cases WHERE guild_id = ?")
+        .all(guild.id)
 
     return query.reverse()
 }
@@ -143,7 +161,9 @@ exports.getAllCases = getAllCases
  * @param {Number} caseID case to fetch
  */
 function getCase(guild, caseID) {
-    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?").get(guild.id, caseID)
+    const query = db
+        .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
+        .get(guild.id, caseID)
     return query
 }
 
@@ -160,7 +180,9 @@ function newMute(guild, userIDs, date) {
         userIDs = [userIDs]
     }
     for (let userID of userIDs) {
-        db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
+        db.prepare(
+            "INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)"
+        ).run(userID, date, guild.id)
     }
 }
 
@@ -178,7 +200,11 @@ function newBan(guild, userIDs, date) {
     }
 
     for (let userID of userIDs) {
-        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
+        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(
+            userID,
+            date,
+            guild.id
+        )
     }
 }
 
@@ -190,7 +216,9 @@ exports.newBan = newBan
  * @param {GuildMember} member
  */
 function isMuted(guild, member) {
-    const query = db.prepare("SELECT user FROM moderation_mutes WHERE guild_id = ? AND user = ?").get(guild.id, member.user.id)
+    const query = db
+        .prepare("SELECT user FROM moderation_mutes WHERE guild_id = ? AND user = ?")
+        .get(guild.id, member.user.id)
 
     if (query) {
         return true
@@ -253,7 +281,11 @@ exports.runModerationChecks = runModerationChecks
  * @param {String} reason
  */
 function setReason(guild, caseID, reason) {
-    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(reason, caseID, guild.id)
+    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(
+        reason,
+        caseID,
+        guild.id
+    )
 }
 
 exports.setReason = setReason
