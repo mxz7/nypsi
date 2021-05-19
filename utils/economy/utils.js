@@ -822,7 +822,11 @@ function createUser(member) {
 
     if (member.user) id = member.user.id
 
-    users[id] = new EconProfile()
+    if (userExists(id)) {
+        db.prepare("DELETE FROM economy WHERE id = ?").run(id)
+    }
+
+    db.prepare("INSERT INTO economy (id) VALUES (?)").run(id)
 }
 
 exports.createUser = createUser
