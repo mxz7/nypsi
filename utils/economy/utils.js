@@ -1,10 +1,8 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
-let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`, types.DATA)
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 info(
-    `${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`,
+    `${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`,
     types.DATA
 )
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
@@ -14,7 +12,6 @@ const topgg = require("@top-gg/sdk")
 const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
-const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { Worker, getAllWorkers } = require("./workers")
@@ -55,11 +52,15 @@ setInterval(() => {
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
-    const query = db.prepare("SELECT workers FROM economy WHERE workers != '{}'").all()
+    const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
 
-    for (const user in users) {
-        for (let worker in users[user].workers) {
-            worker = users[user].workers[worker]
+    for (const user of query) {
+        const workers = JSON.parse(user.workers)
+
+        const workers1 = JSON.parse(user.workers)
+
+        for (let worker in workers) {
+            worker = workers[worker]
 
             if (worker.stored < worker.maxStorage) {
                 if (worker.stored + worker.perInterval > worker.maxStorage) {
@@ -68,8 +69,13 @@ setInterval(() => {
                     worker.stored += worker.perInterval
                 }
             }
+        }
 
-            users[user].workers[worker.id] = worker
+        if (workers != workers1) {
+            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
+                JSON.stringify(workers),
+                user.id
+            )
         }
     }
 }, 5 * 60 * 1000)
@@ -92,12 +98,22 @@ function loadItems() {
 
     let deleted = 0
 
-    for (let user of Array.from(Object.keys(users))) {
-        for (let item of Array.from(Object.keys(users[user].inventory))) {
+    const query = db.prepare("SELECT id, inventory FROM economy").all()
+
+    for (const user of query) {
+        const inventory = JSON.parse(user.inventory)
+
+        const inventory1 = JSON.parse(user.inventory)
+
+        for (const item of Array.from(Object.keys(inventory))) {
             if (!Array.from(Object.keys(items)).includes(item)) {
-                delete users[user].inventory[item]
+                delete inventory[item]
                 deleted++
             }
+        }
+
+        if (inventory != inventory1) {
+            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id)
         }
     }
 
@@ -1023,7 +1039,7 @@ function emptyWorkersStored(member) {
         workers[worker.id] = worker
     }
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers))
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID)
 }
 
 exports.emptyWorkersStored = emptyWorkersStored
