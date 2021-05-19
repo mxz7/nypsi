@@ -658,12 +658,10 @@ exports.topAmountGlobal = topAmountGlobal
 async function topAmount(guild, amount) {
     let members
 
-    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+    if (guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
     } else {
         members = await guild.members.fetch()
-
-        addCooldown(guild, 3600)
     }
 
     if (!members) members = guild.members.cache
@@ -672,19 +670,20 @@ async function topAmount(guild, amount) {
         return !m.user.bot
     })
 
-    const users1 = []
+    const query = db.prepare("SELECT id, money FROM economy").all()
 
-    for (let user in users) {
+    const userIDs = []
+    const balances = new Map()
+
+    for (const user of query) {
         if (members.find((member) => member.user.id == user) && users[user].money.balance != 0) {
-            users1.push(user)
+            userIDs.push(user.id)
+            balances.set(user.id, user.money)
         }
+        
     }
 
-    inPlaceSort(users1).desc((i) => users[i].money.balance)
-
-    // users1.sort(function (a, b) {
-    //     return users[b].money.balance - users[a].money.balance
-    // })
+    inPlaceSort(userIDs).desc((i) => balances.get(i))
 
     let usersFinal = []
 
@@ -698,11 +697,11 @@ async function topAmount(guild, amount) {
         return target
     }
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].money.balance == 0) {
+        if (balances.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -718,7 +717,7 @@ async function topAmount(guild, amount) {
                 " **" +
                 getMemberID(guild, user).user.tag +
                 "** $" +
-                users[user].money.balance.toLocaleString()
+                balances.get(user).toLocaleString()
             count++
         }
     }
