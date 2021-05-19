@@ -46,7 +46,9 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n**filter bots** \`${profile.filter_bots == 1 ? "true" : "false"}\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
+            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n**filter bots** \`${
+                profile.filter_bots == 1 ? "true" : "false"
+            }\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
             .setTitle("member count")
             .setFooter(`use ${prefix}counter help to view additional commands`)
@@ -182,7 +184,10 @@ async function run(message, args) {
                 "if this is true, bots will not be counted towards the member count"
             )
                 .setTitle("member count")
-                .addField("current value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
+                .addField(
+                    "current value",
+                    "`" + (profile.filter_bots === 1 ? "true" : "false") + "`"
+                )
                 .addField(
                     "help",
                     `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`

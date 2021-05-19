@@ -4,12 +4,14 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getDatabase } = require("../utils/database/database")
 const { createCaptcha } = require("../utils/utils")
 
-const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions([
+    "bot owner",
+])
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
     if (message.author.id != "672793821850894347") return
@@ -47,11 +49,7 @@ async function run(message, args) {
         console.log(d)
 
         return message.channel.send(
-            new CustomEmbed(
-                message.member,
-                false,
-                `made \`${d.changes}\` changes`
-            )
+            new CustomEmbed(message.member, false, `made \`${d.changes}\` changes`)
         )
     }
 }
