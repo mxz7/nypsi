@@ -1003,7 +1003,9 @@ exports.getDMsEnabled = getDMsEnabled
  * @param {Boolean} value
  */
 function setDMsEnabled(member, value) {
-    users[member.user.id].dms = value
+    const setting = value ? 1 : 0
+
+    db.prepare("UPDATE economy SET dms = ? WHERE id = ?").run(setting, member.user.id)
 }
 
 exports.setDMsEnabled = setDMsEnabled
