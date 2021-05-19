@@ -31,11 +31,7 @@ function createTables() {
 
     db.prepare("CREATE TABLE IF NOT EXISTS premium ('id' TEXT PRIMARY KEY, 'level' INTEGER, 'embed_color' TEXT DEFAULT 'default', 'last_daily' INTEGER DEFAULT 0, 'last_weekly' INTEGER DEFAULT 0, 'status' INTEGER DEFAULT 1, 'revokeReason' TEXT DEFAULT 'none', 'start_date' INTEGER, 'expire_date' INTEGER)").run()
 
-    db.prepare("CREATE TABLE IF NOT EXISTS premium_commands ('owner' TEXT PRIMARY KEY, 'trigger' TEXT NOT NULL, 'content' TEXT NOT NULL, 'uses' INTEGER DEFAULT 0)")
-
     db.prepare("CREATE TABLE IF NOT EXISTS chat_reaction ('id' TEXT PRIMARY KEY, 'word_list' TEXT DEFAULT '', 'random_start' BOOLEAN DEFAULT 0, 'random_channels' TEXT DEFAULT '', 'between_events' INTEGER DEFAULT 600, 'random_modifier' INTEGER DEFAULT 300, 'timeout' INTEGER DEFAULT 60)").run()
-
-    db.prepare("CREATE TABLE IF NOT EXISTS socials ('id' TEXT PRIMARY KEY, 'youtube' TEXT DEFAULT '', 'twitter' TEXT DEFAULT '', 'instagram' TEXT DEFAULT '', 'snapchat' TEXT DEFAULT '', 'email' TEXT DEFAULT '')").run()
 }
 
 createTables()
