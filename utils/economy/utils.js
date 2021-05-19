@@ -1042,7 +1042,7 @@ function getWorkers(member) {
 
     const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(id)
 
-    return query.workers
+    return JSON.parse(query.workers)
 }
 
 exports.getWorkers = getWorkers
@@ -1059,7 +1059,7 @@ function getWorker(member, id) {
 
     const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID)
 
-    return query.workers[id]
+    return JSON.parse(query.workers)[id]
 }
 
 exports.getWorker = getWorker
