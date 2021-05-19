@@ -1119,13 +1119,17 @@ function upgradeWorker(member, id) {
     let memberID = member
     if (member.user) memberID = member.user.id
 
-    let worker = getWorkers(memberID)[id]
+    const workers = getWorkers(memberID)
+
+    let worker = workers[id]
 
     worker = Worker.fromJSON(worker)
 
     worker.upgrade()
 
-    users[memberID].workers[worker.id] = worker
+    workers[id] = worker
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers))
 }
 
 exports.upgradeWorker = upgradeWorker
