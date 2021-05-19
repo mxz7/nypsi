@@ -500,7 +500,7 @@ function userExists(member) {
     const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
 
     if (query) {
-        existsCache.set(id)
+        existsCache.add(id)
         return true
     } else {
         return false
