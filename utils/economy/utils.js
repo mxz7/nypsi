@@ -597,27 +597,27 @@ exports.getMaxBankBalance = getMaxBankBalance
  * @param {Boolean} anon
  */
 async function topAmountGlobal(amount, client, anon) {
-    const users1 = []
+    const query = db.prepare("SELECT id, money FROM economy").all()
 
-    for (let user in users) {
-        users1.push(user)
+    const userIDs = []
+    const balances = new Map()
+
+    for (const user of query) {
+        userIDs.push(user.id)
+        balances.set(user.id, user.money)
     }
 
-    // users1.sort(function (a, b) {
-    //     return users[b].money.balance - users[a].money.balance
-    // })
-
-    inPlaceSort(users1).desc((i) => users[i].money.balance)
+    inPlaceSort(userIDs).desc((i) => balances.get(i))
 
     let usersFinal = []
 
     let count = 0
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (users[user].money.balance != 0) {
+        if (balances.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -641,7 +641,7 @@ async function topAmountGlobal(amount, client, anon) {
             }
 
             usersFinal[count] =
-                pos + " **" + username + "** $" + users[user].money.balance.toLocaleString()
+                pos + " **" + username + "** $" + balances.get(user).toLocaleString()
             count++
         }
     }
