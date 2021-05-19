@@ -540,8 +540,7 @@ exports.getBankBalance = getBankBalance
  * @param {Number} amount to update balance to
  */
 function updateBankBalance(member, amount) {
-    const amount1 = parseInt(amount)
-    users[member.user.id].money.bank = amount1
+    db.prepare("UPDATE economy SET bank = ? WHERE id = ?").run(parseInt(amount), member.user.id)
 }
 
 exports.updateBankBalance = updateBankBalance
