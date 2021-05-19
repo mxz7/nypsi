@@ -1172,15 +1172,14 @@ exports.toggleBan = toggleBan
 function reset() {
     let deleted = 0
     let updated = 0
-    for (const id in users) {
-        let user = users[id]
 
+    const query = db.prepare("SELECT * FROM economy").all()
+
+    for (const user in query) {
         let prestige = user.prestige
-        let lastVote = user.lastVote
+        let lastVote = user.last_vote
         let inventory = user.inventory
         const dms = user.dms
-
-        if (!lastVote) lastVote = 0
 
         if (Array.from(Object.keys(inventory)).length == 0) {
             inventory = undefined
@@ -1193,18 +1192,13 @@ function reset() {
         }
 
         if (prestige == 0 && lastVote == 0 && !inventory && !dms) {
-            delete users[id]
-            info("deleted " + id)
+            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
+            info("deleted " + user.id)
             deleted++
         } else {
-            user = new EconProfile()
-            user.prestige = prestige
-            user.lastVote = lastVote
-            user.inventory = inventory
-            user.dms = dms
+            db.prepare("UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?").run(prestige, dms, lastVote, inventory, user.id)
 
-            users[id] = user
-            info("updated " + id)
+            info("updated " + user.id)
             updated++
         }
     }
