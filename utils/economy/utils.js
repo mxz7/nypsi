@@ -1086,7 +1086,7 @@ function addWorker(member, id) {
 
     memberWorkers[id] = worker
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers))
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID)
 }
 
 exports.addWorker = addWorker
