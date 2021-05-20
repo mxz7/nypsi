@@ -508,8 +508,13 @@ function updateStats(guild, member, newStats) {
 
 exports.updateStats = updateStats
 
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ */
 function addWin(guild, member) {
-    data[guild.id].stats[member.user.id].wins++
+    db.prepare("UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?").run(guild.id, member.user.id)
 }
 
 exports.addWin = addWin
