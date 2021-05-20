@@ -378,11 +378,11 @@ exports.renewUser = renewUser
  * @param {String} member id
  */
 function expireUser(member) {
-    const profile = PremUser.fromData(data[member])
+    const profile = getPremiumProfile(member)
 
     profile.expire()
 
-    data[member] = profile
+    db.prepare("UPDATE premium SET level = ?, status = ? WHERE id = ?").run(0, 0, member)
 }
 
 exports.expireUser = expireUser
