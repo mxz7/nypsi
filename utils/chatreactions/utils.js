@@ -208,7 +208,7 @@ function hasReactionProfile(guild) {
 
     const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id)
 
-    if (query.id) {
+    if (query) {
         existsCache.add(guild.id)
         return true
     } else {
