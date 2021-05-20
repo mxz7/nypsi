@@ -254,75 +254,82 @@ function setStatsProfile(guild, profile) {
 
 exports.setStatsProfile = setStatsProfile
 
-/**
- *
- * @param {Guild} guild
- */
-async function checkStats(guild) {
-    let memberCount
+function checkStats() {
+    setInterval(async () => {
+        const query = db.prepare("SELECT * from guilds_counters WHERE enabled = 1").all()
 
-    const profile = db.prepare("SELECT * FROM guilds_counters WHERE guild_id = ?").get(guild.id)
+        for (const profile of query) {
+            const { getGuild } = require("../../nypsi")
+            const guild = await getGuild(profile.guild_id)
 
-    if (profile.filter_bots && guild.memberCount >= 500) {
-        profile.filter_bots = 0
-        setStatsProfile(guild, profile)
-        memberCount = guild.memberCount
-    } else if (profile.filter_bots) {
-        let members
+            let memberCount
 
-        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
-            members = guild.members.cache
-        } else {
-            members = await guild.members.fetch().catch(() => {})
-            addCooldown(guild, 3600)
-        }
+            if (profile.filter_bots && guild.memberCount >= 500) {
+                profile.filter_bots = 0
+                setStatsProfile(guild, profile)
+                memberCount = guild.memberCount
+            } else if (profile.filter_bots) {
+                let members
 
-        if (members.size == guild.memberCount) {
-            members = members.filter((m) => !m.user.bot)
+                if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+                    members = guild.members.cache
+                } else {
+                    members = await guild.members.fetch().catch(() => {})
+                    addCooldown(guild, 3600)
+                }
 
-            memberCount = members.size
-        } else {
-            memberCount = guild.memberCount
-        }
-    } else {
-        memberCount = guild.memberCount
-    }
+                if (members.size == guild.memberCount) {
+                    members = members.filter((m) => !m.user.bot)
 
-    if (!memberCount) memberCount = guild.memberCount
+                    memberCount = members.size
+                } else {
+                    memberCount = guild.memberCount
+                }
+            } else {
+                memberCount = guild.memberCount
+            }
 
-    const channel = guild.channels.cache.find((c) => c.id == profile.channel)
+            if (!memberCount) memberCount = guild.memberCount
 
-    if (!channel) {
-        profile.enabled = false
-        profile.channel = "none"
-        setStatsProfile(guild, profile)
-        return
-    }
+            const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
-    let format = profile.format
-    format = format.split("%count%").join(memberCount.toLocaleString())
-    format = format.split("%peak%").join(getPeaks(guild).toLocaleString())
-
-    if (channel.name != format) {
-        const old = channel.name
-
-        return await channel
-            .edit({ name: format })
-            .then(() => {
-                info(
-                    "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
-                    types.AUTOMATION
-                )
-            })
-            .catch(() => {
-                error("error updating counter in " + guild.name)
+            if (!channel) {
                 profile.enabled = false
                 profile.channel = "none"
                 setStatsProfile(guild, profile)
-            })
-    } else {
-        return
-    }
+                return
+            }
+
+            let format = profile.format
+            format = format.split("%count%").join(memberCount.toLocaleString())
+            format = format.split("%peak%").join(getPeaks(guild).toLocaleString())
+
+            if (channel.name != format) {
+                const old = channel.name
+
+                return await channel
+                    .edit({ name: format })
+                    .then(() => {
+                        info(
+                            "counter updated for '" +
+                                guild.name +
+                                "' ~ '" +
+                                old +
+                                "' -> '" +
+                                format +
+                                "'",
+                            types.AUTOMATION
+                        )
+                    })
+                    .catch(() => {
+                        error("error updating counter in " + guild.name)
+                        profile.enabled = false
+                        profile.channel = "none"
+                        setStatsProfile(guild, profile)
+                    })
+            }
+        }
+    }, 600000)
 }
 
 exports.checkStats = checkStats
