@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3")
-const { info } = require("../logger")
-const db = new Database("./utils/database/storage.db", { verbose: info })
+const { databaseLog } = require("../logger")
+const db = new Database("./utils/database/storage.db", { verbose: databaseLog })
 
 function createTables() {
     db.prepare(
