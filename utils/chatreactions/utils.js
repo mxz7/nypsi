@@ -741,7 +741,9 @@ exports.hasRandomReactionsEnabled = hasRandomReactionsEnabled
  * @returns {Array<String>}
  */
 function getRandomChannels(guild) {
-    return data[guild.id].settings.randomChannels
+    const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.random_channels)
 }
 
 exports.getRandomChannels = getRandomChannels
