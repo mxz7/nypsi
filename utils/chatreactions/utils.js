@@ -255,7 +255,9 @@ exports.updateWords = updateWords
  * @returns {Array<String>}
  */
 function getWordList(guild) {
-    return data[guild.id].wordList
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.word_list)
 }
 
 exports.getWordList = getWordList
