@@ -1,7 +1,6 @@
 const { Guild, TextChannel, GuildMember } = require("discord.js")
 const fetch = require("node-fetch")
 const { inCooldown, addCooldown } = require("../guilds/utils")
-const { ChatReactionProfile, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
