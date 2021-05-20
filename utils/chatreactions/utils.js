@@ -731,3 +731,5 @@ async function getDefaultWords() {
 function getZeroWidth() {
     return "​"
 }
+
+exports.getZeroWidth = getZeroWidth
