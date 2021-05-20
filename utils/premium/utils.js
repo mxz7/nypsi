@@ -385,7 +385,7 @@ function expireUser(member) {
 
     profile.expire()
 
-    db.prepare("UPDATE premium SET level = 0, status = 0 WHERE id = ?").run(member)
+    db.prepare("DELETE FROM premium WHERE id = ?").run(member)
 }
 
 exports.expireUser = expireUser
