@@ -173,7 +173,10 @@ function addMember(member, level) {
         id = member.user.id
     }
 
-    db.prepare("INSERT INTO premium (id, level) VALUES (?, ?)").run(id, level)
+    const start = new Date().getTime()
+    const expire = new Date().setDate(new Date().getDate() + 35)
+
+    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(id, level, start, expire)
 
     const profile = getPremiumProfile(id)
 
