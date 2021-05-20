@@ -486,11 +486,13 @@ function hasReactionStatsProfile(guild, member) {
 
 exports.hasReactionStatsProfile = hasReactionStatsProfile
 
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {guildMember} member 
+ */
 function createReactionStatsProfile(guild, member) {
-    if (!data[guild.id].stats) {
-        data[guild.id].stats = {}
-    }
-    data[guild.id].stats[member.user.id] = new StatsProfile()
+    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id)
 }
 
 exports.createReactionStatsProfile = createReactionStatsProfile
@@ -498,10 +500,10 @@ exports.createReactionStatsProfile = createReactionStatsProfile
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
- * @param {StatsProfile} stats
+ * @param {StatsProfile} newStats
  */
 function updateStats(guild, member, newStats) {
-    data[guild.id].stats[member.user.id] = newStats
+    db.prepare("UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?").run(newStats.wins, newStats.secondPlace, newStats.thirdPlace, guild.id, member.user.id)
 }
 
 exports.updateStats = updateStats
