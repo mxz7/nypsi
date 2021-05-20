@@ -155,7 +155,19 @@ function getTierString(member) {
         id = member.user.id
     }
 
-    const a = PremUser.fromData(data[id])
+    const query = db.prepare("SELECT * FROM premium WHERE id = ?").run(id)
+
+    const a = PremUser.fromData({
+        id: query.id,
+        level: query.level,
+        embedColor: query.embed_color,
+        lastDaily: query.last_daily,
+        lastWeekly: query.last_weekly,
+        status: query.status,
+        revokeReason: query.revoke_reason,
+        startDate: query.start_date,
+        expireDate: query.expire_date
+    })
 
     return a.getLevelString()
 }
