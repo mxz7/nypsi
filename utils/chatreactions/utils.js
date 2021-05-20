@@ -5,13 +5,16 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
+const { getDatabase } = require("../database/database")
 let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 info(
     `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
     types.DATA
 )
+const db = getDatabase()
 
 const currentChannels = new Set()
+const existsCache = new Set()
 const lastGame = new Map()
 
 let timer = 0
@@ -199,7 +202,14 @@ exports.createReactionProfile = createReactionProfile
  * @param {Guild} guild
  */
 function hasReactionProfile(guild) {
-    if (data[guild.id]) {
+    if (existsCache.has(guild.id)) {
+        return true
+    }
+
+    const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    if (query.id) {
+        existsCache.add(guild.id)
         return true
     } else {
         return false
