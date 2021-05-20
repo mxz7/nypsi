@@ -290,7 +290,7 @@ function setLastDaily(member, date) {
         id = member.user.id
     }
 
-    data[id].lastDaily = date
+    db.prepare("UPDATE premium SET last_daily = ? WHERE id = ?").run(date, id)
 }
 
 exports.setLastDaily = setLastDaily
