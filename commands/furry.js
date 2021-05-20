@@ -21,8 +21,7 @@ const cmd = new Command("furry", "measure how much of a furry you are", categori
 async function run(message, args) {
     let cooldownLength = 7
     let cacheTime = 60
-    
-    
+
     if (!userExists(member)) createProfile(member)
 
     if (isPremium(message.author.id)) {
