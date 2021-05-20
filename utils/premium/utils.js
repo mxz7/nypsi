@@ -79,19 +79,10 @@ setInterval(() => {
 setInterval(async () => {
     const now = new Date().getTime()
 
-    for (let user in data) {
-        user = data[user]
+    const query = db.prepare("SELECT id FROM premium WHERE expire_date <= ?").all(now)
 
-        if (user.level == 0) continue
-
-        const expiry = user.expireDate
-
-        if (expiry <= now) {
-            user = PremUser.fromData(user)
-
-            await user.expire()
-            data[user.id] = user
-        }
+    for (const user of query) {
+        expireUser(user.id)
     }
 }, 300000)
 
