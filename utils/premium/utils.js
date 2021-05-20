@@ -305,7 +305,7 @@ function setLastWeekly(member, date) {
         id = member.user.id
     }
 
-    data[id].lastWeekly = date
+    db.prepare("UPDATE premium SET last_weekly = ? WHERE id = ?").run(date, id)
 }
 
 exports.setLastWeekly = setLastWeekly
