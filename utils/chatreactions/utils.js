@@ -425,7 +425,7 @@ async function startReaction(guild, channel) {
                             collector.stop()
                         })
                     }
-                }, 750)
+                }, 250)
             } else {
                 if (!waiting) {
                     const field = await embed.embed.fields.find((f) => f.name == "winners")
