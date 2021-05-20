@@ -530,8 +530,13 @@ function add2ndPlace(guild, member) {
 
 exports.add2ndPlace = add2ndPlace
 
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ */
 function add3rdPlace(guild, member) {
-    data[guild.id].stats[member.user.id].thirdPlace++
+    db.prepare("UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?").run(guild.id, member.user.id)
 }
 
 exports.add3rdPlace = add3rdPlace
