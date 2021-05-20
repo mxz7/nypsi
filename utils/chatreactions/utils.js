@@ -5,7 +5,7 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
-const { getDatabase } = require("../database/database")
+const { getDatabase, toArray } = require("../database/database")
 let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 info(
     `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
@@ -223,14 +223,16 @@ exports.hasReactionProfile = hasReactionProfile
  * @returns {Array<String>}
  */
 async function getWords(guild) {
-    const profile = ChatReactionProfile.from(data[guild.id])
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
 
-    if (profile.wordList.length == 0) {
+    const wordList = toString(query.word_list)
+
+    if (wordList.length == 0) {
         const a = await getDefaultWords()
 
         return a
     } else {
-        return profile.wordList
+        return wordList
     }
 }
 
