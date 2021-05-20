@@ -82,110 +82,92 @@ setInterval(async () => {
 setInterval(async () => {
     let count = 0
 
-    /**
-     * @param {Guild} guild
-     * @param {TextChannel} channel
-     */
-    const runGame = async (guild, channel) => {
-        const messages = await channel.messages.fetch({ limit: 10 })
-        let stop = false
+    const query = db.prepare("SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1").all()
 
-        await messages.forEach((m) => {
-            if (m.author.id == guild.client.user.id) {
-                if (m.embeds[0].title == "chat reaction") {
-                    stop = true
-                    return
-                }
-            }
-        })
-
-        if (stop) {
-            return
-        }
-
-        const a = await startReaction(guild, channel)
-
-        if (a != "xoxo69") {
-            count++
-        } else {
-            return
-        }
-
-        const settings = getReactionSettings(guild)
-
-        const base = settings.timeBetweenEvents
-        let final
-
-        if (settings.randomModifier == 0) {
-            final = base
-        } else {
-            const o = ["+", "-"]
-            let operator = o[Math.floor(Math.random() * o.length)]
-
-            if (base - settings.randomModifier < 120) {
-                operator = "+"
-            }
-
-            const amount = Math.floor(Math.random() * settings.randomModifier)
-
-            if (operator == "+") {
-                final = base + amount
-            } else {
-                final = base - amount
-            }
-        }
-
-        const nextGame = new Date().getTime() + final * 1000
-
-        return lastGame.set(channel.id, nextGame)
-    }
-
-    for (const guildID in data) {
+    for (const guildData of query) {
         const { getGuild } = require("../../nypsi")
-        const guild = await getGuild(guildID)
-        const guildData = ChatReactionProfile.from(data[guildID])
-
-        if (!guildData.settings.randomStart) continue
+        const guild = await getGuild(guildData.id)
 
         if (!guild) {
-            console.log("no guild [chat reaction] ", guildID)
-            continue
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guildData.id)
+            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guildData.id)
+            return
         }
 
-        const channels = guildData.settings.randomChannels
+        const channels = guildData.random_channels
 
-        if (channels.length == 0) {
-            data[guildID].settings.randomStart = false
-        }
+        if (channels.length == 0) return
 
         const now = new Date().getTime()
 
         for (const ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
-                    const channel = await guild.channels.cache.find((cha) => cha.id == ch)
-
-                    if (!channel) {
-                        channels.splice(channels.indexOf(ch), 1)
-                        data[guildID].settings.randomChannels = channels
-                        continue
-                    }
-
-                    await runGame(guild, channel)
+                    lastGame.delete(ch)
+                } else {
+                    return
                 }
-            } else {
-                const channel = await guild.channels.cache.find((cha) => cha.id == ch)
-
-                if (!channel) {
-                    channels.splice(channels.indexOf(ch), 1)
-                    data[guildID].settings.randomChannels = channels
-                    continue
-                }
-
-                await runGame(guild, channel)
             }
+
+            const channel = await guild.channels.cache.find((cha) => cha.id == ch)
+
+            if (!channel) {
+                continue
+            }
+
+            const messages = await channel.messages.fetch({ limit: 15 })
+            let stop = false
+
+            await messages.forEach((m) => {
+                if (m.author.id == guild.client.user.id) {
+                    if (!m.embeds[0]) return
+                    if (m.embeds[0].title == "chat reaction") {
+                        stop = true
+                        return
+                    }
+                }
+            })
+
+            if (stop) {
+                return
+            }
+
+            const a = await startReaction(guild, channel)
+
+            if (a != "xoxo69") {
+                count++
+            } else {
+                return
+            }
+
+            const base = guildData.between_events
+            let final
+
+            if (guildData.random_modifier == 0) {
+                final = base
+            } else {
+                const o = ["+", "-"]
+                let operator = o[Math.floor(Math.random() * o.length)]
+
+                if (base - guildData.random_modifier < 120) {
+                    operator = "+"
+                }
+
+                const amount = Math.floor(Math.random() * guildData.random_modifier)
+
+                if (operator == "+") {
+                    final = base + amount
+                } else {
+                    final = base - amount
+                }
+            }
+
+            const nextGame = new Date().getTime() + final * 1000
+
+            return lastGame.set(channel.id, nextGame)
         }
     }
+
     if (count > 0) {
         info(`${count} chat reactions automatically started`, types.AUTOMATION)
     }
