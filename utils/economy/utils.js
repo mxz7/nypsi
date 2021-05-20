@@ -113,7 +113,10 @@ function loadItems() {
         }
 
         if (inventory != inventory1) {
-            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id)
+            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(
+                JSON.stringify(inventory),
+                user.id
+            )
         }
     }
 

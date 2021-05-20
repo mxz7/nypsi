@@ -22,10 +22,7 @@ async function run(message, args) {
 
     let members
 
-    if (
-        inCooldown(server) ||
-        message.guild.memberCount == message.guild.members.cache.size
-    ) {
+    if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size) {
         members = server.members.cache
     } else {
         members = await server.members.fetch()
