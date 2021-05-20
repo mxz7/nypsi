@@ -320,7 +320,7 @@ function setStatus(member, status) {
         id = member.user.id
     }
 
-    data[id].status = status
+    db.prepare("UPDATE premium SET status = ? WHERE id = ?").run(status, id)
 }
 
 exports.setStatus = setStatus
