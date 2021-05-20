@@ -359,11 +359,11 @@ exports.setStartDate = setStartDate
  * @param {String} member id
  */
 function renewUser(member) {
-    const profile = PremUser.fromData(data[member])
+    const profile = getPremiumProfile(member)
 
     profile.renew()
 
-    data[member] = profile
+    db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(profile.expireDate, member)
 
     const { requestDM } = require("../../nypsi")
     requestDM(
