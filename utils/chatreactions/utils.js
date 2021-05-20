@@ -1,7 +1,5 @@
 const { Guild, TextChannel, GuildMember } = require("discord.js")
 const fetch = require("node-fetch")
-const { inCooldown, addCooldown } = require("../guilds/utils")
-const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
 const { inPlaceSort } = require("fast-sort")
@@ -281,6 +279,9 @@ async function startReaction(guild, channel) {
         displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
     }
 
+    
+    const { CustomEmbed } = require("../classes/EmbedBuilders")
+
     const embed = new CustomEmbed().setColor("#5efb8f")
 
     embed.setTitle("chat reaction")
@@ -483,6 +484,8 @@ exports.add3rdPlace = add3rdPlace
  * @returns {Map}
  */
 async function getServerLeaderboard(guild, amount) {
+    const { inCooldown, addCooldown } = require("../guilds/utils")
+
     let members
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
