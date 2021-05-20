@@ -1,6 +1,7 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { PremUser, status } = require("../classes/PremStorage")
+const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
 let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
@@ -10,6 +11,9 @@ info(
     `${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`,
     types.DATA
 )
+const db = getDatabase()
+
+const isPremiumCache = new Map()
 
 let timer = 0
 let timerCheck = true
@@ -99,13 +103,22 @@ function isPremium(member) {
         id = member.user.id
     }
 
-    if (data[id]) {
-        if (data[id].level == 0) {
+    if (isPremiumCache.has(id)) {
+        return isPremiumCache.get(id)
+    }
+
+    const query = db.prepare("SELECT id FROM premium WHERE id = ?").get(id)
+
+    if (query) {
+        if (getTier(id) == 0) {
+            isPremiumCache.set(id, false)
             return false
         }
 
+        isPremiumCache.set(id, true)
         return true
     } else {
+        isPremiumCache.set(id, false)
         return false
     }
 }
