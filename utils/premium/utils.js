@@ -392,13 +392,7 @@ exports.expireUser = expireUser
  * @param {String} reason
  */
 function revokeUser(member, reason) {
-    const profile = PremUser.fromData(data[member])
-
-    profile.status = status.REVOKED
-    profile.revokeReason = reason
-    profile.level = 0
-
-    data[member] = profile
+    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(reason, member)
 
     const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")
