@@ -2,7 +2,7 @@ const { Guild, TextChannel, GuildMember } = require("discord.js")
 const fs = require("fs")
 const fetch = require("node-fetch")
 const { inCooldown, addCooldown } = require("../guilds/utils")
-const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/ChatReaction")
+const { ChatReactionProfile, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
@@ -766,4 +766,8 @@ async function getDefaultWords() {
     let words = body.split("\n")
 
     return words
+}
+
+function getZeroWidth() {
+    return "​"
 }

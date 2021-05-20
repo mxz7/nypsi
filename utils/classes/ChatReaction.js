@@ -67,9 +67,3 @@ class StatsProfile {
 }
 
 exports.StatsProfile = StatsProfile
-
-function getZeroWidth() {
-    return "​"
-}
-
-exports.getZeroWidth = getZeroWidth
