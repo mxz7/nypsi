@@ -417,7 +417,9 @@ exports.getLastDaily = getLastDaily
  * @param {String} member id
  */
 function getLastWeekly(member) {
-    return data[member].lastWeekly
+    const query = db.prepare("SELECT last_weekly FROM premium WHERE id = ?").get(member)
+
+    return query.last_weekly
 }
 
 exports.getLastWeekly = getLastWeekly
