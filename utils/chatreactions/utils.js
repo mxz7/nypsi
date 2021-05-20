@@ -94,7 +94,7 @@ setInterval(async () => {
             return
         }
 
-        const channels = guildData.random_channels
+        const channels = toArray(guildData.random_channels)
 
         if (channels.length == 0) return
 
