@@ -190,9 +190,7 @@ setInterval(async () => {
  * @param {Guild} guild
  */
 function createReactionProfile(guild) {
-    const a = new ChatReactionProfile()
-
-    data[guild.id] = a
+    db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id)
 }
 
 exports.createReactionProfile = createReactionProfile
