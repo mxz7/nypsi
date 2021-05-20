@@ -16,6 +16,7 @@ const db = getDatabase()
 
 const currentChannels = new Set()
 const existsCache = new Set()
+const enabledCache = new Map()
 const lastGame = new Map()
 
 let timer = 0
@@ -301,6 +302,8 @@ exports.getReactionSettings = getReactionSettings
  */
 function updateReactionSettings(guild, settings) {
     db.prepare("UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?").run(settings.randomStart ? 1 : 0, toStorage(settings.randomChannels), settings.timeBetweenEvents, settings.randomModifier, settings.timeout)
+
+    if (enabledCache.has(guild.id)) enabledCache.delete(guild.id)
 }
 
 exports.updateReactionSettings = updateReactionSettings
@@ -716,9 +719,17 @@ exports.getServerLeaderboard = getServerLeaderboard
  * @returns {Boolean}
  */
 function hasRandomReactionsEnabled(guild) {
-    if (data[guild.id].settings.randomStart) {
+    if (enabledCache.has(guild.id)) {
+        return enabledCache.get(guild.id)
+    }
+
+    const query = db.prepare("SELECT random_start FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    if (query.random_start == 1) {
+        enabledCache.set(guild.id, true)
         return true
     } else {
+        enabledCache.set(guild.id, false)
         return false
     }
 }
