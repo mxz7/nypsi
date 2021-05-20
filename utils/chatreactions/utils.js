@@ -1,5 +1,4 @@
 const { Guild, TextChannel, GuildMember } = require("discord.js")
-const fs = require("fs")
 const fetch = require("node-fetch")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, StatsProfile } = require("../classes/ChatReaction")
@@ -7,11 +6,6 @@ const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
 const { inPlaceSort } = require("fast-sort")
-let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-info(
-    `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
-    types.DATA
-)
 const db = getDatabase()
 
 const currentChannels = new Set()
@@ -19,62 +13,19 @@ const existsCache = new Set()
 const enabledCache = new Map()
 const lastGame = new Map()
 
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/chatreactions/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("chatreactions data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-        info("chatreactions data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-        info("chatreactions data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/chatreactions/backup/" + date + ".json", JSON.stringify(data))
-    info("chatreactions data backup complete", types.DATA)
-}, 43200000)
-
 setInterval(async () => {
     const { checkGuild, getGuild } = require("../../nypsi")
 
-    for (let guild in data) {
+    const query = db.prepare("SELECT id FROM chat_reaction").all()
+
+    for (let guild of query) {
         const exists = await checkGuild(guild)
 
         if (!exists) {
-            delete data[guild]
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild)
+            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild)
 
-            info(`deleted guild '${guild}' from chatreaction data`, types.DATA)
+            info(`deleted guild '${guild}' from chat reaction data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
