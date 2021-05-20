@@ -224,12 +224,20 @@ function setTier(member, level) {
         id = member.user.id
     }
 
-    data[id].level = level
+    db.prepare("UPDATE premium SET level = ? WHERE id = ?").run(level, id)
 
     info(`premium level updated to ${level} for ${id}`)
 
     const { requestDM } = require("../../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
+
+    if (isPremiumCache.has(id)) {
+        isPremiumCache.delete(id)
+    }
+
+    if (tierCache.has(id)) {
+        tierCache.delete(id)
+    }
 }
 
 exports.setTier = setTier
