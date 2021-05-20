@@ -4,8 +4,6 @@ const { PremUser, status } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
-let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-info(`${Array.from(Object.keys(data)).length.toLocaleString()} premium users loaded`, types.DATA)
 let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 info(
     `${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`,
@@ -16,38 +14,6 @@ const db = getDatabase()
 const isPremiumCache = new Map()
 const tierCache = new Map()
 const colorCache = new Map()
-
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/premium/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("premium data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-        info("premium data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-        info("premium data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
     const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
@@ -61,20 +27,6 @@ setInterval(() => {
         })
     }
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/premium/backup/" + date + ".json", JSON.stringify(data))
-    info("premium data backup complete", types.DATA)
-}, 43200000)
 
 setInterval(async () => {
     const now = new Date().getTime()
