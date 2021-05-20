@@ -560,12 +560,14 @@ async function getServerLeaderboard(guild, amount) {
 
     const query = db.prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?").all(guild.id)
 
+    console.log(query)
+
     for (const user of query) {
         let overall = false
 
         if (
             members.find((member) => member.user.id == user.user_id) &&
-            query.wins != 0
+            user.wins != 0
         ) {
             usersWins.push(user.user_id)
             winsStats.set(user.user_id, user.wins)
@@ -573,7 +575,7 @@ async function getServerLeaderboard(guild, amount) {
         }
         if (
             members.find((member) => member.user.id == user.user_id) &&
-            query.second != 0
+            user.second != 0
         ) {
             usersSecond.push(user.user_id)
             secondStats.set(user.user_id, user.second)
@@ -581,7 +583,7 @@ async function getServerLeaderboard(guild, amount) {
         }
         if (
             members.find((member) => member.user.id == user.user_id) &&
-            query.third != 0
+            user.third != 0
         ) {
             usersThird.push(user.user_id)
             thirdStats.set(user.user_id, user.third)
