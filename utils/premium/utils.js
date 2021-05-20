@@ -157,17 +157,7 @@ function getTierString(member) {
 
     const query = db.prepare("SELECT * FROM premium WHERE id = ?").run(id)
 
-    const a = PremUser.fromData({
-        id: query.id,
-        level: query.level,
-        embedColor: query.embed_color,
-        lastDaily: query.last_daily,
-        lastWeekly: query.last_weekly,
-        status: query.status,
-        revokeReason: query.revoke_reason,
-        startDate: query.start_date,
-        expireDate: query.expire_date
-    })
+    const a = createPremUser(query)
 
     return a.getLevelString()
 }
@@ -182,9 +172,9 @@ function addMember(member, level) {
         id = member.user.id
     }
 
-    const profile = new PremUser(id, level)
+    db.prepare("INSERT INTO premium (id, level) VALUES (?, ?)").run(id, level)
 
-    data[id] = profile
+    const profile = getPremiumProfile(id)
 
     info(`premium level ${level} given to ${id}`)
 
@@ -465,3 +455,17 @@ function addUse(id) {
 }
 
 exports.addUse = addUse
+
+function createPremUser(query) {
+    return PremUser.fromData({
+        id: query.id,
+        level: query.level,
+        embedColor: query.embed_color,
+        lastDaily: query.last_daily,
+        lastWeekly: query.last_weekly,
+        status: query.status,
+        revokeReason: query.revoke_reason,
+        startDate: query.start_date,
+        expireDate: query.expire_date
+    })
+}
