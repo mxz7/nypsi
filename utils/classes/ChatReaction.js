@@ -4,11 +4,10 @@ class ChatReactionProfile {
     /**
      * @param {Array<String>} phraseList
      * @param {Object} settings
-     * @param {Object} stats
      * @param {Array<String>} blacklisted
      * @returns {ChatReactionProfile}
      */
-    constructor(phraseList, settings, stats, blacklisted) {
+    constructor(phraseList, settings, blacklisted) {
         if (!phraseList) {
             this.wordList = []
         } else {
@@ -16,21 +15,17 @@ class ChatReactionProfile {
         }
 
         if (settings) {
-            this.settings = settings
+            this.randomStart = settings.randomStart
+            this.randomChannels = settings.randomChannels
+            this.timeBetweenEvents = settings.timeBetweenEvents
+            this.randomModifier = settings.randomModifier
+            this.timeout = settings.timeout
         } else {
-            this.settings = {
-                randomStart: false,
-                randomChannels: [],
-                timeBetweenEvents: 600,
-                randomModifier: 300,
-                timeout: 60,
-            }
-        }
-
-        if (stats) {
-            this.stats = stats
-        } else {
-            this.stats = {}
+            this.randomStart = false
+            this.randomChannels = []
+            this.timeBetweenEvents = 600
+            this.randomModifier = 300
+            this.timeout = 60
         }
 
         if (blacklisted) {
