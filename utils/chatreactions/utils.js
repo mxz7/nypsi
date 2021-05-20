@@ -5,7 +5,7 @@ const { inCooldown, addCooldown } = require("../guilds/utils")
 const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
-const { getDatabase, toArray } = require("../database/database")
+const { getDatabase, toArray, toStorage } = require("../database/database")
 let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 info(
     `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
@@ -225,7 +225,7 @@ exports.hasReactionProfile = hasReactionProfile
 async function getWords(guild) {
     const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
 
-    const wordList = toString(query.word_list)
+    const wordList = toArray(query.word_list)
 
     if (wordList.length == 0) {
         const a = await getDefaultWords()
@@ -243,7 +243,9 @@ exports.getWords = getWords
  * @param {Array<String>} newWordList
  */
 async function updateWords(guild, newWordList) {
-    data[guild.id].wordList = newWordList
+    const list = toStorage(newWordList)
+
+    db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id)
 }
 
 exports.updateWords = updateWords
