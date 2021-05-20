@@ -140,7 +140,7 @@ function getTier(member) {
         return tierCache.get(id)
     }
 
-    const query = db.prepare("SELECT level FROM premium WHERE id = ?").run(id)
+    const query = db.prepare("SELECT level FROM premium WHERE id = ?").get(id)
 
     tierCache.set(id, query.level)
 
@@ -155,7 +155,7 @@ function getTierString(member) {
         id = member.user.id
     }
 
-    const query = db.prepare("SELECT * FROM premium WHERE id = ?").run(id)
+    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
 
     const a = createPremUser(query)
 
