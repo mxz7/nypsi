@@ -262,6 +262,8 @@ function checkStats() {
             const { getGuild } = require("../../nypsi")
             const guild = await getGuild(profile.guild_id)
 
+            if (!guild) return
+
             let memberCount
 
             if (profile.filter_bots && guild.memberCount >= 500) {
