@@ -765,7 +765,7 @@ exports.getBlacklisted = getBlacklisted
  * @param {Array<String>} blacklisted
  */
 function setBlacklisted(guild, blacklisted) {
-    data[guild.id].blacklisted = blacklisted
+    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id)
 }
 
 exports.setBlacklisted = setBlacklisted
