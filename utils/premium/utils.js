@@ -335,7 +335,7 @@ function setReason(member, reason) {
         id = member.user.id
     }
 
-    data[id].revokeReason = reason
+    db.prepare("UPDATE premium SET revoke_reason = ? WHERE id = ?").run(reason, id)
 }
 
 exports.setReason = setReason
