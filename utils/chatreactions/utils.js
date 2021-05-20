@@ -753,7 +753,9 @@ exports.getRandomChannels = getRandomChannels
  * @returns {Array<String>}
  */
 function getBlacklisted(guild) {
-    return data[guild.id].blacklisted
+    const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.blacklisted)
 }
 
 exports.getBlacklisted = getBlacklisted
