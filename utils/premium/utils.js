@@ -364,6 +364,18 @@ function renewUser(member) {
         member,
         `your membership has been renewed until **${formatDate(profile.expireDate)}**`
     )
+
+    if (isPremiumCache.has(member)) {
+        isPremiumCache.delete(member)
+    }
+
+    if (tierCache.has(member)) {
+        tierCache.delete(member)
+    }
+
+    if (colorCache.has(member)) {
+        colorCache.delete(member)
+    }
 }
 
 exports.renewUser = renewUser
