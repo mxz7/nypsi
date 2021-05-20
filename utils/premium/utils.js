@@ -185,6 +185,14 @@ function addMember(member, level) {
             profile.expireDate
         )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`
     )
+
+    if (isPremiumCache.has(id)) {
+        isPremiumCache.delete(id)
+    }
+
+    if (tierCache.has(id)) {
+        tierCache.delete(id)
+    }
 }
 
 exports.addMember = addMember
