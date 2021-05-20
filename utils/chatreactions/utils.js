@@ -519,8 +519,13 @@ function addWin(guild, member) {
 
 exports.addWin = addWin
 
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ */
 function add2ndPlace(guild, member) {
-    data[guild.id].stats[member.user.id].secondPlace++
+    db.prepare("UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?").run(guild.id, member.user.id)
 }
 
 exports.add2ndPlace = add2ndPlace
