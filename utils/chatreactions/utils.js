@@ -267,7 +267,7 @@ exports.getWordList = getWordList
  * @returns {Boolean}
  */
 async function isUsingDefaultWords(guild) {
-    if (data[guild.id].wordList.length == 0) {
+    if (getWordList(guild.id).length == 0) {
         return true
     } else {
         return false
