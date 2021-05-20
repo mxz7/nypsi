@@ -45,7 +45,7 @@ function createTables() {
 
     db.prepare(
         "CREATE TABLE IF NOT EXISTS chat_reaction_stats ('guild_id' TEXT, 'user_id' TEXT, 'wins' NUMBER DEFAULT 0, 'second' NUMBER DEFAULT 0, 'third' NUMBER DEFAULT 0, FOREIGN KEY (guild_id) REFERENCES chat_reaction (id))"
-    )
+    ).run()
 }
 
 createTables()
