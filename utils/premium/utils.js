@@ -389,6 +389,18 @@ function expireUser(member) {
     profile.expire()
 
     db.prepare("DELETE FROM premium WHERE id = ?").run(member)
+
+    if (isPremiumCache.has(member)) {
+        isPremiumCache.delete(member)
+    }
+
+    if (tierCache.has(member)) {
+        tierCache.delete(member)
+    }
+
+    if (colorCache.has(member)) {
+        colorCache.delete(member)
+    }
 }
 
 exports.expireUser = expireUser
