@@ -76,8 +76,8 @@ function error(string) {
 exports.error = error
 
 /**
- * 
- * @param {String} content 
+ *
+ * @param {String} content
  */
 function databaseLog(content) {
     const day = new Date().getDate()
