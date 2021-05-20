@@ -14,6 +14,7 @@ info(
 const db = getDatabase()
 
 const isPremiumCache = new Map()
+const tierCache = new Map()
 
 let timer = 0
 let timerCheck = true
@@ -135,7 +136,13 @@ function getTier(member) {
         id = member.user.id
     }
 
+    if (tierCache.has(id)) {
+        return tierCache.get(id)
+    }
+
     const query = db.prepare("SELECT level FROM premium WHERE id = ?").run(id)
+
+    tierCache.set(id, query.level)
 
     return query.level
 }
