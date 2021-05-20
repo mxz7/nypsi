@@ -278,12 +278,18 @@ exports.isUsingDefaultWords = isUsingDefaultWords
 
 /**
  * @param {Guild} guild
- * @returns {Object}
+ * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
 function getReactionSettings(guild) {
-    const profile = ChatReactionProfile.from(data[guild.id])
+    const query = db.prepare("SELECT random_start, random_channels, between_events, random_modifier, timeout FROM chat_reaction WHERE id = ?").get(guild.id)
 
-    return profile.settings
+    return {
+        randomStart: query.random_start == 1 ? true : false,
+        randomChannels: toArray(query.random_channels),
+        timeBetweenEvents: query.between_events,
+        randomModifier: query.random_modifier,
+        timeout: query.timeout,
+    }
 }
 
 exports.getReactionSettings = getReactionSettings
