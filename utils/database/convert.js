@@ -1,9 +1,9 @@
 /**
- * 
+ *
  * ~ used to convert old .json storage system into database system ~
- * 
+ *
  *  this file should be ran as its own thing, without a database file present
- * 
+ *
  */
 
 console.time("runtime")
@@ -85,7 +85,20 @@ function convertEconomy() {
         const id = user
         user = file[user]
 
-        db.prepare("INSERT INTO economy (id, money, bank, xp, prestige, padlock, dms, last_vote, inventory, workers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, user.money.balance, user.money.bank, user.xp, user.prestige, user.padlock ? 1 : 0, user.dms ? 1 : 0, user.lastVote, JSON.stringify(user.inventory), JSON.stringify(user.workers))
+        db.prepare(
+            "INSERT INTO economy (id, money, bank, xp, prestige, padlock, dms, last_vote, inventory, workers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            id,
+            user.money.balance,
+            user.money.bank,
+            user.xp,
+            user.prestige,
+            user.padlock ? 1 : 0,
+            user.dms ? 1 : 0,
+            user.lastVote,
+            JSON.stringify(user.inventory),
+            JSON.stringify(user.workers)
+        )
     }
 }
 
@@ -98,9 +111,27 @@ function convertGuilds() {
         const id = guild
         guild = file[guild]
 
-        db.prepare("INSERT INTO guilds (id, peak, disabled_commands, snipe_filter, chat_filter, prefix, countdowns) VALUES (?, ?, ?, ?, ?, ?, ?)").run(id, guild.peaks.members, toStorage(guild.disabledCommands), toStorage(guild.snipeFilter), toStorage(guild.chatFilter), guild.prefix, JSON.stringify(guild.countdowns))
+        db.prepare(
+            "INSERT INTO guilds (id, peak, disabled_commands, snipe_filter, chat_filter, prefix, countdowns) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            id,
+            guild.peaks.members,
+            toStorage(guild.disabledCommands),
+            toStorage(guild.snipeFilter),
+            toStorage(guild.chatFilter),
+            guild.prefix,
+            JSON.stringify(guild.countdowns)
+        )
 
-        db.prepare("INSERT INTO guilds_counters (guild_id, enabled, format, filter_bots, channel) VALUES (?, ?, ?, ?, ?)").run(id, guild.counter.enabled ? 1 : 0, guild.counter.format, guild.counter.filterBots ? 1 : 0, guild.counter.channel)
+        db.prepare(
+            "INSERT INTO guilds_counters (guild_id, enabled, format, filter_bots, channel) VALUES (?, ?, ?, ?, ?)"
+        ).run(
+            id,
+            guild.counter.enabled ? 1 : 0,
+            guild.counter.format,
+            guild.counter.filterBots ? 1 : 0,
+            guild.counter.channel
+        )
 
         if (guild.xmas) {
             db.prepare(
@@ -113,7 +144,5 @@ function convertGuilds() {
 }
 
 convertGuilds()
-
-
 
 console.timeEnd("runtime")

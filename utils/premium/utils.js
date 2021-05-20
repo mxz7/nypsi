@@ -167,7 +167,12 @@ function addMember(member, level) {
     const start = new Date().getTime()
     const expire = new Date().setDate(new Date().getDate() + 35)
 
-    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(id, level, start, expire)
+    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(
+        id,
+        level,
+        start,
+        expire
+    )
 
     const profile = getPremiumProfile(id)
 
@@ -410,7 +415,10 @@ exports.expireUser = expireUser
  * @param {String} reason
  */
 function revokeUser(member, reason) {
-    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(reason, member)
+    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(
+        reason,
+        member
+    )
 
     const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")
@@ -513,6 +521,6 @@ function createPremUser(query) {
         status: query.status,
         revokeReason: query.revoke_reason,
         startDate: query.start_date,
-        expireDate: query.expire_date
+        expireDate: query.expire_date,
     })
 }
