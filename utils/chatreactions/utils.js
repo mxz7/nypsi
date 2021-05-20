@@ -296,10 +296,10 @@ exports.getReactionSettings = getReactionSettings
 
 /**
  * @param {Guild} guild
- * @param {Object} settings
+ * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
 function updateReactionSettings(guild, settings) {
-    data[guild.id].settings = settings
+    db.prepare("UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?").run(settings.randomStart ? 1 : 0, toStorage(settings.randomChannels), settings.timeBetweenEvents, settings.randomModifier, settings.timeout)
 }
 
 exports.updateReactionSettings = updateReactionSettings
