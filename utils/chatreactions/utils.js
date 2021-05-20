@@ -283,7 +283,7 @@ exports.getReactionSettings = getReactionSettings
  * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
 function updateReactionSettings(guild, settings) {
-    db.prepare("UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?").run(settings.randomStart ? 1 : 0, toStorage(settings.randomChannels), settings.timeBetweenEvents, settings.randomModifier, settings.timeout)
+    db.prepare("UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?").run(settings.randomStart ? 1 : 0, toStorage(settings.randomChannels), settings.timeBetweenEvents, settings.randomModifier, settings.timeout, guild.id)
 
     if (enabledCache.has(guild.id)) enabledCache.delete(guild.id)
 }
