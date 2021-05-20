@@ -199,7 +199,9 @@ function getPremiumProfile(member) {
         id = member.user.id
     }
 
-    return PremUser.fromData(data[id])
+    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
+
+    return createPremUser(query)
 }
 
 exports.getPremiumProfile = getPremiumProfile
