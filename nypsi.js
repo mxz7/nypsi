@@ -101,11 +101,10 @@ async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach((guild) => {
             if (!hasGuild(guild)) return createGuild(guild)
-            if (hasStatsEnabled(guild)) {
-                checkStats(guild)
-            }
         })
-    }, 600000)
+    }, 3600000)
+
+    checkStats()
 
     const now = new Date()
 
