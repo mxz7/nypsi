@@ -267,7 +267,15 @@ exports.setEmbedColor = setEmbedColor
  * @param {String} member id
  */
 function getEmbedColor(member) {
-    return data[member].embedColor
+    if (colorCache.has(member)) {
+        return colorCache.get(member)
+    }
+
+    const query = db.prepare("SELECT embed_color FROM premium WHERE id = ?").get(member)
+
+    colorCache.set(member, query.embed_color)
+
+    return query.embed_color
 }
 
 exports.getEmbedColor = getEmbedColor
