@@ -6,6 +6,7 @@ const { ChatReactionProfile, StatsProfile } = require("../classes/ChatReaction")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
+const { inPlaceSort } = require("fast-sort")
 let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
 info(
     `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
@@ -564,36 +565,47 @@ async function getServerLeaderboard(guild, amount) {
     })
 
     const usersWins = []
+    const winsStats = new Map()
     const usersSecond = []
+    const secondStats = new Map()
     const usersThird = []
+    const thirdStats = new Map()
     const overallWins = []
+    const overallStats = new Map()
 
-    for (const user in data[guild.id].stats) {
+    const query = db.prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?").all(guild.id)
+
+    for (const user of query) {
         let overall = false
+
         if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].wins != 0
+            members.find((member) => member.user.id == user.user_id) &&
+            query.wins != 0
         ) {
-            usersWins.push(user)
+            usersWins.push(user.user_id)
+            winsStats.set(user.user_id, user.wins)
             overall = true
         }
         if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].secondPlace != 0
+            members.find((member) => member.user.id == user.user_id) &&
+            query.second != 0
         ) {
-            usersSecond.push(user)
+            usersSecond.push(user.user_id)
+            secondStats.set(user.user_id, user.second)
             overall = true
         }
         if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].thirdPlace != 0
+            members.find((member) => member.user.id == user.user_id) &&
+            query.third != 0
         ) {
-            usersThird.push(user)
+            usersThird.push(user.user_id)
+            thirdStats.set(user.user_id, user.third)
             overall = true
         }
 
         if (overall) {
-            overallWins.push(user)
+            overallWins.push(user.user_id)
+            overallStats.set(user.user_id, user.wins + user.second + user.third)
         }
     }
 
@@ -603,31 +615,10 @@ async function getServerLeaderboard(guild, amount) {
         return target
     }
 
-    usersWins.sort((a, b) => {
-        return data[guild.id].stats[b].wins - data[guild.id].stats[a].wins
-    })
-
-    usersSecond.sort((a, b) => {
-        return data[guild.id].stats[b].secondPlace - data[guild.id].stats[a].secondPlace
-    })
-
-    usersThird.sort((a, b) => {
-        return data[guild.id].stats[b].thirdPlace - data[guild.id].stats[a].thirdPlace
-    })
-
-    overallWins.sort((a, b) => {
-        const aTotal =
-            data[guild.id].stats[a].wins +
-            data[guild.id].stats[a].secondPlace +
-            data[guild.id].stats[a].thirdPlace
-
-        const bTotal =
-            data[guild.id].stats[b].wins +
-            data[guild.id].stats[b].secondPlace +
-            data[guild.id].stats[b].thirdPlace
-
-        return bTotal - aTotal
-    })
+    inPlaceSort(usersWins).desc((i) => winsStats.get(i))
+    inPlaceSort(usersSecond).desc((i) => secondStats.get(i))
+    inPlaceSort(usersThird).desc((i) => thirdStats.get(i))
+    inPlaceSort(overallWins).desc((i) => overallStats.get(i))
 
     usersWins.splice(amount, usersWins.length - amount)
     usersSecond.splice(amount, usersSecond.length - amount)
@@ -652,7 +643,7 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        winsMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].wins}\n`
+        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats.get(user).toLocaleString()}\n`
         count++
     }
 
@@ -670,7 +661,7 @@ async function getServerLeaderboard(guild, amount) {
         }
 
         secondMsg += `${pos} **${getMember(user).user.tag}** ${
-            data[guild.id].stats[user].secondPlace
+            secondStats.get(user).toLocaleString()
         }\n`
         count++
     }
@@ -689,7 +680,7 @@ async function getServerLeaderboard(guild, amount) {
         }
 
         thirdMsg += `${pos} **${getMember(user).user.tag}** ${
-            data[guild.id].stats[user].thirdPlace
+            thirdStats.get(user).toLocaleString()
         }\n`
         count++
     }
@@ -707,11 +698,7 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        overallMsg += `${pos} **${getMember(user).user.tag}** ${(
-            data[guild.id].stats[user].wins +
-            data[guild.id].stats[user].secondPlace +
-            data[guild.id].stats[user].thirdPlace
-        ).toLocaleString()}\n`
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats.get(user).toLocaleString()}\n`
         count++
     }
 
