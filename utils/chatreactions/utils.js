@@ -775,7 +775,7 @@ exports.setBlacklisted = setBlacklisted
  * @param {Guild} guild
  */
 function deleteStats(guild) {
-    delete data[guild.id].stats
+    db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
 }
 
 exports.deleteStats = deleteStats
