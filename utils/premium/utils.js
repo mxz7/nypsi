@@ -405,7 +405,9 @@ exports.revokeUser = revokeUser
  * @param {String} member id
  */
 function getLastDaily(member) {
-    return data[member].lastDaily
+    const query = db.prepare("SELECT last_daily FROM premium WHERE id = ?").get(member)
+
+    return query.last_daily
 }
 
 exports.getLastDaily = getLastDaily
