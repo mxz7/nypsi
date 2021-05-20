@@ -296,7 +296,7 @@ exports.updateReactionSettings = updateReactionSettings
  * @returns {StatsProfile}
  */
 function getReactionStats(guild, member) {
-    const query = db.prepare("SELECT wins, second, third FROM chat_reaction WHERE guild_id = ? AND user_id = ?").get(guild.id, member.user.id)
+    const query = db.prepare("SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?").get(guild.id, member.user.id)
 
     return {
         wins: query.wins,
