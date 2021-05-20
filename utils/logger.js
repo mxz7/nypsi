@@ -101,7 +101,7 @@ function databaseLog(content) {
                 lastLine = `+${amount + 1} more`
             }
 
-            current = current.substr(0, 1500) + "\n" + lastLine
+            current = current.substr(0, 1500) + "\n\n" + lastLine
         } else {
             current = current + content
         }
