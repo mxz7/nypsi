@@ -350,7 +350,7 @@ function setStartDate(member, date) {
         id = member.user.id
     }
 
-    data[id].startDate = date
+    db.prepare("UPDATE premium SET start_date = ? WHERE id = ?").run(date, id)
 }
 
 exports.setStartDate = setStartDate
