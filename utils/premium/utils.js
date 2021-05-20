@@ -15,6 +15,7 @@ const db = getDatabase()
 
 const isPremiumCache = new Map()
 const tierCache = new Map()
+const colorCache = new Map()
 
 let timer = 0
 let timerCheck = true
@@ -252,7 +253,11 @@ function setEmbedColor(member, color) {
         id = member.user.id
     }
 
-    data[id].embedColor = color
+    db.prepare("UPDATE premium SET embed_color = ? WHERE id = ?").run(color, id)
+
+    if (colorCache.has(id)) {
+        colorCache.delete(id)
+    }
 }
 
 exports.setEmbedColor = setEmbedColor
