@@ -467,10 +467,17 @@ async function startReaction(guild, channel) {
 
 exports.startReaction = startReaction
 
-function hasReactionStatsProfile(guild, member) {
-    if (!data[guild.id].stats) return false
 
-    if (data[guild.id].stats[member.user.id]) {
+/**
+ * 
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ * @returns {Boolean}
+ */
+function hasReactionStatsProfile(guild, member) {
+    const query = db.prepare("SELECT user_id FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?").get(guild.id, member.user.id)
+
+    if (query) {
         return true
     } else {
         return false
