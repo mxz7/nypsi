@@ -122,7 +122,9 @@ function getTier(member) {
         id = member.user.id
     }
 
-    return data[member].level
+    const query = db.prepare("SELECT level FROM premium WHERE id = ?").run(id)
+
+    return query.level
 }
 
 exports.getTier = getTier
