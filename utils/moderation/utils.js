@@ -256,16 +256,16 @@ function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
 
-        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?")
+        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?").all(date)
 
-        for (let unmute of query.iterate(date)) {
+        for (let unmute of query) {
             requestUnmute(unmute.guild_id, unmute.user, client)
             info(`requested unmute in ${unmute.guild_id} for ${unmute.user}`, types.AUTOMATION)
         }
 
-        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?")
+        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date)
 
-        for (let unban of query.iterate(date)) {
+        for (let unban of query) {
             requestUnmute(unban.guild_id, unban.user, client)
             info(`requested unmute in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
         }
