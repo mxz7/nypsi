@@ -54,7 +54,7 @@ module.exports = async (message) => {
             mentionQueue.push({
                 type: "collection",
                 members: members.clone(),
-                message: message
+                message: message,
             })
 
             if (!mentionInterval) {
@@ -66,7 +66,7 @@ module.exports = async (message) => {
                     mentionQueue.push({
                         type: "collection",
                         members: r.members.clone(),
-                        message: message
+                        message: message,
                     })
                 })
 
@@ -74,12 +74,12 @@ module.exports = async (message) => {
                     mentionInterval = setInterval(() => addMention(), 25)
                 }
             }
-        
+
             if (message.mentions.members.first()) {
                 mentionQueue.push({
                     type: "collection",
                     members: message.mentions.members.clone(),
-                    message: message
+                    message: message,
                 })
 
                 if (!mentionInterval) {
@@ -136,7 +136,7 @@ function addMention() {
                 user: mention.message.author.tag,
                 content: content,
                 date: mention.message.createdTimestamp,
-                link: mention.message.url
+                link: mention.message.url,
             }
 
             const guild = mention.message.guild.id
@@ -145,7 +145,7 @@ function addMention() {
                 type: "mention",
                 data: data,
                 guild: guild,
-                target: member.user.id
+                target: member.user.id,
             })
             count++
         }
