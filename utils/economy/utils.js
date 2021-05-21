@@ -1066,7 +1066,7 @@ function upgradeWorker(member, id) {
 
     workers[id] = worker
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers))
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID)
 }
 
 exports.upgradeWorker = upgradeWorker
