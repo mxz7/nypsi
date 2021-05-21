@@ -120,7 +120,7 @@ function convertGuilds() {
             toStorage(guild.snipeFilter),
             toStorage(guild.chatFilter),
             guild.prefix,
-            JSON.stringify(guild.countdowns)
+            JSON.stringify(guild.countdowns) ? JSON.stringify(guild.countdowns) : "{}"
         )
 
         db.prepare(
