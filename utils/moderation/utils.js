@@ -11,12 +11,12 @@ setInterval(async () => {
     const query = db.prepare("SELECT id FROM moderation").all()
 
     for (let guild of query) {
-        const exists = await checkGuild(guild)
+        const exists = await checkGuild(guild.id)
 
         if (!exists) {
             deleteServer(guild)
 
-            info(`deleted guild '${guild}' from moderation data`, types.GUILD)
+            info(`deleted guild '${guild.id}' from moderation data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
