@@ -21,7 +21,7 @@
     "mc-names": "^1.0.1",
     "node-fetch": "^2.6.1",
     "shuffle-array": "^1.0.1",
-    "table": "6.1",
+    "table": "6.7",
     "urban-dictionary": "^3.0.0",
     "utf-8-validate": "^5.0.5"
   },
