@@ -22,8 +22,6 @@ async function run(message, args) {
     let cooldownLength = 7
     let cacheTime = 60
 
-    if (!userExists(member)) createProfile(member)
-
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
@@ -68,6 +66,8 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("invalid user"))
         }
     }
+
+    if (!userExists(member)) createProfile(member)
 
     if (isPremium(member.user.id)) {
         cacheTime = 25
