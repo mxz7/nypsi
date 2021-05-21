@@ -1,6 +1,6 @@
 const { Message, MessageEmbed } = require("discord.js")
 const { mentions } = require("../nypsi")
-const { getChatFilter, getPrefix, inCooldown } = require("../utils/guilds/utils")
+const { getChatFilter, getPrefix, inCooldown, hasGuild, addCooldown } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 
@@ -20,7 +20,7 @@ module.exports = async (message) => {
         return await message.channel.send(embed)
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.hasPermission("ADMINISTRATOR") && hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
@@ -87,6 +87,7 @@ module.exports = async (message) => {
 
         if (!inCooldown(message.guild)) {
             await message.guild.members.fetch()
+            addCooldown(message.guild, 3600)
         }
 
         members.forEach((m) => addMention(m))
