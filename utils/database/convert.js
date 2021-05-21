@@ -156,7 +156,7 @@ function convertModeration() {
         const bans = guild.bans
         const cases = guild.cases
 
-        db.prepare("INSERT INTO moderation (id, case_count, mute_role) VALUES (?, ?, ?)").run(id, guild.caseCount, guild.muteRole)
+        db.prepare("INSERT INTO moderation (id, case_count, mute_role) VALUES (?, ?, ?)").run(id, guild.caseCount, guild.muteRole ? guild.muteRole : "")
 
         for (let case0 of cases) {
             db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(case0.id, case0.type, case0.user, case0.moderator, case0.command, case0.time, case0.deleted ? 1 : 0, id)
