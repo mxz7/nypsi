@@ -181,7 +181,7 @@ function convertPremium() {
         const id = user
         user = file[id]
 
-        if (user.level == 0) return
+        if (user.level == 0) continue
 
         db.prepare("INSERT INTO premium (id, level, embed_color, last_daily, last_weekly, status, revoke_reason, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, user.level, user.embedColor, user.lastDaily, user.lastWeekly, user.status, user.revokeReason, user.startDate, user.expireDate)
     }
