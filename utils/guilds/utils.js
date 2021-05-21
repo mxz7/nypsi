@@ -70,7 +70,7 @@ setInterval(async () => {
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    const query = db.prepare("SELECT id FROM moderation").all()
+    const query = db.prepare("SELECT id FROM guilds").all()
 
     for (let guild of query) {
         const exists = await checkGuild(guild)
