@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3")
-const { databaseLog } = require("../logger")
+const { databaseLog, info, types, error } = require("../logger")
 const db = new Database("./utils/database/storage.db", { verbose: databaseLog })
 
 function createTables() {
@@ -49,6 +49,20 @@ function createTables() {
 }
 
 createTables()
+
+function runBackups() {
+    setInterval(() => {
+        info("data backup starting..", types.DATA)
+        db.backup(`./utils/database/backups/backup-${Date.now()}.db`).then(() => {
+            info("backup complete", types.DATA)
+        }).catch((e) => {
+            error("backup failed")
+            console.error(e)
+        })
+    }, 43200000)
+}
+
+runBackups()
 
 /**
  *
