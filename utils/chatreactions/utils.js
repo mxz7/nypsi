@@ -41,14 +41,12 @@ setInterval(async () => {
         const guild = await getGuild(guildData.id)
 
         if (!guild) {
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guildData.id)
-            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guildData.id)
-            return
+            continue
         }
 
         const channels = toArray(guildData.random_channels)
 
-        if (channels.length == 0) return
+        if (channels.length == 0) continue
 
         const now = new Date().getTime()
 
@@ -57,7 +55,7 @@ setInterval(async () => {
                 if (now >= lastGame.get(ch)) {
                     lastGame.delete(ch)
                 } else {
-                    return
+                    continue
                 }
             }
 
@@ -81,7 +79,7 @@ setInterval(async () => {
             })
 
             if (stop) {
-                return
+                continue
             }
 
             const a = await startReaction(guild, channel)
@@ -89,7 +87,7 @@ setInterval(async () => {
             if (a != "xoxo69") {
                 count++
             } else {
-                return
+                continue
             }
 
             const base = guildData.between_events
@@ -116,7 +114,9 @@ setInterval(async () => {
 
             const nextGame = new Date().getTime() + final * 1000
 
-            return lastGame.set(channel.id, nextGame)
+            lastGame.set(channel.id, nextGame)
+
+            continue 
         }
     }
 
