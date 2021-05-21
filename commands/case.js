@@ -35,7 +35,7 @@ async function run(message, args) {
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
-    const case0 = getCase(message.guild, args[0])
+    const case0 = getCase(message.guild, parseInt(args[0]))
 
     if (!case0) {
         return message.channel.send(
