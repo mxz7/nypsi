@@ -1112,11 +1112,13 @@ function reset() {
 
     const query = db.prepare("SELECT * FROM economy").all()
 
-    for (const user in query) {
+    for (const user of query) {
         let prestige = user.prestige
         let lastVote = user.last_vote
-        let inventory = user.inventory
+        let inventory = JSON.parse(user.inventory)
         const dms = user.dms
+
+        if (!inventory) inventory = {}
 
         if (Array.from(Object.keys(inventory)).length == 0) {
             inventory = undefined
@@ -1135,7 +1137,7 @@ function reset() {
         } else {
             db.prepare(
                 "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
-            ).run(prestige, dms, lastVote, inventory, user.id)
+            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
 
             info("updated " + user.id)
             updated++
