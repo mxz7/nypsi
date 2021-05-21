@@ -109,9 +109,6 @@ module.exports = async (message) => {
 function addMention() {
     const mention = mentionQueue.shift()
 
-    console.log(mention)
-    console.log(mentionQueue)
-
     if (mention.type == "collection") {
         const members = mention.members
 
