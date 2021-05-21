@@ -716,11 +716,11 @@ function runCountdowns(client) {
 
                 const guildToSend = await client.guilds.fetch(guildID).catch(() => {})
 
-                if (!guildToSend) return
+                if (!guildToSend) continue
 
                 const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel).catch(() => {})
 
-                if (!channel) return
+                if (!channel) continue
 
                 await channel
                     .send(embed)
