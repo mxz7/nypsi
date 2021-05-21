@@ -167,7 +167,7 @@ exports.getAllCases = getAllCases
 function getCase(guild, caseID) {
     const query = db
         .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
-        .get(guild.id, caseID)
+        .get(guild.id, caseID.toString())
 
     query.case_id = parseInt(query.case_id)
 
