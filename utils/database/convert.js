@@ -174,4 +174,17 @@ function convertModeration() {
 
 convertModeration()
 
+function convertPremium() {
+    const file = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
+
+    for (let user in file) {
+        const id = user
+        user = file[id]
+
+        db.prepare("INSERT INTO premium (id, level, embed_color, last_daily, last_weekly, status, revoke_reason, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, user.level, user.embedColor, user.lastDaily, user.lastWeekly, user.status, user.revokeReason, user.startDate, user.expireDate)
+    }
+}
+
+convertPremium()
+
 console.timeEnd("runtime")
