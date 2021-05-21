@@ -113,6 +113,10 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you cannot use this item"))
     }
 
+    if (selected.role == "crate") {
+        cooldownLength = 5
+    }
+
     cooldown.set(message.member.id, new Date())
 
     setTimeout(() => {
