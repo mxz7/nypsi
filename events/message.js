@@ -1,6 +1,12 @@
 const { Message, MessageEmbed, Collection } = require("discord.js")
 const { mentions } = require("../nypsi")
-const { getChatFilter, getPrefix, inCooldown, addCooldown } = require("../utils/guilds/utils")
+const {
+    getChatFilter,
+    getPrefix,
+    inCooldown,
+    addCooldown,
+    hasGuild,
+} = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 
@@ -26,7 +32,7 @@ module.exports = async (message) => {
         return await message.channel.send(embed)
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.hasPermission("ADMINISTRATOR") && hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")

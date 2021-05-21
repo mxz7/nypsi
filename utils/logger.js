@@ -5,7 +5,7 @@ const { Client, Webhook, User } = require("discord.js")
  */
 let webhook = new Map()
 /**
- * @type {Map<String, Webhook>}
+ * @type {Map<String, String>}
  */
 let nextLogMsg = new Map()
 
@@ -74,6 +74,43 @@ function error(string) {
 }
 
 exports.error = error
+
+/**
+ *
+ * @param {String} content
+ */
+function databaseLog(content) {
+    const day = new Date().getDate()
+    const month = new Date().getMonth() + 1
+
+    content = `${day}/${month} ${getTimestamp()} ${content}\n\n`
+
+    if (!nextLogMsg.get("sql")) {
+        nextLogMsg.set("sql", content)
+    } else {
+        let current = nextLogMsg.get("sql")
+
+        if (current.length >= 1500) {
+            let lastLine = current.substr(current.lastIndexOf("\n"), 50)
+
+            const amount = parseInt(lastLine.split(" ")[0].substr("1", lastLine.length))
+
+            if (!amount) {
+                lastLine = "+1 more"
+            } else {
+                lastLine = `+${amount + 1} more`
+            }
+
+            current = current.substr(0, 1500) + "\n\n" + lastLine
+        } else {
+            current = current + content
+        }
+
+        nextLogMsg.set("sql", current)
+    }
+}
+
+exports.databaseLog = databaseLog
 
 /**
  *
@@ -200,6 +237,11 @@ async function getWebhooks(client) {
 
     webhook.set("gamble", gambleLogs)
     info(`gamble logs webhook running ${gambleLogs.id}`)
+
+    const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176")
+
+    webhook.set("sql", sqlLogs)
+    info(`sql logs webhook running ${sqlLogs.id}`)
 
     runLogs()
 }
