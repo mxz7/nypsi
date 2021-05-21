@@ -1,75 +1,28 @@
 const { Guild, TextChannel, GuildMember } = require("discord.js")
-const fs = require("fs")
 const fetch = require("node-fetch")
-const { inCooldown, addCooldown } = require("../guilds/utils")
-const { ChatReactionProfile, getZeroWidth, StatsProfile } = require("../classes/ChatReaction")
-const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { info, types, getTimestamp } = require("../logger")
-let data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-info(
-    `${Array.from(Object.keys(data)).length.toLocaleString()} chatreaction guilds loaded`,
-    types.DATA
-)
+const { getDatabase, toArray, toStorage } = require("../database/database")
+const { inPlaceSort } = require("fast-sort")
+const db = getDatabase()
 
 const currentChannels = new Set()
+const existsCache = new Set()
+const enabledCache = new Map()
 const lastGame = new Map()
-
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/chatreactions/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("chatreactions data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-        info("chatreactions data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
-        info("chatreactions data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/chatreactions/backup/" + date + ".json", JSON.stringify(data))
-    info("chatreactions data backup complete", types.DATA)
-}, 43200000)
 
 setInterval(async () => {
     const { checkGuild, getGuild } = require("../../nypsi")
 
-    for (let guild in data) {
-        const exists = await checkGuild(guild)
+    const query = db.prepare("SELECT id FROM chat_reaction").all()
+
+    for (let guild of query) {
+        const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            delete data[guild]
+            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild)
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild)
 
-            info(`deleted guild '${guild}' from chatreaction data`, types.DATA)
+            info(`deleted guild '${guild.id}' from chat reaction data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -77,110 +30,96 @@ setInterval(async () => {
 setInterval(async () => {
     let count = 0
 
-    /**
-     * @param {Guild} guild
-     * @param {TextChannel} channel
-     */
-    const runGame = async (guild, channel) => {
-        const messages = await channel.messages.fetch({ limit: 10 })
-        let stop = false
+    const query = db
+        .prepare(
+            "SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1"
+        )
+        .all()
 
-        await messages.forEach((m) => {
-            if (m.author.id == guild.client.user.id) {
-                if (m.embeds[0].title == "chat reaction") {
-                    stop = true
-                    return
-                }
-            }
-        })
-
-        if (stop) {
-            return
-        }
-
-        const a = await startReaction(guild, channel)
-
-        if (a != "xoxo69") {
-            count++
-        } else {
-            return
-        }
-
-        const settings = getReactionSettings(guild)
-
-        const base = settings.timeBetweenEvents
-        let final
-
-        if (settings.randomModifier == 0) {
-            final = base
-        } else {
-            const o = ["+", "-"]
-            let operator = o[Math.floor(Math.random() * o.length)]
-
-            if (base - settings.randomModifier < 120) {
-                operator = "+"
-            }
-
-            const amount = Math.floor(Math.random() * settings.randomModifier)
-
-            if (operator == "+") {
-                final = base + amount
-            } else {
-                final = base - amount
-            }
-        }
-
-        const nextGame = new Date().getTime() + final * 1000
-
-        return lastGame.set(channel.id, nextGame)
-    }
-
-    for (const guildID in data) {
+    for (const guildData of query) {
         const { getGuild } = require("../../nypsi")
-        const guild = await getGuild(guildID)
-        const guildData = ChatReactionProfile.from(data[guildID])
-
-        if (!guildData.settings.randomStart) continue
+        const guild = await getGuild(guildData.id)
 
         if (!guild) {
-            console.log("no guild [chat reaction] ", guildID)
             continue
         }
 
-        const channels = guildData.settings.randomChannels
+        const channels = toArray(guildData.random_channels)
 
-        if (channels.length == 0) {
-            data[guildID].settings.randomStart = false
-        }
+        if (channels.length == 0) continue
 
         const now = new Date().getTime()
 
         for (const ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
-                    const channel = await guild.channels.cache.find((cha) => cha.id == ch)
-
-                    if (!channel) {
-                        channels.splice(channels.indexOf(ch), 1)
-                        data[guildID].settings.randomChannels = channels
-                        continue
-                    }
-
-                    await runGame(guild, channel)
-                }
-            } else {
-                const channel = await guild.channels.cache.find((cha) => cha.id == ch)
-
-                if (!channel) {
-                    channels.splice(channels.indexOf(ch), 1)
-                    data[guildID].settings.randomChannels = channels
+                    lastGame.delete(ch)
+                } else {
                     continue
                 }
-
-                await runGame(guild, channel)
             }
+
+            const channel = await guild.channels.cache.find((cha) => cha.id == ch)
+
+            if (!channel) {
+                continue
+            }
+
+            const messages = await channel.messages.fetch({ limit: 15 })
+            let stop = false
+
+            await messages.forEach((m) => {
+                if (m.author.id == guild.client.user.id) {
+                    if (!m.embeds[0]) return
+                    if (m.embeds[0].title == "chat reaction") {
+                        stop = true
+                        return
+                    }
+                }
+            })
+
+            if (stop) {
+                continue
+            }
+
+            const a = await startReaction(guild, channel)
+
+            if (a != "xoxo69") {
+                count++
+            } else {
+                continue
+            }
+
+            const base = guildData.between_events
+            let final
+
+            if (guildData.random_modifier == 0) {
+                final = base
+            } else {
+                const o = ["+", "-"]
+                let operator = o[Math.floor(Math.random() * o.length)]
+
+                if (base - guildData.random_modifier < 120) {
+                    operator = "+"
+                }
+
+                const amount = Math.floor(Math.random() * guildData.random_modifier)
+
+                if (operator == "+") {
+                    final = base + amount
+                } else {
+                    final = base - amount
+                }
+            }
+
+            const nextGame = new Date().getTime() + final * 1000
+
+            lastGame.set(channel.id, nextGame)
+
+            continue
         }
     }
+
     if (count > 0) {
         info(`${count} chat reactions automatically started`, types.AUTOMATION)
     }
@@ -190,9 +129,7 @@ setInterval(async () => {
  * @param {Guild} guild
  */
 function createReactionProfile(guild) {
-    const a = new ChatReactionProfile()
-
-    data[guild.id] = a
+    db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id)
 }
 
 exports.createReactionProfile = createReactionProfile
@@ -201,7 +138,14 @@ exports.createReactionProfile = createReactionProfile
  * @param {Guild} guild
  */
 function hasReactionProfile(guild) {
-    if (data[guild.id]) {
+    if (existsCache.has(guild.id)) {
+        return true
+    }
+
+    const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    if (query) {
+        existsCache.add(guild.id)
         return true
     } else {
         return false
@@ -215,14 +159,16 @@ exports.hasReactionProfile = hasReactionProfile
  * @returns {Array<String>}
  */
 async function getWords(guild) {
-    const profile = ChatReactionProfile.from(data[guild.id])
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
 
-    if (profile.wordList.length == 0) {
+    const wordList = toArray(query.word_list)
+
+    if (wordList.length == 0) {
         const a = await getDefaultWords()
 
         return a
     } else {
-        return profile.wordList
+        return wordList
     }
 }
 
@@ -233,7 +179,9 @@ exports.getWords = getWords
  * @param {Array<String>} newWordList
  */
 async function updateWords(guild, newWordList) {
-    data[guild.id].wordList = newWordList
+    const list = toStorage(newWordList)
+
+    db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id)
 }
 
 exports.updateWords = updateWords
@@ -243,7 +191,9 @@ exports.updateWords = updateWords
  * @returns {Array<String>}
  */
 function getWordList(guild) {
-    return data[guild.id].wordList
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.word_list)
 }
 
 exports.getWordList = getWordList
@@ -253,7 +203,7 @@ exports.getWordList = getWordList
  * @returns {Boolean}
  */
 async function isUsingDefaultWords(guild) {
-    if (data[guild.id].wordList.length == 0) {
+    if (getWordList(guild.id).length == 0) {
         return true
     } else {
         return false
@@ -264,22 +214,43 @@ exports.isUsingDefaultWords = isUsingDefaultWords
 
 /**
  * @param {Guild} guild
- * @returns {Object}
+ * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
 function getReactionSettings(guild) {
-    const profile = ChatReactionProfile.from(data[guild.id])
+    const query = db
+        .prepare(
+            "SELECT random_start, random_channels, between_events, random_modifier, timeout FROM chat_reaction WHERE id = ?"
+        )
+        .get(guild.id)
 
-    return profile.settings
+    return {
+        randomStart: query.random_start == 1 ? true : false,
+        randomChannels: toArray(query.random_channels),
+        timeBetweenEvents: query.between_events,
+        randomModifier: query.random_modifier,
+        timeout: query.timeout,
+    }
 }
 
 exports.getReactionSettings = getReactionSettings
 
 /**
  * @param {Guild} guild
- * @param {Object} settings
+ * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
 function updateReactionSettings(guild, settings) {
-    data[guild.id].settings = settings
+    db.prepare(
+        "UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?"
+    ).run(
+        settings.randomStart ? 1 : 0,
+        toStorage(settings.randomChannels),
+        settings.timeBetweenEvents,
+        settings.randomModifier,
+        settings.timeout,
+        guild.id
+    )
+
+    if (enabledCache.has(guild.id)) enabledCache.delete(guild.id)
 }
 
 exports.updateReactionSettings = updateReactionSettings
@@ -290,9 +261,17 @@ exports.updateReactionSettings = updateReactionSettings
  * @returns {StatsProfile}
  */
 function getReactionStats(guild, member) {
-    const profile = ChatReactionProfile.from(data[guild.id])
+    const query = db
+        .prepare(
+            "SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?"
+        )
+        .get(guild.id, member.user.id)
 
-    return profile.stats[member.user.id]
+    return {
+        wins: query.wins,
+        secondPlace: query.second,
+        thirdPlace: query.third,
+    }
 }
 
 exports.getReactionStats = getReactionStats
@@ -320,6 +299,8 @@ async function startReaction(guild, channel) {
 
         displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
     }
+
+    const { CustomEmbed } = require("../classes/EmbedBuilders")
 
     const embed = new CustomEmbed().setColor("#5efb8f")
 
@@ -401,7 +382,7 @@ async function startReaction(guild, channel) {
                             collector.stop()
                         })
                     }
-                }, 750)
+                }, 250)
             } else {
                 if (!waiting) {
                     const field = await embed.embed.fields.find((f) => f.name == "winners")
@@ -443,10 +424,18 @@ async function startReaction(guild, channel) {
 
 exports.startReaction = startReaction
 
+/**
+ *
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ * @returns {Boolean}
+ */
 function hasReactionStatsProfile(guild, member) {
-    if (!data[guild.id].stats) return false
+    const query = db
+        .prepare("SELECT user_id FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
+        .get(guild.id, member.user.id)
 
-    if (data[guild.id].stats[member.user.id]) {
+    if (query) {
         return true
     } else {
         return false
@@ -455,11 +444,16 @@ function hasReactionStatsProfile(guild, member) {
 
 exports.hasReactionStatsProfile = hasReactionStatsProfile
 
+/**
+ *
+ * @param {Guild} guild
+ * @param {guildMember} member
+ */
 function createReactionStatsProfile(guild, member) {
-    if (!data[guild.id].stats) {
-        data[guild.id].stats = {}
-    }
-    data[guild.id].stats[member.user.id] = new StatsProfile()
+    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(
+        guild.id,
+        member.user.id
+    )
 }
 
 exports.createReactionStatsProfile = createReactionStatsProfile
@@ -467,28 +461,51 @@ exports.createReactionStatsProfile = createReactionStatsProfile
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
- * @param {StatsProfile} stats
+ * @param {StatsProfile} newStats
  */
 function updateStats(guild, member, newStats) {
-    data[guild.id].stats[member.user.id] = newStats
+    db.prepare(
+        "UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?"
+    ).run(newStats.wins, newStats.secondPlace, newStats.thirdPlace, guild.id, member.user.id)
 }
 
 exports.updateStats = updateStats
 
+/**
+ *
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ */
 function addWin(guild, member) {
-    data[guild.id].stats[member.user.id].wins++
+    db.prepare(
+        "UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?"
+    ).run(guild.id, member.user.id)
 }
 
 exports.addWin = addWin
 
+/**
+ *
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ */
 function add2ndPlace(guild, member) {
-    data[guild.id].stats[member.user.id].secondPlace++
+    db.prepare(
+        "UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?"
+    ).run(guild.id, member.user.id)
 }
 
 exports.add2ndPlace = add2ndPlace
 
+/**
+ *
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ */
 function add3rdPlace(guild, member) {
-    data[guild.id].stats[member.user.id].thirdPlace++
+    db.prepare(
+        "UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?"
+    ).run(guild.id, member.user.id)
 }
 
 exports.add3rdPlace = add3rdPlace
@@ -499,6 +516,8 @@ exports.add3rdPlace = add3rdPlace
  * @returns {Map}
  */
 async function getServerLeaderboard(guild, amount) {
+    const { inCooldown, addCooldown } = require("../guilds/utils")
+
     let members
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -516,36 +535,40 @@ async function getServerLeaderboard(guild, amount) {
     })
 
     const usersWins = []
+    const winsStats = new Map()
     const usersSecond = []
+    const secondStats = new Map()
     const usersThird = []
+    const thirdStats = new Map()
     const overallWins = []
+    const overallStats = new Map()
 
-    for (const user in data[guild.id].stats) {
+    const query = db
+        .prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?")
+        .all(guild.id)
+
+    for (const user of query) {
         let overall = false
-        if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].wins != 0
-        ) {
-            usersWins.push(user)
+
+        if (members.find((member) => member.user.id == user.user_id) && user.wins != 0) {
+            usersWins.push(user.user_id)
+            winsStats.set(user.user_id, user.wins)
             overall = true
         }
-        if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].secondPlace != 0
-        ) {
-            usersSecond.push(user)
+        if (members.find((member) => member.user.id == user.user_id) && user.second != 0) {
+            usersSecond.push(user.user_id)
+            secondStats.set(user.user_id, user.second)
             overall = true
         }
-        if (
-            members.find((member) => member.user.id == user) &&
-            data[guild.id].stats[user].thirdPlace != 0
-        ) {
-            usersThird.push(user)
+        if (members.find((member) => member.user.id == user.user_id) && user.third != 0) {
+            usersThird.push(user.user_id)
+            thirdStats.set(user.user_id, user.third)
             overall = true
         }
 
         if (overall) {
-            overallWins.push(user)
+            overallWins.push(user.user_id)
+            overallStats.set(user.user_id, user.wins + user.second + user.third)
         }
     }
 
@@ -555,31 +578,10 @@ async function getServerLeaderboard(guild, amount) {
         return target
     }
 
-    usersWins.sort((a, b) => {
-        return data[guild.id].stats[b].wins - data[guild.id].stats[a].wins
-    })
-
-    usersSecond.sort((a, b) => {
-        return data[guild.id].stats[b].secondPlace - data[guild.id].stats[a].secondPlace
-    })
-
-    usersThird.sort((a, b) => {
-        return data[guild.id].stats[b].thirdPlace - data[guild.id].stats[a].thirdPlace
-    })
-
-    overallWins.sort((a, b) => {
-        const aTotal =
-            data[guild.id].stats[a].wins +
-            data[guild.id].stats[a].secondPlace +
-            data[guild.id].stats[a].thirdPlace
-
-        const bTotal =
-            data[guild.id].stats[b].wins +
-            data[guild.id].stats[b].secondPlace +
-            data[guild.id].stats[b].thirdPlace
-
-        return bTotal - aTotal
-    })
+    inPlaceSort(usersWins).desc((i) => winsStats.get(i))
+    inPlaceSort(usersSecond).desc((i) => secondStats.get(i))
+    inPlaceSort(usersThird).desc((i) => thirdStats.get(i))
+    inPlaceSort(overallWins).desc((i) => overallStats.get(i))
 
     usersWins.splice(amount, usersWins.length - amount)
     usersSecond.splice(amount, usersSecond.length - amount)
@@ -604,7 +606,9 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        winsMsg += `${pos} **${getMember(user).user.tag}** ${data[guild.id].stats[user].wins}\n`
+        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats
+            .get(user)
+            .toLocaleString()}\n`
         count++
     }
 
@@ -621,9 +625,9 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        secondMsg += `${pos} **${getMember(user).user.tag}** ${
-            data[guild.id].stats[user].secondPlace
-        }\n`
+        secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats
+            .get(user)
+            .toLocaleString()}\n`
         count++
     }
 
@@ -640,9 +644,9 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        thirdMsg += `${pos} **${getMember(user).user.tag}** ${
-            data[guild.id].stats[user].thirdPlace
-        }\n`
+        thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats
+            .get(user)
+            .toLocaleString()}\n`
         count++
     }
 
@@ -659,11 +663,9 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        overallMsg += `${pos} **${getMember(user).user.tag}** ${(
-            data[guild.id].stats[user].wins +
-            data[guild.id].stats[user].secondPlace +
-            data[guild.id].stats[user].thirdPlace
-        ).toLocaleString()}\n`
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats
+            .get(user)
+            .toLocaleString()}\n`
         count++
     }
 
@@ -681,9 +683,17 @@ exports.getServerLeaderboard = getServerLeaderboard
  * @returns {Boolean}
  */
 function hasRandomReactionsEnabled(guild) {
-    if (data[guild.id].settings.randomStart) {
+    if (enabledCache.has(guild.id)) {
+        return enabledCache.get(guild.id)
+    }
+
+    const query = db.prepare("SELECT random_start FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    if (query.random_start == 1) {
+        enabledCache.set(guild.id, true)
         return true
     } else {
+        enabledCache.set(guild.id, false)
         return false
     }
 }
@@ -695,7 +705,9 @@ exports.hasRandomReactionsEnabled = hasRandomReactionsEnabled
  * @returns {Array<String>}
  */
 function getRandomChannels(guild) {
-    return data[guild.id].settings.randomChannels
+    const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.random_channels)
 }
 
 exports.getRandomChannels = getRandomChannels
@@ -705,7 +717,9 @@ exports.getRandomChannels = getRandomChannels
  * @returns {Array<String>}
  */
 function getBlacklisted(guild) {
-    return data[guild.id].blacklisted
+    const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id)
+
+    return toArray(query.blacklisted)
 }
 
 exports.getBlacklisted = getBlacklisted
@@ -715,7 +729,10 @@ exports.getBlacklisted = getBlacklisted
  * @param {Array<String>} blacklisted
  */
 function setBlacklisted(guild, blacklisted) {
-    data[guild.id].blacklisted = blacklisted
+    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(
+        toStorage(blacklisted),
+        guild.id
+    )
 }
 
 exports.setBlacklisted = setBlacklisted
@@ -725,7 +742,7 @@ exports.setBlacklisted = setBlacklisted
  * @param {Guild} guild
  */
 function deleteStats(guild) {
-    delete data[guild.id].stats
+    db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
 }
 
 exports.deleteStats = deleteStats
@@ -743,3 +760,9 @@ async function getDefaultWords() {
 
     return words
 }
+
+function getZeroWidth() {
+    return "​"
+}
+
+exports.getZeroWidth = getZeroWidth

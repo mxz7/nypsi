@@ -1,10 +1,8 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
-let users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-info(`${Array.from(Object.keys(users)).length.toLocaleString()} economy users loaded`, types.DATA)
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 info(
-    `${Array.from(Object.keys(users)).length.toLocaleString()} economy stats users loaded`,
+    `${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`,
     types.DATA
 )
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
@@ -14,17 +12,20 @@ const topgg = require("@top-gg/sdk")
 const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client } = require("discord.js")
-const { EconProfile } = require("../classes/EconStorage")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
+const { getDatabase } = require("../database/database")
+const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
 const topggStats = new topgg.Api(topggToken)
 const app = express()
+
 const voteCache = new Map()
+const existsCache = new Set()
 
 app.post(
     "/dblwebhook",
@@ -36,52 +37,6 @@ app.post(
 )
 
 app.listen(5000)
-
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-
-    if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./utils/economy/users.json", JSON.stringify(users), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("economy data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-        info("economy data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/economy/users.json"))
-        info("economy data refreshed")
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/economy/backup/" + date + ".json", JSON.stringify(users))
-    info("user data backup complete", types.DATA)
-}, 43200000)
 
 setInterval(() => {
     const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
@@ -97,49 +52,15 @@ setInterval(() => {
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
 
 setInterval(() => {
-    for (let user in users) {
-        if (
-            isNaN(users[user].money.balance) ||
-            users[user].money.balance == null ||
-            users[user].money.balance == undefined ||
-            users[user].money.balance == -NaN ||
-            users[user].money.balance < 0
-        ) {
-            users[user].money.balance = 0
+    const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
 
-            info(user + " set to 0 because NaN", types.ECONOMY)
-        }
+    for (const user of query) {
+        const workers = JSON.parse(user.workers)
 
-        if (
-            isNaN(users[user].money.bank) ||
-            users[user].money.bank == null ||
-            users[user].money.bank == undefined ||
-            users[user].money.bank == -NaN ||
-            users[user].money.bank < 0
-        ) {
-            users[user].money.bank = 0
+        const workers1 = JSON.parse(user.workers)
 
-            info(user + " bank set to 0 because NaN", types.ECONOMY)
-        }
-
-        if (
-            isNaN(users[user].xp) ||
-            users[user].xp == null ||
-            users[user].xp == undefined ||
-            users[user].xp == -NaN ||
-            users[user].xp < 0
-        ) {
-            users[user].xp = 0
-
-            info(user + " xp set to 0 because NaN", types.ECONOMY)
-        }
-    }
-}, 120000)
-
-setInterval(() => {
-    for (const user in users) {
-        for (let worker in users[user].workers) {
-            worker = users[user].workers[worker]
+        for (let worker in workers) {
+            worker = workers[worker]
 
             if (worker.stored < worker.maxStorage) {
                 if (worker.stored + worker.perInterval > worker.maxStorage) {
@@ -148,8 +69,13 @@ setInterval(() => {
                     worker.stored += worker.perInterval
                 }
             }
+        }
 
-            users[user].workers[worker.id] = worker
+        if (workers != workers1) {
+            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
+                JSON.stringify(workers),
+                user.id
+            )
         }
     }
 }, 5 * 60 * 1000)
@@ -172,12 +98,25 @@ function loadItems() {
 
     let deleted = 0
 
-    for (let user of Array.from(Object.keys(users))) {
-        for (let item of Array.from(Object.keys(users[user].inventory))) {
+    const query = db.prepare("SELECT id, inventory FROM economy").all()
+
+    for (const user of query) {
+        const inventory = JSON.parse(user.inventory)
+
+        const inventory1 = JSON.parse(user.inventory)
+
+        for (const item of Array.from(Object.keys(inventory))) {
             if (!Array.from(Object.keys(items)).includes(item)) {
-                delete users[user].inventory[item]
+                delete inventory[item]
                 deleted++
             }
+        }
+
+        if (inventory != inventory1) {
+            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(
+                JSON.stringify(inventory),
+                user.id
+            )
         }
     }
 
@@ -248,11 +187,23 @@ async function doVote(client, vote) {
 
     const now = new Date().getTime()
 
-    if (now - users[user].lastVote < 43200000) {
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(user)
+
+    const lastVote = query.lastVote
+
+    if (now - lastVote < 43200000) {
         return error(`${user} already voted`)
     }
 
-    users[user].lastVote = now
+    db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
+
+    voteCache.set(user, true)
+
+    setTimeout(() => {
+        if (voteCache.has(user)) {
+            voteCache.delete(user)
+        }
+    }, 43200000)
 
     let member = await client.users.fetch(user)
 
@@ -278,6 +229,8 @@ async function doVote(client, vote) {
     } else {
         inventory["vote_crate"] = getPrestige(memberID) + 1
     }
+
+    setInventory(memberID, inventory)
 
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed()
@@ -337,18 +290,29 @@ function hasVoted(member) {
 
     if (member.user) id = member.user.id
 
-    const now = new Date().getTime()
-
-    let lastVote = users[id].lastVote
-
-    if (!lastVote) {
-        lastVote = 0
-        users[id].lastVote = 0
+    if (voteCache.has(id)) {
+        return voteCache.get(id)
     }
 
+    const now = new Date().getTime()
+
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(id)
+
+    const lastVote = query.lastVote
+
     if (now - lastVote < 43200000) {
+        voteCache.set(id, true)
+
+        setTimeout(() => {
+            voteCache.delete(id)
+        }, 3600)
         return true
     } else {
+        voteCache.set(id, false)
+
+        setTimeout(() => {
+            voteCache.delete(id)
+        }, 3600)
         return false
     }
 }
@@ -402,7 +366,9 @@ exports.getMulti = getMulti
  * @returns {Number}
  */
 function getUserCount() {
-    return Object.keys(users).length
+    const query = db.prepare("SELECT id FROM economy").all()
+
+    return query.length
 }
 
 exports.getUserCount = getUserCount
@@ -413,7 +379,9 @@ exports.getUserCount = getUserCount
 function getUserCountGuild(guild) {
     let count = 0
 
-    for (let user in users) {
+    const query = db.prepare("SELECT id FROM economy").all()
+
+    for (let user in query) {
         if (guild.members.cache.find((member) => member.user.id == user)) {
             count++
         }
@@ -433,7 +401,9 @@ function getBalance(member) {
 
     if (member.user) id = member.user.id
 
-    return parseInt(users[id].money.balance)
+    const query = db.prepare("SELECT money FROM economy WHERE id = ?").get(id)
+
+    return parseInt(query.money)
 }
 
 exports.getBalance = getBalance
@@ -458,7 +428,14 @@ function userExists(member) {
 
     if (member.user) id = member.user.id
 
-    if (users[id]) {
+    if (existsCache.has(id)) {
+        return true
+    }
+
+    const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
+
+    if (query) {
+        existsCache.add(id)
         return true
     } else {
         return false
@@ -477,7 +454,8 @@ function updateBalance(member, amount) {
     if (member.user) id = member.user.id
 
     const amount1 = parseInt(amount)
-    users[id].money.balance = amount1
+
+    db.prepare("UPDATE economy SET money = ? WHERE id = ?").run(amount1, id)
 }
 
 exports.updateBalance = updateBalance
@@ -491,7 +469,9 @@ function getBankBalance(member) {
 
     if (member.user) id = member.user.id
 
-    return parseInt(users[id].money.bank)
+    const query = db.prepare("SELECT bank FROM economy WHERE id = ?").get(id)
+
+    return parseInt(query.bank)
 }
 
 exports.getBankBalance = getBankBalance
@@ -502,8 +482,7 @@ exports.getBankBalance = getBankBalance
  * @param {Number} amount to update balance to
  */
 function updateBankBalance(member, amount) {
-    const amount1 = parseInt(amount)
-    users[member.user.id].money.bank = amount1
+    db.prepare("UPDATE economy SET bank = ? WHERE id = ?").run(parseInt(amount), member.user.id)
 }
 
 exports.updateBankBalance = updateBankBalance
@@ -517,7 +496,9 @@ function getXp(member) {
 
     if (member.user) id = member.user.id
 
-    return parseInt(users[id].xp)
+    const query = db.prepare("SELECT xp FROM economy WHERE id = ?").get(id)
+
+    return parseInt(query.xp)
 }
 
 exports.getXp = getXp
@@ -528,10 +509,9 @@ exports.getXp = getXp
  * @param {Number} amount to update xp to
  */
 function updateXp(member, amount) {
-    if (users[member.user.id].xp >= 1000000) return
+    if (amount >= 69420) return
 
-    const amount1 = parseInt(amount)
-    users[member.user.id].xp = amount1
+    db.prepare("UPDATE economy SET xp = ? WHERE id = ?").run(parseInt(amount), member.user.id)
 }
 
 exports.updateXp = updateXp
@@ -559,27 +539,27 @@ exports.getMaxBankBalance = getMaxBankBalance
  * @param {Boolean} anon
  */
 async function topAmountGlobal(amount, client, anon) {
-    const users1 = []
+    const query = db.prepare("SELECT id, money FROM economy").all()
 
-    for (let user in users) {
-        users1.push(user)
+    const userIDs = []
+    const balances = new Map()
+
+    for (const user of query) {
+        userIDs.push(user.id)
+        balances.set(user.id, user.money)
     }
 
-    // users1.sort(function (a, b) {
-    //     return users[b].money.balance - users[a].money.balance
-    // })
-
-    inPlaceSort(users1).desc((i) => users[i].money.balance)
+    inPlaceSort(userIDs).desc((i) => balances.get(i))
 
     let usersFinal = []
 
     let count = 0
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (users[user].money.balance != 0) {
+        if (balances.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -603,7 +583,7 @@ async function topAmountGlobal(amount, client, anon) {
             }
 
             usersFinal[count] =
-                pos + " **" + username + "** $" + users[user].money.balance.toLocaleString()
+                pos + " **" + username + "** $" + balances.get(user).toLocaleString()
             count++
         }
     }
@@ -620,12 +600,10 @@ exports.topAmountGlobal = topAmountGlobal
 async function topAmount(guild, amount) {
     let members
 
-    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+    if (guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
     } else {
         members = await guild.members.fetch()
-
-        addCooldown(guild, 3600)
     }
 
     if (!members) members = guild.members.cache
@@ -634,19 +612,19 @@ async function topAmount(guild, amount) {
         return !m.user.bot
     })
 
-    const users1 = []
+    const query = db.prepare("SELECT id, money FROM economy").all()
 
-    for (let user in users) {
-        if (members.find((member) => member.user.id == user) && users[user].money.balance != 0) {
-            users1.push(user)
+    const userIDs = []
+    const balances = new Map()
+
+    for (const user of query) {
+        if (members.find((member) => member.user.id == user.id) && user.money != 0) {
+            userIDs.push(user.id)
+            balances.set(user.id, user.money)
         }
     }
 
-    inPlaceSort(users1).desc((i) => users[i].money.balance)
-
-    // users1.sort(function (a, b) {
-    //     return users[b].money.balance - users[a].money.balance
-    // })
+    inPlaceSort(userIDs).desc((i) => balances.get(i))
 
     let usersFinal = []
 
@@ -660,11 +638,11 @@ async function topAmount(guild, amount) {
         return target
     }
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].money.balance == 0) {
+        if (balances.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -680,7 +658,7 @@ async function topAmount(guild, amount) {
                 " **" +
                 getMemberID(guild, user).user.tag +
                 "** $" +
-                users[user].money.balance.toLocaleString()
+                balances.get(user).toLocaleString()
             count++
         }
     }
@@ -697,12 +675,10 @@ exports.topAmount = topAmount
 async function topAmountPrestige(guild, amount) {
     let members
 
-    if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+    if (guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
     } else {
         members = await guild.members.fetch()
-
-        addCooldown(guild, 3600)
     }
 
     if (!members) members = guild.members.cache
@@ -711,19 +687,19 @@ async function topAmountPrestige(guild, amount) {
         return !m.user.bot
     })
 
-    const users1 = []
+    const query = db.prepare("SELECT id, prestige FROM economy").all()
 
-    for (let user in users) {
-        if (members.find((member) => member.user.id == user) && users[user].prestige != 0) {
-            users1.push(user)
+    const userIDs = []
+    const prestiges = new Map()
+
+    for (const user of query) {
+        if (members.find((member) => member.user.id == user.id) && user.prestige != 0) {
+            userIDs.push(user.id)
+            prestiges.set(user.id, user.prestige)
         }
     }
 
-    // users1.sort(function (a, b) {
-    //     return users[b].prestige - users[a].prestige
-    // })
-
-    inPlaceSort(users1).desc((i) => users[i].prestige)
+    inPlaceSort(userIDs).desc((i) => prestiges.get(i))
 
     let usersFinal = []
 
@@ -737,11 +713,11 @@ async function topAmountPrestige(guild, amount) {
         return target
     }
 
-    for (let user of users1) {
+    for (let user of userIDs) {
         if (count >= amount) break
         if (usersFinal.join().length >= 1500) break
 
-        if (!users[user].prestige == 0) {
+        if (prestiges.get(user) != 0) {
             let pos = count + 1
 
             if (pos == 1) {
@@ -754,11 +730,11 @@ async function topAmountPrestige(guild, amount) {
 
             let thing = "th"
 
-            if (users[user].prestige == 1) {
+            if (prestiges.get(user) == 1) {
                 thing = "st"
-            } else if (users[user].prestige == 2) {
+            } else if (prestiges.get(user) == 2) {
                 thing = "nd"
-            } else if (users[user].prestige == 3) {
+            } else if (prestiges.get(user) == 3) {
                 thing = "rd"
             }
 
@@ -767,7 +743,7 @@ async function topAmountPrestige(guild, amount) {
                 " **" +
                 getMemberID(guild, user).user.tag +
                 "** " +
-                users[user].prestige +
+                prestiges.get(user) +
                 thing +
                 " prestige"
             count++
@@ -787,7 +763,11 @@ function createUser(member) {
 
     if (member.user) id = member.user.id
 
-    users[id] = new EconProfile()
+    if (userExists(id)) {
+        db.prepare("DELETE FROM economy WHERE id = ?").run(id)
+    }
+
+    db.prepare("INSERT INTO economy (id) VALUES (?)").run(id)
 }
 
 exports.createUser = createUser
@@ -836,11 +816,9 @@ exports.formatBet = formatBet
  * @param {GuildMember} member to check
  */
 function hasPadlock(member) {
-    if (users[member.user.id].padlock) {
-        return true
-    } else {
-        return false
-    }
+    const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id)
+
+    return query.padlock == 1 ? true : false
 }
 
 exports.hasPadlock = hasPadlock
@@ -851,7 +829,9 @@ exports.hasPadlock = hasPadlock
  * @param {Boolean} setting padlock to true or false
  */
 function setPadlock(member, setting) {
-    users[member.user.id].padlock = setting
+    setting = setting ? 1 : 0
+
+    db.prepare("UPDATE economy SET padlock = ? WHERE id = ?").run(setting, member.user.id)
 }
 
 exports.setPadlock = setPadlock
@@ -885,7 +865,9 @@ function getPrestige(member) {
 
     if (member.user) id = member.user.id
 
-    return users[id].prestige
+    const query = db.prepare("SELECT prestige FROM economy WHERE id = ?").get(id)
+
+    return query.prestige
 }
 
 exports.getPrestige = getPrestige
@@ -896,7 +878,7 @@ exports.getPrestige = getPrestige
  * @param {Number} amount
  */
 function setPrestige(member, amount) {
-    users[member.user.id].prestige = amount
+    db.prepare("UPDATE economy SET prestige = ? WHERE id = ?").run(amount, member.user.id)
 }
 
 exports.setPrestige = setPrestige
@@ -938,7 +920,9 @@ function getDMsEnabled(member) {
 
     if (!userExists(id)) createUser(id)
 
-    if (users[id].dms == true) {
+    const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id)
+
+    if (query.dms == 1) {
         return true
     } else {
         return false
@@ -953,7 +937,9 @@ exports.getDMsEnabled = getDMsEnabled
  * @param {Boolean} value
  */
 function setDMsEnabled(member, value) {
-    users[member.user.id].dms = value
+    const setting = value ? 1 : 0
+
+    db.prepare("UPDATE economy SET dms = ? WHERE id = ?").run(setting, member.user.id)
 }
 
 exports.setDMsEnabled = setDMsEnabled
@@ -988,7 +974,9 @@ function getWorkers(member) {
 
     if (member.user) id = member.user.id
 
-    return users[id].workers
+    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(id)
+
+    return JSON.parse(query.workers)
 }
 
 exports.getWorkers = getWorkers
@@ -1003,7 +991,9 @@ function getWorker(member, id) {
     let memberID = member
     if (member.user) memberID = member.user.id
 
-    return users[memberID].workers[id]
+    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID)
+
+    return JSON.parse(query.workers)[id]
 }
 
 exports.getWorker = getWorker
@@ -1026,7 +1016,14 @@ function addWorker(member, id) {
 
     worker = new worker()
 
-    return (users[memberID].workers[id] = worker)
+    const memberWorkers = getWorkers(member)
+
+    memberWorkers[id] = worker
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
+        JSON.stringify(memberWorkers),
+        memberID
+    )
 }
 
 exports.addWorker = addWorker
@@ -1037,13 +1034,15 @@ function emptyWorkersStored(member) {
 
     const workers = getWorkers(memberID)
 
-    for (let worker of Object.keys(getWorkers(member))) {
-        worker = users[memberID].workers[worker]
+    for (let worker of Object.keys(workers)) {
+        worker = workers[worker]
 
         worker.stored = 0
 
-        users[memberID].workers[worker.id] = worker
+        workers[worker.id] = worker
     }
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID)
 }
 
 exports.emptyWorkersStored = emptyWorkersStored
@@ -1057,13 +1056,17 @@ function upgradeWorker(member, id) {
     let memberID = member
     if (member.user) memberID = member.user.id
 
-    let worker = getWorkers(memberID)[id]
+    const workers = getWorkers(memberID)
+
+    let worker = workers[id]
 
     worker = Worker.fromJSON(worker)
 
     worker.upgrade()
 
-    users[memberID].workers[worker.id] = worker
+    workers[id] = worker
+
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers))
 }
 
 exports.upgradeWorker = upgradeWorker
@@ -1106,15 +1109,14 @@ exports.toggleBan = toggleBan
 function reset() {
     let deleted = 0
     let updated = 0
-    for (const id in users) {
-        let user = users[id]
 
+    const query = db.prepare("SELECT * FROM economy").all()
+
+    for (const user in query) {
         let prestige = user.prestige
-        let lastVote = user.lastVote
+        let lastVote = user.last_vote
         let inventory = user.inventory
         const dms = user.dms
-
-        if (!lastVote) lastVote = 0
 
         if (Array.from(Object.keys(inventory)).length == 0) {
             inventory = undefined
@@ -1127,18 +1129,15 @@ function reset() {
         }
 
         if (prestige == 0 && lastVote == 0 && !inventory && !dms) {
-            delete users[id]
-            info("deleted " + id)
+            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
+            info("deleted " + user.id)
             deleted++
         } else {
-            user = new EconProfile()
-            user.prestige = prestige
-            user.lastVote = lastVote
-            user.inventory = inventory
-            user.dms = dms
+            db.prepare(
+                "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+            ).run(prestige, dms, lastVote, inventory, user.id)
 
-            users[id] = user
-            info("updated " + id)
+            info("updated " + user.id)
             updated++
         }
     }
@@ -1252,11 +1251,9 @@ function getInventory(member) {
 
     if (member.user) id = member.user.id
 
-    if (!users[id].inventory) {
-        users[id].inventory = {}
-        return {}
-    }
-    return users[id].inventory
+    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id)
+
+    return JSON.parse(query.inventory)
 }
 
 exports.getInventory = getInventory
@@ -1271,7 +1268,7 @@ function setInventory(member, inventory) {
 
     if (member.user) id = member.user.id
 
-    users[id].inventory = inventory
+    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id)
 }
 
 exports.setInventory = setInventory

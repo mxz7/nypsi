@@ -24,6 +24,9 @@ const {
     checkChristmasCountdown,
     hasChristmasCountdownEnabled,
     runCountdowns,
+    hasGuild,
+    createGuild,
+    runChristmas,
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
@@ -76,8 +79,8 @@ client.on("shardReconnecting", (shardID) => info(`shard#${shardID} connecting`))
 process.on("unhandledRejection", (e) => {
     let stack = e.stack.split("\n").join("\n\x1b[31m")
 
-    if (stack.length > 200) {
-        stack = stack.substr(0, 200) + "..."
+    if (stack.length > 500) {
+        stack = stack.substr(0, 500) + "..."
     }
 
     error(stack)
@@ -98,11 +101,11 @@ exports.checkGuild = checkGuild
 async function runChecks() {
     setInterval(async () => {
         client.guilds.cache.forEach((guild) => {
-            if (hasStatsEnabled(guild)) {
-                checkStats(guild)
-            }
+            if (!hasGuild(guild)) return createGuild(guild)
         })
-    }, 600000)
+    }, 3600000)
+
+    checkStats()
 
     const now = new Date()
 
@@ -111,21 +114,6 @@ async function runChecks() {
     if (now.getHours() < 3) {
         d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
     }
-
-    const needed = new Date(Date.parse(d) + 10800000)
-
-    setTimeout(() => {
-        setInterval(() => {
-            client.guilds.cache.forEach((guild) => {
-                if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
-            })
-        }, 86400000)
-        client.guilds.cache.forEach((guild) => {
-            if (hasChristmasCountdownEnabled(guild)) checkChristmasCountdown(guild)
-        })
-    }, needed - now)
-
-    info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 
     if (client.user.id != "678711738845102087") return
 
@@ -248,6 +236,7 @@ setTimeout(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
             runCountdowns(client)
+            runChristmas(client)
             showTopGlobalBal(client)
             runChecks()
             updateCache()

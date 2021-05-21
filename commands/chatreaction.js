@@ -284,6 +284,8 @@ async function run(message, args) {
 
                 blacklisted.splice(blacklisted.indexOf(user), 1)
 
+                setBlacklisted(message.guild, blacklisted)
+
                 return message.channel.send(
                     new CustomEmbed(message.member, false, "✅ user has been unblacklisted")
                 )
