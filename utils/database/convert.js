@@ -156,18 +156,37 @@ function convertModeration() {
         const bans = guild.bans
         const cases = guild.cases
 
-        db.prepare("INSERT INTO moderation (id, case_count, mute_role) VALUES (?, ?, ?)").run(id, guild.caseCount, guild.muteRole ? guild.muteRole : "")
+        db.prepare("INSERT INTO moderation (id, case_count, mute_role) VALUES (?, ?, ?)").run(
+            id,
+            guild.caseCount,
+            guild.muteRole ? guild.muteRole : ""
+        )
 
         for (let case0 of cases) {
-            db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(case0.id, case0.type, case0.user, case0.moderator, case0.command, case0.time, case0.deleted ? 1 : 0, id)
+            db.prepare(
+                "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            ).run(
+                case0.id,
+                case0.type,
+                case0.user,
+                case0.moderator,
+                case0.command,
+                case0.time,
+                case0.deleted ? 1 : 0,
+                id
+            )
         }
 
         for (let mute of mutes) {
-            db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(mute.user, mute.unmuteTime, id)
+            db.prepare(
+                "INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)"
+            ).run(mute.user, mute.unmuteTime, id)
         }
 
         for (let ban of bans) {
-            db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(ban.user, ban.unbanTime, id)
+            db.prepare(
+                "INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)"
+            ).run(ban.user, ban.unbanTime, id)
         }
     }
 }
@@ -183,7 +202,19 @@ function convertPremium() {
 
         if (user.level == 0) continue
 
-        db.prepare("INSERT INTO premium (id, level, embed_color, last_daily, last_weekly, status, revoke_reason, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, user.level, user.embedColor, user.lastDaily, user.lastWeekly, user.status, user.revokeReason, user.startDate, user.expireDate)
+        db.prepare(
+            "INSERT INTO premium (id, level, embed_color, last_daily, last_weekly, status, revoke_reason, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            id,
+            user.level,
+            user.embedColor,
+            user.lastDaily,
+            user.lastWeekly,
+            user.status,
+            user.revokeReason,
+            user.startDate,
+            user.expireDate
+        )
     }
 }
 
@@ -196,13 +227,26 @@ function convertChatReactions() {
         const id = guild
         guild = file[id]
 
-        db.prepare("INSERT INTO chat_reaction (id, word_list, random_start, random_channels, between_events, random_modifier, timeout, blacklisted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(id, toStorage(guild.wordList), guild.settings.randomStart ? 1 : 0, toStorage(guild.settings.randomChannels), guild.settings.timeBetweenEvents, guild.settings.randomModifier, guild.settings.timeout, toStorage(guild.blacklisted))
+        db.prepare(
+            "INSERT INTO chat_reaction (id, word_list, random_start, random_channels, between_events, random_modifier, timeout, blacklisted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            id,
+            toStorage(guild.wordList),
+            guild.settings.randomStart ? 1 : 0,
+            toStorage(guild.settings.randomChannels),
+            guild.settings.timeBetweenEvents,
+            guild.settings.randomModifier,
+            guild.settings.timeout,
+            toStorage(guild.blacklisted)
+        )
 
         for (let user in guild.stats) {
             const userID = user
             user = guild.stats[userID]
 
-            db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id, wins, second, third) VALUES (?, ?, ?, ?, ?)").run(id, userID, user.wins, user.secondPlace, user.thirdPlace)
+            db.prepare(
+                "INSERT INTO chat_reaction_stats (guild_id, user_id, wins, second, third) VALUES (?, ?, ?, ?, ?)"
+            ).run(id, userID, user.wins, user.secondPlace, user.thirdPlace)
         }
     }
 }

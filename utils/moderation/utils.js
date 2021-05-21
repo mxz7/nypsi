@@ -139,7 +139,7 @@ function getCases(guild, userID) {
     for (const d of query) {
         d.case_id = parseInt(d.case_id)
     }
-    
+
     return query.reverse()
 }
 
@@ -168,9 +168,9 @@ function getCase(guild, caseID) {
     const query = db
         .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
         .get(guild.id, caseID)
-    
+
     query.case_id = parseInt(query.case_id)
-    
+
     return query
 }
 
