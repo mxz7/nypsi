@@ -547,8 +547,6 @@ async function getServerLeaderboard(guild, amount) {
         .prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?")
         .all(guild.id)
 
-    console.log(query)
-
     for (const user of query) {
         let overall = false
 

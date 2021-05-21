@@ -46,8 +46,6 @@ async function run(message, args) {
     } else {
         const d = query.run()
 
-        console.log(d)
-
         return message.channel.send(
             new CustomEmbed(message.member, false, `made \`${d.changes}\` changes`)
         )
