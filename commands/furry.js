@@ -22,6 +22,8 @@ async function run(message, args) {
     let cooldownLength = 7
     let cacheTime = 60
 
+    if (!userExists(member)) createProfile(member)
+
     if (isPremium(message.author.id)) {
         cooldownLength = 1
     }
@@ -117,7 +119,6 @@ async function run(message, args) {
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id)
-            if (!userExists(member)) createProfile(member)
             updateXp(member, getXp(member) + 1)
         }
     }

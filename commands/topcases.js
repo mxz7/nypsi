@@ -44,7 +44,7 @@ async function run(message, args) {
 
     const cases = getAllCases(message.guild)
 
-    if (cases.size <= 0) return message.channel.send(new ErrorEmbed("no data for this server"))
+    if (cases.length <= 0) return message.channel.send(new ErrorEmbed("no data for this server"))
 
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {

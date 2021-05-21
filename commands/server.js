@@ -22,11 +22,7 @@ async function run(message, args) {
 
     let members
 
-    if (
-        inCooldown(server) ||
-        message.guild.memberCount == message.guild.members.cache.size ||
-        message.guild.memberCount <= 50
-    ) {
+    if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size) {
         members = server.members.cache
     } else {
         members = await server.members.fetch()
@@ -95,7 +91,7 @@ async function run(message, args) {
             `**total** ${server.memberCount.toLocaleString()}\n` +
                 `**humans** ${users.size.toLocaleString()}\n` +
                 `**bots** ${bots.size.toLocaleString()}\n` +
-                `**member peak** ${getPeaks(message.guild).members.toLocaleString()}`
+                `**member peak** ${getPeaks(message.guild).toLocaleString()}`
         )
 
     if (server.memberCount >= 25000) {

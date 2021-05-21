@@ -1,85 +1,32 @@
-const fs = require("fs")
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
 const { info, types, getTimestamp, error } = require("../logger")
-let data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-info(
-    `${Array.from(Object.keys(data)).length.toLocaleString()} moderation guilds loaded`,
-    types.DATA
-)
+const { getDatabase } = require("../database/database")
 
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/moderation/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("moderation data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-        info("moderation data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
-        info("moderation data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
+const db = getDatabase()
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
 
-    for (let guild in data) {
-        const exists = await checkGuild(guild)
+    const query = db.prepare("SELECT id FROM moderation").all()
+
+    for (let guild of query) {
+        const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            delete data[guild]
+            deleteServer(guild)
 
-            info(`deleted guild '${guild}' from moderation data`, types.GUILD)
+            info(`deleted guild '${guild.id}' from moderation data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
-
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/moderation/backup/" + date + ".json", JSON.stringify(data))
-    info("moderation data backup complete", types.DATA)
-}, 43200000 * 2)
 
 /**
  *
  * @param {Guild} guild guild to create profile for
  */
 function createProfile(guild) {
-    data[guild.id] = {
-        caseCount: 0,
-        muteRole: "",
-        cases: [],
-        mutes: [],
-        bans: [],
-    }
+    db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id)
 }
 
 exports.createProfile = createProfile
@@ -89,10 +36,12 @@ exports.createProfile = createProfile
  * @param {Guild} guild check if profile exists for this guild
  */
 function profileExists(guild) {
-    if (data[guild.id]) {
-        return true
-    } else {
+    const query = db.prepare("SELECT id FROM moderation WHERE id = ?").get(guild.id)
+
+    if (!query) {
         return false
+    } else {
+        return true
     }
 }
 
@@ -103,7 +52,9 @@ exports.profileExists = profileExists
  * @param {Guild} guild guild to get case count of
  */
 function getCaseCount(guild) {
-    return data[guild.id].caseCount
+    const query = db.prepare("SELECT case_count FROM moderation WHERE id = ?").get(guild.id)
+
+    return query.case_count
 }
 
 exports.getCaseCount = getCaseCount
@@ -121,20 +72,20 @@ function newCase(guild, caseType, userIDs, moderator, command) {
         userIDs = [userIDs]
     }
     for (let userID of userIDs) {
-        const currentCases = data[guild.id].cases
-        const count = data[guild.id].caseCount
-        const case0 = {
-            id: count,
-            type: caseType,
-            user: userID,
-            moderator: moderator,
-            command: command,
-            time: new Date().getTime(),
-            deleted: false,
-        }
-        currentCases.push(case0)
-        data[guild.id].cases = currentCases
-        data[guild.id].caseCount = count + 1
+        const caseCount = getCaseCount(guild)
+        db.prepare(
+            "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+            caseCount.toString(),
+            caseType,
+            userID,
+            moderator,
+            command,
+            new Date().getTime(),
+            0,
+            guild.id
+        )
+        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
     }
 }
 
@@ -146,9 +97,10 @@ exports.newCase = newCase
  * @param {String} caseID case to delete
  */
 function deleteCase(guild, caseID) {
-    const caseInfo = data[guild.id].cases[caseID]
-    caseInfo.deleted = true
-    data[guild.id].cases[caseID] = caseInfo
+    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(
+        guild.id,
+        caseID
+    )
 }
 
 exports.deleteCase = deleteCase
@@ -158,7 +110,18 @@ exports.deleteCase = deleteCase
  * @param {Guild} guild guild to delete data for
  */
 function deleteServer(guild) {
-    delete data[guild.id]
+    let id
+
+    if (!guild.id) {
+        id = guild
+    } else {
+        id = guild.id
+    }
+
+    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(id)
+    db.prepare("DELETE FROM moderation WHERE id = ?").run(id)
 }
 
 exports.deleteServer = deleteServer
@@ -169,13 +132,15 @@ exports.deleteServer = deleteServer
  * @param {String} userID user to get cases of
  */
 function getCases(guild, userID) {
-    const cases = []
-    for (let case0 of data[guild.id].cases) {
-        if (case0.user == userID) {
-            cases.push(case0)
-        }
+    const query = db
+        .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?")
+        .all(guild.id, userID)
+
+    for (const d of query) {
+        d.case_id = parseInt(d.case_id)
     }
-    return cases.reverse()
+
+    return query.reverse()
 }
 
 exports.getCases = getCases
@@ -185,7 +150,11 @@ exports.getCases = getCases
  * @param {Guild} guild guild to get cases of
  */
 function getAllCases(guild) {
-    return data[guild.id].cases
+    const query = db
+        .prepare("SELECT user, moderator FROM moderation_cases WHERE guild_id = ?")
+        .all(guild.id)
+
+    return query.reverse()
 }
 
 exports.getAllCases = getAllCases
@@ -196,7 +165,13 @@ exports.getAllCases = getAllCases
  * @param {Number} caseID case to fetch
  */
 function getCase(guild, caseID) {
-    return data[guild.id].cases[caseID]
+    const query = db
+        .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
+        .get(guild.id, caseID.toString())
+
+    query.case_id = parseInt(query.case_id)
+
+    return query
 }
 
 exports.getCase = getCase
@@ -212,13 +187,9 @@ function newMute(guild, userIDs, date) {
         userIDs = [userIDs]
     }
     for (let userID of userIDs) {
-        const currentMutes = data[guild.id].mutes
-        const d = {
-            user: userID,
-            unmuteTime: date,
-        }
-        currentMutes.push(d)
-        data[guild.id].mutes = currentMutes
+        db.prepare(
+            "INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)"
+        ).run(userID, date, guild.id)
     }
 }
 
@@ -236,13 +207,11 @@ function newBan(guild, userIDs, date) {
     }
 
     for (let userID of userIDs) {
-        const currentBans = data[guild.id].bans
-        const d = {
-            user: userID,
-            unbanTime: date,
-        }
-        currentBans.push(d)
-        data[guild.id].bans = currentBans
+        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(
+            userID,
+            date,
+            guild.id
+        )
     }
 }
 
@@ -254,13 +223,15 @@ exports.newBan = newBan
  * @param {GuildMember} member
  */
 function isMuted(guild, member) {
-    const currentMutes = data[guild.id].mutes
-    for (let mute of currentMutes) {
-        if (mute.user == member.user.id) {
-            return true
-        }
+    const query = db
+        .prepare("SELECT user FROM moderation_mutes WHERE guild_id = ? AND user = ?")
+        .get(guild.id, member.user.id)
+
+    if (query) {
+        return true
+    } else {
+        return false
     }
-    return false
 }
 
 exports.isMuted = isMuted
@@ -271,13 +242,15 @@ exports.isMuted = isMuted
  * @param {GuildMember} member
  */
 function isBanned(guild, member) {
-    const currentBans = data[guild.id].bans
-    for (let ban of currentBans) {
-        if (ban.user == member.user.id) {
-            return true
-        }
+    const query = db
+        .prepare("SELECT user FROM moderation_bans WHERE guild_id = ? AND user = ?")
+        .get(guild.id, member.user.id)
+
+    if (query) {
+        return true
+    } else {
+        return false
     }
-    return false
 }
 
 exports.isBanned = isBanned
@@ -289,25 +262,23 @@ exports.isBanned = isBanned
 function runModerationChecks(client) {
     setInterval(() => {
         const date = new Date().getTime()
-        for (let guild in data) {
-            const mutes = data[guild].mutes
-            if (mutes.length > 0) {
-                for (let mute of mutes) {
-                    if (mute.unmuteTime <= date) {
-                        requestUnmute(guild, mute.user, client)
-                        info(`requested unmute in ${guild} for ${mute.user}`, types.AUTOMATION)
-                    }
-                }
-            }
-            const bans = data[guild].bans
-            if (bans.length > 0) {
-                for (let ban of bans) {
-                    if (ban.unbanTime <= date) {
-                        requestUnban(guild, ban.user, client)
-                        info(`requested unban in ${guild} for ${ban.user}`, types.AUTOMATION)
-                    }
-                }
-            }
+
+        let query = db
+            .prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?")
+            .all(date)
+
+        for (let unmute of query) {
+            requestUnmute(unmute.guild_id, unmute.user, client)
+            info(`requested unmute in ${unmute.guild_id} for ${unmute.user}`, types.AUTOMATION)
+        }
+
+        query = db
+            .prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?")
+            .all(date)
+
+        for (let unban of query) {
+            requestUnmute(unban.guild_id, unban.user, client)
+            info(`requested unmute in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
         }
     }, 30000)
 }
@@ -321,9 +292,11 @@ exports.runModerationChecks = runModerationChecks
  * @param {String} reason
  */
 function setReason(guild, caseID, reason) {
-    const currentCase = data[guild.id].cases[caseID]
-    currentCase.command = reason
-    data[guild.id].cases[caseID] = currentCase
+    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(
+        reason,
+        caseID,
+        guild.id
+    )
 }
 
 exports.setReason = setReason
@@ -335,15 +308,7 @@ function deleteMute(guild, member) {
         id = member
     }
 
-    const currentMutes = data[guild.id].mutes
-
-    for (let mute of currentMutes) {
-        if (mute.user == id) {
-            currentMutes.splice(currentMutes.indexOf(mute), 1)
-        }
-    }
-
-    data[guild.id].mutes = currentMutes
+    db.prepare("DELETE FROM moderation_mutes WHERE user = ? AND guild_id = ?").run(id, guild.id)
 }
 
 exports.deleteMute = deleteMute
@@ -355,15 +320,7 @@ function deleteBan(guild, member) {
         id = member
     }
 
-    const currentBans = data[guild.id].bans
-
-    for (let ban of currentBans) {
-        if (ban.user == id) {
-            currentBans.splice(currentBans.indexOf(ban), 1)
-        }
-    }
-
-    data[guild.id].bans = currentBans
+    db.prepare("DELETE FROM moderation_bans WHERE user = ? AND guild_id = ?").run(id, guild.id)
 }
 
 exports.deleteBan = deleteBan
@@ -374,9 +331,13 @@ exports.deleteBan = deleteBan
  * @returns {String}
  */
 function getMuteRole(guild) {
-    if (!data[guild.id]) return undefined
-    if (!data[guild.id].muteRole) return undefined
-    return data[guild.id].muteRole
+    const query = db.prepare("SELECT mute_role FROM moderation WHERE id = ?").get(guild.id)
+
+    if (query.mute_role == "") {
+        return undefined
+    } else {
+        return query.mute_role
+    }
 }
 
 exports.getMuteRole = getMuteRole
@@ -387,10 +348,12 @@ exports.getMuteRole = getMuteRole
  * @param {Role} role
  */
 function setMuteRole(guild, role) {
+    const query = db.prepare("UPDATE moderation SET mute_role = ? WHERE id = ?")
+
     if (role == "default") {
-        data[guild.id].muteRole = ""
+        query.run("", guild.id)
     } else {
-        data[guild.id].muteRole = role.id
+        query.run(role.id, guild.id)
     }
 }
 
@@ -434,9 +397,11 @@ async function requestUnmute(guild, member, client) {
 
     await guild.roles.fetch()
 
-    let muteRole = await guild.roles.cache.find((r) => r.id == data[guild.id].muteRole)
+    const muteRoleID = getMuteRole(guild)
 
-    if (data[guild.id].muteRole == "") {
+    let muteRole = await guild.roles.cache.find((r) => r.id == muteRole)
+
+    if (muteRoleID == "") {
         muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
