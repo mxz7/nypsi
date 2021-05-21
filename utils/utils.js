@@ -1,7 +1,7 @@
 const { GuildMember, Message, Client } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
-const { getZeroWidth } = require("./classes/ChatReaction")
+const { getZeroWidth } = require("./chatreactions/utils")
 const { error, info, types } = require("./logger")
 
 const news = {

@@ -1,47 +1,19 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { PremUser, status } = require("../classes/PremStorage")
+const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
-let data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-info(`${Array.from(Object.keys(data)).length.toLocaleString()} premium users loaded`, types.DATA)
 let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 info(
     `${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`,
     types.DATA
 )
+const db = getDatabase()
 
-let timer = 0
-let timerCheck = true
-setInterval(() => {
-    const data1 = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-
-    if (JSON.stringify(data) != JSON.stringify(data1)) {
-        fs.writeFile("./utils/premium/data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("premium data saved", types.DATA)
-        })
-
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
-
-    if (timer >= 5 && !timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-        info("premium data refreshed", types.DATA)
-        timerCheck = true
-    }
-
-    if (timer >= 30 && timerCheck) {
-        data = JSON.parse(fs.readFileSync("./utils/premium/data.json"))
-        info("premium data refreshed", types.DATA)
-        timer = 0
-    }
-}, 60000 + Math.floor(Math.random() * 60) * 1000)
+const isPremiumCache = new Map()
+const tierCache = new Map()
+const colorCache = new Map()
 
 setInterval(() => {
     const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
@@ -56,36 +28,13 @@ setInterval(() => {
     }
 }, 120000 + Math.floor(Math.random() * 60) * 1000)
 
-setInterval(() => {
-    let date = new Date()
-    date =
-        getTimestamp().split(":").join(".") +
-        " - " +
-        date.getDate() +
-        "." +
-        date.getMonth() +
-        "." +
-        date.getFullYear()
-    fs.writeFileSync("./utils/premium/backup/" + date + ".json", JSON.stringify(data))
-    info("premium data backup complete", types.DATA)
-}, 43200000)
-
 setInterval(async () => {
     const now = new Date().getTime()
 
-    for (let user in data) {
-        user = data[user]
+    const query = db.prepare("SELECT id FROM premium WHERE expire_date <= ?").all(now)
 
-        if (user.level == 0) continue
-
-        const expiry = user.expireDate
-
-        if (expiry <= now) {
-            user = PremUser.fromData(user)
-
-            await user.expire()
-            data[user.id] = user
-        }
+    for (const user of query) {
+        expireUser(user.id)
     }
 }, 300000)
 
@@ -99,13 +48,22 @@ function isPremium(member) {
         id = member.user.id
     }
 
-    if (data[id]) {
-        if (data[id].level == 0) {
+    if (isPremiumCache.has(id)) {
+        return isPremiumCache.get(id)
+    }
+
+    const query = db.prepare("SELECT id FROM premium WHERE id = ?").get(id)
+
+    if (query) {
+        if (getTier(id) == 0) {
+            isPremiumCache.set(id, false)
             return false
         }
 
+        isPremiumCache.set(id, true)
         return true
     } else {
+        isPremiumCache.set(id, false)
         return false
     }
 }
@@ -122,7 +80,15 @@ function getTier(member) {
         id = member.user.id
     }
 
-    return data[member].level
+    if (tierCache.has(id)) {
+        return tierCache.get(id)
+    }
+
+    const query = db.prepare("SELECT level FROM premium WHERE id = ?").get(id)
+
+    tierCache.set(id, query.level)
+
+    return query.level
 }
 
 exports.getTier = getTier
@@ -133,7 +99,9 @@ function getTierString(member) {
         id = member.user.id
     }
 
-    const a = PremUser.fromData(data[id])
+    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
+
+    const a = createPremUser(query)
 
     return a.getLevelString()
 }
@@ -148,9 +116,17 @@ function addMember(member, level) {
         id = member.user.id
     }
 
-    const profile = new PremUser(id, level)
+    const start = new Date().getTime()
+    const expire = new Date().setDate(new Date().getDate() + 35)
 
-    data[id] = profile
+    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(
+        id,
+        level,
+        start,
+        expire
+    )
+
+    const profile = getPremiumProfile(id)
 
     info(`premium level ${level} given to ${id}`)
 
@@ -161,6 +137,14 @@ function addMember(member, level) {
             profile.expireDate
         )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`
     )
+
+    if (isPremiumCache.has(id)) {
+        isPremiumCache.delete(id)
+    }
+
+    if (tierCache.has(id)) {
+        tierCache.delete(id)
+    }
 }
 
 exports.addMember = addMember
@@ -175,7 +159,9 @@ function getPremiumProfile(member) {
         id = member.user.id
     }
 
-    return PremUser.fromData(data[id])
+    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
+
+    return createPremUser(query)
 }
 
 exports.getPremiumProfile = getPremiumProfile
@@ -190,12 +176,20 @@ function setTier(member, level) {
         id = member.user.id
     }
 
-    data[id].level = level
+    db.prepare("UPDATE premium SET level = ? WHERE id = ?").run(level, id)
 
     info(`premium level updated to ${level} for ${id}`)
 
     const { requestDM } = require("../../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
+
+    if (isPremiumCache.has(id)) {
+        isPremiumCache.delete(id)
+    }
+
+    if (tierCache.has(id)) {
+        tierCache.delete(id)
+    }
 }
 
 exports.setTier = setTier
@@ -210,7 +204,11 @@ function setEmbedColor(member, color) {
         id = member.user.id
     }
 
-    data[id].embedColor = color
+    db.prepare("UPDATE premium SET embed_color = ? WHERE id = ?").run(color, id)
+
+    if (colorCache.has(id)) {
+        colorCache.delete(id)
+    }
 }
 
 exports.setEmbedColor = setEmbedColor
@@ -220,7 +218,15 @@ exports.setEmbedColor = setEmbedColor
  * @param {String} member id
  */
 function getEmbedColor(member) {
-    return data[member].embedColor
+    if (colorCache.has(member)) {
+        return colorCache.get(member)
+    }
+
+    const query = db.prepare("SELECT embed_color FROM premium WHERE id = ?").get(member)
+
+    colorCache.set(member, query.embed_color)
+
+    return query.embed_color
 }
 
 exports.getEmbedColor = getEmbedColor
@@ -235,7 +241,7 @@ function setLastDaily(member, date) {
         id = member.user.id
     }
 
-    data[id].lastDaily = date
+    db.prepare("UPDATE premium SET last_daily = ? WHERE id = ?").run(date, id)
 }
 
 exports.setLastDaily = setLastDaily
@@ -250,7 +256,7 @@ function setLastWeekly(member, date) {
         id = member.user.id
     }
 
-    data[id].lastWeekly = date
+    db.prepare("UPDATE premium SET last_weekly = ? WHERE id = ?").run(date, id)
 }
 
 exports.setLastWeekly = setLastWeekly
@@ -265,7 +271,7 @@ function setStatus(member, status) {
         id = member.user.id
     }
 
-    data[id].status = status
+    db.prepare("UPDATE premium SET status = ? WHERE id = ?").run(status, id)
 }
 
 exports.setStatus = setStatus
@@ -280,7 +286,7 @@ function setReason(member, reason) {
         id = member.user.id
     }
 
-    data[id].revokeReason = reason
+    db.prepare("UPDATE premium SET revoke_reason = ? WHERE id = ?").run(reason, id)
 }
 
 exports.setReason = setReason
@@ -295,7 +301,7 @@ function setStartDate(member, date) {
         id = member.user.id
     }
 
-    data[id].startDate = date
+    db.prepare("UPDATE premium SET start_date = ? WHERE id = ?").run(date, id)
 }
 
 exports.setStartDate = setStartDate
@@ -304,17 +310,29 @@ exports.setStartDate = setStartDate
  * @param {String} member id
  */
 function renewUser(member) {
-    const profile = PremUser.fromData(data[member])
+    const profile = getPremiumProfile(member)
 
     profile.renew()
 
-    data[member] = profile
+    db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(profile.expireDate, member)
 
     const { requestDM } = require("../../nypsi")
     requestDM(
         member,
         `your membership has been renewed until **${formatDate(profile.expireDate)}**`
     )
+
+    if (isPremiumCache.has(member)) {
+        isPremiumCache.delete(member)
+    }
+
+    if (tierCache.has(member)) {
+        tierCache.delete(member)
+    }
+
+    if (colorCache.has(member)) {
+        colorCache.delete(member)
+    }
 }
 
 exports.renewUser = renewUser
@@ -323,11 +341,23 @@ exports.renewUser = renewUser
  * @param {String} member id
  */
 function expireUser(member) {
-    const profile = PremUser.fromData(data[member])
+    const profile = getPremiumProfile(member)
 
     profile.expire()
 
-    data[member] = profile
+    db.prepare("DELETE FROM premium WHERE id = ?").run(member)
+
+    if (isPremiumCache.has(member)) {
+        isPremiumCache.delete(member)
+    }
+
+    if (tierCache.has(member)) {
+        tierCache.delete(member)
+    }
+
+    if (colorCache.has(member)) {
+        colorCache.delete(member)
+    }
 }
 
 exports.expireUser = expireUser
@@ -337,13 +367,10 @@ exports.expireUser = expireUser
  * @param {String} reason
  */
 function revokeUser(member, reason) {
-    const profile = PremUser.fromData(data[member])
-
-    profile.status = status.REVOKED
-    profile.revokeReason = reason
-    profile.level = 0
-
-    data[member] = profile
+    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(
+        reason,
+        member
+    )
 
     const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")
@@ -356,7 +383,9 @@ exports.revokeUser = revokeUser
  * @param {String} member id
  */
 function getLastDaily(member) {
-    return data[member].lastDaily
+    const query = db.prepare("SELECT last_daily FROM premium WHERE id = ?").get(member)
+
+    return query.last_daily
 }
 
 exports.getLastDaily = getLastDaily
@@ -366,7 +395,9 @@ exports.getLastDaily = getLastDaily
  * @param {String} member id
  */
 function getLastWeekly(member) {
-    return data[member].lastWeekly
+    const query = db.prepare("SELECT last_weekly FROM premium WHERE id = ?").get(member)
+
+    return query.last_weekly
 }
 
 exports.getLastWeekly = getLastWeekly
@@ -431,3 +462,17 @@ function addUse(id) {
 }
 
 exports.addUse = addUse
+
+function createPremUser(query) {
+    return PremUser.fromData({
+        id: query.id,
+        level: query.level,
+        embedColor: query.embed_color,
+        lastDaily: query.last_daily,
+        lastWeekly: query.last_weekly,
+        status: query.status,
+        revokeReason: query.revoke_reason,
+        startDate: query.start_date,
+        expireDate: query.expire_date,
+    })
+}

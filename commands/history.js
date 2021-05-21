@@ -131,10 +131,10 @@ async function run(message, args) {
     for (let case0 of pages[0]) {
         const date = formatDate(new Date(case0.time))
         if (case0.deleted) {
-            embed.addField("case " + case0.id, "`[deleted]`")
+            embed.addField("case " + case0.case_id, "`[deleted]`")
         } else {
             embed.addField(
-                "case " + case0.id,
+                "case " + case0.case_id,
                 "`" + case0.type + "` - " + case0.command + "\non " + date
             )
         }
@@ -182,10 +182,10 @@ async function run(message, args) {
                     for (let case0 of pages[currentPage]) {
                         const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
-                            newEmbed.addField("case " + case0.id, "`[deleted]`")
+                            newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
                             newEmbed.addField(
-                                "case " + case0.id,
+                                "case " + case0.case_id,
                                 "`" + case0.type + "` - " + case0.command + "\non " + date
                             )
                         }
@@ -209,10 +209,10 @@ async function run(message, args) {
                     for (let case0 of pages[currentPage]) {
                         const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
-                            newEmbed.addField("case " + case0.id, "`[deleted]`")
+                            newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
                             newEmbed.addField(
-                                "case " + case0.id,
+                                "case " + case0.case_id,
                                 "`" + case0.type + "` - " + case0.command + "\nat " + date
                             )
                         }

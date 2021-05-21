@@ -41,8 +41,7 @@ async function run(message, args) {
 
     if (
         inCooldown(message.guild) ||
-        message.guild.memberCount == message.guild.members.cache.size ||
-        message.guild.memberCount <= 50
+        message.guild.memberCount == message.guild.members.cache.size
     ) {
         members = message.guild.members.cache
     } else {
