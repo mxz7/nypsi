@@ -718,7 +718,9 @@ function runCountdowns(client) {
 
                 if (!guildToSend) continue
 
-                const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel).catch(() => {})
+                const channel = guildToSend.channels.cache
+                    .find((ch) => ch.id == countdown.channel)
+                    .catch(() => {})
 
                 if (!channel) continue
 
