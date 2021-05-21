@@ -714,11 +714,13 @@ function runCountdowns(client) {
                 embed.setDescription(message)
                 embed.setColor("#111111")
 
-                const guildToSend = await client.guilds.fetch(guildID)
+                const guildToSend = await client.guilds.fetch(guildID).catch(() => {})
 
                 if (!guildToSend) return
 
-                const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel)
+                const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel).catch(() => {})
+
+                if (!channel) return
 
                 await channel
                     .send(embed)
