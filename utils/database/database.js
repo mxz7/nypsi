@@ -72,12 +72,10 @@ runBackups()
 function toArray(string, seperator) {
     const d = string.split(seperator || "#@|@#")
 
-    if (string == "") {
-        return []
-    }
-
-    if (d.length == 2 && d[0] == "") {
-        d.splice(0, 1)
+    for (const thing in d) {
+        if (thing == "") {
+            d.splice(d.indexOf(thing), 1)
+        }
     }
 
     return d
