@@ -187,4 +187,24 @@ function convertPremium() {
 
 convertPremium()
 
+function convertChatReactions() {
+    const file = JSON.parse(fs.readFileSync("./utils/chatreactions/data.json"))
+
+    for (let guild in file) {
+        const id = guild
+        guild = file[id]
+
+        db.prepare("INSERT INTO chat_reaction (id, word_list, random_start, random_channels, between_events, random_modifier, timeout, blacklisted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(id, toStorage(guild.wordList), guild.settings.randomStart ? 1 : 0, toStorage(guild.settings.randomChannels), guild.settings.timeBetweenEvents, guild.settings.randomModifier, guild.settings.timeout, toStorage(guild.blacklisted))
+
+        for (let user in guild.stats) {
+            const userID = user
+            user = guild.stats[userID]
+
+            db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id, wins, second, third) VALUES (?, ?, ?, ?, ?)").run(id, userID, user.wins, user.secondPlace, user.thirdPlace)
+        }
+    }
+}
+
+convertChatReactions()
+
 console.timeEnd("runtime")
