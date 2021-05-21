@@ -73,19 +73,19 @@ setInterval(async () => {
     const query = db.prepare("SELECT id FROM guilds").all()
 
     for (let guild of query) {
-        const exists = await checkGuild(guild)
+        const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            db.prepare("DELETE FROM guilds WHERE id = ?").run(guild)
-            db.prepare("DELETE FROM guilds_counters WHERE guild_id = ?").run(guild)
-            db.prepare("DELETE FROM guilds_christmas WHERE guild_id = ?").run(guild)
+            db.prepare("DELETE FROM guilds_counters WHERE guild_id = ?").run(guild.id)
+            db.prepare("DELETE FROM guilds_christmas WHERE guild_id = ?").run(guild.id)
+            db.prepare("DELETE FROM guilds WHERE id = ?").run(guild.id)
 
             if (existsCooldown.has(guild)) existsCooldown.delete(guild)
 
-            info(`deleted guild '${guild}' from guild data`, types.GUILD)
+            info(`deleted guild '${guild.id}' from guild data`, types.GUILD)
         }
     }
-}, 24 * 60 * 60 * 1000)
+}, 10000)
 
 const fetchCooldown = new Set()
 const prefixCache = new Map()

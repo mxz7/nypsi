@@ -16,13 +16,13 @@ setInterval(async () => {
     const query = db.prepare("SELECT id FROM chat_reaction").all()
 
     for (let guild of query) {
-        const exists = await checkGuild(guild)
+        const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild)
             db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild)
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild)
 
-            info(`deleted guild '${guild}' from chat reaction data`, types.GUILD)
+            info(`deleted guild '${guild.id}' from chat reaction data`, types.GUILD)
         }
     }
 }, 24 * 60 * 60 * 1000)
