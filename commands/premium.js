@@ -163,18 +163,6 @@ async function run(message, args) {
         renewUser(args[1])
 
         return message.channel.send(new CustomEmbed(message.member, false, "✅ membership renewed"))
-    } else if (args[0].toLowerCase() == "revoke") {
-        if (message.author.id != "672793821850894347") {
-            return defaultMessage()
-        }
-
-        if (args.length != 2) {
-            return message.channel.send(new ErrorEmbed("invalid syntax bro"))
-        }
-
-        revokeUser(args[1], message.content)
-
-        return message.channel.send(new CustomEmbed(message.member, false, "✅ membership revoked"))
     } else if (args[0].toLowerCase() == "expire") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage()

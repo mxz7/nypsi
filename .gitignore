@@ -5,3 +5,4 @@ backup/
 !items.json
 !package.json
 !package-lock.json
+*.db
