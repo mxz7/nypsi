@@ -72,7 +72,7 @@ runBackups()
 function toArray(string, seperator) {
     const d = string.split(seperator || "#@|@#")
 
-    for (const thing in d) {
+    for (const thing of d) {
         if (thing == "") {
             d.splice(d.indexOf(thing), 1)
         }
