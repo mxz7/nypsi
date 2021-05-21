@@ -116,7 +116,7 @@ setInterval(async () => {
 
             lastGame.set(channel.id, nextGame)
 
-            continue 
+            continue
         }
     }
 
