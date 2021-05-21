@@ -145,4 +145,33 @@ function convertGuilds() {
 
 convertGuilds()
 
+function convertModeration() {
+    const file = JSON.parse(fs.readFileSync("./utils/moderation/data.json"))
+
+    for (let guild in file) {
+        const id = guild
+        guild = file[id]
+
+        const mutes = guild.mutes
+        const bans = guild.bans
+        const cases = guild.cases
+
+        db.prepare("INSERT INTO moderation (id, case_count, mute_role) VALUES (?, ?, ?)").run(id, guild.caseCount, guild.muteRole)
+
+        for (let case0 of cases) {
+            db.prepare("INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(case0.id, case0.type, case0.user, case0.moderator, case0.command, case0.time, case0.deleted ? 1 : 0, id)
+        }
+
+        for (let mute of mutes) {
+            db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(mute.user, mute.unmuteTime, id)
+        }
+
+        for (let ban of bans) {
+            db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(ban.user, ban.unbanTime, id)
+        }
+    }
+}
+
+convertModeration()
+
 console.timeEnd("runtime")
