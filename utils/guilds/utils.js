@@ -85,7 +85,7 @@ setInterval(async () => {
             info(`deleted guild '${guild.id}' from guild data`, types.GUILD)
         }
     }
-}, 10000)
+}, 24 * 60 * 60 * 1000)
 
 const fetchCooldown = new Set()
 const prefixCache = new Map()
