@@ -83,7 +83,7 @@ async function run(message, args) {
         let fail = false
 
         let res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
@@ -132,7 +132,7 @@ async function run(message, args) {
         await message.channel.send(embed)
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
@@ -157,7 +157,7 @@ async function run(message, args) {
         await message.channel.send(embed)
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
@@ -184,7 +184,7 @@ async function run(message, args) {
         await message.channel.send(embed)
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
                 return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
