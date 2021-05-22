@@ -203,7 +203,7 @@ async function doVote(client, vote) {
         if (voteCache.has(user)) {
             voteCache.delete(user)
         }
-    }, 43200000)
+    }, 10800)
 
     let member = await client.users.fetch(user)
 
@@ -305,14 +305,14 @@ function hasVoted(member) {
 
         setTimeout(() => {
             voteCache.delete(id)
-        }, 3600)
+        }, 10800000)
         return true
     } else {
         voteCache.set(id, false)
 
         setTimeout(() => {
             voteCache.delete(id)
-        }, 3600)
+        }, 10800000)
         return false
     }
 }
