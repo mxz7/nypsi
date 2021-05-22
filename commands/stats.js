@@ -104,13 +104,18 @@ async function run(message, args) {
                     if (pages.get(pages.size).length >= 6) {
                         pages.set(pages.size + 1, [item])
                     } else {
-                        pages.set(pages.size, pages.get(pages.size).push(item))
+                        const current = pages.get(pages.size)
+                        current.push(item)
+                        pages.set(pages.size, current)
                     }
                 }
             }
+            embed.setFooter(`page 1/${pages.size}`)
         }
 
         for (const item in stats) {
+            if (embed.embed.fields.length >= 6) break
+
             embed.addField(
                 item,
                 `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`,
