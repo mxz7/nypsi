@@ -17,6 +17,7 @@ const {
     getMaxBitcoin,
     getMaxDogecoin,
     getDMsEnabled,
+    addItemUse,
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -162,17 +163,20 @@ async function run(message, args) {
 
         switch (selected.id) {
             case "standard_watch":
+                addItemUse(message.member, selected.id)
                 embed.setDescription("you look down at your watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
             case "golden_watch":
-                embed.setDescription("you look down at your watch to check the time..")
+                addItemUse(message.member, selected.id)
+                embed.setDescription("you look down at your *golden* 😏 watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
             case "diamond_watch":
-                embed.setDescription("you look down at your watch to check the time..")
+                addItemUse(message.member, selected.id)
+                embed.setDescription("you look down at your 💎 *diamond* 💎 watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
