@@ -26,6 +26,8 @@ async function run(message, args) {
         return
     }
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     if (
         !message.guild.me.hasPermission("MANAGE_ROLES") ||
         !message.guild.me.hasPermission("MANAGE_CHANNELS")
@@ -254,8 +256,6 @@ async function run(message, args) {
     } else {
         await message.channel.send(embed)
     }
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     let storeReason = reason
 
