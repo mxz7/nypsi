@@ -36,6 +36,8 @@ async function run(message, args) {
         )
     }
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
@@ -115,8 +117,6 @@ async function run(message, args) {
     }
 
     if (fail) return
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     const embed = new CustomEmbed(
         message.member,

@@ -26,6 +26,8 @@ async function run(message, args) {
         )
     }
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0 && message.mentions.members.first() == null) {
@@ -155,8 +157,6 @@ async function run(message, args) {
     } else {
         await message.channel.send(embed)
     }
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     const members1 = members.keyArray()
 

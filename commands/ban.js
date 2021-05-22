@@ -28,6 +28,8 @@ async function run(message, args) {
         )
     }
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     let idOnly = false
 
     const prefix = getPrefix(message.guild)
@@ -217,8 +219,6 @@ async function run(message, args) {
     } else {
         await message.channel.send(embed)
     }
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     if (idOnly) {
         newCase(
