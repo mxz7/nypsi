@@ -13,6 +13,7 @@ const {
     getBalance,
     updateXp,
     getXp,
+    addItemUse,
 } = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -76,6 +77,8 @@ async function run(message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
+
+    addItemUse(message.member, gun)
 
     const huntItems = Array.from(Object.keys(items))
 
