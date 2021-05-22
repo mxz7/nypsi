@@ -1172,7 +1172,7 @@ exports.hasStatsProfile = hasStatsProfile
 function createStatsProfile(member) {
     stats[member.user.id] = {
         gamble: {},
-        padlock: 0,
+        items: {},
         rob: {
             wins: 0,
             lose: 0,
