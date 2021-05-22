@@ -26,6 +26,8 @@ async function run(message, args) {
         )
     }
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
@@ -48,8 +50,6 @@ async function run(message, args) {
 
     const members = []
     const failed = []
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     for (let arg of args) {
         if (arg.length == 18) {
