@@ -45,7 +45,7 @@ async function run(message, args) {
 
         let gambleWins = 0
         let gambleLoses = 0
-        
+
         let itemsUsed = 0
 
         for (const gambleStats in stats.gamble) {
@@ -158,7 +158,7 @@ async function run(message, args) {
                     return pageManager()
                 } else {
                     currentPage--
-                    
+
                     for (const item of pages.get(currentPage)) {
                         newEmbed.addField(
                             item,
@@ -176,7 +176,7 @@ async function run(message, args) {
                     return pageManager()
                 } else {
                     currentPage++
-                    
+
                     for (const item of pages.get(currentPage)) {
                         newEmbed.addField(
                             item,

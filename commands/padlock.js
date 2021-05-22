@@ -21,7 +21,9 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 1) {
-        return message.channel.send(new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`))
+        return message.channel.send(
+            new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`)
+        )
     } else {
         if (hasPadlock(message.member)) {
             embed.setColor("#5efb8f")

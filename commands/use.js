@@ -119,7 +119,7 @@ async function run(message, args) {
 
     cooldown.set(message.member.id, {
         init: new Date(),
-        length: cooldownLength
+        length: cooldownLength,
     })
 
     setTimeout(() => {
@@ -176,7 +176,9 @@ async function run(message, args) {
 
             case "diamond_watch":
                 addItemUse(message.member, selected.id)
-                embed.setDescription("you look down at your 💎 *diamond* 💎 watch to check the time..")
+                embed.setDescription(
+                    "you look down at your 💎 *diamond* 💎 watch to check the time.."
+                )
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
@@ -333,7 +335,7 @@ async function run(message, args) {
                         )
                     )
                 }
-                
+
                 addItemUse(message.member, selected.id)
 
                 addRadioCooldown(radioTarget.id)
