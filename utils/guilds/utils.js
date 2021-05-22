@@ -451,7 +451,7 @@ exports.getChristmasCountdown = getChristmasCountdown
 function setChristmasCountdown(guild, xmas) {
     db.prepare(
         "UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?"
-    ).run(xmas.enabled, xmas.format, xmas.channel, guild.id)
+    ).run(xmas.enabled ? 1 : 0, xmas.format, xmas.channel, guild.id)
 }
 
 exports.setChristmasCountdown = setChristmasCountdown
@@ -773,10 +773,9 @@ function runChristmas(client) {
     const needed = new Date(Date.parse(d) + 10800000)
 
     const runChristmasThing = async () => {
-        const query = db.prepare("SELECT * FROM guilds_christmas").all()
+        const query = db.prepare("SELECT * FROM guilds_christmas WHERE enabled = 1").all()
 
         for (const profile of query) {
-            if (!profile.enabled) continue
             const guild = client.guilds.cache.find((g) => g.id == profile.guild_id)
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
@@ -797,7 +796,7 @@ function runChristmas(client) {
                 format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
             }
 
-            return await channel
+            await channel
                 .send(
                     new CustomEmbed()
                         .setDescription(format)
