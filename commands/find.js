@@ -426,7 +426,7 @@ async function guildInfo(guild) {
                 guild.memberCount.toLocaleString() +
                 "\n" +
                 "**member peak** " +
-                getPeaks(guild).members.toLocaleString(),
+                getPeaks(guild).toLocaleString(),
             true
         )
 
