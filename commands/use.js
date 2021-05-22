@@ -360,7 +360,7 @@ async function run(message, args) {
                     )
                 }
 
-                if (onChastityCooldown(chastityTarget)) {
+                if (onChastityCooldown(chastityTarget.id)) {
                     return message.channel.send(
                         new ErrorEmbed(
                             `**${chastityTarget.user.tag}** is already equipped with a chastity cage`
