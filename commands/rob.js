@@ -14,6 +14,7 @@ const {
     addRob,
     getInventory,
     setInventory,
+    addItemUse,
 } = require("../utils/economy/utils.js")
 const { Message, GuildMember } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -268,6 +269,7 @@ async function run(message, args) {
             const inventory = getInventory(message.member)
 
             if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+                addItemUse(message.member, "lawyer")
                 inventory["lawyer"]--
 
                 if (inventory["lawyer"] == 0) {
