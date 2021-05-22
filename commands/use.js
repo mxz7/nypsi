@@ -13,10 +13,10 @@ const {
     getXp,
     hasPadlock,
     setPadlock,
-    addPadlock,
     getMaxBitcoin,
     getMaxDogecoin,
     getDMsEnabled,
+    addItemUse,
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -42,10 +42,10 @@ async function run(message, args) {
     }
 
     if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
+        const init = cooldown.get(message.member.id).init
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = cooldownLength - diff
+        const time = cooldown.get(message.member.id).length - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -117,7 +117,10 @@ async function run(message, args) {
         cooldownLength = 5
     }
 
-    cooldown.set(message.member.id, new Date())
+    cooldown.set(message.member.id, {
+        init: new Date(),
+        length: cooldownLength
+    })
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
@@ -140,6 +143,7 @@ async function run(message, args) {
     let laterDescription
 
     if (selected.role == "crate") {
+        addItemUse(message.member, selected.id)
         const itemsFound = openCrate(message.member, selected)
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
@@ -159,21 +163,25 @@ async function run(message, args) {
 
         switch (selected.id) {
             case "standard_watch":
+                addItemUse(message.member, selected.id)
                 embed.setDescription("you look down at your watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
             case "golden_watch":
-                embed.setDescription("you look down at your watch to check the time..")
+                addItemUse(message.member, selected.id)
+                embed.setDescription("you look down at your *golden* 😏 watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
             case "diamond_watch":
-                embed.setDescription("you look down at your watch to check the time..")
+                addItemUse(message.member, selected.id)
+                embed.setDescription("you look down at your 💎 *diamond* 💎 watch to check the time..")
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`
                 break
 
             case "calendar":
+                addItemUse(message.member, selected.id)
                 embed.setDescription("you look at your calendar to check the date..")
                 laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
                 break
@@ -194,7 +202,7 @@ async function run(message, args) {
 
                 setInventory(message.member, inventory)
 
-                addPadlock(message.member)
+                addItemUse(message.member, selected.id)
 
                 embed.setDescription("✅ your padlock has been applied")
                 break
@@ -224,6 +232,7 @@ async function run(message, args) {
 
                 if (message.member == lockPickTarget) {
                     if (onChastityCooldown(message.author.id)) {
+                        addItemUse(message.member, selected.id)
                         deleteChastityCooldown(message.author.id)
 
                         embed.setDescription("picking chastity cage...")
@@ -247,6 +256,8 @@ async function run(message, args) {
                 if (inventory["lock_pick"] <= 0) {
                     delete inventory["lock_pick"]
                 }
+
+                addItemUse(message.member, selected.id)
 
                 setInventory(message.member, inventory)
 
@@ -285,6 +296,8 @@ async function run(message, args) {
                     delete inventory["mask"]
                 }
 
+                addItemUse(message.member, selected.id)
+
                 setInventory(message.member, inventory)
 
                 embed.setDescription("you're wearing your **mask** and can now rob someone again")
@@ -320,6 +333,8 @@ async function run(message, args) {
                         )
                     )
                 }
+                
+                addItemUse(message.member, selected.id)
 
                 addRadioCooldown(radioTarget.id)
 
@@ -368,6 +383,8 @@ async function run(message, args) {
                     )
                 }
 
+                addItemUse(message.member, selected.id)
+
                 addChastityCooldown(chastityTarget.id)
 
                 inventory["chastity_cage"]--
@@ -410,6 +427,8 @@ async function run(message, args) {
                         new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)
                     )
                 }
+
+                addItemUse(message.member, selected.id)
 
                 addHandcuffs(handcuffsTarget.id)
 

@@ -1172,7 +1172,7 @@ exports.hasStatsProfile = hasStatsProfile
 function createStatsProfile(member) {
     stats[member.user.id] = {
         gamble: {},
-        padlock: 0,
+        items: {},
         rob: {
             wins: 0,
             lose: 0,
@@ -1235,13 +1235,17 @@ exports.addRob = addRob
  *
  * @param {GuildMember} member
  */
-function addPadlock(member) {
+function addItemUse(member, item) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
 
-    stats[member.user.id].padlock++
+    if (stats[member.user.id].items[item]) {
+        stats[member.user.id].items[item]++
+    } else {
+        stats[member.user.id].items[item] = 1
+    }
 }
 
-exports.addPadlock = addPadlock
+exports.addItemUse = addItemUse
 
 /**
  *
