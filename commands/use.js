@@ -13,7 +13,6 @@ const {
     getXp,
     hasPadlock,
     setPadlock,
-    addPadlock,
     getMaxBitcoin,
     getMaxDogecoin,
     getDMsEnabled,
@@ -144,6 +143,7 @@ async function run(message, args) {
     let laterDescription
 
     if (selected.role == "crate") {
+        addItemUse(message.member, selected.id)
         const itemsFound = openCrate(message.member, selected)
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`)
@@ -181,6 +181,7 @@ async function run(message, args) {
                 break
 
             case "calendar":
+                addItemUse(message.member, selected.id)
                 embed.setDescription("you look at your calendar to check the date..")
                 laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`
                 break
@@ -201,7 +202,7 @@ async function run(message, args) {
 
                 setInventory(message.member, inventory)
 
-                addPadlock(message.member)
+                addItemUse(message.member, selected.id)
 
                 embed.setDescription("✅ your padlock has been applied")
                 break
@@ -231,6 +232,7 @@ async function run(message, args) {
 
                 if (message.member == lockPickTarget) {
                     if (onChastityCooldown(message.author.id)) {
+                        addItemUse(message.member, selected.id)
                         deleteChastityCooldown(message.author.id)
 
                         embed.setDescription("picking chastity cage...")
@@ -254,6 +256,8 @@ async function run(message, args) {
                 if (inventory["lock_pick"] <= 0) {
                     delete inventory["lock_pick"]
                 }
+
+                addItemUse(message.member, selected.id)
 
                 setInventory(message.member, inventory)
 
@@ -292,6 +296,8 @@ async function run(message, args) {
                     delete inventory["mask"]
                 }
 
+                addItemUse(message.member, selected.id)
+
                 setInventory(message.member, inventory)
 
                 embed.setDescription("you're wearing your **mask** and can now rob someone again")
@@ -327,6 +333,8 @@ async function run(message, args) {
                         )
                     )
                 }
+                
+                addItemUse(message.member, selected.id)
 
                 addRadioCooldown(radioTarget.id)
 
@@ -375,6 +383,8 @@ async function run(message, args) {
                     )
                 }
 
+                addItemUse(message.member, selected.id)
+
                 addChastityCooldown(chastityTarget.id)
 
                 inventory["chastity_cage"]--
@@ -417,6 +427,8 @@ async function run(message, args) {
                         new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)
                     )
                 }
+
+                addItemUse(message.member, selected.id)
 
                 addHandcuffs(handcuffsTarget.id)
 
