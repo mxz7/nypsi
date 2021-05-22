@@ -13,6 +13,7 @@ const {
     getMulti,
     calcMaxBet,
     getInventory,
+    setInventory,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
@@ -153,6 +154,8 @@ async function run(message, args) {
         } else {
             inventory["basic_crate"] = amount
         }
+
+        setInventory(message.member, inventory)
 
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
