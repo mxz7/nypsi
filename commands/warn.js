@@ -16,6 +16,8 @@ const cmd = new Command("warn", "warn one or more users", categories.MODERATION)
 async function run(message, args) {
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return
 
+    if (!profileExists(message.guild)) createProfile(message.guild)
+
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0 && message.mentions.members.first() == null) {
@@ -84,8 +86,6 @@ async function run(message, args) {
     let error = []
 
     const messageDM = "you have been warned in **" + message.guild.name + "** for `" + reason + "`"
-
-    if (!profileExists(message.guild)) createProfile(message.guild)
 
     for (let member of members.keyArray()) {
         const targetHighestRole = members.get(member).roles.highest
