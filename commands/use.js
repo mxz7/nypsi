@@ -42,10 +42,10 @@ async function run(message, args) {
     }
 
     if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
+        const init = cooldown.get(message.member.id).init
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = cooldownLength - diff
+        const time = cooldown.get(message.member.id).length - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -117,7 +117,10 @@ async function run(message, args) {
         cooldownLength = 5
     }
 
-    cooldown.set(message.member.id, new Date())
+    cooldown.set(message.member.id, {
+        init: new Date(),
+        length: cooldownLength
+    })
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
