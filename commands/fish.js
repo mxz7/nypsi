@@ -13,6 +13,7 @@ const {
     getBalance,
     updateXp,
     getXp,
+    addItemUse,
 } = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -105,6 +106,8 @@ async function run(message, args) {
     for (const i of Array.from(Object.keys(items))) {
         fishItems.push(i)
     }
+
+    addItemUse(message.member, fishingRod)
 
     inventory[fishingRod]--
 
