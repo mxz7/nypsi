@@ -129,7 +129,7 @@ function addMention() {
         let count = 0
 
         for (const memberID of Array.from(members.keys())) {
-            if (count >= 15) return
+            if (count >= 200) return
             const member = members.get(memberID)
 
             if (member.user.bot) continue
