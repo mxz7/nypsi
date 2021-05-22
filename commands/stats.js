@@ -45,10 +45,16 @@ async function run(message, args) {
 
         let gambleWins = 0
         let gambleLoses = 0
+        
+        let itemsUsed = 0
 
         for (const gambleStats in stats.gamble) {
             gambleWins += stats.gamble[gambleStats].wins
             gambleLoses += stats.gamble[gambleStats].lose
+        }
+
+        for (const item in stats.items) {
+            itemsUsed += stats.items[item]
         }
 
         const embed = new CustomEmbed(message.member, true).setTitle(
@@ -70,19 +76,125 @@ async function run(message, args) {
             true
         )
         embed.addField(
-            "padlock",
-            `**${stats.padlock.toLocaleString()}** padlock${stats.padlock == 1 ? "" : "s"} used`,
+            "items",
+            `**${itemsUsed.toLocaleString()}** item use${stats.padlock == 1 ? "d" : "s"}`,
             true
         )
 
         return message.channel.send(embed)
     }
 
+    const itemStats = async () => {
+        const stats = getStats(message.member).items
+
+        const embed = new CustomEmbed(message.member, true).setTitle(
+            "item stats | " + message.author.username
+        )
+
+        /**
+         * @type {Map<Number, Array<String>}
+         */
+        const pages = new Map()
+
+        if (Array.from(Object.keys(stats)).length > 6) {
+            for (const item in stats) {
+                if (pages.size == 0) {
+                    pages.set(1, [item])
+                } else {
+                    if (pages.get(pages.size).length >= 6) {
+                        pages.set(pages.size + 1, [item])
+                    } else {
+                        pages.set(pages.size, pages.get(pages.size).push(item))
+                    }
+                }
+            }
+        }
+
+        for (const item in stats) {
+            embed.addField(
+                item,
+                `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`,
+                true
+            )
+        }
+
+        const msg = await message.channel.send(embed)
+
+        if (pages.size == 0) return
+
+        await msg.react("⬅")
+        await msg.react("➡")
+
+        let currentPage = 1
+        const lastPage = pages.size
+
+        const filter = (reaction, user) => {
+            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+        }
+
+        async function pageManager() {
+            const reaction = await msg
+                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .then((collected) => {
+                    return collected.first().emoji.name
+                })
+                .catch(async () => {
+                    await msg.reactions.removeAll()
+                })
+
+            if (!reaction) return
+
+            const newEmbed = new CustomEmbed(message.member, false).setTitle(
+                "item stats | " + message.author.username
+            )
+
+            if (reaction == "⬅") {
+                if (currentPage <= 1) {
+                    return pageManager()
+                } else {
+                    currentPage--
+                    
+                    for (const item of pages.get(currentPage)) {
+                        newEmbed.addField(
+                            item,
+                            `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`,
+                            true
+                        )
+                    }
+
+                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
+                    await msg.edit(newEmbed)
+                    return pageManager()
+                }
+            } else if (reaction == "➡") {
+                if (currentPage >= lastPage) {
+                    return pageManager()
+                } else {
+                    currentPage++
+                    
+                    for (const item of pages.get(currentPage)) {
+                        newEmbed.addField(
+                            item,
+                            `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`,
+                            true
+                        )
+                    }
+
+                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
+                    await msg.edit(newEmbed)
+                    return pageManager()
+                }
+            }
+        }
+
+        return pageManager()
+    }
+
     const gambleStats = () => {
         const stats = getStats(message.member).gamble
 
         const embed = new CustomEmbed(message.member, true).setTitle(
-            "stats | " + message.author.username
+            "gamble stats | " + message.author.username
         )
 
         for (const gambleStat in stats) {
@@ -104,6 +216,8 @@ async function run(message, args) {
         return normalStats()
     } else if (args[0].toLowerCase() == "gamble") {
         return gambleStats()
+    } else if (args[0].toLowerCase() == "item" || args[0].toLowerCase() == "items") {
+        return itemStats()
     } else {
         return normalStats()
     }
