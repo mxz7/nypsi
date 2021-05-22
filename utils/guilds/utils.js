@@ -299,7 +299,7 @@ function checkStats() {
                 profile.enabled = false
                 profile.channel = "none"
                 setStatsProfile(guild, profile)
-                return
+                continue
             }
 
             let format = profile.format
@@ -309,7 +309,7 @@ function checkStats() {
             if (channel.name != format) {
                 const old = channel.name
 
-                return await channel
+                await channel
                     .edit({ name: format })
                     .then(() => {
                         info(
