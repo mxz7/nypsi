@@ -570,6 +570,13 @@ function acceptWholesomeImage(id, accepter) {
 
     clearWholesomeCache()
 
+    const { requestDM } = require("../nypsi")
+    const { getDMsEnabled } = require("./economy/utils")
+
+    if (getDMsEnabled(query.submitter_id)) {
+        requestDM(query.submitter_id, `your wholesome image (${query.image}) has been accepted`, true)
+    }
+
     return true
 }
 
