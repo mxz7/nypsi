@@ -2,11 +2,9 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "clearsnipe",
-    "delete the current sniped thing",
-    categories.MODERATION
-).setAliases(["cs"]).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("clearsnipe", "delete the current sniped thing", categories.MODERATION)
+    .setAliases(["cs"])
+    .setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
@@ -28,14 +26,18 @@ async function run(message, args) {
         }
     }
 
-    if (!snipe || !snipe.get(channel.id) && (!eSnipe || !eSnipe.get(channel.id))) {
-        return message.channel.send(new ErrorEmbed("nothing has been sniped in " + channel.toString()))
+    if (!snipe || (!snipe.get(channel.id) && (!eSnipe || !eSnipe.get(channel.id)))) {
+        return message.channel.send(
+            new ErrorEmbed("nothing has been sniped in " + channel.toString())
+        )
     }
 
     snipe.delete(channel.id)
     eSnipe.delete(channel.id)
 
-    return message.channel.send(new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString()))
+    return message.channel.send(
+        new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())
+    )
 }
 
 cmd.setRun(run)
