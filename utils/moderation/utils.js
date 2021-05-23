@@ -165,9 +165,20 @@ exports.getAllCases = getAllCases
  * @param {Number} caseID case to fetch
  */
 function getCase(guild, caseID) {
-    const query = db
+    if (caseID > getCaseCount(guild)) return undefined
+
+    let query = db
         .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
         .get(guild.id, caseID.toString())
+    
+    if (!query) {
+        query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?").get(
+            guild.id,
+            caseID.toString() + ".0"
+        )
+    }
+
+    if (!query) return undefined
 
     query.case_id = parseInt(query.case_id)
 
