@@ -64,7 +64,7 @@ async function run(message, args) {
             return message.channel.send(new ErrorEmbed("must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"))
         }
 
-        const res = await suggestWholesomeImage(message.member, url)
+        const res = await suggestWholesomeImage(message.member, args[1])
 
         if (!res) {
             return message.channel.send(new ErrorEmbed(`error: maybe that image already exists? if this persists join the ${getPrefix(message.guild)}support server`))
