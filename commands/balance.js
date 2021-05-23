@@ -94,7 +94,8 @@ async function run(message, args) {
     if (message.member == target) {
         if (
             getXp(target) >= getPrestigeRequirement(target) &&
-            getBankBalance(target) >= getPrestigeRequirementBal(getXp(target))
+            getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
+            getPrestige(target) < 20
         ) {
             return message.channel.send(
                 `you are eligible to prestige, use ${getPrefix(
