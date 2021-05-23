@@ -1238,6 +1238,8 @@ exports.addRob = addRob
 function addItemUse(member, item) {
     if (!hasStatsProfile(member)) createStatsProfile(member)
 
+    if (!stats[member.user.id].items) stats[member.user.id].items = {}
+
     if (stats[member.user.id].items[item]) {
         stats[member.user.id].items[item]++
     } else {
