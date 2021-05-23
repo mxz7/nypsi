@@ -617,6 +617,8 @@ exports.clearWholesomeCache = clearWholesomeCache
 function deleteFromWholesome(id) {
     const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
 
+    wholesomeCache = []
+
     if (query.changes > 0) {
         return true
     } else {
