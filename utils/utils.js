@@ -560,7 +560,7 @@ function acceptWholesomeImage(id, accepter) {
 
     db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
 
-    wholesomeCache = []
+    clearWholesomeCache()
 
     return true
 }
@@ -619,7 +619,7 @@ exports.clearWholesomeCache = clearWholesomeCache
 function deleteFromWholesome(id) {
     const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
 
-    wholesomeCache = []
+    clearWholesomeCache()
 
     if (query.changes > 0) {
         return true
