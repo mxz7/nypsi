@@ -630,6 +630,9 @@ function deleteFromWholesome(id) {
 
 exports.deleteFromWholesome = deleteFromWholesome
 
+/**
+ * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
+ */
 function getAllSuggestions() {
     const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
 
