@@ -494,7 +494,7 @@ class captcha {
 }
 
 /**
- * 
+ * @returns {Boolean}
  * @param {GuildMember} submitter 
  * @param {String} image 
  */
@@ -540,3 +540,22 @@ async function suggestWholesomeImage(submitter, image) {
 }
 
 exports.suggestWholesomeImage = suggestWholesomeImage
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ * @param {GuildMember} accepter
+ */
+function acceptWholesomeImage(id, accepter) {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
+
+    if (!query) return false
+
+    db.prepare("INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)").run(query.image, query.submitter, query.submitter_id, query.upload, accepter.user.id)
+
+    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
+
+    return true
+}
+
+exports.acceptWholesomeImage = acceptWholesomeImage
