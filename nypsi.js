@@ -141,8 +141,9 @@ exports.onVote = onVote
 /**
  * @returns {Boolean}
  * @param {String} id
+ * @param {Boolean} dontDmTekoh
  */
-async function requestDM(id, content) {
+async function requestDM(id, content, dontDmTekoh) {
     info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
@@ -154,17 +155,20 @@ async function requestDM(id, content) {
             })
             .catch(async () => {
                 error(`failed to send DM to ${member.tag} (${member.id})`)
-                const tekoh = await client.users.fetch("672793821850894347")
+                if (!dontDmTekoh) {
+                    const tekoh = await client.users.fetch("672793821850894347")
 
-                await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+                    await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+                }
             })
         return true
     } else {
         error(`failed to send DM to ${member.id}`)
-        const tekoh = await client.users.fetch("672793821850894347")
+        if (!dontDmTekoh) {
+            const tekoh = await client.users.fetch("672793821850894347")
 
-        await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
-
+            await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+        }
         return false
     }
 }
