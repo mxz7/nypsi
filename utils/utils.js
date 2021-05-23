@@ -1,8 +1,10 @@
-const { GuildMember, Message, Client } = require("discord.js")
+const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
+const { getDatabase } = require("./database/database")
 const { error, info, types } = require("./logger")
+const db = getDatabase()
 
 const news = {
     text: "",
@@ -10,6 +12,16 @@ const news = {
 }
 
 const locked = []
+
+/**
+ * @type {Webhook}
+ */
+let wholesomeWebhook
+
+/**
+ * @type {Array<{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }>}
+ */
+let wholesomeCache
 
 /**
  * @returns {String}
@@ -484,3 +496,147 @@ class captcha {
         return this
     }
 }
+
+/**
+ * @returns {Boolean}
+ * @param {GuildMember} submitter 
+ * @param {String} image 
+ */
+async function suggestWholesomeImage(submitter, image) {
+    if (!wholesomeWebhook) {
+        const { getGuild } = require("../nypsi")
+        const guild = await getGuild("747056029795221513")
+
+        const webhooks = await guild.fetchWebhooks()
+
+        wholesomeWebhook = await webhooks.find((w) => w.id == "846092969396142080")
+        info(`wholesome webhook assigned as ${wholesomeWebhook.id}`)
+    }
+
+    let query = db.prepare("SELECT id FROM wholesome WHERE image = ?").get(image)
+
+    if (query) {
+        return false
+    }
+
+    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
+
+    if (query) {
+        return false
+    }
+
+    db.prepare("INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)").run(image, submitter.user.tag, submitter.user.id, Date.now())
+
+    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
+
+    const { CustomEmbed } = require("./classes/EmbedBuilders")
+
+    const embed = new CustomEmbed().embed.setColor("#111111").setTitle("wholesome suggestion #" + query.id)
+
+    embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
+
+    embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`)
+
+    embed.setImage(image)
+
+    await wholesomeWebhook.send(embed)
+
+    return true
+}
+
+exports.suggestWholesomeImage = suggestWholesomeImage
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ * @param {GuildMember} accepter
+ */
+function acceptWholesomeImage(id, accepter) {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
+
+    if (!query) return false
+
+    db.prepare("INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)").run(query.image, query.submitter, query.submitter_id, query.upload, accepter.user.id)
+
+    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
+
+    clearWholesomeCache()
+
+    return true
+}
+
+exports.acceptWholesomeImage = acceptWholesomeImage
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ */
+function denyWholesomeImage(id) {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
+
+    if (!query) return false
+
+    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
+
+    return true
+}
+
+exports.denyWholesomeImage = denyWholesomeImage
+
+/**
+ * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
+ * @param {id} Number
+ */
+function getWholesomeImage(id) {
+    if (id) {
+        const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
+        return query
+    } else {
+        if (wholesomeCache) {
+            return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)]
+        } else {
+            const query = db.prepare("SELECT * FROM wholesome").all()
+
+            wholesomeCache = query
+
+            return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)]
+        }
+    }
+}
+
+exports.getWholesomeImage = getWholesomeImage
+
+function clearWholesomeCache() {
+    wholesomeCache = undefined
+}
+
+exports.clearWholesomeCache = clearWholesomeCache
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ */
+function deleteFromWholesome(id) {
+    const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
+
+    clearWholesomeCache()
+
+    if (query.changes > 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.deleteFromWholesome = deleteFromWholesome
+
+/**
+ * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
+ */
+function getAllSuggestions() {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
+
+    return query
+}
+
+exports.getAllSuggestions = getAllSuggestions
