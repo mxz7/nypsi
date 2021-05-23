@@ -1,8 +1,11 @@
-const { GuildMember, Message, Client } = require("discord.js")
+const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
+const { getGuild } = require("../nypsi")
 const { getZeroWidth } = require("./chatreactions/utils")
+const { getDatabase } = require("./database/database")
 const { error, info, types } = require("./logger")
+const db = getDatabase()
 
 const news = {
     text: "",
@@ -10,6 +13,11 @@ const news = {
 }
 
 const locked = []
+
+/**
+ * @type {Webhook}
+ */
+let wholesomeWebhook
 
 /**
  * @returns {String}
@@ -484,3 +492,51 @@ class captcha {
         return this
     }
 }
+
+/**
+ * 
+ * @param {GuildMember} submitter 
+ * @param {String} image 
+ */
+async function suggestWholesomeImage(submitter, image) {
+    if (!wholesomeWebhook) {
+        const guild = await getGuild("747056029795221513")
+
+        const webhooks = await guild.fetchWebhooks()
+
+        wholesomeWebhook = await webhooks.find((w) => w.id == "832299675309965333")
+        info(`wholesome webhook assigned as ${wholesomeWebhook.id}`)
+    }
+
+    let query = db.prepare("SELECT id FROM wholesome WHERE image = ?").get(image)
+
+    if (query) {
+        return false
+    }
+
+    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
+
+    if (query) {
+        return false
+    }
+
+    db.prepare("INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)").run(image, submitter.user.tag, submitter.user.id, Date.now())
+
+    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
+
+    const { CustomEmbed } = require("./classes/EmbedBuilders")
+
+    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + query.id)
+
+    embed.setImage(image)
+
+    embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
+
+    embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`)
+
+    await wholesomeWebhook.send(embed)
+
+    return true
+}
+
+exports.suggestWholesomeImage = suggestWholesomeImage
