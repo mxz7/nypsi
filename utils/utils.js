@@ -1,7 +1,6 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
-const { getGuild } = require("../nypsi")
 const { getZeroWidth } = require("./chatreactions/utils")
 const { getDatabase } = require("./database/database")
 const { error, info, types } = require("./logger")
@@ -505,6 +504,7 @@ class captcha {
  */
 async function suggestWholesomeImage(submitter, image) {
     if (!wholesomeWebhook) {
+        const { getGuild } = require("../nypsi")
         const guild = await getGuild("747056029795221513")
 
         const webhooks = await guild.fetchWebhooks()
