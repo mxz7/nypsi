@@ -49,7 +49,7 @@ function createTables() {
 
     db.prepare("CREATE TABLE IF NOT EXISTS wholesome ('id' INTEGER PRIMARY KEY, 'image' TEXT NOT NULL UNIQUE, 'submitter' TEXT, 'submitter_id' TEXT, 'upload' INTEGER, 'accepter' TEXT NOT NULL)").run()
 
-    db.prepare("CREATE TABLE IF NOT EXSITS wholesome_suggestions ('id' INTEGER PRIMARY KEY, 'image' TEXT NOT NULL UNIQUE, 'submitter' TEXT, 'submitter_id' TEXT, 'upload' INTEGER)")
+    db.prepare("CREATE TABLE IF NOT EXISTS wholesome_suggestions ('id' INTEGER PRIMARY KEY, 'image' TEXT NOT NULL UNIQUE, 'submitter' TEXT, 'submitter_id' TEXT, 'upload' INTEGER)")
 }
 
 createTables()
