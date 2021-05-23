@@ -20,6 +20,11 @@ const locked = []
 let wholesomeWebhook
 
 /**
+ * @type {Array<{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }>}
+ */
+let wholesomeCache
+
+/**
  * @returns {String}
  * @param {GuildMember} member member to get color of
  */
@@ -555,6 +560,8 @@ function acceptWholesomeImage(id, accepter) {
 
     db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
 
+    wholesomeCache = []
+
     return true
 }
 
@@ -575,3 +582,30 @@ function denyWholesomeImage(id) {
 }
 
 exports.denyWholesomeImage = denyWholesomeImage
+
+/**
+ * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
+ * @param {id} Number
+ */
+function getWholesomeImage(id) {
+    if (id) {
+        const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
+        return query
+    } else {
+        if (wholesomeCache) {
+            return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)]
+        } else {
+            const query = db.prepare("SELECT * FROM wholesome").all()
+
+            wholesomeCache = query
+        }
+    }
+}
+
+exports.getWholesomeImage = getWholesomeImage
+
+function clearWholesomeCache() {
+    wholesomeCache = undefined
+}
+
+exports.clearWholesomeCache = clearWholesomeCache
