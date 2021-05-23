@@ -97,6 +97,12 @@ async function run(message, args) {
             )
         }
 
+        cooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, cooldownLength * 1000)
+
         return message.react("✅")
     } else if (args[0].toLowerCase() == "get") {
         if (message.author.id != "672793821850894347") return
