@@ -234,7 +234,7 @@ async function run(message, args) {
 
             embed.addField(
                 image.id,
-                `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image}`
+                `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image}`
             )
         }
 
@@ -285,7 +285,7 @@ async function run(message, args) {
                     for (const image of pages.get(currentPage)) {
                         newEmbed.addField(
                             image.id,
-                            `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+                            `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image})`
                         )
                     }
 
@@ -302,7 +302,7 @@ async function run(message, args) {
                     for (const image of pages.get(currentPage)) {
                         newEmbed.addField(
                             image.id,
-                            `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+                            `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image})`
                         )
                     }
 
