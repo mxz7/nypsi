@@ -499,8 +499,8 @@ class captcha {
 
 /**
  * @returns {Boolean}
- * @param {GuildMember} submitter 
- * @param {String} image 
+ * @param {GuildMember} submitter
+ * @param {String} image
  */
 async function suggestWholesomeImage(submitter, image) {
     if (!wholesomeWebhook) {
@@ -525,15 +525,21 @@ async function suggestWholesomeImage(submitter, image) {
         return false
     }
 
-    db.prepare("INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)").run(image, submitter.user.tag, submitter.user.id, Date.now())
+    db.prepare(
+        "INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)"
+    ).run(image, submitter.user.tag, submitter.user.id, Date.now())
 
     query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
 
     const { CustomEmbed } = require("./classes/EmbedBuilders")
 
-    const embed = new CustomEmbed().embed.setColor("#111111").setTitle("wholesome suggestion #" + query.id)
+    const embed = new CustomEmbed().embed
+        .setColor("#111111")
+        .setTitle("wholesome suggestion #" + query.id)
 
-    embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
+    embed.setDescription(
+        `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`
+    )
 
     embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`)
 
@@ -548,7 +554,7 @@ exports.suggestWholesomeImage = suggestWholesomeImage
 
 /**
  * @returns {Boolean}
- * @param {Number} id 
+ * @param {Number} id
  * @param {GuildMember} accepter
  */
 function acceptWholesomeImage(id, accepter) {
@@ -556,7 +562,9 @@ function acceptWholesomeImage(id, accepter) {
 
     if (!query) return false
 
-    db.prepare("INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)").run(query.image, query.submitter, query.submitter_id, query.upload, accepter.user.id)
+    db.prepare(
+        "INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)"
+    ).run(query.image, query.submitter, query.submitter_id, query.upload, accepter.user.id)
 
     db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
 
@@ -569,7 +577,7 @@ exports.acceptWholesomeImage = acceptWholesomeImage
 
 /**
  * @returns {Boolean}
- * @param {Number} id 
+ * @param {Number} id
  */
 function denyWholesomeImage(id) {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
@@ -614,7 +622,7 @@ exports.clearWholesomeCache = clearWholesomeCache
 
 /**
  * @returns {Boolean}
- * @param {Number} id 
+ * @param {Number} id
  */
 function deleteFromWholesome(id) {
     const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)

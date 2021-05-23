@@ -2,7 +2,17 @@ const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getWholesomeImage, suggestWholesomeImage, formatDate, acceptWholesomeImage, denyWholesomeImage, deleteFromWholesome, clearWholesomeCache, getMember, getAllSuggestions } = require("../utils/utils")
+const {
+    getWholesomeImage,
+    suggestWholesomeImage,
+    formatDate,
+    acceptWholesomeImage,
+    denyWholesomeImage,
+    deleteFromWholesome,
+    clearWholesomeCache,
+    getMember,
+    getAllSuggestions,
+} = require("../utils/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const e = require("express")
 
@@ -12,7 +22,7 @@ const cmd = new Command("wholesome", "get a random wholesome picture", categorie
     "iloveyou",
     "loveu",
     "ws",
-    "ily"
+    "ily",
 ])
 
 /**
@@ -54,21 +64,37 @@ async function run(message, args) {
 
         embed.setHeader(`<3 | #${image.id}`)
         embed.setImage(image.image)
-    } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "suggest" || args[0].toLowerCase() == "+") {
+    } else if (
+        args[0].toLowerCase() == "add" ||
+        args[0].toLowerCase() == "suggest" ||
+        args[0].toLowerCase() == "+"
+    ) {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`))
+            return message.channel.send(
+                new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)
+            )
         }
 
         const url = args[1].toLowerCase()
 
         if (!url.startsWith("https://i.imgur.com/")) {
-            return message.channel.send(new ErrorEmbed("must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"))
+            return message.channel.send(
+                new ErrorEmbed(
+                    "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
+                )
+            )
         }
 
         const res = await suggestWholesomeImage(message.member, args[1])
 
         if (!res) {
-            return message.channel.send(new ErrorEmbed(`error: maybe that image already exists? if this persists join the ${getPrefix(message.guild)}support server`))
+            return message.channel.send(
+                new ErrorEmbed(
+                    `error: maybe that image already exists? if this persists join the ${getPrefix(
+                        message.guild
+                    )}support server`
+                )
+            )
         }
 
         return message.react("✅")
@@ -87,7 +113,9 @@ async function run(message, args) {
 
         embed.setTitle(`image #${wholesome.id}`)
 
-        embed.setDescription(`**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`)
+        embed.setDescription(
+            `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
+        )
         embed.setImage(wholesome.image)
         embed.setFooter(`submitted on ${formatDate(wholesome.date)}`)
     } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
@@ -110,7 +138,9 @@ async function run(message, args) {
         const res = await acceptWholesomeImage(parseInt(args[1]), message.member)
 
         if (!res) {
-            return message.channel.send(new ErrorEmbed(`couldnt find a suggestion with id ${args[1]}`))
+            return message.channel.send(
+                new ErrorEmbed(`couldnt find a suggestion with id ${args[1]}`)
+            )
         }
 
         return message.react("✅")
@@ -196,7 +226,10 @@ async function run(message, args) {
         for (const image of queue) {
             if (embed.embed.fields.length >= 6) break
 
-            embed.addField(image.id, `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`)
+            embed.addField(
+                image.id,
+                `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+            )
         }
 
         embed.setTitle("wholesome queue")
@@ -244,7 +277,10 @@ async function run(message, args) {
                     currentPage--
 
                     for (const image of pages.get(currentPage)) {
-                        newEmbed.addField(image.id, `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`)
+                        newEmbed.addField(
+                            image.id,
+                            `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+                        )
                     }
 
                     newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
@@ -300,7 +336,10 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     if (target) {
-        return message.channel.send(`${target.user.toString()} you've received a wholesome image (:`, embed)
+        return message.channel.send(
+            `${target.user.toString()} you've received a wholesome image (:`,
+            embed
+        )
     }
 
     return message.channel.send(embed)
