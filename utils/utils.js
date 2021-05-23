@@ -609,3 +609,19 @@ function clearWholesomeCache() {
 }
 
 exports.clearWholesomeCache = clearWholesomeCache
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ */
+function deleteFromWholesome(id) {
+    const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
+
+    if (query.changes > 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+exports.deleteFromWholesome = deleteFromWholesome
