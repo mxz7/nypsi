@@ -629,3 +629,11 @@ function deleteFromWholesome(id) {
 }
 
 exports.deleteFromWholesome = deleteFromWholesome
+
+function getAllSuggestions() {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
+
+    return query
+}
+
+exports.getAllSuggestions = getAllSuggestions
