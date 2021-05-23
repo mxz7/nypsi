@@ -145,7 +145,7 @@ async function run(message, args) {
 
         if (!res) {
             return message.channel.send(
-                new ErrorEmbed(`couldnt find a suggestion with id ${args[1]}`)
+                new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)
             )
         }
 
@@ -171,7 +171,7 @@ async function run(message, args) {
 
         if (!res) {
             return message.channel.send(
-                new ErrorEmbed(`couldnt find a suggestion with id ${args[1]}`)
+                new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)
             )
         }
 
