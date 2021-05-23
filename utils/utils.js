@@ -559,3 +559,19 @@ function acceptWholesomeImage(id, accepter) {
 }
 
 exports.acceptWholesomeImage = acceptWholesomeImage
+
+/**
+ * @returns {Boolean}
+ * @param {Number} id 
+ */
+function denyWholesomeImage(id) {
+    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
+
+    if (!query) return false
+
+    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
+
+    return true
+}
+
+exports.denyWholesomeImage = denyWholesomeImage
