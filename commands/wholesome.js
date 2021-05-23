@@ -228,7 +228,7 @@ async function run(message, args) {
 
             embed.addField(
                 image.id,
-                `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+                `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image}`
             )
         }
 
