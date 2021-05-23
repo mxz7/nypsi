@@ -1,8 +1,9 @@
 const { Message } = require("discord.js")
-let wholesome = require("../lists.json").wholesome
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getWholesomeImage, suggestWholesomeImage } = require("../utils/utils")
+const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
@@ -42,18 +43,31 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
 
-    if (args.length == 1 && args[0] == "refresh") {
-        if (message.author.id != "672793821850894347") return
+    const embed = new CustomEmbed(message.member)
 
-        reload()
+    if (args.length == 0) {
+        const image = getWholesomeImage()
 
-        return message.channel.send(
-            new CustomEmbed(
-                message.member,
-                false,
-                `✅ wholesome images reloaded\nsize: ${wholesome.length}`
-            )
-        )
+        embed.setHeader(`<3 | ${image.id}`)
+        embed.setImage(image.image)
+    } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "suggest" || args[0].toLowerCase() == "+") {
+        if (args.length == 1) {
+            return message.channel.send(new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`))
+        }
+
+        const url = args[1].toLowerCase()
+
+        if (!url.startsWith("https://i.imgur.com/")) {
+            return message.channel.send(new ErrorEmbed("must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"))
+        }
+
+        const res = await suggestWholesomeImage(message.member, url)
+
+        if (!res) {
+            return message.channel.send(new ErrorEmbed(`error: maybe that image already exists? if this persists join the ${getPrefix(message.guild)}support server`))
+        }
+
+        return message.react("✅")
     }
 
     cooldown.set(message.member.id, new Date())
@@ -62,20 +76,9 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    const imageNumber = Math.floor(Math.random() * wholesome.length)
-
-    const embed = new CustomEmbed(message.member).embed
-        .setAuthor(`<3 | #${imageNumber}`)
-        .setImage(wholesome[imageNumber])
-
-    message.channel.send(embed)
+    return message.channel.send(embed)
 }
 
 cmd.setRun(run)
 
 module.exports = cmd
-
-function reload() {
-    delete require.cache[require.resolve("../lists.json")]
-    wholesome = require("../lists.json").wholesome
-}
