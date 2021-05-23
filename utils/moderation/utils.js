@@ -170,12 +170,11 @@ function getCase(guild, caseID) {
     let query = db
         .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
         .get(guild.id, caseID.toString())
-    
+
     if (!query) {
-        query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?").get(
-            guild.id,
-            caseID.toString() + ".0"
-        )
+        query = db
+            .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
+            .get(guild.id, caseID.toString() + ".0")
     }
 
     if (!query) return undefined
