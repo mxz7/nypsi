@@ -509,7 +509,7 @@ async function suggestWholesomeImage(submitter, image) {
 
         const webhooks = await guild.fetchWebhooks()
 
-        wholesomeWebhook = await webhooks.find((w) => w.id == "832299675309965333")
+        wholesomeWebhook = await webhooks.find((w) => w.id == "846092969396142080")
         info(`wholesome webhook assigned as ${wholesomeWebhook.id}`)
     }
 
@@ -531,13 +531,13 @@ async function suggestWholesomeImage(submitter, image) {
 
     const { CustomEmbed } = require("./classes/EmbedBuilders")
 
-    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + query.id)
-
-    embed.setImage(image)
+    const embed = new CustomEmbed().embed.setColor("#111111").setTitle("wholesome suggestion #" + query.id)
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
 
     embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`)
+
+    embed.setImage(image)
 
     await wholesomeWebhook.send(embed)
 
@@ -598,6 +598,8 @@ function getWholesomeImage(id) {
             const query = db.prepare("SELECT * FROM wholesome").all()
 
             wholesomeCache = query
+
+            return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)]
         }
     }
 }
