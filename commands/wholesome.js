@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { getWholesomeImage, suggestWholesomeImage, formatDate, acceptWholesomeImage, denyWholesomeImage, deleteFromWholesome, clearWholesomeCache, getMember } = require("../utils/utils")
+const { getWholesomeImage, suggestWholesomeImage, formatDate, acceptWholesomeImage, denyWholesomeImage, deleteFromWholesome, clearWholesomeCache, getMember, getAllSuggestions } = require("../utils/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const e = require("express")
 
@@ -10,8 +10,9 @@ const cooldown = new Map()
 
 const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN).setAliases([
     "iloveyou",
-    "loveyou",
     "loveu",
+    "ws",
+    "ily"
 ])
 
 /**
@@ -88,8 +89,8 @@ async function run(message, args) {
 
         embed.setDescription(`**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`)
         embed.setImage(wholesome.image)
-        embed.setFooter(`submitted on ${formatDate(new Date(wholesome.date))}`)
-    } else if (args[0].toLowerCase() == "accept") {
+        embed.setFooter(`submitted on ${formatDate(wholesome.date)}`)
+    } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
         if (message.guild.id != "747056029795221513") return
 
         const roles = message.member.roles.cache
@@ -98,6 +99,7 @@ async function run(message, args) {
 
         if (roles.has("747056620688900139")) allow = true
         if (roles.has("747059949770768475")) allow = true
+        if (roles.has("845613231229370429")) allow = true
 
         if (!allow) return
 
@@ -112,7 +114,7 @@ async function run(message, args) {
         }
 
         return message.react("✅")
-    } else if (args[0].toLowerCase() == "deny") {
+    } else if (args[0].toLowerCase() == "deny" || args[0].toLowerCase() == "d") {
         if (message.guild.id != "747056029795221513") return
 
         const roles = message.member.roles.cache
@@ -121,6 +123,7 @@ async function run(message, args) {
 
         if (roles.has("747056620688900139")) allow = true
         if (roles.has("747059949770768475")) allow = true
+        if (roles.has("845613231229370429")) allow = true
 
         if (!allow) return
 
@@ -157,6 +160,118 @@ async function run(message, args) {
         clearWholesomeCache()
 
         return message.react("✅")
+    } else if (args[0].toLowerCase() == "queue" || args[0].toLowerCase() == "q") {
+        if (message.guild.id != "747056029795221513") return
+
+        const roles = message.member.roles.cache
+
+        let allow = false
+
+        if (roles.has("747056620688900139")) allow = true
+        if (roles.has("747059949770768475")) allow = true
+        if (roles.has("845613231229370429")) allow = true
+
+        if (!allow) return
+
+        const queue = getAllSuggestions()
+
+        const pages = new Map()
+
+        if (queue.length > 6) {
+            for (const image of queue) {
+                if (pages.size == 0) {
+                    pages.set(1, [image])
+                } else {
+                    if (pages.get(pages.size).length >= 6) {
+                        pages.set(pages.size + 1, [image])
+                    } else {
+                        const current = pages.get(pages.size)
+                        current.push(image)
+                        pages.set(pages.size, current)
+                    }
+                }
+            }
+        }
+
+        for (const image of queue) {
+            if (embed.embed.fields.length >= 6) break
+
+            embed.addField(image.id, `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`)
+        }
+
+        embed.setTitle("wholesome queue")
+
+        if (queue.length == 0) {
+            embed.setDescription("no wholesome suggestions")
+        }
+
+        if (pages.size != 0) {
+            embed.setFooter(`page 1/${pages.size}`)
+        }
+
+        const msg = await message.channel.send(embed)
+
+        if (pages.size == 0) return
+
+        await msg.react("⬅")
+        await msg.react("➡")
+
+        let currentPage = 1
+        const lastPage = pages.size
+
+        const filter = (reaction, user) => {
+            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
+        }
+
+        const pageManager = async () => {
+            const reaction = await msg
+                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .then((collected) => {
+                    return collected.first().emoji.name
+                })
+                .catch(async () => {
+                    await msg.reactions.removeAll()
+                })
+
+            if (!reaction) return
+
+            const newEmbed = new CustomEmbed(message.member, false).setTitle("wholesome queue")
+
+            if (reaction == "⬅") {
+                if (currentPage <= 1) {
+                    return pageManager()
+                } else {
+                    currentPage--
+
+                    for (const image of pages.get(currentPage)) {
+                        newEmbed.addField(image.id, `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`)
+                    }
+
+                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
+                    await msg.edit(newEmbed)
+                    return pageManager()
+                }
+            } else if (reaction == "➡") {
+                if (currentPage >= lastPage) {
+                    return pageManager()
+                } else {
+                    currentPage++
+
+                    for (const image of pages.get(currentPage)) {
+                        newEmbed.addField(
+                            image.id,
+                            `**suggested** ${image.submitter} (${image.submitter_id}\n**url** ${image.image})`
+                        )
+                    }
+
+                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
+                    await msg.edit(newEmbed)
+                    return pageManager()
+                }
+            }
+        }
+
+        return pageManager()
     } else {
         let member
 
