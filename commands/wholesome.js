@@ -51,7 +51,7 @@ async function run(message, args) {
     if (args.length == 0) {
         const image = getWholesomeImage()
 
-        embed.setHeader(`<3 | ${image.id}`)
+        embed.setHeader(`<3 | #${image.id}`)
         embed.setImage(image.image)
     } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "suggest" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
@@ -171,6 +171,11 @@ async function run(message, args) {
         } else {
             return message.channel.send(new ErrorEmbed("couldnt find that member ):"))
         }
+
+        const image = getWholesomeImage()
+
+        embed.setHeader(`<3 | #${image.id}`)
+        embed.setImage(image.image)
     }
 
     cooldown.set(message.member.id, new Date())
