@@ -99,7 +99,7 @@ exports.newCase = newCase
 function deleteCase(guild, caseID) {
     db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(
         guild.id,
-        caseID
+        caseID.toString()
     )
 }
 
