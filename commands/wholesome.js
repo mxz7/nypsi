@@ -341,6 +341,13 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
+    const chance = Math.floor(Math.random() * 25)
+
+    if (chance == 7)
+        embed.setFooter(
+            `submit your own image with ${getPrefix(message.guild)}wholesome suggest (:`
+        )
+
     if (target) {
         return message.channel.send(
             `${target.user.toString()} you've received a wholesome image (:`,
