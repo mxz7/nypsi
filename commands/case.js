@@ -91,7 +91,7 @@ async function run(message, args) {
         })
 
     if (reaction == "❌") {
-        deleteCase(message.guild, case0.case_id)
+        deleteCase(message.guild, case0.case_id.toString())
 
         const newEmbed = new CustomEmbed(
             message.member,
