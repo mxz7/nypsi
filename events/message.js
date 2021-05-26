@@ -50,12 +50,15 @@ module.exports = async (message) => {
 
     if (message.guild.memberCount < 50000) {
         if (message.mentions.everyone) {
-            let members = message.channel.members
-
-            if (!inCooldown(message.guild)) {
+            if (
+                !inCooldown(message.guild) &&
+                message.guild.members.cache != message.guild.memberCount
+            ) {
                 await message.guild.members.fetch()
                 addCooldown(message.guild, 3600)
             }
+
+            let members = message.channel.members
 
             mentionQueue.push({
                 type: "collection",
@@ -68,6 +71,14 @@ module.exports = async (message) => {
             }
         } else {
             if (message.mentions.roles.first()) {
+                if (
+                    !inCooldown(message.guild) &&
+                    message.guild.members.cache != message.guild.memberCount
+                ) {
+                    await message.guild.members.fetch()
+                    addCooldown(message.guild, 3600)
+                }
+
                 message.mentions.roles.forEach((r) => {
                     mentionQueue.push({
                         type: "collection",
