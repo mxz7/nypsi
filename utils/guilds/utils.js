@@ -665,7 +665,7 @@ function deleteCountdown(guild, id) {
 
     db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(
         JSON.stringify(countdowns),
-        guild.id
+        guildID
     )
 }
 
@@ -736,7 +736,7 @@ function runCountdowns(client) {
                         )
                     })
 
-                if (days == 0) {
+                if (days <= 0) {
                     deleteCountdown(guildID, countdown.id)
                 }
             }
