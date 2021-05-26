@@ -381,8 +381,8 @@ function getUserCountGuild(guild) {
 
     const query = db.prepare("SELECT id FROM economy").all()
 
-    for (let user of query) {
-        if (guild.members.cache.find((member) => member.user.id == user)) {
+    for (const user of query) {
+        if (guild.members.cache.find((member) => member.user.id == user.id)) {
             count++
         }
     }
