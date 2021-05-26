@@ -141,10 +141,6 @@ class PremUser {
      */
     async expire() {
         const { requestDM, requestRemoveRole } = require("../../nypsi")
-        const d = await requestDM(
-            this.id,
-            `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
-        ).catch(() => {})
 
         let roleID
 
@@ -168,14 +164,18 @@ class PremUser {
         })
 
         if (e == "boost") {
-            this.renew()
-            return
+            return "boost"
         }
+
+        const d = await requestDM(
+            this.id,
+            `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
+        ).catch(() => {})
 
         this.status = status.INACTIVE
         this.level = 0
 
-        return this
+        return
     }
 
     /**
