@@ -340,10 +340,14 @@ exports.renewUser = renewUser
 /**
  * @param {String} member id
  */
-function expireUser(member) {
+async function expireUser(member) {
     const profile = getPremiumProfile(member)
 
-    profile.expire()
+    const expire = await profile.expire()
+
+    if (expire == "boost") {
+        return renewUser(member)
+    }
 
     db.prepare("DELETE FROM premium WHERE id = ?").run(member)
 
