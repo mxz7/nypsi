@@ -9,8 +9,8 @@ const usernameCache = new Map()
 const avatarCache = new Map()
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function createUsernameProfile(member, tag, url) {
     let id = member
@@ -18,8 +18,18 @@ function createUsernameProfile(member, tag, url) {
     if (member.user) id = member.user.id
 
     db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(id)
-    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(id, member.user ? member.user.tag : tag, Date.now())
-    if (url) db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(id, url, "avatar", Date.now())
+    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(
+        id,
+        member.user ? member.user.tag : tag,
+        Date.now()
+    )
+    if (url)
+        db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(
+            id,
+            url,
+            "avatar",
+            Date.now()
+        )
 }
 
 exports.createUsernameProfile = createUsernameProfile
@@ -98,16 +108,21 @@ function enableTracking(member) {
 exports.enableTracking = enableTracking
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {String} username 
+ *
+ * @param {GuildMember} member
+ * @param {String} username
  */
 function addNewUsername(member, username) {
     let id = member
 
     if (member.user) id = member.user.id
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "username", username, Date.now())
+    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(
+        id,
+        "username",
+        username,
+        Date.now()
+    )
 
     if (usernameCache.has(id)) {
         usernameCache.delete(id)
@@ -118,7 +133,7 @@ exports.addNewUsername = addNewUsername
 
 /**
  * @returns {Array<{ value: String, date: Number }>}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function fetchUsernameHistory(member) {
     let id = member
@@ -129,9 +144,11 @@ function fetchUsernameHistory(member) {
         return usernameCache.get(id)
     }
 
-    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'").all(id)
+    const query = db
+        .prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'")
+        .all(id)
 
-    inPlaceSort(query).desc(u => u.date)
+    inPlaceSort(query).desc((u) => u.date)
 
     usernameCache.set(id, query)
 
@@ -141,15 +158,18 @@ function fetchUsernameHistory(member) {
 exports.fetchUsernameHistory = fetchUsernameHistory
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function clearUsernameHistory(member) {
     let id = member
 
     if (member.user) id = member.user.id
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(id, member.user.tag)
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(
+        id,
+        member.user.tag
+    )
 
     if (usernameCache.has(id)) {
         usernameCache.delete(id)
@@ -159,16 +179,21 @@ function clearUsernameHistory(member) {
 exports.clearUsernameHistory = clearUsernameHistory
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {String} url 
+ *
+ * @param {GuildMember} member
+ * @param {String} url
  */
 function addNewAvatar(member, url) {
     let id = member
 
     if (member.user) id = member.user.id
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "avatar", url, Date.now())
+    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(
+        id,
+        "avatar",
+        url,
+        Date.now()
+    )
 
     if (avatarCache.has(id)) {
         avatarCache.delete(id)
@@ -179,7 +204,7 @@ exports.addNewAvatar = addNewAvatar
 
 /**
  * @returns {Array<{ value: String, date: Number }>}
- * @param {GuildMember} member 
+ * @param {GuildMember} member
  */
 function fetchAvatarHistory(member) {
     let id = member
@@ -190,9 +215,11 @@ function fetchAvatarHistory(member) {
         return avatarCache.get(id)
     }
 
-    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'").all(id)
+    const query = db
+        .prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'")
+        .all(id)
 
-    inPlaceSort(query).desc(u => u.date)
+    inPlaceSort(query).desc((u) => u.date)
 
     avatarCache.set(id, query)
 
@@ -202,8 +229,8 @@ function fetchAvatarHistory(member) {
 exports.fetchAvatarHistory = fetchAvatarHistory
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function clearAvatarHistory(member) {
     let id = member
@@ -212,7 +239,10 @@ function clearAvatarHistory(member) {
 
     const current = fetchAvatarHistory(id)[0].value
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar' AND value != ?").run(id, current)
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar' AND value != ?").run(
+        id,
+        current
+    )
 
     if (avatarCache.has(id)) {
         avatarCache.delete(id)

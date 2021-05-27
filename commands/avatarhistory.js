@@ -54,10 +54,11 @@ async function run(message, args) {
     if (args.length == 0) {
         member = message.member
     } else {
-
         if (args[0].toLowerCase() == "-clear") {
             clearAvatarHistory(message.member)
-            return message.channel.send(new CustomEmbed(message.member, false, "✅ your avatar history has been cleared"))
+            return message.channel.send(
+                new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")
+            )
         }
 
         if (!message.mentions.members.first()) {
@@ -82,7 +83,9 @@ async function run(message, args) {
     let history = fetchAvatarHistory(member)
 
     if (history.length == 0) {
-        const url = await uploadImage(member.user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+        const url = await uploadImage(
+            member.user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
+        )
         if (url) {
             addNewAvatar(member, url)
             history = fetchAvatarHistory(member)
@@ -144,7 +147,11 @@ async function run(message, args) {
 
                 newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
-                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
+                newEmbed.setFooter(
+                    `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${
+                        history.length
+                    }`
+                )
 
                 await msg.edit(newEmbed)
                 return pageManager()
@@ -157,7 +164,11 @@ async function run(message, args) {
 
                 newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
-                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
+                newEmbed.setFooter(
+                    `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${
+                        history.length
+                    }`
+                )
 
                 await msg.edit(newEmbed)
                 return pageManager()

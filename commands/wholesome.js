@@ -91,7 +91,7 @@ async function run(message, args) {
                     )
                 )
             }
-            
+
             const upload = await uploadImage(url)
 
             if (!upload) {

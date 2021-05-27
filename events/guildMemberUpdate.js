@@ -7,7 +7,12 @@ const {
     getTier,
     expireUser,
 } = require("../utils/premium/utils")
-const { addNewUsername, addNewAvatar, usernameProfileExists, createUsernameProfile } = require("../utils/users/utils")
+const {
+    addNewUsername,
+    addNewAvatar,
+    usernameProfileExists,
+    createUsernameProfile,
+} = require("../utils/users/utils")
 
 /**
  * @param {GuildMember} oldMember
