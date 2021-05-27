@@ -7,12 +7,22 @@ const {
     getTier,
     expireUser,
 } = require("../utils/premium/utils")
+const { addNewUsername, addNewAvatar } = require("../utils/users/utils")
 
 /**
  * @param {GuildMember} oldMember
  * @param {GuildMember} newMember
  */
 module.exports = async (oldMember, newMember) => {
+
+    if (oldMember.user.tag != newMember.user.tag) {
+        addNewUsername(newMember, newMember.user.tag)
+    }
+
+    if (oldMember.user.displayAvatarURL({ dynamic: true, size: 256 }) != newMember.user.displayAvatarURL({ dynamic: true, size: 256 })) {
+        addNewAvatar(newMember, newMember.user.displayAvatarURL({ dynamic: true, size: 256 }))
+    }
+
     if (newMember.guild.id == "747056029795221513") {
         if (oldMember.roles.cache.size < newMember.roles.cache.size) {
             let tier = 0
