@@ -7,6 +7,7 @@ const {
     createUsernameProfile,
     fetchAvatarHistory,
     addNewAvatar,
+    clearAvatarHistory,
 } = require("../utils/users/utils")
 const { getMember, formatDate, uploadImage } = require("../utils/utils")
 
@@ -53,6 +54,12 @@ async function run(message, args) {
     if (args.length == 0) {
         member = message.member
     } else {
+
+        if (args[0].toLowerCase() == "-clear") {
+            clearAvatarHistory(message.member)
+            return message.channel.send(new CustomEmbed(message.member, false, "✅ your avatar history has been cleared"))
+        }
+
         if (!message.mentions.members.first()) {
             member = await getMember(message, args[0])
         } else {
