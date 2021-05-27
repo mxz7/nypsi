@@ -167,3 +167,5 @@ async function run(message, args) {
 
     return pageManager()
 }
+
+cmd.setRun(run)
