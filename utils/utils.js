@@ -1,10 +1,22 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
+const util = require("util")
+const { imgur: imgurClientID } = require("../config.json")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
 const { getDatabase } = require("./database/database")
 const { error, info, types } = require("./logger")
 const db = getDatabase()
+const imgur = require("imgur")
+imgur.setClientId(imgurClientID)
+
+const uploadImage = util.promisify(imgur.uploadUrl)
+
+let uploadCount = 0
+setInterval(() => {
+    uploadCount = 0
+    info("imgur upload count reset")
+}, 86400000)
 
 const news = {
     text: "",
@@ -659,3 +671,25 @@ function getAllSuggestions() {
 }
 
 exports.getAllSuggestions = getAllSuggestions
+
+/**
+ * @returns {String}
+ * @param {String} url
+ */
+async function uploadImageToImgur(url) {
+    if (uploadCount >= 1000) return null
+    let fail = false
+
+    info(`uploading ${url}`)
+    const boobies = await imgur.uploadUrl(url).catch((e) => {
+        error(e)
+        fail = true
+    })
+    info("uploaded")
+
+    if (fail) return null
+
+    return boobies.link
+}
+
+exports.uploadImage = uploadImageToImgur
