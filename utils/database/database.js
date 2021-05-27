@@ -55,7 +55,7 @@ function createTables() {
         "CREATE TABLE IF NOT EXISTS wholesome_suggestions ('id' INTEGER PRIMARY KEY, 'image' TEXT NOT NULL UNIQUE, 'submitter' TEXT, 'submitter_id' TEXT, 'upload' INTEGER)"
     ).run()
 
-    db.prepare("CREATE TABLE IF NOT EXISTS username_optout ('id' TEXT PRIMARY KEY, 'tracking' BOOLEAN DEFAULT 1)")
+    db.prepare("CREATE TABLE IF NOT EXISTS usernames_optout ('id' TEXT PRIMARY KEY, 'tracking' BOOLEAN DEFAULT 1)")
 
     db.prepare("CREATE TABLE IF NOT EXISTS usernames ('id' TEXT NOT NULL, 'type' TEXT NOT NULL DEFAULT 'username', 'value' TEXT NOT NULL, 'date' INTEGER NOT NULL, FOREIGN KEY (id) REFERENCES username_optout (id))").run()
 }
