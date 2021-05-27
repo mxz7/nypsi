@@ -91,7 +91,7 @@ async function run(message, args) {
     let description = ""
 
     for (const item of pages.get(1)) {
-        description += `\`${item.value}\` | \`${formatDate(item.date)}\``
+        description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`
     }
 
     embed.setDescription(description)
@@ -139,7 +139,7 @@ async function run(message, args) {
                 let description = ""
 
                 for (const item of pages.get(currentPage)) {
-                    description += `\`${item.value}\` | \`${formatDate(item.date)}\``
+                    description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`
                 }
 
                 newEmbed.setDescription(description)
@@ -157,7 +157,7 @@ async function run(message, args) {
                 let description = ""
 
                 for (const item of pages.get(currentPage)) {
-                    description += `\`${item.value}\` | \`${formatDate(item.date)}\``
+                    description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`
                 }
 
                 newEmbed.setDescription(description)
