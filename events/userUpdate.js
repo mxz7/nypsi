@@ -1,5 +1,6 @@
 const { User } = require("discord.js")
 const { usernameProfileExists, createUsernameProfile, addNewUsername, addNewAvatar } = require("../utils/users/utils")
+const { uploadImage } = require("../utils/utils")
 
 /**
  * 
@@ -7,12 +8,6 @@ const { usernameProfileExists, createUsernameProfile, addNewUsername, addNewAvat
  * @param {User} newUser 
  */
 module.exports = async (oldUser, newUser) => {
-    console.log(oldUser.tag == newUser.tag)
-    console.log(
-        oldUser.displayAvatarURL({ dynamic: true, size: 256 }) ==
-            newUser.displayAvatarURL({ dynamic: true, size: 256 })
-    )
-
     if (oldUser.tag != newUser.tag) {
         if (!usernameProfileExists(newUser.id)) {
             createUsernameProfile(newUser.id, newUser.tag)
@@ -25,10 +20,13 @@ module.exports = async (oldUser, newUser) => {
         oldUser.displayAvatarURL({ dynamic: true, size: 256 }) !=
         newUser.displayAvatarURL({ dynamic: true, size: 256 })
     ) {
-        if (!usernameProfileExists(newUser.id)) {
-            createUsernameProfile(newUser.id, newUser.tag)
+        const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+        if (!usernameProfileExists(newUser.id) && url) {
+            createUsernameProfile(newUser.id, newUser.tag, url)
         } else {
-            addNewAvatar(newUser.id, newUser.displayAvatarURL({ dynamic: true, size: 256 }))
+            if (url) {
+                addNewAvatar(newUser.id, url)
+            }
         }
     }
 }

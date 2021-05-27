@@ -12,13 +12,14 @@ const avatarCache = new Map()
  * 
  * @param {GuildMember} member 
  */
-function createUsernameProfile(member, tag) {
+function createUsernameProfile(member, tag, url) {
     let id = member
 
     if (member.user) id = member.user.id
 
     db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(id)
     db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(id, member.user ? member.user.tag : tag, Date.now())
+    if (url) db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(id, url, "avatar", Date.now())
 }
 
 exports.createUsernameProfile = createUsernameProfile
