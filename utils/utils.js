@@ -680,7 +680,7 @@ async function uploadImageToImgur(url) {
     if (uploadCount >= 690) return null
     let fail = false
 
-    const boobies = await uploadImage(url).catch((e) => {
+    const boobies = await imgur.uploadUrl(url).catch((e) => {
         error(e)
         fail = true
     })
@@ -690,4 +690,4 @@ async function uploadImageToImgur(url) {
     return boobies.link
 }
 
-exports.uploadImage = uploadImage
+exports.uploadImage = uploadImageToImgur
