@@ -1,5 +1,5 @@
 const { User } = require("discord.js")
-const { usernameProfileExists, createUsernameProfile, addNewUsername, addNewAvatar } = require("../utils/users/utils")
+const { usernameProfileExists, createUsernameProfile, addNewUsername, addNewAvatar, isTracking } = require("../utils/users/utils")
 const { uploadImage } = require("../utils/utils")
 
 /**
@@ -12,6 +12,7 @@ module.exports = async (oldUser, newUser) => {
         if (!usernameProfileExists(newUser.id)) {
             createUsernameProfile(newUser.id, newUser.tag)
         } else {
+            if (!isTracking(newUser.id)) return
             addNewUsername(newUser.id, newUser.tag)
         }
     }
@@ -20,13 +21,15 @@ module.exports = async (oldUser, newUser) => {
         oldUser.displayAvatarURL({ dynamic: true, size: 256 }) !=
         newUser.displayAvatarURL({ dynamic: true, size: 256 })
     ) {
-        const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
-        if (!usernameProfileExists(newUser.id) && url) {
+        if (!usernameProfileExists(newUser.id)) {
+            const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+            if (!url) return
             createUsernameProfile(newUser.id, newUser.tag, url)
         } else {
-            if (url) {
-                addNewAvatar(newUser.id, url)
-            }
+            if (!isTracking(newUser.id)) return
+            
+            const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+            addNewAvatar(newUser.id, url)
         }
     }
 }
