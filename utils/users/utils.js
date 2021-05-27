@@ -3,6 +3,7 @@ const { getDatabase } = require("../database/database")
 
 const db = getDatabase()
 const optCache = new Map()
+const usernameCache = new Map()
 
 /**
  * 
@@ -84,3 +85,22 @@ function enableTracking(member) {
 }
 
 exports.enableTracking = enableTracking
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} username 
+ */
+function addNewUsername(member, username) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "username", username, Date.now())
+
+    if (usernameCache.has(id)) {
+        usernameCache.delete(id)
+    }
+}
+
+exports.addNewUsername = addNewUsername
