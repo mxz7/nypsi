@@ -1,4 +1,5 @@
 const { GuildMember } = require("discord.js")
+const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
 
 const db = getDatabase()
@@ -10,7 +11,7 @@ const usernameCache = new Map()
  * @param {GuildMember} member 
  */
 function createUsernameProfile(member) {
-    db.prepare("INSERT INTO username_optout (id) VALUES (?)").run(member.user.id)
+    db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(member.user.id)
     db.prepare("INSERT INTO usernames (id, username, date) VALUES (?, ?, ?)").run(member.user.id, member.user.tag, Date.now())
 }
 
@@ -77,7 +78,7 @@ function enableTracking(member) {
 
     if (member.user) id = member.user.id
 
-    db.prepare("UPDATE usernames_optout SET tracking = 1 WHERE id = ?").run(id)
+    db.prepare("UPDATE username_optout SET tracking = 1 WHERE id = ?").run(id)
 
     if (optCache.has(id)) {
         optCache.delete(id)
@@ -104,3 +105,27 @@ function addNewUsername(member, username) {
 }
 
 exports.addNewUsername = addNewUsername
+
+/**
+ * @returns {Array<{ value: String, date: Number }>}
+ * @param {GuildMember} member 
+ */
+function fetchUsernameHistory(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (!usernameCache.has(id)) {
+        return usernameCache.get(id)
+    }
+
+    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ?").all(id)
+
+    inPlaceSort(query).asc(u => u.date)
+
+    usernameCache.set(id, query)
+
+    return query
+}
+
+exports.fetchUsernameHistory = fetchUsernameHistory
