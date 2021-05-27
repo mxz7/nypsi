@@ -680,10 +680,12 @@ async function uploadImageToImgur(url) {
     if (uploadCount >= 1000) return null
     let fail = false
 
+    info(`uploading ${url}`)
     const boobies = await imgur.uploadUrl(url).catch((e) => {
         error(e)
         fail = true
     })
+    info("uploaded")
 
     if (fail) return null
 
