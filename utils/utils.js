@@ -697,7 +697,7 @@ async function uploadImageToImgur(url) {
 
         return null
     }
-    
+
     info("uploaded")
 
     return boobies.link
