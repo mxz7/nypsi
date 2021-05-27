@@ -120,7 +120,7 @@ function fetchUsernameHistory(member) {
 
     if (member.user) id = member.user.id
 
-    if (!usernameCache.has(id)) {
+    if (usernameCache.has(id)) {
         return usernameCache.get(id)
     }
 
@@ -181,7 +181,7 @@ function fetchAvatarHistory(member) {
 
     if (member.user) id = member.user.id
 
-    if (!avatarCache.has(id)) {
+    if (avatarCache.has(id)) {
         return avatarCache.get(id)
     }
 
