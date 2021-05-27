@@ -674,7 +674,7 @@ exports.getAllSuggestions = getAllSuggestions
 
 /**
  * @returns {String}
- * @param {String} url 
+ * @param {String} url
  */
 async function uploadImageToImgur(url) {
     if (uploadCount >= 1000) return null

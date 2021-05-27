@@ -2,10 +2,19 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
-const { usernameProfileExists, createUsernameProfile, fetchUsernameHistory, clearUsernameHistory } = require("../utils/users/utils")
+const {
+    usernameProfileExists,
+    createUsernameProfile,
+    fetchUsernameHistory,
+    clearUsernameHistory,
+} = require("../utils/users/utils")
 const { getMember, formatDate } = require("../utils/utils")
 
-const cmd = new Command("usernamehistory", "view a user's username history", categories.INFO).setAliases(["un", "usernames"])
+const cmd = new Command(
+    "usernamehistory",
+    "view a user's username history",
+    categories.INFO
+).setAliases(["un", "usernames"])
 
 const cooldown = new Map()
 
@@ -44,7 +53,6 @@ async function run(message, args) {
     if (args.length == 0) {
         member = message.member
     } else {
-
         if (args[0].toLowerCase() == "-clear") {
             clearUsernameHistory(message.member)
             return message.channel.send(
