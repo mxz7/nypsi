@@ -677,7 +677,7 @@ exports.getAllSuggestions = getAllSuggestions
  * @param {String} url 
  */
 async function uploadImageToImgur(url) {
-    if (uploadCount >= 690) return null
+    if (uploadCount >= 1000) return null
     let fail = false
 
     const boobies = await imgur.uploadUrl(url).catch((e) => {
