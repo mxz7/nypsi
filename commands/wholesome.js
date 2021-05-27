@@ -12,9 +12,11 @@ const {
     clearWholesomeCache,
     getMember,
     getAllSuggestions,
+    uploadImage,
 } = require("../utils/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const e = require("express")
+const isImageUrl = require("is-image-url")
 
 const cooldown = new Map()
 
@@ -75,17 +77,35 @@ async function run(message, args) {
             )
         }
 
-        const url = args[1].toLowerCase()
+        let url = args[1]
 
-        if (!url.startsWith("https://i.imgur.com/")) {
-            return message.channel.send(
-                new ErrorEmbed(
-                    "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
-                )
-            )
+        if (!url.toLowerCase().startsWith("https")) {
+            return message.channel.send(new ErrorEmbed("must be http**s**"))
         }
 
-        const res = await suggestWholesomeImage(message.member, args[1])
+        if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
+            if (!isImageUrl(url)) {
+                return message.channel.send(
+                    new ErrorEmbed(
+                        "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
+                    )
+                )
+            }
+
+            const upload = await uploadImage(url)
+
+            if (!upload) {
+                return message.channel.send(
+                    new ErrorEmbed(
+                        "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
+                    )
+                )
+            } else {
+                url = upload
+            }
+        }
+
+        const res = await suggestWholesomeImage(message.member, url)
 
         if (!res) {
             return message.channel.send(
