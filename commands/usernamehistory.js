@@ -84,7 +84,9 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, true).setTitle(member.user.tag)
+    const embed = new CustomEmbed(message.member, true)
+        .setTitle(member.user.tag)
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
 
     let description = ""
 
@@ -124,7 +126,9 @@ async function run(message, args) {
 
         if (!reaction) return
 
-        const newEmbed = new CustomEmbed(message.member, false).setTitle(member.user.tag)
+        const newEmbed = new CustomEmbed(message.member, false)
+            .setTitle(member.user.tag)
+            .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
 
         if (reaction == "⬅") {
             if (currentPage <= 1) {
