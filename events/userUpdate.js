@@ -42,6 +42,9 @@ module.exports = async (oldUser, newUser) => {
             const url = await uploadImage(
                 newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
             )
+
+            if (!url) return
+
             addNewAvatar(newUser.id, url)
         }
     }
