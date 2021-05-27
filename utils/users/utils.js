@@ -140,6 +140,10 @@ function clearUsernameHistory(member) {
     if (member.user) id = member.user.id
 
     db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(id, member.user.tag)
+
+    if (usernameCache.has(id)) {
+        usernameCache.delete(id)
+    }
 }
 
 exports.clearUsernameHistory = clearUsernameHistory
