@@ -677,7 +677,7 @@ exports.getAllSuggestions = getAllSuggestions
  * @param {String} url
  */
 async function uploadImageToImgur(url) {
-    if (uploadCount >= 1000) return null
+    if (uploadCount >= 775) return null
     let fail = false
 
     info(`uploading ${url}`)
