@@ -687,7 +687,6 @@ async function uploadImageToImgur(url) {
         error(e)
         fail = true
     })
-    info("uploaded")
 
     if (fail) {
         uploadDisabled = true
@@ -698,6 +697,8 @@ async function uploadImageToImgur(url) {
 
         return null
     }
+    
+    info("uploaded")
 
     return boobies.link
 }
