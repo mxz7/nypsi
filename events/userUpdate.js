@@ -11,6 +11,12 @@ const {
 const { uploadImage } = require("../utils/utils")
 
 /**
+ * @type {Array<User>}
+ */
+const queue = []
+let interval
+
+/**
  *
  * @param {User} oldUser
  * @param {User} newUser
@@ -41,13 +47,27 @@ module.exports = async (oldUser, newUser) => {
         } else {
             if (!isTracking(newUser.id)) return
 
-            const url = await uploadImage(
-                newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
-            )
+            queue.push(newUser)
 
-            if (!url) return
-
-            addNewAvatar(newUser.id, url)
+            if (!interval) {
+                interval = setInterval(doQueue, 60000)
+            }
         }
+    }
+}
+
+async function doQueue() {
+    const user = queue.shift()
+
+    const url = await uploadImage(
+        user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
+    )
+
+    if (!url) return
+
+    addNewAvatar(user.id, url)
+
+    if (queue.length == 0) {
+        clearInterval(interval)
     }
 }
