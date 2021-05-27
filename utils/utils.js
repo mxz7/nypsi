@@ -693,7 +693,7 @@ async function uploadImageToImgur(url) {
 
         setTimeout(() => {
             uploadDisabled = false
-        }, 600000)
+        }, 1800000)
 
         return null
     }
