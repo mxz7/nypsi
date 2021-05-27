@@ -88,7 +88,7 @@ function enableTracking(member) {
 
     if (member.user) id = member.user.id
 
-    db.prepare("UPDATE username_optout SET tracking = 1 WHERE id = ?").run(id)
+    db.prepare("UPDATE usernames_optout SET tracking = 1 WHERE id = ?").run(id)
 
     if (optCache.has(id)) {
         optCache.delete(id)
