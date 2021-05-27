@@ -11,6 +11,7 @@ const imgur = require("imgur")
 imgur.setClientId(imgurClientID)
 
 const uploadImage = util.promisify(imgur.uploadUrl)
+let uploadDisabled = false
 
 let uploadCount = 0
 setInterval(() => {
@@ -678,6 +679,7 @@ exports.getAllSuggestions = getAllSuggestions
  */
 async function uploadImageToImgur(url) {
     if (uploadCount >= 775) return null
+    if (uploadDisabled) return null
     let fail = false
 
     info(`uploading ${url}`)
@@ -687,7 +689,15 @@ async function uploadImageToImgur(url) {
     })
     info("uploaded")
 
-    if (fail) return null
+    if (fail) {
+        uploadDisabled = true
+
+        setTimeout(() => {
+            uploadDisabled = false
+        }, 600000)
+
+        return null
+    }
 
     return boobies.link
 }
