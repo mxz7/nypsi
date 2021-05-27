@@ -126,7 +126,7 @@ function fetchUsernameHistory(member) {
 
     const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'").all(id)
 
-    inPlaceSort(query).asc(u => u.date)
+    inPlaceSort(query).desc(u => u.date)
 
     usernameCache.set(id, query)
 
@@ -187,7 +187,7 @@ function fetchAvatarHistory(member) {
 
     const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'").all(id)
 
-    inPlaceSort(query).asc(u => u.date)
+    inPlaceSort(query).desc(u => u.date)
 
     avatarCache.set(id, query)
 
