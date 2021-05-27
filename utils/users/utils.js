@@ -3,6 +3,7 @@ const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
 
 const db = getDatabase()
+const existsCache = new Set()
 const optCache = new Map()
 const usernameCache = new Map()
 const avatarCache = new Map()
@@ -27,9 +28,12 @@ function usernameProfileExists(member) {
 
     if (member.user) id = member.user.id
 
+    if (existsCache.has(id)) return true
+
     const query = db.prepare("SELECT id FROM usernames_optout WHERE id = ?").get(id)
 
     if (query) {
+        existsCache.add(id)
         return true
     } else {
         return false
