@@ -13,8 +13,12 @@ const avatarCache = new Map()
  * @param {GuildMember} member 
  */
 function createUsernameProfile(member, tag) {
-    db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(member.user.id)
-    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(member.user.id, member.user ? member.user.tag : tag, Date.now())
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(id)
+    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(id, member.user ? member.user.tag : tag, Date.now())
 }
 
 exports.createUsernameProfile = createUsernameProfile
