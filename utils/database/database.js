@@ -57,7 +57,7 @@ function createTables() {
 
     db.prepare("CREATE TABLE IF NOT EXISTS username_optout ('id' TEXT PRIMARY KEY, 'tracking' BOOLEAN DEFAULT 1)")
 
-    db.prepare("CREATE TABLE IF NOT EXISTS usernames ('id' TEXT NOT NULL, 'username' TEXT NOT NULL, 'date' INTEGER NOT NULL, FOREIGN KEY (id) REFERENCES username_optout (id))").run()
+    db.prepare("CREATE TABLE IF NOT EXISTS usernames ('id' TEXT NOT NULL, 'type' TEXT NOT NULL DEFAULT 'username', 'value' TEXT NOT NULL, 'date' INTEGER NOT NULL, FOREIGN KEY (id) REFERENCES username_optout (id))").run()
 }
 
 createTables()
