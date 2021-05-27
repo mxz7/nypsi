@@ -2,6 +2,7 @@ const { GuildMember } = require("discord.js")
 const { getDatabase } = require("../database/database")
 
 const db = getDatabase()
+const optCache = new Map()
 
 /**
  * 
@@ -33,3 +34,25 @@ function usernameProfileExists(member) {
 }
 
 exports.usernameProfileExists = usernameProfileExists
+
+function isTracking(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (optCache.has(id)) {
+        return optCache.get(id)
+    }
+
+    const query = db.prepare("SELECT tracking FROM usernames_optout WHERE id = ?").get(id)
+
+    if (query.tracking == 1) {
+        optCache.set(id, true)
+        return true
+    } else {
+        optCache.set(id, false)
+        return false
+    }
+}
+
+exports.isTracking = isTracking
