@@ -17,7 +17,7 @@ async function run(message, args) {
     let cooldownLength = 15
 
     if (isPremium(message.author.id)) {
-        5
+        cooldownLength = 5
     }
 
     if (cooldown.has(message.member.id)) {
