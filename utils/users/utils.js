@@ -23,7 +23,7 @@ function usernameProfileExists(member) {
 
     if (member.user) id = member.user.id
 
-    const query = db.prepare("SELECT id FROM usernames_optout WHERE id = ?").get(member.user.id)
+    const query = db.prepare("SELECT id FROM usernames_optout WHERE id = ?").get(id)
 
     if (query) {
         return true
