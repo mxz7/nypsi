@@ -14,7 +14,7 @@ const avatarCache = new Map()
  */
 function createUsernameProfile(member) {
     db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(member.user.id)
-    db.prepare("INSERT INTO usernames (id, username, date) VALUES (?, ?, ?)").run(member.user.id, member.user.tag, Date.now())
+    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(member.user.id, member.user.tag, Date.now())
 }
 
 exports.createUsernameProfile = createUsernameProfile
