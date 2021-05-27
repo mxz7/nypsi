@@ -119,7 +119,7 @@ function fetchUsernameHistory(member) {
         return usernameCache.get(id)
     }
 
-    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ?").all(id)
+    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'").all(id)
 
     inPlaceSort(query).asc(u => u.date)
 
@@ -129,3 +129,17 @@ function fetchUsernameHistory(member) {
 }
 
 exports.fetchUsernameHistory = fetchUsernameHistory
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function clearUsernameHistory(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(id, member.user.tag)
+}
+
+exports.clearUsernameHistory = clearUsernameHistory
