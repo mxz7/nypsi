@@ -56,3 +56,31 @@ function isTracking(member) {
 }
 
 exports.isTracking = isTracking
+
+function disableTracking(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("UPDATE usernames_optout SET tracking = 0 WHERE id = ?").run(id)
+
+    if (optCache.has(id)) {
+        optCache.delete(id)
+    }
+}
+
+exports.disableTracking = disableTracking
+
+function enableTracking(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("UPDATE usernames_optout SET tracking = 1 WHERE id = ?").run(id)
+
+    if (optCache.has(id)) {
+        optCache.delete(id)
+    }
+}
+
+exports.enableTracking = enableTracking
