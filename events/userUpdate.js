@@ -15,7 +15,7 @@ module.exports = async (oldUser, newUser) => {
 
     if (oldUser.tag != newUser.tag) {
         if (!usernameProfileExists(newUser.id)) {
-            createUsernameProfile(newUser.id)
+            createUsernameProfile(newUser.id, newUser.tag)
         } else {
             addNewUsername(newUser.id, newUser.tag)
         }
@@ -26,7 +26,7 @@ module.exports = async (oldUser, newUser) => {
         newUser.displayAvatarURL({ dynamic: true, size: 256 })
     ) {
         if (!usernameProfileExists(newUser.id)) {
-            createUsernameProfile(newUser.id)
+            createUsernameProfile(newUser.id, newUser.tag)
         } else {
             addNewAvatar(newUser.id, newUser.displayAvatarURL({ dynamic: true, size: 256 }))
         }
