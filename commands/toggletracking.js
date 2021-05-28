@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
-const { isTracking, disableTracking, enableTracking } = require("../utils/users/utils")
+const { isTracking, disableTracking, enableTracking, usernameProfileExists, createUsernameProfile } = require("../utils/users/utils")
 
 const cmd = new Command(
     "toggletracking",
@@ -35,6 +35,8 @@ async function run(message, args) {
         }
         return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
     }
+
+    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member)
 
     cooldown.set(message.member.id, new Date())
 
