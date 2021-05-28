@@ -2,7 +2,13 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
-const { isTracking, disableTracking, enableTracking, usernameProfileExists, createUsernameProfile } = require("../utils/users/utils")
+const {
+    isTracking,
+    disableTracking,
+    enableTracking,
+    usernameProfileExists,
+    createUsernameProfile,
+} = require("../utils/users/utils")
 
 const cmd = new Command(
     "toggletracking",
