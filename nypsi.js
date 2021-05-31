@@ -250,6 +250,6 @@ setTimeout(() => {
             updateCache()
             runModerationChecks(client)
             getWebhooks(client)
-        }, 2000)
+        }, 10000)
     })
 }, 500)
