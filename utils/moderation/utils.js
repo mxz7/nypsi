@@ -287,8 +287,8 @@ function runModerationChecks(client) {
             .all(date)
 
         for (let unban of query) {
-            requestUnmute(unban.guild_id, unban.user, client)
-            info(`requested unmute in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
+            requestUnban(unban.guild_id, unban.user, client)
+            info(`requested unban in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
         }
     }, 30000)
 }
