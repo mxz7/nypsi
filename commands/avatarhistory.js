@@ -8,6 +8,7 @@ const {
     fetchAvatarHistory,
     addNewAvatar,
     clearAvatarHistory,
+    isTracking,
 } = require("../utils/users/utils")
 const { getMember, formatDate, uploadImage } = require("../utils/utils")
 
@@ -111,6 +112,10 @@ async function run(message, args) {
         embed.setFooter(`${formatDate(history[index].date)} | ${index + 1}/${history.length}`)
     }
 
+    if (!isTracking(member)) {
+        embed.setDescription("`[tracking disabled]`")
+    }
+
     const msg = await message.channel.send(embed)
 
     if (history.length == 1) return
@@ -138,6 +143,10 @@ async function run(message, args) {
         if (!reaction) return
 
         const newEmbed = new CustomEmbed(message.member, false)
+
+        if (!isTracking(member)) {
+            newEmbed.setDescription("`[tracking disabled]`")
+        }
 
         if (reaction == "⬅") {
             if (currentPage <= 1) {
