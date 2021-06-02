@@ -77,7 +77,7 @@ client.on("userUpdate", userUpdate.bind(null))
 
 client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
 client.on("shardDisconnect", (s, shardID) => info(`shard#${shardID} disconnected`))
-client.on("shardError", (error, shardID) => error(`shard#${shardID} error: ${error}`))
+client.on("shardError", (error1, shardID) => error(`shard#${shardID} error: ${error1}`))
 client.on("shardReconnecting", (shardID) => info(`shard#${shardID} connecting`))
 
 process.on("unhandledRejection", (e) => {
