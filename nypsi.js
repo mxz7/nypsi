@@ -14,6 +14,7 @@ const client = new Discord.Client({
         },
     },
     restTimeOffset: 169,
+    shards: "auto",
 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
