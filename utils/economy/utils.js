@@ -1261,6 +1261,11 @@ function getInventory(member) {
 
     const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id)
 
+    if (!query.inventory) {
+        db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(id)
+        return {}
+    }
+
     return JSON.parse(query.inventory)
 }
 
