@@ -7,6 +7,7 @@ const {
     createUsernameProfile,
     fetchUsernameHistory,
     clearUsernameHistory,
+    isTracking,
 } = require("../utils/users/utils")
 const { getMember, formatDate } = require("../utils/utils")
 
@@ -79,6 +80,8 @@ async function run(message, args) {
 
     if (!usernameProfileExists(member)) createUsernameProfile(member)
 
+    const isUserTracking = isTracking(member)
+
     const history = fetchUsernameHistory(member)
 
     /**
@@ -88,7 +91,11 @@ async function run(message, args) {
 
     for (const item of history) {
         if (pages.size == 0) {
-            pages.set(1, [item])
+            if (!isUserTracking) {
+                pages.set(1, [{ value: "[tracking disabled]", date: Date.now() }, item])
+            } else {
+                pages.set(1, [item])
+            }
         } else {
             if (pages.get(pages.size).length >= 7) {
                 pages.set(pages.size + 1, [item])
