@@ -101,7 +101,12 @@ function loadItems() {
     const query = db.prepare("SELECT id, inventory FROM economy").all()
 
     for (const user of query) {
-        const inventory = JSON.parse(user.inventory)
+        let inventory = JSON.parse(user.inventory)
+
+        if (!inventory) {
+            inventory = {}
+            db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(user.id)
+        }
 
         const inventory1 = JSON.parse(user.inventory)
 
