@@ -1135,7 +1135,7 @@ function reset() {
             }
         }
 
-        if (prestige == 0 && lastVote == 0 && !inventory && !dms) {
+        if (prestige == 0 && Date.now() - lastVote > 43200000 && !inventory && dms) {
             db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
             info("deleted " + user.id)
             deleted++
