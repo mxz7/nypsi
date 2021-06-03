@@ -166,9 +166,11 @@ function clearUsernameHistory(member) {
 
     if (member.user) id = member.user.id
 
+    const current = fetchUsernameHistory(id)[0].value
+
     db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(
         id,
-        member.user.tag
+        current
     )
 
     if (usernameCache.has(id)) {
