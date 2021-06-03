@@ -48,7 +48,7 @@ module.exports = async (message) => {
         }
     }
 
-    if (message.guild.memberCount < 50000) {
+    if (message.guild.memberCount < 75000) {
         if (message.mentions.everyone) {
             if (
                 !inCooldown(message.guild) &&
@@ -139,12 +139,15 @@ function addMention() {
 
         let count = 0
 
+        const channelMembers = mention.message.channel.members
+
         for (const memberID of Array.from(members.keys())) {
             if (count >= 200) return
             const member = members.get(memberID)
 
             if (member.user.bot) continue
             if (member.user.id == mention.message.author.id) continue
+            if (!channelMembers.has(memberID)) continue
 
             const data = {
                 user: mention.message.author.tag,
