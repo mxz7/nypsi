@@ -172,7 +172,7 @@ async function run(message, args) {
             members.forEach((m) => {
                 if (names.size == 0) {
                     const value1 = []
-                    value1.push("`" + m.user.tag + "`")
+                    value1.push("`" + m.user.tag + "`" + " | " + "`" + m.user.id + "`")
                     names.set(1, value1)
                 } else {
                     const lastPage = names.size
