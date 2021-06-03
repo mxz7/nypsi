@@ -15,7 +15,9 @@ async function run(message, args) {
         return message.channel.send("dumbass")
     }
 
-    toggleLock(args[0])
+    for (const user of args) {
+        toggleLock(user)
+    }
 
     message.react("✅")
 }
