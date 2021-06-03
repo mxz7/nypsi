@@ -485,6 +485,7 @@ async function runCommand(cmd, message, args) {
             })
             .catch(() => {
                 fail = true
+                info(`captcha (${message.author.id}) failed`)
                 return message.channel.send(
                     message.author.toString() +
                         " captcha failed, please **type** the letter/number combination shown"
@@ -498,9 +499,11 @@ async function runCommand(cmd, message, args) {
         }
 
         if (response == captcha.answer) {
+            info(`captcha (${message.author.id}) passed`)
             toggleLock(message.author.id)
             return message.react("✅")
         } else {
+            info(`captcha (${message.author.id}) failed`)
             return message.channel.send(
                 message.author.toString() +
                     " captcha failed, please **type** the letter/number combination shown"
