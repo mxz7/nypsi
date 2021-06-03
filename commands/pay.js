@@ -123,15 +123,15 @@ async function run(message, args) {
     if (targetPrestige < 4) {
         const targetXp = getXp(target)
 
-        let payLimit = 100000
+        let payLimit = 75000
 
-        let xpBonus = targetXp * 1000
+        let xpBonus = targetXp * 750
 
-        if (xpBonus > 1000000) xpBonus = 1000000
+        if (xpBonus > 1000000) xpBonus = 100000
 
         payLimit += xpBonus
 
-        const prestigeBonus = targetPrestige * 1000000
+        const prestigeBonus = targetPrestige * 100000
 
         payLimit += prestigeBonus
 
