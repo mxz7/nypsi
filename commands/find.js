@@ -179,10 +179,12 @@ async function run(message, args) {
 
                     if (names.get(lastPage).length >= 10) {
                         const value1 = []
-                        value1.push("`" + m.user.tag + "`")
+                        value1.push("`" + m.user.tag + "`" + " | " + "`" + m.user.id + "`")
                         names.set(lastPage + 1, value1)
                     } else {
-                        names.get(lastPage).push("`" + m.user.tag + "`")
+                        names
+                            .get(lastPage)
+                            .push("`" + m.user.tag + "`" + " | " + "`" + m.user.id + "`")
                     }
                 }
             })
