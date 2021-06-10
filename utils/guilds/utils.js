@@ -296,9 +296,6 @@ function checkStats() {
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
             if (!channel) {
-                profile.enabled = false
-                profile.channel = "none"
-                setStatsProfile(guild, profile)
                 continue
             }
 
