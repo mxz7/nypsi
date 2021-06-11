@@ -69,7 +69,7 @@ async function run(message, args) {
     let statusDesc = `\`0/${members.length}\` members kicked..`
     let reason = message.member.user.tag + ": "
 
-    if (members.length >= 15) {
+    if (members.size >= 15) {
         status = new CustomEmbed(message.member, false, statusDesc + "\n\n - if you'd like to cancel this operation, delete this message").setTitle(`kick | ${message.author.username}`)
     }
 
@@ -118,15 +118,19 @@ async function run(message, args) {
                 continue
             }
 
-            await members
-                .get(member)
-                .kick(reason)
-                .then(() => {
-                    count++
-                })
-                .catch(() => {
-                    failed.push(members.get(member).user)
-                })
+            count++
+
+            Math.floor(Math.random() * 10) > 7 ? failed.push(Math.random()) : ""
+
+            // await members
+            //     .get(member)
+            //     .kick(reason)
+            //     .then(() => {
+            //         count++
+            //     })
+            //     .catch(() => {
+            //         failed.push(members.get(member).user)
+            //     })
             
             if (interval >= 5 && status) {
                 statusDesc = `\`${count}/${members.length}\` members kicked..${failed.length != 0 ? `\n - **${failed.length}** failed` : ""}`
