@@ -90,15 +90,15 @@ async function run(message, args) {
                 continue
             }
 
-            // await members
-            //     .get(member)
-            //     .kick(reason)
-            //     .then(() => {
-            //         count++
-            //     })
-            //     .catch(() => {
-            //         failed.push(members.get(member).user)
-            //     })
+            await members
+                .get(member)
+                .kick(reason)
+                .then(() => {
+                    count++
+                })
+                .catch(() => {
+                    failed.push(members.get(member).user)
+                })
         }
     }
 
