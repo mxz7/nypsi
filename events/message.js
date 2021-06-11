@@ -48,7 +48,7 @@ module.exports = async (message) => {
         }
     }
 
-    if (message.guild.memberCount < 75000) {
+    if (message.guild.memberCount < 250000) {
         if (message.mentions.everyone) {
             if (
                 !inCooldown(message.guild) &&
