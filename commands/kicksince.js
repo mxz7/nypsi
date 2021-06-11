@@ -65,7 +65,22 @@ async function run(message, args) {
 
     const members = await message.guild.members.cache.filter((m) => m.user.createdTimestamp >= time)
 
+    let status
+    let statusDesc = `\`0/${members.length}\` members kicked..`
     let reason = message.member.user.tag + ": "
+
+    if (members.length >= 15) {
+        status = new CustomEmbed(message.member, false, statusDesc + "\n\n - if you'd like to cancel this operation, delete this message").setTitle(`kick | ${message.author.username}`)
+    }
+
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    if (status) {
+        await message.channel.send(status)
+    }
 
     if (args.length > 1) {
         args.shift()
@@ -77,8 +92,19 @@ async function run(message, args) {
 
     let count = 0
     let failed = []
+    let interval = 0
 
     for (let member of members.keyArray()) {
+        interval++
+
+        if (status) {
+            if (msg.deleted) {
+                return message.channel.send(
+                    new CustomEmbed(message.member, false, "✅ operation cancelled")
+                )
+            }
+        }
+
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -101,6 +127,13 @@ async function run(message, args) {
                 .catch(() => {
                     failed.push(members.get(member).user)
                 })
+            
+            if (interval >= 5 && status) {
+                statusDesc = `\`${count}/${members.length}\` members kicked..${failed.length != 0 ? `\n - **${failed.length}** failed` : ""}`
+                status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message")
+                await msg.edit(status)
+                interval = 0
+            }
         }
     }
 
