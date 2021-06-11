@@ -61,9 +61,9 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("lol dont even try"))
     }
 
-    await message.guild.members.fetch()
+    let members = await message.guild.members.fetch()
 
-    const members = await message.guild.members.cache.filter((m) => m.user.createdTimestamp >= time)
+    members = await members.filter((m) => m.user.createdTimestamp >= time)
 
     let status
     let statusDesc = `\`0/${members.size}\` members kicked..`
@@ -118,24 +118,28 @@ async function run(message, args) {
                 continue
             }
 
-            count++
-
-            Math.floor(Math.random() * 10) > 7 ? failed.push(Math.random()) : ""
-
-            // await members
-            //     .get(member)
-            //     .kick(reason)
-            //     .then(() => {
-            //         count++
-            //     })
-            //     .catch(() => {
-            //         failed.push(members.get(member).user)
-            //     })
+            await members
+                .get(member)
+                .kick(reason)
+                .then(() => {
+                    count++
+                })
+                .catch(() => {
+                    failed.push(members.get(member).user)
+                })
             
             if (interval >= 5 && status) {
                 statusDesc = `\`${count}/${members.size}\` members kicked..${failed.length != 0 ? `\n - **${failed.length}** failed` : ""}`
                 status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message")
-                await msg.edit(status)
+                let fail = false
+                await msg.edit(status).catch(() => {
+                    fail = true
+                })
+                if (fail) {
+                    return message.channel.send(
+                        new CustomEmbed(message.member, false, "✅ operation cancelled")
+                    )
+                }
                 interval = 0
             }
         }
@@ -193,19 +197,19 @@ async function run(message, args) {
 
     newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
 
-    // for (let member of members1) {
-    //     const m = members.get(member)
+    for (let member of members1) {
+        const m = members.get(member)
 
-    //     if (reason.split(": ")[1] == "no reason given") {
-    //         await m.send(`you have been kicked from ${message.guild.name}`).catch(() => {})
-    //     } else {
-    //         const embed = new CustomEmbed(m)
-    //             .setTitle(`kicked from ${message.guild.name}`)
-    //             .addField("reason", `\`${reason.split(": ")[1]}\``)
+        if (reason.split(": ")[1] == "no reason given") {
+            await m.send(`you have been kicked from ${message.guild.name}`).catch(() => {})
+        } else {
+            const embed = new CustomEmbed(m)
+                .setTitle(`kicked from ${message.guild.name}`)
+                .addField("reason", `\`${reason.split(": ")[1]}\``)
 
-    //         await m.send(`you have been kicked from ${message.guild.name}`, embed).catch(() => {})
-    //     }
-    // }
+            await m.send(`you have been kicked from ${message.guild.name}`, embed).catch(() => {})
+        }
+    }
 }
 
 cmd.setRun(run)
