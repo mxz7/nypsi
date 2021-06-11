@@ -57,7 +57,7 @@ async function run(message, args) {
         sortCache.get(message.guild.id).length == message.guild.memberCount
     ) {
         membersSorted = sortCache.get(message.guild.id)
-    } else {
+    } else if (message.guild.memberCount < 15000) {
         members.forEach((m) => {
             if (m.joinedTimestamp) {
                 membersSorted.push(m.id)
@@ -68,7 +68,7 @@ async function run(message, args) {
 
         sortCache.set(message.guild.id, membersSorted)
 
-        setTimeout(() => sortCache.delete(message.guild.id), 60000)
+        setTimeout(() => sortCache.delete(message.guild.id), 86400000)
     }
 
     let joinPos = membersSorted.indexOf(member.id) + 1
@@ -100,7 +100,7 @@ async function run(message, args) {
 
         .addField(
             "server",
-            "**joined** " + joined.toString().toLowerCase() + "\n" + "**join pos** " + joinPos,
+            "**joined** " + joined.toString().toLowerCase() + "\n" + "**join pos** " + joinPos != "invalid" ? joinPos.toLocaleString() : "--",
             true
         )
 
