@@ -136,12 +136,7 @@ async function run(message, args) {
         }
     }
 
-    if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await message.member.send(embed).catch()
-    } else {
-        await message.channel.send(embed)
-    }
+    await message.channel.send(embed)
 
     const members1 = members.keyArray()
 
@@ -166,7 +161,7 @@ async function run(message, args) {
                 .setTitle(`kicked from ${message.guild.name}`)
                 .addField("reason", `\`${reason.split(": ")[1]}\``)
 
-            await m.send(`you have been kicked from ${message.guild.name}`, embed)
+            await m.send(`you have been kicked from ${message.guild.name}`, embed).catch(() => {})
         }
     }
 }
