@@ -57,7 +57,11 @@ async function run(message, args) {
 
     if (!time) {
         return message.channel.send(new ErrorEmbed("invalid time length"))
-    } else if (time < Date.now() - 604800000) {
+    } else if (
+        time < Date.now() - 604800000 &&
+        message.author.id != message.guild.ownerID &&
+        time < Date.now() - 604800000 * 2
+    ) {
         return message.channel.send(new ErrorEmbed("lol dont even try"))
     }
 
