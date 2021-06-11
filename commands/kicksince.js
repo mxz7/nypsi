@@ -7,7 +7,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const cmd = new Command(
     "kicksince",
     "kick members that joined after a certain time",
-    categories.MODERATION
+    categories.ADMIN
 )
     .setPermissions(["ADMINISTRATOR"])
     .setAliases(["fuckoffsince"])
