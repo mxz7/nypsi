@@ -9,7 +9,7 @@ const cmd = new Command(
     "kick members that joined after a certain time",
     categories.MODERATION
 )
-    .setPermissions(["KICK_MEMBERS"])
+    .setPermissions(["ADMINISTRATOR"])
     .setAliases(["fuckoffsince"])
 
 /**
@@ -17,9 +17,9 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("KICK_MEMBERS")) {
+    if (!message.member.hasPermission("ADMINISTRATOR")) {
         if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("you need the `kick members` permission"))
+            return message.channel.send(new ErrorEmbed("you need the `administrator` permission"))
         }
         return
     }
