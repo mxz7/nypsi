@@ -44,7 +44,7 @@ async function run(message, args) {
                     "**<length>** the amount of time to traceback to before kicking\n" +
                     "**(reason)** reason for the kick, will be given to all kicked members\n"
             )
-            .addField("examples", `${prefix}kick 1h bots`)
+            .addField("examples", `${prefix}kicksince 1h bots`)
             .addField(
                 "time format examples",
                 "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
