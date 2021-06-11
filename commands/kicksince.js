@@ -75,8 +75,6 @@ async function run(message, args) {
         reason += "no reason given"
     }
 
-    console.log(reason)
-
     let count = 0
     let failed = []
 
