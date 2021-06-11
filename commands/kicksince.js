@@ -155,7 +155,7 @@ async function run(message, args) {
         const m = members.get(member)
 
         if (reason.split(": ")[1] == "no reason given") {
-            await m.send(`you have been kicked from ${message.guild.name}`)
+            await m.send(`you have been kicked from ${message.guild.name}`).catch(() => {})
         } else {
             const embed = new CustomEmbed(m)
                 .setTitle(`kicked from ${message.guild.name}`)
