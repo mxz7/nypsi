@@ -66,7 +66,13 @@ async function run(message, args) {
     members = await members.filter((m) => m.user.createdTimestamp >= time)
 
     if (members.size >= 50) {
-        const confirm = await message.channel.send(new CustomEmbed(message.member, false, `this will kick **${members.size.toLocaleString()}** members, are you sure?`))
+        const confirm = await message.channel.send(
+            new CustomEmbed(
+                message.member,
+                false,
+                `this will kick **${members.size.toLocaleString()}** members, are you sure?`
+            )
+        )
 
         await confirm.react("✅")
 
