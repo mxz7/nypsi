@@ -84,8 +84,10 @@ async function run(message, args) {
             timeAgo.toLocaleString() +
             "** days ago\n" +
             "join position is **" +
-            joinPos != "invalid" ? joinPos.toLocaleString() : "--" +
-            "**"
+            joinPos !=
+        "invalid"
+            ? joinPos.toLocaleString()
+            : "--" + "**"
     )
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))

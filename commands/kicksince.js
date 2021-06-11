@@ -70,7 +70,11 @@ async function run(message, args) {
     let reason = message.member.user.tag + ": "
 
     if (members.size >= 15) {
-        status = new CustomEmbed(message.member, false, statusDesc + "\n\n - if you'd like to cancel this operation, delete this message").setTitle(`kick | ${message.author.username}`)
+        status = new CustomEmbed(
+            message.member,
+            false,
+            statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
+        ).setTitle(`kick | ${message.author.username}`)
     }
 
     /**
@@ -127,10 +131,15 @@ async function run(message, args) {
                 .catch(() => {
                     failed.push(members.get(member).user)
                 })
-            
+
             if (interval >= 5 && status) {
-                statusDesc = `\`${count}/${members.size}\` members kicked..${failed.length != 0 ? `\n - **${failed.length}** failed` : ""}`
-                status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message")
+                statusDesc = `\`${count}/${members.size}\` members kicked..${
+                    failed.length != 0 ? `\n - **${failed.length}** failed` : ""
+                }`
+                status.setDescription(
+                    statusDesc +
+                        "\n\n - if you'd like to cancel this operation, delete this message"
+                )
                 let fail = false
                 await msg.edit(status).catch(() => {
                     fail = true
