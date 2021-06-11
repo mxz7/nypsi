@@ -65,6 +65,31 @@ async function run(message, args) {
 
     members = await members.filter((m) => m.user.createdTimestamp >= time)
 
+    if (members.size >= 50) {
+        const confirm = await message.channel.send(new CustomEmbed(message.member, false, `this will kick **${members.size.toLocaleString()}** members, are you sure?`))
+
+        await confirm.react("✅")
+
+        const filter = (reaction, user) => {
+            return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id
+        }
+
+        const reaction = await confirm
+            .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+            .then((collected) => {
+                return collected.first().emoji.name
+            })
+            .catch(async () => {
+                await confirm.reactions.removeAll()
+            })
+
+        if (reaction == "✅") {
+            await confirm.delete()
+        } else {
+            return
+        }
+    }
+
     let status
     let statusDesc = `\`0/${members.size}\` members kicked..`
     let reason = message.member.user.tag + ": "
