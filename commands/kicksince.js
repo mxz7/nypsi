@@ -4,7 +4,11 @@ const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("kicksince", "kick members that joined after a certain time", categories.MODERATION)
+const cmd = new Command(
+    "kicksince",
+    "kick members that joined after a certain time",
+    categories.MODERATION
+)
     .setPermissions(["KICK_MEMBERS"])
     .setAliases(["fuckoffsince"])
 
@@ -59,8 +63,8 @@ async function run(message, args) {
 
     await message.guild.members.fetch()
 
-    const members = await message.guild.members.cache.filter(m => m.user.createdTimestamp >= time)
-    
+    const members = await message.guild.members.cache.filter((m) => m.user.createdTimestamp >= time)
+
     let reason = message.member.user.tag + ": "
 
     if (args.length > 1) {
