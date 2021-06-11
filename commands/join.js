@@ -77,17 +77,9 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        "joined on **" +
-            joinedServer +
-            "**\n" +
-            " - **" +
-            timeAgo.toLocaleString() +
-            "** days ago\n" +
-            "join position is **" +
-            joinPos !=
-        "invalid"
-            ? joinPos.toLocaleString()
-            : "--" + "**"
+        `joined on **${joinedServer}**\n - **${timeAgo.toLocaleString()}** days ago\njoin position is **${
+            joinPos != "invalid" ? joinPos.toLocaleString() : "--"
+        }**`
     )
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))

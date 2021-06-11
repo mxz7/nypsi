@@ -100,10 +100,9 @@ async function run(message, args) {
 
         .addField(
             "server",
-            "**joined** " + joined.toString().toLowerCase() + "\n" + "**join pos** " + joinPos !=
-                "invalid"
-                ? joinPos.toLocaleString()
-                : "--",
+            `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
+                joinPos != "invalid" ? joinPos.toLocaleString() : "--"
+            }`,
             true
         )
 
