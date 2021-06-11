@@ -132,7 +132,7 @@ async function run(message, args) {
                     failed.push(members.get(member).user)
                 })
 
-            if (interval >= 5 && status) {
+            if (interval >= 10 && status) {
                 statusDesc = `\`${count}/${members.size}\` members kicked..${
                     failed.length != 0 ? `\n - **${failed.length}** failed` : ""
                 }`
