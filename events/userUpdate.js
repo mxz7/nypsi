@@ -24,7 +24,8 @@ let interval
 module.exports = async (oldUser, newUser) => {
     if (oldUser.tag != newUser.tag) {
         if (!usernameProfileExists(newUser.id)) {
-            createUsernameProfile(newUser.id, newUser.tag)
+            createUsernameProfile(newUser.id, oldUser.tag)
+            addNewUsername(newUser.id, newUser.tag)
         } else {
             if (!isTracking(newUser.id)) return
             addNewUsername(newUser.id, newUser.tag)
