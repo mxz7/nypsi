@@ -171,6 +171,10 @@ async function run(message, args) {
         }
     }
 
+    if (status) {
+        msg.delete()
+    }
+
     await message.channel.send(embed)
 
     const members1 = members.keyArray()
