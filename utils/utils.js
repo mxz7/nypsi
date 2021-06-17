@@ -1,6 +1,6 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const util = require("util")
-const { imgur: imgurClientID } = require("../config.json")
+const { imgur: imgurClientID, imgbb: imgbbKey } = require("../config.json")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
@@ -678,8 +678,10 @@ exports.getAllSuggestions = getAllSuggestions
  * @param {String} url
  */
 async function uploadImageToImgur(url) {
-    if (uploadCount >= 775) return null
-    if (uploadDisabled) return null
+    let fallback = false
+
+    if (uploadCount >= 775) fallback = true
+    if (uploadDisabled) fallback = true
     let fail = false
 
     info(`uploading ${url}`)
@@ -695,7 +697,20 @@ async function uploadImageToImgur(url) {
             uploadDisabled = false
         }, 1800000)
 
-        return null
+        fallback = true
+    }
+
+    if (fallback) {
+        info("using fallback uploader..")
+
+        const res = await fallbackUpload(url)
+
+        if (!res) {
+            error("fallback upload failed")
+            return null
+        }
+
+        return res
     }
 
     info("uploaded")
@@ -704,3 +719,15 @@ async function uploadImageToImgur(url) {
 }
 
 exports.uploadImage = uploadImageToImgur
+
+async function fallbackUpload(url) {
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}&image=${url}`).then(
+        (res) => res.json()
+    )
+
+    if (!res.success) {
+        return false
+    }
+
+    return res.display_url
+}

@@ -71,13 +71,17 @@ async function run(message, args) {
         args[0].toLowerCase() == "suggest" ||
         args[0].toLowerCase() == "+"
     ) {
-        if (args.length == 1) {
+        if (args.length == 1 && !message.attachments.first()) {
             return message.channel.send(
                 new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)
             )
         }
 
         let url = args[1]
+
+        if (message.attachments.first()) {
+            url = message.attachments.first().url
+        }
 
         if (!url.toLowerCase().startsWith("https")) {
             return message.channel.send(new ErrorEmbed("must be http**s**"))
