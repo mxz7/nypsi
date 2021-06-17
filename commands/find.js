@@ -1,4 +1,4 @@
-const { Message, Guild } = require("discord.js")
+const { Message, Guild, User } = require("discord.js")
 const { formatDate } = require("../utils/utils.js")
 const { getPeaks } = require("../utils/guilds/utils")
 const {
@@ -34,13 +34,12 @@ async function run(message, args) {
         const users = message.client.users.cache
         const guilds = message.client.guilds.cache
 
-        let user = users.find((u) => u.id == args[1])
+        /**
+         * @type {User}
+         */
+        let user = await message.client.users.fetch(args[1])
         if (!user) {
-            user = await message.client.users.fetch(args[1])
-
-            if (!user) {
-                return message.react("❌")
-            }
+            return message.react("❌")
         }
 
         console.log(user)
@@ -56,11 +55,9 @@ async function run(message, args) {
             }
         })
 
-        const tag = `${user.username}#${user.discriminator}`
-
         const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
-            .setTitle(tag)
-            .addField("user info", "**tag** " + tag, true)
+            .setTitle(user.tag)
+            .addField("user info", "**tag** " + user.tag, true)
 
         if (userExists(user.id)) {
             let voted = false
@@ -98,8 +95,13 @@ async function run(message, args) {
         const users = message.client.users.cache
         const guilds = message.client.guilds.cache
 
+        args.shift()
+
+        /**
+         * @type {User}
+         */
         let user = users.find((u) =>
-            (u.username + "#" + u.discriminator).toLowerCase().includes(args[1])
+            (u.username + "#" + u.discriminator).toLowerCase().includes(args.join(" "))
         )
 
         if (!user) {
@@ -119,11 +121,9 @@ async function run(message, args) {
             }
         })
 
-        const tag = `${user.username}#${user.discriminator}`
-
         const embed = new CustomEmbed(message.member, false, "`" + user.id + "`")
-            .setTitle(tag)
-            .addField("user info", "**tag** " + tag, true)
+            .setTitle(user.tag)
+            .addField("user info", "**tag** " + user.tag, true)
 
         if (userExists(user.id)) {
             let voted = false
