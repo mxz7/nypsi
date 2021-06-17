@@ -23,8 +23,8 @@ async function run(message, args) {
         }
 
         channel = message.mentions.channels.first()
-        
-        if (!channel.members.find(m => m.user.id == message.author.id)) {
+
+        if (!channel.members.find((m) => m.user.id == message.author.id)) {
             return message.channel.send(new ErrorEmbed("invalid channel"))
         }
 
