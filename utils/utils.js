@@ -9,6 +9,7 @@ const { error, info, types } = require("./logger")
 const db = getDatabase()
 const imgur = require("imgur")
 imgur.setClientId(imgurClientID)
+const imgbbUploader = require("imgbb-uploader")
 
 const uploadImage = util.promisify(imgur.uploadUrl)
 let uploadDisabled = false
@@ -678,8 +679,10 @@ exports.getAllSuggestions = getAllSuggestions
  * @param {String} url
  */
 async function uploadImageToImgur(url) {
-    if (uploadCount >= 775) return null
-    if (uploadDisabled) return null
+    let fallback = false
+
+    if (uploadCount >= 775) fallback = true
+    if (uploadDisabled) fallback = true
     let fail = false
 
     info(`uploading ${url}`)
@@ -695,7 +698,15 @@ async function uploadImageToImgur(url) {
             uploadDisabled = false
         }, 1800000)
 
-        return null
+        fallback = true
+    }
+
+    if (fallback) {
+        info("using fallback uploader..")
+
+        const res = await fallbackUpload(url)
+
+        return res
     }
 
     info("uploaded")
@@ -704,3 +715,11 @@ async function uploadImageToImgur(url) {
 }
 
 exports.uploadImage = uploadImageToImgur
+
+async function fallbackUpload(url) {
+    const res = await imgbbUploader(imgbbKey, url)
+
+    console.log(res)
+
+    return res
+}
