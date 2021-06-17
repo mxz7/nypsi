@@ -21,7 +21,13 @@ async function run(message, args) {
         if (!message.mentions.channels.first()) {
             return message.channel.send(new ErrorEmbed("invalid channel"))
         }
+
         channel = message.mentions.channels.first()
+
+        if (!channel.members.find((m) => m.user.id == message.author.id)) {
+            return message.channel.send(new ErrorEmbed("invalid channel"))
+        }
+
         if (!channel) {
             return message.channel.send(new ErrorEmbed("invalid channel"))
         }
