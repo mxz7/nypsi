@@ -37,7 +37,7 @@ module.exports = async (oldUser, newUser) => {
         newUser.displayAvatarURL({ dynamic: true, size: 256 })
     ) {
         if (!userExists(newUser.id)) return
-        if (!isPremium(newUser.id) && getPrestige(newUser.id) < 5) return
+        if (!isPremium(newUser.id) && getPrestige(newUser.id) < 3) return
 
         if (!usernameProfileExists(newUser.id)) {
             const url = await uploadImage(
