@@ -9,8 +9,6 @@ const { error, info, types } = require("./logger")
 const db = getDatabase()
 const imgur = require("imgur")
 imgur.setClientId(imgurClientID)
-const imgbbUploader = require("imgbb-uploader")
-const imageToBase64 = require("image-to-base64")
 
 const uploadImage = util.promisify(imgur.uploadUrl)
 let uploadDisabled = false
