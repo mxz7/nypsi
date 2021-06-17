@@ -11,7 +11,7 @@ const cmd = new Command(
     "inspiration",
     "generate an inspirational quote (inspirobot.me)",
     categories.FUN
-).setAliases(["quote"])
+).setAliases(["quote", "inspire"])
 
 /**
  * @param {Message} message
