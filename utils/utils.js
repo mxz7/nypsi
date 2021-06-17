@@ -10,6 +10,7 @@ const db = getDatabase()
 const imgur = require("imgur")
 imgur.setClientId(imgurClientID)
 const imgbbUploader = require("imgbb-uploader")
+const imageToBase64 = require("image-to-base64")
 
 const uploadImage = util.promisify(imgur.uploadUrl)
 let uploadDisabled = false
@@ -706,6 +707,11 @@ async function uploadImageToImgur(url) {
 
         const res = await fallbackUpload(url)
 
+        if (!res) {
+            error("fallback upload failed")
+            return null
+        }
+
         return res
     }
 
@@ -717,9 +723,11 @@ async function uploadImageToImgur(url) {
 exports.uploadImage = uploadImageToImgur
 
 async function fallbackUpload(url) {
-    const res = await imgbbUploader(imgbbKey, url)
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}&image=${url}`).then((res) => res.json())
 
-    console.log(res)
+    if (!res.success) {
+        return false
+    }
 
-    return res
+    return res.display_url
 }
