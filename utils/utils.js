@@ -1,6 +1,6 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const util = require("util")
-const { imgur: imgurClientID } = require("../config.json")
+const { imgur: imgurClientID, imgbb: imgbbKey } = require("../config.json")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
