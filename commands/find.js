@@ -47,7 +47,9 @@ async function run(message, args) {
         let guildNames = ""
 
         guilds.forEach((g) => {
-            const abc = g.members.cache.find((u) => u.id == args[1])
+            const abc = g.members.cache.find((u) => u.id == user.id)
+
+            console.log(abc)
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
@@ -112,7 +114,7 @@ async function run(message, args) {
         let guildNames = ""
 
         guilds.forEach((g) => {
-            const abc = g.members.cache.find((u) => u.user.tag.toLowerCase().includes(args[1]))
+            const abc = g.members.cache.find((u) => u.user.id == user.id)
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
