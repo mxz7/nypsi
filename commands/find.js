@@ -51,7 +51,6 @@ async function run(message, args) {
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
-                user = abc
             }
         })
 
@@ -117,7 +116,6 @@ async function run(message, args) {
 
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
-                user = abc
             }
         })
 
