@@ -49,8 +49,6 @@ async function run(message, args) {
         guilds.forEach((g) => {
             const abc = g.members.cache.find((u) => u.id == user.id)
 
-            console.log(abc)
-
             if (abc) {
                 guildNames = guildNames + "`" + g.id + "` "
             }
