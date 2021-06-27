@@ -70,5 +70,6 @@ async function doQueue() {
 
     if (queue.length == 0) {
         clearInterval(interval)
+        interval = undefined
     }
 }
