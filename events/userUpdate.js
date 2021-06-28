@@ -32,19 +32,6 @@ module.exports = async (oldUser, newUser) => {
         }
     }
 
-<<<<<<< HEAD
-=======
-    console.log(
-        oldUser.displayAvatarURL({ dynamic: true, size: 256 }) !=
-            newUser.displayAvatarURL({ dynamic: true, size: 256 })
-    )
-
-    console.log(
-        oldUser.displayAvatarURL({ dynamic: true, size: 256 }),
-        newUser.displayAvatarURL({ dynamic: true, size: 256 })
-    )
-
->>>>>>> 0e9191b1cd44c4a6786927b413214e93c7de53e0
     if (
         oldUser.displayAvatarURL({ dynamic: true, size: 256 }) !=
         newUser.displayAvatarURL({ dynamic: true, size: 256 })
