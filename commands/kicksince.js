@@ -65,7 +65,7 @@ async function run(message, args) {
 
     let members = await message.guild.members.fetch()
 
-    members = await members.filter((m) => m.user.createdTimestamp >= time)
+    members = await members.filter((m) => m.joinedTimestamp >= time)
 
     if (members.size >= 50) {
         const confirm = await message.channel.send(
