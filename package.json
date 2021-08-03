@@ -10,7 +10,7 @@
   "author": "tekoh",
   "license": "ISC",
   "dependencies": {
-    "@top-gg/sdk": "^3.1.1",
+    "@top-gg/sdk": "^3.1.2",
     "better-sqlite3": "^7.4.3",
     "bufferutil": "^4.0.3",
     "discord.js": "^12.5.3",
