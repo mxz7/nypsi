@@ -4,9 +4,12 @@ const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
     disableMentions: "everyone",
-    messageCacheMaxSize: 100,
-    messageSweepInterval: 1800,
-    messageCacheLifetime: 3600,
+    makeCache: Discord.Options.cacheWithLimits({
+        MessageManager: 100,
+        ThreadManager: {
+            sweepInterval: 1800
+        }
+    }),
     presence: {
         status: "dnd",
         activity: {
