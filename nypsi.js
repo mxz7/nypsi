@@ -3,7 +3,9 @@ const startUp = Date.now()
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
-    disableMentions: "everyone",
+    allowedMentions: {
+        parse: ["users", "roles"]
+    },
     makeCache: Discord.Options.cacheWithLimits({
         MessageManager: 100,
         ThreadManager: {
