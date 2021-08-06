@@ -34,9 +34,9 @@ module.exports = async (client, startUp) => {
 
         client.user.setPresence({
             status: "dnd",
-            activity: {
+            activities: [{
                 name: game,
-            },
+            }],
         })
     }, 5000)
 
@@ -53,9 +53,9 @@ module.exports = async (client, startUp) => {
 
         client.user.setPresence({
             status: "dnd",
-            activity: {
+            activities: [{
                 name: game,
-            },
+            }],
         })
     }, 15 * 60 * 1000)
 
