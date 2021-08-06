@@ -168,7 +168,7 @@ async function requestDM(id, content, dontDmTekoh) {
 
     if (member) {
         await member
-            .send(content)
+            .send({content: content})
             .then(() => {
                 info(`successfully sent DM to ${member.tag} (${member.id})`)
             })
@@ -177,7 +177,7 @@ async function requestDM(id, content, dontDmTekoh) {
                 if (!dontDmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347")
 
-                    await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+                    await tekoh.send({content: `failed to send dm to ${id}\n\n${content}`})
                 }
             })
         return true
@@ -186,7 +186,7 @@ async function requestDM(id, content, dontDmTekoh) {
         if (!dontDmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347")
 
-            await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+            await tekoh.send({content: `failed to send dm to ${id}\n\n${content}`})
         }
         return false
     }
@@ -204,7 +204,7 @@ async function requestRemoveRole(id, roleID) {
     if (!guild) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch guild - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch guild - user: ${id} role: ${roleID}`})
     }
 
     const role = await guild.roles.fetch(roleID)
@@ -212,7 +212,7 @@ async function requestRemoveRole(id, roleID) {
     if (!role) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch role - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch role - user: ${id} role: ${roleID}`})
     }
 
     const user = await guild.members.fetch(id)
@@ -220,7 +220,7 @@ async function requestRemoveRole(id, roleID) {
     if (!user) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch role - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch role - user: ${id} role: ${roleID}`})
     }
 
     if (roleID == "819870846536646666") {
