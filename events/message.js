@@ -1,4 +1,4 @@
-const { Message, MessageEmbed, Collection } = require("discord.js")
+const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
 const { mentions } = require("../nypsi")
 const {
     getChatFilter,
@@ -32,7 +32,7 @@ module.exports = async (message) => {
         return await message.channel.send(embed)
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR") && hasGuild(message.guild)) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) && hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
