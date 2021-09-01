@@ -13,7 +13,7 @@
     "@top-gg/sdk": "^3.1.2",
     "better-sqlite3": "^7.4.3",
     "bufferutil": "^4.0.3",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.1.0",
     "express": "^4.17.1",
     "fast-sort": "^3.0.2",
     "figlet": "^1.5.2",
