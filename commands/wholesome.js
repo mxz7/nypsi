@@ -73,24 +73,26 @@ async function run(message, args) {
         args[0].toLowerCase() == "+"
     ) {
         if (uploadCooldown.has(message.member.id)) {
-        const init = uploadCooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
-        const time = 60 - diff
+            const init = uploadCooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 60 - diff
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
 
-        let remaining
+            let remaining
 
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+
+            return message.channel.send(
+                new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``)
+            )
         }
-            
-        return message.channel.send(new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``))
-    }
 
         if (args.length == 1 && !message.attachments.first()) {
             return message.channel.send(
