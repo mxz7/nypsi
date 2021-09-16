@@ -1175,6 +1175,12 @@ function hasStatsProfile(member) {
 exports.hasStatsProfile = hasStatsProfile
 
 function createStatsProfile(member) {
+    let id = member
+
+    if (member.user) {
+        id = member.user.id
+    }
+
     stats[member.user.id] = {
         gamble: {},
         items: {},
