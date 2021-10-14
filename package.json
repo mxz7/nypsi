@@ -24,7 +24,7 @@
     "shuffle-array": "^1.0.1",
     "table": "6.7",
     "urban-dictionary": "^3.0.2",
-    "utf-8-validate": "^5.0.5"
+    "utf-8-validate": "^5.0.7"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
