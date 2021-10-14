@@ -12,10 +12,10 @@
   "dependencies": {
     "@top-gg/sdk": "^3.1.2",
     "better-sqlite3": "^7.4.3",
-    "bufferutil": "^4.0.3",
+    "bufferutil": "^4.0.5",
     "discord.js": "^12.5.3",
     "express": "^4.17.1",
-    "fast-sort": "^3.0.2",
+    "fast-sort": "^3.0.3",
     "figlet": "^1.5.2",
     "imgur": "^1.0.2",
     "is-image-url": "^1.1.8",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "eslint": "^7.32.0",
-    "prettier": "2.3.2"
+    "prettier": "2.4.1"
   },
   "repository": {
     "type": "git",
