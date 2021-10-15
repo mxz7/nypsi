@@ -98,13 +98,13 @@ async function run(message, args) {
             true
         )
 
-        .addField(
-            "server",
-            `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
-                joinPos != "invalid" ? joinPos.toLocaleString() : "--"
-            }`,
-            true
-        )
+        // .addField(
+        //     "server",
+        //     `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
+        //         joinPos != "invalid" ? joinPos.toLocaleString() : "--"
+        //     }`,
+        //     true
+        // )
 
     if (rolesText != " ") {
         embed.addField("roles [" + member._roles.length + "]", rolesText)
