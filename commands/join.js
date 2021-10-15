@@ -4,7 +4,6 @@ const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { inPlaceSort } = require("fast-sort")
-const quicksort = require("qsort-async")
 
 const cmd = new Command(
     "join",
@@ -64,23 +63,9 @@ async function run(message, args) {
             }
         })
 
-        if (membersSorted.length > 500) {
-            console.time("quicksort")
-            await quicksort(
-                membersSorted,
-                (one, two) =>
-                    members.find((m) => m.id == one).joinedAt -
-                    members.find((m) => m.id == two).joinedAt,
-                500
-            )
-            console.timeEnd("quicksort")
-        } else {
-            console.time("fastsort")
-            inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
-            console.timeEnd("fastsort")
-        }
+        inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
 
-        // sortCache.set(message.guild.id, membersSorted)
+        sortCache.set(message.guild.id, membersSorted)
 
         setTimeout(() => sortCache.delete(message.guild.id), 86400000)
     }
