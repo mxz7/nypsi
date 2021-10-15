@@ -2,9 +2,9 @@ const { Worker, isMainThread, parentPort, workerData } = require("worker_threads
 
 if (isMainThread) {
     /**
-     * 
-     * @param {Array<String>} array 
-     * @param {Map<String, Number>} members 
+     *
+     * @param {Array<String>} array
+     * @param {Map<String, Number>} members
      * @returns {Array<String>}
      */
     module.exports = function sort(array, members) {

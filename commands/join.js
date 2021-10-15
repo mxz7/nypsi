@@ -65,7 +65,7 @@ async function run(message, args) {
                 membersMap.set(m.id, m.joinedAt)
             }
         })
-    
+
         membersSorted = await workerSort(membersSorted, membersMap)
 
         sortCache.set(message.guild.id, membersSorted)
