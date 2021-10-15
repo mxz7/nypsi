@@ -3,7 +3,6 @@ const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const { inPlaceSort } = require("fast-sort")
 const workerSort = require("../utils/sort-worker")
 
 const cmd = new Command(
@@ -66,16 +65,10 @@ async function run(message, args) {
                 membersMap.set(m.id, m.joinedAt)
             }
         })
-        
-        console.time("worker-sort")
+    
         membersSorted = await workerSort(membersSorted, membersMap)
-        console.timeEnd("worker-sort")
 
-        console.time("fast-sort")
-        //inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
-        console.timeEnd("fast-sort")
-
-        //sortCache.set(message.guild.id, membersSorted)
+        sortCache.set(message.guild.id, membersSorted)
 
         setTimeout(() => sortCache.delete(message.guild.id), 86400000)
     }
