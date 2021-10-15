@@ -21,6 +21,7 @@ const {
 } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
+const { start } = require("repl")
 
 const commands = new Map()
 const aliases = new Map()
@@ -30,6 +31,8 @@ const cooldown = new Set()
 const handcuffs = new Map()
 
 const beingChecked = []
+
+let restarting = false
 
 function loadCommands() {
     const commandFiles = fs.readdirSync("./commands/").filter((file) => file.endsWith(".js"))
@@ -388,6 +391,14 @@ async function runCommand(cmd, message, args) {
                 "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
                 "if this error still shows, check channel specific permissions"
         )
+    }
+
+    if (restarting) {
+        if (message.author.id == "672793821850894347") {
+            message.react("💀")
+        } else {
+            return message.channel.send(new ErrorEmbed("nypsi is restarting.."))
+        }
     }
 
     if (cmd == "help") {
@@ -792,3 +803,9 @@ function addHandcuffs(id) {
 }
 
 exports.addHandcuffs = addHandcuffs
+
+function startRestart() {
+    restarting = true
+}
+
+exports.startRestart = startRestart
