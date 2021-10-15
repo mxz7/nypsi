@@ -20,7 +20,7 @@
     "imgur": "^1.0.2",
     "is-image-url": "^1.1.8",
     "mc-names": "^1.0.1",
-    "node-fetch": "^2.6.5",
+    "node-fetch": "^3.0.0",
     "shuffle-array": "^1.0.1",
     "table": "6.7",
     "urban-dictionary": "^3.0.2",
