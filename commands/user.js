@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { inPlaceSort } = require("fast-sort")
+const workerSort = require("../utils/sort-worker")
 
 const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(
     ["whois", "who"]
@@ -57,14 +57,17 @@ async function run(message, args) {
         sortCache.get(message.guild.id).length == message.guild.memberCount
     ) {
         membersSorted = sortCache.get(message.guild.id)
-    } else if (message.guild.memberCount < 15000) {
+    } else if (message.guild.memberCount < 69420) {
+        const membersMap = new Map()
+
         members.forEach((m) => {
             if (m.joinedTimestamp) {
                 membersSorted.push(m.id)
+                membersMap.set(m.id, m.joinedAt)
             }
         })
 
-        inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
+        membersSorted = await workerSort(membersSorted, membersMap)
 
         sortCache.set(message.guild.id, membersSorted)
 
@@ -98,13 +101,13 @@ async function run(message, args) {
             true
         )
 
-        // .addField(
-        //     "server",
-        //     `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
-        //         joinPos != "invalid" ? joinPos.toLocaleString() : "--"
-        //     }`,
-        //     true
-        // )
+        .addField(
+            "server",
+            `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
+                joinPos != "invalid" ? joinPos.toLocaleString() : "--"
+            }`,
+            true
+        )
 
     if (rolesText != " ") {
         embed.addField("roles [" + member._roles.length + "]", rolesText)
