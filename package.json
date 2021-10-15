@@ -21,6 +21,7 @@
     "is-image-url": "^1.1.8",
     "mc-names": "^1.0.1",
     "node-fetch": "^2.6.5",
+    "qsort-async": "^1.0.1",
     "shuffle-array": "^1.0.1",
     "table": "6.7",
     "urban-dictionary": "^3.0.2",
