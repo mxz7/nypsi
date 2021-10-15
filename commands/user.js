@@ -3,6 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const workerSort = require("../utils/sort-worker")
+const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 
 const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(
     ["whois", "who"]
@@ -49,7 +50,18 @@ async function run(message, args) {
         return message.channel.send(embed)
     }
 
-    const members = message.guild.members.cache
+    let members
+
+    if (
+        inCooldown(message.guild) ||
+        message.guild.memberCount == message.guild.members.cache.size
+    ) {
+        members = message.guild.members.cache
+    } else {
+        members = await message.guild.members.fetch()
+        addCooldown(message.guild, 3600)
+    }
+
     let membersSorted = []
 
     if (
