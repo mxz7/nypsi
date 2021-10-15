@@ -353,18 +353,11 @@ function calcTotal(member) {
         }
     }
 
-    if (aces > 0) {
-        for (let i = 0; i < aces; i++) {
-            if (aces > 1) {
-                total = total + 1
-            } else {
-                if (total <= 10) {
-                    total = total + 11
-                    aceAs11 = true
-                } else {
-                    total = total + 1
-                }
-            }
+    for (let i = 0; i < aces; i++) {
+        if (total < 11) {
+            total += 11
+        } else {
+            total += 1
         }
     }
 
@@ -397,18 +390,11 @@ function calcTotalDealer(member) {
         }
     }
 
-    if (aces > 0) {
-        for (let i = 0; i < aces; i++) {
-            if (aces > 1) {
-                total = total + 1
-            } else {
-                if (total <= 10) {
-                    total = total + 11
-                    aceAs11 = true
-                } else {
-                    total = total + 1
-                }
-            }
+    for (let i = 0; i < aces; i++) {
+        if (total < 11) {
+            total += 11
+        } else {
+            total += 1
         }
     }
 
