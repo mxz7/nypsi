@@ -64,15 +64,23 @@ async function run(message, args) {
             }
         })
 
-        console.time("quicksort")
-        await quicksort(membersSorted, (one, two) => members.find(m => m.id == one).joinedAt - members.find(m => m.id == two).joinedAt)
-        console.timeEnd("quicksort")
+        if (membersSorted.length > 500) {
+            console.time("quicksort")
+            await quicksort(
+                membersSorted,
+                (one, two) =>
+                    members.find((m) => m.id == one).joinedAt -
+                    members.find((m) => m.id == two).joinedAt,
+                500
+            )
+            console.timeEnd("quicksort")
+        } else {
+            console.time("fastsort")
+            inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
+            console.timeEnd("fastsort")
+        }
 
-        // console.time("fastsort")
-        // inPlaceSort(membersSorted).asc((i) => members.find((m) => m.id == i).joinedAt)
-        // console.timeEnd("fastsort")
-
-        //sortCache.set(message.guild.id, membersSorted)
+        // sortCache.set(message.guild.id, membersSorted)
 
         setTimeout(() => sortCache.delete(message.guild.id), 86400000)
     }
