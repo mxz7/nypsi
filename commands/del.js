@@ -37,7 +37,7 @@ async function run(message, args) {
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed("$del <amount> (@user)"))
+        return message.channel.send({embeds: [new ErrorEmbed("$del <amount> (@user)")]})
     }
 
     let amount = parseInt(args[0])
@@ -140,7 +140,7 @@ async function run(message, args) {
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 )
-                await m.edit(embed)
+                await m.edit({embeds: [embed]})
             }
 
             await message.channel.bulkDelete(messages).catch(() => {
@@ -163,7 +163,7 @@ async function run(message, args) {
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 )
-                await m.edit(embed)
+                await m.edit({embeds: [embed]})
             }
         }
         return m.delete().catch()
