@@ -80,7 +80,7 @@ async function run(message, args) {
                     "💰 **cash out** end the game and receive the current win\nmax win **15**x"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "info") {
@@ -93,7 +93,7 @@ async function run(message, args) {
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)"
         ).setTitle("highlow help")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {

@@ -170,7 +170,7 @@ async function run(message, args) {
         }`
     )
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

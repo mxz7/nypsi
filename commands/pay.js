@@ -61,7 +61,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}pay <user> <amount>`)
             .addField("help", "the payment will be taxxed at certain amounts")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let target = message.mentions.members.first()
@@ -205,7 +205,7 @@ async function run(message, args) {
         )
     }
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())

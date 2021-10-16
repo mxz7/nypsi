@@ -32,7 +32,7 @@ async function run(message, args) {
                 "**prefix** <new prefix> to change the current prefix"
         ).setTitle("prefix")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.join(" ").length > 3) {
@@ -47,7 +47,7 @@ async function run(message, args) {
         "✅ prefix changed to `" + args.join(" ") + "`"
     ).setTitle("prefix")
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

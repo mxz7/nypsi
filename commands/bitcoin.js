@@ -35,7 +35,7 @@ async function run(message, args) {
         .setFooter("not real bitcoin, although it reflects current worth in USD")
         .setTitle("bitcoin | " + message.author.username)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

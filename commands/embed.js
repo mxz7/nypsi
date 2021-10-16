@@ -56,7 +56,7 @@ async function run(message, args) {
                     `${prefix}embed hello | this is a description | #13c696`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let mode = ""

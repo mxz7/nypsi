@@ -154,7 +154,7 @@ async function run(message, args) {
                 )
             }
 
-            await message.channel.send(embed)
+            await message.channel.send({ embeds: [embed] })
 
             const channel = await key.guild.channels.cache.find((ch) => ch.id == key.channel)
 

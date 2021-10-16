@@ -51,7 +51,7 @@ async function run(message, args) {
         .setTitle(eSnipe.get(channel.id).member)
         .setFooter(timeSince(created) + " ago")
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

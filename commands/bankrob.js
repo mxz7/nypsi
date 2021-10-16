@@ -81,7 +81,7 @@ async function run(message, args) {
             "current bank balances"
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let cooldownLength = 600
@@ -188,7 +188,7 @@ async function run(message, args) {
         embed2.setColor("#5efb8f")
     }
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         setTimeout(() => {
             m.edit(embed2)
         }, 1500)

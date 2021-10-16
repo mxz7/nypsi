@@ -70,7 +70,7 @@ async function run(message, args) {
         `+$**${amount.toLocaleString()}**`
     ).setTitle("freemoney | " + message.member.user.username)
 
-    message.channel.send(embed).then((msg) => {
+    message.channel.send({ embeds: [embed] }).then((msg) => {
         embed.setDescription(
             `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(
                 message.member

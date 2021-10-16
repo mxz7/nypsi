@@ -87,7 +87,7 @@ async function run(message, args) {
             )
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const listPersonalWorkers = () => {
@@ -125,7 +125,7 @@ async function run(message, args) {
             )
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -236,7 +236,7 @@ async function run(message, args) {
                 `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`
             ).setTitle("workers | " + message.author.username)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send(
@@ -320,7 +320,7 @@ async function run(message, args) {
                     } / ${worker.maxStorage.toLocaleString()}`
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[0].toLowerCase() == "list") {
             return listAllWorkers()
         } else if (
@@ -395,7 +395,7 @@ async function run(message, args) {
                     `${getPrefix(message.guild)}**workers upgrade** *upgrade a worker*`
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
     }
 }

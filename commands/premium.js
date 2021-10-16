@@ -56,7 +56,7 @@ async function run(message, args) {
             embed.setDescription(description)
             embed.setFooter("thank you so much for supporting!")
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             return message.channel.send(
                 new CustomEmbed(
@@ -97,7 +97,7 @@ async function run(message, args) {
             `level: ${a.level}\n\ncheck console for all info`
         ).setTitle(args[1])
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "update") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage()

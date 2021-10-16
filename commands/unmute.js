@@ -147,7 +147,7 @@ async function run(message, args) {
         message.delete()
         await message.member.send(embed).catch(() => {})
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     const members1 = members.keyArray()

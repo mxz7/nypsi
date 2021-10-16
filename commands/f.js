@@ -66,7 +66,7 @@ async function run(message, args) {
         `press **F** to pay your respects to **${content}**`
     )
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     await msg.react("🇫")
 

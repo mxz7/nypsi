@@ -50,7 +50,7 @@ async function run(message, args) {
                 "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const time = new Date().getTime() - getDuration(args[0].toLowerCase()) * 1000
@@ -225,7 +225,7 @@ async function run(message, args) {
         msg.delete()
     }
 
-    await message.channel.send(embed)
+    await message.channel.send({ embeds: [embed] })
 
     const members1 = members.keyArray()
 

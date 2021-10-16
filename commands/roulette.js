@@ -135,7 +135,7 @@ async function run(message, args) {
                     "red and black give a **1.5x** win and green gives a **17**x win"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (
@@ -285,7 +285,7 @@ async function run(message, args) {
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
     ).setTitle("roulette wheel | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             "**landed on** " +
                 roll +

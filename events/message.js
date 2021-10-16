@@ -29,7 +29,7 @@ module.exports = async (message) => {
             .setTitle("support")
             .setColor("#36393f")
             .setDescription("support server: https://discord.gg/hJTDNST")
-        return await message.channel.send(embed)
+        return await message.channel.send({ embeds: [embed] })
     }
 
     if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) && hasGuild(message.guild)) {

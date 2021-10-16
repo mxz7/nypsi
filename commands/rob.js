@@ -96,7 +96,7 @@ async function run(message, args) {
                     "you can lose up to **25**% of your balance by failing a robbery"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -316,7 +316,7 @@ async function run(message, args) {
         }
     }
 
-    message.channel.send(embed).then(async (m) => {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
         setTimeout(async () => {
             await m.edit(embed2)
 

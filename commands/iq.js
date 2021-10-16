@@ -132,7 +132,7 @@ async function run(message, args) {
         `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`
     ).setTitle("iq calculator")
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

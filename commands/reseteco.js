@@ -25,7 +25,7 @@ async function run(message, args) {
             "\n--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---"
     )
 
-    await message.channel.send(embed)
+    await message.channel.send({ embeds: [embed] })
 
     const filter = (msg) => message.author.id == msg.author.id
 

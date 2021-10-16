@@ -80,7 +80,7 @@ async function run(message, args) {
         .setURL(url)
         .setImage(image)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

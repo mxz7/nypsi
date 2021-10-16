@@ -66,7 +66,7 @@ async function run(message, args) {
                 "help",
                 "you can withdraw money from your bank aslong as you have that amount available in your bank"
             )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (getBankBalance(message.member) == 0) {
@@ -121,7 +121,7 @@ async function run(message, args) {
         )
         .addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
-    const m = await message.channel.send(embed)
+    const m = await message.channel.send({ embeds: [embed] })
 
     updateBankBalance(message.member, getBankBalance(message.member) - amount)
     updateBalance(message.member, getBalance(message.member) + amount)

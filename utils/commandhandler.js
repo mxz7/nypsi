@@ -299,7 +299,7 @@ async function helpCmd(message, args) {
         }
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (!pageSystemNeeded) return
 
@@ -456,7 +456,7 @@ async function runCommand(cmd, message, args) {
                 `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             alias = true
         }
@@ -481,7 +481,7 @@ async function runCommand(cmd, message, args) {
 
         beingChecked.push(message.author.id)
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         info(`sent captcha (${message.author.id}) - awaiting reply`)
 

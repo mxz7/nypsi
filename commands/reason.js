@@ -25,7 +25,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}reason <case ID> <new reason>`)
             .addField("help", "use this command to change the current reason for a punishment case")
 
-        return await message.channel.send(embed)
+        return await message.channel.send({ embeds: [embed] })
     }
 
     const caseID = args[0]
@@ -48,7 +48,7 @@ async function run(message, args) {
         .setTitle("reason | " + message.member.user.username)
         .setDescription("✅ case updated")
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

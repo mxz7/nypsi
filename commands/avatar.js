@@ -32,7 +32,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(member, false).setTitle(member.user.tag).setImage(avatar)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 avatar.setRun(run)

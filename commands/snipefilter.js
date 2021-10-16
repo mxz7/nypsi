@@ -32,7 +32,7 @@ async function run(message, args) {
             embed.setDescription("`❌` empty snipe filter")
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
@@ -63,7 +63,7 @@ async function run(message, args) {
                 .setTitle("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         filter.push(word)
@@ -77,7 +77,7 @@ async function run(message, args) {
                 `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`
             ).setTitle("snipe filter")
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateFilter(message.guild, filter)
@@ -87,7 +87,7 @@ async function run(message, args) {
             true,
             "✅ added `" + word + "` to the filter"
         ).setTitle("snipe filter")
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
@@ -112,7 +112,7 @@ async function run(message, args) {
                 .setTitle("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateFilter(message.guild, filter)
@@ -125,7 +125,7 @@ async function run(message, args) {
             .setTitle("snipe filter")
             .setFooter(`you can use ${prefix}sf reset to reset the filter`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "reset") {
@@ -137,7 +137,7 @@ async function run(message, args) {
             "snipe filter"
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

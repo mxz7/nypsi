@@ -35,7 +35,7 @@ async function run(message, args) {
         .setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
         .setTitle("dogecoin | " + message.author.username)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

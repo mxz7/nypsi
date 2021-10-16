@@ -41,7 +41,7 @@ async function run(message, args) {
             message.guild
         )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let color = args[0].split("#").join("")

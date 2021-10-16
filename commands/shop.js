@@ -104,7 +104,7 @@ async function run(message, args) {
         )
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (pages.length > 1) {
         await msg.react("⬅")

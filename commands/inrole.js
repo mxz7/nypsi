@@ -104,7 +104,7 @@ async function run(message, args) {
         .setTitle(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`)
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (memberList.size <= 1) return
 

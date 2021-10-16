@@ -53,7 +53,7 @@ async function run(message, args) {
             .setTitle("member count")
             .setFooter(`use ${prefix}counter help to view additional commands`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "help") {
         const embed = new CustomEmbed(
             message.member,
@@ -67,7 +67,7 @@ async function run(message, args) {
             .setTitle("member count")
             .setFooter("channel will be updated every 10 minutes")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "enable") {
         if (profile.enabled) {
             return message.channel.send(new ErrorEmbed("already enabled"))
@@ -114,7 +114,7 @@ async function run(message, args) {
             .setTitle("member count")
             .setFooter("channel will be updated every 10 minutes")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
             return message.channel.send(new ErrorEmbed("already disabled"))
@@ -131,7 +131,7 @@ async function run(message, args) {
             "✅ counter successfully disabled"
         ).setTitle("member count")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -146,7 +146,7 @@ async function run(message, args) {
                     `to change this format, do ${prefix}**counter format <new format>**`
                 )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         args.shift()
@@ -175,7 +175,7 @@ async function run(message, args) {
             .setTitle("member count")
             .addField("new format", "`" + newFormat + "`")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "filterbots") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -193,7 +193,7 @@ async function run(message, args) {
                     `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`
                 )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         if (args[1].toLowerCase() != "true" && args[1].toLowerCase() != "false") {
@@ -216,7 +216,7 @@ async function run(message, args) {
             .setTitle("member count")
             .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "channel") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -231,7 +231,7 @@ async function run(message, args) {
                     `to change this value, do ${prefix}**counter channel <channel id>**`
                 )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         let channel
@@ -309,7 +309,7 @@ async function run(message, args) {
             .setTitle("member count")
             .addField("new value", "`" + profile.channel + "`")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         const embed = new CustomEmbed(
             message.member,
@@ -322,7 +322,7 @@ async function run(message, args) {
             .setTitle("member count")
             .setFooter("member count will be updated every 10 minutes")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

@@ -47,7 +47,7 @@ async function run(message, args) {
 
         embed.setFooter(`use ${getPrefix(message.guild)}countdown help for more commands`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "create" || args[0].toLowerCase() == "new") {
         const countdowns = getCountdowns(message.guild)
 
@@ -76,7 +76,7 @@ async function run(message, args) {
             "what date do you want to count down to?\n\nplease use the following format: `MM/DD/YYYY` - example: 12/25/2069"
         )
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         const filter = (msg) => message.author.id == msg.author.id
 
@@ -129,7 +129,7 @@ async function run(message, args) {
             "which channel would you like to send countdown messages to\n\nplease mention the channel using # - and make sure i have permission to send messages there"
         )
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
             .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
@@ -154,7 +154,7 @@ async function run(message, args) {
             "what format would you like to use?\n\n%days% will be replaced with how many days are left"
         )
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
             .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
@@ -181,7 +181,7 @@ async function run(message, args) {
             "what final format would you like to use?\n\nthe final format is what will be used on the final day"
         )
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
             .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
@@ -218,7 +218,7 @@ async function run(message, args) {
 
         embed.setDescription("✅ countdown added")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (
         args[0].toLowerCase() == "del" ||
         args[0].toLowerCase() == "-" ||
@@ -251,7 +251,7 @@ async function run(message, args) {
             )}**countdown** *list all active countdowns*`
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 
