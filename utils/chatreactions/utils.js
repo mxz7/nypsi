@@ -19,8 +19,8 @@ setInterval(async () => {
         const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild)
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild)
+            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id)
 
             info(`deleted guild '${guild.id}' from chat reaction data`, types.GUILD)
         }

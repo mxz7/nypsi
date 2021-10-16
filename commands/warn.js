@@ -87,7 +87,7 @@ async function run(message, args) {
 
     const messageDM = "you have been warned in **" + message.guild.name + "** for `" + reason + "`"
 
-    for (let member of members.keyArray()) {
+    for (let member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -154,7 +154,7 @@ async function run(message, args) {
         await message.channel.send({ embeds: [embed] })
     }
 
-    const members1 = members.keyArray()
+    const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
         for (let fail of failed) {

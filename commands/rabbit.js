@@ -46,7 +46,7 @@ async function run(message, args) {
     const { rabbitCache } = require("../utils/imghandler")
 
     if (rabbitCache.size < 1) {
-        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
+        return message.channel.send({embeds: [new ErrorEmbed("please wait a couple more seconds..")]})
     }
 
     cooldown.set(message.member.id, new Date())
