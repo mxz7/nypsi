@@ -32,7 +32,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
@@ -68,13 +68,13 @@ async function run(message, args) {
         })
 
         if (membersSorted.length > 1500) {
-            const msg = await message.channel.send(
-                new CustomEmbed(
+            const msg = await message.channel.send({
+                embeds: [new CustomEmbed(
                     message.member,
                     false,
                     `sorting ${membersSorted.length.toLocaleString()} members..`
-                )
-            )
+                )]
+            })
             membersSorted = await workerSort(membersSorted, membersMap)
             await msg.delete()
         } else {
