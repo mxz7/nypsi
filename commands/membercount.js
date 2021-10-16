@@ -1,4 +1,4 @@
-const { Message, Permissions } = require("discord.js")
+const { Message, Permissions, ChannelTypes } = require("discord.js")
 const {
     setStatsProfile,
     getStatsProfile,
@@ -26,15 +26,15 @@ const cmd = new Command(
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
+            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `manage channels` permission for this command to work")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")]
+        })
     }
 
     if (!hasGuild(message.guild)) createGuild(message.guild)
@@ -70,7 +70,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "enable") {
         if (profile.enabled) {
-            return message.channel.send(new ErrorEmbed("already enabled"))
+            return message.channel.send({embeds: [new ErrorEmbed("already enabled")]})
         }
 
         const role = message.guild.roles.cache.find((r) => r.name == "@everyone")
@@ -90,7 +90,7 @@ async function run(message, args) {
 
         const channel = await message.guild.channels
             .create(format, {
-                type: "voice",
+                type: "GUILD_VOICE",
                 permissionOverwrites: [
                     {
                         id: role.id,
@@ -100,7 +100,7 @@ async function run(message, args) {
             })
             .catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("error creating channel"))
+                return message.channel.send({embeds: [new ErrorEmbed("error creating channel")]})
             })
 
         if (fail) return
@@ -117,7 +117,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
-            return message.channel.send(new ErrorEmbed("already disabled"))
+            return message.channel.send({embeds: [new ErrorEmbed("already disabled")]})
         }
 
         profile.enabled = false
@@ -154,13 +154,13 @@ async function run(message, args) {
         const newFormat = args.join(" ")
 
         if (!newFormat.includes("%count%") && !newFormat.includes("%peak%")) {
-            return message.channel.send(
-                new ErrorEmbed("format must include `%count%` or `%peak%` or both")
-            )
+            return message.channel.send({
+               embeds: [new ErrorEmbed("format must include `%count%` or `%peak%` or both")]
+            })
         }
 
         if (newFormat.length > 30) {
-            return message.channel.send(new ErrorEmbed("cannot be longer than 30 characers"))
+            return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 30 characers")]})
         }
 
         profile.format = newFormat
@@ -197,7 +197,7 @@ async function run(message, args) {
         }
 
         if (args[1].toLowerCase() != "true" && args[1].toLowerCase() != "false") {
-            return message.channel.send(new ErrorEmbed("value must either be true or false"))
+            return message.channel.send({embeds: [new ErrorEmbed("value must either be true or false")]})
         }
 
         if (args[1].toLowerCase() == "true") {
@@ -240,22 +240,22 @@ async function run(message, args) {
             if (message.mentions.channels.first()) {
                 channel = message.mentions.channels.first()
             } else {
-                return message.channel.send(new ErrorEmbed("invalid channel"))
+                return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
             }
         } else {
             const c = message.guild.channels.cache.find((c) => c.id == args[1])
 
             if (!c) {
-                return message.channel.send(new ErrorEmbed("invalid channel"))
+                return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
             } else {
                 channel = c
             }
         }
 
         if (profile.channel == channel.id) {
-            return message.channel.send(
-                new ErrorEmbed("channel must be different to current channel")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("channel must be different to current channel")]
+            })
         }
 
         profile.channel = channel.id
@@ -302,7 +302,7 @@ async function run(message, args) {
             profile.enabled = false
             profile.channel = "none"
             setStatsProfile(message.guild, profile)
-            return message.channel.send(new ErrorEmbed("error updating channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("error updating channel")]})
         }
 
         const embed = new CustomEmbed(message.member, false, "✅ channel updated")
