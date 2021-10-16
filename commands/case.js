@@ -38,9 +38,9 @@ async function run(message, args) {
     const case0 = getCase(message.guild, parseInt(args[0]))
 
     if (!case0) {
-        return message.channel.send(
-            new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")]
+        })
     }
 
     case0.deleted = case0.deleted === 0 ? false : true
@@ -63,7 +63,7 @@ async function run(message, args) {
         .addField("date/time", date, true)
         .addField("user", "`" + case0.user + "`", true)
         .addField("reason", reason, true)
-        .addField("deleted", case0.deleted, true)
+        .addField("deleted", case0.deleted.toString(), true)
 
     if (target) {
         embed.setDescription("punished user: " + target.toString())
@@ -82,7 +82,7 @@ async function run(message, args) {
     }
 
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+        .awaitReactions({filter, max: 1, time: 15000, errors: ["time"] })
         .then((collected) => {
             return collected.first().emoji.name
         })
@@ -99,7 +99,7 @@ async function run(message, args) {
             "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
-        await msg.edit(newEmbed)
+        await msg.edit({embeds: [newEmbed]})
     }
 }
 
