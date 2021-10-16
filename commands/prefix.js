@@ -15,7 +15,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (!message.member.hasPermission("MANAGE_GUILD")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
         return

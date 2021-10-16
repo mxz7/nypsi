@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
@@ -39,14 +39,14 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_EMOJIS")) {
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage emojis` permission for this command to work")]
         })
     }
 
-    if (!message.member.hasPermission("MANAGE_EMOJIS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.MANAGE_EMOJIS_AND_STICKERS)) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({embeds: [new ErrorEmbed("you need the `manage emojis` permission")]})
         }
         return

@@ -34,7 +34,7 @@ async function run(message, args) {
     }
 
     if (!message.member.hasPermission("MANAGE_CHANNELS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `manage channels` permission"))
         }
         return
