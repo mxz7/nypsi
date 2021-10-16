@@ -53,15 +53,23 @@ async function run(message, args) {
 
     amount = parseInt(args[0])
 
+    let min = 1
+
+    if (parseInt(args[1])) min = parseInt(args[1])
+
     if (amount > 10 && !message.member.hasPermission("ADMINISTRATOR")) amount = 10
 
     if (amount < 5) amount = 5
 
-    const balBottom = await bottomAmount(message.guild, amount)
+    const balBottom = await bottomAmount(message.guild, amount, min)
 
     let filtered = balBottom.filter(function (el) {
         return el != null
     })
+
+    if (filtered.length == 0) {
+        return await message.channel.send(new CustomEmbed(message.member, false, "no members to show"))
+    }
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle("bottom " + filtered.length)
