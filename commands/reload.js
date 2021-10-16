@@ -24,7 +24,7 @@ async function run(message, args) {
             msg = reloadCommand(args).split("✔")
             msg = "```\n" + msg + "```"
         } catch (e) {
-            return message.channel.send(new ErrorEmbed(`\`\`\`${e}\`\`\``))
+            return message.channel.send({embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)]})
         }
 
         const embed = new CustomEmbed(message.member, false, msg).setTitle("reload")
