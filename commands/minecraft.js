@@ -51,7 +51,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}minecraft <name/server IP>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -80,7 +80,7 @@ async function run(message, args) {
                     serverCache.delete(serverIP.toLowerCase())
                 }, 600000)
             } else {
-                return message.channel.send(new ErrorEmbed("invalid server"))
+                return message.channel.send({embeds: [new ErrorEmbed("invalid server")]})
             }
         }
 
@@ -102,7 +102,7 @@ async function run(message, args) {
     const nameHistory = await getNameHistory(username)
 
     if (!nameHistory) {
-        return await message.channel.send(new ErrorEmbed("invalid account"))
+        return await message.channel.send({embeds: [new ErrorEmbed("invalid account")]})
     }
 
     const skin = `https://mc-heads.net/avatar/${nameHistory.uuid}/256`
@@ -135,7 +135,7 @@ async function run(message, args) {
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
                 .then((collected) => {
                     return collected.first().emoji.name
                 })
@@ -152,7 +152,7 @@ async function run(message, args) {
                     currentPage--
                     embed.setDescription(names.get(currentPage).join("\n"))
                     embed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(embed)
+                    await msg.edit({embeds: [embed]})
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -162,7 +162,7 @@ async function run(message, args) {
                     currentPage++
                     embed.setDescription(names.get(currentPage).join("\n"))
                     embed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(embed)
+                    await msg.edit({embeds: [embed]})
                     return pageManager()
                 }
             }
