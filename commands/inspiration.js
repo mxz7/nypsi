@@ -52,10 +52,10 @@ async function run(message, args) {
     const res = await fetch("https://inspirobot.me/api?generate=true").then((res) => res.text())
 
     if (!isImageUrl(res)) {
-        return message.channel.send(new ErrorEmbed("error fetching image"))
+        return message.channel.send({embeds: [new ErrorEmbed("error fetching image")]})
     }
 
-    return message.channel.send(new CustomEmbed(message.member, false).setImage(res))
+    return message.channel.send({embeds: [new CustomEmbed(message.member, false).setImage(res)]})
 }
 
 cmd.setRun(run)
