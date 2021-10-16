@@ -788,6 +788,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         info("sent popular commands", types.AUTOMATION)
 
         popularCommands.clear()
+        noLifers.clear()
     }
 
     setTimeout(async () => {
