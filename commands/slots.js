@@ -141,9 +141,9 @@ async function run(message, args) {
     }
 
     if (!args[0]) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)]
+        })
     }
 
     if (args[0] == "all") {
@@ -158,11 +158,11 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`
-                )
-            )
+                )]
+            })
         }
     }
 
@@ -173,23 +173,23 @@ async function run(message, args) {
     }
 
     if (bet <= 0) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)]
+        })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+            )]
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -337,7 +337,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({embeds: [embed]})
         }, 1500)
     })
 
