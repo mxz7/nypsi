@@ -74,7 +74,7 @@ async function run(message, args) {
         if (message.mentions.members.size == 2) {
             target1 = message.mentions.members.first()
 
-            target2 = message.mentions.members.get(message.mentions.members.keyArray()[1])
+            target2 = message.mentions.members.get(Array.from(message.mentions.members.keys())[1])
         } else if (message.mentions.members.size == 1) {
             if (args[0].startsWith("<@")) {
                 target1 = message.mentions.members.first()
@@ -89,12 +89,12 @@ async function run(message, args) {
             target1 = await getMember(message, args[0])
             target2 = await getMember(message, args[1])
         } else {
-            return message.channel.send(new ErrorEmbed(`${prefix}love <user> (user)`))
+            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}love <user> (user)`)]})
         }
     }
 
     if (!target1 || !target2) {
-        return message.channel.send(new ErrorEmbed("invalid user(s)"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid user(s)")]})
     }
 
     cooldown.set(message.member.id, new Date())
