@@ -75,7 +75,7 @@ async function run(message, args) {
         .setURL("https://namemc.com/profile/" + username)
         .setImage(skinIMG)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -37,7 +37,7 @@ async function run(message, args) {
             .setTitle(server.name)
             .setDescription("`" + server.id + "`")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 1 && args[0] == "-m") {
@@ -53,7 +53,7 @@ async function run(message, args) {
                     `**member peak** ${getPeaks(message.guild).toLocaleString()}`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const embed = new CustomEmbed(message.member)
@@ -98,7 +98,7 @@ async function run(message, args) {
         embed.setFooter("humans and bots may be inaccurate due to server size")
     }
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

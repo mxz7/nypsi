@@ -156,7 +156,7 @@ async function run(message, args) {
                 embed.addField("email", links.join("\n"), true)
             }
         }
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         if (!profileExists(message.member)) createProfile(message.member)
 
@@ -184,7 +184,7 @@ async function run(message, args) {
                     "`youtube` `twitter` `instagram` `snapchat` `email`"
                 )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         if (args[1].toLowerCase() == "add" || args[1] == "+") {

@@ -23,7 +23,7 @@ async function run(message, args) {
                 "help",
                 "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain"
             )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (cooldown.has(message.member.id)) {

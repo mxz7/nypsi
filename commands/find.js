@@ -87,7 +87,7 @@ async function run(message, args) {
             embed.addField("guilds", guildNames)
         }
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     } else if (args[0] == "tag") {
         if (args.length == 1) return
 
@@ -152,7 +152,7 @@ async function run(message, args) {
             embed.addField("guilds", guildNames)
         }
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     } else if (args[0] == "gid") {
         if (args.length == 1) return
 
@@ -191,7 +191,7 @@ async function run(message, args) {
                 guild.name
             )
 
-            const msg = await message.channel.send(embed)
+            const msg = await message.channel.send({ embeds: [embed] })
 
             if (names.size >= 2) {
                 await msg.react("⬅")
@@ -289,7 +289,7 @@ async function run(message, args) {
                 guild.name
             )
 
-            const msg = await message.channel.send(embed)
+            const msg = await message.channel.send({ embeds: [embed] })
 
             if (names.size >= 2) {
                 await msg.react("⬅")
@@ -360,7 +360,7 @@ async function run(message, args) {
             "top " + balTop.length
         )
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     }
 }
 

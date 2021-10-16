@@ -111,7 +111,7 @@ async function run(message, args) {
         `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
     ).setTitle("pp predictor 1337")
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -77,7 +77,7 @@ async function run(message, args) {
                     "**2**x multiplier for winning"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let choice = args[0]
@@ -227,7 +227,7 @@ async function run(message, args) {
             bet.toLocaleString()
     ).setTitle("rock paper scissors | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             "**threw** " +
                 winning +

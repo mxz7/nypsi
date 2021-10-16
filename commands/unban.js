@@ -45,7 +45,7 @@ async function run(message, args) {
                 `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const members = []
@@ -112,7 +112,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send(embed).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     const members1 = []

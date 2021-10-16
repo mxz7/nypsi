@@ -48,7 +48,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setTitle(
             member.user.tag
         )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let members
@@ -138,7 +138,7 @@ async function run(message, args) {
         embed.addField("roles [" + member._roles.length + "]", rolesText)
     }
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

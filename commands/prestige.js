@@ -88,7 +88,7 @@ async function run(message, args) {
 
     cooldown.set(message.member.id, new Date())
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
     await msg.react("✅")
 
     const filter = (reaction, user) => {

@@ -71,7 +71,7 @@ async function run(message, args) {
                     `${prefix}channel delete #channel1 #channel2 #channel3`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "create" || args[0] == "c") {
@@ -99,7 +99,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member, false, channels).setTitle(
             "channel | " + message.member.user.username
         )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "delete" || args[0] == "del") {
@@ -128,7 +128,7 @@ async function run(message, args) {
             false,
             "✅ **" + count + "** channels deleted"
         ).setTitle("channel | " + message.member.user.username)
-        return message.channel.send(embed).catch()
+        return message.channel.send({ embeds: [embed] }).catch()
     }
 
     if (args[0] == "rename" || args[0] == "r") {
@@ -163,7 +163,7 @@ async function run(message, args) {
             false,
             "✅ channel renamed to " + name
         ).setTitle("channel | " + message.member.user.username)
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "nsfw") {
@@ -192,7 +192,7 @@ async function run(message, args) {
                 false,
                 channel.toString() + "\n\n✅ channel is now nsfw"
             ).setTitle("channel | " + message.member.user.username)
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             await channel.edit({ nsfw: false }).catch(() => {
                 perms = false
@@ -206,7 +206,7 @@ async function run(message, args) {
                 false,
                 channel.toString() + "\n\n✅ channel is no longer nsfw"
             ).setTitle("channel")
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
     }
 

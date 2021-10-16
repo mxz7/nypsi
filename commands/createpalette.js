@@ -66,7 +66,7 @@ async function run(message, args) {
             )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
         )
         embed.addField("example", `${getPrefix(message.guild)}palette my_palette #ff0000`)
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let roles = await message.guild.roles.fetch()
@@ -153,7 +153,7 @@ async function run(message, args) {
         embed.setDescription(`very long URL generated ~ ${colors.length} colors`)
     }
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -129,7 +129,7 @@ async function run(message, args) {
             .setTitle("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField("help", "you should know how a slot machine works..")
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 1 && args[0] == "info") {
@@ -137,7 +137,7 @@ async function run(message, args) {
             .setTitle("win board")
             .setDescription(winBoard())
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!args[0]) {
@@ -299,7 +299,7 @@ async function run(message, args) {
             bet.toLocaleString()
     ).setTitle("slots | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         if (win) {
             if (voted) {
                 embed.addField(

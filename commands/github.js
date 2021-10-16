@@ -24,7 +24,7 @@ async function run(message, args) {
             "if you know how to code, you could fix bugs, add features, create your own commands.. the list goes on."
         )
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -101,7 +101,7 @@ async function run(message, args) {
             "✅ " + channel.toString() + " has been locked"
         ).setTitle("lockdown | " + message.member.user.username)
 
-        return message.channel.send(embed).catch(() => {
+        return message.channel.send({ embeds: [embed] }).catch(() => {
             return message.member.send(embed).catch()
         })
     } else {
@@ -114,7 +114,7 @@ async function run(message, args) {
             "✅ " + channel.toString() + " has been unlocked"
         ).setTitle("lockdown | " + message.member.user.username)
 
-        return message.channel.send(embed).catch(() => {
+        return message.channel.send({ embeds: [embed] }).catch(() => {
             return message.member.send(embed)
         })
     }

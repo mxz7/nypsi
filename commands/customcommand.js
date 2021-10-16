@@ -80,7 +80,7 @@ async function run(message, args) {
             )}mycmd <content> to set the content of your custom command`
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         const content = args.join(" ")
 

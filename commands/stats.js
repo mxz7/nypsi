@@ -81,7 +81,7 @@ async function run(message, args) {
             true
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const itemStats = async () => {
@@ -123,7 +123,7 @@ async function run(message, args) {
             )
         }
 
-        const msg = await message.channel.send(embed)
+        const msg = await message.channel.send({ embeds: [embed] })
 
         if (pages.size == 0) return
 
@@ -214,7 +214,7 @@ async function run(message, args) {
             )
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {

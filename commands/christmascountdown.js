@@ -53,7 +53,7 @@ async function run(message, args) {
                 `${prefix}**xmas channel <channel>** *change the channel used*\n` +
                 `${prefix}**xmas format <new format>** *change the format for the countdown*`
         ).setTitle("christmas countdown")
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -66,7 +66,7 @@ async function run(message, args) {
             .setTitle("christmas countdown")
             .setFooter(`use ${prefix}xmas help to view additional commands`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "enable") {
         if (profile.enabled) {
             return message.channel.send(new ErrorEmbed("already enabled"))
@@ -143,7 +143,7 @@ async function run(message, args) {
                 .addField("example", format, true)
                 .addField("help", `to change this format, do ${prefix}**xmas format <new format>**`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         args.shift()
@@ -184,7 +184,7 @@ async function run(message, args) {
             "christmas countdown"
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "channel") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -196,7 +196,7 @@ async function run(message, args) {
                 .addField("current value", "`" + profile.channel + "`")
                 .addField("help", `to change this value, do ${prefix}**xmas channel <channel id>**`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         let channel
@@ -243,7 +243,7 @@ async function run(message, args) {
             "christmas countdown"
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         return help()
     }

@@ -288,7 +288,7 @@ async function run(message, args) {
         `you go to the pond and cast your **${items[fishingRod].name}**`
     )
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${

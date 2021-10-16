@@ -104,11 +104,11 @@ async function run(message, args) {
                 "` messages..\n - if you'd like to cancel this operation, delete this message"
         ).setTitle("delete | " + message.member.user.tag)
 
-        const m = await message.channel.send(embed)
+        const m = await message.channel.send({ embeds: [embed] })
         for (let i = 0; i < amount1 / 100; i++) {
             if (m.deleted) {
                 embed.setDescription("✅ operation cancelled")
-                return await message.channel.send(embed)
+                return await message.channel.send({ embeds: [embed] })
             }
 
             if (amount < 10) return await m.delete().catch()

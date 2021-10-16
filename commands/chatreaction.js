@@ -78,7 +78,7 @@ async function run(message, args) {
                 `${prefix}**cr lb** *view the server leaderboard*`
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const showStats = async () => {
@@ -105,7 +105,7 @@ async function run(message, args) {
             embed.setFooter("you are blacklisted from chat reactions in this server")
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const showLeaderboard = async () => {
@@ -145,7 +145,7 @@ async function run(message, args) {
             embed.addField("overall", leaderboards.get("overall"))
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -205,7 +205,7 @@ async function run(message, args) {
 
             embed.setFooter(`use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             if (args[1].toLowerCase() == "add" || args[1] == "+") {
                 if (args.length == 2) {
@@ -252,7 +252,7 @@ async function run(message, args) {
                     `✅ ${user.toString()} has been blacklisted`
                 )
 
-                return message.channel.send(embed)
+                return message.channel.send({ embeds: [embed] })
             } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
                 if (args.length == 2) {
                     return message.channel.send(new ErrorEmbed(`${prefix}cr blacklist del/- @user`))
@@ -330,7 +330,7 @@ async function run(message, args) {
 
             embed.setFooter(`use ${prefix}cr settings help to change this settings`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args.length == 2) {
             if (args[1].toLowerCase() == "help") {
                 const embed = new CustomEmbed(message.member, false)
@@ -346,7 +346,7 @@ async function run(message, args) {
                         `${prefix}**cr settings length <seconds>** *set a maximum game length*`
                 )
 
-                return message.channel.send(embed)
+                return message.channel.send({ embeds: [embed] })
             } else if (args[1].toLowerCase() == "enable") {
                 const settings = getReactionSettings(message.guild)
 
@@ -441,7 +441,7 @@ async function run(message, args) {
                             )
                         }
 
-                        return message.channel.send(embed)
+                        return message.channel.send({ embeds: [embed] })
                     }
                     settings.randomChannels.push(channel.id)
                     added = true
@@ -461,7 +461,7 @@ async function run(message, args) {
                     embed.setDescription(`${channel.name} has been removed`)
                 }
 
-                return message.channel.send(embed)
+                return message.channel.send({ embeds: [embed] })
             } else if (args[1].toLowerCase() == "cooldown") {
                 const length = parseInt(args[2])
 
@@ -574,7 +574,7 @@ async function run(message, args) {
                     `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[1].toLowerCase() == "add" || args[1] == "+") {
             if (args.length == 2) {
                 return message.channel.send(
@@ -690,7 +690,7 @@ async function run(message, args) {
                 embed.setFooter(`page 1/${pages.size}`)
 
                 if (pages.size > 1) {
-                    const msg = await message.channel.send(embed)
+                    const msg = await message.channel.send({ embeds: [embed] })
 
                     await msg.react("⬅")
                     await msg.react("➡")
@@ -743,7 +743,7 @@ async function run(message, args) {
                 }
             }
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
     }
 }

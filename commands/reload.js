@@ -29,7 +29,7 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false, msg).setTitle("reload")
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     }
 }
 

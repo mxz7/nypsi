@@ -214,7 +214,7 @@ async function run(message, args) {
         }**`
     )
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${

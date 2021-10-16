@@ -94,7 +94,7 @@ async function run(message, args) {
                     "`finish` - this is used to end the game and collect your reward"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {
@@ -218,7 +218,7 @@ async function run(message, args) {
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     playGame(message, msg).catch((e) => {
         console.error(e)

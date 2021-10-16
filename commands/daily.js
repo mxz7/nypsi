@@ -56,7 +56,7 @@ async function run(message, args) {
             `${getPrefix(message.guild)}daily is for BRONZE tier and higher`
         ).setFooter(`${getPrefix(message.guild)}patreon`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!isPremium(message.author.id)) {
@@ -93,7 +93,7 @@ async function run(message, args) {
 
             const embed = new CustomEmbed(message.member, false, description)
 
-            return message.channel.send(embed).then((msg) => {
+            return message.channel.send({ embeds: [embed] }).then((msg) => {
                 setTimeout(() => {
                     embed.setDescription(
                         `new balance: $**${getBalance(message.member).toLocaleString()}**`
@@ -111,7 +111,7 @@ async function run(message, args) {
                 "you have already used your daily reward! come back in **" + dd + "**"
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
     }
 }

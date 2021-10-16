@@ -41,7 +41,7 @@ async function run(message, args) {
                 `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -155,7 +155,7 @@ async function run(message, args) {
             }`
         )
 
-        const msg = await message.channel.send(embed)
+        const msg = await message.channel.send({ embeds: [embed] })
 
         game.message = msg
         game.embed = embed

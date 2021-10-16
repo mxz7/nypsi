@@ -110,7 +110,7 @@ async function run(message, args) {
         .setTitle("boob calculator")
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

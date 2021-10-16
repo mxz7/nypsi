@@ -53,7 +53,7 @@ async function run(message, args) {
                 "time format examples",
                 "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
             )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -254,7 +254,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send(embed).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     let storeReason = reason
