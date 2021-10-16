@@ -186,7 +186,7 @@ async function getMember(message, memberName) {
     let target
     let possible = new Map()
 
-    for (let member of members.keyArray()) {
+    for (let member of members.keys()) {
         member = members.get(member)
 
         if (member.user.id == memberName) {
