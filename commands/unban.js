@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -13,14 +13,14 @@ const cmd = new Command("unban", "unban one or more users", categories.MODERATIO
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("BAN_MEMBERS")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
         }
         return
     }
 
-    if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
         return message.channel.send(
             new ErrorEmbed("i need the `ban members` permission for this command to work")
         )

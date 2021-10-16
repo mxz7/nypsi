@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const {
     setStatsProfile,
     getStatsProfile,
@@ -24,14 +24,14 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_GUILD")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
         return
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_CHANNELS")) {
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         return message.channel.send(
             new ErrorEmbed("i need the `manage channels` permission for this command to work")
         )

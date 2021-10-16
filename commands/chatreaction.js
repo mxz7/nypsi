@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const {
     createReactionProfile,
     hasReactionProfile,
@@ -123,7 +123,7 @@ async function run(message, args) {
             amount = parseInt(args[1])
 
             if (amount > 10) {
-                if (!message.member.hasPermission("ADMINISTRATOR")) amount = 10
+                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10
             }
         }
 
@@ -184,7 +184,7 @@ async function run(message, args) {
         return showLeaderboard()
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
-        if (!message.member.hasPermission("MANAGE_GUILD")) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
             )
@@ -299,7 +299,7 @@ async function run(message, args) {
         }
     } else if (args[0].toLowerCase() == "settings") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
-        if (!message.member.hasPermission("MANAGE_GUILD")) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
             )
@@ -556,7 +556,7 @@ async function run(message, args) {
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
-        if (!message.member.hasPermission("MANAGE_GUILD")) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
             )
