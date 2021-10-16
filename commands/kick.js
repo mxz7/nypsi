@@ -181,7 +181,7 @@ async function run(message, args) {
                 .setTitle(`kicked from ${message.guild.name}`)
                 .addField("reason", `\`${reason.split(": ")[1]}\``)
 
-            await m.send({content: `you have been kicked from ${message.guild.name}`, embeds: [embed}])
+            await m.send({content: `you have been kicked from ${message.guild.name}`, embeds: [embed]})
         }
     }
 }
