@@ -76,11 +76,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `you have been reported to the police, they will continue looking for you for **${remaining}**`
-            )
-        )
+            )]
+        })
     }
 
     const prefix = getPrefix(message.guild)
@@ -102,7 +102,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (message.guild.id == "747056029795221513") {
-        return message.channel.send(new ErrorEmbed("this has been disabled in the support server"))
+        return message.channel.send({embeds: [new ErrorEmbed("this has been disabled in the support server")]})
     }
 
     let target = message.mentions.members.first()
@@ -124,15 +124,15 @@ async function run(message, args) {
     }
 
     if (message.member == target) {
-        return message.channel.send(new ErrorEmbed("you cant rob yourself"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cant rob yourself")]})
     }
 
     if (!userExists(target) || getBalance(target) <= 500) {
-        return message.channel.send(new ErrorEmbed("this user doesnt have sufficient funds"))
+        return message.channel.send({embeds: [new ErrorEmbed("this user doesnt have sufficient funds")]})
     }
 
     if (getBalance(message.member) < 750) {
-        return message.channel.send(new ErrorEmbed("you need $750 in your wallet to rob someone"))
+        return message.channel.send({embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")]})
     }
 
     const date = new Date()
@@ -318,15 +318,15 @@ async function run(message, args) {
 
     message.channel.send({ embeds: [embed] }).then(async (m) => {
         setTimeout(async () => {
-            await m.edit(embed2)
+            await m.edit({embeds: [embed2]})
 
             if (getDMsEnabled(target)) {
                 if (robberySuccess) {
                     addRob(message.member, true)
-                    target.send("you have been robbed!!", embed3).catch(() => {})
+                    target.send({content: "you have been robbed!!", embeds: [embed3]}).catch(() => {})
                 } else {
                     addRob(message.member, false)
-                    target.send("you were nearly robbed!!", embed3).catch(() => {})
+                    target.send({content: "you were nearly robbed!!", embeds: [embed3]}).catch(() => {})
                 }
             }
         }, 1500)
