@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -18,26 +18,26 @@ async function run(message, args) {
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
         }
         channel = message.mentions.channels.first()
         if (!channel) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
         }
     }
 
     if (!snipe || (!snipe.get(channel.id) && (!eSnipe || !eSnipe.get(channel.id)))) {
-        return message.channel.send(
-            new ErrorEmbed("nothing has been sniped in " + channel.toString())
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("nothing has been sniped in " + channel.toString())]
+        })
     }
 
     snipe.delete(channel.id)
     eSnipe.delete(channel.id)
 
-    return message.channel.send(
-        new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())
-    )
+    return message.channel.send({
+        embeds: [new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())]
+    })
 }
 
 cmd.setRun(run)
