@@ -23,9 +23,9 @@ async function run(message, args) {
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)
     ) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(
-                new ErrorEmbed("you need the `manage channels` and `manage messages` permission")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("you need the `manage channels` and `manage messages` permission")]
+            })
         }
         return
     }
@@ -34,11 +34,11 @@ async function run(message, args) {
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)
     ) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 "i need the `manage channels` and `manage roles` permission for this command to work"
-            )
-        )
+            )]
+        })
     }
 
     if (cooldown.has(message.member.id)) {
@@ -60,6 +60,9 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
+    /**
+     * @type {Discord.TextChannel}
+     */
     let channel = message.channel
 
     if (message.mentions.channels.first()) {
@@ -75,7 +78,7 @@ async function run(message, args) {
 
     const role = message.guild.roles.cache.find((role) => role.name == "@everyone")
 
-    const a = channel.permissionOverwrites.get(role.id)
+    const a = channel.permissionOverwrites.cache.get(role.id)
 
     if (!a) {
         locked = false
@@ -91,7 +94,7 @@ async function run(message, args) {
     }
 
     if (!locked) {
-        await channel.updateOverwrite(role, {
+        await channel.permissionOverwrites.edit(role, {
             SEND_MESSAGES: false,
         })
 
@@ -102,10 +105,10 @@ async function run(message, args) {
         ).setTitle("lockdown | " + message.member.user.username)
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
-            return message.member.send(embed).catch()
+            return message.member.send({ embeds: [embed] }).catch()
         })
     } else {
-        await channel.updateOverwrite(role, {
+        await channel.permissionOverwrites.edit(role, {
             SEND_MESSAGES: null,
         })
         const embed = new CustomEmbed(
@@ -115,7 +118,7 @@ async function run(message, args) {
         ).setTitle("lockdown | " + message.member.user.username)
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
-            return message.member.send(embed)
+            return message.member.send({embeds: [embed]})
         })
     }
 }
