@@ -17,7 +17,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}skin <account>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}skin <account>`)]})
     }
 
     let cooldownLength = 10
@@ -61,7 +61,7 @@ async function run(message, args) {
     try {
         uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json())
     } catch (e) {
-        return message.channel.send(new ErrorEmbed("invalid account"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid account")]})
     }
 
     const skinIMG = `https://visage.surgeplay.com/full/${uuid.id}.png`
