@@ -107,35 +107,35 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
     }
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}highlow <bet>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}highlow <bet>`)]})
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+            )]
+        })
     }
 
     if (games.has(message.member.user.id)) {
-        return message.channel.send(new ErrorEmbed("you are already playing highlow"))
+        return message.channel.send({embeds: [new ErrorEmbed("you are already playing highlow")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -241,17 +241,17 @@ async function run(message, args) {
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
         .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
 
-    message.channel.send(loadingEmbed).then(async (m) => {
+    message.channel.send({embeds: [loadingEmbed]}).then(async (m) => {
         await m.react("⬆")
         await m.react("⬇")
         await m.react("💰")
 
-        await m.edit(embed)
+        await m.edit({embeds: [embed]})
         playGame(message, m).catch((e) => {
             console.error(e)
-            return message.channel.send(
-                new ErrorEmbed("an error occured while running - join support server")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("an error occured while running - join support server")]
+            })
         })
     })
 }
@@ -323,7 +323,7 @@ async function playGame(message, m) {
         )
         newEmbed.addField("card", "| " + card + " |")
         games.delete(message.author.id)
-        await m.edit(newEmbed)
+        await m.edit({embeds: [newEmbed]})
         return m.reactions.removeAll()
     }
 
@@ -384,7 +384,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        await m.edit(newEmbed)
+        await m.edit({embeds: [newEmbed]})
         return m.reactions.removeAll()
     }
 
@@ -406,7 +406,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        await m.edit(newEmbed)
+        await m.edit({embeds: [newEmbed]})
         return m.reactions.removeAll()
     }
 
@@ -421,14 +421,14 @@ async function playGame(message, m) {
     let fail = false
 
     const reaction = await m
-        .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+        .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
         .then((collected) => {
             return collected.first().emoji.name
         })
         .catch(() => {
             fail = true
             games.delete(message.author.id)
-            return message.channel.send(message.author.toString() + " highlow game expired")
+            return message.channel.send({ content: message.author.toString() + " highlow game expired" })
         })
 
     if (fail) return
@@ -468,7 +468,7 @@ async function playGame(message, m) {
             )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬆").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
@@ -482,7 +482,7 @@ async function playGame(message, m) {
             )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬆").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else {
             return lose()
@@ -520,7 +520,7 @@ async function playGame(message, m) {
             )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬇").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
@@ -534,7 +534,7 @@ async function playGame(message, m) {
             )
             newEmbed.addField("card", "| " + card + " |")
             await m.reactions.cache.get("⬇").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else {
             return lose()
