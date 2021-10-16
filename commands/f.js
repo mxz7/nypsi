@@ -41,7 +41,7 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("you need to pay respects to something"))
+        return message.channel.send({embeds: [new ErrorEmbed("you need to pay respects to something")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -75,13 +75,13 @@ async function run(message, args) {
     const filter = (reaction, user) => {
         if (reaction.emoji.name == "🇫" && !reacted.get(msg.id).includes(user.id)) {
             reacted.get(msg.id).push(user.id)
-            return message.channel.send(
-                new CustomEmbed(
+            return message.channel.send({
+                embeds: [new CustomEmbed(
                     message.member,
                     false,
                     `${user.toString()} has paid respects to **${args.join(" ")}**`
-                )
-            )
+                )]
+            })
         }
     }
 
@@ -89,18 +89,18 @@ async function run(message, args) {
 
     async function getReactions() {
         await msg
-            .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+            .awaitReactions({ filter, max: 1, time: 15000, errors: ["time"] })
             .catch(async () => {
                 finished = true
-                await message.channel.send(
-                    new CustomEmbed(
+                await message.channel.send({
+                    embeds: [new CustomEmbed(
                         message.member,
                         false,
                         `**${reacted
                             .get(msg.id)
                             .length.toLocaleString()}** people paid their respects to **${content}**`
-                    )
-                )
+                    )]
+                })
                 return reacted.delete(msg.id)
             })
         if (!finished) {
