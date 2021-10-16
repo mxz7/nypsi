@@ -53,7 +53,7 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     cooldown.set(message.member.id, new Date())

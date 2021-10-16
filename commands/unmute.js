@@ -95,7 +95,7 @@ async function run(message, args) {
     let fail = false
     let failed = []
 
-    for (let member of message.mentions.members.keyArray()) {
+    for (let member of message.mentions.members.keys()) {
         const m = message.mentions.members.get(member)
 
         if (m.roles.cache.has(muteRole.id)) {
@@ -150,7 +150,7 @@ async function run(message, args) {
         await message.channel.send({ embeds: [embed] })
     }
 
-    const members1 = members.keyArray()
+    const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
         for (let fail1 of failed) {

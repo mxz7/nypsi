@@ -112,15 +112,15 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     if (target.user.bot) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     if (message.member == target) {
