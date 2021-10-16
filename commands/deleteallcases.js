@@ -24,7 +24,7 @@ async function run(message, args) {
     }
 
     if (!profileExists(message.guild))
-        return await message.channel.send(new ErrorEmbed("there are no cases to delete"))
+        return await message.channel.send({embeds: [new ErrorEmbed("there are no cases to delete")]})
 
     const embed = new CustomEmbed(
         message.member,
@@ -43,7 +43,7 @@ async function run(message, args) {
     }
 
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+        .awaitReactions({ filter, max: 1, time: 15000, errors: ["time"] })
         .then((collected) => {
             return collected.first().emoji.name
         })
@@ -60,7 +60,7 @@ async function run(message, args) {
             "✅ all cases have been deleted"
         ).setDescription("✅ all cases have been deleted")
 
-        await msg.edit(newEmbed)
+        await msg.edit({embeds: [newEmbed]})
     }
 }
 
