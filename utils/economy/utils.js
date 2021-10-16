@@ -677,6 +677,82 @@ exports.topAmount = topAmount
  * @param {Guild} guild to pull data from
  * @param {Number} amount of users to return with
  */
+async function bottomAmount(guild, amount) {
+    let members
+
+    if (guild.memberCount == guild.members.cache.size) {
+        members = guild.members.cache
+    } else {
+        members = await guild.members.fetch()
+    }
+
+    if (!members) members = guild.members.cache
+
+    members = members.filter((m) => {
+        return !m.user.bot
+    })
+
+    const query = db.prepare("SELECT id, money FROM economy").all()
+
+    const userIDs = []
+    const balances = new Map()
+
+    for (const user of query) {
+        if (members.find((member) => member.user.id == user.id) && user.money != 0) {
+            userIDs.push(user.id)
+            balances.set(user.id, user.money)
+        }
+    }
+
+    inPlaceSort(userIDs).asc((i) => balances.get(i))
+
+    let usersFinal = []
+
+    let count = 0
+
+    const getMemberID = (guild, id) => {
+        let target = guild.members.cache.find((member) => {
+            return member.user.id == id
+        })
+
+        return target
+    }
+
+    for (let user of userIDs) {
+        if (count >= amount) break
+        if (usersFinal.join().length >= 1500) break
+
+        if (balances.get(user) != 0) {
+            let pos = count + 1
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            usersFinal[count] =
+                pos +
+                " **" +
+                getMemberID(guild, user).user.tag +
+                "** $" +
+                balances.get(user).toLocaleString()
+            count++
+        }
+    }
+
+    return usersFinal
+}
+
+exports.bottomAmount = bottomAmount
+
+/**
+ * @returns {Array<String>}
+ * @param {Guild} guild to pull data from
+ * @param {Number} amount of users to return with
+ */
 async function topAmountPrestige(guild, amount) {
     let members
 
