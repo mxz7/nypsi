@@ -73,11 +73,11 @@ async function run(message, args) {
             member = await getMember(message, args.join(" "))
 
             if (!member) {
-                return message.channel.send(
-                    new ErrorEmbed(
+                return message.channel.send({
+                    embeds: [new ErrorEmbed(
                         `can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`
-                    )
-                )
+                    )]
+                })
             }
         }
     }
@@ -92,7 +92,7 @@ async function run(message, args) {
     }
 
     if (cases.length == 0) {
-        return message.channel.send(new ErrorEmbed("no history to display"))
+        return message.channel.send({embeds: [new ErrorEmbed("no history to display")]})
     }
 
     cooldown.set(message.author.id, new Date())
@@ -156,7 +156,7 @@ async function run(message, args) {
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
                 .then((collected) => {
                     return collected.first().emoji.name
                 })
@@ -198,7 +198,7 @@ async function run(message, args) {
                             " | total: " +
                             cases.length
                     )
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -225,7 +225,7 @@ async function run(message, args) {
                             " | total: " +
                             cases.length
                     )
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             }
