@@ -676,8 +676,9 @@ exports.topAmount = topAmount
  * @returns {Array<String>}
  * @param {Guild} guild to pull data from
  * @param {Number} amount of users to return with
+ * @param {Number} min minimum balance
  */
-async function bottomAmount(guild, amount) {
+async function bottomAmount(guild, amount, min = 1) {
     let members
 
     if (guild.memberCount == guild.members.cache.size) {
@@ -698,7 +699,7 @@ async function bottomAmount(guild, amount) {
     const balances = new Map()
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id) && user.money != 0) {
+        if (members.find((member) => member.user.id == user.id) && user.money >= min) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
