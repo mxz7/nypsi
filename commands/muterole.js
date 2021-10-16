@@ -22,7 +22,7 @@ const cmd = new Command(
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
+            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
         }
         return
     }
@@ -43,8 +43,8 @@ async function run(message, args) {
             }
         }
 
-        return message.channel.send(
-            new CustomEmbed(
+        return message.channel.send({
+            embeds: [new CustomEmbed(
                 message.member,
                 false,
                 `${getPrefix(
@@ -56,8 +56,8 @@ async function run(message, args) {
                 )}**muterole update** *update mute permissions for every channel*\n\ncurrent mute role: ${
                     role ? role.toString() : "default"
                 }`
-            ).setTitle("muterole | " + message.author.username)
-        )
+            ).setTitle("muterole | " + message.author.username)]
+        })
     }
 
     if (args.length == 0) {
@@ -66,13 +66,13 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "set") {
         if (args.length == 1) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embed: [new ErrorEmbed(
                     `${getPrefix(
                         message.guild
                     )}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
-                )
-            )
+                )]
+            })
         }
 
         const roles = message.guild.roles.cache
@@ -89,26 +89,26 @@ async function run(message, args) {
         }
 
         if (!role) {
-            return message.channel.send(
-                new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)]
+            })
         }
 
         setMuteRole(message.guild, role)
 
-        return message.channel.send(
-            new CustomEmbed(
+        return message.channel.send({
+            embeds: [new CustomEmbed(
                 message.member,
                 false,
                 `✅ muterole has been updated to ${role.toString()}`
-            )
-        )
+            )]
+        })
     } else if (args[0].toLowerCase() == "reset") {
         setMuteRole(message.guild, "default")
 
-        return message.channel.send(
-            new CustomEmbed(message.member, false, "✅ muterole has been reset")
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "✅ muterole has been reset")]
+        })
     } else if (args[0].toLowerCase() == "update") {
         let channelError = false
         try {
@@ -134,7 +134,7 @@ async function run(message, args) {
 
             await message.guild.channels.cache.forEach(async (channel) => {
                 await channel
-                    .updateOverwrite(muteRole, {
+                    .permissionOverwrites.edit(muteRole, {
                         SEND_MESSAGES: false,
                         SPEAK: false,
                         ADD_REACTIONS: false,
@@ -144,23 +144,23 @@ async function run(message, args) {
                     })
             })
         } catch (e) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                )
-            )
+                )]
+            })
         }
         if (channelError) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                )
-            )
+                )]
+            })
         }
 
-        return message.channel.send(
-            new CustomEmbed(message.member, false, "✅ permissions were updated")
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "✅ permissions were updated")]
+        })
     }
 }
 
