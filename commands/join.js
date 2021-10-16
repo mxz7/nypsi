@@ -68,7 +68,13 @@ async function run(message, args) {
         })
 
         if (membersSorted.length > 1500) {
-            const msg = await message.channel.send(new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`))
+            const msg = await message.channel.send(
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `sorting ${membersSorted.length.toLocaleString()} members..`
+                )
+            )
             membersSorted = await workerSort(membersSorted, membersMap)
             await msg.delete()
         } else {
