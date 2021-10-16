@@ -154,19 +154,19 @@ async function run(message, args) {
                 if (currentPage >= lastPage) {
                     return pageManager()
                 } else {
-                    if (!isPremium(message.author.id)) {
-                        newEmbed.setFooter(
-                            `pages are only available for patreons (${getPrefix(
-                                message.guild
-                            )}patreon)`
-                        )
-                        for (let i of pages.get(currentPage)) {
-                            const fieldName = i.split("|6|9|")[0]
-                            const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
-                            newEmbed.addField(fieldName, fieldValue)
-                        }
-                        return await msg.edit(newEmbed)
-                    }
+                    // if (!isPremium(message.author.id)) {
+                    //     newEmbed.setFooter(
+                    //         `pages are only available for patreons (${getPrefix(
+                    //             message.guild
+                    //         )}patreon)`
+                    //     )
+                    //     for (let i of pages.get(currentPage)) {
+                    //         const fieldName = i.split("|6|9|")[0]
+                    //         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
+                    //         newEmbed.addField(fieldName, fieldValue)
+                    //     }
+                    //     return await msg.edit(newEmbed)
+                    // }
 
                     currentPage++
 
