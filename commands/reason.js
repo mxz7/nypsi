@@ -15,7 +15,7 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     const prefix = getPrefix(message.guild)
 

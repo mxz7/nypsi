@@ -16,7 +16,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
  */
 async function run(message, args) {
     if (!message.member.hasPermission("MANAGE_GUILD")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }
         return

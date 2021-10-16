@@ -14,7 +14,7 @@ const cmd = new Command("embed", "create an embed message", categories.UTILITY).
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
 

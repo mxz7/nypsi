@@ -21,7 +21,7 @@ const cmd = new Command("unmute", "unmute one or more users", categories.MODERAT
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
 

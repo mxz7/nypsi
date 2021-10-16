@@ -13,7 +13,7 @@ const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATI
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
 

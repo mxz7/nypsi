@@ -149,10 +149,10 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return showStats()
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return showStats()
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
@@ -162,7 +162,7 @@ async function run(message, args) {
         }
     } else if (args[0].toLowerCase() == "stats") {
         if (args.length == 2 && args[1].toLowerCase() == "reset") {
-            if (message.member.hasPermission("MANAGE_MESSAGES")) {
+            if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
                 if (message.author.id != message.guild.owner.id) {
                     return message.channel.send(
                         new ErrorEmbed("you need the to be the server owner for this command")
@@ -183,7 +183,7 @@ async function run(message, args) {
     ) {
         return showLeaderboard()
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
@@ -298,7 +298,7 @@ async function run(message, args) {
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
@@ -555,7 +555,7 @@ async function run(message, args) {
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.hasPermission("MANAGE_GUILD")) {
             return message.channel.send(
                 new ErrorEmbed("you need the `manage server` permission to do this")
