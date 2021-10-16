@@ -91,9 +91,9 @@ async function run(message, args) {
         choice != "p" &&
         choice != "s"
     ) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)]
+        })
     }
 
     if (choice == "r") choice = "rock"
@@ -116,9 +116,9 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(
-                new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)]
+            })
         }
     }
 
@@ -129,29 +129,29 @@ async function run(message, args) {
     }
 
     if (!bet) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)]
+        })
     }
 
     if (bet <= 0) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)]
+        })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+            )]
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -278,7 +278,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({embeds: [embed]})
         }, 1500)
     })
 
