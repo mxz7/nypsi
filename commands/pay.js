@@ -101,21 +101,21 @@ async function run(message, args) {
     if (parseInt(args[1])) {
         args[1] = formatBet(args[1])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
     }
 
     let amount = parseInt(args[1])
 
     if (!amount) {
-        return message.channel.send(new ErrorEmbed("invalid payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
     }
 
     if (amount > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this payment")]})
     }
 
     if (amount <= 0) {
-        return message.channel.send(new ErrorEmbed("invalid payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
     }
 
     const targetPrestige = getPrestige(target)
@@ -136,7 +136,7 @@ async function run(message, args) {
         payLimit += prestigeBonus
 
         if (amount > payLimit) {
-            return message.channel.send(new ErrorEmbed("you can't pay this user that much yet"))
+            return message.channel.send({embeds: [new ErrorEmbed("you can't pay this user that much yet")]})
         }
     }
 
@@ -240,7 +240,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({embeds: [embed]})
         }, 1500)
     })
 
