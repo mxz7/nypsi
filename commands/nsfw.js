@@ -13,15 +13,15 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", categories.ADMIN)
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(new ErrorEmbed("you need the `manage channels` permission"))
+            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage channels` permission")]})
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `manage channel` permission for this command to work")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")]
+        })
     }
 
     const prefix = getPrefix(message.guild)
