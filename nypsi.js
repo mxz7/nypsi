@@ -3,10 +3,15 @@ const startUp = Date.now()
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
-    disableMentions: "everyone",
-    messageCacheMaxSize: 100,
-    messageSweepInterval: 1800,
-    messageCacheLifetime: 3600,
+    allowedMentions: {
+        parse: ["users", "roles"]
+    },
+    makeCache: Discord.Options.cacheWithLimits({
+        MessageManager: 100,
+        ThreadManager: {
+            sweepInterval: 1800
+        }
+    }),
     presence: {
         status: "dnd",
         activity: {
@@ -15,6 +20,17 @@ const client = new Discord.Client({
     },
     restTimeOffset: 169,
     shards: "auto",
+    intents: [
+        Discord.Intents.FLAGS.DIRECT_MESSAGES,
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_BANS,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+        Discord.Intents.FLAGS.GUILD_WEBHOOKS,
+        Discord.Intents.FLAGS.GUILD_INVITES,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    ],
 })
 const { token } = require("./config.json")
 const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
@@ -71,7 +87,7 @@ client.on("guildMemberAdd", guildMemberAdd.bind(null))
 client.on("guildMemberRemove", guildMemberRemove.bind(null))
 client.on("messageDelete", messageDelete.bind(null))
 client.on("messageUpdate", messageUpdate.bind(null))
-client.on("message", message.bind(null))
+client.on("messageCreate", message.bind(null))
 client.on("channelCreate", channelCreate.bind(null))
 client.on("roleDelete", roleDelete.bind(null))
 client.on("userUpdate", userUpdate.bind(null))
@@ -152,7 +168,7 @@ async function requestDM(id, content, dontDmTekoh) {
 
     if (member) {
         await member
-            .send(content)
+            .send({content: content})
             .then(() => {
                 info(`successfully sent DM to ${member.tag} (${member.id})`)
             })
@@ -161,7 +177,7 @@ async function requestDM(id, content, dontDmTekoh) {
                 if (!dontDmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347")
 
-                    await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+                    await tekoh.send({content: `failed to send dm to ${id}\n\n${content}`})
                 }
             })
         return true
@@ -170,7 +186,7 @@ async function requestDM(id, content, dontDmTekoh) {
         if (!dontDmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347")
 
-            await tekoh.send(`failed to send dm to ${id}\n\n${content}`)
+            await tekoh.send({content: `failed to send dm to ${id}\n\n${content}`})
         }
         return false
     }
@@ -188,7 +204,7 @@ async function requestRemoveRole(id, roleID) {
     if (!guild) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch guild - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch guild - user: ${id} role: ${roleID}`})
     }
 
     const role = await guild.roles.fetch(roleID)
@@ -196,7 +212,7 @@ async function requestRemoveRole(id, roleID) {
     if (!role) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch role - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch role - user: ${id} role: ${roleID}`})
     }
 
     const user = await guild.members.fetch(id)
@@ -204,7 +220,7 @@ async function requestRemoveRole(id, roleID) {
     if (!user) {
         const tekoh = await client.users.fetch("672793821850894347")
 
-        return await tekoh.send(`failed to fetch role - user: ${id} role: ${roleID}`)
+        return await tekoh.send({content: `failed to fetch role - user: ${id} role: ${roleID}`})
     }
 
     if (roleID == "819870846536646666") {
