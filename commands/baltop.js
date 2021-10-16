@@ -65,7 +65,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle("top " + filtered.length)
-        .setDescription(filtered)
+        .setDescription(filtered.join("\n"))
 
     message.channel.send({ embeds: [embed] })
 }
