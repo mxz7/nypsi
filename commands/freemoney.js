@@ -39,7 +39,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) > 500000) {
-        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
+        return message.channel.send({embeds: [new ErrorEmbed("you're too rich for this command bro")]})
     }
 
     cooldown.set(message.member.id, new Date())
