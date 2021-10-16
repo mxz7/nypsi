@@ -84,21 +84,21 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
     }
 
     const amount = parseInt(args[0])
 
     if (amount > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this payment")]})
     }
 
     if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("your bank is not big enough for this payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("your bank is not big enough for this payment")]})
     }
 
     if (amount <= 0) {
-        return message.channel.send(new ErrorEmbed("invalid payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -137,7 +137,7 @@ async function run(message, args) {
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
 
-    setTimeout(() => m.edit(embed1), 1500)
+    setTimeout(() => m.edit({embeds: [embed1]}), 1500)
 }
 
 cmd.setRun(run)
