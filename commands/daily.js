@@ -98,7 +98,7 @@ async function run(message, args) {
                     embed.setDescription(
                         `new balance: $**${getBalance(message.member).toLocaleString()}**`
                     )
-                    msg.edit(embed)
+                    msg.edit({embeds: [embed]})
                 }, 2000)
             })
         } else {
