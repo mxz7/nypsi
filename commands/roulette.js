@@ -99,8 +99,8 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
-        return message.channel.send(
-            new CustomEmbed(
+        return message.channel.send({
+            embeds: [new CustomEmbed(
                 message.member,
                 false,
                 "🔴 " +
@@ -116,8 +116,8 @@ async function run(message, args) {
                     "🟢 1/" +
                     values.length +
                     " win **17**x"
-            )
-        )
+            )]
+        })
     }
 
     const prefix = getPrefix(message.guild)
@@ -146,11 +146,11 @@ async function run(message, args) {
         args[0] != "g" &&
         args[0] != "b"
     ) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+            )]
+        })
     }
 
     if (args[0] == "red") {
@@ -173,11 +173,11 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-                )
-            )
+                )]
+            })
         }
     }
 
@@ -188,33 +188,33 @@ async function run(message, args) {
     }
 
     if (bet <= 0) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+            )]
+        })
     }
 
     if (!bet) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+            )]
+        })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+            )]
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -332,7 +332,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({embeds: [embed]})
         }, 2000)
     })
     gamble(message.author, "roulette", bet, win, winnings)
