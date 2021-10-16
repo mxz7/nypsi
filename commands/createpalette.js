@@ -40,13 +40,13 @@ async function run(message, args) {
     }
 
     if (!isPremium(message.author.id)) {
-        return message.channel.send(new ErrorEmbed("you must be a patreon for this command"))
+        return message.channel.send({embeds: [new ErrorEmbed("you must be a patreon for this command")]})
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `manage roles` permission for this command to work")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `manage roles` permission for this command to work")]
+        })
     }
 
     if (args.length == 0) {
@@ -70,7 +70,6 @@ async function run(message, args) {
     }
 
     let roles = await message.guild.roles.fetch()
-    roles = roles.cache
 
     const sortedRoleIDs = []
 
@@ -91,9 +90,9 @@ async function run(message, args) {
     }
 
     if (colors.length < 3) {
-        return message.channel.send(
-            new ErrorEmbed("there aren't enough role colors to make a palette (minimum of 3)")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("there aren't enough role colors to make a palette (minimum of 3)")]
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -123,23 +122,23 @@ async function run(message, args) {
         }
 
         if (color.length != 6) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `invalid color, you can use ${getPrefix(
                         message.guild
                     )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
-                )
-            )
+                )]
+            })
         }
 
         if (color.match(regex)) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `invalid color, you can use ${getPrefix(
                         message.guild
                     )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
-                )
-            )
+                )]
+            })
         }
     }
 
