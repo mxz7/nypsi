@@ -37,9 +37,9 @@ async function run(message, args) {
     const case0 = getCase(message.guild, caseID)
 
     if (!case0) {
-        return message.channel.send(
-            new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")]
+        })
     }
 
     setReason(message.guild, caseID, reason)
