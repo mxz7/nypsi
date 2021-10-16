@@ -42,7 +42,7 @@ async function run(message, args) {
     const { catCache } = require("../utils/imghandler")
 
     if (catCache.size < 1) {
-        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
+        return message.channel.send({embeds: [new ErrorEmbed("please wait a couple more seconds..")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -62,7 +62,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find cat image"))
+        return message.channel.send({embeds: [new ErrorEmbed("unable to find cat image")]})
     }
 
     const image = a.split("|")[0]
