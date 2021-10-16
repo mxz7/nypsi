@@ -69,14 +69,14 @@ async function run(message, args) {
     })
 
     if (filtered.length == 0) {
-        return await message.channel.send(
-            new CustomEmbed(message.member, false, "no members to show")
-        )
+        return await message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "no members to show")]
+        })
     }
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle("bottom " + filtered.length)
-        .setDescription(filtered)
+        .setDescription(filtered.join("\n"))
 
     message.channel.send({ embeds: [embed] })
 }
