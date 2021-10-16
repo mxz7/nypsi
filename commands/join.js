@@ -4,6 +4,7 @@ const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const workerSort = require("../utils/sort-worker")
+const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(
     "join",
@@ -66,7 +67,13 @@ async function run(message, args) {
             }
         })
 
-        membersSorted = await workerSort(membersSorted, membersMap)
+        if (membersSorted.length > 1500) {
+            const msg = await message.channel.send(new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`))
+            membersSorted = await workerSort(membersSorted, membersMap)
+            await msg.delete()
+        } else {
+            inPlaceSort(membersSorted).asc((i) => membersMap.get(i))
+        }
 
         sortCache.set(message.guild.id, membersSorted)
 
