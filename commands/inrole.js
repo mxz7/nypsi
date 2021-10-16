@@ -35,7 +35,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}inrole <role>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}inrole <role>`)]})
     }
 
     const roles = message.guild.roles.cache
@@ -51,7 +51,7 @@ async function run(message, args) {
     }
 
     if (!role) {
-        return message.channel.send(new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``))
+        return message.channel.send({embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)]})
     }
 
     let members
@@ -95,12 +95,12 @@ async function run(message, args) {
     })
 
     if (!memberList.get(1)) {
-        return message.channel.send(
-            new CustomEmbed(message.member, false, "that role has no members")
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "that role has no members")]
+        })
     }
 
-    const embed = new CustomEmbed(message.member, false, memberList.get(1))
+    const embed = new CustomEmbed(message.member, false, memberList.get(1).join("\n"))
         .setTitle(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`)
 
@@ -120,7 +120,7 @@ async function run(message, args) {
 
     async function pageManager() {
         const reaction = await msg
-            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
             .then((collected) => {
                 return collected.first().emoji.name
             })
@@ -137,7 +137,7 @@ async function run(message, args) {
                 currentPage--
                 embed.setDescription(memberList.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit(embed)
+                await msg.edit({embeds: [embed]})
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -147,7 +147,7 @@ async function run(message, args) {
                 currentPage++
                 embed.setDescription(memberList.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit(embed)
+                await msg.edit({embeds: [embed]})
                 return pageManager()
             }
         }
