@@ -19,6 +19,7 @@ const e = require("express")
 const isImageUrl = require("is-image-url")
 
 const cooldown = new Map()
+const uploadCooldown = new Map()
 
 const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN).setAliases([
     "iloveyou",
@@ -71,6 +72,28 @@ async function run(message, args) {
         args[0].toLowerCase() == "suggest" ||
         args[0].toLowerCase() == "+"
     ) {
+        if (uploadCooldown.has(message.member.id)) {
+            const init = uploadCooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = 60 - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+
+            return message.channel.send(
+                new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``)
+            )
+        }
+
         if (args.length == 1 && !message.attachments.first()) {
             return message.channel.send(
                 new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)
@@ -126,6 +149,12 @@ async function run(message, args) {
         setTimeout(() => {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
+
+        uploadCooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            uploadCooldown.delete(message.author.id)
+        }, 60 * 1000)
 
         return message.react("✅")
     } else if (args[0].toLowerCase() == "get") {
