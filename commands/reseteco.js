@@ -36,17 +36,17 @@ async function run(message, args) {
     response = response.first().content
 
     if (response != captcha.answer) {
-        return message.channel.send(new ErrorEmbed("captcha failed"))
+        return message.channel.send({embeds: [new ErrorEmbed("captcha failed")]})
     } else {
         const c = reset()
 
-        return message.channel.send(
-            new CustomEmbed(
+        return message.channel.send({
+            embeds: [new CustomEmbed(
                 message.member,
                 false,
                 `${c.deleted} users deleted\n${c.updated} users updated`
-            )
-        )
+            )]
+        })
     }
 }
 
