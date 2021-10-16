@@ -17,7 +17,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
+            message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
         }
         return
     }
@@ -39,7 +39,7 @@ async function run(message, args) {
                 const date = formatDate(new Date(countdown.date).getTime())
 
                 embed.addField(
-                    countdown.id,
+                    countdown.id.toString(),
                     `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** \`${countdown.format}\`\n**final format** \`${countdown.finalFormat}\`\n**date** \`${date}\``
                 )
             }
@@ -67,7 +67,7 @@ async function run(message, args) {
                     "\n\nyou can upgrade your subscription to get access to more countdowns per server"
             }
 
-            return message.channel.send(new ErrorEmbed(error))
+            return message.channel.send({embeds: [new ErrorEmbed(error)]})
         }
 
         const embed = new CustomEmbed(
@@ -83,10 +83,10 @@ async function run(message, args) {
         let fail = false
 
         let res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
+                return message.channel.send({embeds: [new ErrorEmbed("you ran out of time - cancelled")]})
             })
 
         if (fail) return
@@ -94,35 +94,35 @@ async function run(message, args) {
         res = res.first().content.split(" ")[0]
 
         if (!res.includes("/")) {
-            return message.channel.send(new ErrorEmbed("invalid date"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid date")]})
         }
 
         if (res.includes(":")) {
-            return message.channel.send(new ErrorEmbed("invalid date"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid date")]})
         }
 
         const date = new Date(Date.parse(res))
 
         if (isNaN(date.getTime())) {
-            return message.channel.send(new ErrorEmbed("invalid date"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid date")]})
         }
 
         const now = new Date().getTime()
 
         if (date.getTime() < now) {
-            return message.channel.send(new ErrorEmbed("unfortunately i cant go back in time"))
+            return message.channel.send({embeds: [new ErrorEmbed("unfortunately i cant go back in time")]})
         }
 
         if (date.getTime() - now < 172800000) {
-            return message.channel.send(new ErrorEmbed("thats less than 2 days away bro"))
+            return message.channel.send({embeds: [new ErrorEmbed("thats less than 2 days away bro")]})
         }
 
         if (date.getTime() - now > 63072000000) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     "thats more than 2 years away man. i might not live that long"
-                ).setFooter("so become a patreon 😏")
-            )
+                ).setFooter("so become a patreon 😏")]
+            })
         }
 
         embed.setDescription(
@@ -132,10 +132,10 @@ async function run(message, args) {
         await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
+                return message.channel.send({embeds: [new ErrorEmbed("you ran out of time - cancelled")]})
             })
 
         if (fail) return
@@ -143,9 +143,9 @@ async function run(message, args) {
         res = res.first()
 
         if (!res.mentions.channels.first()) {
-            return message.channel.send(
-                new ErrorEmbed("invalid channel, please mention the channel using #")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("invalid channel, please mention the channel using #")]
+            })
         }
 
         const channel = res.mentions.channels.first()
@@ -157,10 +157,10 @@ async function run(message, args) {
         await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
+                return message.channel.send({embeds: [new ErrorEmbed("you ran out of time - cancelled")]})
             })
 
         if (fail) return
@@ -168,11 +168,11 @@ async function run(message, args) {
         res = res.first().content
 
         if (!res.includes("%days%")) {
-            return message.channel.send(new ErrorEmbed("could not find %days%"))
+            return message.channel.send({embeds: [new ErrorEmbed("could not find %days%")]})
         }
 
         if (res.length > 250) {
-            return message.channel.send(new ErrorEmbed("cannot be longer than 250 characters"))
+            return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 250 characters")]})
         }
 
         const format = res
@@ -184,10 +184,10 @@ async function run(message, args) {
         await message.channel.send({ embeds: [embed] })
 
         res = await message.channel
-            .awaitMessages(filter, { max: 1, time: 60000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
             .catch(() => {
                 fail = true
-                return message.channel.send(new ErrorEmbed("you ran out of time - cancelled"))
+                return message.channel.send({embeds: [new ErrorEmbed("you ran out of time - cancelled")]})
             })
 
         if (fail) return
@@ -195,7 +195,7 @@ async function run(message, args) {
         res = res.first().content
 
         if (res.length > 250) {
-            return message.channel.send(new ErrorEmbed("cannot be longer than 250 characters"))
+            return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 250 characters")]})
         }
 
         const finalFormat = res
@@ -205,11 +205,11 @@ async function run(message, args) {
         embedd.setDescription(format.split("%days%").join(daysUntil(date) + 1))
         embedd.setColor("#37393f")
 
-        await channel.send(embedd).catch(() => {
+        await channel.send({embeds: [embedd]}).catch(() => {
             fail = true
-            return message.channel.send(
-                new ErrorEmbed("failed to send countdown - check my permissions")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("failed to send countdown - check my permissions")]
+            })
         })
 
         if (fail) return
@@ -225,20 +225,20 @@ async function run(message, args) {
         args[0].toLowerCase() == "delete"
     ) {
         if (args.length == 1) {
-            return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}countdown delete <countdown id>`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}countdown delete <countdown id>`)]
+            })
         }
 
         const countdowns = getCountdowns(message.guild)
 
         if (Object.keys(countdowns).indexOf(args[1].toString()) == -1) {
-            return message.channel.send(new ErrorEmbed("invalid countdown use the countdown id"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid countdown use the countdown id")]})
         }
 
         deleteCountdown(message.guild, args[1].toString())
 
-        return message.channel.send(new CustomEmbed(message.member, false, "✅ countdown deleted"))
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "✅ countdown deleted")]})
     } else {
         const embed = new CustomEmbed(message.member, true)
 
