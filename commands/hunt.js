@@ -69,7 +69,7 @@ async function run(message, args) {
     }
 
     if (!gun) {
-        return message.channel.send(new ErrorEmbed("you need a gun to hunt"))
+        return message.channel.send({embeds: [new ErrorEmbed("you need a gun to hunt")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -225,7 +225,7 @@ async function run(message, args) {
     )
 
     setTimeout(() => {
-        msg.edit(embed)
+        msg.edit({embeds: [embed]})
     }, 1500)
 }
 
