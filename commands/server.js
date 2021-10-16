@@ -63,13 +63,10 @@ async function run(message, args) {
         .addField(
             "info",
             "**owner** " +
-                server.owner.user.tag +
+                server.members.cache.get(server.ownerId).user.tag +
                 "\n" +
                 "**created** " +
-                created +
-                "\n" +
-                "**region** " +
-                server.region,
+                created,
             true
         )
 
