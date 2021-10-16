@@ -58,7 +58,7 @@ async function run(message, args) {
     }
 
     if (args.length < 2) {
-        return message.channel.send(new ErrorEmbed("not enough options"))
+        return message.channel.send({embeds: [new ErrorEmbed("not enough options")]})
     }
 
     cooldown.set(message.member.id, new Date())
