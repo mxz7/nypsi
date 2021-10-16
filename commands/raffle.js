@@ -58,7 +58,7 @@ async function run(message, args) {
         )
 
         if (!role) {
-            return await message.channel.send(new ErrorEmbed("i wasn't able to find that role"))
+            return await message.channel.send({embeds: [new ErrorEmbed("i wasn't able to find that role")]})
         }
 
         role.members.forEach((m) => {
@@ -66,7 +66,7 @@ async function run(message, args) {
         })
 
         if (members.length == 0) {
-            return message.channel.send(new ErrorEmbed("there is nobody in that role"))
+            return message.channel.send({embeds: [new ErrorEmbed("there is nobody in that role")]})
         }
     }
 
