@@ -21,7 +21,7 @@ async function run(message, args) {
         .setTitle("nypsi")
         .setFooter("made by max#0777 | tekoh.net")
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

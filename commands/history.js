@@ -49,7 +49,7 @@ async function run(message, args) {
             .setTitle("history help")
             .addField("usage", `${prefix}history @user\n${prefix}history <user ID or tag>`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -140,7 +140,7 @@ async function run(message, args) {
         }
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (pages.length > 1) {
         await msg.react("⬅")

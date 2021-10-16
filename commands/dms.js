@@ -68,7 +68,7 @@ async function run(message, args) {
 
     setDMsEnabled(message.member, newValue)
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

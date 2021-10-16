@@ -78,7 +78,7 @@ async function run(message, args) {
         .setTitle(`${message.member.user.username}'s raffle`)
         .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

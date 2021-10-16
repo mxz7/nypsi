@@ -87,7 +87,7 @@ async function run(message, args) {
                     "3️⃣ **double down** take one more card and double your bet"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "info") {
@@ -100,7 +100,7 @@ async function run(message, args) {
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)"
         ).setTitle("blackjack help")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {

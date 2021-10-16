@@ -37,7 +37,7 @@ async function run(message, args) {
             embed.setDescription("`❌` no commands disabled")
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
@@ -58,7 +58,7 @@ async function run(message, args) {
                 "❌ `" + getPrefix(message.guild) + word + "` is already disabled"
             ).setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         if (!commandExists(word)) {
@@ -86,7 +86,7 @@ async function run(message, args) {
                 `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`
             ).setTitle("chat filter")
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateDisabledCommands(message.guild, filter)
@@ -96,7 +96,7 @@ async function run(message, args) {
             true,
             "✅ disabled `" + getPrefix(message.guild) + word + "` command"
         ).setTitle("disabled commands")
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
             return message.channel.send(new ErrorEmbed(`${prefix}disablecmd del/- <command>`))
@@ -119,7 +119,7 @@ async function run(message, args) {
                 .setTitle("disabled commands")
                 .setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateDisabledCommands(message.guild, filter)
@@ -132,7 +132,7 @@ async function run(message, args) {
             .setTitle("disable commands")
             .setFooter(`you can use ${prefix}disablecmd reset to reset disabled commands`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "reset") {
         filter = []
 
@@ -144,7 +144,7 @@ async function run(message, args) {
             "✅ disabled commands have been"
         ).setTitle("disabled commands")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
             .setTitle("disabled commands")
@@ -154,7 +154,7 @@ async function run(message, args) {
             embed.setDescription("`❌` no commands disabled")
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

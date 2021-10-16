@@ -20,7 +20,7 @@ async function run(message, args) {
     ) {
         const embed = new ErrorEmbed("to delete all cases you must be the server owner")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild))
@@ -34,7 +34,7 @@ async function run(message, args) {
         .setTitle("confirmation")
         .setFooter("this cannot be reversed")
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     await msg.react("✅")
 

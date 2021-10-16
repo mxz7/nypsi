@@ -89,7 +89,7 @@ async function run(message, args) {
         "work | " + message.member.user.username
     )
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {

@@ -61,7 +61,7 @@ async function run(message, args) {
                     `${prefix}poll 9 hello | this is a description | #13c696`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -130,7 +130,7 @@ async function run(message, args) {
         embed.setHeader(message.member.user.tag)
     }
 
-    message.channel.send(embed).then(async (m) => {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
         if (choices == 0) {

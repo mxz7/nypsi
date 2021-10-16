@@ -67,7 +67,7 @@ async function run(message, args) {
         .setTitle("top " + filtered.length)
         .setDescription(filtered)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

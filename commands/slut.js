@@ -119,7 +119,7 @@ async function run(message, args) {
         `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`
     ).setTitle("slut calculator")
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

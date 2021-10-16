@@ -94,7 +94,7 @@ async function run(message, args) {
             .addField("version", res.version, true)
             .addField("motd", res.motd.clean)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let username = args[0]
@@ -120,7 +120,7 @@ async function run(message, args) {
         embed.setFooter(`page 1/${names.size}`)
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (names.size >= 2) {
         await msg.react("⬅")

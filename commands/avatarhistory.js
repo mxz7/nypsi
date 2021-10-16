@@ -116,7 +116,7 @@ async function run(message, args) {
         embed.setDescription("`[tracking disabled]`")
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (history.length == 1) return
 

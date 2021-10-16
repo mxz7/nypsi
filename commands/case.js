@@ -30,7 +30,7 @@ async function run(message, args) {
                     `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -69,7 +69,7 @@ async function run(message, args) {
         embed.setDescription("punished user: " + target.toString())
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (case0.deleted) return
 

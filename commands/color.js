@@ -49,7 +49,7 @@ async function run(message, args) {
         embed.setURL(`https://color.tekoh.net/${member.displayHexColor}`)
     }
 
-    return await message.channel.send(embed).catch(() => {
+    return await message.channel.send({ embeds: [embed] }).catch(() => {
         message.channel.send(new ErrorEmbed("invalid color"))
     })
 }

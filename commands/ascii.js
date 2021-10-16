@@ -50,7 +50,7 @@ async function run(message, args) {
                 `${prefix}ascii hello\n${prefix}ascii hello | ghost\n${prefix}ascii <text> | <font>`
             )
             .addField("help", `to view different fonts use ${prefix}ascii fonts <page (1/2/3/4/5)>`)
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "fonts") {
@@ -65,7 +65,7 @@ async function run(message, args) {
                 .setTitle("ascii fonts page 1")
                 .setFooter(`${prefix}ascii fonts 2 for next page`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[1] == "2") {
             const embed = new CustomEmbed(
                 message.member,
@@ -75,7 +75,7 @@ async function run(message, args) {
                 .setTitle("ascii fonts page 2")
                 .setFooter(`${prefix}ascii fonts 3 for next page`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[1] == "3") {
             const embed = new CustomEmbed(
                 message.member,
@@ -85,7 +85,7 @@ async function run(message, args) {
                 .setTitle("ascii fonts page 3")
                 .setFooter(`${prefix}ascii fonts 4 for next page`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[1] == "4") {
             const embed = new CustomEmbed(
                 message.member,
@@ -95,7 +95,7 @@ async function run(message, args) {
                 .setTitle("ascii fonts page 4")
                 .setFooter(`${prefix}ascii fonts 5 for next page`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else if (args[1] == "5") {
             const embed = new CustomEmbed(
                 message.member,
@@ -103,7 +103,7 @@ async function run(message, args) {
                 "`Serifcap`, `Shadow`, `Shimrod`, `Short`, `Slant Relief`, `Slant`, `Slide`, `Small Caps`, `Small Isometric1`, `Small Keyboard`, `Small Poison`, `Small Script`, `Small Shadow`, `Small Slant`, `Small Tengwar`, `Small`, `Soft`, `Speed`, `Spliff`, `Stacey`, `Stampate`, `Stampatello`, `Standard`, `Star Strips`, `Star Wars`, `Stellar`, `Stforek`, `Stick Letters`, `Stop`, `Straight`, `Stronger Than All`, `Sub-Zero`, `Swamp Land`, `Swan`, `Sweet`, `THIS`, `Tanja`, `Tengwar`, `Term`, `Test1`, `The Edge`, `Thick`, `Thin`, `Thorned`, `Three Point`, `Ticks Slant`, `Ticks`, `Tiles`, `Tinker-Toy`, `Tombstone`, `Train`, `Trek`, `Tsalagi`, `Tubular`, `Twisted`, `Two Point`, `USA Flag`, `Univers`, `Varsity`, `Wavy`, `Weird`, `Wet Letter`, `Whimsy`, `Wow`"
             ).setTitle("ascii fonts page 5")
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             return message.channel.send(new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`))
         }

@@ -66,7 +66,7 @@ async function run(message, args) {
                 "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
                     "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as your use the bot more."
             )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {
@@ -119,7 +119,7 @@ async function run(message, args) {
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
 
-    const m = await message.channel.send(embed)
+    const m = await message.channel.send({ embeds: [embed] })
 
     updateBalance(message.member, getBalance(message.member) - amount)
     updateBankBalance(message.member, getBankBalance(message.member) + amount)

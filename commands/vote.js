@@ -87,7 +87,7 @@ async function run(message, args) {
         removeFromVoteCache(message.member)
     }
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

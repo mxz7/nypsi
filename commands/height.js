@@ -109,7 +109,7 @@ async function run(message, args) {
         `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`
     ).setTitle("short person calculator")
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

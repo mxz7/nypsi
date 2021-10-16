@@ -107,7 +107,7 @@ async function run(message, args) {
         `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
     ).setTitle("gay calculator")
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -54,7 +54,7 @@ async function run(message, args) {
             )
             .addField("example", `${prefix}ezpoll option1 option2`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length < 2) {
@@ -93,7 +93,7 @@ async function run(message, args) {
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
 
-    message.channel.send(embed).then(async (m) => {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
         if (args.length >= 2) {

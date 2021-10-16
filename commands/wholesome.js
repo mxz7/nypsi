@@ -301,7 +301,7 @@ async function run(message, args) {
             embed.setFooter(`page 1/${pages.size}`)
         }
 
-        const msg = await message.channel.send(embed)
+        const msg = await message.channel.send({ embeds: [embed] })
 
         if (pages.size == 0) return
 
@@ -408,7 +408,7 @@ async function run(message, args) {
         )
     }
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

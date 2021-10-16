@@ -21,7 +21,7 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false, `${news.text}\n\nset on: ${lastSet}`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     } else {
         if (message.member.user.id != "672793821850894347") return
         setNews(args.join(" "))
@@ -32,7 +32,7 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false, `${news.text}\n\nset on: ${lastSet}`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

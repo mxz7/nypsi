@@ -201,7 +201,7 @@ async function run(message, args) {
         .setURL(url)
         .setThumbnail(skin)
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

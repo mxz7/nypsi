@@ -146,7 +146,7 @@ async function run(message, args) {
         )
         .addField("usage", "**memory** " + memUsage + "mb", true)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

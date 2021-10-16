@@ -72,7 +72,7 @@ async function run(message, args) {
             .addField("help", "if you win, you will double your bet")
             .addField("example", `${prefix}coinflip @user 100`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (waiting.includes(message.author.id)) {
@@ -273,7 +273,7 @@ async function run(message, args) {
             `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
         ).setTitle("coinflip")
 
-        return message.channel.send(embed).then((msg) => {
+        return message.channel.send({ embeds: [embed] }).then((msg) => {
             if (winner == message.member) {
                 thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${
                     target.user.username

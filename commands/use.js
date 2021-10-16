@@ -451,7 +451,7 @@ async function run(message, args) {
         }
     }
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     if (!laterDescription) return
 

@@ -32,7 +32,7 @@ async function run(message, args) {
             embed.setDescription("`❌` empty chat filter")
         }
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
@@ -63,7 +63,7 @@ async function run(message, args) {
                 .setTitle("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         filter.push(word)
@@ -77,7 +77,7 @@ async function run(message, args) {
                 `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`
             ).setTitle("chat filter")
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateChatFilter(message.guild, filter)
@@ -87,7 +87,7 @@ async function run(message, args) {
             true,
             "✅ added `" + word + "` to the filter"
         ).setTitle("chat filter")
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
@@ -112,7 +112,7 @@ async function run(message, args) {
                 .setTitle("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`)
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
 
         updateChatFilter(message.guild, filter)
@@ -125,7 +125,7 @@ async function run(message, args) {
             .setTitle("chat filter")
             .setFooter(`you can use ${prefix}filter reset to reset the filter`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "reset") {
@@ -137,7 +137,7 @@ async function run(message, args) {
             "chat filter"
         )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

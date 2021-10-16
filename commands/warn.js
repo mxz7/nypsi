@@ -37,7 +37,7 @@ async function run(message, args) {
                 `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -151,7 +151,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send(embed).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     const members1 = members.keyArray()

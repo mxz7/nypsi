@@ -78,7 +78,7 @@ async function run(message, args) {
         .addField("👎", result.thumbs_down.toLocaleString(), true)
         .setURL(result.permalink)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
