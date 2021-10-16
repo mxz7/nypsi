@@ -69,7 +69,7 @@ async function run(message, args) {
     }
 
     if (!fishingRod) {
-        return message.channel.send(new ErrorEmbed("you need a fishing rod to fish"))
+        return message.channel.send({embeds: [new ErrorEmbed("you need a fishing rod to fish")]})
     }
 
     cooldown.set(message.member.id, new Date())
