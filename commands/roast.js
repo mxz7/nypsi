@@ -41,7 +41,7 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("who do u want me to roast bro"))
+        return message.channel.send({embeds: [new ErrorEmbed("who do u want me to roast bro")]})
     }
 
     let target
@@ -68,9 +68,9 @@ async function run(message, args) {
         .replace("%t", target.user.toString())
         .replace("%m", message.author.toString())
 
-    return message.channel.send(
-        new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`)
-    )
+    return message.channel.send({
+        embeds: [new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`)]
+    })
 }
 
 cmd.setRun(run)
