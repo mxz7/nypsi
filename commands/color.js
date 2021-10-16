@@ -41,7 +41,13 @@ async function run(message, args) {
         message.member,
         false,
         `[**#${color}**](https://color.tekoh.net/#${color})`
-    ).setColor(color)
+    )
+
+    try {
+        embed.setColor(color)
+    } catch {
+        return message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
+    }
 
     if (member) {
         embed.setDescription(member.user.toString())
@@ -50,7 +56,7 @@ async function run(message, args) {
     }
 
     return await message.channel.send({ embeds: [embed] }).catch(() => {
-        message.channel.send(new ErrorEmbed("invalid color"))
+        message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
     })
 }
 
