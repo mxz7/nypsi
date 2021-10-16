@@ -14,7 +14,7 @@ async function run(message, args) {
 
     const d = loadItems()
 
-    return message.channel.send(new CustomEmbed(message.member, false, d))
+    return message.channel.send({embeds: [new CustomEmbed(message.member, false, d)]})
 }
 
 cmd.setRun(run)
