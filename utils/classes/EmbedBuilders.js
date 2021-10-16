@@ -2,7 +2,7 @@ const { MessageEmbed, GuildMember } = require("discord.js")
 const { isPremium, getTier, getEmbedColor } = require("../premium/utils")
 const { getColor } = require("../utils")
 
-class CustomEmbed {
+class CustomEmbed extends MessageEmbed {
     /**
      * @returns {CustomEmbed}
      * @param {GuildMember} member
@@ -10,21 +10,21 @@ class CustomEmbed {
      * @param {String} text
      */
     constructor(member, footer, text) {
-        this.embed = new MessageEmbed()
+        super()
 
         if (member) {
             if (isPremium(member.user.id)) {
                 if (getTier(member.user.id) >= 1) {
                     if (getEmbedColor(member.user.id) != "default") {
-                        this.embed.setColor(getEmbedColor(member.user.id))
+                        super.setColor(getEmbedColor(member.user.id))
                     } else {
-                        this.embed.setColor(getColor(member))
+                        super.setColor(getColor(member))
                     }
                 } else {
-                    this.embed.setColor(getColor(member))
+                    super.setColor(getColor(member))
                 }
             } else {
-                this.embed.setColor(getColor(member))
+                super.setColor(getColor(member))
             }
         }
 
@@ -33,11 +33,11 @@ class CustomEmbed {
                 text = text.substr(0, 2000)
             }
 
-            this.embed.setDescription(text)
+            super.setDescription(text)
         }
 
         if (footer) {
-            this.embed.setFooter("nypsi.xyz")
+            super.setFooter("nypsi.xyz")
         }
 
         return this
@@ -51,7 +51,7 @@ class CustomEmbed {
         if (text.length > 2000) {
             text = text.substr(0, 2000)
         }
-        this.embed.setDescription(text)
+        super.setDescription(text)
 
         return this
     }
@@ -67,7 +67,7 @@ class CustomEmbed {
             text = text.substr(0, 1000)
         }
 
-        this.embed.addField(title, text, inline)
+        super.addField(title, text, inline)
 
         return this
     }
@@ -77,7 +77,7 @@ class CustomEmbed {
      * @param {Sting} text
      */
     setTitle(text) {
-        this.embed.setTitle(text)
+        super.setTitle(text)
 
         return this
     }
@@ -87,7 +87,7 @@ class CustomEmbed {
      * @param {String} url
      */
     setImage(url) {
-        this.embed.setImage(url)
+        super.setImage(url)
 
         return this
     }
@@ -97,7 +97,7 @@ class CustomEmbed {
      * @param {String} url
      */
     setThumbnail(url) {
-        this.embed.setThumbnail(url)
+        super.setThumbnail(url)
 
         return this
     }
@@ -107,7 +107,7 @@ class CustomEmbed {
      * @param {String} url
      */
     setURL(url) {
-        this.embed.setURL(url)
+        super.setURL(url)
 
         return this
     }
@@ -117,7 +117,7 @@ class CustomEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        this.embed.setAuthor(text)
+        super.setAuthor(text)
 
         return this
     }
@@ -127,7 +127,7 @@ class CustomEmbed {
      * @param {String} text
      */
     setFooter(text) {
-        this.embed.setFooter(text)
+        super.setFooter(text)
 
         return this
     }
@@ -137,7 +137,7 @@ class CustomEmbed {
      * @param {String} color
      */
     setColor(color) {
-        this.embed.setColor(color)
+        super.setColor(color)
 
         return this
     }
@@ -148,9 +148,9 @@ class CustomEmbed {
      */
     setTimestamp(date) {
         if (date) {
-            this.embed.setTimestamp(date)
+            super.setTimestamp(date)
         } else {
-            this.embed.setTimestamp()
+            super.setTimestamp()
         }
 
         return this
@@ -159,15 +159,15 @@ class CustomEmbed {
 
 exports.CustomEmbed = CustomEmbed
 
-class ErrorEmbed {
+class ErrorEmbed extends MessageEmbed {
     /**
      * @returns {ErrorEmbed}
      * @param {String} text
      */
     constructor(text) {
-        this.embed = new MessageEmbed().setColor("#e31937")
-        this.embed.setTitle("`❌`")
-        this.embed.setDescription(text)
+        super().setColor("#e31937")
+        super.setTitle("`❌`")
+        super.setDescription(text)
 
         return this
     }
@@ -180,7 +180,7 @@ class ErrorEmbed {
         if (text.length > 2000) {
             text = text.substr(0, 2000)
         }
-        this.embed.setDescription(text)
+        super.setDescription(text)
 
         return this
     }
@@ -196,7 +196,7 @@ class ErrorEmbed {
             text = text.substr(0, 1000)
         }
 
-        this.embed.addField(title, text, inline)
+        super.addField(title, text, inline)
 
         return this
     }
@@ -206,7 +206,7 @@ class ErrorEmbed {
      * @param {Sting} text
      */
     setTitle(text) {
-        this.embed.setTitle(text)
+        super.setTitle(text)
 
         return this
     }
@@ -216,7 +216,7 @@ class ErrorEmbed {
      * @param {String} url
      */
     setImage(url) {
-        this.embed.setImage(url)
+        super.setImage(url)
 
         return this
     }
@@ -226,7 +226,7 @@ class ErrorEmbed {
      * @param {String} url
      */
     setThumbnail(url) {
-        this.embed.setThumbnail(url)
+        super.setThumbnail(url)
 
         return this
     }
@@ -236,7 +236,7 @@ class ErrorEmbed {
      * @param {String} url
      */
     setURL(url) {
-        this.embed.setURL(url)
+        super.setURL(url)
 
         return this
     }
@@ -246,7 +246,7 @@ class ErrorEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        this.embed.setAuthor(text)
+        super.setAuthor(text)
 
         return this
     }
@@ -256,7 +256,7 @@ class ErrorEmbed {
      * @param {String} text
      */
     setFooter(text) {
-        this.embed.setFooter(text)
+        super.setFooter(text)
 
         return this
     }
@@ -266,7 +266,7 @@ class ErrorEmbed {
      * @param {String} color
      */
     setColor(color) {
-        this.embed.setColor(color)
+        super.setColor(color)
 
         return this
     }
@@ -277,9 +277,9 @@ class ErrorEmbed {
      */
     setTimestamp(date) {
         if (date) {
-            this.embed.setTimestamp(date)
+            super.setTimestamp(date)
         } else {
-            this.embed.setTimestamp()
+            super.setTimestamp()
         }
 
         return this
