@@ -12,6 +12,7 @@ const {
     hasVoted,
     hasPadlock,
     getWorkers,
+    getInventory,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 const { profileExistsID, getProfileID } = require("../utils/socials/utils")
@@ -68,6 +69,8 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%"
     const voted = hasVoted(message.member)
+    const inventory = getInventory(message.member)
+    const inventoryItems = Array.from(Object.values(inventory)).reduce((a, b) => a + b)
 
     embed.addField(
         "💰 economy",
@@ -75,7 +78,8 @@ async function run(message, args) {
     **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(
             message.member
         )}
-    **workers** ${Object.keys(getWorkers(message.member)).length}`,
+    **workers** ${Object.keys(getWorkers(message.member)).length}
+    **inventory** ${inventoryItems.toLocaleString()} items`,
         true
     )
 
