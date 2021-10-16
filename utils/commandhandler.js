@@ -26,6 +26,7 @@ const { start } = require("repl")
 const commands = new Map()
 const aliases = new Map()
 const popularCommands = new Map()
+const noLifers = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 const handcuffs = new Map()
@@ -553,7 +554,7 @@ async function runCommand(cmd, message, args) {
             )
         }
 
-        updatePopularCommands(commands.get(aliases.get(cmd)).name)
+        updatePopularCommands(commands.get(aliases.get(cmd)).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
             return message.channel.send(new ErrorEmbed("that command has been disabled"))
@@ -586,7 +587,7 @@ async function runCommand(cmd, message, args) {
             )
         }
 
-        updatePopularCommands(commands.get(cmd).name)
+        updatePopularCommands(commands.get(cmd).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
             return message.channel.send(new ErrorEmbed("that command has been disabled"))
@@ -700,12 +701,19 @@ function logCommand(message, args) {
 
 /**
  * @param {String} command
+ * @param {String} tag
  */
-function updatePopularCommands(command) {
+function updatePopularCommands(command, tag) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1)
     } else {
         popularCommands.set(command, 1)
+    }
+
+    if (noLifers.has(tag)) {
+        noLifers.set(tag, noLifers.get(tag) + 1)
+    } else {
+        noLifers.set(tag, 1)
     }
 }
 
@@ -740,6 +748,8 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
 
+        const sortedNoLifers = new Map([...noLifers.entries()].sort((a, b) => b[1] - a[1]))
+
         let msg = ""
         let count = 1
 
@@ -768,6 +778,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
         if (client.uptime < 86400 * 1000) {
             embed.setFooter("data is from less than 24 hours")
+        } else {
+            const noLifer = sortedNoLifers.keys().next().value
+
+            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer)} commands)`)
         }
 
         await channel.send(embed)
