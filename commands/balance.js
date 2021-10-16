@@ -35,9 +35,9 @@ async function run(message, args) {
         if (!target) {
             target = args[0]
             if (!userExists(target)) {
-                return message.channel.send(
-                    "❌ invalid user - you must tag the user for this command or use a user id"
-                )
+                return message.channel.send({
+                    content: "❌ invalid user - you must tag the user for this command or use a user id"
+                })
             }
             id = true
         }
@@ -65,7 +65,7 @@ async function run(message, args) {
         }
 
         if (!target) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
         }
     }
 
@@ -97,11 +97,11 @@ async function run(message, args) {
             getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
             getPrestige(target) < 20
         ) {
-            return message.channel.send(
-                `you are eligible to prestige, use ${getPrefix(
+            return message.channel.send({
+                content: `you are eligible to prestige, use ${getPrefix(
                     message.guild
                 )}prestige for more info`,
-                embed
+                embeds: [embed]}
             )
         }
     }
