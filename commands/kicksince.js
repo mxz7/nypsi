@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -17,14 +17,14 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `administrator` permission"))
         }
         return
     }
 
-    if (!message.guild.me.hasPermission("KICK_MEMBERS")) {
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
         return message.channel.send(
             new ErrorEmbed("i need the `kick members` permission for this command to work")
         )

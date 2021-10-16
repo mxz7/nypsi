@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const {
     profileExists,
@@ -26,8 +26,8 @@ async function run(message, args) {
     }
 
     if (
-        !message.guild.me.hasPermission("MANAGE_ROLES") ||
-        !message.guild.me.hasPermission("MANAGE_CHANNELS")
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) ||
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
     ) {
         return message.channel.send(
             new ErrorEmbed(

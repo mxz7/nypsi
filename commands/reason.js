@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, setReason } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")

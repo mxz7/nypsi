@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, deleteCase, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -73,7 +73,7 @@ async function run(message, args) {
 
     if (case0.deleted) return
 
-    if (!message.member.hasPermission("MANAGE_GUILD")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) return
 
     await msg.react("❌")
 

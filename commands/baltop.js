@@ -1,5 +1,5 @@
 const { topAmount } = require("../utils/economy/utils.js")
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -53,7 +53,7 @@ async function run(message, args) {
 
     amount = parseInt(args[0])
 
-    if (amount > 10 && !message.member.hasPermission("ADMINISTRATOR")) amount = 10
+    if (amount > 10 && !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10
 
     if (amount < 5) amount = 5
 

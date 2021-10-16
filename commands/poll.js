@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -85,7 +85,7 @@ async function run(message, args) {
 
         if (
             !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
-            !message.member.hasPermission("ADMINISTRATOR") &&
+            !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) &&
             num > 2
         ) {
             choices = 2
@@ -126,7 +126,7 @@ async function run(message, args) {
         embed.setDescription(description)
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         embed.setHeader(message.member.user.tag)
     }
 
