@@ -97,12 +97,12 @@ async function run(message, args) {
     }
 
     message.channel
-        .send(embed)
+        .send({embeds: [embed]})
         .then(() => {
             message.delete()
         })
         .catch((e) => {
-            message.channel.send(new ErrorEmbed(e))
+            message.channel.send({embeds: [new ErrorEmbed(e)]})
         })
 }
 
