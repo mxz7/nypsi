@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -43,7 +43,7 @@ async function run(message, args) {
         return message.channel.send(new ErrorEmbed("you must be a patreon for this command"))
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_ROLES")) {
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
         return message.channel.send(
             new ErrorEmbed("i need the `manage roles` permission for this command to work")
         )

@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -44,7 +44,7 @@ async function run(message, args) {
 
     if (amount < 60) amount++
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         if (amount > 100) {
             amount = 100
         }

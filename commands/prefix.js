@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix, setPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
@@ -14,7 +14,7 @@ const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).s
 async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
-    if (!message.member.hasPermission("MANAGE_GUILD")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
         }

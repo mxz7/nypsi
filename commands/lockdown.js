@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const Discord = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -19,7 +19,7 @@ const cmd = new Command(
  */
 async function run(message, args) {
     if (
-        !message.member.hasPermission("MANAGE_CHANNELS") ||
+        !message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)
     ) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
@@ -31,8 +31,8 @@ async function run(message, args) {
     }
 
     if (
-        !message.guild.me.hasPermission("MANAGE_CHANNELS") ||
-        !message.guild.me.hasPermission("MANAGE_ROLES")
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)
     ) {
         return message.channel.send(
             new ErrorEmbed(

@@ -1,5 +1,5 @@
 const { getMember, formatDate } = require("../utils/utils")
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
