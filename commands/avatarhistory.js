@@ -57,9 +57,9 @@ async function run(message, args) {
     } else {
         if (args[0].toLowerCase() == "-clear") {
             clearAvatarHistory(message.member)
-            return message.channel.send(
-                new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")
-            )
+            return message.channel.send({
+                embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")]
+            })
         }
 
         if (!message.mentions.members.first()) {
@@ -70,7 +70,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -91,7 +91,7 @@ async function run(message, args) {
             addNewAvatar(member, url)
             history = fetchAvatarHistory(member)
         } else {
-            return message.channel.send(new ErrorEmbed("no avatar history"))
+            return message.channel.send({embeds: [new ErrorEmbed("no avatar history")]})
         }
     }
 
