@@ -45,17 +45,17 @@ async function run(message, args) {
     const { mentions } = require("../nypsi.js")
 
     if (!mentions.get(message.guild.id)) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
     }
 
     if (!mentions.get(message.guild.id).get(message.author.id)) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
     }
 
     const userMentions = mentions.get(message.guild.id).get(message.author.id)
 
     if (userMentions.length == 0) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
     }
 
     userMentions.reverse()
@@ -122,7 +122,7 @@ async function run(message, args) {
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
                 .then((collected) => {
                     return collected.first().emoji.name
                 })
@@ -147,27 +147,13 @@ async function run(message, args) {
                     }
 
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             } else if (reaction == "➡") {
                 if (currentPage >= lastPage) {
                     return pageManager()
                 } else {
-                    // if (!isPremium(message.author.id)) {
-                    //     newEmbed.setFooter(
-                    //         `pages are only available for patreons (${getPrefix(
-                    //             message.guild
-                    //         )}patreon)`
-                    //     )
-                    //     for (let i of pages.get(currentPage)) {
-                    //         const fieldName = i.split("|6|9|")[0]
-                    //         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
-                    //         newEmbed.addField(fieldName, fieldValue)
-                    //     }
-                    //     return await msg.edit(newEmbed)
-                    // }
-
                     currentPage++
 
                     for (let i of pages.get(currentPage)) {
@@ -176,7 +162,7 @@ async function run(message, args) {
                         newEmbed.addField(fieldName, fieldValue)
                     }
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             } else if (reaction == "❌") {
@@ -185,7 +171,7 @@ async function run(message, args) {
                 newEmbed.setDescription("✅ mentions cleared")
 
                 await msg.reactions.removeAll()
-                return msg.edit(newEmbed)
+                return msg.edit({embeds: [newEmbed]})
             }
         }
 
