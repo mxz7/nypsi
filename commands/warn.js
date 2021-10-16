@@ -14,7 +14,7 @@ const cmd = new Command("warn", "warn one or more users", categories.MODERATION)
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 

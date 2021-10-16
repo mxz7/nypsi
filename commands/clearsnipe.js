@@ -11,7 +11,7 @@ const cmd = new Command("clearsnipe", "delete the current sniped thing", categor
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
     const { snipe, eSnipe } = require("../nypsi.js")
 
     let channel = message.channel

@@ -14,7 +14,7 @@ const cmd = new Command("kick", "kick one or more users", categories.MODERATION)
  */
 async function run(message, args) {
     if (!message.member.hasPermission("KICK_MEMBERS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `kick members` permission"))
         }
         return

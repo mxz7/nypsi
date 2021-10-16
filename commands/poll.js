@@ -84,7 +84,7 @@ async function run(message, args) {
         }
 
         if (
-            !message.member.hasPermission("MANAGE_MESSAGES") &&
+            !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
             !message.member.hasPermission("ADMINISTRATOR") &&
             num > 2
         ) {

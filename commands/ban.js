@@ -16,7 +16,7 @@ const cmd = new Command(
  */
 async function run(message, args) {
     if (!message.member.hasPermission("BAN_MEMBERS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
         }
         return
