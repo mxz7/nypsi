@@ -57,7 +57,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}delp <amount>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}delp <amount>`)]})
     }
 
     let amount = parseInt(args[0])
@@ -95,7 +95,7 @@ async function run(message, args) {
 
     let count = 0
 
-    for (let msg of collecteda.array()) {
+    for (let msg of collecteda.keys()) {
         if (count >= amount) {
             await collecteda.delete(msg.id)
         } else {
