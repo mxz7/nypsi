@@ -83,7 +83,7 @@ async function run(message, args) {
     }
 
     if (chosen.data.over_18 && !message.channel.nsfw) {
-        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")]})
     }
 
     const a = await redditImage(chosen, allowed)

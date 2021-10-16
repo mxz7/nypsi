@@ -229,7 +229,7 @@ async function run(message, args) {
                 }
 
                 if (!lockPickTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (message.member == lockPickTarget) {
@@ -242,7 +242,7 @@ async function run(message, args) {
                             "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
                         break
                     }
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (!hasPadlock(lockPickTarget)) {
@@ -321,11 +321,11 @@ async function run(message, args) {
                 }
 
                 if (!radioTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (message.member == radioTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (onRadioCooldown(radioTarget)) {
@@ -368,7 +368,7 @@ async function run(message, args) {
                 }
 
                 if (!chastityTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (message.member == chastityTarget) {
@@ -417,7 +417,7 @@ async function run(message, args) {
                 }
 
                 if (!handcuffsTarget) {
-                    return message.channel.send(new ErrorEmbed("invalid user"))
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
                 }
 
                 if (message.member == handcuffsTarget) {
