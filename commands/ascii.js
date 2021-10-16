@@ -17,9 +17,9 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (!getDMsEnabled(message.member)) {
-        return message.channel.send(
-            new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)]
+        })
     }
 
     if (cooldown.has(message.member.id)) {
@@ -39,7 +39,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {

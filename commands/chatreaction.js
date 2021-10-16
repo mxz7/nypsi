@@ -55,7 +55,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild)
