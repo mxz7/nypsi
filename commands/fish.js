@@ -297,7 +297,7 @@ async function run(message, args) {
     )
 
     setTimeout(() => {
-        msg.edit(embed)
+        msg.edit({embeds: [embed]})
     }, 1500)
 }
 
