@@ -14,7 +14,7 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(new ErrorEmbed("you need the `manage server` permission"))
+            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
         }
         return
     }
@@ -37,11 +37,11 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
-                )
-            )
+                )]
+            })
         }
 
         const word = args[1]
@@ -51,7 +51,7 @@ async function run(message, args) {
             .replace(/[^A-z0-9\s]/g, "")
 
         if (word == "" || word == " ") {
-            return message.channel.send(new ErrorEmbed("word must contain letters or numbers"))
+            return message.channel.send({embeds: [new ErrorEmbed("word must contain letters or numbers")]})
         }
 
         if (filter.indexOf(word) > -1) {
@@ -92,7 +92,7 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed(`${prefix}filter del/- <word>`))
+            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}filter del/- <word>`)]})
         }
 
         let word = args[1]
