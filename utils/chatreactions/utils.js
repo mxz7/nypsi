@@ -307,7 +307,7 @@ async function startReaction(guild, channel) {
     embed.setTitle("chat reaction")
     embed.setDescription(`type: \`${displayWord}\``)
 
-    const msg = await channel.send(embed)
+    const msg = await channel.send({embeds: [embed]})
 
     const start = new Date().getTime()
 
@@ -324,7 +324,8 @@ async function startReaction(guild, channel) {
 
     const timeout = getReactionSettings(guild).timeout
 
-    const collector = channel.createMessageCollector(filter, {
+    const collector = channel.createMessageCollector({
+        filter,
         max: 3,
         time: timeout * 1000,
     })
@@ -378,7 +379,7 @@ async function startReaction(guild, channel) {
                             add3rdPlace(guild, winners.get(3).member)
                         }
 
-                        return await msg.edit(embed).catch(() => {
+                        return await msg.edit({embeds: [embed]}).catch(() => {
                             collector.stop()
                         })
                     }
@@ -401,7 +402,7 @@ async function startReaction(guild, channel) {
         })
         winnersIDs.push(message.author.id)
         if (!waiting) {
-            return await msg.edit(embed).catch(() => {
+            return await msg.edit({embeds: [embed]}).catch(() => {
                 collector.stop()
             })
         }
@@ -417,7 +418,7 @@ async function startReaction(guild, channel) {
             } else {
                 embed.setFooter(`ended with ${winners.size} winners`)
             }
-            await msg.edit(embed).catch(() => {})
+            await msg.edit({embeds: [embed]}).catch(() => {})
         }, 500)
     })
 }
