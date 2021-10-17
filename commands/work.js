@@ -49,11 +49,11 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) <= 0) {
-        return message.channel.send(new ErrorEmbed("you need money to work"))
+        return message.channel.send({embeds: [new ErrorEmbed("you need money to work")]})
     }
 
     if (getBalance(message.member) > 750000) {
-        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
+        return message.channel.send({embeds: [new ErrorEmbed("you're too rich for this command bro")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -99,7 +99,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({embeds: [embed]})
         }, 1500)
     })
 }
