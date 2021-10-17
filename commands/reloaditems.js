@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { loadItems } = require("../utils/economy/utils")
 
-const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message
