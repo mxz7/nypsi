@@ -283,7 +283,7 @@ async function run(message, args) {
         }
 
         for (const image of queue) {
-            if (embed.embed.fields.length >= 6) break
+            if (embed.fields.length >= 6) break
 
             embed.addField(
                 image.id,

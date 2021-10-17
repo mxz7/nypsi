@@ -114,7 +114,7 @@ async function run(message, args) {
         }
 
         for (const item in stats) {
-            if (embed.embed.fields.length >= 6) break
+            if (embed.fields.length >= 6) break
 
             embed.addField(
                 item,

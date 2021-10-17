@@ -364,7 +364,7 @@ async function startReaction(guild, channel) {
                     if (winners.size == 1) {
                         return
                     } else {
-                        const field = await embed.embed.fields.find((f) => f.name == "winners")
+                        const field = await embed.fields.find((f) => f.name == "winners")
 
                         field.value += `\n🥈 ${winners.get(2).mention} in \`${
                             winners.get(2).time
@@ -412,7 +412,7 @@ async function startReaction(guild, channel) {
         currentChannels.delete(channel.id)
         setTimeout(async () => {
             if (winners.size == 0) {
-                embed.setDescription(embed.embed.description + "\n\nnobody won ):")
+                embed.setDescription(embed.description + "\n\nnobody won ):")
             } else if (winners.size == 1) {
                 embed.setFooter("ended with 1 winner")
             } else {
