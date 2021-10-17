@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     userExists,
     createUser,
@@ -58,7 +58,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -80,7 +80,7 @@ async function run(message, args) {
                     "💰 **cash out** end the game and receive the current win\nmax win **15**x"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "info") {
@@ -93,7 +93,7 @@ async function run(message, args) {
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)"
         ).setTitle("highlow help")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {
@@ -107,35 +107,37 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}highlow <bet>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}highlow <bet>`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
+        })
     }
 
     if (games.has(message.member.user.id)) {
-        return message.channel.send(new ErrorEmbed("you are already playing highlow"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you are already playing highlow")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -228,30 +230,22 @@ async function run(message, args) {
 
     newCard(message.member)
 
-    const loadingEmbed = new CustomEmbed(message.member).setTitle(
-        "loading.. | " + message.member.user.username
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
     )
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
-    )
+    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setTitle("highlow | " + message.member.user.username)
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
-        .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
 
-    message.channel.send(loadingEmbed).then(async (m) => {
-        await m.react("⬆")
-        await m.react("⬇")
-        await m.react("💰")
-
-        await m.edit(embed)
+    message.channel.send({ embeds: [embed], components: [row] }).then((m) => {
         playGame(message, m).catch((e) => {
             console.error(e)
-            return message.channel.send(
-                new ErrorEmbed("an error occured while running - join support server")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("an error occured while running - join support server")],
+            })
         })
     })
 }
@@ -296,6 +290,12 @@ function getValue(member) {
     }
 }
 
+/**
+ *
+ * @param {Message} message
+ * @param {Message} m
+ * @returns
+ */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
 
@@ -303,9 +303,7 @@ async function playGame(message, m) {
     let win = games.get(message.member.user.id).win
     let card = games.get(message.member.user.id).card
 
-    const newEmbed = new CustomEmbed(message.member, true).setTitle(
-        "highlow | " + message.member.user.username
-    )
+    const newEmbed = new CustomEmbed(message.member, true).setTitle("highlow | " + message.member.user.username)
 
     const lose = async () => {
         gamble(message.author, "highlow", bet, false, 0)
@@ -323,8 +321,7 @@ async function playGame(message, m) {
         )
         newEmbed.addField("card", "| " + card + " |")
         games.delete(message.author.id)
-        await m.edit(newEmbed)
-        return m.reactions.removeAll()
+        return await m.edit({ embeds: [newEmbed], components: [] })
     }
 
     const win1 = async () => {
@@ -384,8 +381,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        await m.edit(newEmbed)
-        return m.reactions.removeAll()
+        return m.edit({ embeds: [newEmbed], components: [] })
     }
 
     const draw = async () => {
@@ -406,29 +402,27 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        await m.edit(newEmbed)
-        return m.reactions.removeAll()
+        return await m.edit({ embeds: [newEmbed], components: [] })
     }
 
     if (win == 15) {
         return win1()
     }
 
-    const filter = (reaction, user) => {
-        return ["⬆", "⬇", "💰"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
     let fail = false
 
     const reaction = await m
-        .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(() => {
             fail = true
             games.delete(message.author.id)
-            return message.channel.send(message.author.toString() + " highlow game expired")
+            return message.channel.send({ content: message.author.toString() + " highlow game expired" })
         })
 
     if (fail) return
@@ -457,32 +451,33 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             })
 
+            let row = new MessageActionRow().addComponents(
+                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            )
+
+            if (win >= 1) {
+                row = new MessageActionRow().addComponents(
+                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                )
+            }
+
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬆").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({ embeds: [newEmbed], components: [row] })
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬆").users.remove(message.member)
-            await m.edit(newEmbed)
+
+            await m.edit({ embeds: [newEmbed] })
             return playGame(message, m)
         } else {
             return lose()
@@ -509,39 +504,38 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             })
 
+            let row = new MessageActionRow().addComponents(
+                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            )
+
+            if (win >= 1) {
+                row = new MessageActionRow().addComponents(
+                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                )
+            }
+
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬇").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({ embeds: [newEmbed], components: [row] })
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬇").users.remove(message.member)
-            await m.edit(newEmbed)
+            await m.edit({ embeds: [newEmbed] })
             return playGame(message, m)
         } else {
             return lose()
         }
     } else if (reaction == "💰") {
         if (win < 1) {
-            await m.reactions.cache.get("💰").users.remove(message.member)
             return playGame(message, m)
         } else if (win == 1) {
             return draw()

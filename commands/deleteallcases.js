@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { deleteServer, profileExists } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -12,29 +12,25 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", catego
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (
-        message.member.hasPermission("MANAGE_MESSAGES") &&
-        message.guild.owner.user.id != message.member.user.id
+        message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
+        message.guild.ownerId != message.member.user.id
     ) {
         const embed = new ErrorEmbed("to delete all cases you must be the server owner")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild))
-        return await message.channel.send(new ErrorEmbed("there are no cases to delete"))
+        return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] })
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        "react with ✅ to delete all punishment/moderation cases"
-    )
+    const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
         .setTitle("confirmation")
         .setFooter("this cannot be reversed")
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     await msg.react("✅")
 
@@ -43,7 +39,7 @@ async function run(message, args) {
     }
 
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+        .awaitReactions({ filter, max: 1, time: 15000, errors: ["time"] })
         .then((collected) => {
             return collected.first().emoji.name
         })
@@ -54,13 +50,11 @@ async function run(message, args) {
     if (reaction == "✅") {
         deleteServer(message.guild)
 
-        const newEmbed = new CustomEmbed(
-            message.member,
-            false,
+        const newEmbed = new CustomEmbed(message.member, false, "✅ all cases have been deleted").setDescription(
             "✅ all cases have been deleted"
-        ).setDescription("✅ all cases have been deleted")
+        )
 
-        await msg.edit(newEmbed)
+        await msg.edit({ embeds: [newEmbed] })
     }
 }
 

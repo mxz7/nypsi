@@ -1,20 +1,18 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { newCase, profileExists, createProfile } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions([
-    "MANAGE_MESSAGES",
-])
+const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
@@ -32,12 +30,9 @@ async function run(message, args) {
                     "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n\n" +
                     "if the bot was unable to DM a user on warn, the warning will still be logged"
             )
-            .addField(
-                "examples",
-                `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`
-            )
+            .addField("examples", `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -53,9 +48,9 @@ async function run(message, args) {
         const member = members.find((m) => m.id == args[0])
 
         if (!member) {
-            return message.channel.send(
-                new ErrorEmbed("unable to find member with ID `" + args[0] + "`")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
+            })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -63,7 +58,7 @@ async function run(message, args) {
         const member = await getExactMember(message, args[0])
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("unable to find member `" + args[0] + "`"))
+            return message.channel.send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -78,7 +73,7 @@ async function run(message, args) {
         }
         reason = args.join(" ")
     } else {
-        return message.channel.send(new ErrorEmbed("you must include a warn reason"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you must include a warn reason")] })
     }
 
     let count = 0
@@ -87,14 +82,11 @@ async function run(message, args) {
 
     const messageDM = "you have been warned in **" + message.guild.name + "** for `" + reason + "`"
 
-    for (let member of members.keyArray()) {
+    for (let member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
-        if (
-            targetHighestRole.position >= memberHighestRole.position &&
-            message.guild.owner.user.id != message.member.user.id
-        ) {
+        if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
             failed.push(members.get(member).user)
         } else {
             const embed = new CustomEmbed(members.get(member))
@@ -103,7 +95,7 @@ async function run(message, args) {
 
             await members
                 .get(member)
-                .send(`you have been warned in ${message.guild.name}`, embed)
+                .send({ content: `you have been warned in ${message.guild.name}`, embeds: [embed] })
                 .catch(() => {
                     error.push(members.get(member).user)
                 })
@@ -111,19 +103,17 @@ async function run(message, args) {
         }
 
         if (members.get(member).user.id == message.client.user.id) {
-            await message.channel.send("wow... 😢")
+            await message.channel.send({ content: "wow... 😢" })
         }
     }
 
     if (count == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to warn any users"))
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to warn any users")] })
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        "✅ **" + count + "** members warned for: " + reason
-    ).setTitle("warn | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason).setTitle(
+        "warn | " + message.member.user.username
+    )
 
     if (count == 1 && failed.length == 0) {
         embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason)
@@ -149,12 +139,12 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send(embed).catch()
+        await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
-    const members1 = members.keyArray()
+    const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
         for (let fail of failed) {

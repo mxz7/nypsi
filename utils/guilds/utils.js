@@ -247,9 +247,13 @@ exports.getStatsProfile = getStatsProfile
  * @param {JSON} profile
  */
 function setStatsProfile(guild, profile) {
-    db.prepare(
-        "UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?"
-    ).run(profile.enabled ? 1 : 0, profile.format, profile.filter_bots, profile.channel, guild.id)
+    db.prepare("UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?").run(
+        profile.enabled ? 1 : 0,
+        profile.format,
+        profile.filter_bots,
+        profile.channel,
+        guild.id
+    )
 }
 
 exports.setStatsProfile = setStatsProfile
@@ -310,13 +314,7 @@ function checkStats() {
                     .edit({ name: format })
                     .then(() => {
                         info(
-                            "counter updated for '" +
-                                guild.name +
-                                "' ~ '" +
-                                old +
-                                "' -> '" +
-                                format +
-                                "'",
+                            "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
                             types.AUTOMATION
                         )
                     })
@@ -409,9 +407,7 @@ exports.setPrefix = setPrefix
  * @param {Guild} guild
  */
 function hasChristmasCountdown(guild) {
-    const query = db
-        .prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?")
-        .get(guild.id)
+    const query = db.prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     if (query) {
         return true
@@ -446,9 +442,12 @@ exports.getChristmasCountdown = getChristmasCountdown
  * @param {JSON} xmas
  */
 function setChristmasCountdown(guild, xmas) {
-    db.prepare(
-        "UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?"
-    ).run(xmas.enabled ? 1 : 0, xmas.format, xmas.channel, guild.id)
+    db.prepare("UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?").run(
+        xmas.enabled ? 1 : 0,
+        xmas.format,
+        xmas.channel,
+        guild.id
+    )
 }
 
 exports.setChristmasCountdown = setChristmasCountdown
@@ -458,9 +457,7 @@ exports.setChristmasCountdown = setChristmasCountdown
  * @param {Guild} guild
  */
 function hasChristmasCountdownEnabled(guild) {
-    const query = db
-        .prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?")
-        .get(guild.id)
+    const query = db.prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     if (query.enabled) {
         return true
@@ -498,9 +495,9 @@ async function checkChristmasCountdown(guild) {
     }
 
     return await channel
-        .send(
-            new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")
-        )
+        .send({
+            embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
+        })
         .then(() => {
             info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
         })
@@ -634,10 +631,7 @@ function addCountdown(guild, date, format, finalFormat, channel) {
 
     countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
 
-    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(
-        JSON.stringify(countdowns),
-        guild.id
-    )
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
 }
 
 exports.addCountdown = addCountdown
@@ -660,10 +654,7 @@ function deleteCountdown(guild, id) {
 
     delete countdowns[id]
 
-    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(
-        JSON.stringify(countdowns),
-        guildID
-    )
+    db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guildID)
 }
 
 exports.deleteCountdown = deleteCountdown
@@ -720,17 +711,12 @@ function runCountdowns(client) {
                 if (!channel) continue
 
                 await channel
-                    .send(embed)
+                    .send({ embeds: [embed] })
                     .then(() => {
-                        info(
-                            `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`,
-                            types.AUTOMATION
-                        )
+                        info(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`, types.AUTOMATION)
                     })
                     .catch(() => {
-                        error(
-                            `error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`
-                        )
+                        error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
                     })
 
                 if (days <= 0) {
@@ -792,12 +778,9 @@ function runChristmas(client) {
             }
 
             await channel
-                .send(
-                    new CustomEmbed()
-                        .setDescription(format)
-                        .setColor("#ff0000")
-                        .setTitle(":santa_tone1:")
-                )
+                .send({
+                    embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
+                })
                 .then(() => {
                     info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
                 })

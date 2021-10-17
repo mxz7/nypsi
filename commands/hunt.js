@@ -52,7 +52,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const inventory = getInventory(message.member)
@@ -69,7 +69,7 @@ async function run(message, args) {
     }
 
     if (!gun) {
-        return message.channel.send(new ErrorEmbed("you need a gun to hunt"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you need a gun to hunt")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -209,23 +209,19 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-            items[gun].name
-        }**`
+        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`
     )
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
             items[gun].name
-        }**\n\nyou killed${
-            foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
-        }`
+        }**\n\nyou killed${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`
     )
 
     setTimeout(() => {
-        msg.edit(embed)
+        msg.edit({ embeds: [embed] })
     }, 1500)
 }
 

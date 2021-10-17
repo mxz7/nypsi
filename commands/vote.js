@@ -43,7 +43,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -59,11 +59,7 @@ async function run(message, args) {
     const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "https://top.gg/bot/678711738845102087/vote"
-    )
+    const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
         .setFooter("you get increased rewards for prestiging")
 
@@ -87,7 +83,7 @@ async function run(message, args) {
         removeFromVoteCache(message.member)
     }
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

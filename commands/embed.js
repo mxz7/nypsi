@@ -1,20 +1,18 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions([
-    "MANAGE_MESSAGES",
-])
+const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
 
@@ -35,7 +33,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -46,8 +44,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
             .addField(
                 "help",
-                "with this command you can create a simple embed message\n" +
-                    "**<>** required | **()** optional\n"
+                "with this command you can create a simple embed message\n" + "**<>** required | **()** optional\n"
             )
             .addField(
                 "examples",
@@ -56,7 +53,7 @@ async function run(message, args) {
                     `${prefix}embed hello | this is a description | #13c696`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let mode = ""
@@ -97,12 +94,12 @@ async function run(message, args) {
     }
 
     message.channel
-        .send(embed)
+        .send({ embeds: [embed] })
         .then(() => {
             message.delete()
         })
         .catch((e) => {
-            message.channel.send(new ErrorEmbed(e))
+            message.channel.send({ embeds: [new ErrorEmbed(e)] })
         })
 }
 

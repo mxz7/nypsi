@@ -38,7 +38,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -54,11 +54,11 @@ async function run(message, args) {
             )
             .addField("example", `${prefix}ezpoll option1 option2`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length < 2) {
-        return message.channel.send(new ErrorEmbed("not enough options"))
+        return message.channel.send({ embeds: [new ErrorEmbed("not enough options")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -93,7 +93,7 @@ async function run(message, args) {
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
 
-    message.channel.send(embed).then(async (m) => {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
         if (args.length >= 2) {

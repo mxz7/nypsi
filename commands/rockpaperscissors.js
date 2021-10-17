@@ -21,11 +21,7 @@ const { gamble } = require("../utils/logger.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "rockpaperscissors",
-    "play rock paper scissors",
-    categories.MONEY
-).setAliases(["rps"])
+const cmd = new Command("rockpaperscissors", "play rock paper scissors", categories.MONEY).setAliases(["rps"])
 
 /**
  * @param {Message} message
@@ -58,7 +54,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) {
@@ -73,27 +69,19 @@ async function run(message, args) {
             .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
             .addField(
                 "help",
-                "rock paper scissors works exactly how this game does in real life\n" +
-                    "**2**x multiplier for winning"
+                "rock paper scissors works exactly how this game does in real life\n" + "**2**x multiplier for winning"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let choice = args[0]
     let memberEmoji = ""
 
-    if (
-        choice != "rock" &&
-        choice != "paper" &&
-        choice != "scissors" &&
-        choice != "r" &&
-        choice != "p" &&
-        choice != "s"
-    ) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+    if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
+        })
     }
 
     if (choice == "r") choice = "rock"
@@ -116,42 +104,44 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(
-                new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
+            })
         }
     }
 
     const bet = parseInt(args[1])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (!bet) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
+        })
     }
 
     if (bet <= 0) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
+        })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -208,10 +198,7 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(
-                message.member,
-                getBalance(message.member) + Math.round(winnings * voteMulti)
-            )
+            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
@@ -227,7 +214,7 @@ async function run(message, args) {
             bet.toLocaleString()
     ).setTitle("rock paper scissors | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             "**threw** " +
                 winning +
@@ -278,7 +265,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({ embeds: [embed] })
         }, 1500)
     })
 

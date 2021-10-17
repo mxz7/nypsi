@@ -8,11 +8,7 @@ const { inPlaceSort } = require("fast-sort")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "urban",
-    "get a definition from urban dictionary",
-    categories.INFO
-).setAliases(["define"])
+const cmd = new Command("urban", "get a definition from urban dictionary", categories.INFO).setAliases(["define"])
 
 /**
  * @param {Message} message
@@ -41,13 +37,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}urban <definition>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}urban <definition>`)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -57,7 +53,7 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     const results = await urban.define(args.join()).catch(() => {
-        return message.channel.send(new ErrorEmbed("unknown definition"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] })
     })
 
     inPlaceSort(results).desc((i) => i.thumbs_up)
@@ -67,18 +63,14 @@ async function run(message, args) {
     if (!result) return
     if (!result.word) return
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        result.definition + "\n\n" + result.example
-    )
+    const embed = new CustomEmbed(message.member, false, result.definition + "\n\n" + result.example)
         .setTitle(result.word)
         .setHeader("published by " + result.author)
         .addField("👍", result.thumbs_up.toLocaleString(), true)
         .addField("👎", result.thumbs_down.toLocaleString(), true)
         .setURL(result.permalink)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

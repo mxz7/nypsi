@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { loadItems } = require("../utils/economy/utils")
 
-const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message
@@ -14,7 +14,7 @@ async function run(message, args) {
 
     const d = loadItems()
 
-    return message.channel.send(new CustomEmbed(message.member, false, d))
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, false, d)] })
 }
 
 cmd.setRun(run)

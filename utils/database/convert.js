@@ -134,9 +134,12 @@ function convertGuilds() {
         )
 
         if (guild.xmas) {
-            db.prepare(
-                "INSERT INTO guilds_christmas (guild_id, enabled, format, channel) VALUES (?, ?, ?, ?)"
-            ).run(id, guild.xmas.enabled ? 1 : 0, guild.xmas.format, guild.xmas.channel)
+            db.prepare("INSERT INTO guilds_christmas (guild_id, enabled, format, channel) VALUES (?, ?, ?, ?)").run(
+                id,
+                guild.xmas.enabled ? 1 : 0,
+                guild.xmas.format,
+                guild.xmas.channel
+            )
         } else {
             db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(id)
         }
@@ -165,28 +168,23 @@ function convertModeration() {
         for (let case0 of cases) {
             db.prepare(
                 "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            ).run(
-                case0.id,
-                case0.type,
-                case0.user,
-                case0.moderator,
-                case0.command,
-                case0.time,
-                case0.deleted ? 1 : 0,
+            ).run(case0.id, case0.type, case0.user, case0.moderator, case0.command, case0.time, case0.deleted ? 1 : 0, id)
+        }
+
+        for (let mute of mutes) {
+            db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(
+                mute.user,
+                mute.unmuteTime,
                 id
             )
         }
 
-        for (let mute of mutes) {
-            db.prepare(
-                "INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)"
-            ).run(mute.user, mute.unmuteTime, id)
-        }
-
         for (let ban of bans) {
-            db.prepare(
-                "INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)"
-            ).run(ban.user, ban.unbanTime, id)
+            db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(
+                ban.user,
+                ban.unbanTime,
+                id
+            )
         }
     }
 }

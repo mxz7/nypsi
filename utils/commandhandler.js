@@ -1,24 +1,11 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
-const { Message, Client } = require("discord.js")
-const {
-    getPrefix,
-    getDisabledCommands,
-    getChatFilter,
-    hasGuild,
-    createGuild,
-} = require("../utils/guilds/utils")
+const { Message, Client, MessageActionRow, MessageButton } = require("discord.js")
+const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const {
-    MStoTime,
-    getNews,
-    formatDate,
-    isLockedOut,
-    createCaptcha,
-    toggleLock,
-} = require("./utils.js")
+const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
@@ -26,6 +13,7 @@ const { start } = require("repl")
 const commands = new Map()
 const aliases = new Map()
 const popularCommands = new Map()
+const noLifers = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 const handcuffs = new Map()
@@ -64,9 +52,7 @@ function loadCommands() {
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
                             error(
-                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
-                                    command.name
-                                }] - not overwriting`
+                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`
                             )
                         } else {
                             aliases.set(a, command.name)
@@ -113,12 +99,7 @@ function reloadCommand(commandsArray) {
 
             let enabled = true
 
-            if (
-                !commandData.name ||
-                !commandData.description ||
-                !commandData.run ||
-                !commandData.category
-            ) {
+            if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
                 enabled = false
             }
 
@@ -196,9 +177,7 @@ async function helpCmd(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(
-        prefix + "help <command> | get info about a command"
-    )
+    const embed = new CustomEmbed(message.member).setFooter(prefix + "help <command> | get info about a command")
 
     /**
      * FINDING WHAT THE USER REQUESTED
@@ -227,9 +206,7 @@ async function helpCmd(message, args) {
                 `my prefix for this server is \`${prefix}\``
         )
         embed.addField("command categories", categoriesMsg, true)
-        embed.setThumbnail(
-            message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
-        )
+        embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
         if (news.text != "") {
             embed.addField("news", `${news.text} - *${lastSet}*`)
@@ -251,7 +228,7 @@ async function helpCmd(message, args) {
             }
 
             embed.setTitle(`${args[0].toLowerCase()} commands`)
-            embed.setDescription(pages.get(1))
+            embed.setDescription(pages.get(1).join("\n"))
             embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd
@@ -263,14 +240,7 @@ async function helpCmd(message, args) {
             }
 
             let desc =
-                "**name** " +
-                cmd.name +
-                "\n" +
-                "**description** " +
-                cmd.description +
-                "\n" +
-                "**category** " +
-                cmd.category
+                "**name** " + cmd.name + "\n" + "**description** " + cmd.description + "\n" + "**category** " + cmd.category
 
             if (cmd.permissions) {
                 desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`"
@@ -283,9 +253,7 @@ async function helpCmd(message, args) {
             embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
         } else if (getCommand(args[0].toLowerCase())) {
-            const member = await message.guild.members.cache.find(
-                (m) => m.id == getCommand(args[0].toLowerCase()).owner
-            )
+            const member = await message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner)
             embed.setTitle("custom command")
             embed.setDescription(
                 `this is a custom command${
@@ -295,34 +263,42 @@ async function helpCmd(message, args) {
                 )}disablecmd + customcommand`
             )
         } else {
-            return message.channel.send(new ErrorEmbed("unknown command"))
+            return message.channel.send({ embeds: [new ErrorEmbed("unknown command")] })
         }
     }
 
-    const msg = await message.channel.send(embed)
+    /**
+     * @type {Message}
+     */
+    let msg
 
-    if (!pageSystemNeeded) return
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
+
+    if (pageSystemNeeded) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
+    }
 
     const pages = helpCategories.get(args[0].toLowerCase())
-
-    await msg.react("⬅")
-    await msg.react("➡")
 
     let currentPage = 1
     const lastPage = pages.size
 
-    const filter = (reaction, user) => {
-        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
-    async function pageManager() {
+    const pageManager = async () => {
         const reaction = await msg
-            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name
+            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                await collected.deferUpdate()
+                return collected.customId
             })
             .catch(async () => {
-                await msg.reactions.removeAll()
+                await msg.edit({ components: [] })
             })
 
         if (!reaction) return
@@ -334,7 +310,18 @@ async function helpCmd(message, args) {
                 currentPage--
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit(embed)
+                if (currentPage == 1) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -344,7 +331,18 @@ async function helpCmd(message, args) {
                 currentPage++
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit(embed)
+                if (currentPage == lastPage) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         }
@@ -371,10 +369,11 @@ async function runCommand(cmd, message, args) {
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
-        return message.channel.send(
-            "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
-                "if this error still shows, check channel specific permissions"
-        )
+        return message.channel.send({
+            content:
+                "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+                "if this error still shows, check channel specific permissions",
+        })
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
@@ -386,18 +385,19 @@ async function runCommand(cmd, message, args) {
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
-        return message.channel.send(
-            "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+        return message.channel.send({
+            content:
+                "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
                 "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
-                "if this error still shows, check channel specific permissions"
-        )
+                "if this error still shows, check channel specific permissions",
+        })
     }
 
     if (restarting) {
         if (message.author.id == "672793821850894347") {
             message.react("💀")
         } else {
-            return message.channel.send(new ErrorEmbed("nypsi is restarting.."))
+            return message.channel.send({ embeds: [new ErrorEmbed("nypsi is restarting..")] })
         }
     }
 
@@ -426,9 +426,9 @@ async function runCommand(cmd, message, args) {
             }, 1500)
 
             if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
-                return message.channel.send(
-                    new ErrorEmbed("custom commands have been disabled in this server")
-                )
+                return message.channel.send({
+                    embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
+                })
             }
 
             const filter = getChatFilter(message.guild)
@@ -441,9 +441,9 @@ async function runCommand(cmd, message, args) {
 
             for (const word of filter) {
                 if (content.indexOf(word.toLowerCase()) != -1) {
-                    return message.channel.send(
-                        new ErrorEmbed("this custom command is not allowed in this server")
-                    )
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
+                    })
                 }
             }
 
@@ -456,7 +456,7 @@ async function runCommand(cmd, message, args) {
                 `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         } else {
             alias = true
         }
@@ -481,7 +481,7 @@ async function runCommand(cmd, message, args) {
 
         beingChecked.push(message.author.id)
 
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
 
         info(`sent captcha (${message.author.id}) - awaiting reply`)
 
@@ -490,17 +490,17 @@ async function runCommand(cmd, message, args) {
         let fail = false
 
         const response = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
             .then(async (collected) => {
                 return collected.first().content.toLowerCase()
             })
             .catch(() => {
                 fail = true
                 info(`captcha (${message.author.id}) failed`)
-                return message.channel.send(
-                    message.author.toString() +
-                        " captcha failed, please **type** the letter/number combination shown"
-                )
+                return message.channel.send({
+                    content:
+                        message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+                })
             })
 
         beingChecked.splice(beingChecked.indexOf(message.author.id), 1)
@@ -515,10 +515,9 @@ async function runCommand(cmd, message, args) {
             return message.react("✅")
         } else {
             info(`captcha (${message.author.id}) failed`)
-            return message.channel.send(
-                message.author.toString() +
-                    " captcha failed, please **type** the letter/number combination shown"
-            )
+            return message.channel.send({
+                content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+            })
         }
     }
 
@@ -528,10 +527,7 @@ async function runCommand(cmd, message, args) {
             if (commands.get(aliases.get(cmd)).category == "money") {
                 return
             }
-        } else if (
-            commands.get(aliases.get(cmd)).category == "money" &&
-            handcuffs.has(message.author.id)
-        ) {
+        } else if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
@@ -548,15 +544,15 @@ async function runCommand(cmd, message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send(
-                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+            })
         }
 
-        updatePopularCommands(commands.get(aliases.get(cmd)).name)
+        updatePopularCommands(commands.get(aliases.get(cmd)).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
-            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(aliases.get(cmd)).run(message, args)
     } else {
@@ -581,15 +577,15 @@ async function runCommand(cmd, message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send(
-                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+            })
         }
 
-        updatePopularCommands(commands.get(cmd).name)
+        updatePopularCommands(commands.get(cmd).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
-            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(cmd).run(message, args)
     }
@@ -700,12 +696,19 @@ function logCommand(message, args) {
 
 /**
  * @param {String} command
+ * @param {String} tag
  */
-function updatePopularCommands(command) {
+function updatePopularCommands(command, tag) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1)
     } else {
         popularCommands.set(command, 1)
+    }
+
+    if (noLifers.has(tag)) {
+        noLifers.set(tag, noLifers.get(tag) + 1)
+    } else {
+        noLifers.set(tag, 1)
     }
 }
 
@@ -740,6 +743,8 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
 
+        const sortedNoLifers = new Map([...noLifers.entries()].sort((a, b) => b[1] - a[1]))
+
         let msg = ""
         let count = 1
 
@@ -768,12 +773,17 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
         if (client.uptime < 86400 * 1000) {
             embed.setFooter("data is from less than 24 hours")
+        } else {
+            const noLifer = sortedNoLifers.keys().next().value
+
+            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer)} commands)`)
         }
 
-        await channel.send(embed)
+        await channel.send({ embeds: [embed] })
         info("sent popular commands", types.AUTOMATION)
 
         popularCommands.clear()
+        noLifers.clear()
     }
 
     setTimeout(async () => {

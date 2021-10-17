@@ -4,7 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { startRestart } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 
-const cmd = new Command("shutdown", "shutdown bot", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("shutdown", "shutdown bot", categories.NONE).setPermissions(["bot owner"])
 
 let confirm = false
 
@@ -20,9 +20,9 @@ async function run(message, args) {
         setTimeout(() => {
             confirm = false
         }, 120000)
-        return message.channel.send(
-            new CustomEmbed(message.member, false, "run command again to confirm")
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "run command again to confirm")],
+        })
     } else {
         startRestart()
 
@@ -33,9 +33,9 @@ async function run(message, args) {
             process.exit()
         }, 60000)
 
-        return message.channel.send(
-            new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")],
+        })
     }
 }
 

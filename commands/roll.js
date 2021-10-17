@@ -14,20 +14,22 @@ async function run(message, args) {
     if (args.length != 0) {
         if (parseInt(args[0])) {
             if (parseInt(args[0]) < 2 || parseInt(args[0]) > 1000000000) {
-                return message.channel.send(new ErrorEmbed("invalid range"))
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid range")] })
             } else {
                 range = parseInt(args[0])
             }
         }
     }
 
-    return message.channel.send(
-        new CustomEmbed(
-            message.member,
-            false,
-            "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
-        )
-    )
+    return message.channel.send({
+        embeds: [
+            new CustomEmbed(
+                message.member,
+                false,
+                "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
+            ),
+        ],
+    })
 }
 
 cmd.setRun(run)

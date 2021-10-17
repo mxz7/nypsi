@@ -22,11 +22,7 @@ ranks.set("MVP", "MVP")
 ranks.set("VIP_PLUS", "VIP+")
 ranks.set("VIP", "VIP")
 
-const cmd = new Command(
-    "hypixel",
-    "view hypixel stats for a minecraft account",
-    categories.MINECRAFT
-).setAliases(["h"])
+const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", categories.MINECRAFT).setAliases(["h"])
 
 /**
  * @param {Message} message
@@ -36,7 +32,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}h <username>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}h <username>`)] })
     }
 
     let cooldownLength = 10
@@ -63,7 +59,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -86,7 +82,7 @@ async function run(message, args) {
         try {
             uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json())
         } catch (e) {
-            return message.channel.send(new ErrorEmbed("invalid account"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] })
         }
 
         const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
@@ -95,11 +91,11 @@ async function run(message, args) {
             hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json())
         } catch (e) {
             console.log(e)
-            return await message.channel.send(new ErrorEmbed("error fetching data"))
+            return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] })
         }
 
         if (!hypixelData.success) {
-            return await message.channel.send(new ErrorEmbed("error fetching data"))
+            return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] })
         }
 
         cache.set(username.toLowerCase(), {
@@ -187,7 +183,7 @@ async function run(message, args) {
         if (cache.has(username.toLowerCase())) {
             cache.delete(username.toLowerCase())
         }
-        return message.channel.send(new ErrorEmbed("error reading hypixel data"))
+        return message.channel.send({ embeds: [new ErrorEmbed("error reading hypixel data")] })
     }
 
     const embed = new CustomEmbed(message.member, true)
@@ -201,7 +197,7 @@ async function run(message, args) {
         .setURL(url)
         .setThumbnail(skin)
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
@@ -209,9 +205,7 @@ cmd.setRun(run)
 module.exports = cmd
 
 function getLevel(exp) {
-    return exp < 0
-        ? 1
-        : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp))
+    return exp < 0 ? 1 : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp))
 }
 
 function timeSince(date) {

@@ -52,7 +52,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const inventory = getInventory(message.member)
@@ -69,7 +69,7 @@ async function run(message, args) {
     }
 
     if (!fishingRod) {
-        return message.channel.send(new ErrorEmbed("you need a fishing rod to fish"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you need a fishing rod to fish")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -282,13 +282,9 @@ async function run(message, args) {
     }
     setInventory(message.member, inventory)
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `you go to the pond and cast your **${items[fishingRod].name}**`
-    )
+    const embed = new CustomEmbed(message.member, false, `you go to the pond and cast your **${items[fishingRod].name}**`)
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${
@@ -297,7 +293,7 @@ async function run(message, args) {
     )
 
     setTimeout(() => {
-        msg.edit(embed)
+        msg.edit({ embeds: [embed] })
     }, 1500)
 }
 

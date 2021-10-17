@@ -8,10 +8,7 @@ const { getMember } = require("../utils/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases([
-    "howfurry",
-    "stfufurry",
-])
+const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases(["howfurry", "stfufurry"])
 
 /**
  * @param {Message} message
@@ -41,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -62,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -132,7 +129,7 @@ async function run(message, args) {
         embed.setFooter("+1xp")
     }
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

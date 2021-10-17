@@ -24,12 +24,7 @@ function createUsernameProfile(member, tag, url) {
         Date.now()
     )
     if (url)
-        db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(
-            id,
-            url,
-            "avatar",
-            Date.now()
-        )
+        db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(id, url, "avatar", Date.now())
 }
 
 exports.createUsernameProfile = createUsernameProfile
@@ -117,12 +112,7 @@ function addNewUsername(member, username) {
 
     if (member.user) id = member.user.id
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(
-        id,
-        "username",
-        username,
-        Date.now()
-    )
+    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "username", username, Date.now())
 
     if (usernameCache.has(id)) {
         usernameCache.delete(id)
@@ -144,9 +134,7 @@ function fetchUsernameHistory(member) {
         return usernameCache.get(id)
     }
 
-    const query = db
-        .prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'")
-        .all(id)
+    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'").all(id)
 
     inPlaceSort(query).desc((u) => u.date)
 
@@ -168,10 +156,7 @@ function clearUsernameHistory(member) {
 
     const current = fetchUsernameHistory(id)[0].value
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(
-        id,
-        current
-    )
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(id, current)
 
     if (usernameCache.has(id)) {
         usernameCache.delete(id)
@@ -190,12 +175,7 @@ function addNewAvatar(member, url) {
 
     if (member.user) id = member.user.id
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(
-        id,
-        "avatar",
-        url,
-        Date.now()
-    )
+    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "avatar", url, Date.now())
 
     if (avatarCache.has(id)) {
         avatarCache.delete(id)
@@ -217,9 +197,7 @@ function fetchAvatarHistory(member) {
         return avatarCache.get(id)
     }
 
-    const query = db
-        .prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'")
-        .all(id)
+    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'").all(id)
 
     inPlaceSort(query).desc((u) => u.date)
 
@@ -241,10 +219,7 @@ function clearAvatarHistory(member) {
 
     const current = fetchAvatarHistory(id)[0].value
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar' AND value != ?").run(
-        id,
-        current
-    )
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar' AND value != ?").run(id, current)
 
     if (avatarCache.has(id)) {
         avatarCache.delete(id)
