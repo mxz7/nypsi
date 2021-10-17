@@ -169,7 +169,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     } else {
-                        let row = new MessageActionRow().addComponents(
+                        row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
