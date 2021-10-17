@@ -724,7 +724,7 @@ async function run(message, args) {
                                 currentPage--
                                 embed.setDescription(pages.get(currentPage).join("\n"))
                                 embed.setFooter("page " + currentPage + "/" + lastPage)
-                                await msg.edit(embed)
+                                await msg.edit({embeds: [embed]})
                                 return pageManager()
                             }
                         } else if (reaction == "➡") {
@@ -734,7 +734,7 @@ async function run(message, args) {
                                 currentPage++
                                 embed.setDescription(pages.get(currentPage).join("\n"))
                                 embed.setFooter("page " + currentPage + "/" + lastPage)
-                                await msg.edit(embed)
+                                await msg.edit({embeds: [embed]})
                                 return pageManager()
                             }
                         }

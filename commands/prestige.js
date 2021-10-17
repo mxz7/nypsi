@@ -103,7 +103,7 @@ async function run(message, args) {
         .catch(async () => {
             await msg.reactions.removeAll()
             embed.setDescription("❌ expired")
-            await msg.edit(embed)
+            await msg.edit({embeds: [embed]})
             cooldown.delete(message.author.id)
         })
 
@@ -168,7 +168,7 @@ async function run(message, args) {
                 )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
-        await msg.edit(embed)
+        await msg.edit({embeds: [embed]})
     }
 }
 
