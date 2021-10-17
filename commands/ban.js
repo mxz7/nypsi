@@ -120,7 +120,7 @@ async function run(message, args) {
 
             if (
                 targetHighestRole.position >= memberHighestRole.position &&
-                message.guild.owner.user.id != message.member.user.id
+                message.guild.ownerId != message.member.user.id
             ) {
                 failed.push(members.get(member).user)
                 continue
