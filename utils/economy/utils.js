@@ -314,7 +314,7 @@ exports.hasVoted = hasVoted
  * @param {GuildMember} member
  * @returns {Number}
  */
-async function getMulti(member) {
+function getMulti(member) {
     let id = member
 
     if (member.user) id = member.user.id
