@@ -45,9 +45,7 @@ module.exports = async (oldMember, newMember) => {
             ) {
                 if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return
                 if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return
-                if (newMember.roles.cache.find((r) => r.id == "819870727834566696"))
-
-                expireUser(newMember.id)
+                if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) expireUser(newMember.id)
             }
         }
     }
