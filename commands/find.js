@@ -29,7 +29,9 @@ async function run(message, args) {
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
 
-        embed.setDescription("$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top")
+        embed.setDescription(
+            "$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top"
+        )
 
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "gid") {
@@ -73,7 +75,7 @@ async function run(message, args) {
 
         const embed = new CustomEmbed(message.member, false, balTop.join("\n")).setTitle("top " + balTop.length)
 
-        return message.channel.send({embeds: [embed]})
+        return message.channel.send({ embeds: [embed] })
     }
 }
 
@@ -158,7 +160,8 @@ async function showUser(message, user) {
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}
             **prestige** ${getPrestige(user.id)}
-            **bonus** ${Math.floor(getMulti(user.id) * 100)}%`, true
+            **bonus** ${Math.floor(getMulti(user.id) * 100)}%`,
+            true
         )
     }
 
@@ -166,7 +169,7 @@ async function showUser(message, user) {
         embed.addField("guilds", guilds.join(" "))
     }
 
-    return message.channel.send({embeds: [embed]})
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
