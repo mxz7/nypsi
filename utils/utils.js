@@ -458,7 +458,7 @@ async function showTopGlobalBal(client) {
         embed.setDescription(baltop)
         embed.setColor("#111111")
 
-        await channel.send(embed)
+        await channel.send({embeds: [embed]})
         info("sent global bal top", types.AUTOMATION)
     }
 
@@ -558,7 +558,7 @@ async function suggestWholesomeImage(submitter, image) {
 
     embed.setImage(image)
 
-    await wholesomeWebhook.send(embed)
+    await wholesomeWebhook.send({embeds: [embed]})
 
     return true
 }
