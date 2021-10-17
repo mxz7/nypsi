@@ -37,16 +37,12 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `[**#${color}**](https://color.tekoh.net/#${color})`
-    )
+    const embed = new CustomEmbed(message.member, false, `[**#${color}**](https://color.tekoh.net/#${color})`)
 
     try {
         embed.setColor(color)
     } catch {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid color")] })
     }
 
     if (member) {
@@ -56,7 +52,7 @@ async function run(message, args) {
     }
 
     return await message.channel.send({ embeds: [embed] }).catch(() => {
-        message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
+        message.channel.send({ embeds: [new ErrorEmbed("invalid color")] })
     })
 }
 

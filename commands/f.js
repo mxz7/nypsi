@@ -40,7 +40,7 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you need to pay respects to something")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you need to pay respects to something")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -59,11 +59,7 @@ async function run(message, args) {
         content = content.substr(0, 50)
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `press **F** to pay your respects to **${content}**`
-    )
+    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`)
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
@@ -73,10 +69,9 @@ async function run(message, args) {
 
     const reactions = []
 
-    const collector = message.channel.createMessageComponentCollector({time: 60000 })
+    const collector = message.channel.createMessageComponentCollector({ time: 60000 })
 
-    collector.on("collect", async i => {
-
+    collector.on("collect", async (i) => {
         if (reactions.includes(i.user.id)) return
 
         i.deferUpdate()

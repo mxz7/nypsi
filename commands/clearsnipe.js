@@ -18,17 +18,17 @@ async function run(message, args) {
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
-            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
         }
         channel = message.mentions.channels.first()
         if (!channel) {
-            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
         }
     }
 
     if (!snipe || (!snipe.get(channel.id) && (!eSnipe || !eSnipe.get(channel.id)))) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("nothing has been sniped in " + channel.toString())]
+            embeds: [new ErrorEmbed("nothing has been sniped in " + channel.toString())],
         })
     }
 
@@ -36,7 +36,7 @@ async function run(message, args) {
     eSnipe.delete(channel.id)
 
     return message.channel.send({
-        embeds: [new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())]
+        embeds: [new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())],
     })
 }
 

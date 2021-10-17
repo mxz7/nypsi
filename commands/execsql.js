@@ -4,9 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getDatabase } = require("../utils/database/database")
 const { createCaptcha } = require("../utils/utils")
 
-const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions([
-    "bot owner",
-])
+const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions(["bot owner"])
 
 /**
  *
@@ -43,12 +41,12 @@ async function run(message, args) {
     response = response.first().content
 
     if (response != captcha.answer) {
-        return message.channel.send({embeds: [new ErrorEmbed("captcha failed")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("captcha failed")] })
     } else {
         const d = query.run()
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `made \`${d.changes}\` changes`)]
+            embeds: [new CustomEmbed(message.member, false, `made \`${d.changes}\` changes`)],
         })
     }
 }

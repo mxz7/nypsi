@@ -24,16 +24,16 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", ca
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
         }
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`)]
+            embeds: [new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`)],
         })
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")]
+            embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")],
         })
     }
 
@@ -69,7 +69,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "enable") {
         if (profile.enabled) {
-            return message.channel.send({embeds: [new ErrorEmbed("already enabled")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("already enabled")] })
         }
 
         let channel
@@ -81,13 +81,13 @@ async function run(message, args) {
                 if (message.mentions.channels.first()) {
                     channel = message.mentions.channels.first()
                 } else {
-                    return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
                 }
             } else {
                 const c = message.guild.channels.find((c) => c.id == args[1])
 
                 if (!c) {
-                    return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
                 } else {
                     channel = c
                 }
@@ -95,7 +95,7 @@ async function run(message, args) {
         }
 
         if (!channel) {
-            return message.channel.send({embeds: [new ErrorEmbed("error creating/getting channel")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("error creating/getting channel")] })
         }
 
         profile.enabled = 1
@@ -109,16 +109,16 @@ async function run(message, args) {
 
         if (!profile.enabled) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")]
+                embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")],
             })
         }
 
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown enabled")]
+            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown enabled")],
         })
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
-            return message.channel.send({embeds: [new ErrorEmbed("already disabled")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("already disabled")] })
         }
 
         profile.enabled = 0
@@ -127,7 +127,7 @@ async function run(message, args) {
         setChristmasCountdown(message.guild, profile)
 
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown disabled")]
+            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown disabled")],
         })
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
@@ -151,11 +151,11 @@ async function run(message, args) {
         const newFormat = args.join(" ")
 
         if (!newFormat.includes("%days%")) {
-            return message.channel.send({embeds: [new ErrorEmbed("format must include %days%")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("format must include %days%")] })
         }
 
         if (newFormat.length > 250) {
-            return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 250 characters")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 250 characters")] })
         }
 
         profile.format = newFormat
@@ -175,14 +175,12 @@ async function run(message, args) {
 
             if (!profile.enabled) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")]
+                    embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")],
                 })
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ format updated").setTitle(
-            "christmas countdown"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ format updated").setTitle("christmas countdown")
 
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "channel") {
@@ -205,13 +203,13 @@ async function run(message, args) {
             if (message.mentions.channels.first()) {
                 channel = message.mentions.channels.first()
             } else {
-                return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
             }
         } else {
             const c = message.guild.channels.find((c) => c.id == args[1])
 
             if (!c) {
-                return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
             } else {
                 channel = c
             }
@@ -219,7 +217,7 @@ async function run(message, args) {
 
         if (profile.channel == channel.id) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("channel must be different to current channel")]
+                embeds: [new ErrorEmbed("channel must be different to current channel")],
             })
         }
 
@@ -234,14 +232,12 @@ async function run(message, args) {
 
             if (!profile.enabled) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")]
+                    embeds: [new ErrorEmbed("error sending message: check permissions for nypsi")],
                 })
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setTitle(
-            "christmas countdown"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setTitle("christmas countdown")
 
         return message.channel.send({ embeds: [embed] })
     } else {

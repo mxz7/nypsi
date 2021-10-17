@@ -33,9 +33,7 @@ async function run(message, args) {
     const bots = members.filter((member) => member.user.bot)
 
     if (args.length == 1 && args[0] == "-id") {
-        const embed = new CustomEmbed(message.member)
-            .setTitle(server.name)
-            .setDescription("`" + server.id + "`")
+        const embed = new CustomEmbed(message.member).setTitle(server.name).setDescription("`" + server.id + "`")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -62,11 +60,7 @@ async function run(message, args) {
 
         .addField(
             "info",
-            "**owner** " +
-                server.members.cache.get(server.ownerId).user.tag +
-                "\n" +
-                "**created** " +
-                created,
+            "**owner** " + server.members.cache.get(server.ownerId).user.tag + "\n" + "**created** " + created,
             true
         )
 

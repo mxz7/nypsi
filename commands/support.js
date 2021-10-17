@@ -10,7 +10,7 @@ const cmd = new Command("support", "join the nypsi support server", categories.I
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    return message.channel.send({content: "discord.gg/hJTDNST"})
+    return message.channel.send({ content: "discord.gg/hJTDNST" })
 }
 
 cmd.setRun(run)

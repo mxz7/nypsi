@@ -2,23 +2,10 @@ const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
 const { Message, Client, MessageActionRow, MessageButton } = require("discord.js")
-const {
-    getPrefix,
-    getDisabledCommands,
-    getChatFilter,
-    hasGuild,
-    createGuild,
-} = require("../utils/guilds/utils")
+const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
-const {
-    MStoTime,
-    getNews,
-    formatDate,
-    isLockedOut,
-    createCaptcha,
-    toggleLock,
-} = require("./utils.js")
+const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
 const { info, types, error } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
@@ -65,9 +52,7 @@ function loadCommands() {
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
                             error(
-                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
-                                    command.name
-                                }] - not overwriting`
+                                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`
                             )
                         } else {
                             aliases.set(a, command.name)
@@ -114,12 +99,7 @@ function reloadCommand(commandsArray) {
 
             let enabled = true
 
-            if (
-                !commandData.name ||
-                !commandData.description ||
-                !commandData.run ||
-                !commandData.category
-            ) {
+            if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
                 enabled = false
             }
 
@@ -390,8 +370,9 @@ async function runCommand(cmd, message, args) {
 
     if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
         return message.channel.send({
-            content: "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
-                "if this error still shows, check channel specific permissions"
+            content:
+                "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+                "if this error still shows, check channel specific permissions",
         })
     }
 
@@ -405,9 +386,10 @@ async function runCommand(cmd, message, args) {
 
     if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
         return message.channel.send({
-            content: "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+            content:
+                "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
                 "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
-                "if this error still shows, check channel specific permissions"
+                "if this error still shows, check channel specific permissions",
         })
     }
 
@@ -415,7 +397,7 @@ async function runCommand(cmd, message, args) {
         if (message.author.id == "672793821850894347") {
             message.react("💀")
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed("nypsi is restarting..")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("nypsi is restarting..")] })
         }
     }
 
@@ -445,7 +427,7 @@ async function runCommand(cmd, message, args) {
 
             if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("custom commands have been disabled in this server")]
+                    embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
                 })
             }
 
@@ -460,7 +442,7 @@ async function runCommand(cmd, message, args) {
             for (const word of filter) {
                 if (content.indexOf(word.toLowerCase()) != -1) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("this custom command is not allowed in this server")]
+                        embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
                     })
                 }
             }
@@ -516,8 +498,8 @@ async function runCommand(cmd, message, args) {
                 fail = true
                 info(`captcha (${message.author.id}) failed`)
                 return message.channel.send({
-                    content: message.author.toString() +
-                        " captcha failed, please **type** the letter/number combination shown"
+                    content:
+                        message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
                 })
             })
 
@@ -534,8 +516,7 @@ async function runCommand(cmd, message, args) {
         } else {
             info(`captcha (${message.author.id}) failed`)
             return message.channel.send({
-                content: message.author.toString() +
-                    " captcha failed, please **type** the letter/number combination shown"
+                content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
             })
         }
     }
@@ -546,10 +527,7 @@ async function runCommand(cmd, message, args) {
             if (commands.get(aliases.get(cmd)).category == "money") {
                 return
             }
-        } else if (
-            commands.get(aliases.get(cmd)).category == "money" &&
-            handcuffs.has(message.author.id)
-        ) {
+        } else if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
@@ -567,14 +545,14 @@ async function runCommand(cmd, message, args) {
             }
 
             return message.channel.send({
-                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)]
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
             })
         }
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
-            return message.channel.send({embeds: [new ErrorEmbed("that command has been disabled")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(aliases.get(cmd)).run(message, args)
     } else {
@@ -600,14 +578,14 @@ async function runCommand(cmd, message, args) {
             }
 
             return message.channel.send({
-                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)]
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
             })
         }
 
         updatePopularCommands(commands.get(cmd).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
-            return message.channel.send({embeds: [new ErrorEmbed("that command has been disabled")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(cmd).run(message, args)
     }
@@ -801,7 +779,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer)} commands)`)
         }
 
-        await channel.send({embeds: [embed]})
+        await channel.send({ embeds: [embed] })
         info("sent popular commands", types.AUTOMATION)
 
         popularCommands.clear()

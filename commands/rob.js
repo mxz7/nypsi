@@ -77,9 +77,11 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `you have been reported to the police, they will continue looking for you for **${remaining}**`
-            )]
+            embeds: [
+                new ErrorEmbed(
+                    `you have been reported to the police, they will continue looking for you for **${remaining}**`
+                ),
+            ],
         })
     }
 
@@ -102,7 +104,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (message.guild.id == "747056029795221513") {
-        return message.channel.send({embeds: [new ErrorEmbed("this has been disabled in the support server")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
     }
 
     let target = message.mentions.members.first()
@@ -112,27 +114,27 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (target.user.bot) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (message.member == target) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cant rob yourself")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cant rob yourself")] })
     }
 
     if (!userExists(target) || getBalance(target) <= 500) {
-        return message.channel.send({embeds: [new ErrorEmbed("this user doesnt have sufficient funds")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] })
     }
 
     if (getBalance(message.member) < 750) {
-        return message.channel.send({embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] })
     }
 
     const date = new Date()
@@ -145,17 +147,13 @@ async function run(message, args) {
         }
     }, cooldownLength * 1000)
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "robbing " + target.user.toString() + ".."
-    ).setTitle("robbery | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setTitle(
+        "robbery | " + message.member.user.username
+    )
 
-    const embed2 = new CustomEmbed(
-        message.member,
-        true,
-        "robbing " + target.user.toString() + ".."
-    ).setTitle("robbery | " + message.member.user.username)
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setTitle(
+        "robbery | " + message.member.user.username
+    )
 
     const embed3 = new CustomEmbed().setFooter("use $optout to optout of bot dms")
 
@@ -200,10 +198,7 @@ async function run(message, args) {
         const amountMoney = Math.round(getBalance(target) * (amount / 100))
 
         embed2.setColor("#e4334f")
-        embed2.addField(
-            "fail!!",
-            "**" + target.user.tag + "** had a padlock, which has now been broken"
-        )
+        embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken")
 
         embed3.setTitle("you were nearly robbed")
         embed3.setColor("#5efb8f")
@@ -230,10 +225,7 @@ async function run(message, args) {
             updateBalance(message.member, getBalance(message.member) + amountMoney)
 
             embed2.setColor("#5efb8f")
-            embed2.addField(
-                "success!!",
-                "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
-            )
+            embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
 
             const voted = hasVoted(message.member)
 
@@ -293,10 +285,7 @@ async function run(message, args) {
             } else {
                 updateBalance(target, getBalance(target) + amountMoney)
                 updateBalance(message.member, getBalance(message.member) - amountMoney)
-                embed2.addField(
-                    "fail!!",
-                    "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)"
-                )
+                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
                 embed3.setDescription(
                     "**" +
                         message.member.user.tag +
@@ -318,15 +307,15 @@ async function run(message, args) {
 
     message.channel.send({ embeds: [embed] }).then(async (m) => {
         setTimeout(async () => {
-            await m.edit({embeds: [embed2]})
+            await m.edit({ embeds: [embed2] })
 
             if (getDMsEnabled(target)) {
                 if (robberySuccess) {
                     addRob(message.member, true)
-                    target.send({content: "you have been robbed!!", embeds: [embed3]}).catch(() => {})
+                    target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {})
                 } else {
                     addRob(message.member, false)
-                    target.send({content: "you were nearly robbed!!", embeds: [embed3]}).catch(() => {})
+                    target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {})
                 }
             }
         }, 1500)

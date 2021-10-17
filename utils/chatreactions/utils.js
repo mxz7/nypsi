@@ -31,9 +31,7 @@ setInterval(async () => {
     let count = 0
 
     const query = db
-        .prepare(
-            "SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1"
-        )
+        .prepare("SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1")
         .all()
 
     for (const guildData of query) {
@@ -262,9 +260,7 @@ exports.updateReactionSettings = updateReactionSettings
  */
 function getReactionStats(guild, member) {
     const query = db
-        .prepare(
-            "SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?"
-        )
+        .prepare("SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
         .get(guild.id, member.user.id)
 
     return {
@@ -307,7 +303,7 @@ async function startReaction(guild, channel) {
     embed.setTitle("chat reaction")
     embed.setDescription(`type: \`${displayWord}\``)
 
-    const msg = await channel.send({embeds: [embed]})
+    const msg = await channel.send({ embeds: [embed] })
 
     const start = new Date().getTime()
 
@@ -341,8 +337,7 @@ async function startReaction(guild, channel) {
 
         time = ((time - start) / 1000).toFixed(2)
 
-        if (!hasReactionStatsProfile(guild, message.member))
-            createReactionStatsProfile(guild, message.member)
+        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member)
 
         if (winners.size == 0) {
             embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``)
@@ -366,20 +361,16 @@ async function startReaction(guild, channel) {
                     } else {
                         const field = await embed.fields.find((f) => f.name == "winners")
 
-                        field.value += `\n🥈 ${winners.get(2).mention} in \`${
-                            winners.get(2).time
-                        }s\``
+                        field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``
 
                         add2ndPlace(guild, winners.get(2).member)
 
                         if (winners.get(3)) {
-                            field.value += `\n🥉 ${winners.get(3).mention} in \`${
-                                winners.get(3).time
-                            }s\``
+                            field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``
                             add3rdPlace(guild, winners.get(3).member)
                         }
 
-                        return await msg.edit({embeds: [embed]}).catch(() => {
+                        return await msg.edit({ embeds: [embed] }).catch(() => {
                             collector.stop()
                         })
                     }
@@ -402,7 +393,7 @@ async function startReaction(guild, channel) {
         })
         winnersIDs.push(message.author.id)
         if (!waiting) {
-            return await msg.edit({embeds: [embed]}).catch(() => {
+            return await msg.edit({ embeds: [embed] }).catch(() => {
                 collector.stop()
             })
         }
@@ -418,7 +409,7 @@ async function startReaction(guild, channel) {
             } else {
                 embed.setFooter(`ended with ${winners.size} winners`)
             }
-            await msg.edit({embeds: [embed]}).catch(() => {})
+            await msg.edit({ embeds: [embed] }).catch(() => {})
         }, 500)
     })
 }
@@ -451,10 +442,7 @@ exports.hasReactionStatsProfile = hasReactionStatsProfile
  * @param {guildMember} member
  */
 function createReactionStatsProfile(guild, member) {
-    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(
-        guild.id,
-        member.user.id
-    )
+    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id)
 }
 
 exports.createReactionStatsProfile = createReactionStatsProfile
@@ -465,9 +453,13 @@ exports.createReactionStatsProfile = createReactionStatsProfile
  * @param {StatsProfile} newStats
  */
 function updateStats(guild, member, newStats) {
-    db.prepare(
-        "UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?"
-    ).run(newStats.wins, newStats.secondPlace, newStats.thirdPlace, guild.id, member.user.id)
+    db.prepare("UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?").run(
+        newStats.wins,
+        newStats.secondPlace,
+        newStats.thirdPlace,
+        guild.id,
+        member.user.id
+    )
 }
 
 exports.updateStats = updateStats
@@ -478,9 +470,10 @@ exports.updateStats = updateStats
  * @param {GuildMember} member
  */
 function addWin(guild, member) {
-    db.prepare(
-        "UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?"
-    ).run(guild.id, member.user.id)
+    db.prepare("UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?").run(
+        guild.id,
+        member.user.id
+    )
 }
 
 exports.addWin = addWin
@@ -491,9 +484,10 @@ exports.addWin = addWin
  * @param {GuildMember} member
  */
 function add2ndPlace(guild, member) {
-    db.prepare(
-        "UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?"
-    ).run(guild.id, member.user.id)
+    db.prepare("UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?").run(
+        guild.id,
+        member.user.id
+    )
 }
 
 exports.add2ndPlace = add2ndPlace
@@ -504,9 +498,10 @@ exports.add2ndPlace = add2ndPlace
  * @param {GuildMember} member
  */
 function add3rdPlace(guild, member) {
-    db.prepare(
-        "UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?"
-    ).run(guild.id, member.user.id)
+    db.prepare("UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?").run(
+        guild.id,
+        member.user.id
+    )
 }
 
 exports.add3rdPlace = add3rdPlace
@@ -544,9 +539,7 @@ async function getServerLeaderboard(guild, amount) {
     const overallWins = []
     const overallStats = new Map()
 
-    const query = db
-        .prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?")
-        .all(guild.id)
+    const query = db.prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?").all(guild.id)
 
     for (const user of query) {
         let overall = false
@@ -607,9 +600,7 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats
-            .get(user)
-            .toLocaleString()}\n`
+        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats.get(user).toLocaleString()}\n`
         count++
     }
 
@@ -626,9 +617,7 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats
-            .get(user)
-            .toLocaleString()}\n`
+        secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats.get(user).toLocaleString()}\n`
         count++
     }
 
@@ -645,9 +634,7 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats
-            .get(user)
-            .toLocaleString()}\n`
+        thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats.get(user).toLocaleString()}\n`
         count++
     }
 
@@ -664,17 +651,11 @@ async function getServerLeaderboard(guild, amount) {
             pos = "🥉"
         }
 
-        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats
-            .get(user)
-            .toLocaleString()}\n`
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats.get(user).toLocaleString()}\n`
         count++
     }
 
-    return new Map()
-        .set("wins", winsMsg)
-        .set("second", secondMsg)
-        .set("third", thirdMsg)
-        .set("overall", overallMsg)
+    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
 }
 
 exports.getServerLeaderboard = getServerLeaderboard
@@ -730,10 +711,7 @@ exports.getBlacklisted = getBlacklisted
  * @param {Array<String>} blacklisted
  */
 function setBlacklisted(guild, blacklisted) {
-    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(
-        toStorage(blacklisted),
-        guild.id
-    )
+    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id)
 }
 
 exports.setBlacklisted = setBlacklisted

@@ -17,11 +17,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases([
-    "bal",
-    "money",
-    "wallet",
-])
+const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money", "wallet"])
 
 /**
  * @param {Message} message
@@ -36,7 +32,7 @@ async function run(message, args) {
             target = args[0]
             if (!userExists(target)) {
                 return message.channel.send({
-                    content: "❌ invalid user - you must tag the user for this command or use a user id"
+                    content: "❌ invalid user - you must tag the user for this command or use a user id",
                 })
             }
             id = true
@@ -65,7 +61,7 @@ async function run(message, args) {
         }
 
         if (!target) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -98,11 +94,9 @@ async function run(message, args) {
             getPrestige(target) < 20
         ) {
             return message.channel.send({
-                content: `you are eligible to prestige, use ${getPrefix(
-                    message.guild
-                )}prestige for more info`,
-                embeds: [embed]}
-            )
+                content: `you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`,
+                embeds: [embed],
+            })
         }
     }
 

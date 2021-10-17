@@ -39,13 +39,13 @@ async function run(message, args) {
     }
 
     if (!message.channel.nsfw) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
     const { pornCache } = require("../utils/imghandler")
 
     if (pornCache.size <= 2) {
-        return message.channel.send({embeds: [new ErrorEmbed("please wait a couple more seconds..")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -65,7 +65,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send({embeds: [new ErrorEmbed("unable to find porn image")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find porn image")] })
     }
 
     const image = a.split("|")[0]

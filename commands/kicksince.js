@@ -4,11 +4,7 @@ const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "kicksince",
-    "kick members that joined after a certain time",
-    categories.ADMIN
-)
+const cmd = new Command("kicksince", "kick members that joined after a certain time", categories.ADMIN)
     .setPermissions(["ADMINISTRATOR"])
     .setAliases(["fuckoffsince"])
 
@@ -19,14 +15,14 @@ const cmd = new Command(
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `administrator` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] })
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")]
+            embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
         })
     }
 
@@ -56,11 +52,11 @@ async function run(message, args) {
     const time = new Date().getTime() - getDuration(args[0].toLowerCase()) * 1000
 
     if (!time) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid time length")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid time length")] })
     } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerID) {
-        return message.channel.send({embeds: [new ErrorEmbed("lol dont even try")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] })
     } else if (time < Date.now() - 604800000 * 2) {
-        return message.channel.send({embeds: [new ErrorEmbed("lol dont even try")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] })
     }
 
     let members = await message.guild.members.fetch()
@@ -69,11 +65,13 @@ async function run(message, args) {
 
     if (members.size >= 50) {
         const confirm = await message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                `this will kick **${members.size.toLocaleString()}** members, are you sure?`
-            )]
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `this will kick **${members.size.toLocaleString()}** members, are you sure?`
+                ),
+            ],
         })
 
         await confirm.react("✅")
@@ -116,7 +114,7 @@ async function run(message, args) {
     let msg
 
     if (status) {
-        msg = await message.channel.send({embeds: [status]})
+        msg = await message.channel.send({ embeds: [status] })
     }
 
     if (args.length > 1) {
@@ -137,7 +135,7 @@ async function run(message, args) {
         if (status) {
             if (msg.deleted) {
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")],
                 })
             }
         }
@@ -145,10 +143,7 @@ async function run(message, args) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
-        if (
-            targetHighestRole.position >= memberHighestRole.position &&
-            message.guild.ownerId != message.member.user.id
-        ) {
+        if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
             failed.push(members.get(member).user)
         } else {
             if (members.get(member).user.id == message.client.user.id) {
@@ -169,17 +164,14 @@ async function run(message, args) {
                 statusDesc = `\`${count}/${members.size}\` members kicked..${
                     failed.length != 0 ? `\n - **${failed.length}** failed` : ""
                 }`
-                status.setDescription(
-                    statusDesc +
-                        "\n\n - if you'd like to cancel this operation, delete this message"
-                )
+                status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message")
                 let fail = false
-                await msg.edit({embeds: [status]}).catch(() => {
+                await msg.edit({ embeds: [status] }).catch(() => {
                     fail = true
                 })
                 if (fail) {
                     return message.channel.send({
-                        embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")]
+                        embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")],
                     })
                 }
                 interval = 0
@@ -188,7 +180,7 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("i was unable to kick any users")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] })
     }
 
     const embed = new CustomEmbed(message.member).setTitle("kick | " + message.member.user.username)
@@ -212,12 +204,7 @@ async function run(message, args) {
         if (reason.split(": ")[1] == "no reason given") {
             embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked")
         } else {
-            embed.setDescription(
-                "✅ `" +
-                    members.first().user.tag +
-                    "` has been kicked for: " +
-                    reason.split(": ")[1]
-            )
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1])
         }
     }
 
@@ -243,13 +230,13 @@ async function run(message, args) {
         const m = members.get(member)
 
         if (reason.split(": ")[1] == "no reason given") {
-            await m.send({content: `you have been kicked from ${message.guild.name}`}).catch(() => {})
+            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {})
         } else {
             const embed = new CustomEmbed(m)
                 .setTitle(`kicked from ${message.guild.name}`)
                 .addField("reason", `\`${reason.split(": ")[1]}\``)
 
-            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed]}).catch(() => {})
+            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {})
         }
     }
 }

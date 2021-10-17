@@ -15,17 +15,7 @@ const cooldown = new Map()
 const chastityCooldown = new Map()
 const looking = new Map()
 
-const descFilter = [
-    "nigger",
-    "nigga",
-    "faggot",
-    "fag",
-    "nig",
-    "ugly",
-    "discordgg",
-    "discordcom",
-    "discordappcom",
-]
+const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"]
 
 /**
  * @param {Message} message
@@ -75,9 +65,9 @@ async function run(message, args) {
         }
 
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
-            )]
+            embeds: [
+                new ErrorEmbed(`you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`),
+            ],
         })
     }
 
@@ -119,16 +109,18 @@ async function run(message, args) {
     if (looking.size == 0) {
         addToLooking(description)
         return message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
-            ).setTitle(`milf finder | ${message.author.username}`)]
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
+                ).setTitle(`milf finder | ${message.author.username}`),
+            ],
         })
     } else {
         if (looking.has(message.author.id)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")]
+                embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")],
             })
         }
 
@@ -174,16 +166,18 @@ async function run(message, args) {
                 )
             }
 
-            return await channel.send({content: key.user.toString() + " a match has been found", embeds: [embed2]})
+            return await channel.send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })
         }
 
         addToLooking(description)
         return message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
-            ).setTitle(`milf finder | ${message.author.username}`)]
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
+                ).setTitle(`milf finder | ${message.author.username}`),
+            ],
         })
     }
 }
@@ -203,13 +197,11 @@ setInterval(() => {
         if (now - obj.date >= expire) {
             if (getDMsEnabled(obj.user.id)) {
                 await obj.user.send({
-                    embeds: [new CustomEmbed(
-                        undefined,
-                        false,
-                        "unfortunately we couldn't find you a milf 😢"
-                    )
-                        .setColor("#e4334f")
-                        .setTitle("milf finder")]
+                    embeds: [
+                        new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢")
+                            .setColor("#e4334f")
+                            .setTitle("milf finder"),
+                    ],
                 })
             }
 

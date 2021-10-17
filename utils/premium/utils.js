@@ -5,10 +5,7 @@ const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
 let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
-info(
-    `${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`,
-    types.DATA
-)
+info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`, types.DATA)
 const db = getDatabase()
 
 const isPremiumCache = new Map()
@@ -119,12 +116,7 @@ function addMember(member, level) {
     const start = new Date().getTime()
     const expire = new Date().setDate(new Date().getDate() + 35)
 
-    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(
-        id,
-        level,
-        start,
-        expire
-    )
+    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(id, level, start, expire)
 
     const profile = getPremiumProfile(id)
 
@@ -317,10 +309,7 @@ function renewUser(member) {
     db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(profile.expireDate, member)
 
     const { requestDM } = require("../../nypsi")
-    requestDM(
-        member,
-        `your membership has been renewed until **${formatDate(profile.expireDate)}**`
-    )
+    requestDM(member, `your membership has been renewed until **${formatDate(profile.expireDate)}**`)
 
     if (isPremiumCache.has(member)) {
         isPremiumCache.delete(member)
@@ -371,10 +360,7 @@ exports.expireUser = expireUser
  * @param {String} reason
  */
 function revokeUser(member, reason) {
-    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(
-        reason,
-        member
-    )
+    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(reason, member)
 
     const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")

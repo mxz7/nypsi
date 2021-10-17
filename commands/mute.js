@@ -13,9 +13,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("mute", "mute one or more users", categories.MODERATION).setPermissions([
-    "MANAGE_MESSAGES",
-])
+const cmd = new Command("mute", "mute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
@@ -33,9 +31,7 @@ async function run(message, args) {
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
     ) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                "i need the `manage roles` and `manage channels` permission for this command to work"
-            )]
+            embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
         })
     }
 
@@ -70,7 +66,7 @@ async function run(message, args) {
 
         if (!member) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")]
+                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
             })
         }
 
@@ -79,7 +75,7 @@ async function run(message, args) {
         const member = await getExactMember(message, args[0])
 
         if (!member) {
-            return message.channel.send({embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -118,8 +114,8 @@ async function run(message, args) {
                 })
 
             message.guild.channels.cache.forEach(async (channel) => {
-                await channel
-                    .permissionOverwrites.edit(muteRole, {
+                await channel.permissionOverwrites
+                    .edit(muteRole, {
                         SEND_MESSAGES: false,
                         SPEAK: false,
                         ADD_REACTIONS: false,
@@ -130,16 +126,20 @@ async function run(message, args) {
             })
         } catch (e) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(
-                    "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                )]
+                embeds: [
+                    new ErrorEmbed(
+                        "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+                    ),
+                ],
             })
         }
         if (channelError) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(
-                    "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                )]
+                embeds: [
+                    new ErrorEmbed(
+                        "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+                    ),
+                ],
             })
         }
     }
@@ -164,21 +164,18 @@ async function run(message, args) {
 
     for (let member of members.keys()) {
         if (members.get(member).user.id == message.client.user.id) {
-            await message.channel.send({content: "youll never shut me up 😏"})
+            await message.channel.send({ content: "youll never shut me up 😏" })
             continue
         }
 
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
-        if (
-            targetHighestRole.position >= memberHighestRole.position &&
-            message.guild.ownerId != message.member.user.id
-        ) {
+        if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
             failed.push(members.get(member).user)
         } else if (members.get(member).roles.cache.find((r) => r.id == muteRole.id)) {
             if (Array.from(members.keys()).length == 1) {
-                return message.channel.send({embeds: [new ErrorEmbed("that user is already muted")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("that user is already muted")] })
             }
 
             failed.push(members.get(member).user)
@@ -190,9 +187,11 @@ async function run(message, args) {
                 .catch(() => {
                     fail = true
                     return message.channel.send({
-                        embeds: [new ErrorEmbed(
-                            "i am unable to give users the mute role - ensure my role is above the 'muted' role"
-                        )]
+                        embeds: [
+                            new ErrorEmbed(
+                                "i am unable to give users the mute role - ensure my role is above the 'muted' role"
+                            ),
+                        ],
                     })
                 })
         }
@@ -216,20 +215,16 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("i was unable to mute any users")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to mute any users")] })
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `✅ **${count}** member(s) muted`
-    ).setTitle("mute | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, false, `✅ **${count}** member(s) muted`).setTitle(
+        "mute | " + message.member.user.username
+    )
 
     if (timedMute) {
         if (count == 1 && failed.length == 0) {
-            embed.setDescription(
-                "✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**"
-            )
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**")
         } else {
             embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**")
         }
@@ -252,7 +247,7 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send({embeds: [embed]}).catch()
+        await message.member.send({ embeds: [embed] }).catch()
     } else {
         await message.channel.send({ embeds: [embed] })
     }
@@ -303,7 +298,7 @@ async function run(message, args) {
                 embed.addField("reason", `\`${reason}\``, true)
             }
 
-            await m.send({content: `you have been muted in ${message.guild.name}`, embeds: [embed]})
+            await m.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
         } else {
             const embed = new CustomEmbed(m)
                 .setTitle(`muted in ${message.guild.name}`)
@@ -315,7 +310,7 @@ async function run(message, args) {
                 embed.addField("reason", `\`${reason}\``, true)
             }
 
-            await m.send({content: `you have been muted in ${message.guild.name}`, embeds: [embed]})
+            await m.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
         }
     }
 }

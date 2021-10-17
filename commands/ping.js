@@ -15,20 +15,15 @@ const cmd = new Command(
 async function run(message, args) {
     const now = new Date().getTime()
 
-    const msg = await message.channel.send({content: "pinging.."})
+    const msg = await message.channel.send({ content: "pinging.." })
 
     const embed = new CustomEmbed(
         message.member,
         false,
-        "**bot** `~ " +
-            (new Date().getTime() - now) +
-            "ms`\n" +
-            "**api** `~ " +
-            Math.round(message.client.ws.ping) +
-            "ms`"
+        "**bot** `~ " + (new Date().getTime() - now) + "ms`\n" + "**api** `~ " + Math.round(message.client.ws.ping) + "ms`"
     ).setFooter("nypsi is hosted in new jersey - us east")
 
-    return await msg.edit({embeds: [embed]})
+    return await msg.edit({ embeds: [embed] })
 }
 
 cmd.setRun(run)

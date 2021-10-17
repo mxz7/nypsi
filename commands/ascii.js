@@ -18,7 +18,7 @@ async function run(message, args) {
 
     if (!getDMsEnabled(message.member)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)]
+            embeds: [new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)],
         })
     }
 
@@ -45,17 +45,14 @@ async function run(message, args) {
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("ascii help")
-            .addField(
-                "usage",
-                `${prefix}ascii hello\n${prefix}ascii hello | ghost\n${prefix}ascii <text> | <font>`
-            )
+            .addField("usage", `${prefix}ascii hello\n${prefix}ascii hello | ghost\n${prefix}ascii <text> | <font>`)
             .addField("help", `to view different fonts use ${prefix}ascii fonts <page (1/2/3/4/5)>`)
         return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "fonts") {
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)] })
         } else if (args[1] == "1") {
             const embed = new CustomEmbed(
                 message.member,
@@ -105,7 +102,7 @@ async function run(message, args) {
 
             return message.channel.send({ embeds: [embed] })
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)] })
         }
     }
 
@@ -139,7 +136,7 @@ async function run(message, args) {
             } else {
                 fail = true
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**")]
+                    embeds: [new ErrorEmbed("error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**")],
                 })
             }
         }
@@ -151,18 +148,18 @@ async function run(message, args) {
         }
 
         if (asciiString.length >= 2000) {
-            return message.channel.send({ embeds: [new ErrorEmbed("ascii text exceeds discord message size")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("ascii text exceeds discord message size")] })
         }
 
         message.member
             .send({ content: asciiString })
             .then(() => {
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ success **-** check your dms")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ success **-** check your dms")],
                 })
             })
             .catch(() => {
-                return message.channel.send({ embeds: [new ErrorEmbed("unable to send you a dm")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("unable to send you a dm")] })
             })
     }, 500)
 }

@@ -41,7 +41,7 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("who do u want me to roast bro")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("who do u want me to roast bro")] })
     }
 
     let target
@@ -53,7 +53,7 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -64,12 +64,10 @@ async function run(message, args) {
 
     const roastIndex = Math.floor(Math.random() * roasts.length)
 
-    const roast = roasts[roastIndex]
-        .replace("%t", target.user.toString())
-        .replace("%m", message.author.toString())
+    const roast = roasts[roastIndex].replace("%t", target.user.toString()).replace("%m", message.author.toString())
 
     return message.channel.send({
-        embeds: [new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`)]
+        embeds: [new CustomEmbed(message.member, false, roast).setFooter(`roast #${roastIndex}`)],
     })
 }
 

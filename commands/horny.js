@@ -62,7 +62,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 

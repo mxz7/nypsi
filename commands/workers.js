@@ -16,11 +16,13 @@ const { getAllWorkers, Worker } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const cmd = new Command(
-    "workers",
-    "view the available workers and manage your own",
-    categories.MONEY
-).setAliases(["worker", "minion", "minions", "slave", "slaves"])
+const cmd = new Command("workers", "view the available workers and manage your own", categories.MONEY).setAliases([
+    "worker",
+    "minion",
+    "minions",
+    "slave",
+    "slaves",
+])
 
 const cooldown = new Map()
 
@@ -65,11 +67,7 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     const listAllWorkers = () => {
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "workers create items over time, which you can sell for money"
-        )
+        const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")
             .setTitle("workers | " + message.author.username)
             .setFooter(`${getPrefix(message.guild)}workers help`)
 
@@ -80,9 +78,9 @@ async function run(message, args) {
                 `${worker.name} [${worker.id}]`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
                     worker.prestige
-                }\n**item worth** $${worker.perItem.toLocaleString()} / ${
-                    worker.itemName
-                }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${worker.itemName} / hour`,
+                }\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker
+                    .getHourlyRate()
+                    .toLocaleString()} ${worker.itemName} / hour`,
                 true
             )
         }
@@ -96,9 +94,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            `you have ${Object.keys(personalWorkers).length} worker${
-                Object.keys(personalWorkers).length == 1 ? "" : "s"
-            }`
+            `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
             .setTitle("your workers")
             .setFooter(`${getPrefix(message.guild)}workers help`)
@@ -109,18 +105,12 @@ async function run(message, args) {
                 `${worker.name} [${worker.id}]`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
                     worker.itemName
-                } / ${worker.maxStorage.toLocaleString()} ($${(
-                    worker.stored * worker.perItem
-                ).toLocaleString()})\n` +
+                } / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})\n` +
                     `**level** ${worker.level}${
-                        worker.level >= 5
-                            ? ""
-                            : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
-                    }\n**item worth** $${worker.perItem.toLocaleString()} / ${
-                        worker.itemName
-                    }\n**rate** ${worker.getHourlyRate().toLocaleString()} ${
-                        worker.itemName
-                    } / hour`,
+                        worker.level >= 5 ? "" : `\n**upgrade cost** $${worker.getUpgradeCost().toLocaleString()}`
+                    }\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker
+                        .getHourlyRate()
+                        .toLocaleString()} ${worker.itemName} / hour`,
                 true
             )
         }
@@ -138,7 +128,7 @@ async function run(message, args) {
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`)]
+                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`)],
                 })
             }
 
@@ -171,22 +161,24 @@ async function run(message, args) {
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")]
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
                 })
             }
 
             if (worker.prestige > getPrestige(message.member)) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(
-                        `you need to be prestige **${
-                            worker.prestige
-                        }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
-                    )]
+                    embeds: [
+                        new ErrorEmbed(
+                            `you need to be prestige **${
+                                worker.prestige
+                            }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
+                        ),
+                    ],
                 })
             }
 
             if (getBalance(message.member) < worker.cost) {
-                return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this worker")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this worker")] })
             }
 
             const personalWorkers = getWorkers(message.member)
@@ -195,7 +187,7 @@ async function run(message, args) {
                 worker1 = personalWorkers[worker1]
 
                 if (worker1.id == worker.id) {
-                    return message.channel.send({embeds: [new ErrorEmbed("you already have this worker")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this worker")] })
                 }
             }
 
@@ -204,7 +196,7 @@ async function run(message, args) {
             addWorker(message.member, worker.id)
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ you have bought a **${worker.name}**`)]
+                embeds: [new CustomEmbed(message.member, false, `✅ you have bought a **${worker.name}**`)],
             })
         } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
             const personalWorkers = getWorkers(message.member)
@@ -223,7 +215,7 @@ async function run(message, args) {
 
             if (amountEarned == 0) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("you have no money to claim from your workers")]
+                    embeds: [new ErrorEmbed("you have no money to claim from your workers")],
                 })
             }
 
@@ -240,7 +232,7 @@ async function run(message, args) {
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers upgrade <id or name>`)]
+                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers upgrade <id or name>`)],
                 })
             }
 
@@ -273,29 +265,31 @@ async function run(message, args) {
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")]
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
                 })
             }
 
             worker = getWorkers(message.member)[worker.id]
 
             if (!worker) {
-                return message.channel.send({embeds: [new ErrorEmbed("you don't have this worker")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] })
             }
 
             worker = Worker.fromJSON(worker)
 
             if (worker.level >= 5) {
-                return message.channel.send({embeds: [new ErrorEmbed("this worker is already max level")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] })
             }
 
             if (getBalance(message.member) < worker.getUpgradeCost()) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(
-                        `the upgrade cost for \`${worker.name}\` is $${worker
-                            .getUpgradeCost()
-                            .toLocaleString()}, you can't afford this`
-                    )]
+                    embeds: [
+                        new ErrorEmbed(
+                            `the upgrade cost for \`${worker.name}\` is $${worker
+                                .getUpgradeCost()
+                                .toLocaleString()}, you can't afford this`
+                        ),
+                    ],
                 })
             }
 
@@ -330,9 +324,11 @@ async function run(message, args) {
         ) {
             if (!isPremium(message.author.id)) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("you must have a premium membership for this").setFooter(
-                        `${getPrefix(message.guild)}patreon`
-                    )]
+                    embeds: [
+                        new ErrorEmbed("you must have a premium membership for this").setFooter(
+                            `${getPrefix(message.guild)}patreon`
+                        ),
+                    ],
                 })
             }
 
@@ -380,18 +376,14 @@ async function run(message, args) {
                 msg = "you weren't able to claim any free workers"
             }
 
-            return message.channel.send({embeds: [new CustomEmbed(message.member, false, msg)]})
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, msg)] })
         } else {
-            const embed = new CustomEmbed(message.member, false).setTitle(
-                "workers | " + message.author.username
-            )
+            const embed = new CustomEmbed(message.member, false).setTitle("workers | " + message.author.username)
 
             embed.setDescription(
                 `${getPrefix(message.guild)}**workers list** *list all available workers*\n` +
                     `${getPrefix(message.guild)}**workers buy** *buy a worker*\n` +
-                    `${getPrefix(
-                        message.guild
-                    )}**workers claim** *claim money from your workers*\n` +
+                    `${getPrefix(message.guild)}**workers claim** *claim money from your workers*\n` +
                     `${getPrefix(message.guild)}**workers upgrade** *upgrade a worker*`
             )
 

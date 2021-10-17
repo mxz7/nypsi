@@ -5,9 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions([
-    "MANAGE_MESSAGES",
-])
+const cmd = new Command("embed", "create an embed message", categories.UTILITY).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
@@ -46,8 +44,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
             .addField(
                 "help",
-                "with this command you can create a simple embed message\n" +
-                    "**<>** required | **()** optional\n"
+                "with this command you can create a simple embed message\n" + "**<>** required | **()** optional\n"
             )
             .addField(
                 "examples",
@@ -97,12 +94,12 @@ async function run(message, args) {
     }
 
     message.channel
-        .send({embeds: [embed]})
+        .send({ embeds: [embed] })
         .then(() => {
             message.delete()
         })
         .catch((e) => {
-            message.channel.send({embeds: [new ErrorEmbed(e)]})
+            message.channel.send({ embeds: [new ErrorEmbed(e)] })
         })
 }
 

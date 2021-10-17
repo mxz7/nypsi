@@ -12,11 +12,12 @@ const {
 } = require("../utils/users/utils")
 const { getMember, formatDate, uploadImage } = require("../utils/utils")
 
-const cmd = new Command(
-    "avatarhistory",
-    "view a user's avatar history",
-    categories.INFO
-).setAliases(["avh", "avhistory", "pfphistory", "pfph"])
+const cmd = new Command("avatarhistory", "view a user's avatar history", categories.INFO).setAliases([
+    "avh",
+    "avhistory",
+    "pfphistory",
+    "pfph",
+])
 
 const cooldown = new Map()
 
@@ -58,7 +59,7 @@ async function run(message, args) {
         if (args[0].toLowerCase() == "-clear") {
             clearAvatarHistory(message.member)
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")]
+                embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")],
             })
         }
 
@@ -70,7 +71,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -84,14 +85,12 @@ async function run(message, args) {
     let history = fetchAvatarHistory(member)
 
     if (history.length == 0) {
-        const url = await uploadImage(
-            member.user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
-        )
+        const url = await uploadImage(member.user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
         if (url) {
             addNewAvatar(member, url)
             history = fetchAvatarHistory(member)
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed("no avatar history")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] })
         }
     }
 
@@ -164,11 +163,7 @@ async function run(message, args) {
 
                 newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
-                newEmbed.setFooter(
-                    `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${
-                        history.length
-                    }`
-                )
+                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
                 if (currentPage == 1) {
                     row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
@@ -180,7 +175,7 @@ async function run(message, args) {
                         new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                     )
                 }
-                await msg.edit({embeds: [newEmbed], components: [row]})
+                await msg.edit({ embeds: [newEmbed], components: [row] })
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -191,11 +186,7 @@ async function run(message, args) {
 
                 newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
-                newEmbed.setFooter(
-                    `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${
-                        history.length
-                    }`
-                )
+                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
                 if (currentPage == lastPage) {
                     row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),

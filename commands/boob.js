@@ -7,9 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(
-    ["howbigaremyboobies"]
-)
+const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
 
 /**
  * @param {Message} message
@@ -61,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 

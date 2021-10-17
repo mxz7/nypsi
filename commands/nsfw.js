@@ -3,8 +3,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("nsfw", "toggle nsfw on a channel", categories.ADMIN)
-    .setPermissions(["MANAGE_CHANNELS"])
+const cmd = new Command("nsfw", "toggle nsfw on a channel", categories.ADMIN).setPermissions(["MANAGE_CHANNELS"])
 
 /**
  * @param {Message} message
@@ -13,14 +12,14 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", categories.ADMIN)
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage channels` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage channels` permission")] })
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")]
+            embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")],
         })
     }
 
@@ -33,10 +32,10 @@ async function run(message, args) {
     } else if (message.mentions.channels.first()) {
         channel = message.mentions.channels.first()
     } else {
-        channel = message.guild.channels.cache.find(ch => ch.name.includes(args[0]))
+        channel = message.guild.channels.cache.find((ch) => ch.name.includes(args[0]))
 
         if (!channel) {
-            return message.channel.send({embeds: [new ErrorEmbed("couldn't find that channel")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("couldn't find that channel")] })
         }
     }
 
@@ -45,7 +44,7 @@ async function run(message, args) {
     }
 
     if (!channel.isText()) {
-        return message.channek.send({embeds: [new ErrorEmbed("this is not a text channel")]})
+        return message.channek.send({ embeds: [new ErrorEmbed("this is not a text channel")] })
     }
 
     if (!channel.nsfw) {
@@ -55,10 +54,12 @@ async function run(message, args) {
         })
 
         if (fail) {
-            return message.channel.send({embeds: [new ErrorEmbed("unable to edit that channel")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("unable to edit that channel")] })
         }
 
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, `✅ ${channel.toString()} is now nsfw`)]})
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, `✅ ${channel.toString()} is now nsfw`)],
+        })
     } else {
         let fail = false
         await channel.setNSFW(false).catch(() => {
@@ -70,9 +71,7 @@ async function run(message, args) {
         }
 
         return message.channel.send({
-            embeds: [
-                new CustomEmbed(message.member, false, `✅ ${channel.toString()} is no longer nsfw`),
-            ],
+            embeds: [new CustomEmbed(message.member, false, `✅ ${channel.toString()} is no longer nsfw`)],
         })
     }
 }

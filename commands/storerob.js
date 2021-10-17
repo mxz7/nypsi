@@ -16,11 +16,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "storerob",
-    "attempt to rob a store for a reward",
-    categories.MONEY
-).setAliases(["shoprob"])
+const cmd = new Command("storerob", "attempt to rob a store for a reward", categories.MONEY).setAliases(["shoprob"])
 
 /**
  * @param {Message} message
@@ -31,7 +27,7 @@ async function run(message, args) {
 
     if (getBalance(message.member) < 1000) {
         return await message.channel.send({
-            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")]
+            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")],
         })
     }
 
@@ -75,16 +71,12 @@ async function run(message, args) {
         let shopList = ""
 
         for (const shop1 of shopWorth.keys()) {
-            shopList =
-                shopList + "**" + shop1 + "** $" + shopWorth.get(shop1).toLocaleString() + "\n"
+            shopList = shopList + "**" + shop1 + "** $" + shopWorth.get(shop1).toLocaleString() + "\n"
         }
 
-        shopList =
-            shopList + "the most you can recieve on one robbery is 90% of the store's balance"
+        shopList = shopList + "the most you can recieve on one robbery is 90% of the store's balance"
 
-        const embed = new CustomEmbed(message.member, false, shopList).setTitle(
-            "current store balances"
-        )
+        const embed = new CustomEmbed(message.member, false, shopList).setTitle("current store balances")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -182,20 +174,14 @@ async function run(message, args) {
 
         embed2.addField(
             "**success!!**",
-            "**you stole** $" +
-                robbedAmount.toLocaleString() +
-                " (" +
-                amount +
-                "%) from **" +
-                shop +
-                "**"
+            "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + shop + "**"
         )
         embed2.setColor("#5efb8f")
     }
 
     message.channel.send({ embeds: [embed] }).then((m) => {
         setTimeout(() => {
-            m.edit({embeds: [embed2]})
+            m.edit({ embeds: [embed2] })
         }, 1500)
     })
 }

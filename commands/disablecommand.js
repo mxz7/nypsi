@@ -4,11 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { commandExists } = require("../utils/commandhandler")
 
-const cmd = new Command(
-    "disablecommand",
-    "disable certain commands in your server",
-    categories.ADMIN
-)
+const cmd = new Command("disablecommand", "disable certain commands in your server", categories.ADMIN)
     .setAliases(["disablecmd", "disable"])
     .setPermissions(["MANAGE_SERVER"])
 
@@ -19,7 +15,7 @@ const cmd = new Command(
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
         }
         return
     }
@@ -42,7 +38,7 @@ async function run(message, args) {
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
-            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)] })
         }
 
         let word = args[1]
@@ -63,16 +59,16 @@ async function run(message, args) {
 
         if (!commandExists(word)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(
-                    `you must use the command's name, you can use ${getPrefix(
-                        message.guild
-                    )}help <command> to find this`
-                )]
+                embeds: [
+                    new ErrorEmbed(
+                        `you must use the command's name, you can use ${getPrefix(message.guild)}help <command> to find this`
+                    ),
+                ],
             })
         }
 
         if (word == "disablecommand") {
-            return message.channel.send({embeds: [new CustomEmbed(message.member, false, "nice try")]})
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "nice try")] })
         }
 
         filter.push(word)
@@ -99,7 +95,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)] })
         }
 
         let word = args[1]
@@ -138,11 +134,7 @@ async function run(message, args) {
 
         updateDisabledCommands(message.guild, filter)
 
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ disabled commands have been"
-        ).setTitle("disabled commands")
+        const embed = new CustomEmbed(message.member, false, "✅ disabled commands have been").setTitle("disabled commands")
 
         return message.channel.send({ embeds: [embed] })
     } else {

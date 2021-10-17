@@ -1,10 +1,7 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
 let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-info(
-    `${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`,
-    types.DATA
-)
+info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`, types.DATA)
 const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const { topgg: topggToken } = require("../../config.json")
@@ -72,10 +69,7 @@ setInterval(() => {
         }
 
         if (workers != workers1) {
-            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
-                JSON.stringify(workers),
-                user.id
-            )
+            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), user.id)
         }
     }
 }, 5 * 60 * 1000)
@@ -89,10 +83,7 @@ let items
 function loadItems() {
     let txt = ""
     items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
-    info(
-        `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`,
-        types.DATA
-    )
+    info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`, types.DATA)
 
     txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`
 
@@ -118,10 +109,7 @@ function loadItems() {
         }
 
         if (inventory != inventory1) {
-            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(
-                JSON.stringify(inventory),
-                user.id
-            )
+            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id)
         }
     }
 
@@ -156,9 +144,7 @@ setInterval(() => {
 }, 3600000)
 
 async function updateCryptoWorth() {
-    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) =>
-        res.json()
-    )
+    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json())
 
     const btcworth = Math.floor(res.bpi.USD.rate_float)
 
@@ -248,7 +234,7 @@ async function doVote(client, vote) {
             )
 
         await member
-            .send({ content: "thank you for voting!", embeds: [embed]})
+            .send({ content: "thank you for voting!", embeds: [embed] })
             .then(() => {
                 info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
             })
@@ -587,8 +573,7 @@ async function topAmountGlobal(amount, client, anon) {
                 }
             }
 
-            usersFinal[count] =
-                pos + " **" + username + "** $" + balances.get(user).toLocaleString()
+            usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString()
             count++
         }
     }
@@ -659,11 +644,7 @@ async function topAmount(guild, amount) {
             }
 
             usersFinal[count] =
-                pos +
-                " **" +
-                getMemberID(guild, user).user.tag +
-                "** $" +
-                balances.get(user).toLocaleString()
+                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString()
             count++
         }
     }
@@ -735,11 +716,7 @@ async function bottomAmount(guild, amount, min = 1) {
             }
 
             usersFinal[count] =
-                pos +
-                " **" +
-                getMemberID(guild, user).user.tag +
-                "** $" +
-                balances.get(user).toLocaleString()
+                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString()
             count++
         }
     }
@@ -821,13 +798,7 @@ async function topAmountPrestige(guild, amount) {
             }
 
             usersFinal[count] =
-                pos +
-                " **" +
-                getMemberID(guild, user).user.tag +
-                "** " +
-                prestiges.get(user) +
-                thing +
-                " prestige"
+                pos + " **" + getMemberID(guild, user).user.tag + "** " + prestiges.get(user) + thing + " prestige"
             count++
         }
     }
@@ -861,16 +832,7 @@ function winBoard() {
     let lol = ""
 
     for (let item in multiplier) {
-        lol =
-            lol +
-            item +
-            " | " +
-            item +
-            " | " +
-            item +
-            " **||** win: **" +
-            multiplier[item] +
-            "**x\n"
+        lol = lol + item + " | " + item + " | " + item + " **||** win: **" + multiplier[item] + "**x\n"
     }
 
     return lol
@@ -1102,10 +1064,7 @@ function addWorker(member, id) {
 
     memberWorkers[id] = worker
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(
-        JSON.stringify(memberWorkers),
-        memberID
-    )
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID)
 }
 
 exports.addWorker = addWorker

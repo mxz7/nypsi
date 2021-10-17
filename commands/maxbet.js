@@ -43,11 +43,7 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
 
     return message.channel.send({
-        embeds: [new CustomEmbed(
-            message.member,
-            false,
-            `your maximum bet is $**${maxBet.toLocaleString()}**`
-        )]
+        embeds: [new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`)],
     })
 }
 
