@@ -19,22 +19,22 @@ async function run(message, args) {
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
         }
 
         channel = message.mentions.channels.first()
 
         if (!channel.members.find((m) => m.user.id == message.author.id)) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
         }
 
         if (!channel) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
         }
     }
 
     if (!snipe || !snipe.get(channel.id)) {
-        return message.channel.send(new ErrorEmbed("nothing to snipe in " + channel.toString()))
+        return message.channel.send({embeds: [new ErrorEmbed("nothing to snipe in " + channel.toString())]})
     }
 
     let content = snipe.get(channel.id).content
