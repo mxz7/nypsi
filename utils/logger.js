@@ -254,7 +254,7 @@ function runLogs() {
             let msg = nextLogMsg.get(k)
 
             if (msg != "" && msg) {
-                v.send(msg)
+                v.send({content: msg})
                 nextLogMsg.set(k, "")
             }
         })
