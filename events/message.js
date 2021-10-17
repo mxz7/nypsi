@@ -136,7 +136,13 @@ function addMention() {
 
             if (member.user.bot) continue
             if (member.user.id == mention.message.author.id) continue
-            if (!channelMembers.has(memberID)) continue
+
+            try {
+                if (!channelMembers.has(memberID)) continue
+            } catch {
+                console.log(channelMembers)
+                console.log("important")
+            }
 
             const data = {
                 user: mention.message.author.tag,
