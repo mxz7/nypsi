@@ -30,9 +30,9 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {
-        return await message.channel.send(
-            new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")
-        )
+        return await message.channel.send({
+            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")]
+        })
     }
 
     const shopWorth = new Discord.Collection()
@@ -195,7 +195,7 @@ async function run(message, args) {
 
     message.channel.send({ embeds: [embed] }).then((m) => {
         setTimeout(() => {
-            m.edit(embed2)
+            m.edit({embeds: [embed2]})
         }, 1500)
     })
 }
