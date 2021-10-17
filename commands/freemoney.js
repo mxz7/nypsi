@@ -77,7 +77,7 @@ async function run(message, args) {
             ).toLocaleString()}**`
         )
         setTimeout(() => {
-            msg.edit(embed)
+            msg.edit({embeds: [embed]})
         }, 1000)
     })
 }

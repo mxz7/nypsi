@@ -181,7 +181,7 @@ async function run(message, args) {
                             pages.length
                         } | worth: $${worth.toLocaleString()}`
                     )
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -204,7 +204,7 @@ async function run(message, args) {
                             pages.length
                         } | worth: $${worth.toLocaleString()}`
                     )
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             }
