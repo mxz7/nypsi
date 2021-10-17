@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -104,30 +104,38 @@ async function run(message, args) {
         embed.setFooter(`page 1/${pages.size}`)
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+    )
+
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    if (pages.size == 1) {
+        return await message.channel.send({ embeds: [embed] })
+    } else {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    }
 
     if (pages.size >= 2) {
-        await msg.react("⬅")
-        await msg.react("➡")
-        await msg.react("❌")
-
         let currentPage = 1
         const lastPage = pages.size
 
-        const filter = (reaction, user) => {
-            return (
-                ["⬅", "➡", "❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
-            )
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-                .then((collected) => {
-                    return collected.first().emoji.name
+                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .then(async (collected) => {
+                    await collected.deferUpdate()
+                    return collected.customId
                 })
                 .catch(async () => {
-                    await msg.reactions.removeAll()
+                    await msg.edit({ components: [] })
                 })
 
             if (!reaction) return
@@ -147,7 +155,20 @@ async function run(message, args) {
                     }
 
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit({embeds: [newEmbed]})
+                    if (currentPage == 1) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -162,7 +183,20 @@ async function run(message, args) {
                         newEmbed.addField(fieldName, fieldValue)
                     }
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit({embeds: [newEmbed]})
+                    if (currentPage == lastPage) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "❌") {
@@ -170,8 +204,7 @@ async function run(message, args) {
 
                 newEmbed.setDescription("✅ mentions cleared")
 
-                await msg.reactions.removeAll()
-                return msg.edit({embeds: [newEmbed]})
+                return msg.edit({ embeds: [newEmbed], components: [] })
             }
         }
 
