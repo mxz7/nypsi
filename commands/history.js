@@ -1,5 +1,5 @@
 const { getMember, formatDate } = require("../utils/utils")
-const { Message, Permissions } = require("discord.js")
+const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -74,9 +74,11 @@ async function run(message, args) {
 
             if (!member) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(
-                        `can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`
-                    )]
+                    embeds: [
+                        new ErrorEmbed(
+                            `can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`
+                        ),
+                    ],
                 })
             }
         }
@@ -92,7 +94,7 @@ async function run(message, args) {
     }
 
     if (cases.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("no history to display")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("no history to display")] })
     }
 
     cooldown.set(message.author.id, new Date())
@@ -118,9 +120,7 @@ async function run(message, args) {
         pages.push(page)
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(
-        "page 1/" + pages.length + " | total: " + cases.length
-    )
+    const embed = new CustomEmbed(message.member).setFooter("page 1/" + pages.length + " | total: " + cases.length)
 
     if (unknownMember) {
         embed.setHeader("history for " + member)
@@ -133,35 +133,42 @@ async function run(message, args) {
         if (case0.deleted) {
             embed.addField("case " + case0.case_id, "`[deleted]`")
         } else {
-            embed.addField(
-                "case " + case0.case_id,
-                "`" + case0.type + "` - " + case0.command + "\non " + date
-            )
+            embed.addField("case " + case0.case_id, "`" + case0.type + "` - " + case0.command + "\non " + date)
         }
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
+
+    if (pages.length >= 2) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
+    }
 
     if (pages.length > 1) {
-        await msg.react("⬅")
-        await msg.react("➡")
-
         let currentPage = 0
 
         const lastPage = pages.length
 
-        const filter = (reaction, user) => {
-            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-                .then((collected) => {
-                    return collected.first().emoji.name
+                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .then(async (collected) => {
+                    await collected.deferUpdate()
+                    return collected.customId
                 })
                 .catch(async () => {
-                    await msg.reactions.removeAll()
+                    await msg.edit({ embeds: [embed], components: [] })
                 })
 
             const newEmbed = new CustomEmbed(message.member)
@@ -190,15 +197,19 @@ async function run(message, args) {
                             )
                         }
                     }
-                    newEmbed.setFooter(
-                        "page " +
-                            (currentPage + 1) +
-                            "/" +
-                            pages.length +
-                            " | total: " +
-                            cases.length
-                    )
-                    await msg.edit({embeds: [newEmbed]})
+                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
+                    if (currentPage == 0) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -217,15 +228,19 @@ async function run(message, args) {
                             )
                         }
                     }
-                    newEmbed.setFooter(
-                        "page " +
-                            (currentPage + 1) +
-                            "/" +
-                            pages.length +
-                            " | total: " +
-                            cases.length
-                    )
-                    await msg.edit({embeds: [newEmbed]})
+                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
+                    if (currentPage == lastPage) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             }
