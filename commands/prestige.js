@@ -50,9 +50,9 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getPrestige(message.member) >= 20) {
-        return message.channel.send(
-            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")]
+        })
     }
 
     let currentXp = getXp(message.member),
@@ -61,17 +61,17 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
     if (currentXp < neededXp) {
-        return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
+        return message.channel.send({embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)]})
     }
 
     if (currentBal < neededBal) {
-        return message.channel.send(
-            new CustomEmbed(
+        return message.channel.send({
+            embeds: [new CustomEmbed(
                 message.member,
                 false,
                 `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-            ).setTitle(`prestige | ${message.member.user.username}`)
-        )
+            ).setTitle(`prestige | ${message.member.user.username}`)]
+        })
     }
 
     let embed = new CustomEmbed(
@@ -113,17 +113,17 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
         if (currentXp < neededXp) {
-            return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
+            return message.channel.send({embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)]})
         }
 
         if (currentBal < neededBal) {
-            return message.channel.send(
-                new CustomEmbed(
+            return message.channel.send({
+                embeds: [new CustomEmbed(
                     message.member,
                     false,
                     `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-                ).setTitle(`prestige | ${message.member.user.username}`)
-            )
+                ).setTitle(`prestige | ${message.member.user.username}`)]
+            })
         }
 
         updateBankBalance(message.member, currentBal - neededBal)
