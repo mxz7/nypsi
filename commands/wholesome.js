@@ -89,15 +89,15 @@ async function run(message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send(
-                new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``)]
+            })
         }
 
         if (args.length == 1 && !message.attachments.first()) {
-            return message.channel.send(
-                new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)]
+            })
         }
 
         let url = args[1]
@@ -107,26 +107,26 @@ async function run(message, args) {
         }
 
         if (!url.toLowerCase().startsWith("https")) {
-            return message.channel.send(new ErrorEmbed("must be http**s**"))
+            return message.channel.send({embeds: [new ErrorEmbed("must be http**s**")]})
         }
 
         if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
             if (!isImageUrl(url)) {
-                return message.channel.send(
-                    new ErrorEmbed(
+                return message.channel.send({
+                    embeds: [new ErrorEmbed(
                         "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
-                    )
-                )
+                    )]
+                })
             }
 
             const upload = await uploadImage(url)
 
             if (!upload) {
-                return message.channel.send(
-                    new ErrorEmbed(
+                return message.channel.send({
+                    embeds: [new ErrorEmbed(
                         "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
-                    )
-                )
+                    )]
+                })
             } else {
                 url = upload
             }
@@ -135,13 +135,13 @@ async function run(message, args) {
         const res = await suggestWholesomeImage(message.member, url)
 
         if (!res) {
-            return message.channel.send(
-                new ErrorEmbed(
+            return message.channel.send({
+                embeds: [new ErrorEmbed(
                     `error: maybe that image already exists? if this persists join the ${getPrefix(
                         message.guild
                     )}support server`
-                )
-            )
+                )]
+            })
         }
 
         cooldown.set(message.member.id, new Date())
@@ -161,7 +161,7 @@ async function run(message, args) {
         if (message.author.id != "672793821850894347") return
 
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("dumbass"))
+            return message.channel.send({embeds: [new ErrorEmbed("dumbass")]})
         }
 
         const wholesome = getWholesomeImage(parseInt(args[1]))
@@ -191,15 +191,15 @@ async function run(message, args) {
         if (!allow) return
 
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("you must include the suggestion id"))
+            return message.channel.send({embeds: [new ErrorEmbed("you must include the suggestion id")]})
         }
 
         const res = await acceptWholesomeImage(parseInt(args[1]), message.member)
 
         if (!res) {
-            return message.channel.send(
-                new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)]
+            })
         }
 
         return message.react("✅")
@@ -217,15 +217,15 @@ async function run(message, args) {
         if (!allow) return
 
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("you must include the suggestion id"))
+            return message.channel.send({embeds: [new ErrorEmbed("you must include the suggestion id")]})
         }
 
         const res = await denyWholesomeImage(parseInt(args[1]))
 
         if (!res) {
-            return message.channel.send(
-                new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)]
+            })
         }
 
         return message.react("✅")
@@ -233,7 +233,7 @@ async function run(message, args) {
         if (message.author.id != "672793821850894347") return
 
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("dumbass"))
+            return message.channel.send({embeds: [new ErrorEmbed("dumbass")]})
         }
 
         const res = await deleteFromWholesome(parseInt(args[1]))
@@ -379,7 +379,7 @@ async function run(message, args) {
         if (member) {
             target = member
         } else {
-            return message.channel.send(new ErrorEmbed("couldnt find that member ):"))
+            return message.channel.send({embeds: [new ErrorEmbed("couldnt find that member ):")]})
         }
 
         const image = getWholesomeImage()
@@ -402,10 +402,10 @@ async function run(message, args) {
         )
 
     if (target) {
-        return message.channel.send(
-            `${target.user.toString()} you've received a wholesome image (:`,
-            embed
-        )
+        return message.channel.send({
+            content: `${target.user.toString()} you've received a wholesome image (:`,
+            embeds: [embed]
+        })
     }
 
     return message.channel.send({ embeds: [embed] })
