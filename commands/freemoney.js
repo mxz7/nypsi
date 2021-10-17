@@ -6,10 +6,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY).setAliases([
-    "poor",
-    "imbroke",
-])
+const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY).setAliases(["poor", "imbroke"])
 
 /**
  * @param {Message} message
@@ -33,13 +30,13 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) > 500000) {
-        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -64,20 +61,16 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) + amount)
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `+$**${amount.toLocaleString()}**`
-    ).setTitle("freemoney | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setTitle(
+        "freemoney | " + message.member.user.username
+    )
 
-    message.channel.send(embed).then((msg) => {
+    message.channel.send({ embeds: [embed] }).then((msg) => {
         embed.setDescription(
-            `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(
-                message.member
-            ).toLocaleString()}**`
+            `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(message.member).toLocaleString()}**`
         )
         setTimeout(() => {
-            msg.edit(embed)
+            msg.edit({ embeds: [embed] })
         }, 1000)
     })
 }

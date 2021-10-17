@@ -1,12 +1,6 @@
-const { Message, MessageEmbed, Collection } = require("discord.js")
+const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
 const { mentions } = require("../nypsi")
-const {
-    getChatFilter,
-    getPrefix,
-    inCooldown,
-    addCooldown,
-    hasGuild,
-} = require("../utils/guilds/utils")
+const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 
@@ -29,10 +23,10 @@ module.exports = async (message) => {
             .setTitle("support")
             .setColor("#36393f")
             .setDescription("support server: https://discord.gg/hJTDNST")
-        return await message.channel.send(embed)
+        return await message.channel.send({ embeds: [embed] })
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR") && hasGuild(message.guild)) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) && hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
@@ -50,10 +44,7 @@ module.exports = async (message) => {
 
     if (message.guild.memberCount < 250000) {
         if (message.mentions.everyone) {
-            if (
-                !inCooldown(message.guild) &&
-                message.guild.members.cache != message.guild.memberCount
-            ) {
+            if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
                 await message.guild.members.fetch()
                 addCooldown(message.guild, 3600)
             }
@@ -71,10 +62,7 @@ module.exports = async (message) => {
             }
         } else {
             if (message.mentions.roles.first()) {
-                if (
-                    !inCooldown(message.guild) &&
-                    message.guild.members.cache != message.guild.memberCount
-                ) {
+                if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
                     await message.guild.members.fetch()
                     addCooldown(message.guild, 3600)
                 }
@@ -111,7 +99,7 @@ module.exports = async (message) => {
     if (message.client.user.id == "685193083570094101") prefix = "£"
 
     if (message.content == `<@!${message.client.user.id}>`) {
-        return message.channel.send(`my prefix for this server is \`${prefix}\``)
+        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` })
     }
 
     if (!message.content.startsWith(prefix)) return

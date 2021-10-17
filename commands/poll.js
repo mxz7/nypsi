@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -38,7 +38,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -61,7 +61,7 @@ async function run(message, args) {
                     `${prefix}poll 9 hello | this is a description | #13c696`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -84,8 +84,8 @@ async function run(message, args) {
         }
 
         if (
-            !message.member.hasPermission("MANAGE_MESSAGES") &&
-            !message.member.hasPermission("ADMINISTRATOR") &&
+            !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
+            !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) &&
             num > 2
         ) {
             choices = 2
@@ -96,7 +96,7 @@ async function run(message, args) {
     let mode = ""
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("missing text"))
+        return message.channel.send({ embeds: [new ErrorEmbed("missing text")] })
     }
 
     if (!message.content.includes("|")) {
@@ -126,11 +126,11 @@ async function run(message, args) {
         embed.setDescription(description)
     }
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         embed.setHeader(message.member.user.tag)
     }
 
-    message.channel.send(embed).then(async (m) => {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
         if (choices == 0) {

@@ -8,11 +8,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "work",
-    "work a random job and safely earn a random amount of money",
-    categories.MONEY
-)
+const cmd = new Command("work", "work a random job and safely earn a random amount of money", categories.MONEY)
 
 /**
  * @param {Message} message
@@ -43,17 +39,17 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) <= 0) {
-        return message.channel.send(new ErrorEmbed("you need money to work"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you need money to work")] })
     }
 
     if (getBalance(message.member) > 750000) {
-        return message.channel.send(new ErrorEmbed("you're too rich for this command bro"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -85,21 +81,17 @@ async function run(message, args) {
 
     updateBalance(message.member, getBalance(message.member) + earned)
 
-    const embed = new CustomEmbed(message.member, true, work).setTitle(
-        "work | " + message.member.user.username
-    )
+    const embed = new CustomEmbed(message.member, true, work).setTitle("work | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {
-            embed.setDescription(
-                work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)"
-            )
+            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({ embeds: [embed] })
         }, 1500)
     })
 }

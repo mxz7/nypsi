@@ -3,11 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command(
-    "bitcoin",
-    "view the current bitcoin value (reflects real life USD)",
-    categories.MONEY
-)
+const cmd = new Command("bitcoin", "view the current bitcoin value (reflects real life USD)", categories.MONEY)
 
 /**
  *
@@ -35,7 +31,7 @@ async function run(message, args) {
         .setFooter("not real bitcoin, although it reflects current worth in USD")
         .setTitle("bitcoin | " + message.author.username)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

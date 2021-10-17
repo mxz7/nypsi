@@ -1,10 +1,9 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
-const reacted = new Map()
 
 const cmd = new Command("f", "pay your respects", categories.FUN)
 
@@ -37,11 +36,11 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("you need to pay respects to something"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you need to pay respects to something")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -60,55 +59,43 @@ async function run(message, args) {
         content = content.substr(0, 50)
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `press **F** to pay your respects to **${content}**`
+    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`)
+
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
     )
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed], components: [row] })
 
-    await msg.react("🇫")
+    const reactions = []
 
-    reacted.set(msg.id, [])
+    const collector = message.channel.createMessageComponentCollector({ time: 60000 })
 
-    const filter = (reaction, user) => {
-        if (reaction.emoji.name == "🇫" && !reacted.get(msg.id).includes(user.id)) {
-            reacted.get(msg.id).push(user.id)
-            return message.channel.send(
+    collector.on("collect", async (i) => {
+        if (reactions.includes(i.user.id)) return
+
+        i.deferUpdate()
+
+        reactions.push(i.user.id)
+
+        return await message.channel.send({
+            embeds: [
+                new CustomEmbed(message.member, false, `${i.user.toString()} has paid respects to **${args.join(" ")}**`),
+            ],
+        })
+    })
+
+    collector.on("end", async () => {
+        await message.channel.send({
+            embeds: [
                 new CustomEmbed(
                     message.member,
                     false,
-                    `${user.toString()} has paid respects to **${args.join(" ")}**`
-                )
-            )
-        }
-    }
-
-    let finished = false
-
-    async function getReactions() {
-        await msg
-            .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
-            .catch(async () => {
-                finished = true
-                await message.channel.send(
-                    new CustomEmbed(
-                        message.member,
-                        false,
-                        `**${reacted
-                            .get(msg.id)
-                            .length.toLocaleString()}** people paid their respects to **${content}**`
-                    )
-                )
-                return reacted.delete(msg.id)
-            })
-        if (!finished) {
-            return getReactions()
-        }
-    }
-
-    return getReactions()
+                    `**${reactions.length.toLocaleString()}** people paid their respects to **${content}**`
+                ),
+            ],
+        })
+    })
 }
 
 cmd.setRun(run)

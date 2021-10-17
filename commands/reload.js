@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { info } = require("../utils/logger")
 
-const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message
@@ -24,12 +24,12 @@ async function run(message, args) {
             msg = reloadCommand(args).split("✔")
             msg = "```\n" + msg + "```"
         } catch (e) {
-            return message.channel.send(new ErrorEmbed(`\`\`\`${e}\`\`\``))
+            return message.channel.send({ embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)] })
         }
 
         const embed = new CustomEmbed(message.member, false, msg).setTitle("reload")
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     }
 }
 

@@ -7,11 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "snek",
-    "get a random picture of a snake/snek",
-    categories.ANIMALS
-).setAliases(["snake"])
+const cmd = new Command("snek", "get a random picture of a snake/snek", categories.ANIMALS).setAliases(["snake"])
 
 /**
  * @param {Message} message
@@ -40,13 +36,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const { snekCache } = require("../utils/imghandler")
 
     if (snekCache.size < 1) {
-        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -66,7 +62,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find snek image"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find snek image")] })
     }
 
     const image = a.split("|")[0]
@@ -84,7 +80,7 @@ async function run(message, args) {
         .setURL(url)
         .setImage(image)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

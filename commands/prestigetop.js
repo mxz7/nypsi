@@ -1,15 +1,11 @@
 const { topAmountPrestige } = require("../utils/economy/utils.js")
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "prestigetop",
-    "view top prestiges in the server",
-    categories.MONEY
-).setAliases(["topprestige"])
+const cmd = new Command("prestigetop", "view top prestiges in the server", categories.MONEY).setAliases(["topprestige"])
 
 /**
  * @param {Message} message
@@ -33,7 +29,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -54,7 +50,7 @@ async function run(message, args) {
 
     amount = parseInt(args[0])
 
-    if (amount > 10 && !message.member.hasPermission("ADMINISTRATOR")) amount = 10
+    if (amount > 10 && !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10
 
     if (amount < 5) amount = 5
 
@@ -64,11 +60,9 @@ async function run(message, args) {
         return el != null
     })
 
-    const embed = new CustomEmbed(message.member, false)
-        .setTitle("top " + filtered.length)
-        .setDescription(filtered)
+    const embed = new CustomEmbed(message.member, false).setTitle("top " + filtered.length).setDescription(filtered)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

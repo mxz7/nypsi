@@ -23,7 +23,7 @@ async function run(message, args) {
                 "help",
                 "if you dont understand what this means you probably shouldn't use this command\nused to gain public information about an ip address or a registered domain"
             )
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (cooldown.has(message.member.id)) {
@@ -42,7 +42,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -53,7 +53,7 @@ async function run(message, args) {
 
     if (args[0] == "ip") {
         if (args.length == 1) {
-            return message.channel.send(new ErrorEmbed("you must include an ip address"))
+            return message.channel.send({ embeds: [new ErrorEmbed("you must include an ip address")] })
         }
 
         const url = "https://apimon.de/ip/" + args[1]
@@ -63,7 +63,7 @@ async function run(message, args) {
             .then((url) => url.json())
             .catch(() => {
                 invalid = true
-                return message.channel.send(new ErrorEmbed("invalid ip address"))
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid ip address")] })
             })
 
         if (invalid) return
@@ -88,7 +88,7 @@ async function run(message, args) {
             ispOrg = res.as.org
             ispEmail = res.as.abuse_contacts
         } catch {
-            return message.channel.send(new ErrorEmbed("invalid ip address"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid ip address")] })
         }
 
         const embed = new CustomEmbed(message.member, true, "`" + hostname + "`")
@@ -112,25 +112,17 @@ async function run(message, args) {
             )
             .addField(
                 "isp",
-                "**name** `" +
-                    ispName +
-                    "`\n" +
-                    "**org** `" +
-                    ispOrg +
-                    "`\n" +
-                    "**abuse** `" +
-                    ispEmail +
-                    "`",
+                "**name** `" + ispName + "`\n" + "**org** `" + ispOrg + "`\n" + "**abuse** `" + ispEmail + "`",
                 true
             )
         return message.channel
-            .send(embed)
-            .then((m) => m.delete({ timeout: 15000 }))
+            .send({ embeds: [embed] })
+            .then((m) => setTimeout(() => m.delete(), 15000))
             .catch()
     }
 
     if (!args[0].includes(".")) {
-        return message.channel.send(new ErrorEmbed("invalid domain"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
     }
 
     const url = "https://apimon.de/whois/" + args[0]
@@ -140,7 +132,7 @@ async function run(message, args) {
         .then((url) => url.json())
         .catch(() => {
             invalid = true
-            return message.channel.send(new ErrorEmbed("invalid domain"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
         })
 
     if (invalid) return
@@ -168,7 +160,7 @@ async function run(message, args) {
         registrantPhone = res.registrant.phone
         registrantEmail = res.registrant.email
     } catch {
-        return message.channel.send(new ErrorEmbed("invalid domain"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
     }
 
     const embed = new CustomEmbed(message.member, true)
@@ -210,8 +202,8 @@ async function run(message, args) {
             true
         )
     return message.channel
-        .send(embed)
-        .then((m) => m.delete({ timeout: 15000 }))
+        .send({ embeds: [embed] })
+        .then((m) => setTimeout(() => m.delete(), 15000))
         .catch()
 }
 

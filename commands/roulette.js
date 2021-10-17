@@ -93,31 +93,33 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
-        return message.channel.send(
-            new CustomEmbed(
-                message.member,
-                false,
-                "🔴 " +
-                    (values.length - 1) / 2 +
-                    "/" +
-                    values.length +
-                    " win **1.5**x\n" +
-                    "⚫ " +
-                    (values.length - 1) / 2 +
-                    "/" +
-                    values.length +
-                    " win **1.5**x\n" +
-                    "🟢 1/" +
-                    values.length +
-                    " win **17**x"
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    "🔴 " +
+                        (values.length - 1) / 2 +
+                        "/" +
+                        values.length +
+                        " win **1.5**x\n" +
+                        "⚫ " +
+                        (values.length - 1) / 2 +
+                        "/" +
+                        values.length +
+                        " win **1.5**x\n" +
+                        "🟢 1/" +
+                        values.length +
+                        " win **17**x"
+                ),
+            ],
+        })
     }
 
     const prefix = getPrefix(message.guild)
@@ -125,32 +127,24 @@ async function run(message, args) {
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
             .setTitle("roulette help")
-            .addField(
-                "usage",
-                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`
-            )
+            .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
             .addField(
                 "help",
                 "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
                     "red and black give a **1.5x** win and green gives a **17**x win"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
-    if (
-        args[0] != "red" &&
-        args[0] != "green" &&
-        args[0] != "black" &&
-        args[0] != "r" &&
-        args[0] != "g" &&
-        args[0] != "b"
-    ) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+    if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+                ),
+            ],
+        })
     }
 
     if (args[0] == "red") {
@@ -173,48 +167,56 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send(
-                new ErrorEmbed(
-                    `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-                )
-            )
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+                    ),
+                ],
+            })
         }
     }
 
     const bet = parseInt(args[1])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+                ),
+            ],
+        })
     }
 
     if (!bet) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+                ),
+            ],
+        })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -271,10 +273,7 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(
-                message.member,
-                getBalance(message.member) + Math.round(winnings * voteMulti)
-            )
+            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
@@ -285,14 +284,9 @@ async function run(message, args) {
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
     ).setTitle("roulette wheel | " + message.member.user.username)
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
-            "**landed on** " +
-                roll +
-                "\n\n**choice** " +
-                colorBet +
-                "\n**your bet** $" +
-                bet.toLocaleString()
+            "**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
         )
 
         if (win) {
@@ -332,7 +326,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit(embed)
+            m.edit({ embeds: [embed] })
         }, 2000)
     })
     gamble(message.author, "roulette", bet, win, winnings)

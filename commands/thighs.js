@@ -35,17 +35,17 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!message.channel.nsfw) {
-        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
     const { thighsCache } = require("../utils/imghandler")
 
     if (thighsCache.size <= 2) {
-        return message.channel.send(new ErrorEmbed("please wait a couple more seconds.."))
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -65,7 +65,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find thighs image"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find thighs image")] })
     }
 
     const image = a.split("|")[0]
@@ -83,7 +83,7 @@ async function run(message, args) {
         .setURL(url)
         .setImage(image)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

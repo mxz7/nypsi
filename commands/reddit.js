@@ -39,22 +39,24 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}reddit <subreddit>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}reddit <subreddit>`)] })
     }
 
     for (let bannedSubReddit of blacklisted) {
         if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
-            return message.channel.send(
-                new ErrorEmbed(
-                    "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"
-                )
-            )
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"
+                    ),
+                ],
+            })
         }
     }
 
@@ -67,23 +69,21 @@ async function run(message, args) {
     let allowed
 
     try {
-        const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then(
-            (a) => a.json()
-        )
+        const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then((a) => a.json())
 
         allowed = res.data.children.filter((post) => !post.data.is_self)
     } catch (e) {
-        return message.channel.send(new ErrorEmbed("invalid subreddit"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid subreddit")] })
     }
 
     const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
     if (!chosen) {
-        return message.channel.send(new ErrorEmbed("unable to find image"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find image")] })
     }
 
     if (chosen.data.over_18 && !message.channel.nsfw) {
-        return message.channel.send(new ErrorEmbed("you must do this in an nsfw channel"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
     const a = await redditImage(chosen, allowed)
@@ -96,7 +96,7 @@ async function run(message, args) {
     url = "https://reddit.com" + url
 
     if (image == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find image"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find image")] })
     }
 
     const subreddit = args[0]
@@ -107,7 +107,7 @@ async function run(message, args) {
         .setURL(url)
         .setImage(image)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

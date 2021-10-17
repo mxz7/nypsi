@@ -1,6 +1,6 @@
 const { eSnipe } = require("../nypsi")
 const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../utils/guilds/utils")
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 
 /**
  * @param {Message} message
@@ -11,7 +11,7 @@ module.exports = async (message, newMessage) => {
 
     if (!message.member) return
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         const filter = getChatFilter(message.guild)
 
         let content = newMessage.content.toLowerCase().normalize("NFD")

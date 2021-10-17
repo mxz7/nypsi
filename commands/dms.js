@@ -1,11 +1,6 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const {
-    getDMsEnabled,
-    setDMsEnabled,
-    userExists,
-    createUser,
-} = require("../utils/economy/utils.js")
+const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../utils/economy/utils.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("dms", "enable/disable dms with the bot", categories.INFO).setAliases([
@@ -38,7 +33,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -56,11 +51,7 @@ async function run(message, args) {
 
     if (current) {
         newValue = false
-        embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ you will no longer receive dms from nypsi"
-        )
+        embed = new CustomEmbed(message.member, false, "✅ you will no longer receive dms from nypsi")
     } else {
         newValue = true
         embed = new CustomEmbed(message.member, false, "✅ you will now receive dms from nypsi")
@@ -68,7 +59,7 @@ async function run(message, args) {
 
     setDMsEnabled(message.member, newValue)
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

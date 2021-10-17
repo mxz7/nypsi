@@ -50,17 +50,19 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        return message.channel.send(
-            new CustomEmbed(
-                message.member,
-                false,
-                "sell items from your inventory\n\ncoins have a set fee of **5**% per coin, while standard items have a **50**% fee"
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    "sell items from your inventory\n\ncoins have a set fee of **5**% per coin, while standard items have a **50**% fee"
+                ),
+            ],
+        })
     }
 
     const items = getItems()
@@ -87,7 +89,7 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send(new ErrorEmbed(`couldnt find \`${args[0]}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
     }
 
     let amount = 1
@@ -104,23 +106,23 @@ async function run(message, args) {
     }
 
     if (!parseInt(amount)) {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (amount < 1) {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (!amount) {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
-        return message.channel.send(new ErrorEmbed("you dont have any " + selected.name))
+        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] })
     }
 
     if (amount > inventory[selected.id]) {
-        return message.channel.send(new ErrorEmbed(`you don't have enough ${selected.name}`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -145,9 +147,9 @@ async function run(message, args) {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
         if (!selected.worth) {
-            return message.channel.send(
-                new ErrorEmbed(`you cannot currently sell ${selected.name}`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
+            })
         }
         sellWorth = Math.floor(selected.worth * 0.95 * amount)
     } else if (!selected.worth) {
@@ -159,9 +161,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(message.member, false)
 
     embed.setDescription(
-        `you sold **${amount}** ${selected.emoji} ${
-            selected.name
-        } for $${sellWorth.toLocaleString()} ${
+        `you sold **${amount}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
             multi > 0 && (selected.role == "fish" || selected.role == "prey")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
                 : selected.id == "bitcoin" || selected.id == "dogecoin"
@@ -170,7 +170,7 @@ async function run(message, args) {
         }`
     )
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

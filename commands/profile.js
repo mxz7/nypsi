@@ -12,6 +12,7 @@ const {
     hasVoted,
     hasPadlock,
     getWorkers,
+    getInventory,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 const { profileExistsID, getProfileID } = require("../utils/socials/utils")
@@ -44,7 +45,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -68,6 +69,8 @@ async function run(message, args) {
     const maxBet = await calcMaxBet(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%"
     const voted = hasVoted(message.member)
+    const inventory = getInventory(message.member)
+    const inventoryItems = Array.from(Object.values(inventory)).reduce((a, b) => a + b)
 
     embed.addField(
         "💰 economy",
@@ -75,20 +78,13 @@ async function run(message, args) {
     **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(
             message.member
         )}
-    **workers** ${Object.keys(getWorkers(message.member)).length}`,
+    **workers** ${Object.keys(getWorkers(message.member)).length}
+    **inventory** ${inventoryItems.toLocaleString()} items`,
         true
     )
 
     //PATREON
-    let tier,
-        tierString,
-        embedColor,
-        lastDaily,
-        lastWeekly,
-        status,
-        revokeReason,
-        startDate,
-        expireDate
+    let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate
 
     if (isPremium(message.author.id)) {
         const profile = getPremiumProfile(message.author.id)
@@ -139,11 +135,9 @@ async function run(message, args) {
     }
 
     embed.setTitle(message.author.tag)
-    embed.setThumbnail(
-        message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
-    )
+    embed.setThumbnail(message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

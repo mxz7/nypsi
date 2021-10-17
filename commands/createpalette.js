@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -36,17 +36,17 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!isPremium(message.author.id)) {
-        return message.channel.send(new ErrorEmbed("you must be a patreon for this command"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you must be a patreon for this command")] })
     }
 
-    if (!message.guild.me.hasPermission("MANAGE_ROLES")) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `manage roles` permission for this command to work")
-        )
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `manage roles` permission for this command to work")],
+        })
     }
 
     if (args.length == 0) {
@@ -66,11 +66,10 @@ async function run(message, args) {
             )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
         )
         embed.addField("example", `${getPrefix(message.guild)}palette my_palette #ff0000`)
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let roles = await message.guild.roles.fetch()
-    roles = roles.cache
 
     const sortedRoleIDs = []
 
@@ -91,9 +90,9 @@ async function run(message, args) {
     }
 
     if (colors.length < 3) {
-        return message.channel.send(
-            new ErrorEmbed("there aren't enough role colors to make a palette (minimum of 3)")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("there aren't enough role colors to make a palette (minimum of 3)")],
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -123,23 +122,27 @@ async function run(message, args) {
         }
 
         if (color.length != 6) {
-            return message.channel.send(
-                new ErrorEmbed(
-                    `invalid color, you can use ${getPrefix(
-                        message.guild
-                    )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
-                )
-            )
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        `invalid color, you can use ${getPrefix(
+                            message.guild
+                        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+                    ),
+                ],
+            })
         }
 
         if (color.match(regex)) {
-            return message.channel.send(
-                new ErrorEmbed(
-                    `invalid color, you can use ${getPrefix(
-                        message.guild
-                    )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
-                )
-            )
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        `invalid color, you can use ${getPrefix(
+                            message.guild
+                        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+                    ),
+                ],
+            })
         }
     }
 
@@ -153,7 +156,7 @@ async function run(message, args) {
         embed.setDescription(`very long URL generated ~ ${colors.length} colors`)
     }
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

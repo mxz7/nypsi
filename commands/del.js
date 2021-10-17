@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -13,7 +13,7 @@ const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATI
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
 
@@ -33,18 +33,18 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed("$del <amount> (@user)"))
+        return message.channel.send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] })
     }
 
     let amount = parseInt(args[0])
 
     if (amount < 60) amount++
 
-    if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         if (amount > 100) {
             amount = 100
         }
@@ -99,16 +99,14 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            "deleting `" +
-                amount +
-                "` messages..\n - if you'd like to cancel this operation, delete this message"
+            "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
         ).setTitle("delete | " + message.member.user.tag)
 
-        const m = await message.channel.send(embed)
+        const m = await message.channel.send({ embeds: [embed] })
         for (let i = 0; i < amount1 / 100; i++) {
             if (m.deleted) {
                 embed.setDescription("✅ operation cancelled")
-                return await message.channel.send(embed)
+                return await message.channel.send({ embeds: [embed] })
             }
 
             if (amount < 10) return await m.delete().catch()
@@ -140,7 +138,7 @@ async function run(message, args) {
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 )
-                await m.edit(embed)
+                await m.edit({ embeds: [embed] })
             }
 
             await message.channel.bulkDelete(messages).catch(() => {
@@ -163,7 +161,7 @@ async function run(message, args) {
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 )
-                await m.edit(embed)
+                await m.edit({ embeds: [embed] })
             }
         }
         return m.delete().catch()

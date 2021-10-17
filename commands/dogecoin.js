@@ -3,11 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command(
-    "dogecoin",
-    "view the current dogecoin value (reflects real life USD x 1000)",
-    categories.MONEY
-)
+const cmd = new Command("dogecoin", "view the current dogecoin value (reflects real life USD x 1000)", categories.MONEY)
 
 /**
  *
@@ -35,7 +31,7 @@ async function run(message, args) {
         .setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
         .setTitle("dogecoin | " + message.author.username)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
