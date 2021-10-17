@@ -27,7 +27,7 @@ module.exports = async (message) => {
     }
 
     if (hasGuild(message.guild)) {
-        if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return
+        
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
@@ -38,7 +38,7 @@ module.exports = async (message) => {
 
         for (let word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
-                return await message.delete()
+                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return await message.delete()
             }
         }
     }
