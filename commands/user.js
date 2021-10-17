@@ -81,13 +81,13 @@ async function run(message, args) {
         })
 
         if (membersSorted.length > 1500) {
-            const msg = await message.channel.send(
-                new CustomEmbed(
+            const msg = await message.channel.send({
+                embeds: [new CustomEmbed(
                     message.member,
                     false,
                     `sorting ${membersSorted.length.toLocaleString()} members..`
-                )
-            )
+                )]
+            })
             membersSorted = await workerSort(membersSorted, membersMap)
             await msg.delete()
         } else {
@@ -106,13 +106,15 @@ async function run(message, args) {
     const joined = formatDate(member.joinedAt)
     const daysAgo = timeSince(new Date(member.joinedAt))
     const created = formatDate(member.user.createdAt)
-    const roles = member.roles._roles
+    const roles = member.roles.cache
 
-    let rolesText = ""
+    let rolesText = []
 
     roles.forEach((role) => {
-        rolesText = rolesText + role.toString() + " "
+        rolesText[role.position] = role.toString()
     })
+
+    rolesText = rolesText.reverse().join(" ")
 
     rolesText = rolesText.split("@everyone").join("")
 
