@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const fetch = require("node-fetch")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -120,27 +120,38 @@ async function run(message, args) {
         embed.setFooter(`page 1/${names.size}`)
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
 
     if (names.size >= 2) {
-        await msg.react("⬅")
-        await msg.react("➡")
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
+    }
 
+
+    if (names.size >= 2) {
         let currentPage = 1
         const lastPage = names.size
 
-        const filter = (reaction, user) => {
-            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-                .then((collected) => {
-                    return collected.first().emoji.name
+                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .then(async (collected) => {
+                    await collected.deferUpdate()
+                    return collected.customId
                 })
                 .catch(async () => {
-                    await msg.reactions.removeAll()
+                    await msg.edit({ embeds: [embed], components: []})
                 })
 
             if (!reaction) return
@@ -152,7 +163,18 @@ async function run(message, args) {
                     currentPage--
                     embed.setDescription(names.get(currentPage).join("\n"))
                     embed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit({embeds: [embed]})
+                    if (currentPage == 1) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    } else {
+                        let row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({ embeds: [embed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -162,7 +184,18 @@ async function run(message, args) {
                     currentPage++
                     embed.setDescription(names.get(currentPage).join("\n"))
                     embed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit({embeds: [embed]})
+                    if (currentPage == lastPage) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({embeds: [embed], components: [row]})
                     return pageManager()
                 }
             }
