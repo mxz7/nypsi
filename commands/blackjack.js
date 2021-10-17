@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     userExists,
     createUser,
@@ -79,12 +79,6 @@ async function run(message, args) {
                     "the dealer will always stand on or above **17**\n" +
                     "**2**x multiplier for winning, on a draw you receive your bet back\n" +
                     "if your first 2 cards add up to 21, you get a **2.5**x win"
-            )
-            .addField(
-                "help",
-                "1️⃣ **hit** receive a new card\n" +
-                    "2️⃣ **stand** end your turn and allow the dealer to play\n" +
-                    "3️⃣ **double down** take one more card and double your bet"
             )
 
         return message.channel.send({ embeds: [embed] })
@@ -236,35 +230,32 @@ async function run(message, args) {
     newDealerCard(message.member)
     newCard(message.member)
 
-    const loadingEmbed = new CustomEmbed(message.member, false).setTitle(
-        "loading.. | " + message.member.user.username
-    )
-
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setTitle("blackjack | " + message.member.user.username)
         .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
         .addField(
             message.member.user.tag,
             getCards(message.member) + " **" + calcTotal(message.member) + "**"
-        )
+    )
+    
+    let row
 
     if (getBalance(message.member) >= bet) {
-        embed.addField("help", "1️⃣ hit | 2️⃣ stand | 3️⃣ double down")
+        row = new MessageActionRow().addComponents(
+            new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
+            new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY"),
+            new MessageButton().setCustomId("3️⃣").setLabel("double down").setStyle("SECONDARY")
+        )
     } else {
-        embed.addField("help", ":one: hit | :two: stand")
+        row = new MessageActionRow().addComponents(
+            new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
+            new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY")
+        )
     }
 
     message.channel
-        .send({embeds: [loadingEmbed]})
-        .then(async (m) => {
-            await m.react("1️⃣")
-            await m.react("2️⃣")
-
-            if (getBalance(message.member) >= bet) {
-                await m.react("3️⃣")
-            }
-
-            await m.edit({embeds: [embed]})
+        .send({embeds: [embed], components: [row]})
+        .then((m) => {
             playGame(message, m).catch((e) => {
                 console.error(e)
                 return message.channel.send({
@@ -419,6 +410,10 @@ function getDealerCards(member) {
     return "| " + cards.join(" | ") + " |"
 }
 
+/**
+ * @param {Message} message
+ * @param {Message} m
+ */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
 
@@ -446,8 +441,7 @@ async function playGame(message, m) {
             getCards(message.member) + " **" + calcTotal(message.member) + "**"
         )
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return await m.edit({embeds: [newEmbed], components: []})
     }
 
     const win = async () => {
@@ -508,8 +502,7 @@ async function playGame(message, m) {
         )
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return await m.edit({embeds: [newEmbed], components: []})
     }
 
     const draw = async () => {
@@ -529,8 +522,7 @@ async function playGame(message, m) {
         )
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return await m.edit({embeds: [newEmbed], components: []})
     }
 
     if (calcTotalDealer(message.member) > 21) {
@@ -560,10 +552,6 @@ async function playGame(message, m) {
     } else if (calcTotal(message.member) > 21) {
         return lose()
     } else {
-        if (!first) {
-            await m.reactions.cache.get("1️⃣").users.remove(message.member)
-        }
-
         games.set(message.member.user.id, {
             bet: bet,
             deck: games.get(message.member.user.id).deck,
@@ -575,29 +563,15 @@ async function playGame(message, m) {
             voted: games.get(message.member.user.id).voted,
         })
 
-        let filter
-
-        if (getBalance(message.member) >= bet && first) {
-            filter = (reaction, user) => {
-                return (
-                    ["1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name) &&
-                    user.id == message.member.user.id
-                )
-            }
-        } else {
-            filter = (reaction, user) => {
-                return (
-                    ["1️⃣", "2️⃣"].includes(reaction.emoji.name) && user.id == message.member.user.id
-                )
-            }
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         let fail = false
 
         const reaction = await m
-            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name
+            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                await collected.deferUpdate()
+                return collected.customId
             })
             .catch(() => {
                 fail = true
@@ -757,8 +731,7 @@ async function playGame(message, m) {
                 }
             }, 1500)
         } else {
-            games.delete(message.author.id)
-            return m.reactions.removeAll()
+            return games.delete(message.author.id)
         }
     }
 }
