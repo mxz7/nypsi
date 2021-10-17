@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
@@ -116,28 +116,36 @@ async function run(message, args) {
         embed.setDescription("`[tracking disabled]`")
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
 
-    if (history.length == 1) return
+    /**
+     * @type {Message}
+     */
+    let msg
 
-    await msg.react("⬅")
-    await msg.react("➡")
+    if (history.length == 1) {
+        return await message.channel.send({ embeds: [embed] })
+    } else {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    }
 
     let currentPage = index + 1
     const lastPage = history.length
 
-    const filter = (reaction, user) => {
-        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
     const pageManager = async () => {
         const reaction = await msg
-            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name
+            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                await collected.deferUpdate()
+                return collected.customId
             })
             .catch(async () => {
-                await msg.reactions.removeAll()
+                await msg.edit({ components: [] })
             })
 
         if (!reaction) return
@@ -161,8 +169,18 @@ async function run(message, args) {
                         history.length
                     }`
                 )
-
-                await msg.edit({embeds: [newEmbed]})
+                if (currentPage == 1) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({embeds: [newEmbed], components: [row]})
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -178,8 +196,18 @@ async function run(message, args) {
                         history.length
                     }`
                 )
-
-                await msg.edit({embeds: [newEmbed]})
+                if (currentPage == lastPage) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [newEmbed], components: [row] })
                 return pageManager()
             }
         }
