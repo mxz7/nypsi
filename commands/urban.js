@@ -47,7 +47,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}urban <definition>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}urban <definition>`)]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -57,7 +57,7 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     const results = await urban.define(args.join()).catch(() => {
-        return message.channel.send(new ErrorEmbed("unknown definition"))
+        return message.channel.send({embeds: [new ErrorEmbed("unknown definition")]})
     })
 
     inPlaceSort(results).desc((i) => i.thumbs_up)
