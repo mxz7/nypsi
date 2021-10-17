@@ -1,21 +1,20 @@
-const { Message } = require("discord.js")
+const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, deleteCase, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "case",
-    "get information about a given case",
-    categories.MODERATION
-).setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER"])
+const cmd = new Command("case", "get information about a given case", categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+    "MANAGE_SERVER",
+])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     const prefix = getPrefix(message.guild)
 
@@ -30,7 +29,7 @@ async function run(message, args) {
                     `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -38,9 +37,9 @@ async function run(message, args) {
     const case0 = getCase(message.guild, parseInt(args[0]))
 
     if (!case0) {
-        return message.channel.send(
-            new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
+        })
     }
 
     case0.deleted = case0.deleted === 0 ? false : true
@@ -63,31 +62,34 @@ async function run(message, args) {
         .addField("date/time", date, true)
         .addField("user", "`" + case0.user + "`", true)
         .addField("reason", reason, true)
-        .addField("deleted", case0.deleted, true)
+        .addField("deleted", case0.deleted.toString(), true)
 
     if (target) {
         embed.setDescription("punished user: " + target.toString())
     }
 
-    const msg = await message.channel.send(embed)
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("❌").setLabel("delete").setStyle("DANGER")
+    )
 
-    if (case0.deleted) return
+    let msg
 
-    if (!message.member.hasPermission("MANAGE_GUILD")) return
-
-    await msg.react("❌")
-
-    const filter = (reaction, user) => {
-        return ["❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
+    if (message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) && !case0.deleted) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
     }
 
+    const filter = (i) => i.user.id == message.author.id
+
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(async () => {
-            await msg.reactions.removeAll()
+            await msg.edit({ components: [] })
         })
 
     if (reaction == "❌") {
@@ -99,7 +101,7 @@ async function run(message, args) {
             "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
-        await msg.edit(newEmbed)
+        await msg.edit({ embeds: [newEmbed], components: [] })
     }
 }
 

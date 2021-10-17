@@ -1,21 +1,19 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, setReason } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "reason",
-    "set a reason for a case/punishment",
-    categories.MODERATION
-).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("reason", "set a reason for a case/punishment", categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     const prefix = getPrefix(message.guild)
 
@@ -25,7 +23,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}reason <case ID> <new reason>`)
             .addField("help", "use this command to change the current reason for a punishment case")
 
-        return await message.channel.send(embed)
+        return await message.channel.send({ embeds: [embed] })
     }
 
     const caseID = args[0]
@@ -37,9 +35,9 @@ async function run(message, args) {
     const case0 = getCase(message.guild, caseID)
 
     if (!case0) {
-        return message.channel.send(
-            new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")],
+        })
     }
 
     setReason(message.guild, caseID, reason)
@@ -48,7 +46,7 @@ async function run(message, args) {
         .setTitle("reason | " + message.member.user.username)
         .setDescription("✅ case updated")
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

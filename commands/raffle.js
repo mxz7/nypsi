@@ -4,11 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "raffle",
-    "select a random user all server members or from a specific role",
-    categories.FUN
-)
+const cmd = new Command("raffle", "select a random user all server members or from a specific role", categories.FUN)
 
 /**
  * @param {Message} message
@@ -31,7 +27,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -53,12 +49,10 @@ async function run(message, args) {
             }
         })
     } else {
-        const role = message.guild.roles.cache.find((r) =>
-            r.name.toLowerCase().includes(args.join(" ").toLowerCase())
-        )
+        const role = message.guild.roles.cache.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
 
         if (!role) {
-            return await message.channel.send(new ErrorEmbed("i wasn't able to find that role"))
+            return await message.channel.send({ embeds: [new ErrorEmbed("i wasn't able to find that role")] })
         }
 
         role.members.forEach((m) => {
@@ -66,7 +60,7 @@ async function run(message, args) {
         })
 
         if (members.length == 0) {
-            return message.channel.send(new ErrorEmbed("there is nobody in that role"))
+            return message.channel.send({ embeds: [new ErrorEmbed("there is nobody in that role")] })
         }
     }
 
@@ -78,7 +72,7 @@ async function run(message, args) {
         .setTitle(`${message.member.user.username}'s raffle`)
         .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

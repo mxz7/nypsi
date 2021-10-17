@@ -25,14 +25,14 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
 
     const embed = new CustomEmbed(member, false).setTitle(member.user.tag).setImage(avatar)
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 avatar.setRun(run)

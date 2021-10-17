@@ -1,18 +1,6 @@
 const { GuildMember } = require("discord.js")
-const {
-    isPremium,
-    setTier,
-    renewUser,
-    addMember,
-    getTier,
-    expireUser,
-} = require("../utils/premium/utils")
-const {
-    addNewUsername,
-    addNewAvatar,
-    usernameProfileExists,
-    createUsernameProfile,
-} = require("../utils/users/utils")
+const { isPremium, setTier, renewUser, addMember, getTier, expireUser } = require("../utils/premium/utils")
+const { addNewUsername, addNewAvatar, usernameProfileExists, createUsernameProfile } = require("../utils/users/utils")
 
 /**
  * @param {GuildMember} oldMember

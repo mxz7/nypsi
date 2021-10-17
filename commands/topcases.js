@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
@@ -7,21 +7,18 @@ const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "topcases",
-    "see who has the top moderation cases",
-    categories.MODERATION
-).setPermissions("MANAGE_MESSAGES")
+const cmd = new Command("topcases", "see who has the top moderation cases", categories.MODERATION).setPermissions(
+    "MANAGE_MESSAGES"
+)
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
-    if (!profileExists(message.guild))
-        return message.channel.send(new ErrorEmbed("no data for this server"))
+    if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -39,21 +36,19 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const cases = getAllCases(message.guild)
 
-    if (cases.length <= 0) return message.channel.send(new ErrorEmbed("no data for this server"))
+    if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
 
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const embed = new CustomEmbed(message.member, true).setTitle(
-        "top cases | " + message.member.user.username
-    )
+    const embed = new CustomEmbed(message.member, true).setTitle("top cases | " + message.member.user.username)
 
     const prefix = getPrefix(message.guild)
 
@@ -109,14 +104,7 @@ async function run(message, args) {
         for (let s of staff) {
             if (count >= 5) break
 
-            staffText[count] =
-                count +
-                1 +
-                " `" +
-                s +
-                "` **" +
-                topStaff.get(s).toLocaleString() +
-                "** punishments given"
+            staffText[count] = count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
 
             count++
         }
@@ -135,28 +123,20 @@ async function run(message, args) {
             }
 
             memberText[count] =
-                count +
-                1 +
-                " `" +
-                username +
-                "` **" +
-                topMembers.get(m).toLocaleString() +
-                "** punishments taken"
+                count + 1 + " `" + username + "` **" + topMembers.get(m).toLocaleString() + "** punishments taken"
 
             count++
         }
 
-        embed.addField("top staff", staffText, true)
-        embed.addField("top members", memberText, true)
+        embed.addField("top staff", staffText.join("\n"), true)
+        embed.addField("top members", memberText.join("\n"), true)
 
         if (deletedCaseCount) {
             embed.setFooter(
                 `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`
             )
         } else {
-            embed.setFooter(
-                `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`
-            )
+            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`)
         }
     } else {
         let member
@@ -176,9 +156,9 @@ async function run(message, args) {
                 member = await getMember(message, args.join(" "))
 
                 if (!member) {
-                    return message.channel.send(
-                        new ErrorEmbed("can't find `" + args.join(" ") + "`")
-                    )
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("can't find `" + args.join(" ") + "`")],
+                    })
                 }
             }
         }
@@ -260,16 +240,12 @@ async function run(message, args) {
         }
         embed.addField(
             "member stats",
-            "punishments `" +
-                punishments.toLocaleString() +
-                "`\ndeleted `" +
-                deletedCases.toLocaleString() +
-                "`",
+            "punishments `" + punishments.toLocaleString() + "`\ndeleted `" + deletedCases.toLocaleString() + "`",
             true
         )
     }
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

@@ -51,18 +51,16 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false).setTitle(
-            "give | " + message.author.tag
-        )
+        const embed = new CustomEmbed(message.member, false).setTitle("give | " + message.author.tag)
 
         embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
         embed.addField("help", "give members items from your inventory")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let target = message.mentions.members.first()
@@ -72,19 +70,19 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (message.member == target) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (target.user.bot) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (!userExists(target)) createUser(target)
@@ -116,11 +114,11 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send(new ErrorEmbed(`couldnt find \`${args[1]}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
     }
 
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
-        return message.channel.send(new ErrorEmbed("you dont have any " + selected.name))
+        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] })
     }
 
     if (args[2] > 50) args[2] = 50
@@ -131,16 +129,16 @@ async function run(message, args) {
         amount = 1
     } else {
         if (amount <= 0) {
-            return message.channel.send(new ErrorEmbed("invalid amount"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
 
         if (amount > inventory[selected.id]) {
-            return message.channel.send(new ErrorEmbed(`you don't have enough ${selected.name}`))
+            return message.channel.send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] })
         }
     }
 
     if (!amount) {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (selected.id == "bitcoin") {
@@ -148,18 +146,18 @@ async function run(message, args) {
         const max = getMaxBitcoin(target)
 
         if (owned + amount > max) {
-            return message.channel.send(
-                new ErrorEmbed("you cannot give this person that much bitcoin")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("you cannot give this person that much bitcoin")],
+            })
         }
     } else if (selected.id == "dogecoin") {
         const owned = targetInventory["dogecoin"] || 0
         const max = getMaxDogecoin(target)
 
         if (owned + amount > max) {
-            return message.channel.send(
-                new ErrorEmbed("you cannot give this person that much dogecoin")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("you cannot give this person that much dogecoin")],
+            })
         }
     }
 
@@ -181,7 +179,7 @@ async function run(message, args) {
         payLimit += prestigeBonus
 
         if (selected.worth * amount > payLimit) {
-            return message.channel.send(new ErrorEmbed("you can't give this user that much yet"))
+            return message.channel.send({ embeds: [new ErrorEmbed("you can't give this user that much yet")] })
         }
     }
 
@@ -208,15 +206,15 @@ async function run(message, args) {
 
     payment(message.author, target.user, selected.worth * amount)
 
-    return message.channel.send(
-        new CustomEmbed(
-            message.member,
-            false,
-            `you have given **${amount}** ${selected.emoji} ${
-                selected.name
-            } to **${target.toString()}**`
-        )
-    )
+    return message.channel.send({
+        embeds: [
+            new CustomEmbed(
+                message.member,
+                false,
+                `you have given **${amount}** ${selected.emoji} ${selected.name} to **${target.toString()}**`
+            ),
+        ],
+    })
 }
 
 cmd.setRun(run)

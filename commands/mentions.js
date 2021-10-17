@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -6,11 +6,10 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "mentions",
-    "view who mentioned you recently",
-    categories.UTILITY
-).setAliases(["pings", "whothefuckpingedme"])
+const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases([
+    "pings",
+    "whothefuckpingedme",
+])
 
 /**
  * @param {Message} message
@@ -33,7 +32,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -45,17 +44,17 @@ async function run(message, args) {
     const { mentions } = require("../nypsi.js")
 
     if (!mentions.get(message.guild.id)) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     if (!mentions.get(message.guild.id).get(message.author.id)) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     const userMentions = mentions.get(message.guild.id).get(message.author.id)
 
     if (userMentions.length == 0) {
-        return message.channel.send(new CustomEmbed(message.member, false, "no recent mentions"))
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     userMentions.reverse()
@@ -65,27 +64,17 @@ async function run(message, args) {
     for (let i of userMentions) {
         if (pages.size == 0) {
             const page1 = []
-            page1.push(
-                `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
-            )
+            page1.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
             pages.set(1, page1)
         } else {
             const lastPage = pages.size
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = []
-                newPage.push(
-                    `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
-                )
+                newPage.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
                 pages.set(lastPage + 1, newPage)
             } else {
-                pages
-                    .get(lastPage)
-                    .push(
-                        `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${
-                            i.link
-                        })`
-                    )
+                pages.get(lastPage).push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
             }
         }
     }
@@ -104,30 +93,38 @@ async function run(message, args) {
         embed.setFooter(`page 1/${pages.size}`)
     }
 
-    const msg = await message.channel.send(embed)
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+    )
+
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    if (pages.size == 1) {
+        return await message.channel.send({ embeds: [embed] })
+    } else {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    }
 
     if (pages.size >= 2) {
-        await msg.react("⬅")
-        await msg.react("➡")
-        await msg.react("❌")
-
         let currentPage = 1
         const lastPage = pages.size
 
-        const filter = (reaction, user) => {
-            return (
-                ["⬅", "➡", "❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
-            )
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
-                .then((collected) => {
-                    return collected.first().emoji.name
+                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .then(async (collected) => {
+                    await collected.deferUpdate()
+                    return collected.customId
                 })
                 .catch(async () => {
-                    await msg.reactions.removeAll()
+                    await msg.edit({ components: [] })
                 })
 
             if (!reaction) return
@@ -147,27 +144,26 @@ async function run(message, args) {
                     }
 
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(newEmbed)
+                    if (currentPage == 1) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
                 if (currentPage >= lastPage) {
                     return pageManager()
                 } else {
-                    // if (!isPremium(message.author.id)) {
-                    //     newEmbed.setFooter(
-                    //         `pages are only available for patreons (${getPrefix(
-                    //             message.guild
-                    //         )}patreon)`
-                    //     )
-                    //     for (let i of pages.get(currentPage)) {
-                    //         const fieldName = i.split("|6|9|")[0]
-                    //         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
-                    //         newEmbed.addField(fieldName, fieldValue)
-                    //     }
-                    //     return await msg.edit(newEmbed)
-                    // }
-
                     currentPage++
 
                     for (let i of pages.get(currentPage)) {
@@ -176,7 +172,20 @@ async function run(message, args) {
                         newEmbed.addField(fieldName, fieldValue)
                     }
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage)
-                    await msg.edit(newEmbed)
+                    if (currentPage == lastPage) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "❌") {
@@ -184,8 +193,7 @@ async function run(message, args) {
 
                 newEmbed.setDescription("✅ mentions cleared")
 
-                await msg.reactions.removeAll()
-                return msg.edit(newEmbed)
+                return msg.edit({ embeds: [newEmbed], components: [] })
             }
         }
 

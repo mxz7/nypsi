@@ -38,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -59,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -103,13 +103,11 @@ async function run(message, args) {
         sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE"
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`
-    ).setTitle("short person calculator")
+    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`).setTitle(
+        "short person calculator"
+    )
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

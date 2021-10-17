@@ -7,9 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(
-    ["howbigaremyboobies"]
-)
+const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
 
 /**
  * @param {Message} message
@@ -40,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -61,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -110,7 +108,7 @@ async function run(message, args) {
         .setTitle("boob calculator")
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
 
-    return message.channel.send(embed)
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

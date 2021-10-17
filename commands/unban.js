@@ -1,29 +1,27 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions([
-    "BAN_MEMBERS",
-])
+const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("BAN_MEMBERS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
+    if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
         }
         return
     }
 
-    if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `ban members` permission for this command to work")
-        )
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
+        })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -45,7 +43,7 @@ async function run(message, args) {
                 `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const members = []
@@ -66,9 +64,7 @@ async function run(message, args) {
             try {
                 const memberCache = message.client.users.cache
 
-                const findingMember = memberCache.find((m) =>
-                    (m.username + "#" + m.discriminator).includes(arg)
-                )
+                const findingMember = memberCache.find((m) => (m.username + "#" + m.discriminator).includes(arg))
 
                 if (findingMember) {
                     const id = findingMember.id
@@ -89,17 +85,13 @@ async function run(message, args) {
     }
 
     if (members.length == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to unban any users"))
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to unban any users")] })
     }
 
-    const embed = new CustomEmbed(message.member).setTitle(
-        `unban | ${message.member.user.username}`
-    )
+    const embed = new CustomEmbed(message.member).setTitle(`unban | ${message.member.user.username}`)
 
     if (members.length == 1) {
-        embed.setDescription(
-            "✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned"
-        )
+        embed.setDescription("✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned")
     } else {
         embed.setDescription("✅ **" + members.length + "** members have been unbanned")
     }
@@ -110,9 +102,9 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send(embed).catch()
+        await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     const members1 = []

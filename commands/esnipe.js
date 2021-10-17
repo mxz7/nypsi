@@ -2,11 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "esnipe",
-    "snipe the most recently edited message",
-    categories.FUN
-).setAliases(["es"])
+const cmd = new Command("esnipe", "snipe the most recently edited message", categories.FUN).setAliases(["es"])
 
 /**
  * @param {Message} message
@@ -19,24 +15,24 @@ async function run(message, args) {
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
         }
 
         channel = message.mentions.channels.first()
 
         if (!channel.members.find((m) => m.user.id == message.author.id)) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
         }
 
         if (!channel) {
-            return message.channel.send(new ErrorEmbed("invalid channel"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
         }
     }
 
     if (!eSnipe || !eSnipe.get(channel.id)) {
-        return message.channel.send(
-            new ErrorEmbed("nothing to edit snipe in " + channel.toString())
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("nothing to edit snipe in " + channel.toString())],
+        })
     }
 
     let content = eSnipe.get(channel.id).content
@@ -51,7 +47,7 @@ async function run(message, args) {
         .setTitle(eSnipe.get(channel.id).member)
         .setFooter(timeSince(created) + " ago")
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

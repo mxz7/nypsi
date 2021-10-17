@@ -2,11 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "invite",
-    "generate an invite link for the bot",
-    categories.INFO
-).setAliases(["bot"])
+const cmd = new Command("invite", "generate an invite link for the bot", categories.INFO).setAliases(["bot"])
 
 /**
  * @param {Message} message
@@ -21,7 +17,7 @@ async function run(message, args) {
         .setTitle("nypsi")
         .setFooter("made by max#0777 | tekoh.net")
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

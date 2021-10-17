@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     getXp,
     getPrestigeRequirement,
@@ -44,16 +44,14 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (getPrestige(message.member) >= 20) {
         return message.channel.send(
-            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage(
-                "https://i.imgur.com/vB3UGgi.png"
-            )
+            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")
         )
     }
 
@@ -63,9 +61,7 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
     if (currentXp < neededXp) {
-        return message.channel.send(
-            new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
-        )
+        return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
     }
 
     if (currentBal < neededBal) {
@@ -82,28 +78,28 @@ async function run(message, args) {
         message.member,
         true,
         "are you sure you want to prestige?\n\n" +
-            `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n` +
-            "react with ✅ to prestige"
+            `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
     ).setTitle(`prestige | ${message.member.user.username}`)
 
     cooldown.set(message.member.id, new Date())
 
-    const msg = await message.channel.send(embed)
-    await msg.react("✅")
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
+    )
 
-    const filter = (reaction, user) => {
-        return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const msg = await message.channel.send({ embeds: [embed] })
+
+    const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(async () => {
-            await msg.reactions.removeAll()
             embed.setDescription("❌ expired")
-            await msg.edit(embed)
+            await msg.edit({ embeds: [embed], components: [] })
             cooldown.delete(message.author.id)
         })
 
@@ -117,9 +113,7 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
         if (currentXp < neededXp) {
-            return message.channel.send(
-                new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
-            )
+            return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
         }
 
         if (currentBal < neededBal) {
@@ -159,16 +153,14 @@ async function run(message, args) {
 
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
-                `new vote rewards: $**${(
-                    15000 *
-                    (getPrestige(message.member) + 1)
-                ).toLocaleString()}**, **${getPrestige(message.member) + 1}** vote crates\n` +
-                `your new multiplier: **${Math.floor(
-                    multi * 100
-                )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
+                `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**, **${
+                    getPrestige(message.member) + 1
+                }** vote crates\n` +
+                `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
-        await msg.edit(embed)
+
+        await msg.edit({ embeds: [embed], components: [] })
     }
 }
 

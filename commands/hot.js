@@ -8,10 +8,7 @@ const { updateBalance, getBalance, userExists, createUser } = require("../utils/
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("hot", "measure how hot you are", categories.FUN).setAliases([
-    "howhot",
-    "sexy",
-])
+const cmd = new Command("hot", "measure how hot you are", categories.FUN).setAliases(["howhot", "sexy"])
 
 /**
  * @param {Message} message
@@ -41,7 +38,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -62,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("invalid user"))
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -131,7 +128,7 @@ async function run(message, args) {
         embed.setFooter("+$1,069")
     }
 
-    return await message.channel.send(embed)
+    return await message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

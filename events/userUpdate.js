@@ -32,17 +32,12 @@ module.exports = async (oldUser, newUser) => {
         }
     }
 
-    if (
-        oldUser.displayAvatarURL({ dynamic: true, size: 256 }) !=
-        newUser.displayAvatarURL({ dynamic: true, size: 256 })
-    ) {
+    if (oldUser.displayAvatarURL({ dynamic: true, size: 256 }) != newUser.displayAvatarURL({ dynamic: true, size: 256 })) {
         if (!userExists(newUser.id)) return
         if (!isPremium(newUser.id) && getPrestige(newUser.id) < 2) return
 
         if (!usernameProfileExists(newUser.id)) {
-            const url = await uploadImage(
-                newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
-            )
+            const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
             if (!url) return
             createUsernameProfile(newUser.id, newUser.tag, url)
         } else {
@@ -60,9 +55,7 @@ module.exports = async (oldUser, newUser) => {
 async function doQueue() {
     const user = queue.shift()
 
-    const url = await uploadImage(
-        user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 })
-    )
+    const url = await uploadImage(user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
 
     if (!url) return
 

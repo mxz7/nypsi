@@ -30,10 +30,7 @@ abcde.set("c", 2)
 abcde.set("d", 3)
 abcde.set("e", 4)
 
-const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases([
-    "sweeper",
-    "ms",
-])
+const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
 
 /**
  * @param {Message} message
@@ -43,7 +40,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (games.has(message.author.id)) {
-        return message.channel.send(new ErrorEmbed("you are already playing minesweeper"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] })
     }
 
     let cooldownLength = 30
@@ -72,7 +69,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -94,7 +91,7 @@ async function run(message, args) {
                     "`finish` - this is used to end the game and collect your reward"
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0] == "all") {
@@ -108,31 +105,33 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send(new ErrorEmbed("invalid bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}ms <bet>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ms <bet>`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send(new ErrorEmbed("you cannot afford this bet"))
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
-        return message.channel.send(
-            new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -209,22 +208,18 @@ async function run(message, args) {
         voted: voteMulti,
     })
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
-    )
+    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setTitle("minesweeper | " + message.author.username)
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
 
-    const msg = await message.channel.send(embed)
+    const msg = await message.channel.send({ embeds: [embed] })
 
     playGame(message, msg).catch((e) => {
         console.error(e)
-        return message.channel.send(
-            new ErrorEmbed("an error occured while running - join support server")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("an error occured while running - join support server")],
+        })
     })
 }
 
@@ -385,9 +380,7 @@ async function playGame(message, msg) {
 
     let table
 
-    const embed = new CustomEmbed(message.member, true).setTitle(
-        "minesweeper | " + message.author.username
-    )
+    const embed = new CustomEmbed(message.member, true).setTitle("minesweeper | " + message.author.username)
 
     const lose = async () => {
         gamble(message.author, "minesweeper", bet, false, 0)
@@ -404,7 +397,7 @@ async function playGame(message, msg) {
         )
         embed.addField("your grid", table)
         games.delete(message.author.id)
-        return await msg.edit(embed)
+        return await msg.edit({ embeds: [embed] })
     }
 
     const win1 = async () => {
@@ -464,7 +457,7 @@ async function playGame(message, msg) {
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        return await msg.edit(embed)
+        return await msg.edit({ embeds: [embed] })
     }
 
     const draw = async () => {
@@ -485,7 +478,7 @@ async function playGame(message, msg) {
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        return await msg.edit(embed)
+        return await msg.edit({ embeds: [embed] })
     }
 
     if (win == 15) {
@@ -496,7 +489,7 @@ async function playGame(message, msg) {
     let fail = false
 
     const response = await message.channel
-        .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+        .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
         .then(async (collected) => {
             await collected.first().delete()
             return collected.first().content.toLowerCase()
@@ -504,13 +497,13 @@ async function playGame(message, msg) {
         .catch(() => {
             fail = true
             games.delete(message.author.id)
-            return message.channel.send(message.author.toString() + " minesweeper game expired")
+            return message.channel.send({ content: message.author.toString() + " minesweeper game expired" })
         })
 
     if (fail) return
 
     if (response.length != 2 && response != "finish") {
-        await message.channel.send(message.author.toString() + " invalid coordinate, example: `a3`")
+        await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" })
         return playGame(message, msg)
     }
 
@@ -545,9 +538,9 @@ async function playGame(message, msg) {
         }
 
         if (!check || !check1) {
-            await message.channel.send(
-                message.author.toString() + " invalid coordinate, example: `a3`"
-            )
+            await message.channel.send({
+                content: message.author.toString() + " invalid coordinate, example: `a3`",
+            })
             return playGame(message, msg)
         }
     }
@@ -581,18 +574,12 @@ async function playGame(message, msg) {
             table = toTable(grid)
 
             embed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             embed.addField("your grid", table)
             embed.addField("help", "type `finish` to stop playing")
 
-            msg.edit(embed)
+            msg.edit({ embeds: [embed] })
 
             return playGame(message, msg)
     }

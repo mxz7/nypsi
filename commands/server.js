@@ -33,11 +33,9 @@ async function run(message, args) {
     const bots = members.filter((member) => member.user.bot)
 
     if (args.length == 1 && args[0] == "-id") {
-        const embed = new CustomEmbed(message.member)
-            .setTitle(server.name)
-            .setDescription("`" + server.id + "`")
+        const embed = new CustomEmbed(message.member).setTitle(server.name).setDescription("`" + server.id + "`")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 1 && args[0] == "-m") {
@@ -53,7 +51,7 @@ async function run(message, args) {
                     `**member peak** ${getPeaks(message.guild).toLocaleString()}`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     const embed = new CustomEmbed(message.member)
@@ -62,14 +60,7 @@ async function run(message, args) {
 
         .addField(
             "info",
-            "**owner** " +
-                server.owner.user.tag +
-                "\n" +
-                "**created** " +
-                created +
-                "\n" +
-                "**region** " +
-                server.region,
+            "**owner** " + server.members.cache.get(server.ownerId).user.tag + "\n" + "**created** " + created,
             true
         )
 
@@ -98,7 +89,7 @@ async function run(message, args) {
         embed.setFooter("humans and bots may be inaccurate due to server size")
     }
 
-    message.channel.send(embed)
+    message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

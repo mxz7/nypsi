@@ -25,28 +25,25 @@ async function run(message, args) {
             "\n--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---"
     )
 
-    await message.channel.send(embed)
+    await message.channel.send({ embeds: [embed] })
 
     const filter = (msg) => message.author.id == msg.author.id
 
-    let response = await message.channel.awaitMessages(filter, {
+    let response = await message.channel.awaitMessages({
+        filter,
         max: 1,
     })
 
     response = response.first().content
 
     if (response != captcha.answer) {
-        return message.channel.send(new ErrorEmbed("captcha failed"))
+        return message.channel.send({ embeds: [new ErrorEmbed("captcha failed")] })
     } else {
         const c = reset()
 
-        return message.channel.send(
-            new CustomEmbed(
-                message.member,
-                false,
-                `${c.deleted} users deleted\n${c.updated} users updated`
-            )
-        )
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, `${c.deleted} users deleted\n${c.updated} users updated`)],
+        })
     }
 }
 

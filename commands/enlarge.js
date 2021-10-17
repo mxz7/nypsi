@@ -3,11 +3,10 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command(
-    "enlarge",
-    "enlarge a custom emoji to its full size",
-    categories.UTILITY
-).setAliases(["emoji", "makebig"])
+const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", categories.UTILITY).setAliases([
+    "emoji",
+    "makebig",
+])
 
 const cooldown = new Map()
 
@@ -34,15 +33,15 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(
-            new ErrorEmbed(`${prefix}enlarge <emoji>`).setTitle("`❌` usage")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`${prefix}enlarge <emoji>`).setTitle("`❌` usage")],
+        })
     }
 
     let emoji = args[0]
@@ -50,7 +49,7 @@ async function run(message, args) {
     emoji = emoji.split(":")
 
     if (!emoji[2]) {
-        return message.channel.send(new ErrorEmbed("invalid emoji - please use a custom emoji"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -69,9 +68,9 @@ async function run(message, args) {
         url = url + ".png"
     }
 
-    return message.channel.send(
-        new CustomEmbed(message.member).setImage(url).setFooter(`id: ${emojiID}`)
-    )
+    return message.channel.send({
+        embeds: [new CustomEmbed(message.member).setImage(url).setFooter(`id: ${emojiID}`)],
+    })
 }
 
 cmd.setRun(run)

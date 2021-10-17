@@ -1,31 +1,29 @@
-const { Message } = require("discord.js")
+const { Message, Permissions } = require("discord.js")
 const { newCase, profileExists, createProfile, newBan } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "ban",
-    "ban one or more users from the server",
-    categories.MODERATION
-).setPermissions(["BAN_MEMBERS"])
+const cmd = new Command("ban", "ban one or more users from the server", categories.MODERATION).setPermissions([
+    "BAN_MEMBERS",
+])
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (!message.member.hasPermission("BAN_MEMBERS")) {
-        if (message.member.hasPermission("MANAGE_MESSAGES")) {
-            return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
+    if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
+        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
         }
         return
     }
 
-    if (!message.guild.me.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `ban members` permission for this command to work")
-        )
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
+        })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -51,7 +49,7 @@ async function run(message, args) {
                 `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s\n${prefix}ban @member 1d annoying`
             )
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -74,9 +72,9 @@ async function run(message, args) {
             message.mentions.members.set(member.user.id, member)
         }
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send(
-            new ErrorEmbed("unable to find member with ID `" + args[0] + "`")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
+        })
     }
 
     const members = message.mentions.members
@@ -113,21 +111,21 @@ async function run(message, args) {
     let failed = []
     let fail = false
 
-    for (let member of members.keyArray()) {
+    for (let member of members.keys()) {
         if (!idOnly) {
             const targetHighestRole = members.get(member).roles.highest
             const memberHighestRole = message.member.roles.highest
 
             if (
                 targetHighestRole.position >= memberHighestRole.position &&
-                message.guild.owner.user.id != message.member.user.id
+                message.guild.ownerId != message.member.user.id
             ) {
                 failed.push(members.get(member).user)
                 continue
             }
 
             if (members.get(member).user.id == message.client.user.id) {
-                await message.channel.send("well... i guess this is goodbye ):")
+                await message.channel.send({ content: "well... i guess this is goodbye ):" })
                 await message.guild.leave()
                 return
             }
@@ -144,9 +142,9 @@ async function run(message, args) {
             .catch(() => {
                 if (idOnly) {
                     fail = true
-                    return message.channel.send(
-                        new ErrorEmbed(`unable to ban the id: \`${member}\``)
-                    )
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed(`unable to ban the id: \`${member}\``)],
+                    })
                 }
                 failed.push(members.get(member).user)
             })
@@ -155,7 +153,7 @@ async function run(message, args) {
     if (fail) return
 
     if (count == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to ban any users"))
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to ban any users")] })
     }
 
     let banLength = ""
@@ -176,30 +174,19 @@ async function run(message, args) {
     if (count == 1 && failed.length == 0) {
         if (idOnly) {
             if (temporary) {
-                embed.setDescription(
-                    `✅ \`${members.first()}\` has been banned for: **${banLength}**`
-                )
+                embed.setDescription(`✅ \`${members.first()}\` has been banned for: **${banLength}**`)
             } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription(`✅ \`${members.first()}\` has been banned`)
             } else {
-                embed.setDescription(
-                    `✅ \`${members.first()}\` has been banned for: ${reason.split(": ")[1]}`
-                )
+                embed.setDescription(`✅ \`${members.first()}\` has been banned for: ${reason.split(": ")[1]}`)
             }
         } else {
             if (temporary) {
-                embed.setDescription(
-                    `✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`
-                )
+                embed.setDescription(`✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`)
             } else if (reason.split(": ")[1] == "no reason given") {
                 embed.setDescription("✅ `" + members.first().user.tag + "` has been banned")
             } else {
-                embed.setDescription(
-                    "✅ `" +
-                        members.first().user.tag +
-                        "` has been banned for: " +
-                        reason.split(": ")[1]
-                )
+                embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split(": ")[1])
             }
         }
     }
@@ -215,24 +202,18 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send(embed).catch()
+        await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send(embed)
+        await message.channel.send({ embeds: [embed] })
     }
 
     if (idOnly) {
-        newCase(
-            message.guild,
-            "ban",
-            members.first(),
-            message.member.user.tag,
-            reason.split(": ")[1]
-        )
+        newCase(message.guild, "ban", members.first(), message.member.user.tag, reason.split(": ")[1])
         if (temporary) {
             newBan(message.guild, members.first(), unbanDate)
         }
     } else {
-        const members1 = members.keyArray()
+        const members1 = Array.from(members.keys())
 
         if (failed.length != 0) {
             for (fail of failed) {
@@ -253,11 +234,11 @@ async function run(message, args) {
             const m = members.get(member)
 
             if (reason.split(": ")[1] == "no reason given") {
-                await m.send(
-                    `you have been banned from ${message.guild.name}${
+                await m.send({
+                    content: `you have been banned from ${message.guild.name}${
                         temporary ? `\n\nexpires in **${banLength}**}` : ""
-                    }`
-                )
+                    }`,
+                })
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
@@ -269,7 +250,7 @@ async function run(message, args) {
                     embed.setTimestamp(unbanDate)
                 }
 
-                await m.send(`you have been banned from ${message.guild.name}`, embed)
+                await m.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
             }
         }
     }

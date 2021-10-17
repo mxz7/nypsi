@@ -6,11 +6,7 @@ const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "delp",
-    "bulk delete/purge your own messages",
-    categories.MODERATION
-).setAliases(["dp"])
+const cmd = new Command("delp", "bulk delete/purge your own messages", categories.MODERATION).setAliases(["dp"])
 
 /**
  * @param {Message} message
@@ -42,7 +38,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
@@ -57,7 +53,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}delp <amount>`))
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}delp <amount>`)] })
     }
 
     let amount = parseInt(args[0])
@@ -95,7 +91,7 @@ async function run(message, args) {
 
     let count = 0
 
-    for (let msg of collecteda.array()) {
+    for (let msg of collecteda.keys()) {
         if (count >= amount) {
             await collecteda.delete(msg.id)
         } else {

@@ -1,11 +1,5 @@
 const { Message } = require("discord.js")
-const {
-    getBalance,
-    getMulti,
-    updateBalance,
-    userExists,
-    createUser,
-} = require("../utils/economy/utils.js")
+const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getLastDaily, setLastDaily } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -36,7 +30,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -56,7 +50,7 @@ async function run(message, args) {
             `${getPrefix(message.guild)}daily is for BRONZE tier and higher`
         ).setFooter(`${getPrefix(message.guild)}patreon`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!isPremium(message.author.id)) {
@@ -76,9 +70,7 @@ async function run(message, args) {
             let amount = 30000
             const multi = await getMulti(message.member)
 
-            let description = `$${getBalance(
-                message.member
-            ).toLocaleString()}\n + $**${amount.toLocaleString()}**`
+            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi)
@@ -93,12 +85,10 @@ async function run(message, args) {
 
             const embed = new CustomEmbed(message.member, false, description)
 
-            return message.channel.send(embed).then((msg) => {
+            return message.channel.send({ embeds: [embed] }).then((msg) => {
                 setTimeout(() => {
-                    embed.setDescription(
-                        `new balance: $**${getBalance(message.member).toLocaleString()}**`
-                    )
-                    msg.edit(embed)
+                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`)
+                    msg.edit({ embeds: [embed] })
                 }, 2000)
             })
         } else {
@@ -111,7 +101,7 @@ async function run(message, args) {
                 "you have already used your daily reward! come back in **" + dd + "**"
             )
 
-            return message.channel.send(embed)
+            return message.channel.send({ embeds: [embed] })
         }
     }
 }

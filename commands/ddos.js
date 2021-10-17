@@ -28,11 +28,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed("$ddos <user>"))
+        return message.channel.send({ embeds: [new ErrorEmbed("$ddos <user>")] })
     }
 
     let member
@@ -48,7 +48,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send(new ErrorEmbed("invalid user"))
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
@@ -72,7 +72,7 @@ async function run(message, args) {
             "**status** *online*"
     ).setTitle("ddos tool | " + message.member.user.username)
 
-    return message.channel.send(embed).then((m) => {
+    return message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             member.user.toString() +
                 "\n\n" +
@@ -84,7 +84,7 @@ async function run(message, args) {
         )
 
         setTimeout(() => {
-            m.edit(embed).then(() => {
+            m.edit({ embeds: [embed] }).then(() => {
                 embed.setDescription(
                     member.user.toString() +
                         "\n\n" +
@@ -96,7 +96,7 @@ async function run(message, args) {
                 )
 
                 setTimeout(() => {
-                    m.edit(embed).then(() => {
+                    m.edit({ embeds: [embed] }).then(() => {
                         embed.setDescription(
                             member.user.toString() +
                                 "\n\n" +
@@ -109,7 +109,7 @@ async function run(message, args) {
                         embed.setColor("#5efb8f")
 
                         setTimeout(() => {
-                            m.edit(embed)
+                            m.edit({ embeds: [embed] })
                         }, 1000)
                     })
                 }, 1000)

@@ -4,11 +4,9 @@ const { isPremium, getTier, getEmbedColor, setEmbedColor } = require("../utils/p
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command(
-    "setcolor",
-    "set the color of the bot's messages (premium only)",
-    categories.UTILITY
-).setAliases(["setcolour"])
+const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", categories.UTILITY).setAliases([
+    "setcolour",
+])
 
 /**
  * @param {Message} message
@@ -16,19 +14,19 @@ const cmd = new Command(
  */
 async function run(message, args) {
     if (!isPremium(message.author.id)) {
-        return message.channel.send(
-            new ErrorEmbed(
-                "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi"
-            )
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi")],
+        })
     }
 
     if (getTier(message.author.id) < 1) {
-        return message.channel.send(
-            new ErrorEmbed(
-                "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"
-            )
-        )
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed(
+                    "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"
+                ),
+            ],
+        })
     }
 
     if (args.length == 0) {
@@ -41,7 +39,7 @@ async function run(message, args) {
             message.guild
         )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`)
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let color = args[0].split("#").join("")
@@ -54,13 +52,15 @@ async function run(message, args) {
 
     setEmbedColor(message.author.id, color)
 
-    return message.channel.send(
-        new CustomEmbed(
-            message.member,
-            false,
-            `your color has been updated to **#${getEmbedColor(message.author.id)}**`
-        )
-    )
+    return message.channel.send({
+        embeds: [
+            new CustomEmbed(
+                message.member,
+                false,
+                `your color has been updated to **#${getEmbedColor(message.author.id)}**`
+            ),
+        ],
+    })
 }
 
 cmd.setRun(run)

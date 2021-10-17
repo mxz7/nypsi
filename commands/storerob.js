@@ -16,11 +16,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "storerob",
-    "attempt to rob a store for a reward",
-    categories.MONEY
-).setAliases(["shoprob"])
+const cmd = new Command("storerob", "attempt to rob a store for a reward", categories.MONEY).setAliases(["shoprob"])
 
 /**
  * @param {Message} message
@@ -30,9 +26,9 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {
-        return await message.channel.send(
-            new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")
-        )
+        return await message.channel.send({
+            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")],
+        })
     }
 
     const shopWorth = new Discord.Collection()
@@ -75,18 +71,14 @@ async function run(message, args) {
         let shopList = ""
 
         for (const shop1 of shopWorth.keys()) {
-            shopList =
-                shopList + "**" + shop1 + "** $" + shopWorth.get(shop1).toLocaleString() + "\n"
+            shopList = shopList + "**" + shop1 + "** $" + shopWorth.get(shop1).toLocaleString() + "\n"
         }
 
-        shopList =
-            shopList + "the most you can recieve on one robbery is 90% of the store's balance"
+        shopList = shopList + "the most you can recieve on one robbery is 90% of the store's balance"
 
-        const embed = new CustomEmbed(message.member, false, shopList).setTitle(
-            "current store balances"
-        )
+        const embed = new CustomEmbed(message.member, false, shopList).setTitle("current store balances")
 
-        return message.channel.send(embed)
+        return message.channel.send({ embeds: [embed] })
     }
 
     let cooldownLength = 600
@@ -113,7 +105,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send(new ErrorEmbed(`still on cooldown for \`${remaining}\``))
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -182,20 +174,14 @@ async function run(message, args) {
 
         embed2.addField(
             "**success!!**",
-            "**you stole** $" +
-                robbedAmount.toLocaleString() +
-                " (" +
-                amount +
-                "%) from **" +
-                shop +
-                "**"
+            "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + shop + "**"
         )
         embed2.setColor("#5efb8f")
     }
 
-    message.channel.send(embed).then((m) => {
+    message.channel.send({ embeds: [embed] }).then((m) => {
         setTimeout(() => {
-            m.edit(embed2)
+            m.edit({ embeds: [embed2] })
         }, 1500)
     })
 }
