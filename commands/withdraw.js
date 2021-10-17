@@ -70,7 +70,7 @@ async function run(message, args) {
     }
 
     if (getBankBalance(message.member) == 0) {
-        return message.channel.send(new ErrorEmbed("you dont have any money in your bank account"))
+        return message.channel.send({embeds: [new ErrorEmbed("you dont have any money in your bank account")]})
     }
 
     if (args[0] == "all") {
@@ -84,23 +84,23 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send(new ErrorEmbed("invalid amount"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
     }
 
     let amount = parseInt(args[0])
 
     if (amount > getBankBalance(message.member)) {
-        return message.channel.send(
-            new ErrorEmbed("you dont have enough money in your bank account")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you dont have enough money in your bank account")]
+        })
     }
 
     if (!amount) {
-        return message.channel.send(new ErrorEmbed("invalid payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
     }
 
     if (amount <= 0) {
-        return message.channel.send(new ErrorEmbed("invalid payment"))
+        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
     }
 
     cooldown.set(message.member.id, new Date())
@@ -140,7 +140,7 @@ async function run(message, args) {
 
     embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
-    setTimeout(() => m.edit(embed1), 1500)
+    setTimeout(() => m.edit({embeds: [embed1]}), 1500)
 }
 
 cmd.setRun(run)
