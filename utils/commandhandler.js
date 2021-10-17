@@ -318,7 +318,7 @@ async function helpCmd(message, args) {
                 return collected.customId
             })
             .catch(async () => {
-                await msg.edit({ embeds: [embed], components: [] })
+                await msg.edit({ components: [] })
             })
 
         if (!reaction) return
