@@ -134,7 +134,7 @@ function addMention() {
                 return mentionQueue.push({
                     type: "collection",
                     members: members.clone(),
-                    message: mention.message
+                    message: mention.message,
                 })
             }
             const member = members.get(memberID)
