@@ -377,7 +377,7 @@ async function startReaction(guild, channel) {
                 }, 250)
             } else {
                 if (!waiting) {
-                    const field = await embed.embed.fields.find((f) => f.name == "winners")
+                    const field = await embed.fields.find((f) => f.name == "winners")
 
                     field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``
 
