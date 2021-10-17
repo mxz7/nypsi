@@ -130,8 +130,16 @@ function addMention() {
         const channelMembers = mention.message.channel.members
 
         for (const memberID of Array.from(members.keys())) {
-            if (count >= 200) return
+            if (count >= 200) {
+                return mentionQueue.push({
+                    type: "collection",
+                    members: members.clone(),
+                    message: mention.message
+                })
+            }
             const member = members.get(memberID)
+
+            members.delete(memberID)
 
             if (member.user.bot) continue
             if (member.user.id == mention.message.author.id) continue
