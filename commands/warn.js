@@ -53,9 +53,9 @@ async function run(message, args) {
         const member = members.find((m) => m.id == args[0])
 
         if (!member) {
-            return message.channel.send(
-                new ErrorEmbed("unable to find member with ID `" + args[0] + "`")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")]
+            })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -63,7 +63,7 @@ async function run(message, args) {
         const member = await getExactMember(message, args[0])
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("unable to find member `" + args[0] + "`"))
+            return message.channel.send({embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")]})
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -78,7 +78,7 @@ async function run(message, args) {
         }
         reason = args.join(" ")
     } else {
-        return message.channel.send(new ErrorEmbed("you must include a warn reason"))
+        return message.channel.send({embeds: [new ErrorEmbed("you must include a warn reason")]})
     }
 
     let count = 0
@@ -93,7 +93,7 @@ async function run(message, args) {
 
         if (
             targetHighestRole.position >= memberHighestRole.position &&
-            message.guild.owner.user.id != message.member.user.id
+            message.guild.ownerId != message.member.user.id
         ) {
             failed.push(members.get(member).user)
         } else {
@@ -103,7 +103,7 @@ async function run(message, args) {
 
             await members
                 .get(member)
-                .send(`you have been warned in ${message.guild.name}`, embed)
+                .send({content: `you have been warned in ${message.guild.name}`, embeds: [embed]})
                 .catch(() => {
                     error.push(members.get(member).user)
                 })
@@ -111,12 +111,12 @@ async function run(message, args) {
         }
 
         if (members.get(member).user.id == message.client.user.id) {
-            await message.channel.send("wow... 😢")
+            await message.channel.send({content: "wow... 😢"})
         }
     }
 
     if (count == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to warn any users"))
+        return message.channel.send({embeds: [new ErrorEmbed("i was unable to warn any users")]})
     }
 
     const embed = new CustomEmbed(
@@ -149,7 +149,7 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send(embed).catch()
+        await message.member.send({embeds: [embed]}).catch()
     } else {
         await message.channel.send({ embeds: [embed] })
     }
