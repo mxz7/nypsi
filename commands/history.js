@@ -229,7 +229,7 @@ async function run(message, args) {
                         }
                     }
                     newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length)
-                    if (currentPage == lastPage) {
+                    if (currentPage + 1 == lastPage) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
