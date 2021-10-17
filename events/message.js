@@ -27,7 +27,6 @@ module.exports = async (message) => {
     }
 
     if (hasGuild(message.guild)) {
-        
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
