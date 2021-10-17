@@ -16,7 +16,7 @@ async function run(message, args) {
 
     if (
         message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
-        message.guild.owner.user.id != message.member.user.id
+        message.guild.ownerId != message.member.user.id
     ) {
         const embed = new ErrorEmbed("to delete all cases you must be the server owner")
 
