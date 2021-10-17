@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     getXp,
     getPrestigeRequirement,
@@ -82,28 +82,28 @@ async function run(message, args) {
         message.member,
         true,
         "are you sure you want to prestige?\n\n" +
-            `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n` +
-            "react with ✅ to prestige"
+            `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
     ).setTitle(`prestige | ${message.member.user.username}`)
 
     cooldown.set(message.member.id, new Date())
 
-    const msg = await message.channel.send({ embeds: [embed] })
-    await msg.react("✅")
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
+    )
 
-    const filter = (reaction, user) => {
-        return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const msg = await message.channel.send({ embeds: [embed] })
+
+    const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitReactions({filter, max: 1, time: 15000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({filter, time: 15000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(async () => {
-            await msg.reactions.removeAll()
             embed.setDescription("❌ expired")
-            await msg.edit({embeds: [embed]})
+            await msg.edit({embeds: [embed], components: []})
             cooldown.delete(message.author.id)
         })
 
@@ -168,7 +168,8 @@ async function run(message, args) {
                 )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
-        await msg.edit({embeds: [embed]})
+        
+        await msg.edit({embeds: [embed], components: []})
     }
 }
 
