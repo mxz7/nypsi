@@ -139,7 +139,7 @@ async function run(message, args) {
 
         async function pageManager() {
             const reaction = await msg
-                .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
                 .then((collected) => {
                     return collected.first().emoji.name
                 })
@@ -168,7 +168,7 @@ async function run(message, args) {
                     }
 
                     newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -186,7 +186,7 @@ async function run(message, args) {
                     }
 
                     newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
-                    await msg.edit(newEmbed)
+                    await msg.edit({embeds: [newEmbed]})
                     return pageManager()
                 }
             }
