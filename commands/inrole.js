@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -35,7 +35,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}inrole <role>`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}inrole <role>`)] })
     }
 
     const roles = message.guild.roles.cache
@@ -51,7 +51,7 @@ async function run(message, args) {
     }
 
     if (!role) {
-        return message.channel.send({embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)] })
     }
 
     let members
@@ -96,7 +96,7 @@ async function run(message, args) {
 
     if (!memberList.get(1)) {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "that role has no members")]
+            embeds: [new CustomEmbed(message.member, false, "that role has no members")],
         })
     }
 
@@ -104,28 +104,38 @@ async function run(message, args) {
         .setTitle(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`)
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
+
+    if (memberList.size >= 2) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
+    }
 
     if (memberList.size <= 1) return
-
-    await msg.react("⬅")
-    await msg.react("➡")
 
     let currentPage = 1
     const lastPage = memberList.size
 
-    const filter = (reaction, user) => {
-        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
     async function pageManager() {
         const reaction = await msg
-            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name
+            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                await collected.deferUpdate()
+                return collected.customId
             })
             .catch(async () => {
-                await msg.reactions.removeAll()
+                await msg.edit({ embeds: [embed], components: [] })
             })
 
         if (!reaction) return
@@ -137,7 +147,18 @@ async function run(message, args) {
                 currentPage--
                 embed.setDescription(memberList.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit({embeds: [embed]})
+                if (currentPage == 1) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -147,7 +168,18 @@ async function run(message, args) {
                 currentPage++
                 embed.setDescription(memberList.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit({embeds: [embed]})
+                if (currentPage == lastPage) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         }
