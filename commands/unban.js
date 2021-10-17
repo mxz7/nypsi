@@ -15,15 +15,15 @@ const cmd = new Command("unban", "unban one or more users", categories.MODERATIO
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send(new ErrorEmbed("you need the `ban members` permission"))
+            return message.channel.send({embeds: [new ErrorEmbed("you need the `ban members` permission")]})
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
-        return message.channel.send(
-            new ErrorEmbed("i need the `ban members` permission for this command to work")
-        )
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")]
+        })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -89,7 +89,7 @@ async function run(message, args) {
     }
 
     if (members.length == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to unban any users"))
+        return message.channel.send({embeds: [new ErrorEmbed("i was unable to unban any users")]})
     }
 
     const embed = new CustomEmbed(message.member).setTitle(
@@ -110,7 +110,7 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         await message.delete()
-        await message.member.send(embed).catch()
+        await message.member.send({embeds: [embed]}).catch()
     } else {
         await message.channel.send({ embeds: [embed] })
     }
