@@ -296,7 +296,7 @@ async function helpCmd(message, args) {
                 )}disablecmd + customcommand`
             )
         } else {
-            return message.channel.send(new ErrorEmbed("unknown command"))
+            return message.channel.send({embeds: [new ErrorEmbed("unknown command")]})
         }
     }
 
@@ -318,7 +318,7 @@ async function helpCmd(message, args) {
 
     async function pageManager() {
         const reaction = await msg
-            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
             .then((collected) => {
                 return collected.first().emoji.name
             })
@@ -335,7 +335,7 @@ async function helpCmd(message, args) {
                 currentPage--
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit(embed)
+                await msg.edit({embeds: [embed]})
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -345,7 +345,7 @@ async function helpCmd(message, args) {
                 currentPage++
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit(embed)
+                await msg.edit({embeds: [embed]})
                 return pageManager()
             }
         }
@@ -372,10 +372,10 @@ async function runCommand(cmd, message, args) {
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
-        return message.channel.send(
-            "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+        return message.channel.send({
+            content: "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
                 "if this error still shows, check channel specific permissions"
-        )
+        })
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
@@ -387,18 +387,18 @@ async function runCommand(cmd, message, args) {
     }
 
     if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
-        return message.channel.send(
-            "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+        return message.channel.send({
+            content: "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
                 "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
                 "if this error still shows, check channel specific permissions"
-        )
+        })
     }
 
     if (restarting) {
         if (message.author.id == "672793821850894347") {
             message.react("💀")
         } else {
-            return message.channel.send(new ErrorEmbed("nypsi is restarting.."))
+            return message.channel.send({embeds: [new ErrorEmbed("nypsi is restarting..")]})
         }
     }
 
@@ -427,9 +427,9 @@ async function runCommand(cmd, message, args) {
             }, 1500)
 
             if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
-                return message.channel.send(
-                    new ErrorEmbed("custom commands have been disabled in this server")
-                )
+                return message.channel.send({
+                    embeds: [new ErrorEmbed("custom commands have been disabled in this server")]
+                })
             }
 
             const filter = getChatFilter(message.guild)
@@ -442,9 +442,9 @@ async function runCommand(cmd, message, args) {
 
             for (const word of filter) {
                 if (content.indexOf(word.toLowerCase()) != -1) {
-                    return message.channel.send(
-                        new ErrorEmbed("this custom command is not allowed in this server")
-                    )
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("this custom command is not allowed in this server")]
+                    })
                 }
             }
 
@@ -498,10 +498,10 @@ async function runCommand(cmd, message, args) {
             .catch(() => {
                 fail = true
                 info(`captcha (${message.author.id}) failed`)
-                return message.channel.send(
-                    message.author.toString() +
+                return message.channel.send({
+                    content: message.author.toString() +
                         " captcha failed, please **type** the letter/number combination shown"
-                )
+                })
             })
 
         beingChecked.splice(beingChecked.indexOf(message.author.id), 1)
@@ -516,10 +516,10 @@ async function runCommand(cmd, message, args) {
             return message.react("✅")
         } else {
             info(`captcha (${message.author.id}) failed`)
-            return message.channel.send(
-                message.author.toString() +
+            return message.channel.send({
+                content: message.author.toString() +
                     " captcha failed, please **type** the letter/number combination shown"
-            )
+            })
         }
     }
 
@@ -549,15 +549,15 @@ async function runCommand(cmd, message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send(
-                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)]
+            })
         }
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
-            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            return message.channel.send({embeds: [new ErrorEmbed("that command has been disabled")]})
         }
         commands.get(aliases.get(cmd)).run(message, args)
     } else {
@@ -582,15 +582,15 @@ async function runCommand(cmd, message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send(
-                new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)]
+            })
         }
 
         updatePopularCommands(commands.get(cmd).name, message.author.tag)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
-            return message.channel.send(new ErrorEmbed("that command has been disabled"))
+            return message.channel.send({embeds: [new ErrorEmbed("that command has been disabled")]})
         }
         commands.get(cmd).run(message, args)
     }
@@ -784,7 +784,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer)} commands)`)
         }
 
-        await channel.send(embed)
+        await channel.send({embeds: [embed]})
         info("sent popular commands", types.AUTOMATION)
 
         popularCommands.clear()
