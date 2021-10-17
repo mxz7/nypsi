@@ -26,7 +26,8 @@ module.exports = async (message) => {
         return await message.channel.send({ embeds: [embed] })
     }
 
-    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) && hasGuild(message.guild)) {
+    if (hasGuild(message.guild)) {
+        if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return
         const filter = getChatFilter(message.guild)
 
         let content = message.content.toLowerCase().normalize("NFD")
