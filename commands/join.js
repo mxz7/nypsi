@@ -6,11 +6,7 @@ const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const workerSort = require("../utils/sort-worker")
 const { inPlaceSort } = require("fast-sort")
 
-const cmd = new Command(
-    "join",
-    "information about when you joined the server",
-    categories.INFO
-).setAliases(["joined"])
+const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
 
 const sortCache = new Map()
 
@@ -32,7 +28,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
@@ -40,10 +36,7 @@ async function run(message, args) {
 
     let members
 
-    if (
-        inCooldown(message.guild) ||
-        message.guild.memberCount == message.guild.members.cache.size
-    ) {
+    if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -52,10 +45,7 @@ async function run(message, args) {
 
     let membersSorted = []
 
-    if (
-        sortCache.has(message.guild.id) &&
-        sortCache.get(message.guild.id).length == message.guild.memberCount
-    ) {
+    if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
         membersSorted = sortCache.get(message.guild.id)
     } else if (message.guild.memberCount < 69420) {
         const membersMap = new Map()
@@ -69,11 +59,9 @@ async function run(message, args) {
 
         if (membersSorted.length > 1500) {
             const msg = await message.channel.send({
-                embeds: [new CustomEmbed(
-                    message.member,
-                    false,
-                    `sorting ${membersSorted.length.toLocaleString()} members..`
-                )]
+                embeds: [
+                    new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
+                ],
             })
             membersSorted = await workerSort(membersSorted, membersMap)
             await msg.delete()

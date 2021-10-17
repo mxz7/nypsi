@@ -24,13 +24,9 @@ async function run(message, args) {
     }
 
     if (!profileExists(message.guild))
-        return await message.channel.send({embeds: [new ErrorEmbed("there are no cases to delete")]})
+        return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] })
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        "react with ✅ to delete all punishment/moderation cases"
-    )
+    const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
         .setTitle("confirmation")
         .setFooter("this cannot be reversed")
 
@@ -54,13 +50,11 @@ async function run(message, args) {
     if (reaction == "✅") {
         deleteServer(message.guild)
 
-        const newEmbed = new CustomEmbed(
-            message.member,
-            false,
+        const newEmbed = new CustomEmbed(message.member, false, "✅ all cases have been deleted").setDescription(
             "✅ all cases have been deleted"
-        ).setDescription("✅ all cases have been deleted")
+        )
 
-        await msg.edit({embeds: [newEmbed]})
+        await msg.edit({ embeds: [newEmbed] })
     }
 }
 

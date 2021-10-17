@@ -1,11 +1,5 @@
 const { Message } = require("discord.js")
-const {
-    getBalance,
-    getMulti,
-    updateBalance,
-    userExists,
-    createUser,
-} = require("../utils/economy/utils.js")
+const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getLastDaily, setLastDaily } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -76,9 +70,7 @@ async function run(message, args) {
             let amount = 30000
             const multi = await getMulti(message.member)
 
-            let description = `$${getBalance(
-                message.member
-            ).toLocaleString()}\n + $**${amount.toLocaleString()}**`
+            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi)
@@ -95,10 +87,8 @@ async function run(message, args) {
 
             return message.channel.send({ embeds: [embed] }).then((msg) => {
                 setTimeout(() => {
-                    embed.setDescription(
-                        `new balance: $**${getBalance(message.member).toLocaleString()}**`
-                    )
-                    msg.edit({embeds: [embed]})
+                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`)
+                    msg.edit({ embeds: [embed] })
                 }, 2000)
             })
         } else {

@@ -1,11 +1,6 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const {
-    getDMsEnabled,
-    setDMsEnabled,
-    userExists,
-    createUser,
-} = require("../utils/economy/utils.js")
+const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../utils/economy/utils.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cmd = new Command("dms", "enable/disable dms with the bot", categories.INFO).setAliases([
@@ -56,11 +51,7 @@ async function run(message, args) {
 
     if (current) {
         newValue = false
-        embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ you will no longer receive dms from nypsi"
-        )
+        embed = new CustomEmbed(message.member, false, "✅ you will no longer receive dms from nypsi")
     } else {
         newValue = true
         embed = new CustomEmbed(message.member, false, "✅ you will now receive dms from nypsi")

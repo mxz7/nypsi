@@ -51,9 +51,7 @@ async function run(message, args) {
 
     if (getPrestige(message.member) >= 20) {
         return message.channel.send(
-            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage(
-                "https://i.imgur.com/vB3UGgi.png"
-            )
+            new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")
         )
     }
 
@@ -63,9 +61,7 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
     if (currentXp < neededXp) {
-        return message.channel.send(
-            new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
-        )
+        return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
     }
 
     if (currentBal < neededBal) {
@@ -96,14 +92,14 @@ async function run(message, args) {
     const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitMessageComponent({filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
         .then(async (collected) => {
             await collected.deferUpdate()
             return collected.customId
         })
         .catch(async () => {
             embed.setDescription("❌ expired")
-            await msg.edit({embeds: [embed], components: []})
+            await msg.edit({ embeds: [embed], components: [] })
             cooldown.delete(message.author.id)
         })
 
@@ -117,9 +113,7 @@ async function run(message, args) {
         neededBal = getPrestigeRequirementBal(neededXp)
 
         if (currentXp < neededXp) {
-            return message.channel.send(
-                new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)
-            )
+            return message.channel.send(new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`))
         }
 
         if (currentBal < neededBal) {
@@ -159,17 +153,14 @@ async function run(message, args) {
 
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
-                `new vote rewards: $**${(
-                    15000 *
-                    (getPrestige(message.member) + 1)
-                ).toLocaleString()}**, **${getPrestige(message.member) + 1}** vote crates\n` +
-                `your new multiplier: **${Math.floor(
-                    multi * 100
-                )}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
+                `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**, **${
+                    getPrestige(message.member) + 1
+                }** vote crates\n` +
+                `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
-        
-        await msg.edit({embeds: [embed], components: []})
+
+        await msg.edit({ embeds: [embed], components: [] })
     }
 }
 

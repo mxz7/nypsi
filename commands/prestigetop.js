@@ -5,11 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "prestigetop",
-    "view top prestiges in the server",
-    categories.MONEY
-).setAliases(["topprestige"])
+const cmd = new Command("prestigetop", "view top prestiges in the server", categories.MONEY).setAliases(["topprestige"])
 
 /**
  * @param {Message} message
@@ -64,9 +60,7 @@ async function run(message, args) {
         return el != null
     })
 
-    const embed = new CustomEmbed(message.member, false)
-        .setTitle("top " + filtered.length)
-        .setDescription(filtered)
+    const embed = new CustomEmbed(message.member, false).setTitle("top " + filtered.length).setDescription(filtered)
 
     message.channel.send({ embeds: [embed] })
 }

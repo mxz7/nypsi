@@ -13,16 +13,14 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", categ
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
-    const embed = new CustomEmbed(message.member).setTitle(
-        "padlock | " + message.member.user.username
-    )
+    const embed = new CustomEmbed(message.member).setTitle("padlock | " + message.member.user.username)
 
     const padlockPrice = getPadlockPrice()
     const prefix = getPrefix(message.guild)
 
     if (args.length == 1) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`)]
+            embeds: [new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`)],
         })
     } else {
         if (hasPadlock(message.member)) {

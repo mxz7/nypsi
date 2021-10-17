@@ -27,7 +27,7 @@ async function run(message, args) {
 
     if (getBalance(message.member) < 1000) {
         return await message.channel.send({
-            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank")]
+            embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank")],
         })
     }
 
@@ -71,15 +71,12 @@ async function run(message, args) {
         let bankList = ""
 
         for (const bank1 of bankWorth.keys()) {
-            bankList =
-                bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
+            bankList = bankList + "**" + bank1 + "** $" + bankWorth.get(bank1).toLocaleString() + "\n"
         }
 
         bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
 
-        const embed = new CustomEmbed(message.member, false, bankList).setTitle(
-            "current bank balances"
-        )
+        const embed = new CustomEmbed(message.member, false, bankList).setTitle("current bank balances")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -177,20 +174,14 @@ async function run(message, args) {
 
         embed2.addField(
             "**success!!**",
-            "**you stole** $" +
-                robbedAmount.toLocaleString() +
-                " (" +
-                amount +
-                "%) from **" +
-                bank +
-                "**"
+            "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + bank + "**"
         )
         embed2.setColor("#5efb8f")
     }
 
     message.channel.send({ embeds: [embed] }).then((m) => {
         setTimeout(() => {
-            m.edit({embeds: [embed2]})
+            m.edit({ embeds: [embed2] })
         }, 1500)
     })
 }

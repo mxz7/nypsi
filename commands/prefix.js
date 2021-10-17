@@ -3,9 +3,7 @@ const { getPrefix, setPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions([
-    "MANAGE_GUILD",
-])
+const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions(["MANAGE_GUILD"])
 
 /**
  * @param {Message} message
@@ -16,7 +14,7 @@ async function run(message, args) {
 
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
         }
         return
     }
@@ -25,27 +23,19 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            "current prefix: `" +
-                prefix +
-                "`\n\nuse " +
-                prefix +
-                "**prefix** <new prefix> to change the current prefix"
+            "current prefix: `" + prefix + "`\n\nuse " + prefix + "**prefix** <new prefix> to change the current prefix"
         ).setTitle("prefix")
 
         return message.channel.send({ embeds: [embed] })
     }
 
     if (args.join(" ").length > 3) {
-        return message.channel.send({embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")] })
     }
 
     setPrefix(message.guild, args.join(" "))
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        "✅ prefix changed to `" + args.join(" ") + "`"
-    ).setTitle("prefix")
+    const embed = new CustomEmbed(message.member, false, "✅ prefix changed to `" + args.join(" ") + "`").setTitle("prefix")
 
     return await message.channel.send({ embeds: [embed] })
 }

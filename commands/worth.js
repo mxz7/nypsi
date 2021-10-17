@@ -18,11 +18,7 @@ async function run(message, args) {
 
     if (args.length == 0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `${getPrefix(
-                    message.guild
-                )}worth <item> (amount)\n\ncalculates the worth of an item`
-            )]
+            embeds: [new ErrorEmbed(`${getPrefix(message.guild)}worth <item> (amount)\n\ncalculates the worth of an item`)],
         })
     }
 
@@ -49,7 +45,7 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send({embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
     }
 
     let amount = 1
@@ -64,11 +60,11 @@ async function run(message, args) {
     }
 
     if (!parseInt(amount)) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (amount < 1) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (amount > 250) amount = 250
@@ -82,7 +78,7 @@ async function run(message, args) {
     } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
         if (!selected.worth) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)]
+                embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
             })
         }
         worth = Math.floor(selected.worth * 0.95 * amount)

@@ -21,7 +21,7 @@ async function run(message, args) {
             confirm = false
         }, 120000)
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "run command again to confirm")]
+            embeds: [new CustomEmbed(message.member, false, "run command again to confirm")],
         })
     } else {
         startRestart()
@@ -34,7 +34,7 @@ async function run(message, args) {
         }, 60000)
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")]
+            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")],
         })
     }
 }

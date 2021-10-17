@@ -20,24 +20,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { gamble } = require("../utils/logger.js")
 
-const reel1 = [
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍊",
-    "🍊",
-    "🍊",
-    "🍊",
-    "🍋",
-    "🍋",
-    "🍒",
-]
+const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = [
     "🍉",
     "🍉",
@@ -59,26 +42,7 @@ const reel2 = [
     "🍒",
     "🍒",
 ]
-const reel3 = [
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍊",
-    "🍊",
-    "🍊",
-    "🍋",
-    "🍋",
-    "🍒",
-    "🍒",
-]
+const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒", "🍒"]
 
 const cooldown = new Map()
 
@@ -133,16 +97,14 @@ async function run(message, args) {
     }
 
     if (args.length == 1 && args[0] == "info") {
-        const embed = new CustomEmbed(message.member)
-            .setTitle("win board")
-            .setDescription(winBoard())
+        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(winBoard())
 
         return message.channel.send({ embeds: [embed] })
     }
 
     if (!args[0]) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)]
+            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
         })
     }
 
@@ -159,9 +121,7 @@ async function run(message, args) {
             args[0] = formatBet(args[0])
         } else {
             return message.channel.send({
-                embeds: [new ErrorEmbed(
-                    `${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`
-                )]
+                embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
             })
         }
     }
@@ -169,26 +129,28 @@ async function run(message, args) {
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)]
+            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
         })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )]
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
         })
     }
 
@@ -230,13 +192,7 @@ async function run(message, args) {
         }
     }
 
-    if (
-        one == two &&
-        one == three &&
-        one != "🍒" &&
-        one != "🍋" &&
-        getBalance(message.member) < 1000000
-    ) {
+    if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
         const chance = Math.floor(Math.random() * 10)
 
         if (chance < 3) {
@@ -278,10 +234,7 @@ async function run(message, args) {
         }
 
         if (voted) {
-            updateBalance(
-                message.member,
-                getBalance(message.member) + Math.round(winnings * voteMulti)
-            )
+            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
             winnings = winnings + Math.round(winnings * voteMulti)
         }
     }
@@ -289,14 +242,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         true,
-        "---------------\n" +
-            one +
-            " | " +
-            two +
-            " | " +
-            three +
-            "\n---------------\n**bet** $" +
-            bet.toLocaleString()
+        "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString()
     ).setTitle("slots | " + message.member.user.username)
 
     message.channel.send({ embeds: [embed] }).then((m) => {
@@ -337,7 +283,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit({embeds: [embed]})
+            m.edit({ embeds: [embed] })
         }, 1500)
     })
 

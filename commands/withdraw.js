@@ -18,9 +18,7 @@ const tax = 0.05
 
 const cooldown = new Map()
 
-const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases([
-    "with",
-])
+const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases(["with"])
 
 /**
  * @param {Message} message
@@ -62,15 +60,12 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member)
             .setTitle("withdraw help")
             .addField("usage", `${prefix}withdraw <amount>`)
-            .addField(
-                "help",
-                "you can withdraw money from your bank aslong as you have that amount available in your bank"
-            )
+            .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank")
         return message.channel.send({ embeds: [embed] })
     }
 
     if (getBankBalance(message.member) == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you dont have any money in your bank account")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] })
     }
 
     if (args[0] == "all") {
@@ -84,23 +79,23 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     let amount = parseInt(args[0])
 
     if (amount > getBankBalance(message.member)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("you dont have enough money in your bank account")]
+            embeds: [new ErrorEmbed("you dont have enough money in your bank account")],
         })
     }
 
     if (!amount) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid payment")] })
     }
 
     if (amount <= 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid payment")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid payment")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -140,7 +135,7 @@ async function run(message, args) {
 
     embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
-    setTimeout(() => m.edit({embeds: [embed1]}), 1500)
+    setTimeout(() => m.edit({ embeds: [embed1] }), 1500)
 }
 
 cmd.setRun(run)

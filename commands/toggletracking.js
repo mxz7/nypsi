@@ -10,11 +10,7 @@ const {
     createUsernameProfile,
 } = require("../utils/users/utils")
 
-const cmd = new Command(
-    "toggletracking",
-    "toggle tracking your username and avatar changes",
-    categories.INFO
-)
+const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", categories.INFO)
 
 const cooldown = new Map()
 
@@ -53,20 +49,16 @@ async function run(message, args) {
     if (isTracking(message.author.id)) {
         disableTracking(message.author.id)
         return message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                "✅ username and avatar tracking has been disabled"
-            ).setFooter(`use ${getPrefix(message.guild)}(un/avh) -clear to clear your history`)]
+            embeds: [
+                new CustomEmbed(message.member, false, "✅ username and avatar tracking has been disabled").setFooter(
+                    `use ${getPrefix(message.guild)}(un/avh) -clear to clear your history`
+                ),
+            ],
         })
     } else {
         enableTracking(message.author.id)
         return message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                "✅ username and avatar tracking has been enabled"
-            )]
+            embeds: [new CustomEmbed(message.member, false, "✅ username and avatar tracking has been enabled")],
         })
     }
 }

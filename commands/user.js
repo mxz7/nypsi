@@ -6,9 +6,7 @@ const workerSort = require("../utils/sort-worker")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { inPlaceSort } = require("fast-sort")
 
-const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(
-    ["whois", "who"]
-)
+const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(["whois", "who"])
 
 const sortCache = new Map()
 
@@ -41,22 +39,17 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (args.join(" ").includes("-id")) {
-        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setTitle(
-            member.user.tag
-        )
+        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setTitle(member.user.tag)
         return message.channel.send({ embeds: [embed] })
     }
 
     let members
 
-    if (
-        inCooldown(message.guild) ||
-        message.guild.memberCount == message.guild.members.cache.size
-    ) {
+    if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -65,10 +58,7 @@ async function run(message, args) {
 
     let membersSorted = []
 
-    if (
-        sortCache.has(message.guild.id) &&
-        sortCache.get(message.guild.id).length == message.guild.memberCount
-    ) {
+    if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
         membersSorted = sortCache.get(message.guild.id)
     } else if (message.guild.memberCount < 69420) {
         const membersMap = new Map()
@@ -82,11 +72,9 @@ async function run(message, args) {
 
         if (membersSorted.length > 1500) {
             const msg = await message.channel.send({
-                embeds: [new CustomEmbed(
-                    message.member,
-                    false,
-                    `sorting ${membersSorted.length.toLocaleString()} members..`
-                )]
+                embeds: [
+                    new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
+                ],
             })
             membersSorted = await workerSort(membersSorted, membersMap)
             await msg.delete()
@@ -122,11 +110,7 @@ async function run(message, args) {
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
         .setTitle(member.user.tag)
 
-        .addField(
-            "account",
-            `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`,
-            true
-        )
+        .addField("account", `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`, true)
 
         .addField(
             "server",

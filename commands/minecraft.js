@@ -10,11 +10,7 @@ const { getNameHistory } = require("mc-names")
 const cooldown = new Map()
 const serverCache = new Map()
 
-const cmd = new Command(
-    "minecraft",
-    "view information about a minecraft account",
-    categories.MINECRAFT
-).setAliases(["mc"])
+const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
 
 /**
  * @param {Message} message
@@ -51,7 +47,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -80,17 +76,13 @@ async function run(message, args) {
                     serverCache.delete(serverIP.toLowerCase())
                 }, 600000)
             } else {
-                return message.channel.send({embeds: [new ErrorEmbed("invalid server")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid server")] })
             }
         }
 
         const embed = new CustomEmbed(message.member, true)
             .setTitle(args[0] + " | " + res.ip + ":" + res.port)
-            .addField(
-                "players",
-                res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(),
-                true
-            )
+            .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
             .addField("version", res.version, true)
             .addField("motd", res.motd.clean)
 
@@ -102,7 +94,7 @@ async function run(message, args) {
     const nameHistory = await getNameHistory(username)
 
     if (!nameHistory) {
-        return await message.channel.send({embeds: [new ErrorEmbed("invalid account")]})
+        return await message.channel.send({ embeds: [new ErrorEmbed("invalid account")] })
     }
 
     const skin = `https://mc-heads.net/avatar/${nameHistory.uuid}/256`
@@ -136,7 +128,6 @@ async function run(message, args) {
         return await message.channel.send({ embeds: [embed] })
     }
 
-
     if (names.size >= 2) {
         let currentPage = 1
         const lastPage = names.size
@@ -151,7 +142,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: []})
+                    await msg.edit({ components: [] })
                 })
 
             if (!reaction) return
@@ -195,7 +186,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({embeds: [embed], components: [row]})
+                    await msg.edit({ embeds: [embed], components: [row] })
                     return pageManager()
                 }
             }

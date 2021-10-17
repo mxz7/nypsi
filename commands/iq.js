@@ -53,7 +53,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -126,11 +126,9 @@ async function run(message, args) {
         iqMsg = "uh. woah."
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`
-    ).setTitle("iq calculator")
+    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setTitle(
+        "iq calculator"
+    )
 
     return message.channel.send({ embeds: [embed] })
 }

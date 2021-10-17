@@ -5,11 +5,9 @@ const { getItems, userExists, getInventory, setInventory } = require("../utils/e
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { info } = require("../utils/logger")
 
-const cmd = new Command(
-    "crateall",
-    "give every user in the current guild a crate",
-    categories.NONE
-).setPermissions(["bot owner"])
+const cmd = new Command("crateall", "give every user in the current guild a crate", categories.NONE).setPermissions([
+    "bot owner",
+])
 
 /**
  * @param {Message} message
@@ -19,7 +17,7 @@ async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("u know how this works")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("u know how this works")] })
     }
 
     const items = getItems()
@@ -45,11 +43,11 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send({embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
     }
 
     if (selected.role != "crate") {
-        return message.channel.send({embeds: [new ErrorEmbed(`${selected.name} is not a crate`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] })
     }
 
     let members
@@ -86,11 +84,7 @@ async function run(message, args) {
     }
 
     return message.channel.send({
-        embeds: [new CustomEmbed(
-            message.member,
-            false,
-            `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`
-        )]
+        embeds: [new CustomEmbed(message.member, false, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
     })
 }
 

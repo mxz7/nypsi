@@ -6,11 +6,10 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "mentions",
-    "view who mentioned you recently",
-    categories.UTILITY
-).setAliases(["pings", "whothefuckpingedme"])
+const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases([
+    "pings",
+    "whothefuckpingedme",
+])
 
 /**
  * @param {Message} message
@@ -45,17 +44,17 @@ async function run(message, args) {
     const { mentions } = require("../nypsi.js")
 
     if (!mentions.get(message.guild.id)) {
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     if (!mentions.get(message.guild.id).get(message.author.id)) {
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     const userMentions = mentions.get(message.guild.id).get(message.author.id)
 
     if (userMentions.length == 0) {
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent mentions")]})
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     userMentions.reverse()
@@ -65,27 +64,17 @@ async function run(message, args) {
     for (let i of userMentions) {
         if (pages.size == 0) {
             const page1 = []
-            page1.push(
-                `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
-            )
+            page1.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
             pages.set(1, page1)
         } else {
             const lastPage = pages.size
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = []
-                newPage.push(
-                    `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`
-                )
+                newPage.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
                 pages.set(lastPage + 1, newPage)
             } else {
-                pages
-                    .get(lastPage)
-                    .push(
-                        `${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${
-                            i.link
-                        })`
-                    )
+                pages.get(lastPage).push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
             }
         }
     }

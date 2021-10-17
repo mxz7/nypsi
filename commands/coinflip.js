@@ -21,9 +21,7 @@ const cooldown = new Map()
 
 const waiting = []
 
-const cmd = new Command("coinflip", "flip a coin, double or nothing", categories.MONEY).setAliases([
-    "cf",
-])
+const cmd = new Command("coinflip", "flip a coin, double or nothing", categories.MONEY).setAliases(["cf"])
 
 /**
  * @param {Message} message
@@ -77,7 +75,7 @@ async function run(message, args) {
 
     if (waiting.includes(message.author.id)) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("please wait until your game has been accepted or denied")]
+            embeds: [new ErrorEmbed("please wait until your game has been accepted or denied")],
         })
     }
 
@@ -94,19 +92,19 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send({embeds: [new ErrorEmbed("unable to find that member")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find that member")] })
     }
 
     if (message.member == target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (target.user.bot) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (args[1] == "all") {
@@ -121,26 +119,26 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] })
         }
     }
 
     const bet = parseInt(args[1])
 
     if (!bet) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     if (bet > getBalance(target)) {
-        return message.channel.send({embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] })
     }
 
     const maxBet = await calcMaxBet(message.member)
@@ -148,15 +146,17 @@ async function run(message, args) {
 
     if (bet > maxBet) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )]
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
         })
     }
 
     if (bet > targetMaxBet) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`**${target.user.tag}**'s max bet is too low for this bet`)]
+            embeds: [new ErrorEmbed(`**${target.user.tag}**'s max bet is too low for this bet`)],
         })
     }
 
@@ -167,14 +167,12 @@ async function run(message, args) {
     const requestEmbed = new CustomEmbed(
         message.member,
         false,
-        `**${
-            message.author.tag
-        }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+        `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
     ).setFooter("expires in 60 seconds")
 
     await message.channel.send({
         content: `${target.user.toString()} you have been invited to a coinflip worth $${bet.toLocaleString()}`,
-        embeds: [requestEmbed]
+        embeds: [requestEmbed],
     })
 
     const filter = (m) => m.author.id == target.id
@@ -189,7 +187,7 @@ async function run(message, args) {
             fail = true
             waiting.splice(waiting.indexOf(message.author.id), 1)
             updateBalance(message.member, getBalance(message.member) + bet)
-            return message.channel.send({content: message.author.toString() + " coinflip request expired"})
+            return message.channel.send({ content: message.author.toString() + " coinflip request expired" })
         })
 
     if (fail) return
@@ -202,7 +200,7 @@ async function run(message, args) {
         response == "bring it on"
     ) {
         if (bet > getBalance(target)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
         }
 
         cooldown.set(message.member.id, new Date())
@@ -275,28 +273,22 @@ async function run(message, args) {
 
         return message.channel.send({ embeds: [embed] }).then((msg) => {
             if (winner == message.member) {
-                thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${
-                    target.user.username
-                }`
+                thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${target.user.username}`
             } else {
-                thingy = `${message.author.username}\n**${
-                    target.user.username
-                }** +$${bet.toLocaleString()}`
+                thingy = `${message.author.username}\n**${target.user.username}** +$${bet.toLocaleString()}`
             }
 
-            embed.setDescription(
-                `**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
-            )
+            embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`)
             embed.setColor(winner.displayHexColor)
 
             return setTimeout(() => {
-                return msg.edit({embeds: [embed]})
+                return msg.edit({ embeds: [embed] })
             }, 2000)
         })
     } else {
         updateBalance(message.member, getBalance(message.member) + bet)
         waiting.splice(waiting.indexOf(message.author.id), 1)
-        return message.channel.send({embeds: [new CustomEmbed(target, false, "✅ coinflip request denied")]})
+        return message.channel.send({ embeds: [new CustomEmbed(target, false, "✅ coinflip request denied")] })
     }
 }
 

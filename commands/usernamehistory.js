@@ -11,11 +11,7 @@ const {
 } = require("../utils/users/utils")
 const { getMember, formatDate } = require("../utils/utils")
 
-const cmd = new Command(
-    "usernamehistory",
-    "view a user's username history",
-    categories.INFO
-).setAliases(["un", "usernames"])
+const cmd = new Command("usernamehistory", "view a user's username history", categories.INFO).setAliases(["un", "usernames"])
 
 const cooldown = new Map()
 
@@ -57,7 +53,7 @@ async function run(message, args) {
         if (args[0].toLowerCase() == "-clear") {
             clearUsernameHistory(message.member)
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "✅ your username history has been cleared")]
+                embeds: [new CustomEmbed(message.member, false, "✅ your username history has been cleared")],
             })
         }
 
@@ -69,7 +65,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     cooldown.set(message.member.id, new Date())

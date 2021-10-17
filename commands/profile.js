@@ -84,15 +84,7 @@ async function run(message, args) {
     )
 
     //PATREON
-    let tier,
-        tierString,
-        embedColor,
-        lastDaily,
-        lastWeekly,
-        status,
-        revokeReason,
-        startDate,
-        expireDate
+    let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate
 
     if (isPremium(message.author.id)) {
         const profile = getPremiumProfile(message.author.id)
@@ -143,9 +135,7 @@ async function run(message, args) {
     }
 
     embed.setTitle(message.author.tag)
-    embed.setThumbnail(
-        message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
-    )
+    embed.setThumbnail(message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
     return message.channel.send({ embeds: [embed] })
 }

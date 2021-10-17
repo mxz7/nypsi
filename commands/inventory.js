@@ -2,17 +2,9 @@ const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const {
-    getInventory,
-    getItems,
-    createUser,
-    userExists,
-    getMulti,
-} = require("../utils/economy/utils")
+const { getInventory, getItems, createUser, userExists, getMulti } = require("../utils/economy/utils")
 
-const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases([
-    "inv",
-])
+const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
 
 const cooldown = new Map()
 
@@ -68,9 +60,11 @@ async function run(message, args) {
 
     if (itemIDs.length == 0) {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "your inventory is empty").setTitle(
-                "inventory | " + message.author.username
-            )]
+            embeds: [
+                new CustomEmbed(message.member, false, "your inventory is empty").setTitle(
+                    "inventory | " + message.author.username
+                ),
+            ],
         })
     }
 
@@ -124,9 +118,7 @@ async function run(message, args) {
         item = items[item]
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${
-                item.description
-            }`,
+            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
             true
         )
     }
@@ -211,7 +203,7 @@ async function run(message, args) {
                         )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`)
-                    if ((currentPage + 1) == lastPage) {
+                    if (currentPage + 1 == lastPage) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
