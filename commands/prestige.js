@@ -91,7 +91,7 @@ async function run(message, args) {
         new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
     )
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await message.channel.send({ embeds: [embed], components: [row] })
 
     const filter = (i) => i.user.id == message.author.id
 
