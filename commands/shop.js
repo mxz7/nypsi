@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
@@ -104,33 +104,41 @@ async function run(message, args) {
         )
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
+
+    /**
+     * @type {Message}
+     */
+    let msg
+
+    if (pages.length == 1) {
+        return await message.channel.send({ embeds: [embed] })
+    } else {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    }
 
     if (pages.length > 1) {
-        await msg.react("⬅")
-        await msg.react("➡")
-
         let currentPage = page
 
         const lastPage = pages.length
 
-        const filter = (reaction, user) => {
-            return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-        }
+        const filter = (i) => i.user.id == message.author.id
 
         const pageManager = async () => {
             const reaction = await msg
-                .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-                .then((collected) => {
-                    return collected.first().emoji.name
+                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .then(async (collected) => {
+                    await collected.deferUpdate()
+                    return collected.customId
                 })
                 .catch(async () => {
-                    await msg.reactions.removeAll()
+                    await msg.edit({ components: [] })
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle(
-                "shop | " + message.author.username
-            )
+            const newEmbed = new CustomEmbed(message.member).setTitle("shop | " + message.author.username)
 
             if (!reaction) return
 
@@ -143,14 +151,23 @@ async function run(message, args) {
                         item = items[item]
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${
-                                item.description
-                            }\n**worth** $${item.worth.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
                             true
                         )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
-                    await msg.edit({embeds: [newEmbed]})
+                    if (currentPage == 0) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -162,14 +179,23 @@ async function run(message, args) {
                         item = items[item]
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${
-                                item.description
-                            }\n**worth** $${item.worth.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
                             true
                         )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
-                    await msg.edit({embeds: [newEmbed]})
+                    if (currentPage + 1 == lastPage) {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                        )
+                    } else {
+                        row = new MessageActionRow().addComponents(
+                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        )
+                    }
+                    await msg.edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             }
