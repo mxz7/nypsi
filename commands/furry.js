@@ -8,10 +8,7 @@ const { getMember } = require("../utils/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases([
-    "howfurry",
-    "stfufurry",
-])
+const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases(["howfurry", "stfufurry"])
 
 /**
  * @param {Message} message
@@ -62,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 

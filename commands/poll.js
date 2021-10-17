@@ -96,7 +96,7 @@ async function run(message, args) {
     let mode = ""
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("missing text")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("missing text")] })
     }
 
     if (!message.content.includes("|")) {

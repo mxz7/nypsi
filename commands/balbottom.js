@@ -5,11 +5,10 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "balbottom",
-    "view bottom balances in the server",
-    categories.MONEY
-).setAliases(["bottom", "brokeboys"])
+const cmd = new Command("balbottom", "view bottom balances in the server", categories.MONEY).setAliases([
+    "bottom",
+    "brokeboys",
+])
 
 /**
  * @param {Message} message
@@ -70,7 +69,7 @@ async function run(message, args) {
 
     if (filtered.length == 0) {
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "no members to show")]
+            embeds: [new CustomEmbed(message.member, false, "no members to show")],
         })
     }
 

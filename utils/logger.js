@@ -47,11 +47,7 @@ function info(string, type) {
     if (!nextLogMsg.get("logs")) {
         nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``)
     } else {
-        nextLogMsg.set(
-            "logs",
-            nextLogMsg.get("logs") +
-                `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``
-        )
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``)
     }
 }
 
@@ -65,11 +61,7 @@ function error(string) {
     if (!nextLogMsg.get("logs")) {
         nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``)
     } else {
-        nextLogMsg.set(
-            "logs",
-            nextLogMsg.get("logs") +
-                `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``
-        )
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``)
     }
 }
 
@@ -120,19 +112,12 @@ exports.databaseLog = databaseLog
  */
 function payment(from, to, amount) {
     if (!nextLogMsg.get("pay")) {
-        nextLogMsg.set(
-            "pay",
-            `**${from.tag}** (${from.id}) -> **${to.tag}** (${
-                to.id
-            }) - $**${amount.toLocaleString()}**\n`
-        )
+        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`)
     } else {
         nextLogMsg.set(
             "pay",
             nextLogMsg.get("pay") +
-                `**${from.tag}** (${from.id}) -> **${to.tag}** (${
-                    to.id
-                }) - $**${amount.toLocaleString()}**\n`
+                `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
         )
     }
 }
@@ -254,7 +239,7 @@ function runLogs() {
             let msg = nextLogMsg.get(k)
 
             if (msg != "" && msg) {
-                v.send({content: msg})
+                v.send({ content: msg })
                 nextLogMsg.set(k, "")
             }
         })

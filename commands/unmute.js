@@ -1,20 +1,11 @@
 const { Message, Permissions } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-const {
-    profileExists,
-    createProfile,
-    newCase,
-    isMuted,
-    deleteMute,
-    getMuteRole,
-} = require("../utils/moderation/utils")
+const { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(
-    ["MANAGE_MESSAGES"]
-)
+const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 /**
  * @param {Message} message
@@ -30,9 +21,7 @@ async function run(message, args) {
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
     ) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                "i need the `manage roles` and `manage channels` permission for this command to work"
-            )]
+            embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
         })
     }
 
@@ -41,7 +30,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -58,7 +47,7 @@ async function run(message, args) {
 
         if (!member) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")]
+                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
             })
         }
 
@@ -67,7 +56,7 @@ async function run(message, args) {
         const member = await getExactMember(message, args[0])
 
         if (!member) {
-            return message.channel.send({embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -83,11 +72,13 @@ async function run(message, args) {
 
     if (!muteRole) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `no mute role could be found, set one with ${getPrefix(
-                    message.guild
-                )}muterole, or create a role called "muted"`
-            )]
+            embeds: [
+                new ErrorEmbed(
+                    `no mute role could be found, set one with ${getPrefix(
+                        message.guild
+                    )}muterole, or create a role called "muted"`
+                ),
+            ],
         })
     }
 
@@ -105,9 +96,11 @@ async function run(message, args) {
                 .catch(() => {
                     fail = true
                     return message.channel.send({
-                        embeds: [new ErrorEmbed(
-                            "there was an error when removing the role, please ensure i have the correct permissions"
-                        )]
+                        embeds: [
+                            new ErrorEmbed(
+                                "there was an error when removing the role, please ensure i have the correct permissions"
+                            ),
+                        ],
                     })
                 })
         } else {
@@ -118,20 +111,16 @@ async function run(message, args) {
 
     if (fail) return
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        "✅ **" + count + "** member(s) unmuted"
-    ).setTitle("unmute | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted").setTitle(
+        "unmute | " + message.member.user.username
+    )
 
     if (count == 1) {
-        embed.setDescription(
-            "✅ `" + message.mentions.members.first().user.tag + "` has been unmuted"
-        )
+        embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted")
     }
 
     if (count == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("i was unable to unmute any users")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to unmute any users")] })
     }
 
     if (failed.length != 0) {
@@ -145,7 +134,7 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         message.delete()
-        await message.member.send({embeds: [embed]}).catch(() => {})
+        await message.member.send({ embeds: [embed] }).catch(() => {})
     } else {
         await message.channel.send({ embeds: [embed] })
     }

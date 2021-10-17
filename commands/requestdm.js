@@ -16,7 +16,7 @@ async function run(message, args) {
     if (message.author.id != "672793821850894347") return
 
     if (args.length < 2) {
-        return message.channel.send({embeds: [new ErrorEmbed("$requestdm <id> <content>")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] })
     }
 
     const { requestDM } = require("../nypsi")

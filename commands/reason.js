@@ -4,11 +4,9 @@ const { getCase, setReason } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "reason",
-    "set a reason for a case/punishment",
-    categories.MODERATION
-).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("reason", "set a reason for a case/punishment", categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+])
 
 /**
  * @param {Message} message
@@ -38,7 +36,7 @@ async function run(message, args) {
 
     if (!case0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")]
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")],
         })
     }
 

@@ -7,10 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases([
-    "howgay",
-    "lgbtdetector",
-])
+const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases(["howgay", "lgbtdetector"])
 
 /**
  * @param {Message} message
@@ -62,7 +59,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 

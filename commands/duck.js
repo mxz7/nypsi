@@ -6,9 +6,7 @@ const { isPremium } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("duck", "get a random picture of a duck", categories.ANIMALS).setAliases([
-    "notdick",
-])
+const cmd = new Command("duck", "get a random picture of a duck", categories.ANIMALS).setAliases(["notdick"])
 
 /**
  * @param {Message} message
@@ -43,7 +41,7 @@ async function run(message, args) {
     const { duckCache } = require("../utils/imghandler")
 
     if (duckCache.size < 1) {
-        return message.channel.send({embeds: [new ErrorEmbed("please wait a couple more seconds..")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -63,7 +61,7 @@ async function run(message, args) {
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send({embeds: [new ErrorEmbed("unable to find duck image")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find duck image")] })
     }
 
     const image = a.split("|")[0]

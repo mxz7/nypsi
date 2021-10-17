@@ -48,20 +48,20 @@ async function run(message, args) {
     } else {
         if (!parseInt(args[0])) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")]
+                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
             })
         }
         const amount = parseInt(args[0])
 
         if ((amount > 1069 || amount < 2) && message.author.id != "672793821850894347") {
             return message.channel.send({
-                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")]
+                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
             })
         }
 
         if (amount > 100000000) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")]
+                embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
             })
         }
 

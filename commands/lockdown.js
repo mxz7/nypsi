@@ -24,7 +24,7 @@ async function run(message, args) {
     ) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("you need the `manage channels` and `manage messages` permission")]
+                embeds: [new ErrorEmbed("you need the `manage channels` and `manage messages` permission")],
             })
         }
         return
@@ -35,9 +35,7 @@ async function run(message, args) {
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)
     ) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                "i need the `manage channels` and `manage roles` permission for this command to work"
-            )]
+            embeds: [new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work")],
         })
     }
 
@@ -98,11 +96,9 @@ async function run(message, args) {
             SEND_MESSAGES: false,
         })
 
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ " + channel.toString() + " has been locked"
-        ).setTitle("lockdown | " + message.member.user.username)
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked").setTitle(
+            "lockdown | " + message.member.user.username
+        )
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
             return message.member.send({ embeds: [embed] }).catch()
@@ -111,14 +107,12 @@ async function run(message, args) {
         await channel.permissionOverwrites.edit(role, {
             SEND_MESSAGES: null,
         })
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ " + channel.toString() + " has been unlocked"
-        ).setTitle("lockdown | " + message.member.user.username)
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked").setTitle(
+            "lockdown | " + message.member.user.username
+        )
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
-            return message.member.send({embeds: [embed]})
+            return message.member.send({ embeds: [embed] })
         })
     }
 }

@@ -5,10 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("baltop", "view top balances in the server", categories.MONEY).setAliases([
-    "top",
-    "gangsters",
-])
+const cmd = new Command("baltop", "view top balances in the server", categories.MONEY).setAliases(["top", "gangsters"])
 
 /**
  * @param {Message} message

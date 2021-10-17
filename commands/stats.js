@@ -57,15 +57,13 @@ async function run(message, args) {
             itemsUsed += stats.items[item]
         }
 
-        const embed = new CustomEmbed(message.member, true).setTitle(
-            "stats | " + message.author.username
-        )
+        const embed = new CustomEmbed(message.member, true).setTitle("stats | " + message.author.username)
 
         embed.addField(
             "gamble",
-            `**${gambleWins.toLocaleString()}** win${
-                gambleWins == 1 ? "" : "s"
-            }\n**${gambleLoses.toLocaleString()}** loss${gambleLoses == 1 ? "" : "es"}`,
+            `**${gambleWins.toLocaleString()}** win${gambleWins == 1 ? "" : "s"}\n**${gambleLoses.toLocaleString()}** loss${
+                gambleLoses == 1 ? "" : "es"
+            }`,
             true
         )
         embed.addField(
@@ -75,11 +73,7 @@ async function run(message, args) {
             }\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`,
             true
         )
-        embed.addField(
-            "items",
-            `**${itemsUsed.toLocaleString()}** item use${stats.padlock == 1 ? "d" : "s"}`,
-            true
-        )
+        embed.addField("items", `**${itemsUsed.toLocaleString()}** item use${stats.padlock == 1 ? "d" : "s"}`, true)
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -87,9 +81,7 @@ async function run(message, args) {
     const itemStats = async () => {
         const stats = getStats(message.member).items
 
-        const embed = new CustomEmbed(message.member, true).setTitle(
-            "item stats | " + message.author.username
-        )
+        const embed = new CustomEmbed(message.member, true).setTitle("item stats | " + message.author.username)
 
         /**
          * @type {Map<Number, Array<String>}
@@ -116,11 +108,7 @@ async function run(message, args) {
         for (const item in stats) {
             if (embed.fields.length >= 6) break
 
-            embed.addField(
-                item,
-                `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`,
-                true
-            )
+            embed.addField(item, `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`, true)
         }
 
         let row = new MessageActionRow().addComponents(
@@ -220,18 +208,14 @@ async function run(message, args) {
     const gambleStats = () => {
         const stats = getStats(message.member).gamble
 
-        const embed = new CustomEmbed(message.member, true).setTitle(
-            "gamble stats | " + message.author.username
-        )
+        const embed = new CustomEmbed(message.member, true).setTitle("gamble stats | " + message.author.username)
 
         for (const gambleStat in stats) {
             embed.addField(
                 gambleStat,
-                `**${stats[gambleStat].wins.toLocaleString()}** win${
-                    stats[gambleStat].wins == 1 ? "" : "s"
-                }\n**${stats[gambleStat].lose.toLocaleString()}** loss${
-                    stats[gambleStat].lose == 1 ? "" : "es"
-                }`,
+                `**${stats[gambleStat].wins.toLocaleString()}** win${stats[gambleStat].wins == 1 ? "" : "s"}\n**${stats[
+                    gambleStat
+                ].lose.toLocaleString()}** loss${stats[gambleStat].lose == 1 ? "" : "es"}`,
                 true
             )
         }

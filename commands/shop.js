@@ -4,11 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems } = require("../utils/economy/utils")
 
-const cmd = new Command(
-    "shop",
-    "view current items that are available to buy/sell",
-    categories.MONEY
-).setAliases(["store"])
+const cmd = new Command("shop", "view current items that are available to buy/sell", categories.MONEY).setAliases(["store"])
 
 const cooldown = new Map()
 
@@ -97,9 +93,7 @@ async function run(message, args) {
         item = items[item]
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${
-                item.description
-            }\n**worth** $${item.worth.toLocaleString()}`,
+            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
             true
         )
     }

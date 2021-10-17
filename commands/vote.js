@@ -59,11 +59,7 @@ async function run(message, args) {
     const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "https://top.gg/bot/678711738845102087/vote"
-    )
+    const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
         .setFooter("you get increased rewards for prestiging")
 

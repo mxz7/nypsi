@@ -4,9 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command("cars", "view the current cars available", categories.MONEY).setAliases([
-    "car",
-])
+const cmd = new Command("cars", "view the current cars available", categories.MONEY).setAliases(["car"])
 
 const cooldown = new Map()
 
@@ -200,7 +198,7 @@ async function run(message, args) {
                         )
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`)
-                    if ((currentPage + 1) == lastPage) {
+                    if (currentPage + 1 == lastPage) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)

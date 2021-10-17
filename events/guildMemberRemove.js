@@ -9,10 +9,7 @@ module.exports = async (member) => {
     if (member.guild.id != "747056029795221513") return
 
     if (member.roles.cache.has("747066190530347089")) {
-        if (
-            member.roles.cache.has("819870959325413387") ||
-            member.roles.cache.has("819870846536646666")
-        ) {
+        if (member.roles.cache.has("819870959325413387") || member.roles.cache.has("819870846536646666")) {
             return
         } else if (member.roles.cache.has("819870727834566696")) {
             setTier(member.user.id, 2)

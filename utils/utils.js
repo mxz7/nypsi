@@ -72,15 +72,11 @@ async function redditImage(post, allowed) {
     }
 
     if (image.includes("gfycat")) {
-        const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-            (url) => url.json()
-        )
+        const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then((url) => url.json())
 
         if (link.gfyItem) {
             image = link.gfyItem.max5mbGif
-            return (
-                image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
-            )
+            return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
         }
     }
 
@@ -107,34 +103,16 @@ async function redditImage(post, allowed) {
             image = "https://i.imgur.com/" + image.split("/")[3] + ".png"
             if (!isImageUrl(image)) {
                 image = "https://i.imgur.com/" + image.split("/")[3] + ".gif"
-                return (
-                    image +
-                    "|" +
-                    post.data.title +
-                    "|" +
-                    post.data.permalink +
-                    "|" +
-                    post.data.author
-                )
+                return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
             }
         }
 
         if (image.includes("gfycat")) {
-            const link = await fetch(
-                "https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]
-            ).then((url) => url.json())
+            const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then((url) => url.json())
 
             if (link) {
                 image = link.gfyItem.max5mbGif
-                return (
-                    image +
-                    "|" +
-                    post.data.title +
-                    "|" +
-                    post.data.permalink +
-                    "|" +
-                    post.data.author
-                )
+                return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author
             }
         }
     }
@@ -174,10 +152,7 @@ async function getMember(message, memberName) {
 
     let members
 
-    if (
-        message.guild.memberCount == message.guild.members.cache.size &&
-        message.guild.memberCount <= 25
-    ) {
+    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -257,10 +232,7 @@ async function getExactMember(message, memberName) {
 
     let members
 
-    if (
-        message.guild.memberCount == message.guild.members.cache.size &&
-        message.guild.memberCount <= 25
-    ) {
+    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
         members = message.guild.members.cache
     } else {
         members = await message.guild.members.fetch()
@@ -458,7 +430,7 @@ async function showTopGlobalBal(client) {
         embed.setDescription(baltop.join("\n"))
         embed.setColor("#111111")
 
-        await channel.send({embeds: [embed]})
+        await channel.send({ embeds: [embed] })
         info("sent global bal top", types.AUTOMATION)
     }
 
@@ -538,27 +510,26 @@ async function suggestWholesomeImage(submitter, image) {
         return false
     }
 
-    db.prepare(
-        "INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)"
-    ).run(image, submitter.user.tag, submitter.user.id, Date.now())
+    db.prepare("INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)").run(
+        image,
+        submitter.user.tag,
+        submitter.user.id,
+        Date.now()
+    )
 
     query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
 
     const { CustomEmbed } = require("./classes/EmbedBuilders")
 
-    const embed = new CustomEmbed().embed
-        .setColor("#111111")
-        .setTitle("wholesome suggestion #" + query.id)
+    const embed = new CustomEmbed().embed.setColor("#111111").setTitle("wholesome suggestion #" + query.id)
 
-    embed.setDescription(
-        `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`
-    )
+    embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
 
     embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`)
 
     embed.setImage(image)
 
-    await wholesomeWebhook.send({embeds: [embed]})
+    await wholesomeWebhook.send({ embeds: [embed] })
 
     return true
 }
@@ -575,9 +546,13 @@ function acceptWholesomeImage(id, accepter) {
 
     if (!query) return false
 
-    db.prepare(
-        "INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)"
-    ).run(query.image, query.submitter, query.submitter_id, query.upload, accepter.user.id)
+    db.prepare("INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)").run(
+        query.image,
+        query.submitter,
+        query.submitter_id,
+        query.upload,
+        accepter.user.id
+    )
 
     db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id)
 
@@ -587,11 +562,7 @@ function acceptWholesomeImage(id, accepter) {
     const { getDMsEnabled } = require("./economy/utils")
 
     if (getDMsEnabled(query.submitter_id)) {
-        requestDM(
-            query.submitter_id,
-            `your wholesome image (${query.image}) has been accepted`,
-            true
-        )
+        requestDM(query.submitter_id, `your wholesome image (${query.image}) has been accepted`, true)
     }
 
     return true
@@ -721,9 +692,7 @@ async function uploadImageToImgur(url) {
 exports.uploadImage = uploadImageToImgur
 
 async function fallbackUpload(url) {
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}&image=${url}`).then(
-        (res) => res.json()
-    )
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}&image=${url}`).then((res) => res.json())
 
     if (!res.success) {
         return false

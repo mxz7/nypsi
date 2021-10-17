@@ -14,7 +14,7 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({embeds: [new ErrorEmbed("you need the `manage server` permission")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
         }
         return
     }
@@ -38,9 +38,7 @@ async function run(message, args) {
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
         if (args.length == 1) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(
-                    `${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
-                )]
+                embeds: [new ErrorEmbed(`${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`)],
             })
         }
 
@@ -51,15 +49,11 @@ async function run(message, args) {
             .replace(/[^A-z0-9\s]/g, "")
 
         if (word == "" || word == " ") {
-            return message.channel.send({embeds: [new ErrorEmbed("word must contain letters or numbers")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("word must contain letters or numbers")] })
         }
 
         if (filter.indexOf(word) > -1) {
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "❌ `" + word + "` already exists in the filter"
-            )
+            const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
                 .setTitle("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
@@ -82,17 +76,13 @@ async function run(message, args) {
 
         updateFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(
-            message.member,
-            true,
-            "✅ added `" + word + "` to the filter"
-        ).setTitle("snipe filter")
+        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setTitle("snipe filter")
         return message.channel.send({ embeds: [embed] })
     }
 
     if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
-            return message.channel.send({embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)] })
         }
 
         let word = args[1]
@@ -104,11 +94,7 @@ async function run(message, args) {
         if (filter.indexOf(word) > -1) {
             filter.splice(filter.indexOf(word), 1)
         } else {
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "❌ `" + word + "` not found in the filter"
-            )
+            const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` not found in the filter")
                 .setTitle("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
@@ -117,11 +103,7 @@ async function run(message, args) {
 
         updateFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ removed `" + word + "` from the filter"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
             .setTitle("snipe filter")
             .setFooter(`you can use ${prefix}sf reset to reset the filter`)
 
@@ -133,9 +115,7 @@ async function run(message, args) {
 
         updateFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setTitle(
-            "snipe filter"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setTitle("snipe filter")
 
         return message.channel.send({ embeds: [embed] })
     }

@@ -32,7 +32,7 @@ async function run(message, args) {
     }
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("$ddos <user>")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("$ddos <user>")] })
     }
 
     let member
@@ -48,7 +48,7 @@ async function run(message, args) {
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`
@@ -84,7 +84,7 @@ async function run(message, args) {
         )
 
         setTimeout(() => {
-            m.edit({embeds: [embed]}).then(() => {
+            m.edit({ embeds: [embed] }).then(() => {
                 embed.setDescription(
                     member.user.toString() +
                         "\n\n" +
@@ -96,7 +96,7 @@ async function run(message, args) {
                 )
 
                 setTimeout(() => {
-                    m.edit({embeds: [embed]}).then(() => {
+                    m.edit({ embeds: [embed] }).then(() => {
                         embed.setDescription(
                             member.user.toString() +
                                 "\n\n" +
@@ -109,7 +109,7 @@ async function run(message, args) {
                         embed.setColor("#5efb8f")
 
                         setTimeout(() => {
-                            m.edit({embeds: [embed]})
+                            m.edit({ embeds: [embed] })
                         }, 1000)
                     })
                 }, 1000)

@@ -97,30 +97,22 @@ async function run(message, args) {
             .addField(
                 "location",
                 "**country** `" +
-                country +
-                "`\n" +
-                "**region** `" +
-                region +
-                "`\n" +
-                "**currency** `" +
-                countryCurrency +
-                "`\n" +
-                "**timezone** `" +
-                timezone +
-                "`",
+                    country +
+                    "`\n" +
+                    "**region** `" +
+                    region +
+                    "`\n" +
+                    "**currency** `" +
+                    countryCurrency +
+                    "`\n" +
+                    "**timezone** `" +
+                    timezone +
+                    "`",
                 true
             )
             .addField(
                 "isp",
-                "**name** `" +
-                ispName +
-                "`\n" +
-                "**org** `" +
-                ispOrg +
-                "`\n" +
-                "**abuse** `" +
-                ispEmail +
-                "`",
+                "**name** `" + ispName + "`\n" + "**org** `" + ispOrg + "`\n" + "**abuse** `" + ispEmail + "`",
                 true
             )
         return message.channel
@@ -130,7 +122,7 @@ async function run(message, args) {
     }
 
     if (!args[0].includes(".")) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid domain")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
     }
 
     const url = "https://apimon.de/whois/" + args[0]
@@ -140,7 +132,7 @@ async function run(message, args) {
         .then((url) => url.json())
         .catch(() => {
             invalid = true
-            return message.channel.send({embeds: [new ErrorEmbed("invalid domain")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
         })
 
     if (invalid) return
@@ -168,7 +160,7 @@ async function run(message, args) {
         registrantPhone = res.registrant.phone
         registrantEmail = res.registrant.email
     } catch {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid domain")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid domain")] })
     }
 
     const embed = new CustomEmbed(message.member, true)

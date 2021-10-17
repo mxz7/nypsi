@@ -107,35 +107,37 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}highlow <bet>`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}highlow <bet>`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this bet")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(
-                `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-            )]
+            embeds: [
+                new ErrorEmbed(
+                    `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+                ),
+            ],
         })
     }
 
     if (games.has(message.member.user.id)) {
-        return message.channel.send({embeds: [new ErrorEmbed("you are already playing highlow")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you are already playing highlow")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -234,19 +236,15 @@ async function run(message, args) {
         new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
     )
 
-    const embed = new CustomEmbed(
-        message.member,
-        true,
-        "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
-    )
+    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setTitle("highlow | " + message.member.user.username)
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
 
-    message.channel.send({embeds: [embed], components: [row]}).then((m) => {
+    message.channel.send({ embeds: [embed], components: [row] }).then((m) => {
         playGame(message, m).catch((e) => {
             console.error(e)
             return message.channel.send({
-                embeds: [new ErrorEmbed("an error occured while running - join support server")]
+                embeds: [new ErrorEmbed("an error occured while running - join support server")],
             })
         })
     })
@@ -293,10 +291,10 @@ function getValue(member) {
 }
 
 /**
- * 
- * @param {Message} message 
- * @param {Message} m 
- * @returns 
+ *
+ * @param {Message} message
+ * @param {Message} m
+ * @returns
  */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
@@ -305,9 +303,7 @@ async function playGame(message, m) {
     let win = games.get(message.member.user.id).win
     let card = games.get(message.member.user.id).card
 
-    const newEmbed = new CustomEmbed(message.member, true).setTitle(
-        "highlow | " + message.member.user.username
-    )
+    const newEmbed = new CustomEmbed(message.member, true).setTitle("highlow | " + message.member.user.username)
 
     const lose = async () => {
         gamble(message.author, "highlow", bet, false, 0)
@@ -325,7 +321,7 @@ async function playGame(message, m) {
         )
         newEmbed.addField("card", "| " + card + " |")
         games.delete(message.author.id)
-        return await m.edit({embeds: [newEmbed], components: []})
+        return await m.edit({ embeds: [newEmbed], components: [] })
     }
 
     const win1 = async () => {
@@ -385,7 +381,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        return m.edit({embeds: [newEmbed], components: []})
+        return m.edit({ embeds: [newEmbed], components: [] })
     }
 
     const draw = async () => {
@@ -406,7 +402,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        return await m.edit({embeds: [newEmbed], components: []})
+        return await m.edit({ embeds: [newEmbed], components: [] })
     }
 
     if (win == 15) {
@@ -470,30 +466,18 @@ async function playGame(message, m) {
             }
 
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.edit({embeds: [newEmbed], components: [row]})
+            await m.edit({ embeds: [newEmbed], components: [row] })
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
 
-            await m.edit({embeds: [newEmbed]})
+            await m.edit({ embeds: [newEmbed] })
             return playGame(message, m)
         } else {
             return lose()
@@ -535,29 +519,17 @@ async function playGame(message, m) {
             }
 
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.edit({embeds: [newEmbed], components: [row]})
+            await m.edit({ embeds: [newEmbed], components: [row] })
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
-                "**bet** $" +
-                    bet.toLocaleString() +
-                    "\n**" +
-                    win +
-                    "**x ($" +
-                    Math.round(bet * win).toLocaleString() +
-                    ")"
+                "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.edit({embeds: [newEmbed]})
+            await m.edit({ embeds: [newEmbed] })
             return playGame(message, m)
         } else {
             return lose()

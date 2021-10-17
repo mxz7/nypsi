@@ -47,13 +47,13 @@ async function run(message, args) {
 
     if (args.length == 0) {
         return message.channel.send({
-            embeds: [new CustomEmbed(
-                message.member,
-                false,
-                `buy items from ${getPrefix(
-                    message.guild
-                )}shop by using the item id or item name without spaces`
-            )]
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `buy items from ${getPrefix(message.guild)}shop by using the item id or item name without spaces`
+                ),
+            ],
         })
     }
 
@@ -81,7 +81,7 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send({embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
     }
 
     if (
@@ -91,7 +91,7 @@ async function run(message, args) {
         selected.role == "fish" ||
         selected.role == "car"
     ) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cannot buy this item")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] })
     }
 
     let amount = 1
@@ -101,17 +101,17 @@ async function run(message, args) {
     }
 
     if (!amount) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (amount < 1) {
-        return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     if (amount > 50) amount = 50
 
     if (getBalance(message.member) < selected.worth * amount) {
-        return message.channel.send({embeds: [new ErrorEmbed("you cannot afford this")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -125,14 +125,14 @@ async function run(message, args) {
         const max = getMaxBitcoin(message.member)
 
         if (owned + amount > max) {
-            return message.channel.send({embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] })
         }
     } else if (selected.id == "dogecoin") {
         const owned = inventory["dogecoin"] || 0
         const max = getMaxDogecoin(message.member)
 
         if (owned + amount > max) {
-            return message.channel.send({embeds: [new ErrorEmbed("you cannot buy this much dogecoin yet")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much dogecoin yet")] })
         }
     }
 
@@ -148,13 +148,15 @@ async function run(message, args) {
     setInventory(message.member, inventory)
 
     return message.channel.send({
-        embeds: [new CustomEmbed(
-            message.member,
-            false,
-            `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${
-                selected.name
-            } for $${(selected.worth * amount).toLocaleString()}`
-        )]
+        embeds: [
+            new CustomEmbed(
+                message.member,
+                false,
+                `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
+                    selected.worth * amount
+                ).toLocaleString()}`
+            ),
+        ],
     })
 }
 

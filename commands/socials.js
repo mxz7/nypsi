@@ -16,11 +16,7 @@ const regex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "socials",
-    "set yours and view people's different social media accounts",
-    categories.INFO
-)
+const cmd = new Command("socials", "set yours and view people's different social media accounts", categories.INFO)
 
 /**
  * @param {Message} message
@@ -66,7 +62,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
         }
 
         if (!profileExists(member)) {
@@ -75,9 +71,7 @@ async function run(message, args) {
 
         const profile = getProfile(member)
 
-        const embed = new CustomEmbed(message.member).setFooter(
-            `do ${prefix}socials help for commands`
-        )
+        const embed = new CustomEmbed(message.member).setFooter(`do ${prefix}socials help for commands`)
 
         if (member == message.member) {
             embed.setTitle("your socials")
@@ -168,10 +162,7 @@ async function run(message, args) {
                 args[0].toLowerCase() != "instagram" &&
                 args[0].toLowerCase() != "snapchat" &&
                 args[0].toLowerCase() != "email") ||
-            (args[1].toLowerCase() != "add" &&
-                args[1].toLowerCase() != "del" &&
-                args[1] != "+" &&
-                args[1] != "-")
+            (args[1].toLowerCase() != "add" && args[1].toLowerCase() != "del" && args[1] != "+" && args[1] != "-")
         ) {
             const embed = new CustomEmbed(
                 message.member,
@@ -179,10 +170,7 @@ async function run(message, args) {
                 `${prefix}**socials <social media> add/+ <username>** *add a social media*\n${prefix}**socials <social media> del/- <username>** *remove a social media*\n${prefix}**socials <user>** *view a user's social medias*`
             )
                 .setTitle("socials")
-                .addField(
-                    "supported social medias",
-                    "`youtube` `twitter` `instagram` `snapchat` `email`"
-                )
+                .addField("supported social medias", "`youtube` `twitter` `instagram` `snapchat` `email`")
 
             return message.channel.send({ embeds: [embed] })
         }
@@ -194,67 +182,57 @@ async function run(message, args) {
                 case "youtube":
                     if (profile.youtube.length > 0) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you already have the maximum amount of youtube accounts added (1)"
-                            )]
+                            embeds: [new ErrorEmbed("you already have the maximum amount of youtube accounts added (1)")],
                         })
                     }
                     if (args.length != 4) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you must include a URL with youtube: $socials youtube add <username> <url>"
-                            )]
+                            embeds: [
+                                new ErrorEmbed("you must include a URL with youtube: $socials youtube add <username> <url>"),
+                            ],
                         })
                     } else {
                         if (!args[3].toLowerCase().startsWith("https://youtube.com/")) {
-                            return message.channel.send({embeds: [new ErrorEmbed("invalid youtube url")]})
+                            return message.channel.send({ embeds: [new ErrorEmbed("invalid youtube url")] })
                         }
 
                         if (args[3].toLowerCase().includes(".com/logout")) {
-                            return message.channel.send({embeds: [new ErrorEmbed("invalid youtube url")]})
+                            return message.channel.send({ embeds: [new ErrorEmbed("invalid youtube url")] })
                         }
                     }
                     break
                 case "twitter":
                     if (profile.twitter.length > 1) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you already have the maximum amount of twitter accounts added (2)"
-                            )]
+                            embeds: [new ErrorEmbed("you already have the maximum amount of twitter accounts added (2)")],
                         })
                     }
                     break
                 case "instagram":
                     if (profile.instagram.length > 1) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you already have the maximum amount of instagram accounts added (2)"
-                            )]
+                            embeds: [new ErrorEmbed("you already have the maximum amount of instagram accounts added (2)")],
                         })
                     }
                     break
                 case "snapchat":
                     if (profile.snapchat.length > 0) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you already have the maximum amount of snapchat accounts added (1)"
-                            )]
+                            embeds: [new ErrorEmbed("you already have the maximum amount of snapchat accounts added (1)")],
                         })
                     }
                     break
                 case "email":
                     if (profile.email.length > 0) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you already have the maximum amount of emails added (1)"
-                            )]
+                            embeds: [new ErrorEmbed("you already have the maximum amount of emails added (1)")],
                         })
                     }
 
                     const index = args[2].search(regex) // eslint-disable-line
 
                     if (index == -1) {
-                        return message.channel.send({embeds: [new ErrorEmbed("invalid email address")]})
+                        return message.channel.send({ embeds: [new ErrorEmbed("invalid email address")] })
                     }
 
                     if (index != 0) {
@@ -267,12 +245,12 @@ async function run(message, args) {
 
             if (username.length > 21) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("username cannot be longer than 21 characters")]
+                    embeds: [new ErrorEmbed("username cannot be longer than 21 characters")],
                 })
             }
 
             if (username.length < 2) {
-                return message.channel.send({embeds: [new ErrorEmbed("username must be 2 or more characters")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("username must be 2 or more characters")] })
             }
 
             if (args[0].toLowerCase() == "youtube") {
@@ -306,7 +284,7 @@ async function run(message, args) {
             updateProfile(message.member, profile)
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "✅ added `" + username + "`")]
+                embeds: [new CustomEmbed(message.member, false, "✅ added `" + username + "`")],
             })
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
             const profile = getProfile(message.member)
@@ -342,7 +320,7 @@ async function run(message, args) {
             }
 
             if (usernames.indexOf(username) == -1) {
-                return message.channel.send({embeds: [new ErrorEmbed("not a valid username to remove")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("not a valid username to remove")] })
             }
 
             switch (args[0].toLowerCase()) {
@@ -364,7 +342,7 @@ async function run(message, args) {
             }
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ removed \`${username}\``)]
+                embeds: [new CustomEmbed(message.member, false, `✅ removed \`${username}\``)],
             })
         }
     }

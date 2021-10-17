@@ -59,11 +59,11 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send({embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you must ask the 8ball something")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -77,9 +77,7 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${
-            answers[Math.floor(Math.random() * answers.length)]
-        }`
+        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${answers[Math.floor(Math.random() * answers.length)]}`
     )
 
     message.channel.send({ embeds: [embed] })

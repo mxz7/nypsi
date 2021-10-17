@@ -4,11 +4,10 @@ const { getCase, deleteCase, profileExists, createProfile } = require("../utils/
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command(
-    "case",
-    "get information about a given case",
-    categories.MODERATION
-).setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER"])
+const cmd = new Command("case", "get information about a given case", categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+    "MANAGE_SERVER",
+])
 
 /**
  * @param {Message} message
@@ -39,7 +38,7 @@ async function run(message, args) {
 
     if (!case0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")]
+            embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
         })
     }
 
@@ -84,13 +83,13 @@ async function run(message, args) {
     const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitMessageComponent({filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
         .then(async (collected) => {
             await collected.deferUpdate()
             return collected.customId
         })
         .catch(async () => {
-            await msg.edit({components: []})
+            await msg.edit({ components: [] })
         })
 
     if (reaction == "❌") {
@@ -102,7 +101,7 @@ async function run(message, args) {
             "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
-        await msg.edit({embeds: [newEmbed], components: []})
+        await msg.edit({ embeds: [newEmbed], components: [] })
     }
 }
 

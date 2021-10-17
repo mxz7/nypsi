@@ -21,10 +21,7 @@ const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 
-const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases([
-    "cr",
-    "reaction",
-])
+const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases(["cr", "reaction"])
 
 const cooldown = new Map()
 
@@ -59,15 +56,12 @@ async function run(message, args) {
     }
 
     if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild)
-    if (!hasReactionStatsProfile(message.guild, message.member))
-        createReactionStatsProfile(message.guild, message.member)
+    if (!hasReactionStatsProfile(message.guild, message.member)) createReactionStatsProfile(message.guild, message.member)
 
     const prefix = getPrefix(message.guild)
 
     const helpCmd = () => {
-        const embed = new CustomEmbed(message.member, true).setTitle(
-            "chat reactions | " + message.author.username
-        )
+        const embed = new CustomEmbed(message.member, true).setTitle("chat reactions | " + message.author.username)
 
         embed.setDescription(
             `${prefix}**cr start** *start a random chat reaction*\n` +
@@ -88,9 +82,7 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
 
-        const embed = new CustomEmbed(message.member, false).setTitle(
-            "chat reaction stats | " + message.author.username
-        )
+        const embed = new CustomEmbed(message.member, false).setTitle("chat reaction stats | " + message.author.username)
 
         const stats = getReactionStats(message.guild, message.member)
 
@@ -157,7 +149,7 @@ async function run(message, args) {
 
         if (a == "xoxo69") {
             return message.channel.send({
-                embeds: [new ErrorEmbed("there is already a chat reaction in this channel")]
+                embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
             })
         }
     } else if (args[0].toLowerCase() == "stats") {
@@ -165,35 +157,29 @@ async function run(message, args) {
             if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
                 if (message.author.id != message.guild.owner.id) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("you need the to be the server owner for this command")]
+                        embeds: [new ErrorEmbed("you need the to be the server owner for this command")],
                     })
                 }
                 deleteStats(message.guild)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ stats have been deleted")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ stats have been deleted")],
                 })
             }
         }
         return showStats()
-    } else if (
-        args[0].toLowerCase() == "leaderboard" ||
-        args[0].toLowerCase() == "lb" ||
-        args[0].toLowerCase() == "top"
-    ) {
+    } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
         return showLeaderboard()
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")]
+                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             })
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setTitle(
-                "chat reactions |" + message.author.username
-            )
+            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions |" + message.author.username)
 
             const blacklisted = getBlacklisted(message.guild)
 
@@ -209,7 +195,7 @@ async function run(message, args) {
         } else {
             if (args[1].toLowerCase() == "add" || args[1] == "+") {
                 if (args.length == 2) {
-                    return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)]})
+                    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)] })
                 }
 
                 let user = args[2]
@@ -217,9 +203,11 @@ async function run(message, args) {
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
-                            )]
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                                ),
+                            ],
                         })
                     } else {
                         user = message.mentions.members.first()
@@ -229,16 +217,14 @@ async function run(message, args) {
                 }
 
                 if (!user) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 const blacklisted = getBlacklisted(message.guild)
 
                 if (blacklisted.length >= 75) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed(
-                            "you have reached the maximum amount of blacklisted users (75)"
-                        )]
+                        embeds: [new ErrorEmbed("you have reached the maximum amount of blacklisted users (75)")],
                     })
                 }
 
@@ -246,16 +232,12 @@ async function run(message, args) {
 
                 setBlacklisted(message.guild, blacklisted)
 
-                const embed = new CustomEmbed(
-                    message.member,
-                    false,
-                    `✅ ${user.toString()} has been blacklisted`
-                )
+                const embed = new CustomEmbed(message.member, false, `✅ ${user.toString()} has been blacklisted`)
 
                 return message.channel.send({ embeds: [embed] })
             } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
                 if (args.length == 2) {
-                    return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr blacklist del/- @user`)]})
+                    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist del/- @user`)] })
                 }
 
                 let user = args[2]
@@ -263,9 +245,11 @@ async function run(message, args) {
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
-                            )]
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                                ),
+                            ],
                         })
                     } else {
                         user = message.mentions.members.first().id
@@ -273,13 +257,13 @@ async function run(message, args) {
                 }
 
                 if (!user) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 const blacklisted = getBlacklisted(message.guild)
 
                 if (blacklisted.indexOf(user) == -1) {
-                    return message.channel.send({embeds: [new ErrorEmbed("this user is not blacklisted")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("this user is not blacklisted")] })
                 }
 
                 blacklisted.splice(blacklisted.indexOf(user), 1)
@@ -287,13 +271,13 @@ async function run(message, args) {
                 setBlacklisted(message.guild, blacklisted)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ user has been unblacklisted")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ user has been unblacklisted")],
                 })
             } else if (args[1].toLowerCase() == "reset" || args[1].toLowerCase() == "empty") {
                 setBlacklisted(message.guild, [])
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ blacklist was emptied")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ blacklist was emptied")],
                 })
             }
         }
@@ -301,7 +285,7 @@ async function run(message, args) {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")]
+                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             })
         }
 
@@ -351,7 +335,7 @@ async function run(message, args) {
                 const settings = getReactionSettings(message.guild)
 
                 if (settings.randomStart) {
-                    return message.channel.send({embeds: [new ErrorEmbed("already enabled")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("already enabled")] })
                 }
 
                 settings.randomStart = true
@@ -363,13 +347,13 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been enabled")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been enabled")],
                 })
             } else if (args[1].toLowerCase() == "disable") {
                 const settings = getReactionSettings(message.guild)
 
                 if (!settings.randomStart) {
-                    return message.channel.send({embeds: [new ErrorEmbed("already disabled")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("already disabled")] })
                 }
 
                 settings.randomStart = false
@@ -377,24 +361,26 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been disabled")]
+                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been disabled")],
                 })
             } else if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(
-                        "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
-                    )]
+                    embeds: [
+                        new ErrorEmbed(
+                            "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
+                        ),
+                    ],
                 })
             } else if (args[1].toLowerCase() == "cooldown") {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}cr settings cooldown <number>`)]
+                    embeds: [new ErrorEmbed(`${prefix}cr settings cooldown <number>`)],
                 })
             } else if (args[1].toLowerCase() == "offset") {
-                return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr settings offset <number>`)]})
+                return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr settings offset <number>`)] })
             } else if (args[1].toLowerCase() == "length") {
-                return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr settings length <number>`)]})
+                return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr settings length <number>`)] })
             } else {
-                return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr settings help`)]})
+                return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] })
             }
         } else if (args.length == 3) {
             if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
@@ -403,9 +389,11 @@ async function run(message, args) {
                 if (channel.length != 18) {
                     if (!message.mentions.channels.first()) {
                         return message.channel.send({
-                            embeds: [new ErrorEmbed(
-                                "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel"
-                            )]
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel"
+                                ),
+                            ],
                         })
                     } else {
                         channel = message.mentions.channels.first()
@@ -415,7 +403,7 @@ async function run(message, args) {
                 }
 
                 if (!channel) {
-                    return message.channel.send({embeds: [new ErrorEmbed("invalid channel")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
                 }
 
                 const settings = getReactionSettings(message.guild)
@@ -436,9 +424,7 @@ async function run(message, args) {
                         )
 
                         if (max > 1) {
-                            embed.setDescription(
-                                `you have reached the maximum amount of random channels (${max})`
-                            )
+                            embed.setDescription(`you have reached the maximum amount of random channels (${max})`)
                         }
 
                         return message.channel.send({ embeds: [embed] })
@@ -467,17 +453,17 @@ async function run(message, args) {
 
                 if (!length) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")]
+                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
                     })
                 }
 
                 if (length > 900) {
-                    return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 900 seconds")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] })
                 }
 
                 if (length < 120) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("cannot be shorter than 120 seconds")]
+                        embeds: [new ErrorEmbed("cannot be shorter than 120 seconds")],
                     })
                 }
 
@@ -488,23 +474,19 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(
-                        message.member,
-                        false,
-                        `✅ event cooldown set to \`${length}s\``
-                    )]
+                    embeds: [new CustomEmbed(message.member, false, `✅ event cooldown set to \`${length}s\``)],
                 })
             } else if (args[1].toLowerCase() == "offset") {
                 let length = parseInt(args[2])
 
                 if (!length) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")]
+                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
                     })
                 }
 
                 if (length > 900) {
-                    return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 900 seconds")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] })
                 }
 
                 if (length < 0) {
@@ -518,27 +500,23 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(
-                        message.member,
-                        false,
-                        `✅ cooldown max offset set to \`${length}s\``
-                    )]
+                    embeds: [new CustomEmbed(message.member, false, `✅ cooldown max offset set to \`${length}s\``)],
                 })
             } else if (args[1].toLowerCase() == "length") {
                 const length = parseInt(args[2])
 
                 if (!length) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")]
+                        embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
                     })
                 }
 
                 if (length > 120) {
-                    return message.channel.send({embeds: [new ErrorEmbed("cannot be longer than 120 seconds")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 120 seconds")] })
                 }
 
                 if (length < 30) {
-                    return message.channel.send({embeds: [new ErrorEmbed("cannot be shorter than 30 seconds")]})
+                    return message.channel.send({ embeds: [new ErrorEmbed("cannot be shorter than 30 seconds")] })
                 }
 
                 const settings = getReactionSettings(message.guild)
@@ -548,24 +526,22 @@ async function run(message, args) {
                 updateReactionSettings(message.guild, settings)
 
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ max length set to \`${length}s\``)]
+                    embeds: [new CustomEmbed(message.member, false, `✅ max length set to \`${length}s\``)],
                 })
             } else {
-                return message.channel.send({embeds: [new ErrorEmbed(`${prefix}cr settings help`)]})
+                return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] })
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")]
+                embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             })
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setTitle(
-                "chat reactions | " + message.author.username
-            )
+            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions | " + message.author.username)
 
             embed.setDescription(
                 `${prefix}**cr words list** *view the current wordlist*\n` +
@@ -578,7 +554,7 @@ async function run(message, args) {
         } else if (args[1].toLowerCase() == "add" || args[1] == "+") {
             if (args.length == 2) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)]
+                    embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)],
                 })
             }
 
@@ -587,12 +563,12 @@ async function run(message, args) {
             const phrase = args.slice(2, args.length).join(" ")
 
             if (phrase == "" || phrase == " ") {
-                return message.channel.send({embeds: [new ErrorEmbed("invalid phrase")]})
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid phrase")] })
             }
 
             if (words.indexOf(phrase) != -1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`\`${phrase}\` already exists in the word list`)]
+                    embeds: [new ErrorEmbed(`\`${phrase}\` already exists in the word list`)],
                 })
             }
 
@@ -609,12 +585,12 @@ async function run(message, args) {
                     error.setFooter("become a patreon ($patreon) to double this limit")
                 }
 
-                return message.channel.send({embeds: [error]})
+                return message.channel.send({ embeds: [error] })
             }
 
             if (phrase.length >= 150) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("phrase is too long (150 characters max)")]
+                    embeds: [new ErrorEmbed("phrase is too long (150 characters max)")],
                 })
             }
 
@@ -623,12 +599,12 @@ async function run(message, args) {
             updateWords(message.guild, words)
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`)]
+                embeds: [new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`)],
             })
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
             if (args.length == 2) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)]
+                    embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)],
                 })
             }
 
@@ -638,7 +614,7 @@ async function run(message, args) {
 
             if (words.indexOf(phrase) == -1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`\`${phrase}\` doesn't exist in the word list`)]
+                    embeds: [new ErrorEmbed(`\`${phrase}\` doesn't exist in the word list`)],
                 })
             }
 
@@ -647,13 +623,13 @@ async function run(message, args) {
             updateWords(message.guild, words)
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist`)]
+                embeds: [new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist`)],
             })
         } else if (args[1].toLowerCase() == "reset") {
             updateWords(message.guild, [])
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "✅ wordlist has been reset")]
+                embeds: [new CustomEmbed(message.member, false, "✅ wordlist has been reset")],
             })
         } else if (args[1].toLowerCase() == "list") {
             const words = getWordList(message.guild)
@@ -750,7 +726,7 @@ async function run(message, args) {
                                     )
                                 }
 
-                                await msg.edit({embeds: [embed], components: [row]})
+                                await msg.edit({ embeds: [embed], components: [row] })
                                 return pageManager()
                             }
                         } else if (reaction == "➡") {
@@ -789,7 +765,7 @@ async function run(message, args) {
                                     )
                                 }
 
-                                await msg.edit({embeds: [embed], components: [row]})
+                                await msg.edit({ embeds: [embed], components: [row] })
                                 return pageManager()
                             }
                         }

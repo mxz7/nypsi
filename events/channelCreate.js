@@ -17,8 +17,8 @@ module.exports = async (channel) => {
 
     if (!muteRole) return
 
-    channel
-        .permissionOverwrites.edit(muteRole, {
+    channel.permissionOverwrites
+        .edit(muteRole, {
             SEND_MESSAGES: false,
             SPEAK: false,
             ADD_REACTIONS: false,

@@ -7,11 +7,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command(
-    "history",
-    "view punishment history for a given user",
-    categories.MODERATION
-)
+const cmd = new Command("history", "view punishment history for a given user", categories.MODERATION)
     .setAliases(["modlogs", "hist"])
     .setPermissions(["MANAGE_MESSAGES"])
 
