@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { info } = require("../utils/logger")
 
-const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message

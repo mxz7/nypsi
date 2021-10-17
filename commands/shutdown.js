@@ -4,7 +4,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { startRestart } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 
-const cmd = new Command("shutdown", "shutdown bot", categories.NONE).setPermissions("bot owner")
+const cmd = new Command("shutdown", "shutdown bot", categories.NONE).setPermissions(["bot owner"])
 
 let confirm = false
 
