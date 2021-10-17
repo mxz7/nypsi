@@ -1,4 +1,4 @@
-const { Message, Permissions } = require("discord.js")
+const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, deleteCase, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -69,25 +69,28 @@ async function run(message, args) {
         embed.setDescription("punished user: " + target.toString())
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("❌").setLabel("delete").setStyle("DANGER")
+    )
 
-    if (case0.deleted) return
+    let msg
 
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) return
-
-    await msg.react("❌")
-
-    const filter = (reaction, user) => {
-        return ["❌"].includes(reaction.emoji.name) && user.id == message.member.user.id
+    if (message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) && !case0.deleted) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
     }
 
+    const filter = (i) => i.user.id == message.author.id
+
     const reaction = await msg
-        .awaitReactions({filter, max: 1, time: 15000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({filter, time: 15000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(async () => {
-            await msg.reactions.removeAll()
+            await msg.edit({components: []})
         })
 
     if (reaction == "❌") {
@@ -99,7 +102,7 @@ async function run(message, args) {
             "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
-        await msg.edit({embeds: [newEmbed]})
+        await msg.edit({embeds: [newEmbed], components: []})
     }
 }
 
