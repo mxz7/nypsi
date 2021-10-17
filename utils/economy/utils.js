@@ -248,7 +248,7 @@ async function doVote(client, vote) {
             )
 
         await member
-            .send("thank you for voting!", embed)
+            .send({ content: "thank you for voting!", embeds: [embed]})
             .then(() => {
                 info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
             })
