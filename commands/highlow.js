@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     userExists,
     createUser,
@@ -228,8 +228,10 @@ async function run(message, args) {
 
     newCard(message.member)
 
-    const loadingEmbed = new CustomEmbed(message.member).setTitle(
-        "loading.. | " + message.member.user.username
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
     )
 
     const embed = new CustomEmbed(
@@ -239,14 +241,8 @@ async function run(message, args) {
     )
         .setTitle("highlow | " + message.member.user.username)
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
-        .addField("help", "⬆ higher | ⬇ lower | 💰 cash out")
 
-    message.channel.send({embeds: [loadingEmbed]}).then(async (m) => {
-        await m.react("⬆")
-        await m.react("⬇")
-        await m.react("💰")
-
-        await m.edit({embeds: [embed]})
+    message.channel.send({embeds: [embed], components: [row]}).then((m) => {
         playGame(message, m).catch((e) => {
             console.error(e)
             return message.channel.send({
@@ -296,6 +292,12 @@ function getValue(member) {
     }
 }
 
+/**
+ * 
+ * @param {Message} message 
+ * @param {Message} m 
+ * @returns 
+ */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
 
@@ -323,8 +325,7 @@ async function playGame(message, m) {
         )
         newEmbed.addField("card", "| " + card + " |")
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return await m.edit({embeds: [newEmbed], components: []})
     }
 
     const win1 = async () => {
@@ -384,8 +385,7 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return m.edit({embeds: [newEmbed], components: []})
     }
 
     const draw = async () => {
@@ -406,24 +406,22 @@ async function playGame(message, m) {
         newEmbed.addField("card", "| " + card + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        await m.edit({embeds: [newEmbed]})
-        return m.reactions.removeAll()
+        return await m.edit({embeds: [newEmbed], components: []})
     }
 
     if (win == 15) {
         return win1()
     }
 
-    const filter = (reaction, user) => {
-        return ["⬆", "⬇", "💰"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
     let fail = false
 
     const reaction = await m
-        .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-        .then((collected) => {
-            return collected.first().emoji.name
+        .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
         })
         .catch(() => {
             fail = true
@@ -457,6 +455,20 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             })
 
+            let row = new MessageActionRow().addComponents(
+                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            )
+
+            if (win >= 1) {
+                row = new MessageActionRow().addComponents(
+                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                )
+            }
+
             newEmbed.setDescription(
                 "**bet** $" +
                     bet.toLocaleString() +
@@ -467,8 +479,7 @@ async function playGame(message, m) {
                     ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬆").users.remove(message.member)
-            await m.edit({embeds: [newEmbed]})
+            await m.edit({embeds: [newEmbed], components: [row]})
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
@@ -481,7 +492,7 @@ async function playGame(message, m) {
                     ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬆").users.remove(message.member)
+
             await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else {
@@ -509,6 +520,20 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             })
 
+            let row = new MessageActionRow().addComponents(
+                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            )
+
+            if (win >= 1) {
+                row = new MessageActionRow().addComponents(
+                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
+                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                )
+            }
+
             newEmbed.setDescription(
                 "**bet** $" +
                     bet.toLocaleString() +
@@ -519,8 +544,7 @@ async function playGame(message, m) {
                     ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬇").users.remove(message.member)
-            await m.edit({embeds: [newEmbed]})
+            await m.edit({embeds: [newEmbed], components: [row]})
             return playGame(message, m)
         } else if (newCard1 == oldCard) {
             newEmbed.setDescription(
@@ -533,7 +557,6 @@ async function playGame(message, m) {
                     ")"
             )
             newEmbed.addField("card", "| " + card + " |")
-            await m.reactions.cache.get("⬇").users.remove(message.member)
             await m.edit({embeds: [newEmbed]})
             return playGame(message, m)
         } else {
@@ -541,7 +564,6 @@ async function playGame(message, m) {
         }
     } else if (reaction == "💰") {
         if (win < 1) {
-            await m.reactions.cache.get("💰").users.remove(message.member)
             return playGame(message, m)
         } else if (win == 1) {
             return draw()
