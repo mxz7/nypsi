@@ -29,11 +29,11 @@ async function run(message, args) {
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) ||
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
     ) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 "i need the `manage roles` and `manage channels` permission for this command to work"
-            )
-        )
+            )]
+        })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -41,7 +41,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send(new ErrorEmbed(`${prefix}unmute <@user(s)>`))
+        return message.channel.send({embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)]})
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -57,9 +57,9 @@ async function run(message, args) {
         const member = members.find((m) => m.id == args[0])
 
         if (!member) {
-            return message.channel.send(
-                new ErrorEmbed("unable to find member with ID `" + args[0] + "`")
-            )
+            return message.channel.send({
+                embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")]
+            })
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -67,7 +67,7 @@ async function run(message, args) {
         const member = await getExactMember(message, args[0])
 
         if (!member) {
-            return message.channel.send(new ErrorEmbed("unable to find member `" + args[0] + "`"))
+            return message.channel.send({embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")]})
         }
 
         message.mentions.members.set(member.user.id, member)
@@ -82,13 +82,13 @@ async function run(message, args) {
     }
 
     if (!muteRole) {
-        return message.channel.send(
-            new ErrorEmbed(
+        return message.channel.send({
+            embeds: [new ErrorEmbed(
                 `no mute role could be found, set one with ${getPrefix(
                     message.guild
                 )}muterole, or create a role called "muted"`
-            )
-        )
+            )]
+        })
     }
 
     let count = 0
@@ -104,11 +104,11 @@ async function run(message, args) {
                 .then(() => count++)
                 .catch(() => {
                     fail = true
-                    return message.channel.send(
-                        new ErrorEmbed(
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed(
                             "there was an error when removing the role, please ensure i have the correct permissions"
-                        )
-                    )
+                        )]
+                    })
                 })
         } else {
             failed.push(m.user)
@@ -131,7 +131,7 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send(new ErrorEmbed("i was unable to unmute any users"))
+        return message.channel.send({embeds: [new ErrorEmbed("i was unable to unmute any users")]})
     }
 
     if (failed.length != 0) {
@@ -145,7 +145,7 @@ async function run(message, args) {
 
     if (args.join(" ").includes("-s")) {
         message.delete()
-        await message.member.send(embed).catch(() => {})
+        await message.member.send({embeds: [embed]}).catch(() => {})
     } else {
         await message.channel.send({ embeds: [embed] })
     }
