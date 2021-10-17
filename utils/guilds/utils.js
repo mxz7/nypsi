@@ -498,9 +498,9 @@ async function checkChristmasCountdown(guild) {
     }
 
     return await channel
-        .send(
-            new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")
-        )
+        .send({
+            embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")]
+        })
         .then(() => {
             info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
         })
@@ -720,7 +720,7 @@ function runCountdowns(client) {
                 if (!channel) continue
 
                 await channel
-                    .send(embed)
+                    .send({embeds: [embed]})
                     .then(() => {
                         info(
                             `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`,
@@ -792,12 +792,12 @@ function runChristmas(client) {
             }
 
             await channel
-                .send(
-                    new CustomEmbed()
+                .send({
+                    embeds: [new CustomEmbed()
                         .setDescription(format)
                         .setColor("#ff0000")
-                        .setTitle(":santa_tone1:")
-                )
+                        .setTitle(":santa_tone1:")]
+                })
                 .then(() => {
                     info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
                 })
