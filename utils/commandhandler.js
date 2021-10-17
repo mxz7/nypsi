@@ -1,7 +1,7 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
-const { Message, Client } = require("discord.js")
+const { Message, Client, MessageActionRow, MessageButton } = require("discord.js")
 const {
     getPrefix,
     getDisabledCommands,
@@ -197,9 +197,7 @@ async function helpCmd(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(
-        prefix + "help <command> | get info about a command"
-    )
+    const embed = new CustomEmbed(message.member).setFooter(prefix + "help <command> | get info about a command")
 
     /**
      * FINDING WHAT THE USER REQUESTED
@@ -228,9 +226,7 @@ async function helpCmd(message, args) {
                 `my prefix for this server is \`${prefix}\``
         )
         embed.addField("command categories", categoriesMsg, true)
-        embed.setThumbnail(
-            message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })
-        )
+        embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
         if (news.text != "") {
             embed.addField("news", `${news.text} - *${lastSet}*`)
@@ -252,7 +248,7 @@ async function helpCmd(message, args) {
             }
 
             embed.setTitle(`${args[0].toLowerCase()} commands`)
-            embed.setDescription(pages.get(1))
+            embed.setDescription(pages.get(1).join("\n"))
             embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd
@@ -264,14 +260,7 @@ async function helpCmd(message, args) {
             }
 
             let desc =
-                "**name** " +
-                cmd.name +
-                "\n" +
-                "**description** " +
-                cmd.description +
-                "\n" +
-                "**category** " +
-                cmd.category
+                "**name** " + cmd.name + "\n" + "**description** " + cmd.description + "\n" + "**category** " + cmd.category
 
             if (cmd.permissions) {
                 desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`"
@@ -284,9 +273,7 @@ async function helpCmd(message, args) {
             embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
         } else if (getCommand(args[0].toLowerCase())) {
-            const member = await message.guild.members.cache.find(
-                (m) => m.id == getCommand(args[0].toLowerCase()).owner
-            )
+            const member = await message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner)
             embed.setTitle("custom command")
             embed.setDescription(
                 `this is a custom command${
@@ -296,34 +283,42 @@ async function helpCmd(message, args) {
                 )}disablecmd + customcommand`
             )
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed("unknown command")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("unknown command")] })
         }
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    /**
+     * @type {Message}
+     */
+    let msg
 
-    if (!pageSystemNeeded) return
+    let row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    )
+
+    if (pageSystemNeeded) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return await message.channel.send({ embeds: [embed] })
+    }
 
     const pages = helpCategories.get(args[0].toLowerCase())
-
-    await msg.react("⬅")
-    await msg.react("➡")
 
     let currentPage = 1
     const lastPage = pages.size
 
-    const filter = (reaction, user) => {
-        return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id
-    }
+    const filter = (i) => i.user.id == message.author.id
 
-    async function pageManager() {
+    const pageManager = async () => {
         const reaction = await msg
-            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name
+            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .then(async (collected) => {
+                await collected.deferUpdate()
+                return collected.customId
             })
             .catch(async () => {
-                await msg.reactions.removeAll()
+                await msg.edit({ embeds: [embed], components: [] })
             })
 
         if (!reaction) return
@@ -335,7 +330,18 @@ async function helpCmd(message, args) {
                 currentPage--
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit({embeds: [embed]})
+                if (currentPage == 1) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -345,7 +351,18 @@ async function helpCmd(message, args) {
                 currentPage++
                 embed.setDescription(pages.get(currentPage).join("\n"))
                 embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
-                await msg.edit({embeds: [embed]})
+                if (currentPage == lastPage) {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    )
+                } else {
+                    row = new MessageActionRow().addComponents(
+                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    )
+                }
+                await msg.edit({ embeds: [embed], components: [row] })
                 return pageManager()
             }
         }
