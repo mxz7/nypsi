@@ -56,9 +56,9 @@ async function run(message, args) {
     } else {
         if (args[0].toLowerCase() == "-clear") {
             clearUsernameHistory(message.member)
-            return message.channel.send(
-                new CustomEmbed(message.member, false, "✅ your username history has been cleared")
-            )
+            return message.channel.send({
+                embeds: [new CustomEmbed(message.member, false, "✅ your username history has been cleared")]
+            })
         }
 
         if (!message.mentions.members.first()) {
@@ -139,7 +139,7 @@ async function run(message, args) {
 
     const pageManager = async () => {
         const reaction = await msg
-            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
             .then((collected) => {
                 return collected.first().emoji.name
             })
@@ -168,7 +168,7 @@ async function run(message, args) {
                 newEmbed.setDescription(description)
 
                 newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit(newEmbed)
+                await msg.edit({embeds: [newEmbed]})
                 return pageManager()
             }
         } else if (reaction == "➡") {
@@ -186,7 +186,7 @@ async function run(message, args) {
                 newEmbed.setDescription(description)
 
                 newEmbed.setFooter(`page ${currentPage}/${lastPage}`)
-                await msg.edit(newEmbed)
+                await msg.edit({embeds: [newEmbed]})
                 return pageManager()
             }
         }
