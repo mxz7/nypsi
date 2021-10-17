@@ -19,7 +19,7 @@ module.exports = async (oldMember, newMember) => {
                 tier = 3
             } else if (newMember.roles.cache.find((r) => r.id == "747066190530347089")) {
                 // boost
-                tier = 3
+                tier = 2
             } else if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) {
                 // silver
                 tier = 2
@@ -45,6 +45,7 @@ module.exports = async (oldMember, newMember) => {
             ) {
                 if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return
                 if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return
+                if (newMember.roles.cache.find((r) => r.id == "819870727834566696"))
 
                 expireUser(newMember.id)
             }
