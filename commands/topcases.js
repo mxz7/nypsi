@@ -21,7 +21,7 @@ async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (!profileExists(message.guild))
-        return message.channel.send(new ErrorEmbed("no data for this server"))
+        return message.channel.send({embeds: [new ErrorEmbed("no data for this server")]})
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -44,7 +44,7 @@ async function run(message, args) {
 
     const cases = getAllCases(message.guild)
 
-    if (cases.length <= 0) return message.channel.send(new ErrorEmbed("no data for this server"))
+    if (cases.length <= 0) return message.channel.send({embeds: [new ErrorEmbed("no data for this server")]})
 
     cooldown.set(message.author.id, new Date())
     setTimeout(() => {
@@ -146,8 +146,8 @@ async function run(message, args) {
             count++
         }
 
-        embed.addField("top staff", staffText, true)
-        embed.addField("top members", memberText, true)
+        embed.addField("top staff", staffText.join("\n"), true)
+        embed.addField("top members", memberText.join("\n"), true)
 
         if (deletedCaseCount) {
             embed.setFooter(
@@ -176,9 +176,9 @@ async function run(message, args) {
                 member = await getMember(message, args.join(" "))
 
                 if (!member) {
-                    return message.channel.send(
-                        new ErrorEmbed("can't find `" + args.join(" ") + "`")
-                    )
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("can't find `" + args.join(" ") + "`")]
+                    })
                 }
             }
         }
