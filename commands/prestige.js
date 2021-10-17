@@ -96,7 +96,7 @@ async function run(message, args) {
     }
 
     const reaction = await msg
-        .awaitReactions(filter, { max: 1, time: 15000, errors: ["time"] })
+        .awaitReactions({filter, max: 1, time: 15000, errors: ["time"] })
         .then((collected) => {
             return collected.first().emoji.name
         })

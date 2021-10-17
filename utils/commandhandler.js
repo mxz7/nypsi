@@ -491,7 +491,7 @@ async function runCommand(cmd, message, args) {
         let fail = false
 
         const response = await message.channel
-            .awaitMessages(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
             .then(async (collected) => {
                 return collected.first().content.toLowerCase()
             })
