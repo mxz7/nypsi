@@ -132,7 +132,7 @@ async function run(message, args) {
 
     const pageManager = async () => {
         const reaction = await msg
-            .awaitReactions(filter, { max: 1, time: 30000, errors: ["time"] })
+            .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
             .then((collected) => {
                 return collected.first().emoji.name
             })

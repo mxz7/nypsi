@@ -35,7 +35,8 @@ async function run(message, args) {
 
     const filter = (msg) => message.author.id == msg.author.id
 
-    let response = await message.channel.awaitMessages(filter, {
+    let response = await message.channel.awaitMessages({
+        filter,
         max: 1,
     })
 
