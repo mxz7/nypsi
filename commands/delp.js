@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { Message, Collection } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -80,26 +80,28 @@ async function run(message, args) {
         collected = await message.channel.messages.fetch({ limit: 100 })
     }
 
-    const collecteda = collected.filter((msg) => {
+    collected = collected.filter((msg) => {
         if (!msg.author) return
         return msg.author.id == message.author.id
     })
 
-    if (collecteda.size == 0) {
+    if (collected.size == 0) {
         return
     }
 
-    let count = 0
+    if (collected.size > amount) {
+        const collectedValues = Array.from(collected.values())
 
-    for (let msg of collecteda.keys()) {
-        if (count >= amount) {
-            await collecteda.delete(msg.id)
-        } else {
-            count++
+        collectedValues.splice(amount + 1, collectedValues.length)
+
+        collected = new Collection()
+
+        for (const msg of collectedValues) {
+            collected.set(msg.id, msg)
         }
     }
 
-    await message.channel.bulkDelete(collecteda)
+    await message.channel.bulkDelete(collected)
 }
 
 cmd.setRun(run)
