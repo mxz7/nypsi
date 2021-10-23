@@ -284,6 +284,8 @@ function checkStats() {
                     addCooldown(guild, 3600)
                 }
 
+                if (!members) return
+
                 if (members.size == guild.memberCount) {
                     members = members.filter((m) => !m.user.bot)
 
