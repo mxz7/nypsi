@@ -105,9 +105,7 @@ async function run(message, args) {
         try {
             muteRole = await message.guild.roles
                 .create({
-                    data: {
-                        name: "muted",
-                    },
+                    name: "muted",
                 })
                 .catch(() => {
                     channelError = true
