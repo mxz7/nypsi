@@ -776,7 +776,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         } else {
             const noLifer = sortedNoLifers.keys().next().value
 
-            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer)} commands)`)
+            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)`)
         }
 
         await channel.send({ embeds: [embed] })
