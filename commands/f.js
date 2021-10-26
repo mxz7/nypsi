@@ -91,7 +91,9 @@ async function run(message, args) {
                 new CustomEmbed(
                     message.member,
                     false,
-                    `**${reactions.length.toLocaleString()}** ${reactions.length != 1 ? "people" : "person"} paid their respects to **${content}**`
+                    `**${reactions.length.toLocaleString()}** ${
+                        reactions.length != 1 ? "people" : "person"
+                    } paid their respects to **${content}**`
                 ),
             ],
         })
