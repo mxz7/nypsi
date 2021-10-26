@@ -287,7 +287,7 @@ async function run(message, args) {
         for (const image of queue) {
             if (embed.fields.length >= 6) break
 
-            embed.addField(image.id, `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image}`)
+            embed.addField(image.id.toString(), `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image}`)
         }
 
         embed.setTitle("wholesome queue")
