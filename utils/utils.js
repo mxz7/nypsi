@@ -521,7 +521,7 @@ async function suggestWholesomeImage(submitter, image) {
 
     const { CustomEmbed } = require("./classes/EmbedBuilders")
 
-    const embed = new CustomEmbed().embed.setColor("#111111").setTitle("wholesome suggestion #" + query.id)
+    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + query.id)
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`)
 
