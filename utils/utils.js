@@ -455,7 +455,7 @@ async function showTopGlobalBal(client) {
         const embed = new CustomEmbed()
 
         embed.setTitle("top 10 richest users")
-        embed.setDescription(baltop)
+        embed.setDescription(baltop.join("\n"))
         embed.setColor("#111111")
 
         await channel.send({embeds: [embed]})
