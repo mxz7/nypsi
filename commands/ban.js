@@ -32,7 +32,7 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0 && message.mentions.members.first() == null) {
+    if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member, false)
             .setTitle("ban help")
             .addField("usage", `${prefix}ban <@user(s)> (reason) [-s] [-k]`)

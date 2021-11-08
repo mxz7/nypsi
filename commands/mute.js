@@ -37,7 +37,7 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0 && message.mentions.members.first() == null) {
+    if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
             .setTitle("mute help")
             .addField("usage", `${prefix}mute <@user(s)> (time) [-s]`)
