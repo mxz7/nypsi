@@ -253,6 +253,15 @@
         "role": "item",
         "worth": 150000
     },
+    "potato": {
+        "id": "potato",
+        "name": "potato",
+        "emoji": "🥔",
+        "description": "a potato.",
+        "rarity": 0,
+        "role": "item",
+        "worth": 250
+    },
     "tooth": {
         "id": "tooth",
         "name": "tooth",
