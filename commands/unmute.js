@@ -29,7 +29,7 @@ async function run(message, args) {
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0) {
+    if (args.length == 0 || !args[0]) {
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] })
     }
 
