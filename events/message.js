@@ -127,7 +127,7 @@ function addMention() {
 
         let count = 0
 
-        const channelMembers = mention.message.channel.members
+        let channelMembers = mention.message.channel.members
 
         for (const memberID of Array.from(members.keys())) {
             if (count >= 200) {
@@ -147,6 +147,7 @@ function addMention() {
             try {
                 if (!channelMembers.has(memberID)) continue
             } catch {
+                channelMembers = channelMembers.cache
                 console.log(channelMembers)
                 console.log("important")
             }
