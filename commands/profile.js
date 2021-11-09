@@ -70,7 +70,13 @@ async function run(message, args) {
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%"
     const voted = hasVoted(message.member)
     const inventory = getInventory(message.member)
-    const inventoryItems = Array.from(Object.values(inventory)).reduce((a, b) => a + b)
+    let inventoryItems
+
+    try {
+        inventoryItems = Array.from(Object.values(inventory)).reduce((a, b) => a + b)
+    } catch {
+        inventoryItems = 0
+    }
 
     embed.addField(
         "💰 economy",
