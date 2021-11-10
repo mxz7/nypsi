@@ -130,7 +130,7 @@ function addMention() {
         let channelMembers
 
         try {
-             channelMembers = mention.message.channel.members
+            channelMembers = mention.message.channel.members
         } catch {
             console.log(mention)
             return console.log("importantxd")
