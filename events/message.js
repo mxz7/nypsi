@@ -127,7 +127,14 @@ function addMention() {
 
         let count = 0
 
-        let channelMembers = mention.message.channel.members
+        let channelMembers
+
+        try {
+             channelMembers = mention.message.channel.members
+        } catch {
+            console.log(mention)
+            return console.log("importantxd")
+        }
 
         for (const memberID of Array.from(members.keys())) {
             if (count >= 200) {
