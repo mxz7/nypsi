@@ -157,6 +157,7 @@ function addMention() {
                 channelMembers = channelMembers.cache
                 console.log(channelMembers)
                 console.log("important")
+                if (!channelMembers.has(memberID)) continue
             }
 
             const data = {
