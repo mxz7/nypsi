@@ -15,7 +15,7 @@
     "bufferutil": "^4.0.3",
     "discord.js": "^13.3.1",
     "express": "^4.17.1",
-    "fast-sort": "^3.0.3",
+    "fast-sort": "^3.1.1",
     "figlet": "^1.5.2",
     "imgur": "^1.0.2",
     "is-image-url": "^1.1.8",
