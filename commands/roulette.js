@@ -309,7 +309,7 @@ async function run(message, args) {
 
                 if (bet >= requiredBet) {
                     const xpBonus =
-                    Math.floor(Math.random() * 2) + (getPrestige(message.member) == 0 ? 1 : getPrestige(message.member))
+                        Math.floor(Math.random() * 2) + (getPrestige(message.member) == 0 ? 1 : getPrestige(message.member))
 
                     const givenXp = xpBonus > 7 ? 7 : xpBonus
 
