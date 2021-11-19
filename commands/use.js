@@ -429,7 +429,7 @@ async function run(message, args) {
                 setInventory(message.member, inventory)
 
                 embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`)
-                laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for two minutes`
+                laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`
                 break
 
             default:
