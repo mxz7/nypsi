@@ -70,7 +70,7 @@ async function run(message, args) {
             }
         })
 
-        if (membersSorted.length > 1500) {
+        if (membersSorted.length > 1000) {
             const msg = await message.channel.send({
                 embeds: [
                     new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
