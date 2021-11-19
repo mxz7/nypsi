@@ -809,7 +809,7 @@ function addHandcuffs(id) {
 
     setTimeout(() => {
         handcuffs.delete(id)
-    }, 120000)
+    }, 60000)
 }
 
 exports.addHandcuffs = addHandcuffs
