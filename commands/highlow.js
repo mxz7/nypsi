@@ -335,7 +335,7 @@ async function playGame(message, m) {
 
             if (getPrestige(message.member) > 2) requiredBet = 10000
 
-            requiredBet += getPrestige(message.member) * 1000
+            requiredBet += getPrestige(message.member) * 5000
 
             if (bet >= requiredBet) {
                 const xpBonus =
