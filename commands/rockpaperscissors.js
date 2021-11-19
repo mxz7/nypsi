@@ -250,7 +250,7 @@ async function run(message, args) {
                     const xpBonus =
                         Math.floor(Math.random() * 2) + (getPrestige(message.member) == 0 ? 1 : getPrestige(message.member))
 
-                    const givenXp = xpBonus > 7 ? 7 : xpBonus
+                    const givenXp = xpBonus > 5 ? 5 : xpBonus
 
                     updateXp(message.member, getXp(message.member) + givenXp)
                     embed.setFooter("+" + givenXp + "xp")
