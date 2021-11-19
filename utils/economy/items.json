@@ -249,9 +249,9 @@
         "name": "mask",
         "emoji": "😷",
         "description": "bypass rob cooldown",
-        "rarity": 1,
+        "rarity": 2,
         "role": "item",
-        "worth": 150000
+        "worth": 300000
     },
     "potato": {
         "id": "potato",
