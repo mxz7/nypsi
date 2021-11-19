@@ -178,7 +178,7 @@ async function run(message, args) {
             `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
         )
         embed.setImage(wholesome.image)
-        embed.setFooter(`submitted on ${formatDate(wholesome.date)}`)
+        embed.setFooter(`submitted on ${formatDate(wholesome.upload)}`)
     } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
         if (message.guild.id != "747056029795221513") return
 
