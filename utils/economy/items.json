@@ -441,9 +441,9 @@
         "name": "handcuffs",
         "emoji": "<:nypsi_handcuffs:839797762404122654>",
         "description": "simply handcuff someone",
-        "rarity": 2,
+        "rarity": 3,
         "role": "item",
-        "worth": 150000,
+        "worth": 400000,
         "aliases": ["handcuff"]
     },
     "smart_car": {
