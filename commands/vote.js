@@ -68,14 +68,14 @@ async function run(message, args) {
         embed.setColor("#5efb8f")
         embed.addField(
             "rewards",
-            `✓ +**10**% multiplier, total: **${multi}**%\n✓ **xp** gambling bonus\n✓ +$**50k** max bet`
+            `✓ +**10**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`
         )
     } else {
         embed.setTitle("vote ❌")
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**10**% multiplier, current: **${multi}**%\n× **xp** gambling bonus\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${
+            `× +**10**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${
                 getPrestige(message.member) + 1
             }** vote crate${getPrestige(message.member) > 0 ? "s" : ""}`
         )
