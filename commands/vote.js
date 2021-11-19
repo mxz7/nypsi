@@ -66,10 +66,7 @@ async function run(message, args) {
     if (voted) {
         embed.setTitle("vote ✅")
         embed.setColor("#5efb8f")
-        embed.addField(
-            "rewards",
-            `✓ +**10**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`
-        )
+        embed.addField("rewards", `✓ +**10**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
         embed.setTitle("vote ❌")
         embed.setColor("#e4334f")
