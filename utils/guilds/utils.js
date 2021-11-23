@@ -760,13 +760,14 @@ function runChristmas(client) {
 
         for (const profile of query) {
             const guild = client.guilds.cache.find((g) => g.id == profile.guild_id)
+            if (!guild) continue
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
 
             if (!channel) {
                 profile.enabled = false
                 profile.channel = "none"
                 setChristmasCountdown(guild, profile)
-                return
+                continue
             }
 
             let format = profile.format
