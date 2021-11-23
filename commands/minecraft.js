@@ -8,7 +8,6 @@ const { info, types } = require("../utils/logger")
 const { getNameHistory } = require("mc-names")
 
 const cooldown = new Map()
-const serverCache = new Map()
 
 const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
 
@@ -55,39 +54,6 @@ async function run(message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
-
-    if (args[0].includes(".")) {
-        const serverIP = args[0]
-        const url = "https://api.mcsrvstat.us/2/" + serverIP.toLowerCase()
-        let res
-        let invalid = false
-
-        if (serverCache.has(serverIP.toLowerCase())) {
-            res = serverCache.get(serverIP.toLowerCase())
-        } else {
-            res = await fetch(url)
-                .then((url) => url.json())
-                .catch(() => {
-                    invalid = true
-                })
-            if (!invalid) {
-                serverCache.set(serverIP.toLowerCase(), res)
-                setTimeout(() => {
-                    serverCache.delete(serverIP.toLowerCase())
-                }, 600000)
-            } else {
-                return message.channel.send({ embeds: [new ErrorEmbed("invalid server")] })
-            }
-        }
-
-        const embed = new CustomEmbed(message.member, true)
-            .setTitle(args[0] + " | " + res.ip + ":" + res.port)
-            .addField("players", res.players.online.toLocaleString() + "/" + res.players.max.toLocaleString(), true)
-            .addField("version", res.version, true)
-            .addField("motd", res.motd.clean)
-
-        return message.channel.send({ embeds: [embed] })
-    }
 
     let username = args[0]
 
@@ -194,13 +160,6 @@ async function run(message, args) {
         return pageManager()
     }
 }
-
-setInterval(() => {
-    if (serverCache.size > 7) {
-        serverCache.clear()
-        info("minecraft server cache cleared", types.AUTOMATION)
-    }
-}, 6 * 60 * 60 * 1000)
 
 cmd.setRun(run)
 
