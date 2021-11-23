@@ -255,7 +255,7 @@ setTimeout(() => {
     info("logging in...", types.INFO)
     client.login(token).then(() => {
         setTimeout(() => {
-            runPopularCommandsTimer(client, "747056029795221513", "823672263693041705")
+            runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"])
             runCountdowns(client)
             runChristmas(client)
             showTopGlobalBal(client)
