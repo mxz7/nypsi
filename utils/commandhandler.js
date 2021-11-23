@@ -715,7 +715,7 @@ function updatePopularCommands(command, tag) {
 /**
  * @param {Client} client
  * @param {String} serverID
- * @param {String} channelID
+ * @param {Array<String>} channelID
  */
 function runPopularCommandsTimer(client, serverID, channelID) {
     const now = new Date()
@@ -735,7 +735,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             return error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
         }
 
-        const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+        const channel = await guild.channels.cache.find((ch) => ch.id == channelID[0])
 
         if (!channel) {
             return error("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
@@ -784,6 +784,51 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
         popularCommands.clear()
         noLifers.clear()
+    }
+
+    const postCommandUsers = async () => {
+        const guild = await client.guilds.fetch(serverID)
+
+        if (!guild) {
+            return error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+        }
+
+        const channel = await guild.channels.cache.find((ch) => ch.id == channelID[1])
+
+        if (!channel) {
+            return error("UNABLE TO FIND CHANNEL FOR HOURLY COMMAND USE LOG", serverID, channelID)
+        }
+
+        const sortedNoLifers = new Map([...noLifers.entries()].sort((a, b) => b[1] - a[1]))
+
+        let msg = ""
+        let count = 1
+
+        for (let [key, value] of sortedNoLifers) {
+            if (count >= 11) break
+
+            let pos = count
+
+            if (pos == 1) {
+                pos = "🥇"
+            } else if (pos == 2) {
+                pos = "🥈"
+            } else if (pos == 3) {
+                pos = "🥉"
+            }
+
+            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`
+            count++
+        }
+
+        const embed = new CustomEmbed()
+
+        embed.setTitle("top 10 command users")
+        embed.setDescription(msg)
+        embed.setColor("#111111")
+
+        await channel.send({ embeds: [embed] })
+        info("sent command use logs", types.AUTOMATION)
     }
 
     setTimeout(async () => {
