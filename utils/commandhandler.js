@@ -817,7 +817,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
                 pos = "🥉"
             }
 
-            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`
+            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** commands\n`
             count++
         }
 
@@ -837,6 +837,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         }, 86400000)
         postPopularCommands()
     }, needed - now)
+
+    setTimeout(() => {
+        setInterval(() => {
+            postCommandUsers()
+        }, 3600000)
+        postCommandUsers()
+    }, 3600000)
 
     info(`popular commands will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
 }
