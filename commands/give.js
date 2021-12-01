@@ -93,7 +93,18 @@ async function run(message, args) {
     const inventory = getInventory(message.member)
     const targetInventory = getInventory(target)
 
-    let searchTag = args[1].toLowerCase()
+    let searchTag
+
+    try {
+        searchTag = args[1].toLowerCase()
+    } catch {
+        const embed = new CustomEmbed(message.member, false).setTitle("give | " + message.author.tag)
+
+        embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
+        embed.addField("help", "give members items from your inventory")
+
+        return message.channel.send({ embeds: [embed] })
+    }
 
     let selected
 
