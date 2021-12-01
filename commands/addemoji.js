@@ -41,7 +41,7 @@ async function run(message, args) {
         })
     }
 
-    if (!message.member.permissions.has(Permissions.MANAGE_EMOJIS_AND_STICKERS)) {
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage emojis` permission")] })
         }
