@@ -128,6 +128,11 @@ async function run(message, args) {
                     ],
                 })
             } else {
+                uploadCooldown.set(message.member.id, new Date())
+
+                setTimeout(() => {
+                    uploadCooldown.delete(message.author.id)
+                }, 60 * 1000)
                 url = upload
             }
         }
@@ -151,12 +156,6 @@ async function run(message, args) {
         setTimeout(() => {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
-
-        uploadCooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            uploadCooldown.delete(message.author.id)
-        }, 60 * 1000)
 
         return message.react("✅")
     } else if (args[0].toLowerCase() == "get") {
