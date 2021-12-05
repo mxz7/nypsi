@@ -11,6 +11,11 @@ module.exports = async (oldMember, newMember) => {
         if (oldMember.roles.cache.size < newMember.roles.cache.size) {
             let tier = 0
 
+            // 747066190530347089 boost role
+            // 819870727834566696 silver role
+            // 819870846536646666 gold role
+            // 819870959325413387 platinum role
+
             if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) {
                 // platinum
                 tier = 4
@@ -39,6 +44,10 @@ module.exports = async (oldMember, newMember) => {
                 addMember(newMember.user.id, tier)
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+            // 747066190530347089 boost role
+            // 819870727834566696 silver role
+            // 819870846536646666 gold role
+            // 819870959325413387 platinum role
             if (
                 oldMember.roles.cache.find((r) => r.id == "747066190530347089") &&
                 !newMember.roles.cache.find((r) => r.id == "747066190530347089")
