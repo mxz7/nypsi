@@ -85,10 +85,6 @@ i'm not gonna help with installation if you want to clone the code and make it f
 
 ![join command](https://i.imgur.com/DjXm8lV.png)
 
--   `$game`
-
-![game command](https://i.imgur.com/gyARIED.png)
-
 -   `$history`
 
 ![history command](https://i.imgur.com/2f5bcWO.png)
