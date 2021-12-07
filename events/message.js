@@ -114,6 +114,12 @@ module.exports = async (message) => {
 function addMention() {
     const mention = mentionQueue.shift()
 
+    if (!mention) {
+        clearInterval(mentionInterval)
+        mentionInterval = undefined
+        return
+    }
+
     if (mention.type == "collection") {
         const members = mention.members
 
