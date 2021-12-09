@@ -103,6 +103,17 @@ function runCheck(guild) {
 
     const query = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
 
+    if (!query) {
+        db.prepare("DELETE FROM guilds_counters WHERE guild_id = ?").run(guild.id)
+        db.prepare("DELETE FROM guilds_christmas WHERE guild_id = ?").run(guild.id)
+        db.prepare("DELETE FROM guilds WHERE id = ?").run(guild.id)
+
+        if (existsCooldown.has(guild)) existsCooldown.delete(guild)
+
+        info(`deleted guild '${guild.id}' from guild data`, types.GUILD)
+        return
+    }
+
     const currentMembersPeak = query.peak
 
     if (guild.memberCount > currentMembersPeak) {
