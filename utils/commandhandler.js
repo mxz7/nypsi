@@ -817,7 +817,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
                 pos = "🥉"
             }
 
-            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** commands\n`
+            msg += `${pos} \`${key}\` used **${value.toLocaleString()}** commands\n`
             count++
         }
 
