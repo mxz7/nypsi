@@ -80,6 +80,10 @@ async function run(message, args) {
 
     const history = fetchUsernameHistory(member)
 
+    if (history.length == 0) {
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "this user has no username history")]})
+    }
+
     /**
      * @type {Map<Number, Array<{ value: String, date: Number }>}
      */
