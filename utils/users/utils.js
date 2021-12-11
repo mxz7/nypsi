@@ -154,9 +154,7 @@ function clearUsernameHistory(member) {
 
     if (member.user) id = member.user.id
 
-    const current = fetchUsernameHistory(id)[0].value
-
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username' AND value != ?").run(id, current)
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username'").run(id)
 
     if (usernameCache.has(id)) {
         usernameCache.delete(id)
@@ -217,9 +215,7 @@ function clearAvatarHistory(member) {
 
     if (member.user) id = member.user.id
 
-    const current = fetchAvatarHistory(id)[0].value
-
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar' AND value != ?").run(id, current)
+    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar'").run(id)
 
     if (avatarCache.has(id)) {
         avatarCache.delete(id)
