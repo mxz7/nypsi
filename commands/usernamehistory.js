@@ -81,7 +81,9 @@ async function run(message, args) {
     const history = fetchUsernameHistory(member)
 
     if (history.length == 0) {
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "this user has no username history")]})
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "this user has no username history")],
+        })
     }
 
     /**
