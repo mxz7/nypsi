@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
-const cmd = new Command("color", "get a random hex color code", categories.INFO)
+const cmd = new Command("color", "get a random hex color code", categories.INFO).setAliases(["colour"])
 
 /**
  * @param {Message} message
