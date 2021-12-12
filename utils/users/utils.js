@@ -1,6 +1,9 @@
 const { GuildMember } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
+const { lastfm: lastfmToken } = require("../../config.json")
+const { default: fetch } = require("node-fetch")
+const { cleanString } = require("../utils")
 
 const db = getDatabase()
 const existsCache = new Set()
@@ -249,3 +252,34 @@ function getLastfmUsername(member) {
 }
 
 exports.getLastfmUsername = getLastfmUsername
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} username
+ */
+async function setLastfmUsername(member, username) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    username = cleanString(username)
+
+    const res = await fetch(
+        `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=fdeda7784e52eb8fa874facecb3d3636&format=json`
+    ).then((res) => res.json())
+
+    if (res.error && res.error == 6) return false
+
+    const query = db.prepere("SELECT id FROM lastfm WHERE id = ?").get(id)
+
+    if (!query) {
+        db.prepare("INSERT INTO lastfm (id, username) VALUES (?, ?)").run(id, res.user.name)
+    } else {
+        db.prepare("UPDATE lastfm SET username = ? WHERE id = ?").run(res.user.name, id)
+    }
+
+    return true
+}
+
+exports.setLastfmUsername = setLastfmUsername
