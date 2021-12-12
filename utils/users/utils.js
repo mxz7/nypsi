@@ -7,6 +7,7 @@ const existsCache = new Set()
 const optCache = new Map()
 const usernameCache = new Map()
 const avatarCache = new Map()
+const lastfmUsernameCache = new Map()
 
 /**
  *
@@ -223,3 +224,28 @@ function clearAvatarHistory(member) {
 }
 
 exports.clearAvatarHistory = clearAvatarHistory
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @returns {String}
+ */
+function getLastfmUsername(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (lastfmUsernameCache.has(id)) {
+        return lastfmUsernameCache.get(id)
+    } else {
+        const query = db.prepare("SELECT username FROM lastfm WHERE id = ?").get(id)
+
+        if (query) {
+            lastfmUsernameCache.set(id, query)
+        }
+
+        return query
+    }
+}
+
+exports.getLastfmUsername = getLastfmUsername
