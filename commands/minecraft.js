@@ -6,6 +6,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { info, types } = require("../utils/logger")
 const { getNameHistory } = require("mc-names")
+const { cleanString } = require("../utils/utils")
 
 const cooldown = new Map()
 
@@ -55,7 +56,7 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    let username = args[0]
+    let username = cleanString(args[0])
 
     const nameHistory = await getNameHistory(username)
 
