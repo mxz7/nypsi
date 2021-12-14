@@ -231,7 +231,7 @@ exports.clearAvatarHistory = clearAvatarHistory
 /**
  * 
  * @param {GuildMember} member 
- * @returns {String}
+ * @returns {({username: String}|undefined)}
  */
 function getLastfmUsername(member) {
     let id = member
