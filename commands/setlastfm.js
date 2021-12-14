@@ -1,3 +1,4 @@
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 const { setLastfmUsername, getLastfmUsername } = require("../utils/users/utils")
@@ -37,7 +38,7 @@ async function run(message, args) {
         const username = getLastfmUsername(message.member)
 
         if (username) {
-            embed.setDescription(`your last.fm username is set to \`${username}\``)
+            embed.setDescription(`your last.fm username is set to \`${username.username}\``)
         } else {
             embed.setDescription("your username has not been set")
         }
