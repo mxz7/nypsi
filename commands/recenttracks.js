@@ -60,6 +60,12 @@ async function run(message, args) {
         }
     }
 
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, 10000)
+
     username = username.username
 
     const res = await fetch(
