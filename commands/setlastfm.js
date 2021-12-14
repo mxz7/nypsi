@@ -1,6 +1,7 @@
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 const { setLastfmUsername, getLastfmUsername } = require("../utils/users/utils")
+const { cleanString } = require("../utils/utils")
 
 const cmd = new Command("setlastfm", "set your last.fm username", categories.INFO).setAliases(["slfm"])
 
@@ -44,7 +45,23 @@ async function run(message, args) {
         return message.channel.send({embeds: [embed]})
     }
 
-    //await setLastfmUsername(message.member, args[0])
+    const res = await setLastfmUsername(message.member, args[0])
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, 30000)
+
+    const embed = new CustomEmbed(message.member, false)
+
+    if (res) {
+        embed.setDescription(`your last.fm username has been set to \`${cleanString(args[0])}\``)
+    } else {
+        embed.setDescription(`\`${cleanString(args[0])}\` is not a valid last.fm username`)
+    }
+
+    return message.channel.send({embeds: [embed]})
 }
 
 cmd.setRun(run)
