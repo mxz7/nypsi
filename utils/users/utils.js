@@ -271,7 +271,7 @@ async function setLastfmUsername(member, username) {
 
     if (res.error && res.error == 6) return false
 
-    const query = db.prepere("SELECT id FROM lastfm WHERE id = ?").get(id)
+    const query = db.prepare("SELECT id FROM lastfm WHERE id = ?").get(id)
 
     if (!query) {
         db.prepare("INSERT INTO lastfm (id, username) VALUES (?, ?)").run(id, res.user.name)
