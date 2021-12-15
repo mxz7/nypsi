@@ -703,7 +703,7 @@ async function fallbackUpload(url) {
 
 /**
  * @returns {String}
- * @param {String} string 
+ * @param {String} string
  */
 function cleanString(string) {
     return string.replace(/[^A-z0-9\s]/g, "")
