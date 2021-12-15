@@ -700,3 +700,13 @@ async function fallbackUpload(url) {
 
     return res.display_url
 }
+
+/**
+ * @returns {String}
+ * @param {String} string 
+ */
+function cleanString(string) {
+    return string.replace(/[^A-z0-9\s]/g, "")
+}
+
+exports.cleanString = cleanString
