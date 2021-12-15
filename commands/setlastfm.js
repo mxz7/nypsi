@@ -44,7 +44,7 @@ async function run(message, args) {
             embed.setDescription(`your username has not been set, ${getPrefix(message.guild)}**slfm <username>**`)
         }
 
-        return message.channel.send({embeds: [embed]})
+        return message.channel.send({ embeds: [embed] })
     }
 
     const res = await setLastfmUsername(message.member, args[0])
@@ -63,7 +63,7 @@ async function run(message, args) {
         embed.setDescription(`\`${cleanString(args[0])}\` is not a valid last.fm username`)
     }
 
-    return message.channel.send({embeds: [embed]})
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

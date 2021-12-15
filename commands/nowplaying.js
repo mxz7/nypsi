@@ -7,11 +7,9 @@ const { getMember } = require("../utils/utils")
 const { lastfm: apiKey } = require("../config.json")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command(
-    "nowplaying",
-    "view yours or another user's currently playing song",
-    categories.INFO
-).setAliases(["np"])
+const cmd = new Command("nowplaying", "view yours or another user's currently playing song", categories.INFO).setAliases([
+    "np",
+])
 
 const cooldown = new Map()
 
@@ -59,7 +57,9 @@ async function run(message, args) {
 
     if (!username) {
         if (message.author.id == member.user.id) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)] })
+            return message.channel.send({
+                embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)],
+            })
         } else {
             return message.channel.send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] })
         }
@@ -86,7 +86,7 @@ async function run(message, args) {
         if (message.author.id == member.user.id) {
             return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
         }
     }
 
