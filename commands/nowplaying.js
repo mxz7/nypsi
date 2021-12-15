@@ -77,6 +77,7 @@ async function run(message, args) {
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
     ).then((res) => res.json())
 
+    
     if (!res.recenttracks) {
         if (message.author.id == member.user.id) {
             if (res.error == 17) {
