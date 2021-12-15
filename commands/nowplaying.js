@@ -78,8 +78,16 @@ async function run(message, args) {
     ).then((res) => res.json())
 
     if (!res.recenttracks) {
-        console.log(res)
         if (message.author.id == member.user.id) {
+            if (res.error == 17) {
+                return message.channel.send({
+                    embeds: [
+                        new ErrorEmbed(`error: ${res.message}
+                
+                is your account set to private?`),
+                    ],
+                })
+            }
             return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
             return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
