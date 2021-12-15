@@ -78,6 +78,7 @@ async function run(message, args) {
     ).then((res) => res.json())
 
     if (!res.recenttracks) {
+        console.log(res)
         if (message.author.id == member.user.id) {
             return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
