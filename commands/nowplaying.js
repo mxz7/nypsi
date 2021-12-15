@@ -76,9 +76,10 @@ async function run(message, args) {
     const res = await fetch(
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
     ).then((res) => res.json())
+    
+    console.log(res)
 
     if (!res.recenttracks) {
-        console.log(res)
         if (message.author.id == member.user.id) {
             if (res.error == 17) {
                 return message.channel.send({
