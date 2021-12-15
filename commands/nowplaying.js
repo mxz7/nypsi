@@ -82,6 +82,14 @@ async function run(message, args) {
      */
     const track = res.recenttracks.track[0]
 
+    if (!track) {
+        if (message.author.id == member.user.id) {
+            return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
+        } else {
+            return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
+        }
+    }
+
     if (!track["@attr"] || !track["@attr"].nowplaying) {
         if (message.author.id == member.user.id) {
             return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
