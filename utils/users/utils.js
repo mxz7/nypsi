@@ -1,12 +1,16 @@
 const { GuildMember } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
+const { lastfm: lastfmToken } = require("../../config.json")
+const { default: fetch } = require("node-fetch")
+const { cleanString } = require("../utils")
 
 const db = getDatabase()
 const existsCache = new Set()
 const optCache = new Map()
 const usernameCache = new Map()
 const avatarCache = new Map()
+const lastfmUsernameCache = new Map()
 
 /**
  *
@@ -223,3 +227,59 @@ function clearAvatarHistory(member) {
 }
 
 exports.clearAvatarHistory = clearAvatarHistory
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @returns {({username: String}|undefined)}
+ */
+function getLastfmUsername(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (lastfmUsernameCache.has(id)) {
+        return lastfmUsernameCache.get(id)
+    } else {
+        const query = db.prepare("SELECT username FROM lastfm WHERE id = ?").get(id)
+
+        if (query) {
+            lastfmUsernameCache.set(id, query)
+        }
+
+        return query
+    }
+}
+
+exports.getLastfmUsername = getLastfmUsername
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {String} username
+ */
+async function setLastfmUsername(member, username) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    username = cleanString(username)
+
+    const res = await fetch(
+        `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=fdeda7784e52eb8fa874facecb3d3636&format=json`
+    ).then((res) => res.json())
+
+    if (res.error && res.error == 6) return false
+
+    const query = db.prepare("SELECT id FROM lastfm WHERE id = ?").get(id)
+
+    if (!query) {
+        db.prepare("INSERT INTO lastfm (id, username) VALUES (?, ?)").run(id, res.user.name)
+    } else {
+        db.prepare("UPDATE lastfm SET username = ? WHERE id = ?").run(res.user.name, id)
+    }
+
+    return true
+}
+
+exports.setLastfmUsername = setLastfmUsername
