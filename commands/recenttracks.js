@@ -82,12 +82,8 @@ async function run(message, args) {
     if (!res.recenttracks) {
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] })
     }
-<<<<<<< HEAD
     
-=======
-
->>>>>>> 2e3758e9654da68420d55835304e8adf5a04c250
-    /**
+   /**
      * @type {Array<{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}>}
      */
     let recenttracks = res.recenttracks.track
