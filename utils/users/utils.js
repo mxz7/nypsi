@@ -229,8 +229,8 @@ function clearAvatarHistory(member) {
 exports.clearAvatarHistory = clearAvatarHistory
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @returns {({username: String}|undefined)}
  */
 function getLastfmUsername(member) {
@@ -254,8 +254,8 @@ function getLastfmUsername(member) {
 exports.getLastfmUsername = getLastfmUsername
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @param {String} username
  */
 async function setLastfmUsername(member, username) {

@@ -7,7 +7,11 @@ const { getMember } = require("../utils/utils")
 const { lastfm: apiKey } = require("../config.json")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("recenttracks", "view yours or another user's recently listened to songs", categories.INFO).setAliases(["recentsongs", "recents"])
+const cmd = new Command(
+    "recenttracks",
+    "view yours or another user's recently listened to songs",
+    categories.INFO
+).setAliases(["recentsongs", "recents"])
 
 const cooldown = new Map()
 
@@ -59,7 +63,7 @@ async function run(message, args) {
                 embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)],
             })
         } else {
-            return message.channel.send({embeds: [new ErrorEmbed("this user has not set their last.fm username")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] })
         }
     }
 
@@ -83,7 +87,7 @@ async function run(message, args) {
     recenttracks = recenttracks.slice(0, 5)
 
     if (recenttracks.length == 0) {
-        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent songs")]})
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] })
     }
 
     let msg = ""
@@ -101,7 +105,7 @@ async function run(message, args) {
 
     embed.setAuthor(username, member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
-    return message.channel.send({embeds: [embed]})
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
