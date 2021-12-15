@@ -79,6 +79,8 @@ async function run(message, args) {
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
     ).then((res) => res.json())
 
+    console.log(res)
+
     /**
      * @type {Array<{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}>}
      */
