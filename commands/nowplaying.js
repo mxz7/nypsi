@@ -78,6 +78,7 @@ async function run(message, args) {
     ).then((res) => res.json())
 
     if (!res.recenttracks) {
+        console.log(res)
         if (message.author.id == member.user.id) {
             if (res.error == 17) {
                 return message.channel.send({
