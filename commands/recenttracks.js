@@ -83,7 +83,6 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] })
     }
     
-
     /**
      * @type {Array<{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}>}
      */
