@@ -531,7 +531,7 @@ async function runCommand(cmd, message, args) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
-            const time = 120 - diff
+            const time = 60 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
