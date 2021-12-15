@@ -76,7 +76,7 @@ async function run(message, args) {
     const res = await fetch(
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
     ).then((res) => res.json())
-    
+
     console.log(res)
 
     if (!res.recenttracks) {
