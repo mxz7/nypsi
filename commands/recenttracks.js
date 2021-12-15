@@ -90,7 +90,7 @@ async function run(message, args) {
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, msg)
+    const embed = new CustomEmbed(message.member, false, msg).setTitle("recent songs")
 
     embed.setAuthor(username, member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
