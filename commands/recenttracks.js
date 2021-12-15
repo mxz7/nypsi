@@ -79,6 +79,11 @@ async function run(message, args) {
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
     ).then((res) => res.json())
 
+    if (!res.recenttracks) {
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] })
+    }
+    
+
     /**
      * @type {Array<{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}>}
      */
