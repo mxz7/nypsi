@@ -82,6 +82,10 @@ async function run(message, args) {
 
     recenttracks = recenttracks.slice(0, 5)
 
+    if (recenttracks.length == 0) {
+        return message.channel.send({embeds: [new CustomEmbed(message.member, false, "no recent songs")]})
+    }
+
     let msg = ""
 
     for (const track of recenttracks) {
