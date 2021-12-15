@@ -271,6 +271,10 @@ async function setLastfmUsername(member, username) {
 
     if (res.error && res.error == 6) return false
 
+    if (lastfmUsernameCache.has(member.user.id)) {
+        lastfmUsernameCache.delete(member.user.id)
+    }
+
     const query = db.prepare("SELECT id FROM lastfm WHERE id = ?").get(id)
 
     if (!query) {
