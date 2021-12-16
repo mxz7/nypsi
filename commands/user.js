@@ -5,6 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const workerSort = require("../utils/sort-worker")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { inPlaceSort } = require("fast-sort")
+const { getKarma } = require("../utils/karma/utils")
 
 const cmd = new Command("user", "view info about a user in the server", categories.INFO).setAliases(["whois", "who"])
 
@@ -119,6 +120,7 @@ async function run(message, args) {
             }`,
             true
         )
+        .setFooter(`${getKarma(member)} karma`)
 
     if (rolesText != " ") {
         embed.addField("roles [" + member._roles.length + "]", rolesText)
