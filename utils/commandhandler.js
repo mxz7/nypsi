@@ -6,7 +6,7 @@ const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } =
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
-const { info, types, error } = require("./logger.js")
+const { info, types, error, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
 const { addKarma } = require("./karma/utils.js")
@@ -807,36 +807,15 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             return error("UNABLE TO FIND CHANNEL FOR HOURLY COMMAND USE LOG", serverID, channelID)
         }
 
-        const sortedNoLifers = new Map([...noLifers.entries()].sort((a, b) => b[1] - a[1]))
+        for (const user of commandUses.keys()) {
+            const uses = commandUses.get(user)
 
-        let msg = ""
-        let count = 1
+            const tag = client.users.cache.find(user).tag
 
-        for (let [key, value] of sortedNoLifers) {
-            if (count >= 11) break
-
-            let pos = count
-
-            if (pos == 1) {
-                pos = "🥇"
-            } else if (pos == 2) {
-                pos = "🥈"
-            } else if (pos == 3) {
-                pos = "🥉"
+            if (uses > 50) {
+                channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
             }
-
-            msg += `${pos} \`${key}\` used **${value.toLocaleString()}** commands\n`
-            count++
         }
-
-        const embed = new CustomEmbed()
-
-        embed.setTitle("top 10 command users")
-        embed.setDescription(msg)
-        embed.setColor("#111111")
-
-        await channel.send({ embeds: [embed] })
-        info("sent command use logs", types.AUTOMATION)
     }
 
     const updateKarma = () => {
@@ -858,12 +837,12 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         postPopularCommands()
     }, needed - now)
 
-    setTimeout(() => {
-        setInterval(() => {
-            postCommandUsers()
+    setTimeout(async () => {
+        setInterval(async () => {
+            await postCommandUsers()
             updateKarma()
         }, 3600000)
-        postCommandUsers()
+        await postCommandUsers()
         updateKarma()
     }, 3600000)
 
