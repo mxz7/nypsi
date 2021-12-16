@@ -15,6 +15,7 @@ const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
 const { getDatabase } = require("../database/database")
+const { addKarma } = require("../karma/utils")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -214,6 +215,7 @@ async function doVote(client, vote) {
     const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
+    addKarma(memberID, 15)
 
     if (inventory["vote_crate"]) {
         inventory["vote_crate"] += getPrestige(memberID) + 1
