@@ -1,7 +1,7 @@
 const { table, getBorderCharacters } = require("table")
 const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
 const fs = require("fs")
-const { Message, Client, MessageActionRow, MessageButton } = require("discord.js")
+const { Message, Client, MessageActionRow, MessageButton, GuildMember } = require("discord.js")
 const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
@@ -9,11 +9,13 @@ const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } 
 const { info, types, error } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
+const { addKarma } = require("./karma/utils.js")
 
 const commands = new Map()
 const aliases = new Map()
 const popularCommands = new Map()
 const noLifers = new Map()
+const commandUses = new Map()
 const xpCooldown = new Set()
 const cooldown = new Set()
 const handcuffs = new Map()
@@ -549,7 +551,7 @@ async function runCommand(cmd, message, args) {
             })
         }
 
-        updatePopularCommands(commands.get(aliases.get(cmd)).name, message.author.tag)
+        updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
@@ -582,7 +584,7 @@ async function runCommand(cmd, message, args) {
             })
         }
 
-        updatePopularCommands(commands.get(cmd).name, message.author.tag)
+        updatePopularCommands(commands.get(cmd).name, message.member)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
@@ -696,19 +698,25 @@ function logCommand(message, args) {
 
 /**
  * @param {String} command
- * @param {String} tag
+ * @param {GuildMember} member
  */
-function updatePopularCommands(command, tag) {
+function updatePopularCommands(command, member) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1)
     } else {
         popularCommands.set(command, 1)
     }
 
-    if (noLifers.has(tag)) {
-        noLifers.set(tag, noLifers.get(tag) + 1)
+    if (noLifers.has(member.user.tag)) {
+        noLifers.set(member.user.tag, noLifers.get(member.user.tag) + 1)
     } else {
-        noLifers.set(tag, 1)
+        noLifers.set(member.user.tag, 1)
+    }
+
+    if (commandUses.has(member.user.id)) {
+        commandUses.set(member.user.id, commandUses.get(member.user.id) + 1)
+    } else {
+        commandUses.set(member.user.id, 1)
     }
 }
 
@@ -831,6 +839,18 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         info("sent command use logs", types.AUTOMATION)
     }
 
+    const updateKarma = () => {
+        for (const user of commandUses.keys()) {
+            const amount = Math.floor(commandUses.get(user) / 3)
+
+            if (amount > 0) {
+                addKarma(user, amount)
+            }
+        }
+
+        commandUses.clear()
+    }
+
     setTimeout(async () => {
         setInterval(() => {
             postPopularCommands()
@@ -841,8 +861,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
     setTimeout(() => {
         setInterval(() => {
             postCommandUsers()
+            updateKarma()
         }, 3600000)
         postCommandUsers()
+        updateKarma()
     }, 3600000)
 
     info(`popular commands will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
