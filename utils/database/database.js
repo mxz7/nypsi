@@ -64,6 +64,14 @@ function createTables() {
     db.prepare(
         "CREATE TABLE IF NOT EXISTS lastfm ('id' TEXT NOT NULL PRIMARY KEY, 'username' TEXT, 'monthly_update' BOOLEAN DEFAULT 0)"
     ).run()
+
+    db.prepare(
+        "CREATE TABLE IF NOT EXISTS karma ('id' TEXT NOT NULL PRIMARY KEY, 'karma' INTEGER NOT NULL DEFAULT 0, 'last_command' INTEGER NOT NULL)"
+    ).run()
+
+    db.prepare(
+        "CREATE TABLE IF NOT EXISTS karma_log ('id' TEXT NOT NULL PRIMARY KEY, 'amount' INTEGER NOT NULL, 'date' INTEGER NOT NULL, 'reason' TEXT)"
+    ).run()
 }
 
 createTables()
