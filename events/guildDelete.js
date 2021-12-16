@@ -1,5 +1,6 @@
 const { Guild, Client } = require("discord.js")
 const { setPrefix, updateDisabledCommands } = require("../utils/guilds/utils")
+const { removeKarma } = require("../utils/karma/utils")
 const { info, types } = require("../utils/logger")
 const { setMuteRole, profileExists } = require("../utils/moderation/utils")
 
@@ -17,4 +18,6 @@ module.exports = async (client, guild) => {
     if (profileExists(guild)) {
         setMuteRole(guild, "")
     }
+
+    removeKarma(guild.ownerId, Math.floor(guild.memberCount / 4))
 }
