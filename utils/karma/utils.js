@@ -62,7 +62,6 @@ function removeKarma(member, amount) {
     if (!query) {
         db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, 1)
     } else {
-        console.log(query.karma)
         if (amount > query.karma) {
             amount = query.karma - 1
         }
