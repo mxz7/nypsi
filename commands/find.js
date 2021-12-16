@@ -151,7 +151,7 @@ async function showUser(message, user) {
             **created** ${formatDate(user.createdAt)}`,
             true
         )
-        .setFooter(`${getKarma(user.id)} karma`)   
+        .setFooter(`${getKarma(user.id)} karma`)
 
     if (userExists(user.id)) {
         const voted = hasVoted(user.id)
