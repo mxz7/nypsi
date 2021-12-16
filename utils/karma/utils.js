@@ -7,8 +7,8 @@ const db = getDatabase()
 let karmaShop = false
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @returns {Number}
  */
 function getKarma(member) {
@@ -29,9 +29,9 @@ function getKarma(member) {
 exports.getKarma = getKarma
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Number} amount 
+ *
+ * @param {GuildMember} member
+ * @param {Number} amount
  */
 function addKarma(member, amount) {
     let id = member
@@ -50,9 +50,9 @@ function addKarma(member, amount) {
 exports.addKarma = addKarma
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Number} amount 
+ *
+ * @param {GuildMember} member
+ * @param {Number} amount
  */
 function removeKarma(member, amount) {
     let id = member
@@ -74,8 +74,8 @@ function removeKarma(member, amount) {
 exports.removeKarma = removeKarma
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function updateLastCommand(member) {
     let id = member
@@ -94,7 +94,7 @@ function updateLastCommand(member) {
 exports.updateLastCommand = updateLastCommand
 
 /**
- * 
+ *
  * @returns {Boolean}
  */
 function isKarmaShopOpen() {
@@ -113,7 +113,7 @@ function deteriorateKarma() {
     const now = Date.now()
 
     const threshold = now - 86400000
-    
+
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
      */
@@ -127,11 +127,10 @@ function deteriorateKarma() {
         if (now - 604800000 > user.last_command) {
             karmaToRemove = 50
         }
-        
+
         if (karmaToRemove > user.karma) {
             karmaToRemove = user.karma - 1
         }
-
 
         total += karmaToRemove
 
@@ -141,7 +140,7 @@ function deteriorateKarma() {
     info(`${total} total karma deteriorated`, types.AUTOMATION)
 }
 
-(() => {
+;(() => {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
