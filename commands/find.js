@@ -14,6 +14,7 @@ const {
     topAmountGlobal,
 } = require("../utils/economy/utils")
 const { getPeaks } = require("../utils/guilds/utils")
+const { getKarma } = require("../utils/karma/utils")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 const { formatDate } = require("../utils/utils")
 
@@ -150,6 +151,7 @@ async function showUser(message, user) {
             **created** ${formatDate(user.createdAt)}`,
             true
         )
+        .setFooter(`${getKarma(user.id)} karma`)   
 
     if (userExists(user.id)) {
         const voted = hasVoted(user.id)
