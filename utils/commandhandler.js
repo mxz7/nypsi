@@ -9,7 +9,7 @@ const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } 
 const { info, types, error, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
-const { addKarma } = require("./karma/utils.js")
+const { addKarma, updateLastCommand } = require("./karma/utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -557,6 +557,7 @@ async function runCommand(cmd, message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(aliases.get(cmd)).run(message, args)
+        updateLastCommand(message.member)
     } else {
         if (isEcoBanned(message.author.id)) {
             if (commands.get(cmd).category == "money") {
@@ -590,6 +591,7 @@ async function runCommand(cmd, message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
         }
         commands.get(cmd).run(message, args)
+        updateLastCommand(message.member)
     }
 
     let cmdName = cmd
