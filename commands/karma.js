@@ -5,7 +5,7 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getKarma } = require("../utils/karma/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("karma", "check how much karma you have", categories.MONEY)
+const cmd = new Command("karma", "check how much karma you have", categories.INFO)
 
 /**
  * @param {Message} message
