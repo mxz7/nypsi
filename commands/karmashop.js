@@ -14,7 +14,7 @@ async function run(message, args) {
     if (!isKarmaShopOpen()) {
         const embed = new CustomEmbed(message.member, false).setTitle("karma shop")
         embed.setDescription("the karma shop is currently closed ❌")
-        return message.channel.send({embeds: [embed]})
+        return message.channel.send({ embeds: [embed] })
     }
 }
 

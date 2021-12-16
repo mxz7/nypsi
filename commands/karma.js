@@ -40,7 +40,7 @@ async function run(message, args) {
 
     embed.setFooter(`whats karma? do ${getPrefix(message.guild)}karmahelp`)
 
-    return message.channel.send({embeds: [embed]})
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
