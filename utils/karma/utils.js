@@ -4,6 +4,8 @@ const { MStoTime } = require("../utils")
 
 const db = getDatabase()
 
+let karmaShop = false
+
 /**
  * 
  * @param {GuildMember} member 
@@ -90,6 +92,22 @@ function updateLastCommand(member) {
 }
 
 exports.updateLastCommand = updateLastCommand
+
+/**
+ * 
+ * @returns {Boolean}
+ */
+function isKarmaShopOpen() {
+    return karmaShop
+}
+
+exports.isKarmaShopOpen = isKarmaShopOpen
+
+function openKarmaShop() {
+    karmaShop = true
+}
+
+exports.openKarmaShop = openKarmaShop
 
 function deteriorateKarma() {
     const now = Date.now()
