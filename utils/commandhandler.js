@@ -818,6 +818,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
                 channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
             }
         }
+        return
     }
 
     const updateKarma = () => {
