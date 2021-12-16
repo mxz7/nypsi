@@ -812,7 +812,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         for (const user of commandUses.keys()) {
             const uses = commandUses.get(user)
 
-            const tag = client.users.cache.find(user).tag
+            const tag = client.users.cache.find(u => u.id == user).tag
 
             if (uses > 50) {
                 channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
