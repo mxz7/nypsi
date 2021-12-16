@@ -1,4 +1,5 @@
 const { GuildMember } = require("discord.js")
+const { addKarma } = require("../utils/karma/utils")
 const { isPremium, setTier, renewUser, addMember, getTier, expireUser } = require("../utils/premium/utils")
 const { addNewUsername, addNewAvatar, usernameProfileExists, createUsernameProfile } = require("../utils/users/utils")
 
@@ -42,6 +43,7 @@ module.exports = async (oldMember, newMember) => {
                 renewUser(newMember.user.id)
             } else {
                 addMember(newMember.user.id, tier)
+                addKarma(newMember.user.id, 50)
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
             // 747066190530347089 boost role
