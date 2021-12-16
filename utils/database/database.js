@@ -66,7 +66,7 @@ function createTables() {
     ).run()
 
     db.prepare(
-        "CREATE TABLE IF NOT EXISTS karma ('id' TEXT NOT NULL PRIMARY KEY, 'karma' INTEGER NOT NULL DEFAULT 0, 'last_command' INTEGER NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS karma ('id' TEXT NOT NULL PRIMARY KEY, 'karma' INTEGER NOT NULL DEFAULT 0, 'last_command' INTEGER)"
     ).run()
 
     db.prepare(
