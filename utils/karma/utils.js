@@ -20,7 +20,7 @@ function getKarma(member) {
         db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, 1)
         return 1
     } else {
-        return query
+        return query.karma
     }
 }
 
