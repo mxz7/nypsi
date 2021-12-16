@@ -50,6 +50,27 @@ exports.addKarma = addKarma
 /**
  * 
  * @param {GuildMember} member 
+ * @param {Number} amount 
+ */
+function removeKarma(member, amount) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
+
+    if (!query) {
+        db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, 1)
+    } else {
+        db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(id, amount)
+    }
+}
+
+exports.removeKarma = removeKarma
+
+/**
+ * 
+ * @param {GuildMember} member 
  */
 function updateLastCommand(member) {
     let id = member
