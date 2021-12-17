@@ -43,7 +43,7 @@ function addKarma(member, amount) {
     if (!query) {
         db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, amount + 1)
     } else {
-        db.prepare("UPDATE karma SET karma = karma + ? WHERE id = ?").run(id, amount)
+        db.prepare("UPDATE karma SET karma = karma + ? WHERE id = ?").run(amount, id)
     }
 }
 
@@ -140,7 +140,8 @@ function deteriorateKarma() {
     info(`${total} total karma deteriorated`, types.AUTOMATION)
 }
 
-;(() => {
+// prettier-ignore
+(() => {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
