@@ -16,6 +16,7 @@ const aliases = new Map()
 const popularCommands = new Map()
 const noLifers = new Map()
 const commandUses = new Map()
+const karmaCooldown = new Set()
 const xpCooldown = new Set()
 const cooldown = new Set()
 const handcuffs = new Map()
@@ -715,11 +716,23 @@ function updatePopularCommands(command, member) {
         noLifers.set(member.user.tag, 1)
     }
 
+    if (karmaCooldown.has(member.user.id)) return
+
     if (commandUses.has(member.user.id)) {
         commandUses.set(member.user.id, commandUses.get(member.user.id) + 1)
     } else {
         commandUses.set(member.user.id, 1)
     }
+
+    karmaCooldown.add(member.user.id)
+
+    setTimeout(() => {
+        try {
+            karmaCooldown.delete(member.user.id)
+        } catch {
+            karmaCooldown.clear()
+        }
+    }, 60000)
 }
 
 /**
