@@ -14,7 +14,7 @@
     "better-sqlite3": "^7.4.5",
     "bufferutil": "^4.0.3",
     "discord.js": "^13.3.1",
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "fast-sort": "^3.1.1",
     "figlet": "^1.5.2",
     "imgur": "^1.0.2",
@@ -28,7 +28,7 @@
     "utf-8-validate": "^5.0.7"
   },
   "devDependencies": {
-    "eslint": "^8.4.1",
+    "eslint": "^8.5.0",
     "prettier": "2.5.1"
   },
   "repository": {
