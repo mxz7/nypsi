@@ -198,7 +198,7 @@ function addMention() {
 
         const userData = guildData.get(target)
 
-        if (userData.length >= 15) {
+        if (userData.length >= 7) {
             userData.shift()
         }
 
