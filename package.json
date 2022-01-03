@@ -25,7 +25,7 @@
     "table": "6.7",
     "tar": "^6.1.11",
     "urban-dictionary": "^3.0.2",
-    "utf-8-validate": "^5.0.7"
+    "utf-8-validate": "^5.0.8"
   },
   "devDependencies": {
     "eslint": "^8.6.0",
