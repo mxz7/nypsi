@@ -72,7 +72,8 @@ async function run(message, args) {
 
         let count = 0
 
-        for (let msg of collecteda.array()) {
+        for (let msg of collecteda.keys()) {
+            msg = collecteda.get(msg)
             if (count >= amount) {
                 await collecteda.delete(msg.id)
             } else {
