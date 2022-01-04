@@ -74,7 +74,7 @@ async function run(message, args) {
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setHeader(`${target.user.tag} | season 2`)
+        .setHeader(`${target.user.tag} | season 3`)
         .setDescription(
             "💰 $**" +
                 getBalance(target).toLocaleString() +
