@@ -71,7 +71,13 @@ async function run(message, args) {
 
         sortCache.set(message.guild.id, membersSorted)
 
-        setTimeout(() => sortCache.delete(message.guild.id), 60000 * 10)
+        setTimeout(() => {
+            try {
+                sortCache.delete(message.guild.id)
+            } catch {
+                sortCache.clear()
+            }
+        }, 60000 * 10)
     }
 
     let joinPos = membersSorted.indexOf(member.id) + 1
