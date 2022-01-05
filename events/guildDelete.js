@@ -19,5 +19,5 @@ module.exports = async (client, guild) => {
         setMuteRole(guild, "")
     }
 
-    removeKarma(guild.ownerId, Math.floor(guild.memberCount / 4))
+    removeKarma(guild.ownerId, Math.floor(guild.memberCount / 10))
 }

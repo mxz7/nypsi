@@ -14,5 +14,5 @@ module.exports = async (client, guild) => {
 
     runCheck(guild)
 
-    addKarma(guild.ownerId, Math.floor(guild.memberCount / 4))
+    addKarma(guild.ownerId, Math.floor(guild.memberCount / 10))
 }
