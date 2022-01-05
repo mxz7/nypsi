@@ -19,7 +19,7 @@ function getKarma(member) {
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
     if (!query) {
-        db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, 1)
+        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now())
         return 1
     } else {
         return query.karma
@@ -41,7 +41,7 @@ function addKarma(member, amount) {
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
     if (!query) {
-        db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, amount + 1)
+        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, amount + 1, Date.now())
     } else {
         db.prepare("UPDATE karma SET karma = karma + ? WHERE id = ?").run(amount, id)
     }
@@ -62,7 +62,7 @@ function removeKarma(member, amount) {
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
     if (!query) {
-        db.prepare("INSERT INTO karma (id, karma) VALUES (?, ?)").run(id, 1)
+        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now())
     } else {
         if (amount > query.karma) {
             amount = query.karma - 1

@@ -732,7 +732,7 @@ function updatePopularCommands(command, member) {
         } catch {
             karmaCooldown.clear()
         }
-    }, 60000)
+    }, 30000)
 }
 
 /**
@@ -836,7 +836,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
     const updateKarma = () => {
         for (const user of commandUses.keys()) {
-            const amount = Math.floor(commandUses.get(user) / 3)
+            const amount = Math.floor(commandUses.get(user) / 1.5)
 
             if (amount > 0) {
                 addKarma(user, amount)
