@@ -112,7 +112,7 @@ exports.openKarmaShop = openKarmaShop
 function deteriorateKarma() {
     const now = Date.now()
 
-    const threshold = now - 86400000
+    const threshold = now - 345600000
 
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
@@ -122,10 +122,10 @@ function deteriorateKarma() {
     let total = 0
 
     for (const user of users) {
-        let karmaToRemove = 10
+        let karmaToRemove = 3
 
-        if (now - 604800000 > user.last_command) {
-            karmaToRemove = 50
+        if (now - 864000000 > user.last_command) {
+            karmaToRemove = 25
         }
 
         if (karmaToRemove > user.karma) {
