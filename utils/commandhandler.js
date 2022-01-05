@@ -827,8 +827,8 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
             const tag = client.users.cache.find((u) => u.id == user).tag
 
-            if (uses > 50) {
-                channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
+            if (uses > 30) {
+                await channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
             }
         }
         return
@@ -856,10 +856,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
     setTimeout(async () => {
         setInterval(async () => {
             await postCommandUsers()
-            updateKarma()
+            setTimeout(updateKarma, 60000)
         }, 3600000)
         await postCommandUsers()
-        updateKarma()
+        setTimeout(updateKarma, 60000)
     }, 3600000)
 
     info(`popular commands will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
