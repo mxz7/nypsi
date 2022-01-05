@@ -138,8 +138,7 @@ function addMention() {
         try {
             channelMembers = mention.message.channel.members
         } catch {
-            console.log(mention)
-            return console.log("importantxd")
+            return
         }
 
         for (const memberID of Array.from(members.keys())) {
