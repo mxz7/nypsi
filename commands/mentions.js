@@ -1,8 +1,10 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
-const { isPremium } = require("../utils/premium/utils")
+const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { fetchUserMentions } = require("../utils/users/utils")
+const { getDatabase } = require("../utils/database/database")
 
 const cooldown = new Map()
 
@@ -41,45 +43,41 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 15000)
 
-    const { mentions } = require("../nypsi.js")
+    let limit = 10
 
-    if (!mentions.get(message.guild.id)) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
+    if (isPremium(message.member)) {
+        const tier = getTier(message.member)
+
+        limit += tier * 2
     }
 
-    if (!mentions.get(message.guild.id).get(message.author.id)) {
+    const mentions = fetchUserMentions(message.guild, message.member, limit)
+
+    console.log(mentions.length)
+
+    if (!mentions || mentions.length == 0) {
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
-
-    const userMentions = mentions.get(message.guild.id).get(message.author.id)
-
-    if (userMentions.length == 0) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
-    }
-
-    userMentions.reverse()
 
     const pages = new Map()
 
-    for (let i of userMentions) {
+    for (let i of mentions) {
         if (pages.size == 0) {
             const page1 = []
-            page1.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+            page1.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
             pages.set(1, page1)
         } else {
             const lastPage = pages.size
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = []
-                newPage.push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+                newPage.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
                 pages.set(lastPage + 1, newPage)
             } else {
-                pages.get(lastPage).push(`${timeSince(i.date)} ago|6|9|**${i.user}**: ${i.content}\n[jump](${i.link})`)
+                pages.get(lastPage).push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
             }
         }
     }
-
-    userMentions.reverse()
 
     const embed = new CustomEmbed(message.member, false).setTitle("recent mentions")
 
@@ -189,7 +187,7 @@ async function run(message, args) {
                     return pageManager()
                 }
             } else if (reaction == "❌") {
-                mentions.get(message.guild.id).set(message.author.id, [])
+                getDatabase().prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?").run(message.guild.id, message.author.id)
 
                 newEmbed.setDescription("✅ mentions cleared")
 
