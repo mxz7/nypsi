@@ -202,7 +202,7 @@ setInterval(() => {
                             .setColor("#e4334f")
                             .setTitle("milf finder"),
                     ],
-                })
+                }).catch(() => {})
             }
 
             looking.delete(obj.user.id)
