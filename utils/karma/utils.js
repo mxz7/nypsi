@@ -109,6 +109,12 @@ function openKarmaShop() {
 
 exports.openKarmaShop = openKarmaShop
 
+function closeKarmaShop() {
+    karmaShop = false
+}
+
+exports.closeKarmaShop = closeKarmaShop
+
 function deteriorateKarma() {
     const now = Date.now()
 
