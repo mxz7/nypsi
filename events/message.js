@@ -189,7 +189,7 @@ function addMention() {
         const data = mention.data
         const target = mention.target
 
-        addMentionToDatabase.run(guild, target, data.date, data.user, data.url, data.content)
+        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
 
         const mentions = fetchMentions.run(guild, target)
 
