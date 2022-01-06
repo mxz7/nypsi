@@ -21,7 +21,7 @@ async function run(message, args) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr - init) / 1000)
-        const time = 30 - diff
+        const time = 10 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -40,7 +40,7 @@ async function run(message, args) {
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 30000)
+    }, 10000)
 
     if (!userExists(message.member)) createUser(message.member)
 
