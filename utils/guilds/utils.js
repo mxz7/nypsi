@@ -8,7 +8,7 @@ const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 const db = getDatabase()
 
 setInterval(async () => {
-    const { snipe, eSnipe, mentions } = require("../../nypsi")
+    const { snipe, eSnipe } = require("../../nypsi")
 
     const now = new Date().getTime()
 
@@ -40,30 +40,6 @@ setInterval(async () => {
 
     if (eSnipeCount > 0) {
         info("deleted " + eSnipeCount.toLocaleString() + " edit sniped messages", types.AUTOMATION)
-    }
-
-    await mentions.forEach(async (guildData, key) => {
-        await guildData.forEach((userData, key) => {
-            for (let i of userData) {
-                const diff = now - i.date
-
-                if (diff >= 86400000) {
-                    userData.splice(userData.indexOf(i), 1)
-                    mentionsCount++
-                }
-            }
-
-            if (userData.length == 0) {
-                guildData.delete(key)
-            }
-        })
-        if (guildData.size == 0) {
-            mentions.delete(key)
-        }
-    })
-
-    if (mentionsCount > 0) {
-        info("deleted " + mentionsCount.toLocaleString() + " mentions", types.AUTOMATION)
     }
 }, 3600000)
 
