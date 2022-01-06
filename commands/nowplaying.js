@@ -121,7 +121,7 @@ async function run(message, args) {
 
     embed.setDescription(`[${track.name}](${track.url}) - ${track.artist["#text"]}`)
 
-    embed.setAuthor({text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })})
+    embed.setAuthor({ text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
 
     return message.channel.send({ embeds: [embed] })
 }
