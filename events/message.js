@@ -1,9 +1,9 @@
 const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
-const { mentions } = require("../nypsi")
 const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
+const { isPremium, getTier } = require("../utils/premium/utils")
 
 /**
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
@@ -11,6 +11,7 @@ const { getDatabase } = require("../utils/database/database")
 const mentionQueue = []
 const db = getDatabase()
 const addMentionToDatabase = db.prepare("INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?))")
+const fetchMentions = db.prepare("SELECT mention_id FROM mentions WHERE guild = ? AND target_id = ? ORDER BY date DESC")
 let mentionInterval
 
 /**
@@ -188,28 +189,27 @@ function addMention() {
         const data = mention.data
         const target = mention.target
 
-        if (!mentions.has(guild)) {
-            mentions.set(guild, new Map())
+        addMentionToDatabase.run(guild, target, data.date, data.user, data.url, data.content)
+
+        const mentions = fetchMentions.run(guild, target)
+
+        let limit = 10
+
+        if (isPremium(target)) {
+            const tier = getTier(target)
+
+            limit += tier * 2
         }
 
-        const guildData = mentions.get(guild)
+        if (mentions.length > limit) {
+            mentions.splice(0, limit)
 
-        if (!guildData.has(target)) {
-            guildData.set(target, [])
+            const deleteMention = db.prepare("DELETE FROM mentions WHERE mention_id = ?")
+
+            for (const mention of mentions) {
+                deleteMention.run(mention.mention_id)
+            }
         }
-
-        const userData = guildData.get(target)
-
-        if (userData.length >= 7) {
-            userData.shift()
-        }
-
-        userData.push(data)
-
-        guildData.set(target, userData)
-        mentions.set(guild, guildData)
-
-        exports.mentions = mentions
     }
 
     if (mentionQueue.length == 0) {
