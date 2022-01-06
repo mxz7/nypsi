@@ -37,14 +37,12 @@ async function run(message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 10000)
-    
+
     if (!isKarmaShopOpen()) {
         const embed = new CustomEmbed(message.member, false).setTitle("karma shop")
         embed.setDescription("the karma shop is currently closed ❌")
         return message.channel.send({ embeds: [embed] })
     }
-
-
 }
 
 cmd.setRun(run)
