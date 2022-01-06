@@ -56,7 +56,7 @@ async function run(message, args) {
 
     const itemIDs = Array.from(Object.keys(items))
 
-    inPlaceSort(itemIDs).asc(i => items[i].cost)
+    inPlaceSort(itemIDs).asc((i) => items[i].cost)
 
     const pages = []
 
@@ -85,7 +85,9 @@ async function run(message, args) {
         item = items[item]
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${item.items_left}* available`,
+            `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${
+                item.items_left
+            }* available`,
             true
         )
     }
@@ -143,7 +145,9 @@ async function run(message, args) {
                             true
                         )
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member)} karma`)
+                    newEmbed.setFooter(
+                        `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member)} karma`
+                    )
                     if (currentPage == 0) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
