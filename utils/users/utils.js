@@ -287,3 +287,21 @@ async function setLastfmUsername(member, username) {
 }
 
 exports.setLastfmUsername = setLastfmUsername
+
+/**
+ * @param {Guild} guild
+ * @param {GuildMember} member
+ * @param {Number} amount 
+ * @returns {Array<{ date: Number, user_tag: String, url: String, content: String }>}
+ */
+function fetchUserMentions(guild, member, amount) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    const mentions = db.prepare("SELECT date, user_tag, url, content FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC LIMIT ?").all(guild.id, id, amount)
+
+    return mentions
+}
+
+exports.fetchUserMentions = fetchUserMentions
