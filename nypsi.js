@@ -53,11 +53,9 @@ const { info, types, error, getWebhooks } = require("./utils/logger")
 
 const snipe = new Map()
 const eSnipe = new Map()
-const mentions = new Map()
 
 exports.eSnipe = eSnipe
 exports.snipe = snipe
-exports.mentions = mentions
 
 loadCommands()
 
