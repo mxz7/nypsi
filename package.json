@@ -22,7 +22,7 @@
     "mc-names": "^1.0.1",
     "node-fetch": "^2.6.5",
     "shuffle-array": "^1.0.1",
-    "table": "6.7",
+    "table": "6.8",
     "tar": "^6.1.11",
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.8"
