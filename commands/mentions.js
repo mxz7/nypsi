@@ -185,7 +185,9 @@ async function run(message, args) {
                     return pageManager()
                 }
             } else if (reaction == "❌") {
-                getDatabase().prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?").run(message.guild.id, message.author.id)
+                getDatabase()
+                    .prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?")
+                    .run(message.guild.id, message.author.id)
 
                 newEmbed.setDescription("✅ mentions cleared")
 

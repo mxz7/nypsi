@@ -107,7 +107,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false, msg).setTitle("recent songs")
 
-    embed.setAuthor({text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 })})
+    embed.setAuthor({ text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
 
     return message.channel.send({ embeds: [embed] })
 }
