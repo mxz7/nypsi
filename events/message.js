@@ -215,7 +215,14 @@ function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
+        cleanMentions()
     }
 }
 
-// todo run cleanmentions function when interval is finished which deletes mentions that are too old or out of the amount the user is allowed
+function cleanMentions() {
+    const limit = Math.floor((Date.now() - 259200000) / 1000)
+
+    const changes = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
+
+    info(`${changes} mentions deleted`)
+}
