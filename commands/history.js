@@ -1,4 +1,4 @@
-const { getMember, formatDate } = require("../utils/utils")
+const { getMember } = require("../utils/utils")
 const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -125,11 +125,13 @@ async function run(message, args) {
     }
 
     for (let case0 of pages[0]) {
-        const date = formatDate(new Date(case0.time))
         if (case0.deleted) {
             embed.addField("case " + case0.case_id, "`[deleted]`")
         } else {
-            embed.addField("case " + case0.case_id, "`" + case0.type + "` - " + case0.command + "\non " + date)
+            embed.addField(
+                "case " + case0.case_id,
+                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time / 1000)}:d>`
+            )
         }
     }
 
@@ -183,13 +185,17 @@ async function run(message, args) {
                 } else {
                     currentPage--
                     for (let case0 of pages[currentPage]) {
-                        const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
                             newEmbed.addField(
                                 "case " + case0.case_id,
-                                "`" + case0.type + "` - " + case0.command + "\non " + date
+                                "`" +
+                                    case0.type +
+                                    "` - " +
+                                    case0.command +
+                                    "\non " +
+                                    `<t:${Math.floor(case0.time / 1000)}:d>`
                             )
                         }
                     }
@@ -214,13 +220,17 @@ async function run(message, args) {
                 } else {
                     currentPage++
                     for (let case0 of pages[currentPage]) {
-                        const date = formatDate(new Date(case0.time))
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
                             newEmbed.addField(
                                 "case " + case0.case_id,
-                                "`" + case0.type + "` - " + case0.command + "\nat " + date
+                                "`" +
+                                    case0.type +
+                                    "` - " +
+                                    case0.command +
+                                    "\nat " +
+                                    `<t:${Math.floor(case0.time / 1000)}:d>`
                             )
                         }
                     }
