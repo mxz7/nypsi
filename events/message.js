@@ -218,6 +218,4 @@ function addMention() {
     }
 }
 
-
-// todo insert row into database instead of into mentions map
 // todo run cleanmentions function when interval is finished which deletes mentions that are too old or out of the amount the user is allowed
