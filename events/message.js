@@ -10,7 +10,9 @@ const { isPremium, getTier } = require("../utils/premium/utils")
  */
 const mentionQueue = []
 const db = getDatabase()
-const addMentionToDatabase = db.prepare("INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)")
+const addMentionToDatabase = db.prepare(
+    "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
+)
 const fetchMentions = db.prepare("SELECT mention_id FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
 let mentionInterval
 

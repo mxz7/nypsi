@@ -37,7 +37,7 @@ class CustomEmbed extends MessageEmbed {
         }
 
         if (footer) {
-            super.setFooter({text: "nypsi.xyz"})
+            super.setFooter({ text: "nypsi.xyz" })
         }
 
         return this
@@ -117,7 +117,7 @@ class CustomEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        super.setAuthor({text: text})
+        super.setAuthor({ text: text })
 
         return this
     }
@@ -127,7 +127,7 @@ class CustomEmbed extends MessageEmbed {
      * @param {String} text
      */
     setFooter(text) {
-        super.setFooter({text: text})
+        super.setFooter({ text: text })
 
         return this
     }
@@ -246,7 +246,7 @@ class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        super.setAuthor({text: text})
+        super.setAuthor({ text: text })
 
         return this
     }
@@ -256,7 +256,7 @@ class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      */
     setFooter(text) {
-        super.setFooter({text: text})
+        super.setFooter({ text: text })
 
         return this
     }
