@@ -196,13 +196,15 @@ setInterval(() => {
     looking.forEach(async (obj) => {
         if (now - obj.date >= expire) {
             if (getDMsEnabled(obj.user.id)) {
-                await obj.user.send({
-                    embeds: [
-                        new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢")
-                            .setColor("#e4334f")
-                            .setTitle("milf finder"),
-                    ],
-                }).catch(() => {})
+                await obj.user
+                    .send({
+                        embeds: [
+                            new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢")
+                                .setColor("#e4334f")
+                                .setTitle("milf finder"),
+                        ],
+                    })
+                    .catch(() => {})
             }
 
             looking.delete(obj.user.id)
