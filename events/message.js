@@ -10,6 +10,7 @@ const { getDatabase } = require("../utils/database/database")
  */
 const mentionQueue = []
 const db = getDatabase()
+const addMentionToDatabase = db.prepare("INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?))")
 let mentionInterval
 
 /**
