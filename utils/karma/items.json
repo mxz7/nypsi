@@ -5,7 +5,8 @@
         "description": "access to nypsi's bronze tier for 35 days",
         "id": "bronze",
         "cost": 150,
-        "unlimited": false
+        "unlimited": false,
+        "items_left": 10
     },
     "silver": {
         "name": "silver membership",
@@ -13,7 +14,8 @@
         "description": "access to nypsi's silver tier for 35 days",
         "id": "silver",
         "cost": 300,
-        "unlimited": false
+        "unlimited": false,
+        "items_left": 5
     },
     "gold": {
         "name": "gold membership",
@@ -21,7 +23,8 @@
         "description": "access to nypsi's gold tier for 35 days",
         "id": "gold",
         "cost": 450,
-        "unlimited": false
+        "unlimited": false,
+        "items_left": 2
     },
     "100xp": {
         "name": "100 xp",
@@ -29,7 +32,8 @@
         "description": "100 xp will be added to your economy profile",
         "id": "100xp",
         "cost": 30,
-        "unlimited": false
+        "unlimited": false,
+        "items_left": 100
     },
     "1000xp": {
         "name": "1000 xp",
@@ -37,7 +41,8 @@
         "description": "1000 xp will be added to your economy profile",
         "id": "1000xp",
         "cost": 200,
-        "unlimited": false
+        "unlimited": false,
+        "items_left": 25
     },
     "basic_crate": {
         "name": "basic crate",
@@ -45,6 +50,7 @@
         "description": "a basic crate will be added to your inventory",
         "id": "basic_crate",
         "cost": 30,
-        "unlimited": true
+        "unlimited": false,
+        "items_left": 100
     }
 }
