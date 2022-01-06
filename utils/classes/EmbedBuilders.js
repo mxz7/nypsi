@@ -117,7 +117,7 @@ class CustomEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        super.setAuthor({ text: text })
+        super.setAuthor({ name: text })
 
         return this
     }
@@ -246,7 +246,7 @@ class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text) {
-        super.setAuthor({ text: text })
+        super.setAuthor({ name: text })
 
         return this
     }
