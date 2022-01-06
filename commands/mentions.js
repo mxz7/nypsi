@@ -53,8 +53,6 @@ async function run(message, args) {
 
     const mentions = fetchUserMentions(message.guild, message.member, limit)
 
-    console.log(mentions.length)
-
     if (!mentions || mentions.length == 0) {
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
