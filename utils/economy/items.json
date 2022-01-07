@@ -188,7 +188,7 @@
         "name": "wolf",
         "emoji": "🐺",
         "description": "bark.",
-        "worth": 300000,
+        "worth": 250000,
         "role": "prey",
         "rarity": 3
     },
