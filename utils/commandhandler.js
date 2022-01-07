@@ -836,7 +836,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
     const updateKarma = () => {
         for (const user of commandUses.keys()) {
-            const amount = Math.floor(commandUses.get(user) / 1.5)
+            const amount = Math.floor(commandUses.get(user) / 2)
 
             if (amount > 0) {
                 addKarma(user, amount)
