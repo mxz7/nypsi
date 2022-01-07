@@ -64,7 +64,7 @@ module.exports = async (message) => {
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(() => addMention(), 25)
+                mentionInterval = setInterval(() => addMention(), 100)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -82,7 +82,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 25)
+                    mentionInterval = setInterval(() => addMention(), 100)
                 }
             }
 
@@ -94,7 +94,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 25)
+                    mentionInterval = setInterval(() => addMention(), 100)
                 }
             }
         }
@@ -148,7 +148,7 @@ function addMention() {
         }
 
         for (const memberID of Array.from(members.keys())) {
-            if (count >= 200) {
+            if (count >= 150) {
                 return mentionQueue.push({
                     type: "collection",
                     members: members.clone(),
