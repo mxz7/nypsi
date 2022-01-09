@@ -67,7 +67,7 @@ function removeKarma(member, amount) {
         if (amount > query.karma) {
             amount = query.karma - 1
         }
-        db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(id, amount)
+        db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(amount, id)
     }
 }
 
