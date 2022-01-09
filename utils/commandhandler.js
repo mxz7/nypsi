@@ -732,7 +732,7 @@ function updatePopularCommands(command, member) {
         } catch {
             karmaCooldown.clear()
         }
-    }, 30000)
+    }, 90000)
 }
 
 /**
