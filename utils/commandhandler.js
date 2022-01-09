@@ -400,6 +400,7 @@ async function runCommand(cmd, message, args) {
         if (message.author.id == "672793821850894347") {
             message.react("💀")
         } else {
+            logCommand(message, args)
             return message.channel.send({ embeds: [new ErrorEmbed("nypsi is restarting..")] })
         }
     }
