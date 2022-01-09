@@ -128,7 +128,7 @@ function deteriorateKarma() {
     let total = 0
 
     for (const user of users) {
-        let karmaToRemove = 3
+        let karmaToRemove = 5
 
         if (now - 864000000 > user.last_command) {
             karmaToRemove = 25
