@@ -9,7 +9,7 @@ const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } 
 const { info, types, error, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
-const { addKarma, updateLastCommand } = require("./karma/utils.js")
+const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
 
 const commands = new Map()
 const aliases = new Map()
@@ -836,6 +836,12 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
     const updateKarma = () => {
         for (const user of commandUses.keys()) {
+            let modifier = 2
+
+            if (getKarma(user) > 200) modifier = 2.5
+            if (getKarma(user) > 400) modifier = 3
+            if (getKarma(user) > 500) modifier = 3.3
+
             const amount = Math.floor(commandUses.get(user) / 2)
 
             if (amount > 0) {
