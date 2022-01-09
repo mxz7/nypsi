@@ -4,9 +4,9 @@
         "emoji": "<:xbronze:820243846461128736>",
         "description": "access to nypsi's bronze tier for 35 days",
         "id": "bronze",
-        "cost": 150,
+        "cost": 100,
         "unlimited": false,
-        "items_left": 10
+        "items_left": 5
     },
     "silver": {
         "name": "silver membership",
@@ -15,16 +15,16 @@
         "id": "silver",
         "cost": 300,
         "unlimited": false,
-        "items_left": 5
+        "items_left": 3
     },
     "gold": {
         "name": "gold membership",
         "emoji": "<:xgold:820243845950341122>",
         "description": "access to nypsi's gold tier for 35 days",
         "id": "gold",
-        "cost": 450,
+        "cost": 500,
         "unlimited": false,
-        "items_left": 2
+        "items_left": 1
     },
     "100xp": {
         "name": "100 xp",
@@ -33,7 +33,7 @@
         "id": "100xp",
         "cost": 30,
         "unlimited": false,
-        "items_left": 100
+        "items_left": 30
     },
     "1000xp": {
         "name": "1000 xp",
@@ -42,14 +42,14 @@
         "id": "1000xp",
         "cost": 200,
         "unlimited": false,
-        "items_left": 25
+        "items_left": 10
     },
     "basic_crate": {
         "name": "basic crate",
         "emoji": "📦",
         "description": "a basic crate will be added to your inventory",
         "id": "basic_crate",
-        "cost": 30,
+        "cost": 45,
         "unlimited": false,
         "items_left": 100
     }
