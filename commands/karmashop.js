@@ -4,6 +4,8 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
 const { inPlaceSort } = require("fast-sort")
+const { isPremium, getTier } = require("../utils/premium/utils")
+const { updateXp, getXp, userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
 
 const cmd = new Command("karmashop", "buy stuff with your karma", categories.INFO)
 
@@ -15,6 +17,7 @@ const items = require("../utils/karma/items.json")
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    if (!userExists(message.member)) createUser(message.member)
     if (message.author.id == "672793821850894347") {
         if (args[0] && args[0].toLowerCase() == "open") {
             return openKarmaShop()
@@ -224,28 +227,100 @@ async function run(message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
         }
 
+        if (selected.items_left <= 0) {
+            return message.channel.send({ embeds: [new ErrorEmbed("there is none of this item left in the shop")] })
+        }
+
         if (getKarma(message.member) < selected.cost) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] })
         }
 
+        switch (selected.id) {
+            case "bronze":
+                if (isPremium(message.member) && getTier(message.member) >= 1) {
+                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] })
+                } else {
+                    if (message.guild.id != "747056029795221513") {
+                        return message.channel.send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
+                                ),
+                            ],
+                        })
+                    } else {
+                        await message.member.roles.add("819870590718181391")
+                    }
+                }
+                break
+            case "silver":
+                if (isPremium(message.member) && getTier(message.member) >= 2) {
+                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] })
+                } else {
+                    if (message.guild.id != "747056029795221513") {
+                        return message.channel.send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
+                                ),
+                            ],
+                        })
+                    } else {
+                        await message.member.roles.add("819870727834566696")
+                    }
+                }
+                break
+            case "gold":
+                if (isPremium(message.member) && getTier(message.member) >= 3) {
+                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] })
+                } else {
+                    if (message.guild.id != "747056029795221513") {
+                        return message.channel.send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
+                                ),
+                            ],
+                        })
+                    } else {
+                        await message.member.roles.add("819870846536646666")
+                    }
+                }
+                break
+            case "100xp":
+                updateXp(message.member, getXp(message.member) + 100)
+                break
+            case "1000xp":
+                updateXp(message.member, getXp(message.member) + 1000)
+                break
+            case "basic_crate":
+                const inventory = getInventory(message.member) // eslint-disable-line
+
+                if (inventory["basic_crate"]) {
+                    inventory["basic_crate"]++
+                } else {
+                    inventory["basic_crate"] = 1
+                }
+
+                setInventory(message.member, inventory)
+        }
+
         removeKarma(message.member, selected.cost)
 
-        // add code to do after buying
+        if (!selected.unlimited) {
+            items[selected.id].items_left -= 1
+        }
 
         return message.channel.send({
             embeds: [
                 new CustomEmbed(
                     message.member,
                     false,
-                    `you have bought ${selected.emoji} ${selected.name} for $${(
-                        selected.cost
-                    ).toLocaleString()}`
+                    `you have bought ${selected.emoji} ${selected.name} for $${selected.cost.toLocaleString()}`
                 ),
             ],
         })
     }
-
-    
 }
 
 cmd.setRun(run)
