@@ -105,7 +105,9 @@ module.exports = async (message) => {
     if (message.client.user.id == "685193083570094101") prefix = "£"
 
     if (message.content == `<@!${message.client.user.id}>`) {
-        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` })
+        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
+            return message.member.send({ content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel` })
+        })
     }
 
     if (!message.content.startsWith(prefix)) return
