@@ -221,7 +221,12 @@ function addMention() {
     }
 }
 
+let cleanCooldown = 0
 function cleanMentions() {
+    if (Date.now() - cleanCooldown < 600000) return
+
+    cleanCooldown = Date.now()
+
     const limit = Math.floor((Date.now() - 86400000) / 1000)
 
     const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
