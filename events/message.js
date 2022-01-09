@@ -195,7 +195,7 @@ function addMention() {
 
         const mentions = fetchMentions.run(guild, target)
 
-        let limit = 10
+        let limit = 6
 
         if (isPremium(target)) {
             const tier = getTier(target)
