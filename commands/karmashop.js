@@ -316,7 +316,7 @@ async function run(message, args) {
                 new CustomEmbed(
                     message.member,
                     false,
-                    `you have bought ${selected.emoji} ${selected.name} for $${selected.cost.toLocaleString()}`
+                    `you have bought ${selected.emoji} ${selected.name} for ${selected.cost.toLocaleString()} karma`
                 ),
             ],
         })
