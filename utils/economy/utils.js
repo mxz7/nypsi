@@ -1,10 +1,21 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
-let stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+
+let stats
+if (process.env.GITHUB_ACTION) {
+    stats = {}
+} else {
+    stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+}
+
 info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`, types.DATA)
-const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
-const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
-const { topgg: topggToken } = require("../../config.json")
+
+let banned
+if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
+
+let multiplier
+if (!process.env.GITHUB_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
+
 const topgg = require("@top-gg/sdk")
 const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
@@ -19,7 +30,7 @@ const { addKarma } = require("../karma/utils")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
-const topggStats = new topgg.Api(topggToken)
+const topggStats = new topgg.Api(process.env.TOPGG_TOKEN)
 const app = express()
 
 const voteCache = new Map()
@@ -36,18 +47,20 @@ app.post(
 
 app.listen(5000)
 
-setInterval(() => {
-    const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+if (!process.env.GITHUB_ACTION) {
+    setInterval(() => {
+        const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 
-    if (JSON.stringify(stats) != JSON.stringify(stats1)) {
-        fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("economy stats data saved", types.DATA)
-        })
-    }
-}, 120000 + Math.floor(Math.random() * 60) * 1000)
+        if (JSON.stringify(stats) != JSON.stringify(stats1)) {
+            fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
+                if (err) {
+                    return console.log(err)
+                }
+                info("economy stats data saved", types.DATA)
+            })
+        }
+    }, 120000 + Math.floor(Math.random() * 60) * 1000)
+}
 
 setInterval(() => {
     const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()

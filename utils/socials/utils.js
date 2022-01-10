@@ -1,40 +1,44 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { info, types } = require("../logger")
-let users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
+let users = {}
+if (!process.env.GITHUB_ACTION) users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 info(`${Array.from(Object.keys(users)).length.toLocaleString()} socials users loaded`, types.DATA)
 
 let timer = 0
 let timerCheck = true
-setInterval(() => {
-    const users1 = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 
-    if (JSON.stringify(users) != JSON.stringify(users1)) {
-        fs.writeFile("./utils/socials/users.json", JSON.stringify(users), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("socials data saved", types.DATA)
-        })
+if (!process.env.GITHUB_ACTION) {
+    setInterval(() => {
+        const users1 = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 
-        timer = 0
-        timerCheck = false
-    } else if (!timerCheck) {
-        timer++
-    }
+        if (JSON.stringify(users) != JSON.stringify(users1)) {
+            fs.writeFile("./utils/socials/users.json", JSON.stringify(users), (err) => {
+                if (err) {
+                    return console.log(err)
+                }
+                info("socials data saved", types.DATA)
+            })
 
-    if (timer >= 5 && !timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
-        info("socials data refreshed", types.DATA)
-        timerCheck = true
-    }
+            timer = 0
+            timerCheck = false
+        } else if (!timerCheck) {
+            timer++
+        }
 
-    if (timer >= 30 && timerCheck) {
-        users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
-        info("socials data refreshed", types.DATA)
-        timer = 0
-    }
-}, 180000 + Math.floor(Math.random() * 60) * 1000)
+        if (timer >= 5 && !timerCheck) {
+            users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
+            info("socials data refreshed", types.DATA)
+            timerCheck = true
+        }
+
+        if (timer >= 30 && timerCheck) {
+            users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
+            info("socials data refreshed", types.DATA)
+            timer = 0
+        }
+    }, 180000 + Math.floor(Math.random() * 60) * 1000)
+}
 
 module.exports = {
     /**
