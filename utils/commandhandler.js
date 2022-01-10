@@ -364,6 +364,8 @@ async function helpCmd(message, args) {
 async function runCommand(cmd, message, args) {
     if (!hasGuild(message.guild)) createGuild(message.guild)
 
+    if (process.env.GITHUB_ACTION) return
+
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
         return message.member
             .send(
