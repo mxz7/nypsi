@@ -1,4 +1,4 @@
-name: Run
+name: Test
 
 on:
   push:
@@ -7,6 +7,19 @@ on:
     branches: [ master ]
 
 jobs:
+    build:
+
+      name: Linting
+      
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v1
+        - uses: bahmutov/npm-install@v1
+  
+        - run: npx eslint ./
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
 
     runs-on: ubuntu-latest
