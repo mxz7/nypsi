@@ -533,7 +533,7 @@ function getMaxBankBalance(member) {
     const karma = getKarma(member)
     const constant = 250
     const starting = 15000
-    const bonus = (xp * constant) + ((constant / 2) * karma)
+    const bonus = xp * constant + (constant / 2) * karma
     const max = bonus + starting
 
     return max

@@ -11,10 +11,12 @@ const cmd = new Command("dobackup", "start a database backup", categories.NONE).
  */
 async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return
-    
+
     doBackup()
 
-    return message.channel.send({embeds: [new CustomEmbed(message.member, false, "backup started, check console for more info")]})
+    return message.channel.send({
+        embeds: [new CustomEmbed(message.member, false, "backup started, check console for more info")],
+    })
 }
 
 cmd.setRun(run)
