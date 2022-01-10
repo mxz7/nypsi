@@ -1388,3 +1388,17 @@ function getMaxDogecoin(member) {
 }
 
 exports.getMaxDogecoin = getMaxDogecoin
+
+function deleteUser(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    if (existsCache.has(id)) {
+        existsCache.delete(id)
+    }
+
+    db.prepare("DELETE FROM economy WHERE id = ?").run(id)
+}
+
+exports.deleteUser = deleteUser
