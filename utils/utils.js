@@ -691,7 +691,9 @@ async function uploadImageToImgur(url) {
 exports.uploadImage = uploadImageToImgur
 
 async function fallbackUpload(url) {
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) => res.json())
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
+        res.json()
+    )
 
     if (!res.success) {
         return false
