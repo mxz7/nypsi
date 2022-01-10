@@ -68,7 +68,7 @@ async function run(message, args) {
     }
 
     if (selected.size == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you do not have anything to sell")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you do not have anything to sell")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -108,9 +108,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setDescription(
-        `+$**${total.toLocaleString()}**\n${earned}`
-    )
+    embed.setDescription(`+$**${total.toLocaleString()}**\n${earned}`)
 
     return message.channel.send({ embeds: [embed] })
 }
