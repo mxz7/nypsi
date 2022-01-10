@@ -99,7 +99,7 @@ async function run(message, args) {
         }
 
         total += sellWorth
-        earned += `\n**${selected.get(item)}** ${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()}`
+        earned += `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`
     }
 
     setInventory(message.member, inventory)
