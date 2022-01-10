@@ -234,6 +234,7 @@ async function getWebhooks(client) {
 exports.getWebhooks = getWebhooks
 
 function runLogs() {
+    if (process.env.GITHUB_ACTION) return
     setInterval(() => {
         webhook.forEach((v, k) => {
             let msg = nextLogMsg.get(k)
