@@ -4,7 +4,6 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 const { getLastfmUsername } = require("../utils/users/utils")
 const { getMember } = require("../utils/utils")
-const { lastfm: apiKey } = require("../config.json")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command(
@@ -76,7 +75,7 @@ async function run(message, args) {
     username = username.username
 
     const res = await fetch(
-        `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json`
+        `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`
     ).then((res) => res.json())
 
     if (!res.recenttracks) {

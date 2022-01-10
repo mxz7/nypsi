@@ -1,6 +1,5 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
 const util = require("util")
-const { imgur: imgurClientID, imgbb: imgbbKey } = require("../config.json")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
@@ -8,7 +7,7 @@ const { getDatabase } = require("./database/database")
 const { error, info, types } = require("./logger")
 const db = getDatabase()
 const imgur = require("imgur")
-imgur.setClientId(imgurClientID)
+imgur.setClientId(process.env.IMGUR_TOKEN)
 
 const uploadImage = util.promisify(imgur.uploadUrl)
 let uploadDisabled = false
@@ -692,7 +691,7 @@ async function uploadImageToImgur(url) {
 exports.uploadImage = uploadImageToImgur
 
 async function fallbackUpload(url) {
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}&image=${url}`).then((res) => res.json())
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) => res.json())
 
     if (!res.success) {
         return false

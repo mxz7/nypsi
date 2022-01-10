@@ -1,7 +1,6 @@
 const { GuildMember } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
-const { lastfm: lastfmToken } = require("../../config.json")
 const { default: fetch } = require("node-fetch")
 const { cleanString } = require("../utils")
 
@@ -266,7 +265,7 @@ async function setLastfmUsername(member, username) {
     username = cleanString(username)
 
     const res = await fetch(
-        `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=fdeda7784e52eb8fa874facecb3d3636&format=json`
+        `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=${process.env.LASTFM_TOKEN}format=json`
     ).then((res) => res.json())
 
     if (res.error && res.error == 6) return false

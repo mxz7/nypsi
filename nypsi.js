@@ -1,5 +1,7 @@
 const startUp = Date.now()
 
+require("dotenv").config()
+
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
@@ -32,7 +34,7 @@ const client = new Discord.Client({
         Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
     ],
 })
-const { token } = require("./config.json")
+
 const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
 const {
     runCheck,
@@ -255,7 +257,7 @@ exports.getGuild = getGuild
 
 setTimeout(() => {
     info("logging in...", types.INFO)
-    client.login(token).then(() => {
+    client.login(process.env.BOT_TOKEN).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"])
             runCountdowns(client)
