@@ -13,7 +13,9 @@ info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats us
 let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 
-const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
+let multiplier
+if (!process.env.GITHUN_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
+
 const topgg = require("@top-gg/sdk")
 const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
