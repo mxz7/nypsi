@@ -14,7 +14,7 @@ let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 
 let multiplier
-if (!process.env.GITHUN_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
+if (!process.env.GITHUB_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 
 const topgg = require("@top-gg/sdk")
 const express = require("express")
