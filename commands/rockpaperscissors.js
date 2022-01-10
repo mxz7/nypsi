@@ -92,8 +92,13 @@ async function run(message, args) {
     if (choice == "paper") memberEmoji = "📰"
     if (choice == "scissors") memberEmoji = "✂"
 
+    const maxBet = await calcMaxBet(message.member)
+
     if (args[1] == "all") {
         args[1] = getBalance(message.member)
+        if (getBalance(message.member) > maxBet) {
+            args[1] = maxBet
+        }
     }
 
     if (args[1] == "half") {
@@ -131,8 +136,6 @@ async function run(message, args) {
     if (bet > getBalance(message.member)) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
-
-    const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
         return message.channel.send({

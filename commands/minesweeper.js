@@ -94,8 +94,13 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     }
 
+    const maxBet = await calcMaxBet(message.member)
+
     if (args[0] == "all") {
         args[0] = getBalance(message.member)
+        if (getBalance(message.member) > maxBet) {
+            args[0] = maxBet
+        }
     }
 
     if (args[0] == "half") {
@@ -121,8 +126,6 @@ async function run(message, args) {
     if (bet > getBalance(message.member)) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
-
-    const maxBet = await calcMaxBet(message.member)
 
     if (bet > maxBet) {
         return message.channel.send({
