@@ -5,7 +5,7 @@ const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
 
-let commands
+let commands = {}
 if (!process.env.GITHUB_ACTION) commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 
 info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`, types.DATA)
