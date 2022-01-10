@@ -150,7 +150,9 @@ async function run(message, args) {
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member).toLocaleString()} karma`
+                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
+                                message.member
+                            ).toLocaleString()} karma`
                         )
                         if (currentPage == 0) {
                             row = new MessageActionRow().addComponents(
@@ -182,7 +184,9 @@ async function run(message, args) {
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member).toLocaleString()} karma`
+                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
+                                message.member
+                            ).toLocaleString()} karma`
                         )
                         if (currentPage + 1 == lastPage) {
                             row = new MessageActionRow().addComponents(
