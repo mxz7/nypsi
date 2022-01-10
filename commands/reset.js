@@ -57,6 +57,8 @@ async function run(message, args) {
     earnedKarma += getXp(message.member) / 100
     earnedKarma += getBalance(message.member) / 100000 / 2
 
+    earnedKarma = Math.floor(earnedKarma)
+
     let embed = new CustomEmbed(
         message.member,
         true,
@@ -95,6 +97,8 @@ async function run(message, args) {
         earnedKarma += getPrestige(message.member) * 20
         earnedKarma += getXp(message.member) / 100
         earnedKarma += getBalance(message.member) / 100000 / 2
+
+        earnedKarma = Math.floor(earnedKarma)
 
         addKarma(message.member, earnedKarma)
 
