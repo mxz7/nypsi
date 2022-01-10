@@ -75,22 +75,25 @@ const guildMemberRemove = require("./events/guildMemberRemove")
 const userUpdate = require("./events/userUpdate")
 
 client.once("ready", ready.bind(null, client, startUp))
-client.on("guildCreate", guildCreate.bind(null, client))
-client.on("guildDelete", guildDelete.bind(null, client))
-client.on("rateLimit", (rate) => {
-    const a = rate.route.split("/")
-    const reason = a[a.length - 1]
-    error("rate limit: " + reason)
-})
-client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
-client.on("guildMemberAdd", guildMemberAdd.bind(null))
-client.on("guildMemberRemove", guildMemberRemove.bind(null))
-client.on("messageDelete", messageDelete.bind(null))
-client.on("messageUpdate", messageUpdate.bind(null))
-client.on("messageCreate", message.bind(null))
-client.on("channelCreate", channelCreate.bind(null))
-client.on("roleDelete", roleDelete.bind(null))
-client.on("userUpdate", userUpdate.bind(null))
+if (!process.env.GITHUB_ACTION) {
+    client.on("guildCreate", guildCreate.bind(null, client))
+    client.on("guildDelete", guildDelete.bind(null, client))
+    client.on("rateLimit", (rate) => {
+        const a = rate.route.split("/")
+        const reason = a[a.length - 1]
+        error("rate limit: " + reason)
+    })
+    client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
+    client.on("guildMemberAdd", guildMemberAdd.bind(null))
+    client.on("guildMemberRemove", guildMemberRemove.bind(null))
+    client.on("messageDelete", messageDelete.bind(null))
+    client.on("messageUpdate", messageUpdate.bind(null))
+    client.on("messageCreate", message.bind(null))
+    client.on("channelCreate", channelCreate.bind(null))
+    client.on("roleDelete", roleDelete.bind(null))
+    client.on("userUpdate", userUpdate.bind(null))
+}
+
 
 client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
 client.on("shardDisconnect", (s, shardID) => info(`shard#${shardID} disconnected`))
