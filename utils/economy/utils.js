@@ -1,13 +1,18 @@
 const { info, types, error, getTimestamp } = require("../logger")
 const fs = require("fs")
+
 let stats
 if (process.env.GITHUB_ACTION) {
     stats = {}
 } else {
     stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 }
+
 info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`, types.DATA)
-const banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
+
+let banned
+if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
+
 const multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
 const topgg = require("@top-gg/sdk")
 const express = require("express")
