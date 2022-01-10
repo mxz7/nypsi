@@ -1,8 +1,11 @@
 node_modules/
 backup/
+
 *.json
+*.env
+*.db
+
 !lists.json
 !items.json
 !package.json
 !package-lock.json
-*.db
