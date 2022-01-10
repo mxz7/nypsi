@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 5
       
     env:
-      LASTFM_TOKEN: ${{ secrets.LASTFM_TOKEN }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     steps:
     - uses: actions/checkout@v2
