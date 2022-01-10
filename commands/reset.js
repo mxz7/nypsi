@@ -53,9 +53,9 @@ async function run(message, args) {
 
     let earnedKarma = 0
 
-    earnedKarma += (getPrestige(message.member) * 30)
-    earnedKarma += (getXp(message.member) / 100)
-    earnedKarma += ((getBalance(message.member) / 100000) / 2)
+    earnedKarma += getPrestige(message.member) * 30
+    earnedKarma += getXp(message.member) / 100
+    earnedKarma += getBalance(message.member) / 100000 / 2
 
     earnedKarma = Math.floor(earnedKarma * 2.2)
 
@@ -94,17 +94,15 @@ async function run(message, args) {
         }, 1800000)
         earnedKarma = 0
 
-        earnedKarma += (getPrestige(message.member) * 30)
-        earnedKarma += (getXp(message.member) / 100)
-        earnedKarma += ((getBalance(message.member) / 100000) / 2)
+        earnedKarma += getPrestige(message.member) * 30
+        earnedKarma += getXp(message.member) / 100
+        earnedKarma += getBalance(message.member) / 100000 / 2
 
         earnedKarma = Math.floor(earnedKarma * 2.2)
 
         addKarma(message.member, earnedKarma)
 
-        embed.setDescription(
-            `your economy profile has been reset.\n\nyou have been given **${earnedKarma}** karma`
-        )
+        embed.setDescription(`your economy profile has been reset.\n\nyou have been given **${earnedKarma}** karma`)
 
         await msg.edit({ embeds: [embed], components: [] })
     }
