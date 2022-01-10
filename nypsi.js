@@ -1,3 +1,5 @@
+return console.log(process.env.LASTFM_TOKEN)
+
 const startUp = Date.now()
 
 require("dotenv").config()
