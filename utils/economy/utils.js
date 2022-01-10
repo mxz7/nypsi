@@ -26,7 +26,7 @@ const { Worker, getAllWorkers } = require("./workers")
 const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
 const { getDatabase } = require("../database/database")
-const { addKarma } = require("../karma/utils")
+const { addKarma, getKarma } = require("../karma/utils")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -342,7 +342,9 @@ function getMulti(member) {
         multi += 10
     }
 
-    const prestigeBonus = getPrestige(member) * 2
+    const prestige = getPrestige(member)
+
+    const prestigeBonus = (prestige > 15 ? 15 : prestige) * 2
 
     multi += prestigeBonus
 
@@ -1019,7 +1021,9 @@ async function calcMaxBet(member) {
         total += 50000
     }
 
-    return total + bonus * getPrestige(member)
+    const prestige = getPrestige(member)
+
+    return total + bonus * (prestige > 15 ? 15 : prestige)
 }
 
 exports.calcMaxBet = calcMaxBet
@@ -1361,7 +1365,11 @@ exports.getItems = getItems
  */
 function getMaxBitcoin(member) {
     const base = 2
-    const prestigeBonus = 5 * getPrestige(member)
+
+    const prestige = getPrestige(member)
+
+    const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige)
+
     let xpBonus = 1 * Math.floor(getXp(member) / 100)
 
     if (xpBonus > 5) xpBonus = 5
