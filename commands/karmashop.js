@@ -83,7 +83,7 @@ async function run(message, args) {
         const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
 
         embed.setTitle("karma shop | " + message.author.username)
-        embed.setFooter(`you have ${getKarma(message.member)} karma`)
+        embed.setFooter(`you have ${getKarma(message.member).toLocaleString()} karma`)
 
         for (let item of pages[page]) {
             item = items[item]
@@ -150,7 +150,7 @@ async function run(message, args) {
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member)} karma`
+                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member).toLocaleString()} karma`
                         )
                         if (currentPage == 0) {
                             row = new MessageActionRow().addComponents(
@@ -182,7 +182,7 @@ async function run(message, args) {
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member)} karma`
+                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(message.member).toLocaleString()} karma`
                         )
                         if (currentPage + 1 == lastPage) {
                             row = new MessageActionRow().addComponents(
