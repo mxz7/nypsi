@@ -59,7 +59,7 @@ async function run(message, args) {
 
     const itemIDs = Array.from(Object.keys(items))
 
-    if (args.length == 0) {
+    if (args.length == 0 || args.length == 1) {
         inPlaceSort(itemIDs).asc((i) => items[i].cost)
 
         const pages = []
