@@ -11,11 +11,8 @@ jobs:
     name: Linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16
-      - run: npm ci
+      - uses: actions/checkout@v1
+      - uses: bahmutov/npm-install@v1
 
       - run: npx eslint ./
         env:
