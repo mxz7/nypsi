@@ -47,18 +47,20 @@ app.post(
 
 app.listen(5000)
 
-setInterval(() => {
-    const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
+if (!process.env.GITHUB_ACTION) {
+    setInterval(() => {
+        const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 
-    if (JSON.stringify(stats) != JSON.stringify(stats1)) {
-        fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
-            if (err) {
-                return console.log(err)
-            }
-            info("economy stats data saved", types.DATA)
-        })
-    }
-}, 120000 + Math.floor(Math.random() * 60) * 1000)
+        if (JSON.stringify(stats) != JSON.stringify(stats1)) {
+            fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
+                if (err) {
+                    return console.log(err)
+                }
+                info("economy stats data saved", types.DATA)
+            })
+        }
+    }, 120000 + Math.floor(Math.random() * 60) * 1000)
+}
 
 setInterval(() => {
     const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
