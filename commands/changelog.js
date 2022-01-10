@@ -13,14 +13,18 @@ async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("dumbass")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] })
     }
 
-    const embed = new CustomEmbed().setColor("#111111").setTitle(formatDate(new Date())).setTimestamp().setDescription(args.join(" "))
+    const embed = new CustomEmbed()
+        .setColor("#111111")
+        .setTitle(formatDate(new Date()))
+        .setTimestamp()
+        .setDescription(args.join(" "))
 
     await message.delete()
 
-    return message.channel.send({embeds: [embed]})
+    return message.channel.send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
