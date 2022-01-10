@@ -1,6 +1,5 @@
 const { Message } = require("discord.js")
 const fetch = require("node-fetch")
-const { hypixel } = require("../config.json")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -86,7 +85,7 @@ async function run(message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] })
         }
 
-        const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${hypixel}`
+        const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${process.env.HYPIXEL_TOKEN}`
 
         try {
             hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json())
