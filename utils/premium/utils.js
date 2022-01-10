@@ -4,7 +4,10 @@ const { PremUser, status } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
 const { info, types, getTimestamp } = require("../logger")
 const { formatDate } = require("../utils")
-let commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
+
+let commands
+if (!process.env.GITHUB_ACTION) commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
+
 info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`, types.DATA)
 const db = getDatabase()
 
