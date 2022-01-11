@@ -234,11 +234,13 @@ async function run(message, args) {
             const m = members.get(member)
 
             if (reason.split(": ")[1] == "no reason given") {
-                await m.send({
-                    content: `you have been banned from ${message.guild.name}${
-                        temporary ? `\n\nexpires in **${banLength}**}` : ""
-                    }`,
-                }).catch(() => {})
+                await m
+                    .send({
+                        content: `you have been banned from ${message.guild.name}${
+                            temporary ? `\n\nexpires in **${banLength}**}` : ""
+                        }`,
+                    })
+                    .catch(() => {})
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
