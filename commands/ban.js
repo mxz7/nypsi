@@ -238,7 +238,7 @@ async function run(message, args) {
                     content: `you have been banned from ${message.guild.name}${
                         temporary ? `\n\nexpires in **${banLength}**}` : ""
                     }`,
-                })
+                }).catch(() => {})
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
@@ -250,7 +250,7 @@ async function run(message, args) {
                     embed.setTimestamp(unbanDate)
                 }
 
-                await m.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
+                await m.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] }).catch(() => {})
             }
         }
     }
