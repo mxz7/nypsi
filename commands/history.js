@@ -166,7 +166,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] })
+                    await msg.edit({ components: [] }).catch(() => {})
                 })
 
             const newEmbed = new CustomEmbed(message.member)
