@@ -222,7 +222,7 @@ function addMention() {
 function cleanMentions() {
     const limit = Math.floor((Date.now() - 259200000) / 1000)
 
-    const changes = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
+    const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
 
-    info(`${changes} mentions deleted`)
+    if (changes > 0) info(`${changes} mentions deleted`)
 }
