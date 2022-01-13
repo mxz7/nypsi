@@ -84,7 +84,14 @@ runBackups()
 
 function doBackup() {
     info("data backup starting..", types.DATA)
-    db.backup(`./utils/database/backups/backup-${Date.now()}.db`)
+
+    const date = new Date()
+
+    db.backup(
+        `./utils/database/backups/${date.getDate()}.${
+            date.getMonth() + 1
+        }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
+    )
         .then(() => {
             info("backup complete", types.DATA)
         })
