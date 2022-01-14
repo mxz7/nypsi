@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const workerSort = require("../utils/sort-worker")
+const workerSort = require("../utils/workers/sort")
 const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
