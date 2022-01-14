@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { cpu } = require("node-os-utils")
 
 const cooldown = new Map()
 
@@ -42,6 +43,7 @@ async function run(message, args) {
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
+    const cpuUsage = await cpu.usage()
     const {
         bdsmCache,
         thighsCache,
@@ -133,7 +135,8 @@ async function run(message, args) {
                 imgCache.toLocaleString(),
             true
         )
-        .addField("usage", "**memory** " + memUsage + "mb", true)
+        .addField("usage", `**memory** ${memUsage}mb
+        **cpu** ${cpuUsage}%`, true)
 
     message.channel.send({ embeds: [embed] })
 }
