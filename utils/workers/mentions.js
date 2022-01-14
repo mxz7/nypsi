@@ -57,11 +57,8 @@ if (isMainThread) {
             if (!channelMembers.has(memberID)) continue
         }
 
-        insertMention.run(collection.message.guild.id, member.user.id, Math.floor(collection.message.createdTimestamp / 1000), collection.message.author.tag, collection.message.url, content)
-
-        const mentions = fetchMentions.all(collection.message.guild.id, member.user.id)
-
-        console.log(mentions)
+        insertMention.run(collection.guild.id, member.user.id, Math.floor(collection.message.createdTimestamp / 1000), `${collection.message.author.username}#${collection.message.author.discriminator}`, collection.url, content)
+        const mentions = fetchMentions.all(collection.guild.id, member.user.id)
 
         let limit = 6
 
