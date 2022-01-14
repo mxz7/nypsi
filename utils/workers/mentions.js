@@ -40,13 +40,7 @@ if (isMainThread) {
 
     content = content.replace(/(\r\n|\n|\r)/gm, " ")
 
-    let channelMembers
-
-    try {
-        channelMembers = collection.message.channel.members
-    } catch {
-        return parentPort.postMessage(1)
-    }
+    let channelMembers = collection.channelMembers
 
     for (const memberID of Array.from(members.keys())) {
         const member = members.get(memberID)
@@ -87,5 +81,6 @@ if (isMainThread) {
             }
         }
     }
+    db.close()
     parentPort.postMessage(0)
 }

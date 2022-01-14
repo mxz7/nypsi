@@ -62,10 +62,11 @@ module.exports = async (message) => {
                 type: "collection",
                 members: members.clone(),
                 message: message,
+                channelMembers: message.channel.members
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(() => addMention(), 1000)
+                mentionInterval = setInterval(async () => await addMention(), 1000)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -79,11 +80,12 @@ module.exports = async (message) => {
                         type: "collection",
                         members: r.members.clone(),
                         message: message,
+                        channelMembers: message.channel.members,
                     })
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 1000)
+                    mentionInterval = setInterval(async () => await addMention(), 1000)
                 }
             }
 
@@ -92,10 +94,11 @@ module.exports = async (message) => {
                     type: "collection",
                     members: message.mentions.members.clone(),
                     message: message,
+                    channelMembers: message.channel.members,
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 1000)
+                    mentionInterval = setInterval(async () => await addMention(), 1000)
                 }
             }
         }
@@ -132,7 +135,69 @@ async function addMention() {
     }
 
     if (mention.type == "collection") {
-        await doCollection(mention)
+        const members = mention.members
+
+        if (members.size > 500) {
+            return await doCollection(mention)
+        }
+
+        let content = mention.message.content
+
+        if (content.length > 100) {
+            content = content.substr(0, 97) + "..."
+        }
+
+        content = content.replace(/(\r\n|\n|\r)/gm, " ")
+
+        let count = 0
+
+        let channelMembers
+
+        try {
+            channelMembers = mention.message.channel.members
+        } catch {
+            return
+        }
+
+        for (const memberID of Array.from(members.keys())) {
+            if (count >= 150) {
+                return mentionQueue.push({
+                    type: "collection",
+                    members: members.clone(),
+                    message: mention.message,
+                })
+            }
+            const member = members.get(memberID)
+
+            members.delete(memberID)
+
+            if (member.user.bot) continue
+            if (member.user.id == mention.message.author.id) continue
+
+            try {
+                if (!channelMembers.has(memberID)) continue
+            } catch {
+                channelMembers = channelMembers.cache
+                if (!channelMembers.has(memberID)) continue
+            }
+
+            const data = {
+                user: mention.message.author.tag,
+                content: content,
+                date: mention.message.createdTimestamp,
+                link: mention.message.url,
+            }
+
+            const guild = mention.message.guild.id
+
+            mentionQueue.push({
+                type: "mention",
+                data: data,
+                guild: guild,
+                target: member.user.id,
+            })
+            count++
+        }
     } else {
         const guild = mention.guild
         const data = mention.data
