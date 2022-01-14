@@ -4,6 +4,7 @@ const { runCommand } = require("../utils/commandhandler")
 const { info } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const doCollection = require("../utils/workers/mentions")
 
 /**
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
@@ -64,7 +65,7 @@ module.exports = async (message) => {
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(() => addMention(), 100)
+                mentionInterval = setInterval(() => addMention(), 1000)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -82,7 +83,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 100)
+                    mentionInterval = setInterval(() => addMention(), 1000)
                 }
             }
 
@@ -94,7 +95,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 100)
+                    mentionInterval = setInterval(() => addMention(), 1000)
                 }
             }
         }
@@ -121,7 +122,7 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
-function addMention() {
+async function addMention() {
     const mention = mentionQueue.shift()
 
     if (!mention) {
@@ -131,65 +132,7 @@ function addMention() {
     }
 
     if (mention.type == "collection") {
-        const members = mention.members
-
-        let content = mention.message.content
-
-        if (content.length > 100) {
-            content = content.substr(0, 97) + "..."
-        }
-
-        content = content.replace(/(\r\n|\n|\r)/gm, " ")
-
-        let count = 0
-
-        let channelMembers
-
-        try {
-            channelMembers = mention.message.channel.members
-        } catch {
-            return
-        }
-
-        for (const memberID of Array.from(members.keys())) {
-            if (count >= 150) {
-                return mentionQueue.push({
-                    type: "collection",
-                    members: members.clone(),
-                    message: mention.message,
-                })
-            }
-            const member = members.get(memberID)
-
-            members.delete(memberID)
-
-            if (member.user.bot) continue
-            if (member.user.id == mention.message.author.id) continue
-
-            try {
-                if (!channelMembers.has(memberID)) continue
-            } catch {
-                channelMembers = channelMembers.cache
-                if (!channelMembers.has(memberID)) continue
-            }
-
-            const data = {
-                user: mention.message.author.tag,
-                content: content,
-                date: mention.message.createdTimestamp,
-                link: mention.message.url,
-            }
-
-            const guild = mention.message.guild.id
-
-            mentionQueue.push({
-                type: "mention",
-                data: data,
-                guild: guild,
-                target: member.user.id,
-            })
-            count++
-        }
+        await doCollection(mention)
     } else {
         const guild = mention.guild
         const data = mention.data
@@ -197,7 +140,7 @@ function addMention() {
 
         addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
 
-        const mentions = fetchMentions.run(guild, target)
+        const mentions = fetchMentions.all(guild, target)
 
         let limit = 6
 
@@ -221,7 +164,6 @@ function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
-        cleanMentions()
     }
 }
 
