@@ -1,7 +1,7 @@
 const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
 const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
-const { info } = require("../utils/logger")
+const { info, error } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
@@ -62,7 +62,9 @@ module.exports = async (message) => {
                 type: "collection",
                 members: members.clone(),
                 message: message,
-                channelMembers: message.channel.members
+                channelMembers: message.channel.members,
+                guild: message.guild,
+                url: message.url
             })
 
             if (!mentionInterval) {
@@ -81,6 +83,8 @@ module.exports = async (message) => {
                         members: r.members.clone(),
                         message: message,
                         channelMembers: message.channel.members,
+                        guild: message.guild,
+                        url: message.url
                     })
                 })
 
@@ -95,6 +99,8 @@ module.exports = async (message) => {
                     members: message.mentions.members.clone(),
                     message: message,
                     channelMembers: message.channel.members,
+                    guild: message.guild,
+                    url: message.url
                 })
 
                 if (!mentionInterval) {
@@ -138,7 +144,9 @@ async function addMention() {
         const members = mention.members
 
         if (members.size > 500) {
-            return await doCollection(mention)
+            await doCollection(mention).catch((e) => {
+                error(e)
+            })
         }
 
         let content = mention.message.content
@@ -151,13 +159,7 @@ async function addMention() {
 
         let count = 0
 
-        let channelMembers
-
-        try {
-            channelMembers = mention.message.channel.members
-        } catch {
-            return
-        }
+        let channelMembers = mention.channelMembers
 
         for (const memberID of Array.from(members.keys())) {
             if (count >= 150) {
@@ -165,6 +167,7 @@ async function addMention() {
                     type: "collection",
                     members: members.clone(),
                     message: mention.message,
+                    channelMembers: channelMembers
                 })
             }
             const member = members.get(memberID)
