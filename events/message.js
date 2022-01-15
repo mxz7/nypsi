@@ -5,6 +5,7 @@ const { info, error } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
+const { cpu } = require("node-os-utils")
 
 /**
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
@@ -131,6 +132,8 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
+let currentInterval = 1000
+
 async function addMention() {
     const mention = mentionQueue.shift()
 
@@ -232,6 +235,27 @@ async function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
+        currentInterval = 1000
+    }
+
+    const cpuUsage = await cpu.usage()
+
+    const old = currentInterval
+
+
+    if (cpuUsage < 95) {
+        currentInterval = 750
+    } else if (cpuUsage < 90) {
+        currentInterval = 500
+    } else if (cpuUsage < 75) {
+        currentInterval = 250
+    } else {
+        currentInterval = 1000
+    }
+
+    if (currentInterval != old) {
+        clearInterval(mentionInterval)
+        mentionInterval = setInterval(async () => await addMention(), currentInterval)
     }
 }
 
