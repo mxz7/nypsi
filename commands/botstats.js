@@ -135,8 +135,12 @@ async function run(message, args) {
                 imgCache.toLocaleString(),
             true
         )
-        .addField("usage", `**memory** ${memUsage}mb
-        **cpu** ${cpuUsage}%`, true)
+        .addField(
+            "usage",
+            `**memory** ${memUsage}mb
+        **cpu** ${cpuUsage}%`,
+            true
+        )
 
     message.channel.send({ embeds: [embed] })
 }

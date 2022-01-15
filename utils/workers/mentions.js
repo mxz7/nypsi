@@ -24,9 +24,7 @@ if (isMainThread) {
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
     )
-    const fetchMentions = db.prepare(
-        "SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC"
-    )
+    const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
     const getTier = db.prepare("SELECT level FROM premium WHERE level > 0 AND id = ?")
     const collection = workerData[0]
 
@@ -57,7 +55,14 @@ if (isMainThread) {
             if (!channelMembers.has(memberID)) continue
         }
 
-        insertMention.run(collection.guild.id, member.user.id, Math.floor(collection.message.createdTimestamp / 1000), `${collection.message.author.username}#${collection.message.author.discriminator}`, collection.url, content)
+        insertMention.run(
+            collection.guild.id,
+            member.user.id,
+            Math.floor(collection.message.createdTimestamp / 1000),
+            `${collection.message.author.username}#${collection.message.author.discriminator}`,
+            collection.url,
+            content
+        )
         const mentions = fetchMentions.all(collection.guild.id, member.user.id)
 
         let limit = 6
