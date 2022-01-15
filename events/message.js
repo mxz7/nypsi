@@ -65,7 +65,7 @@ module.exports = async (message) => {
                 message: message,
                 channelMembers: message.channel.members,
                 guild: message.guild,
-                url: message.url
+                url: message.url,
             })
 
             if (!mentionInterval) {
@@ -85,7 +85,7 @@ module.exports = async (message) => {
                         message: message,
                         channelMembers: message.channel.members,
                         guild: message.guild,
-                        url: message.url
+                        url: message.url,
                     })
                 })
 
@@ -101,7 +101,7 @@ module.exports = async (message) => {
                     message: message,
                     channelMembers: message.channel.members,
                     guild: message.guild,
-                    url: message.url
+                    url: message.url,
                 })
 
                 if (!mentionInterval) {
@@ -170,7 +170,7 @@ async function addMention() {
                     type: "collection",
                     members: members.clone(),
                     message: mention.message,
-                    channelMembers: channelMembers
+                    channelMembers: channelMembers,
                 })
             }
             const member = members.get(memberID)
@@ -241,7 +241,6 @@ async function addMention() {
     const cpuUsage = await cpu.usage()
 
     const old = currentInterval
-
 
     if (cpuUsage < 95) {
         currentInterval = 750
