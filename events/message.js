@@ -1,9 +1,11 @@
 const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
 const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
-const { info } = require("../utils/logger")
+const { info, error } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
+const doCollection = require("../utils/workers/mentions")
+const { cpu } = require("node-os-utils")
 
 /**
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
@@ -61,10 +63,13 @@ module.exports = async (message) => {
                 type: "collection",
                 members: members.clone(),
                 message: message,
+                channelMembers: message.channel.members,
+                guild: message.guild,
+                url: message.url
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(() => addMention(), 100)
+                mentionInterval = setInterval(async () => await addMention(), 1000)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -78,11 +83,14 @@ module.exports = async (message) => {
                         type: "collection",
                         members: r.members.clone(),
                         message: message,
+                        channelMembers: message.channel.members,
+                        guild: message.guild,
+                        url: message.url
                     })
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 1000)
                 }
             }
 
@@ -91,10 +99,13 @@ module.exports = async (message) => {
                     type: "collection",
                     members: message.mentions.members.clone(),
                     message: message,
+                    channelMembers: message.channel.members,
+                    guild: message.guild,
+                    url: message.url
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(() => addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 1000)
                 }
             }
         }
@@ -121,7 +132,9 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
-function addMention() {
+let currentInterval = 1000
+
+async function addMention() {
     const mention = mentionQueue.shift()
 
     if (!mention) {
@@ -133,6 +146,12 @@ function addMention() {
     if (mention.type == "collection") {
         const members = mention.members
 
+        if (members.size > 500) {
+            await doCollection(mention).catch((e) => {
+                error(e)
+            })
+        }
+
         let content = mention.message.content
 
         if (content.length > 100) {
@@ -143,13 +162,7 @@ function addMention() {
 
         let count = 0
 
-        let channelMembers
-
-        try {
-            channelMembers = mention.message.channel.members
-        } catch {
-            return
-        }
+        let channelMembers = mention.channelMembers
 
         for (const memberID of Array.from(members.keys())) {
             if (count >= 150) {
@@ -157,6 +170,7 @@ function addMention() {
                     type: "collection",
                     members: members.clone(),
                     message: mention.message,
+                    channelMembers: channelMembers
                 })
             }
             const member = members.get(memberID)
@@ -197,7 +211,7 @@ function addMention() {
 
         addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
 
-        const mentions = fetchMentions.run(guild, target)
+        const mentions = fetchMentions.all(guild, target)
 
         let limit = 6
 
@@ -221,19 +235,36 @@ function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
-        cleanMentions()
+        currentInterval = 1000
+    }
+
+    const cpuUsage = await cpu.usage()
+
+    const old = currentInterval
+
+
+    if (cpuUsage < 95) {
+        currentInterval = 750
+    } else if (cpuUsage < 90) {
+        currentInterval = 500
+    } else if (cpuUsage < 75) {
+        currentInterval = 250
+    } else {
+        currentInterval = 1000
+    }
+
+    if (currentInterval != old) {
+        clearInterval(mentionInterval)
+        mentionInterval = setInterval(async () => await addMention(), currentInterval)
     }
 }
 
-let cleanCooldown = 0
 function cleanMentions() {
-    if (Date.now() - cleanCooldown < 600000) return
-
-    cleanCooldown = Date.now()
-
     const limit = Math.floor((Date.now() - 86400000) / 1000)
 
     const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
 
     if (changes > 0) info(`${changes} mentions deleted`)
 }
+
+setInterval(cleanMentions, 600000)
