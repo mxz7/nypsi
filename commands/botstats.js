@@ -116,17 +116,21 @@ async function run(message, args) {
                 "**uptime** " +
                 uptime,
             true
-    )
-        .addField("economy", `**users** ${getUserCount().toLocaleString()}
-         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`, true)
+        )
+        .addField(
+            "economy",
+            `**users** ${getUserCount().toLocaleString()}
+         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`,
+            true
+        )
         .addField(
             "cache",
-                "**snipe** " +
+            "**snipe** " +
                 snipedMessages.toLocaleString() +
                 "\n" +
                 "**imgs** " +
-                imgCache.toLocaleString() + 
-                "\n**mention queue** " + 
+                imgCache.toLocaleString() +
+                "\n**mention queue** " +
                 mentionQueue.length.toLocaleString(),
             true
         )
