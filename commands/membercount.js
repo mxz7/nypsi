@@ -245,15 +245,7 @@ async function run(message, args) {
         await channel
             .edit({ name: format })
             .then(() => {
-                logger.auto(
-                    "counter updated for '" +
-                        message.guild.name +
-                        "' ~ '" +
-                        old +
-                        "' -> '" +
-                        format +
-                        "'"
-                )
+                logger.auto("counter updated for '" + message.guild.name + "' ~ '" + old + "' -> '" + format + "'")
             })
             .catch(() => {
                 logger.error("error updating counter in " + message.guild.name)
