@@ -98,6 +98,17 @@ async function run(message, args) {
         memberCount = memberCount + g.memberCount
     })
 
+    let collections = 0
+    let mentions = 0
+
+    for (const mention of mentionQueue) {
+        if (mention.type == "collection") {
+            collections++
+        } else {
+            mentions++
+        }
+    }
+
     const embed = new CustomEmbed(message.member)
         .setTitle("stats")
         .addField(
