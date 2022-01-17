@@ -24,7 +24,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             case "guild":
                 color = clc.blue
                 break
-            case "economy":
+            case "eco":
                 color = clc.green
                 break
             case "auto":
