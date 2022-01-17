@@ -40,6 +40,7 @@ async function run(message, args) {
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
+    const { mentionQueue } = require("../events/message.js")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -116,23 +117,19 @@ async function run(message, args) {
                 "**uptime** " +
                 uptime,
             true
-        )
+    )
+        .addField("economy", `**users** ${getUserCount().toLocaleString()}
+         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}
+         `)
         .addField(
             "cache",
-            "**users (econ)** " +
-                getUserCount().toLocaleString() +
-                "\n" +
-                " -- **this server** " +
-                getUserCountGuild(message.guild) +
-                "\n" +
-                "**vote** " +
-                getVoteCacheSize().toLocaleString() +
-                "\n" +
                 "**snipe** " +
                 snipedMessages.toLocaleString() +
                 "\n" +
                 "**imgs** " +
-                imgCache.toLocaleString(),
+                imgCache.toLocaleString() + 
+                "**mention queue** " + 
+                mentionQueue.length.toLocaleString(),
             true
         )
         .addField(
