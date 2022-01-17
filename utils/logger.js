@@ -42,13 +42,13 @@ function info(string, type) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    const out = `[${clc.black(`${day}/${month} ${getTimestamp()}`)}] ${color(string)}`
+    const out = `[${clc.blackBright(`${day}/${month} ${getTimestamp()}`)}] ${color(string)}`
     console.log(out)
 
     const webhookLog = `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``
 
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", )
+        nextLogMsg.set("logs", webhookLog)
     } else {
         nextLogMsg.set("logs", nextLogMsg.get("logs") + webhookLog)
     }

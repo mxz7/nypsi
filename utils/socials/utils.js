@@ -19,7 +19,6 @@ if (!process.env.GITHUB_ACTION) {
                 }
                 info("socials data saved", types.DATA)
             })
-
             timer = 0
             timerCheck = false
         } else if (!timerCheck) {
