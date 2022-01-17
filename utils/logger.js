@@ -51,7 +51,7 @@ const levels = {
     auto: 2,
     cmd: 2,
     img: 2,
-    debug: 3
+    debug: 3,
 }
 
 const logger = winston.createLogger({
@@ -67,7 +67,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "14d",
             format: winston.format.simple(),
-            level: "error"
+            level: "error",
         }),
         new winston.transports.DailyRotateFile({
             filename: "./logs/warn-%DATE%.log",
@@ -76,7 +76,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "14d",
             format: winston.format.simple(),
-            level: "warn"
+            level: "warn",
         }),
         new winston.transports.DailyRotateFile({
             filename: "./logs/info-%DATE%.log",
@@ -85,7 +85,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "90d",
             format: winston.format.simple(),
-            level: "info"
+            level: "info",
         }),
         new winston.transports.Console(),
     ],
