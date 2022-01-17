@@ -144,15 +144,13 @@ async function run(message, args) {
                 imgCache.toLocaleString() +
                 "\n**mention queue** " +
                 mentionQueue.length.toLocaleString() +
-                "\n-- **collections** " + collections.toLocaleString() +
-                "\n-- **mentions** " + mentions.toLocaleString(),
+                "\n-- **collections** " +
+                collections.toLocaleString() +
+                "\n-- **mentions** " +
+                mentions.toLocaleString(),
             true
         )
-        .addField(
-            "usage",
-            `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`,
-            true
-        )
+        .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
 
     message.channel.send({ embeds: [embed] })
 }
