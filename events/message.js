@@ -11,6 +11,9 @@ const { cpu } = require("node-os-utils")
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
  */
 const mentionQueue = []
+/**
+ * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
+ */
 exports.mentionQueue = mentionQueue
 
 const db = getDatabase()
@@ -211,7 +214,14 @@ async function addMention() {
         const data = mention.data
         const target = mention.target
 
-        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
+        addMentionToDatabase.run(
+            guild,
+            target,
+            Math.floor(data.date / 1000),
+            data.user,
+            data.link,
+            data.content
+        )
 
         const mentions = fetchMentions.all(guild, target)
 
@@ -259,6 +269,9 @@ async function addMention() {
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
     }
 
+    /**
+     * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
+     */
     exports.mentionQueue = mentionQueue
 }
 
