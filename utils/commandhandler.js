@@ -6,7 +6,7 @@ const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } =
 const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
-const { info, types, error, getTimestamp } = require("./logger.js")
+const { logger, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
 const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
@@ -54,7 +54,7 @@ function loadCommands() {
                 if (command.aliases) {
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
-                            error(
+                            logger.error(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`
                             )
                         } else {
@@ -64,11 +64,11 @@ function loadCommands() {
                 }
             } else {
                 failedTable.push([file, "❌"])
-                error(file + " missing name, description, category or run")
+                logger.error(file + " missing name, description, category or run")
             }
         } catch (e) {
             failedTable.push([file, "❌"])
-            error(e)
+            logger.error(e)
         }
     }
     exports.aliasesSize = aliases.size
@@ -79,8 +79,8 @@ function loadCommands() {
         if (process.env.GITHUB_ACTION) process.exit(1)
     }
 
-    info(`${commands.size.toLocaleString()} commands loaded`)
-    info(`${aliases.size.toLocaleString()} aliases loaded`)
+    logger.info(`${commands.size.toLocaleString()} commands loaded`)
+    logger.info(`${aliases.size.toLocaleString()} aliases loaded`)
 }
 
 /**
@@ -96,7 +96,7 @@ function reloadCommand(commandsArray) {
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)]
             } catch (e) {
-                return error("error deleting from cache")
+                return logger.error("error deleting from cache")
             }
 
             const commandData = require(`../commands/${cmd}`)
@@ -112,7 +112,7 @@ function reloadCommand(commandsArray) {
                 if (commandData.aliases) {
                     for (let a of commandData.aliases) {
                         if (aliases.has(a) && aliases.get(a) != commandData.name) {
-                            error(
+                            logger.error(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
                                     commandData.name
                                 }] - not overwriting`
@@ -130,7 +130,7 @@ function reloadCommand(commandsArray) {
             }
         } catch (e) {
             reloadTable.push([cmd, "❌"])
-            error(e)
+            logger.error(e)
         }
     }
     exports.aliasesSize = aliases.size
@@ -479,7 +479,7 @@ async function runCommand(cmd, message, args) {
 
         await message.channel.send({ embeds: [embed] })
 
-        info(`sent captcha (${message.author.id}) - awaiting reply`)
+        logger.info(`sent captcha (${message.author.id}) - awaiting reply`)
 
         const filter = (m) => m.author.id == message.author.id
 
@@ -492,7 +492,7 @@ async function runCommand(cmd, message, args) {
             })
             .catch(() => {
                 fail = true
-                info(`captcha (${message.author.id}) failed`)
+                logger.info(`captcha (${message.author.id}) failed`)
                 return message.channel.send({
                     content:
                         message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
@@ -506,11 +506,11 @@ async function runCommand(cmd, message, args) {
         }
 
         if (response == captcha.answer) {
-            info(`captcha (${message.author.id}) passed`)
+            logger.info(`captcha (${message.author.id}) passed`)
             toggleLock(message.author.id)
             return message.react("✅")
         } else {
-            info(`captcha (${message.author.id}) failed`)
+            logger.info(`captcha (${message.author.id}) failed`)
             return message.channel.send({
                 content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
             })
@@ -619,7 +619,7 @@ async function runCommand(cmd, message, args) {
                             try {
                                 xpCooldown.delete(message.author.id)
                             } catch {
-                                error("error deleting from xpCooldown")
+                                logger.error("error deleting from xpCooldown")
                             }
                         }, 60000)
                     } catch {
@@ -627,7 +627,7 @@ async function runCommand(cmd, message, args) {
                     }
                 }
             } catch (e) {
-                error(e)
+                logger.error(e)
             }
         }, 10000)
     }
@@ -698,7 +698,7 @@ function logCommand(message, args) {
 
     const msg = `${message.guild.id} - ${message.author.tag}: ${content}`
 
-    info(msg, types.COMMAND)
+    logger.cmd(msg)
 }
 
 /**
@@ -757,13 +757,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         const guild = await client.guilds.fetch(serverID)
 
         if (!guild) {
-            return error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == channelID[0])
 
         if (!channel) {
-            return error("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
         }
 
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
@@ -805,7 +805,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         }
 
         await channel.send({ embeds: [embed] })
-        info("sent popular commands", types.AUTOMATION)
+        logger.auto("sent popular commands")
 
         popularCommands.clear()
         noLifers.clear()
@@ -815,13 +815,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         const guild = await client.guilds.fetch(serverID)
 
         if (!guild) {
-            return error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == channelID[1])
 
         if (!channel) {
-            return error("UNABLE TO FIND CHANNEL FOR HOURLY COMMAND USE LOG", serverID, channelID)
+            return logger.error("UNABLE TO FIND CHANNEL FOR HOURLY COMMAND USE LOG", serverID, channelID)
         }
 
         for (const user of commandUses.keys()) {
@@ -870,7 +870,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         setTimeout(updateKarma, 60000)
     }, 3600000)
 
-    info(`popular commands will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+    logger.auto(`popular commands will run in ${MStoTime(needed - now)}`)
 }
 
 exports.runPopularCommandsTimer = runPopularCommandsTimer

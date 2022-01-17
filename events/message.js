@@ -1,7 +1,7 @@
 const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
 const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
 const { runCommand } = require("../utils/commandhandler")
-const { info, error } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
@@ -21,7 +21,7 @@ module.exports = async (message) => {
     if (message.author.bot) return
 
     if (!message.guild) {
-        info("message in DM from " + message.author.tag + ": " + message.content)
+        logger.info("message in DM from " + message.author.tag + ": " + message.content)
 
         const embed = new MessageEmbed()
             .setTitle("support")
@@ -148,7 +148,7 @@ async function addMention() {
 
         if (members.size > 500) {
             await doCollection(mention).catch((e) => {
-                error(e)
+                logger.error(e)
             })
         }
 
@@ -268,7 +268,7 @@ function cleanMentions() {
 
     const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit)
 
-    if (changes > 0) info(`${changes} mentions deleted`)
+    if (changes > 0) logger.info(`${changes} mentions deleted`)
 }
 
 setInterval(cleanMentions, 600000)
