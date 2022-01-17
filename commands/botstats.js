@@ -40,6 +40,7 @@ async function run(message, args) {
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
+    const { mentionQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -87,7 +88,6 @@ async function run(message, args) {
         }
     } catch (error) {
         console.error("error counting image cache")
-        console.error(error)
     }
 
     let memberCount = 0
@@ -118,21 +118,20 @@ async function run(message, args) {
             true
         )
         .addField(
+            "economy",
+            `**users** ${getUserCount().toLocaleString()}
+         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`,
+            true
+        )
+        .addField(
             "cache",
-            "**users (econ)** " +
-                getUserCount().toLocaleString() +
-                "\n" +
-                " -- **this server** " +
-                getUserCountGuild(message.guild) +
-                "\n" +
-                "**vote** " +
-                getVoteCacheSize().toLocaleString() +
-                "\n" +
-                "**snipe** " +
+            "**snipe** " +
                 snipedMessages.toLocaleString() +
                 "\n" +
                 "**imgs** " +
-                imgCache.toLocaleString(),
+                imgCache.toLocaleString() +
+                "\n**mention queue** " +
+                mentionQueue.length.toLocaleString(),
             true
         )
         .addField(

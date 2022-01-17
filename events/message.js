@@ -7,10 +7,6 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
 const { cpu } = require("node-os-utils")
 
-/**
- * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
- */
-const mentionQueue = []
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
@@ -49,6 +45,8 @@ module.exports = async (message) => {
             }
         }
     }
+
+    const { mentionQueue } = require("../utils/users/utils")
 
     if (message.guild.memberCount < 250000) {
         if (message.mentions.everyone) {
@@ -135,6 +133,8 @@ module.exports = async (message) => {
 let currentInterval = 1000
 
 async function addMention() {
+    const { mentionQueue } = require("../utils/users/utils")
+
     const mention = mentionQueue.shift()
 
     if (!mention) {
@@ -256,6 +256,11 @@ async function addMention() {
         clearInterval(mentionInterval)
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
     }
+
+    /**
+     * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
+     */
+    exports.mentionQueue = mentionQueue
 }
 
 function cleanMentions() {
