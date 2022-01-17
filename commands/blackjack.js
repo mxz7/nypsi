@@ -17,7 +17,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { gamble } = require("../utils/logger.js")
+const { gamble, error } = require("../utils/logger.js")
 
 const cooldown = new Map()
 const games = new Map()
@@ -256,7 +256,7 @@ async function run(message, args) {
         .send({ embeds: [embed], components: [row] })
         .then((m) => {
             playGame(message, m).catch((e) => {
-                console.error(e)
+                error(e)
                 return message.channel.send({
                     embeds: [new ErrorEmbed("an error occured while running - join support server")],
                 })
