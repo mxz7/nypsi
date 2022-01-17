@@ -3,6 +3,7 @@ const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../utils/
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
+const { error } = require("../utils/logger")
 
 const cooldown = new Map()
 
@@ -86,8 +87,8 @@ async function run(message, args) {
         for (let link of Array.from(snekCache.keys())) {
             imgCache = imgCache + snekCache.get(link).length
         }
-    } catch (error) {
-        console.error("error counting image cache")
+    } catch {
+        error("error counting image cache")
     }
 
     let memberCount = 0

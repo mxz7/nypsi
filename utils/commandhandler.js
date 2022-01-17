@@ -68,7 +68,7 @@ function loadCommands() {
             }
         } catch (e) {
             failedTable.push([file, "❌"])
-            console.log(e)
+            error(e)
         }
     }
     exports.aliasesSize = aliases.size
@@ -130,7 +130,7 @@ function reloadCommand(commandsArray) {
             }
         } catch (e) {
             reloadTable.push([cmd, "❌"])
-            console.log(e)
+            error(e)
         }
     }
     exports.aliasesSize = aliases.size
@@ -627,7 +627,7 @@ async function runCommand(cmd, message, args) {
                     }
                 }
             } catch (e) {
-                console.log(e)
+                error(e)
             }
         }, 10000)
     }
