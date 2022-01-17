@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-const { error, info, types } = require("./logger")
+const { logger } = require("./logger")
 
 const pornCache = new Map()
 const bdsmCache = new Map()
@@ -99,7 +99,7 @@ async function cacheUpdate(links, imgs, name) {
         const res = await fetch(link).then((a) => a.json())
 
         if (res.message == "Forbidden") {
-            error(`skipped ${link} due to private subreddit`)
+            logger.error(`skipped ${link} due to private subreddit`)
             continue
         }
 
@@ -108,17 +108,17 @@ async function cacheUpdate(links, imgs, name) {
             imgs.set(link, allowed)
             amount += allowed.length
         } else {
-            error(`no images @ ${link}`)
+            logger.error(`no images @ ${link}`)
         }
     }
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    info(`${amount} ${name} images loaded (${total})`, types.IMAGE)
+    logger.img(`${amount} ${name} images loaded (${total})`)
 }
 
 async function updateCache() {
     const start = new Date().getTime()
-    info("img caches updating..", types.IMAGE)
+    logger.img("img caches updating..")
     await cacheUpdate(bdsmLinks, bdsmCache, "bdsm")
     exports.bdsmCache = bdsmCache
     await cacheUpdate(thighsLinks, thighsCache, "thighs")
@@ -145,7 +145,7 @@ async function updateCache() {
     exports.snekCache = snekCache
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    info("images updated (" + total + ")", types.IMAGE)
+    logger.img("images updated (" + total + ")")
 }
 
 exports.updateCache = updateCache
