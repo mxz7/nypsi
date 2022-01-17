@@ -301,9 +301,7 @@ function checkStats() {
                 await channel
                     .edit({ name: format })
                     .then(() => {
-                        logger.auto(
-                            "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'"
-                        )
+                        logger.auto("counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
                     })
                     .catch(() => {
                         logger.warn("error updating counter in " + guild.name)
