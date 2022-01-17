@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { info } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cmd = new Command("reload", "reload commands", categories.NONE).setPermissions(["bot owner"])
 
@@ -16,7 +16,7 @@ async function run(message, args) {
     if (args.length == 0) {
         loadCommands()
         message.react("✅")
-        info("commands reloaded")
+        logger.info("commands reloaded")
     } else {
         let msg
 

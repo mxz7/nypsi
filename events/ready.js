@@ -1,6 +1,6 @@
 const { Client } = require("discord.js")
 const { getRandomCommand } = require("../utils/commandhandler")
-const { info, types } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 const { daysUntilChristmas } = require("../utils/utils")
 
 /**
@@ -71,14 +71,14 @@ module.exports = async (client, startUp) => {
         memberCount = memberCount + g.memberCount
     })
 
-    info("server count: " + client.guilds.cache.size.toLocaleString(), types.INFO)
-    info("user count: " + memberCount.toLocaleString(), types.INFO)
-    info("commands count: " + commandsSize, types.INFO)
+    logger.info("server count: " + client.guilds.cache.size.toLocaleString())
+    logger.info("user count: " + memberCount.toLocaleString())
+    logger.info("commands count: " + commandsSize)
 
-    info("logged in as " + client.user.tag, types.INFO)
+    logger.info("logged in as " + client.user.tag)
 
     const now = Date.now()
     const timeTaken = (now - startUp) / 1000
 
-    info(`time taken: ${timeTaken}s\n`, types.INFO)
+    logger.info(`time taken: ${timeTaken}s\n`)
 }
