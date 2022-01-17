@@ -134,7 +134,7 @@ let currentInterval = 1000
 
 async function addMention() {
     const { mentionQueue } = require("../utils/users/utils")
-    
+
     const mention = mentionQueue.shift()
 
     if (!mention) {
@@ -209,14 +209,7 @@ async function addMention() {
         const data = mention.data
         const target = mention.target
 
-        addMentionToDatabase.run(
-            guild,
-            target,
-            Math.floor(data.date / 1000),
-            data.user,
-            data.link,
-            data.content
-        )
+        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
 
         const mentions = fetchMentions.all(guild, target)
 
