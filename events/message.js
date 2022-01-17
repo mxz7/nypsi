@@ -207,7 +207,7 @@ async function addMention() {
             count++
         }
     } else {
-        for (let i = 0; i < 150; i++) {
+        for (let i = 0; i < 50; i++) {
             if (mention.type == "collection") {
                 return mentionQueue.unshift(mention)
             }
