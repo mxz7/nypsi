@@ -1,3 +1,5 @@
+const { error } = require("../logger")
+
 class PremUser {
     /**
      * @returns {PremUser}
@@ -160,7 +162,7 @@ class PremUser {
         }
 
         const e = await requestRemoveRole(this.id, roleID).catch((e) => {
-            console.log(e)
+            error(e)
         })
 
         if (e == "boost") {

@@ -54,7 +54,7 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(stats) != JSON.stringify(stats1)) {
             fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
                 if (err) {
-                    return console.log(err)
+                    return error(err)
                 }
                 info("economy stats data saved", types.DATA)
             })
@@ -171,7 +171,7 @@ async function updateCryptoWorth() {
 
     if (!dogeworth) {
         error("INVALID DOGECOIN WORTH")
-        return console.error(res)
+        return error(res)
     }
 
     items["dogecoin"].worth = dogeworth
@@ -1154,7 +1154,7 @@ function toggleBan(id) {
     if (JSON.stringify(banned) != JSON.stringify(banned1)) {
         fs.writeFile("./utils/economy/ban.json", JSON.stringify(banned), (err) => {
             if (err) {
-                return console.log(err)
+                return error(err)
             }
             info("banned data saved", types.DATA)
         })

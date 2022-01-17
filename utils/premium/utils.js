@@ -2,7 +2,7 @@ const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { PremUser, status } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
-const { info, types, getTimestamp } = require("../logger")
+const { info, types, getTimestamp, error } = require("../logger")
 const { formatDate } = require("../utils")
 
 let commands = {}
@@ -22,7 +22,7 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(commands) != JSON.stringify(data1)) {
             fs.writeFile("./utils/premium/commands.json", JSON.stringify(commands), (err) => {
                 if (err) {
-                    return console.log(err)
+                    return error(err)
                 }
                 info("premium commands data saved", types.DATA)
             })
