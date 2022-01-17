@@ -15,7 +15,6 @@ const {
     getInventory,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { profileExistsID, getProfileID } = require("../utils/socials/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { daysAgo, daysUntil } = require("../utils/utils")
@@ -117,25 +116,6 @@ async function run(message, args) {
             "💲 patreon",
             `**tier** ${tierString}\n**level** ${tier}\n**color** #${embedColor}\n**daily** ${lastDaily}
         **weekly** ${lastWeekly}\n**status** ${status}\n**reason** ${revokeReason}\n**start** ${startDate}\n**expire** ${expireDate}`,
-            true
-        )
-    }
-
-    //SOCIALS
-    let youtube, twitter, instagram, snapchat, email
-
-    if (profileExistsID(message.author.id)) {
-        const profile = getProfileID(message.author.id)
-
-        youtube = profile.youtube.join(" & ")
-        twitter = profile.twitter.join(" & ")
-        instagram = profile.instagram.join(" & ")
-        snapchat = profile.snapchat.join(" & ")
-        email = profile.email.join(" & ")
-
-        embed.addField(
-            "💬 socials",
-            `**youtube** ${youtube}\n**twitter** ${twitter}\n**instagram** ${instagram}\n**snapchat** ${snapchat}\n**email** ${email}`,
             true
         )
     }
