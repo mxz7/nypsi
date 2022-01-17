@@ -51,7 +51,7 @@ const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandle
 const { updateCache } = require("./utils/imghandler")
 const { MStoTime, showTopGlobalBal } = require("./utils/utils")
 const { runModerationChecks } = require("./utils/moderation/utils")
-const { info, types, error, getWebhooks } = require("./utils/logger")
+const { getWebhooks, logger } = require("./utils/logger")
 
 const snipe = new Map()
 const eSnipe = new Map()
@@ -81,7 +81,7 @@ if (!process.env.GITHUB_ACTION) {
     client.on("rateLimit", (rate) => {
         const a = rate.route.split("/")
         const reason = a[a.length - 1]
-        error("rate limit: " + reason)
+        logger.error("rate limit: " + reason)
     })
     client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
     client.on("guildMemberAdd", guildMemberAdd.bind(null))
@@ -94,15 +94,15 @@ if (!process.env.GITHUB_ACTION) {
     client.on("userUpdate", userUpdate.bind(null))
 }
 
-client.on("shardReady", (shardID) => info(`shard#${shardID} ready`, types.INFO))
-client.on("shardDisconnect", (s, shardID) => info(`shard#${shardID} disconnected`))
-client.on("shardError", (error1, shardID) => error(`shard#${shardID} error: ${error1}`))
-client.on("shardReconnecting", (shardID) => info(`shard#${shardID} connecting`))
+client.on("shardReady", (shardID) => logger.info(`shard#${shardID} ready`))
+client.on("shardDisconnect", (s, shardID) => logger.info(`shard#${shardID} disconnected`))
+client.on("shardError", (error1, shardID) => logger.error(`shard#${shardID} error: ${error1}`))
+client.on("shardReconnecting", (shardID) => logger.info(`shard#${shardID} connecting`))
 
 process.on("unhandledRejection", (e) => {
     let stack = e.stack.split("\n").join("\n\x1b[31m")
 
-    error(stack)
+    logger.error(stack)
 })
 
 async function checkGuild(guildID) {
@@ -138,11 +138,11 @@ async function runChecks() {
 
     setInterval(async () => {
         await updateStats(client.guilds.cache.size, client.options.shardCount)
-        info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
+        logger.auto("guild count posted to top.gg: " + client.guilds.cache.size)
     }, 3600000)
 
     await updateStats(client.guilds.cache.size, client.options.shardCount)
-    info("guild count posted to top.gg: " + client.guilds.cache.size, types.AUTOMATION)
+    logger.auto("guild count posted to top.gg: " + client.guilds.cache.size)
 }
 
 /**
@@ -161,17 +161,17 @@ exports.onVote = onVote
  * @param {Boolean} dontDmTekoh
  */
 async function requestDM(id, content, dontDmTekoh) {
-    info(`DM requested with ${id}`)
+    logger.info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
     if (member) {
         await member
             .send({ content: content })
             .then(() => {
-                info(`successfully sent DM to ${member.tag} (${member.id})`)
+                logger.info(`successfully sent DM to ${member.tag} (${member.id})`)
             })
             .catch(async () => {
-                error(`failed to send DM to ${member.tag} (${member.id})`)
+                logger.error(`failed to send DM to ${member.tag} (${member.id})`)
                 if (!dontDmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347")
 
@@ -180,7 +180,7 @@ async function requestDM(id, content, dontDmTekoh) {
             })
         return true
     } else {
-        error(`failed to send DM to ${member.id}`)
+        logger.error(`failed to send DM to ${member.id}`)
         if (!dontDmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347")
 
@@ -258,7 +258,7 @@ async function getGuild(guildID) {
 exports.getGuild = getGuild
 
 setTimeout(() => {
-    info("logging in...", types.INFO)
+    logger.info("logging in...")
     client.login(process.env.BOT_TOKEN).then(() => {
         setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"])
