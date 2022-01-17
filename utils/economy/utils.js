@@ -254,7 +254,7 @@ async function doVote(client, vote) {
                 logger.eco(`sent vote confirmation to ${member.tag}`)
             })
             .catch(() => {
-                logger.error(`failed to send vote confirmation to ${member.tag}`)
+                logger.warn(`failed to send vote confirmation to ${member.tag}`)
             })
     }
 }

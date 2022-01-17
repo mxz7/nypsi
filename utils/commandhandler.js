@@ -54,7 +54,7 @@ function loadCommands() {
                 if (command.aliases) {
                     for (let a of command.aliases) {
                         if (aliases.has(a)) {
-                            logger.error(
+                            logger.warn(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`
                             )
                         } else {

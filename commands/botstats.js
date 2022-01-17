@@ -88,7 +88,7 @@ async function run(message, args) {
             imgCache = imgCache + snekCache.get(link).length
         }
     } catch {
-        logger.error("error counting image cache")
+        logger.warn("error counting image cache")
     }
 
     let memberCount = 0
