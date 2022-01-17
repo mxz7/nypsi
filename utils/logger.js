@@ -35,7 +35,7 @@ function info(string, type) {
             color = clc.yellow
             break
         case types.IMAGE:
-            color = clc.gren
+            color = clc.green
             break
     }
 
