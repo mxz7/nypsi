@@ -11,6 +11,8 @@ const { cpu } = require("node-os-utils")
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
  */
 const mentionQueue = []
+exports.mentionQueue = mentionQueue
+
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
@@ -256,6 +258,8 @@ async function addMention() {
         clearInterval(mentionInterval)
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
     }
+
+    exports.mentionQueue = mentionQueue
 }
 
 function cleanMentions() {
