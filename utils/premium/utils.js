@@ -2,13 +2,13 @@ const { GuildMember } = require("discord.js")
 const fs = require("fs")
 const { PremUser, status } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
-const { info, types, getTimestamp, error } = require("../logger")
+const { logger } = require("../logger")
 const { formatDate } = require("../utils")
 
 let commands = {}
 if (!process.env.GITHUB_ACTION) commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
 
-info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`, types.DATA)
+logger.info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`)
 const db = getDatabase()
 
 const isPremiumCache = new Map()
@@ -22,9 +22,9 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(commands) != JSON.stringify(data1)) {
             fs.writeFile("./utils/premium/commands.json", JSON.stringify(commands), (err) => {
                 if (err) {
-                    return error(err)
+                    return logger.error(err)
                 }
-                info("premium commands data saved", types.DATA)
+                logger.info("premium commands data saved")
             })
         }
     }, 120000 + Math.floor(Math.random() * 60) * 1000)
@@ -125,7 +125,7 @@ function addMember(member, level) {
 
     const profile = getPremiumProfile(id)
 
-    info(`premium level ${level} given to ${id}`)
+    logger.info(`premium level ${level} given to ${id}`)
 
     const { requestDM } = require("../../nypsi")
     requestDM(
@@ -175,7 +175,7 @@ function setTier(member, level) {
 
     db.prepare("UPDATE premium SET level = ? WHERE id = ?").run(level, id)
 
-    info(`premium level updated to ${level} for ${id}`)
+    logger.info(`premium level updated to ${level} for ${id}`)
 
     const { requestDM } = require("../../nypsi")
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`)
