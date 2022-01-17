@@ -1,4 +1,6 @@
 const { Client, Webhook, User } = require("discord.js")
+const winston = require("winston")
+require("winston-daily-rotate-file")
 const clc = require("cli-color")
 
 /**
@@ -9,6 +11,70 @@ let webhook = new Map()
  * @type {Map<String, String>}
  */
 let nextLogMsg = new Map()
+
+const format = winston.format.printf(({ level, message, timestamp, label }) => {
+    if (level == "error") {
+        return `[${clc.blackBright(timestamp)}] ${clc.red(`[error] ${message}`)}`
+    } else if (level == "warn") {
+        return `[${clc.blackBright(timestamp)}] ${clc.yellowBright(`[warn] ${message}`)}`
+    } else if (level == "info") {
+        let color
+
+        switch (label) {
+            case "guild":
+                color = clc.blue
+                break
+            case "economy":
+                color = clc.green
+                break
+            case "auto":
+                color = clc.blue
+                break
+            case "cmd":
+                color = clc.yellow
+                break
+            case "img":
+                color = clc.green
+                break
+        }
+
+        return `[${clc.blackBright(timestamp)}] ${color(message)}`
+    }
+})
+
+const logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.timestamp({ format: "DD/MM HH:mm:ss" }),
+        format
+    ),
+    
+    transports: [
+        new winston.transports.DailyRotateFile({
+            filename: "error-%DATE%",
+            datePattern: "YYYY-MM-DD-HH",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "14d"
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: "warn-%DATE%",
+            datePattern: "YYYY-MM-DD-HH",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "14d"
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: "info-%DATE%",
+            datePattern: "YYYY-MM-DD-HH",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "90d"
+        }),
+        new winston.transports.Console()
+    ]
+})
+
+exports.logger = logger
 
 function info(string, type) {
     let color
