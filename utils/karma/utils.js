@@ -1,5 +1,5 @@
 const { getDatabase } = require("../database/database")
-const { info, types } = require("../logger")
+const { logger } = require("../logger")
 const { MStoTime } = require("../utils")
 
 const db = getDatabase()
@@ -143,7 +143,7 @@ function deteriorateKarma() {
         db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id)
     }
 
-    info(`${total} total karma deteriorated`, types.AUTOMATION)
+    logger.auto(`${total} total karma deteriorated`)
 }
 
 // prettier-ignore
@@ -165,5 +165,5 @@ function deteriorateKarma() {
         deteriorateKarma()
     }, needed - now)
 
-    info(`karma deterioration will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+    logger.auto(`karma deterioration will run in ${MStoTime(needed - now)}`)
 })()

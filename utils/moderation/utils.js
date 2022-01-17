@@ -1,6 +1,6 @@
 const { inCooldown, addCooldown } = require("../guilds/utils")
 const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
-const { info, types, getTimestamp, error } = require("../logger")
+const { logger } = require("../logger")
 const { getDatabase } = require("../database/database")
 
 const db = getDatabase()
@@ -16,7 +16,7 @@ setInterval(async () => {
         if (!exists) {
             deleteServer(guild)
 
-            info(`deleted guild '${guild.id}' from moderation data`, types.GUILD)
+            logger.guild(`deleted guild '${guild.id}' from moderation data`)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -255,14 +255,14 @@ function runModerationChecks(client) {
 
         for (let unmute of query) {
             requestUnmute(unmute.guild_id, unmute.user, client)
-            info(`requested unmute in ${unmute.guild_id} for ${unmute.user}`, types.AUTOMATION)
+            logger.auto(`requested unmute in ${unmute.guild_id} for ${unmute.user}`)
         }
 
         query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date)
 
         for (let unban of query) {
             requestUnban(unban.guild_id, unban.user, client)
-            info(`requested unban in ${unban.guild_id} for ${unban.user}`, types.AUTOMATION)
+            logger.auto(`requested unban in ${unban.guild_id} for ${unban.user}`)
         }
     }, 30000)
 }
@@ -389,13 +389,7 @@ async function requestUnmute(guild, member, client) {
 
     deleteMute(guild, member)
 
-    try {
-        return await newMember.roles.remove(muteRole).catch((e) => {
-            error(newMember)
-            error(e + " hahaha")
-        })
-    } catch (e) {
-        error(newMember)
-        error(e + " hahaha")
-    }
+    return await newMember.roles.remove(muteRole).catch((e) => {
+        logger.error("couldnt remove mute role")
+    })
 }

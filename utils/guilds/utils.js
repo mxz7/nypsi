@@ -3,7 +3,7 @@ const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { Countdown } = require("../classes/GuildStorage")
 const { getDatabase, toArray, toStorage } = require("../database/database")
-const { info, types, error } = require("../logger")
+const { logger } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
 const db = getDatabase()
 
@@ -26,7 +26,7 @@ setInterval(async () => {
     })
 
     if (snipeCount > 0) {
-        info("deleted " + snipeCount.toLocaleString() + " sniped messages", types.AUTOMATION)
+        logger.auto("deleted " + snipeCount.toLocaleString() + " sniped messages")
     }
 
     await eSnipe.forEach((msg) => {
@@ -39,7 +39,7 @@ setInterval(async () => {
     })
 
     if (eSnipeCount > 0) {
-        info("deleted " + eSnipeCount.toLocaleString() + " edit sniped messages", types.AUTOMATION)
+        logger.auto("deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
     }
 }, 3600000)
 
@@ -58,7 +58,7 @@ setInterval(async () => {
 
             if (existsCooldown.has(guild)) existsCooldown.delete(guild)
 
-            info(`deleted guild '${guild.id}' from guild data`, types.GUILD)
+            logger.guild(`deleted guild '${guild.id}' from guild data`)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -86,7 +86,7 @@ function runCheck(guild) {
 
         if (existsCooldown.has(guild)) existsCooldown.delete(guild)
 
-        info(`deleted guild '${guild.id}' from guild data`, types.GUILD)
+        logger.guild(`deleted guild '${guild.id}' from guild data`)
         return
     }
 
@@ -94,14 +94,13 @@ function runCheck(guild) {
 
     if (guild.memberCount > currentMembersPeak) {
         db.prepare("UPDATE guilds SET peak = ? WHERE id = ?").run(guild.memberCount, guild.id)
-        info(
+        logger.auto(
             "members peak updated for '" +
                 guild.name +
                 "' " +
                 currentMembersPeak.toLocaleString() +
                 " -> " +
-                guild.memberCount.toLocaleString(),
-            types.AUTOMATION
+                guild.memberCount.toLocaleString()
         )
     }
 }
@@ -302,13 +301,12 @@ function checkStats() {
                 await channel
                     .edit({ name: format })
                     .then(() => {
-                        info(
-                            "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
-                            types.AUTOMATION
+                        logger.auto(
+                            "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'"
                         )
                     })
                     .catch(() => {
-                        error("error updating counter in " + guild.name)
+                        logger.warn("error updating counter in " + guild.name)
                         profile.enabled = false
                         profile.channel = "none"
                         setStatsProfile(guild, profile)
@@ -371,7 +369,7 @@ function getPrefix(guild) {
         return query.prefix
     } catch (e) {
         if (!hasGuild(guild)) createGuild(guild)
-        error("couldn't fetch prefix for server " + guild.id)
+        logger.warn("couldn't fetch prefix for server " + guild.id)
         return "$"
     }
 }
@@ -488,10 +486,10 @@ async function checkChristmasCountdown(guild) {
             embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
         })
         .then(() => {
-            info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
+            logger.auto(`sent christmas countdown in ${guild.name} ~ ${format}`)
         })
         .catch(() => {
-            error(`error sending christmas countdown in ${guild.name}`)
+            logger.error(`error sending christmas countdown in ${guild.name}`)
             profile.enabled = false
             profile.channel = "none"
             setChristmasCountdown(guild, profile)
@@ -702,10 +700,10 @@ function runCountdowns(client) {
                 await channel
                     .send({ embeds: [embed] })
                     .then(() => {
-                        info(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`, types.AUTOMATION)
+                        logger.auto(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`)
                     })
                     .catch(() => {
-                        error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
+                        logger.error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
                     })
 
                 if (days <= 0) {
@@ -722,7 +720,7 @@ function runCountdowns(client) {
         runCountdowns()
     }, needed - now)
 
-    info(`custom countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+    logger.auto(`custom countdowns will run in ${MStoTime(needed - now)}`)
 }
 
 exports.runCountdowns = runCountdowns
@@ -772,10 +770,10 @@ function runChristmas(client) {
                     embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
                 })
                 .then(() => {
-                    info(`sent christmas countdown in ${guild.name} ~ ${format}`, types.AUTOMATION)
+                    logger.auto(`sent christmas countdown in ${guild.name} ~ ${format}`)
                 })
                 .catch(() => {
-                    error(`error sending christmas countdown in ${guild.name}`)
+                    logger.error(`error sending christmas countdown in ${guild.name}`)
                     profile.enabled = false
                     profile.channel = "none"
                     setChristmasCountdown(guild, profile)
@@ -791,7 +789,7 @@ function runChristmas(client) {
         runChristmasThing()
     }, needed - now)
 
-    info(`christmas countdowns will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+    logger.auto(`christmas countdowns will run in ${MStoTime(needed - now)}`)
 }
 
 exports.runChristmas = runChristmas

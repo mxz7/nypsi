@@ -90,66 +90,6 @@ const logger = winston.createLogger({
 
 exports.logger = logger
 
-function info(string, type) {
-    let color
-
-    if (!type) type = types.INFO
-
-    switch (type) {
-        case types.INFO:
-            color = clc.white
-            break
-        case types.GUILD:
-            color = clc.blue
-            break
-        case types.ECONOMY:
-            color = clc.green
-            break
-        case types.DATA:
-            color = clc.green
-            break
-        case types.AUTOMATION:
-            color = clc.blue
-            break
-        case types.COMMAND:
-            color = clc.yellow
-            break
-        case types.IMAGE:
-            color = clc.green
-            break
-    }
-
-    const day = new Date().getDate()
-    const month = new Date().getMonth() + 1
-
-    const out = `[${clc.blackBright(`${day}/${month} ${getTimestamp()}`)}] ${color(string)}`
-    console.log(out)
-
-    const webhookLog = `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``
-
-    if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", webhookLog)
-    } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + webhookLog)
-    }
-}
-
-exports.info = info
-
-function error(string) {
-    const day = new Date().getDate()
-    const month = new Date().getMonth() + 1
-
-    console.error(`[${clc.black(`${day}/${month} ${getTimestamp()}`)}] ${clc.red(string)}`)
-    if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
-    } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
-    }
-}
-
-exports.error = error
-
 /**
  *
  * @param {String} content
@@ -286,7 +226,7 @@ async function getWebhooks(client) {
     const guild = await client.guilds.fetch("747056029795221513")
 
     if (!guild) {
-        return error("UNABLE TO GET GUILD FOR LOGS")
+        return logger.error("UNABLE TO GET GUILD FOR LOGS")
     }
 
     const webhooks = await guild.fetchWebhooks()
@@ -294,17 +234,17 @@ async function getWebhooks(client) {
     const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266")
 
     webhook.set("pay", paymentLogs)
-    info(`payment logs webhook running ${paymentLogs.id}`)
+    logger.info(`payment logs webhook running ${paymentLogs.id}`)
 
     const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333")
 
     webhook.set("gamble", gambleLogs)
-    info(`gamble logs webhook running ${gambleLogs.id}`)
+    logger.info(`gamble logs webhook running ${gambleLogs.id}`)
 
     const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176")
 
     webhook.set("sql", sqlLogs)
-    info(`sql logs webhook running ${sqlLogs.id}`)
+    logger.info(`sql logs webhook running ${sqlLogs.id}`)
 
     runLogs()
 }
