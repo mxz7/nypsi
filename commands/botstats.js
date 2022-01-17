@@ -88,7 +88,6 @@ async function run(message, args) {
         }
     } catch (error) {
         console.error("error counting image cache")
-        console.error(error)
     }
 
     let memberCount = 0
@@ -119,8 +118,7 @@ async function run(message, args) {
             true
     )
         .addField("economy", `**users** ${getUserCount().toLocaleString()}
-         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}
-         `)
+         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`, true)
         .addField(
             "cache",
                 "**snipe** " +
