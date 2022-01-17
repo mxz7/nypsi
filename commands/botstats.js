@@ -97,8 +97,6 @@ async function run(message, args) {
         memberCount = memberCount + g.memberCount
     })
 
-    console.log(mentionQueue)
-
     const embed = new CustomEmbed(message.member)
         .setTitle("stats")
         .addField(
@@ -128,7 +126,7 @@ async function run(message, args) {
                 "\n" +
                 "**imgs** " +
                 imgCache.toLocaleString() + 
-                "**mention queue** " + 
+                "\n**mention queue** " + 
                 mentionQueue.length.toLocaleString(),
             true
         )
