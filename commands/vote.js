@@ -54,10 +54,15 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
+    let prestige = getPrestige(message.author.id)
+
+    if (prestige > 15) prestige = 15
+
     const prefix = getPrefix(message.guild)
-    const amount = 15000 * (getPrestige(message.member) + 1)
+    const amount = 15000 * (prestige + 1)
     const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)
+    const crateAmount = Math.floor(prestige / 2 + 1)
 
     const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
@@ -73,8 +78,8 @@ async function run(message, args) {
         embed.addField(
             "rewards",
             `× +**10**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${
-                getPrestige(message.member) + 1
-            }** vote crate${getPrestige(message.member) > 0 ? "s" : ""}`
+                crateAmount
+            }** vote crate${crateAmount > 1 ? "s" : ""}`
         )
         embed.setFooter("you get increased rewards for prestiging")
         removeFromVoteCache(message.member)

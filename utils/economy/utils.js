@@ -223,7 +223,11 @@ async function doVote(client, vote) {
         memberID = member.id
     }
 
-    const amount = 15000 * (getPrestige(memberID) + 1)
+    let prestige = getPrestige(memberID)
+
+    if (prestige > 15) prestige = 15
+
+    const amount = 15000 * (prestige + 1)
     const multi = Math.floor((await getMulti(memberID)) * 100)
     const inventory = getInventory(memberID)
 
@@ -231,9 +235,9 @@ async function doVote(client, vote) {
     addKarma(memberID, 15)
 
     if (inventory["vote_crate"]) {
-        inventory["vote_crate"] += getPrestige(memberID) + 1
+        inventory["vote_crate"] += Math.floor(prestige / 2 + 1)
     } else {
-        inventory["vote_crate"] = getPrestige(memberID) + 1
+        inventory["vote_crate"] = Math.floor(prestige / 2 + 1)
     }
 
     setInventory(memberID, inventory)
@@ -245,7 +249,7 @@ async function doVote(client, vote) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     `+ **10**% multiplier, total: **${multi}**%\n` +
-                    `+ **${getPrestige(memberID) + 1}** vote crates`
+                    `+ **${Math.floor(prestige / 2 + 1)}** vote crates`
             )
 
         await member
