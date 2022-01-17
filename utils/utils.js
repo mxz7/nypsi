@@ -4,7 +4,7 @@ const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
 const { getDatabase } = require("./database/database")
-const { error, info, types } = require("./logger")
+const { logger } = require("./logger")
 const db = getDatabase()
 const imgur = require("imgur")
 imgur.setClientId(process.env.IMGUR_TOKEN)
@@ -15,7 +15,7 @@ let uploadDisabled = false
 let uploadCount = 0
 setInterval(() => {
     uploadCount = 0
-    info("imgur upload count reset")
+    logger.info("imgur upload count reset")
 }, 86400000)
 
 const news = {
@@ -83,7 +83,7 @@ async function redditImage(post, allowed) {
 
     while (!isImageUrl(image)) {
         if (count >= 10) {
-            error("couldnt find image @ " + post.data.subreddit_name_prefixed)
+            logger.warn("couldnt find image @ " + post.data.subreddit_name_prefixed)
             return "lol"
         }
 
@@ -412,13 +412,13 @@ async function showTopGlobalBal(client) {
         const guild = await client.guilds.fetch("747056029795221513")
 
         if (!guild) {
-            return error("UNABLE TO FETCH GUILD FOR GLOBAL BAL TOP")
+            return logger.error("UNABLE TO FETCH GUILD FOR GLOBAL BAL TOP")
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == "833052442069434429")
 
         if (!channel) {
-            return error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP")
+            return logger.error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP")
         }
 
         const baltop = await topAmountGlobal(10, client, true)
@@ -430,7 +430,7 @@ async function showTopGlobalBal(client) {
         embed.setColor("#111111")
 
         await channel.send({ embeds: [embed] })
-        info("sent global bal top", types.AUTOMATION)
+        logger.auto("sent global bal top")
     }
 
     setTimeout(async () => {
@@ -440,7 +440,7 @@ async function showTopGlobalBal(client) {
         postGlobalBalTop()
     }, needed - now)
 
-    info(`global bal top will run in ${MStoTime(needed - now)}`, types.AUTOMATION)
+    logger.auto(`global bal top will run in ${MStoTime(needed - now)}`)
 }
 
 exports.showTopGlobalBal = showTopGlobalBal
@@ -494,7 +494,7 @@ async function suggestWholesomeImage(submitter, image) {
         const webhooks = await guild.fetchWebhooks()
 
         wholesomeWebhook = await webhooks.find((w) => w.id == "846092969396142080")
-        info(`wholesome webhook assigned as ${wholesomeWebhook.id}`)
+        logger.info(`wholesome webhook assigned as ${wholesomeWebhook.id}`)
     }
 
     let query = db.prepare("SELECT id FROM wholesome WHERE image = ?").get(image)
@@ -654,9 +654,9 @@ async function uploadImageToImgur(url) {
     if (uploadDisabled) fallback = true
     let fail = false
 
-    info(`uploading ${url}`)
+    logger.info(`uploading ${url}`)
     const boobies = await imgur.uploadUrl(url).catch((e) => {
-        error(e)
+        logger.error(e)
         fail = true
     })
 
@@ -671,19 +671,19 @@ async function uploadImageToImgur(url) {
     }
 
     if (fallback) {
-        info("using fallback uploader..")
+        logger.info("using fallback uploader..")
 
         const res = await fallbackUpload(url)
 
         if (!res) {
-            error("fallback upload failed")
+            logger.error("fallback upload failed")
             return null
         }
 
         return res
     }
 
-    info("uploaded")
+    logger.info("uploaded")
 
     return boobies.link
 }

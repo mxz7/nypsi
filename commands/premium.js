@@ -16,7 +16,7 @@ const {
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
-const { info } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
 
@@ -86,7 +86,7 @@ async function run(message, args) {
             return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no premium data")] })
         }
 
-        info(a)
+        logger.info(a)
 
         const embed = new CustomEmbed(message.member, false, `level: ${a.level}\n\ncheck console for all info`).setTitle(
             args[1]

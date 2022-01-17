@@ -5,7 +5,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { cleanString } = require("../utils/utils")
-const { error } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cooldown = new Map()
 const cache = new Map()
@@ -91,7 +91,7 @@ async function run(message, args) {
         try {
             hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json())
         } catch (e) {
-            error(e)
+            logger.error(e)
             return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] })
         }
 

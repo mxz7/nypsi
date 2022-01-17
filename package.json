@@ -28,7 +28,9 @@
     "table": "6.8",
     "tar": "^6.1.11",
     "urban-dictionary": "^3.0.2",
-    "utf-8-validate": "^5.0.8"
+    "utf-8-validate": "^5.0.8",
+    "winston": "^3.4.0",
+    "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
     "eslint": "^8.7.0",
