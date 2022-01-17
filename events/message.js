@@ -274,6 +274,7 @@ async function addMention() {
     if (currentInterval != old) {
         clearInterval(mentionInterval)
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
+        logger.info(`mention interval set to ${currentInterval}`)
     }
 
     /**
