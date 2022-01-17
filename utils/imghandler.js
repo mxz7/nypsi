@@ -99,7 +99,7 @@ async function cacheUpdate(links, imgs, name) {
         const res = await fetch(link).then((a) => a.json())
 
         if (res.message == "Forbidden") {
-            logger.error(`skipped ${link} due to private subreddit`)
+            logger.warn(`skipped ${link} due to private subreddit`)
             continue
         }
 
