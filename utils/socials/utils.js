@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { info, types } = require("../logger")
+const { info, types, error } = require("../logger")
 let users = {}
 if (!process.env.GITHUB_ACTION) users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
 info(`${Array.from(Object.keys(users)).length.toLocaleString()} socials users loaded`, types.DATA)
@@ -15,11 +15,10 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(users) != JSON.stringify(users1)) {
             fs.writeFile("./utils/socials/users.json", JSON.stringify(users), (err) => {
                 if (err) {
-                    return console.log(err)
+                    return error(err)
                 }
                 info("socials data saved", types.DATA)
             })
-
             timer = 0
             timerCheck = false
         } else if (!timerCheck) {
