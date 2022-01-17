@@ -40,7 +40,7 @@ async function run(message, args) {
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
-    const { mentionQueue } = require("../events/message.js")
+    const { mentionQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -96,6 +96,8 @@ async function run(message, args) {
     await guilds.forEach((g) => {
         memberCount = memberCount + g.memberCount
     })
+
+    console.log(mentionQueue)
 
     const embed = new CustomEmbed(message.member)
         .setTitle("stats")

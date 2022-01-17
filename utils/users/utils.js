@@ -12,6 +12,15 @@ const avatarCache = new Map()
 const lastfmUsernameCache = new Map()
 
 /**
+ * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
+ */
+const mentionQueue = []
+/**
+ * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
+ */
+exports.mentionQueue = mentionQueue
+
+/**
  *
  * @param {GuildMember} member
  */
