@@ -81,7 +81,7 @@ if (!process.env.GITHUB_ACTION) {
     client.on("rateLimit", (rate) => {
         const a = rate.route.split("/")
         const reason = a[a.length - 1]
-        logger.error("rate limit: " + reason)
+        logger.warn("rate limit: " + reason)
     })
     client.on("guildMemberUpdate", guildMemberUpdate.bind(null))
     client.on("guildMemberAdd", guildMemberAdd.bind(null))
@@ -171,7 +171,7 @@ async function requestDM(id, content, dontDmTekoh) {
                 logger.info(`successfully sent DM to ${member.tag} (${member.id})`)
             })
             .catch(async () => {
-                logger.error(`failed to send DM to ${member.tag} (${member.id})`)
+                logger.warn(`failed to send DM to ${member.tag} (${member.id})`)
                 if (!dontDmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347")
 
@@ -180,7 +180,7 @@ async function requestDM(id, content, dontDmTekoh) {
             })
         return true
     } else {
-        logger.error(`failed to send DM to ${member.id}`)
+        logger.warn(`failed to send DM to ${member.id}`)
         if (!dontDmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347")
 
