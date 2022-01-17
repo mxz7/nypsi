@@ -97,7 +97,7 @@ function doBackup() {
         })
         .catch((e) => {
             error("backup failed")
-            console.error(e)
+            error(e)
         })
 }
 
