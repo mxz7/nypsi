@@ -131,6 +131,7 @@ module.exports = async (message) => {
 }
 
 let currentInterval = 50
+let lastChange = 0
 
 async function addMention() {
     const { mentionQueue } = require("../utils/users/utils")
@@ -272,9 +273,12 @@ async function addMention() {
     }
 
     if (currentInterval != old) {
+        if (Date.now() - lastChange < 15000) return
         clearInterval(mentionInterval)
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
         logger.info(`mention interval set to ${currentInterval}`)
+
+        lastChange = Date.now()
     }
 
     /**
