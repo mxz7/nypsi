@@ -11,7 +11,7 @@ const db = getDatabase()
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 )
-const fetchMentions = db.prepare("SELECT mention_id FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
+const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
 let mentionInterval
 
 /**
@@ -224,10 +224,10 @@ async function addMention() {
         if (mentions.length > limit) {
             mentions.splice(0, limit)
 
-            const deleteMention = db.prepare("DELETE FROM mentions WHERE mention_id = ?")
+            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
 
             for (const mention of mentions) {
-                deleteMention.run(mention.mention_id)
+                deleteMention.run(mention.url)
             }
         }
     }
