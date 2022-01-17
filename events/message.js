@@ -67,7 +67,7 @@ module.exports = async (message) => {
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(async () => await addMention(), 1000)
+                mentionInterval = setInterval(async () => await addMention(), 50)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -88,7 +88,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 1000)
+                    mentionInterval = setInterval(async () => await addMention(), 50)
                 }
             }
 
@@ -103,7 +103,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 1000)
+                    mentionInterval = setInterval(async () => await addMention(), 50)
                 }
             }
         }
@@ -241,7 +241,7 @@ async function addMention() {
             if (mentionQueue.length == 0) {
                 clearInterval(mentionInterval)
                 mentionInterval = undefined
-                currentInterval = 1000
+                currentInterval = 50
                 return
             }
 
@@ -252,7 +252,7 @@ async function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
-        currentInterval = 1000
+        currentInterval = 50
     }
 
     const cpuUsage = await cpu.usage()
@@ -260,15 +260,15 @@ async function addMention() {
     const old = currentInterval
 
     if (cpuUsage > 95) {
-        currentInterval = 750
+        currentInterval = 500
     } else if (cpuUsage > 90) {
-        currentInterval = 400
+        currentInterval = 200
     } else if (cpuUsage > 80) {
-        currentInterval = 250
+        currentInterval = 100
     } else if (cpuUsage < 80) {
         currentInterval = 50
     } else {
-        currentInterval = 1000
+        currentInterval = 50
     }
 
     if (currentInterval != old) {
