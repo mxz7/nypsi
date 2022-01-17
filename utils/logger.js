@@ -12,15 +12,15 @@ let webhook = new Map()
  */
 let nextLogMsg = new Map()
 
-const format = winston.format.printf(({ level, message, timestamp, label }) => {
+const format = winston.format.printf(({ level, message, timestamp }) => {
     if (level == "error") {
         return `[${clc.blackBright(timestamp)}] ${clc.red(`[error] ${message}`)}`
     } else if (level == "warn") {
         return `[${clc.blackBright(timestamp)}] ${clc.yellowBright(`[warn] ${message}`)}`
-    } else if (level == "info") {
-        let color
+    } else {
+        let color = clc.white
 
-        switch (label) {
+        switch (level) {
             case "guild":
                 color = clc.blue
                 break
@@ -42,36 +42,47 @@ const format = winston.format.printf(({ level, message, timestamp, label }) => {
     }
 })
 
+const levels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    guild: 2,
+    economy: 2,
+    auto: 2,
+    cmd: 2,
+    img: 2,
+    debug: 3
+}
+
 const logger = winston.createLogger({
-    format: winston.format.combine(
-        winston.format.timestamp({ format: "DD/MM HH:mm:ss" }),
-        format
-    ),
-    
+    format: winston.format.combine(winston.format.timestamp({ format: "DD/MM HH:mm:ss" }), format),
+
+    levels: levels,
+
     transports: [
         new winston.transports.DailyRotateFile({
-            filename: "error-%DATE%",
-            datePattern: "YYYY-MM-DD-HH",
+            filename: "./logs/error",
             zippedArchive: true,
             maxSize: "20m",
-            maxFiles: "14d"
+            maxFiles: "14d",
+            format: winston.format.simple(),
         }),
         new winston.transports.DailyRotateFile({
-            filename: "warn-%DATE%",
-            datePattern: "YYYY-MM-DD-HH",
+            filename: "./logs/warn",
             zippedArchive: true,
             maxSize: "20m",
-            maxFiles: "14d"
+            maxFiles: "14d",
+            format: winston.format.simple(),
         }),
         new winston.transports.DailyRotateFile({
-            filename: "info-%DATE%",
-            datePattern: "YYYY-MM-DD-HH",
+            filename: "./logs/info",
             zippedArchive: true,
             maxSize: "20m",
-            maxFiles: "90d"
+            maxFiles: "90d",
+            format: winston.format.simple(),
         }),
-        new winston.transports.Console()
-    ]
+        new winston.transports.Console(),
+    ],
 })
 
 exports.logger = logger
