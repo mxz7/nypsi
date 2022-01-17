@@ -48,7 +48,7 @@ async function run(message, args) {
 
         args.shift()
 
-        const guild = message.client.guilds.cache.find(args.join(" "))
+        const guild = message.client.guilds.cache.find(g => g.name.includes(args.join(" ")))
 
         if (!guild) return message.react("❌")
 
