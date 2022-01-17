@@ -1,9 +1,9 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { info, types, error } = require("../logger")
+const { logger } = require("../logger")
 let users = {}
 if (!process.env.GITHUB_ACTION) users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
-info(`${Array.from(Object.keys(users)).length.toLocaleString()} socials users loaded`, types.DATA)
+logger.info(`${Array.from(Object.keys(users)).length.toLocaleString()} socials users loaded`)
 
 let timer = 0
 let timerCheck = true
@@ -15,9 +15,9 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(users) != JSON.stringify(users1)) {
             fs.writeFile("./utils/socials/users.json", JSON.stringify(users), (err) => {
                 if (err) {
-                    return error(err)
+                    return logger.error(err)
                 }
-                info("socials data saved", types.DATA)
+                logger.info("socials data saved")
             })
             timer = 0
             timerCheck = false
@@ -27,13 +27,13 @@ if (!process.env.GITHUB_ACTION) {
 
         if (timer >= 5 && !timerCheck) {
             users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
-            info("socials data refreshed", types.DATA)
+            logger.info("socials data refreshed")
             timerCheck = true
         }
 
         if (timer >= 30 && timerCheck) {
             users = JSON.parse(fs.readFileSync("./utils/socials/users.json"))
-            info("socials data refreshed", types.DATA)
+            logger.info("socials data refreshed")
             timer = 0
         }
     }, 180000 + Math.floor(Math.random() * 60) * 1000)

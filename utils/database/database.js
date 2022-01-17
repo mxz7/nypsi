@@ -83,7 +83,7 @@ function runBackups() {
 runBackups()
 
 function doBackup() {
-    logger.data("data backup starting..")
+    logger.info("data backup starting..")
 
     const date = new Date()
 
@@ -93,7 +93,7 @@ function doBackup() {
         }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
     )
         .then(() => {
-            logger.data("backup complete")
+            logger.info("backup complete")
         })
         .catch((e) => {
             logger.error("backup failed")

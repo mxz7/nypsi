@@ -1,4 +1,4 @@
-const { info, types, error, getTimestamp } = require("../logger")
+const { logger } = require("../logger")
 const fs = require("fs")
 
 let stats
@@ -8,7 +8,7 @@ if (process.env.GITHUB_ACTION) {
     stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
 }
 
-info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`, types.DATA)
+logger.info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`)
 
 let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
@@ -39,7 +39,7 @@ const existsCache = new Set()
 app.post(
     "/dblwebhook",
     webhook.listener((vote) => {
-        info(`received vote: ${vote.user}`)
+        logger.info(`received vote: ${vote.user}`)
         const { onVote } = require("../../nypsi")
         onVote(vote)
     })
@@ -54,9 +54,9 @@ if (!process.env.GITHUB_ACTION) {
         if (JSON.stringify(stats) != JSON.stringify(stats1)) {
             fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
                 if (err) {
-                    return error(err)
+                    return logger.error(err)
                 }
-                info("economy stats data saved", types.DATA)
+                logger.info("economy stats data saved")
             })
         }
     }, 120000 + Math.floor(Math.random() * 60) * 1000)
@@ -97,7 +97,7 @@ let items
 function loadItems() {
     let txt = ""
     items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
-    info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`, types.DATA)
+    logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`)
 
     txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`
 
@@ -128,7 +128,7 @@ function loadItems() {
     }
 
     if (deleted != 0) {
-        info(`${deleted} items deleted from inventories`)
+        logger.info(`${deleted} items deleted from inventories`)
         txt += `\n${deleted.toLocaleString()} items deleted from inventories`
     }
 
@@ -149,12 +149,12 @@ function randomOffset() {
 
 let padlockPrice = 25000 + randomOffset()
 items["padlock"].worth = padlockPrice
-info("padlock price updated: $" + padlockPrice, types.ECONOMY)
+logger.eco("padlock price updated: $" + padlockPrice)
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
     items["padlock"].worth = padlockPrice
-    info("padlock price updated: $" + padlockPrice, types.ECONOMY)
+    logger.eco("padlock price updated: $" + padlockPrice)
 }, 3600000)
 
 async function updateCryptoWorth() {
@@ -163,19 +163,19 @@ async function updateCryptoWorth() {
     const btcworth = Math.floor(res.bpi.USD.rate_float)
 
     items["bitcoin"].worth = btcworth
-    info("bitcoin worth updated: $" + items["bitcoin"].worth, types.ECONOMY)
+    logger.eco("bitcoin worth updated: $" + items["bitcoin"].worth)
 
     res = await fetch("https://sochain.com/api/v2/get_price/DOGE/USD").then((res) => res.json())
 
     const dogeworth = Math.floor(res.data.prices[0].price * 1000)
 
     if (!dogeworth) {
-        error("INVALID DOGECOIN WORTH")
-        return error(res)
+        logger.error("INVALID DOGECOIN WORTH")
+        return logger.error(res)
     }
 
     items["dogecoin"].worth = dogeworth
-    info("dogecoin worth updated: $" + items["dogecoin"].worth, types.ECONOMY)
+    logger.eco("dogecoin worth updated: $" + items["dogecoin"].worth)
 }
 
 setInterval(updateCryptoWorth, 1500000)
@@ -197,7 +197,7 @@ async function doVote(client, vote) {
     const lastVote = query.lastVote
 
     if (now - lastVote < 43200000) {
-        return error(`${user} already voted`)
+        return logger.error(`${user} already voted`)
     }
 
     db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
@@ -251,10 +251,10 @@ async function doVote(client, vote) {
         await member
             .send({ content: "thank you for voting!", embeds: [embed] })
             .then(() => {
-                info(`sent vote confirmation to ${member.tag}`, types.ECONOMY)
+                logger.eco(`sent vote confirmation to ${member.tag}`)
             })
             .catch(() => {
-                error(`failed to send vote confirmation to ${member.tag}`)
+                logger.error(`failed to send vote confirmation to ${member.tag}`)
             })
     }
 }
@@ -1154,9 +1154,9 @@ function toggleBan(id) {
     if (JSON.stringify(banned) != JSON.stringify(banned1)) {
         fs.writeFile("./utils/economy/ban.json", JSON.stringify(banned), (err) => {
             if (err) {
-                return error(err)
+                return logger.error(err)
             }
-            info("banned data saved", types.DATA)
+            logger.info("banned data saved")
         })
     }
 }
@@ -1193,14 +1193,14 @@ function reset() {
 
         if (prestige == 0 && Date.now() - lastVote > 43200000 && !inventory && dms) {
             db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
-            info("deleted " + user.id)
+            logger.info("deleted " + user.id)
             deleted++
         } else {
             db.prepare(
                 "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
             ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
 
-            info("updated " + user.id)
+            logger.info("updated " + user.id)
             updated++
         }
     }
