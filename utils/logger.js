@@ -47,7 +47,7 @@ const levels = {
     warn: 1,
     info: 2,
     guild: 2,
-    economy: 2,
+    eco: 2,
     auto: 2,
     cmd: 2,
     img: 2,
