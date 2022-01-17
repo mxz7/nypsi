@@ -31,7 +31,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
                 color = clc.blue
                 break
             case "cmd":
-                color = clc.yellow
+                color = clc.cyan
                 break
             case "img":
                 color = clc.green
