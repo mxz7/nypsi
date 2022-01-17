@@ -135,7 +135,7 @@ let currentInterval = 1000
 async function addMention() {
     const { mentionQueue } = require("../utils/users/utils")
 
-    const mention = mentionQueue.shift()
+    let mention = mentionQueue.shift()
 
     if (!mention) {
         clearInterval(mentionInterval)
@@ -146,10 +146,12 @@ async function addMention() {
     if (mention.type == "collection") {
         const members = mention.members
 
-        if (members.size > 500) {
-            await doCollection(mention).catch((e) => {
+        if (members.size > 300) {
+            doCollection(mention).catch((e) => {
                 logger.error(e)
             })
+
+            return
         }
 
         let content = mention.message.content
@@ -205,30 +207,45 @@ async function addMention() {
             count++
         }
     } else {
-        const guild = mention.guild
-        const data = mention.data
-        const target = mention.target
-
-        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
-
-        const mentions = fetchMentions.all(guild, target)
-
-        let limit = 6
-
-        if (isPremium(target)) {
-            const tier = getTier(target)
-
-            limit += tier * 2
-        }
-
-        if (mentions.length > limit) {
-            mentions.splice(0, limit)
-
-            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
-
-            for (const mention of mentions) {
-                deleteMention.run(mention.url)
+        for (let i = 0; i < 150; i++) {
+            if (mention.type == "collection") {
+                return mentionQueue.unshift(mention)
             }
+
+            const guild = mention.guild
+            const data = mention.data
+            const target = mention.target
+
+            addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
+
+            const mentions = fetchMentions.all(guild, target)
+
+            let limit = 6
+
+            if (isPremium(target)) {
+                const tier = getTier(target)
+
+                limit += tier * 2
+            }
+
+            if (mentions.length > limit) {
+                mentions.splice(0, limit)
+
+                const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
+
+                for (const mention of mentions) {
+                    deleteMention.run(mention.url)
+                }
+            }
+
+            if (mentionQueue.length == 0) {
+                clearInterval(mentionInterval)
+                mentionInterval = undefined
+                currentInterval = 1000
+                return
+            }
+
+            mention = mentionQueue.shift()
         }
     }
 
