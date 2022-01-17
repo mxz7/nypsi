@@ -130,7 +130,7 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
-let currentInterval = 1000
+let currentInterval = 50
 
 async function addMention() {
     const { mentionQueue } = require("../utils/users/utils")
