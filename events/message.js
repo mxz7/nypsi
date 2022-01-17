@@ -147,7 +147,7 @@ async function addMention() {
         const members = mention.members
 
         if (members.size > 300) {
-            doCollection(mention).catch((e) => {
+            await doCollection(mention).catch((e) => {
                 logger.error(e)
             })
 
