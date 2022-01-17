@@ -3,7 +3,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { error } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
@@ -80,7 +80,7 @@ async function run(message, args) {
                         })
                 }
             } catch (e) {
-                error(e)
+                logger.error(e)
             }
         }
     }

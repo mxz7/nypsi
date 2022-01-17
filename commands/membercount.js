@@ -2,7 +2,7 @@ const { Message, Permissions, ChannelTypes } = require("discord.js")
 const { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { info, types, getTimestamp, error } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cmd = new Command("membercount", "create an updating member count channel for your server", categories.ADMIN)
     .setAliases(["counter"])
@@ -245,21 +245,18 @@ async function run(message, args) {
         await channel
             .edit({ name: format })
             .then(() => {
-                info(
-                    "[" +
-                        getTimestamp() +
-                        "] counter updated for '" +
+                logger.auto(
+                    "counter updated for '" +
                         message.guild.name +
                         "' ~ '" +
                         old +
                         "' -> '" +
                         format +
-                        "'",
-                    types.AUTOMATION
+                        "'"
                 )
             })
             .catch(() => {
-                error("error updating counter in " + message.guild.name)
+                logger.error("error updating counter in " + message.guild.name)
                 fail = true
             })
 

@@ -1,4 +1,6 @@
 const { Client, Webhook, User } = require("discord.js")
+const winston = require("winston")
+require("winston-daily-rotate-file")
 const clc = require("cli-color")
 
 /**
@@ -10,65 +12,86 @@ let webhook = new Map()
  */
 let nextLogMsg = new Map()
 
-function info(string, type) {
-    let color
-
-    if (!type) type = types.INFO
-
-    switch (type) {
-        case types.INFO:
-            color = clc.white
-            break
-        case types.GUILD:
-            color = clc.blue
-            break
-        case types.ECONOMY:
-            color = clc.green
-            break
-        case types.DATA:
-            color = clc.green
-            break
-        case types.AUTOMATION:
-            color = clc.blue
-            break
-        case types.COMMAND:
-            color = clc.yellow
-            break
-        case types.IMAGE:
-            color = clc.green
-            break
-    }
-
-    const day = new Date().getDate()
-    const month = new Date().getMonth() + 1
-
-    const out = `[${clc.blackBright(`${day}/${month} ${getTimestamp()}`)}] ${color(string)}`
-    console.log(out)
-
-    const webhookLog = `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``
-
-    if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", webhookLog)
+const format = winston.format.printf(({ level, message, timestamp }) => {
+    if (level == "error") {
+        return `[${clc.blackBright(timestamp)}] ${clc.red(`[error] ${message}`)}`
+    } else if (level == "warn") {
+        return `[${clc.blackBright(timestamp)}] ${clc.yellowBright(`[warn] ${message}`)}`
     } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + webhookLog)
+        let color = clc.white
+
+        switch (level) {
+            case "guild":
+                color = clc.blue
+                break
+            case "eco":
+                color = clc.green
+                break
+            case "auto":
+                color = clc.blue
+                break
+            case "cmd":
+                color = clc.yellow
+                break
+            case "img":
+                color = clc.green
+                break
+        }
+
+        return `[${clc.blackBright(timestamp)}] ${color(message)}`
     }
+})
+
+const levels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    guild: 2,
+    eco: 2,
+    auto: 2,
+    cmd: 2,
+    img: 2,
+    debug: 3
 }
 
-exports.info = info
+const logger = winston.createLogger({
+    format: winston.format.combine(winston.format.timestamp({ format: "DD/MM HH:mm:ss" }), format),
 
-function error(string) {
-    const day = new Date().getDate()
-    const month = new Date().getMonth() + 1
+    levels: levels,
 
-    console.error(`[${clc.black(`${day}/${month} ${getTimestamp()}`)}] ${clc.red(string)}`)
-    if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
-    } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
-    }
-}
+    transports: [
+        new winston.transports.DailyRotateFile({
+            filename: "./logs/error-%DATE%.log",
+            datePattern: "YYYY-MM",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "14d",
+            format: winston.format.simple(),
+            level: "error"
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: "./logs/warn-%DATE%.log",
+            datePattern: "YYYY-MM",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "14d",
+            format: winston.format.simple(),
+            level: "warn"
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: "./logs/info-%DATE%.log",
+            datePattern: "YYYY-MM",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "90d",
+            format: winston.format.simple(),
+            level: "info"
+        }),
+        new winston.transports.Console(),
+    ],
+})
 
-exports.error = error
+exports.logger = logger
 
 /**
  *
@@ -156,18 +179,6 @@ function gamble(user, game, amount, win, winAmount) {
 
 exports.gamble = gamble
 
-const types = {
-    INFO: "info",
-    DATA: "data",
-    GUILD: "guild",
-    ECONOMY: "eco",
-    AUTOMATION: "auto",
-    COMMAND: "command",
-    IMAGE: "image",
-}
-
-exports.types = types
-
 /**
  * @returns {String}
  */
@@ -206,30 +217,25 @@ async function getWebhooks(client) {
     const guild = await client.guilds.fetch("747056029795221513")
 
     if (!guild) {
-        return error("UNABLE TO GET GUILD FOR LOGS")
+        return logger.error("UNABLE TO GET GUILD FOR LOGS")
     }
 
     const webhooks = await guild.fetchWebhooks()
 
-    const allLogs = await webhooks.find((w) => w.id == "830799277407600640")
-
-    webhook.set("logs", allLogs)
-    info(`logs webhook running ${allLogs.id}`)
-
     const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266")
 
     webhook.set("pay", paymentLogs)
-    info(`payment logs webhook running ${paymentLogs.id}`)
+    logger.info(`payment logs webhook running ${paymentLogs.id}`)
 
     const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333")
 
     webhook.set("gamble", gambleLogs)
-    info(`gamble logs webhook running ${gambleLogs.id}`)
+    logger.info(`gamble logs webhook running ${gambleLogs.id}`)
 
     const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176")
 
     webhook.set("sql", sqlLogs)
-    info(`sql logs webhook running ${sqlLogs.id}`)
+    logger.info(`sql logs webhook running ${sqlLogs.id}`)
 
     runLogs()
 }

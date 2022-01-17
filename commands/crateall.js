@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, userExists, getInventory, setInventory } = require("../utils/economy/utils")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const { info } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 
 const cmd = new Command("crateall", "give every user in the current guild a crate", categories.NONE).setPermissions([
     "bot owner",
@@ -79,7 +79,7 @@ async function run(message, args) {
         }
 
         setInventory(m, inventory)
-        info(`${selected.id} given to ${m.user.tag} (${m.user.id})`)
+        logger.info(`${selected.id} given to ${m.user.tag} (${m.user.id})`)
         count++
     }
 
