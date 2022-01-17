@@ -67,6 +67,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "14d",
             format: winston.format.simple(),
+            level: "error"
         }),
         new winston.transports.DailyRotateFile({
             filename: "./logs/warn-%DATE%.log",
@@ -75,6 +76,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "14d",
             format: winston.format.simple(),
+            level: "warn"
         }),
         new winston.transports.DailyRotateFile({
             filename: "./logs/info-%DATE%.log",
@@ -83,6 +85,7 @@ const logger = winston.createLogger({
             maxSize: "20m",
             maxFiles: "90d",
             format: winston.format.simple(),
+            level: "info"
         }),
         new winston.transports.Console(),
     ],
@@ -175,18 +178,6 @@ function gamble(user, game, amount, win, winAmount) {
 }
 
 exports.gamble = gamble
-
-const types = {
-    INFO: "info",
-    DATA: "data",
-    GUILD: "guild",
-    ECONOMY: "eco",
-    AUTOMATION: "auto",
-    COMMAND: "command",
-    IMAGE: "image",
-}
-
-exports.types = types
 
 /**
  * @returns {String}
