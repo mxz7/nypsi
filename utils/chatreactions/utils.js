@@ -1,6 +1,6 @@
 const { Guild, TextChannel, GuildMember } = require("discord.js")
 const fetch = require("node-fetch")
-const { info, types, getTimestamp } = require("../logger")
+const { logger } = require("../logger")
 const { getDatabase, toArray, toStorage } = require("../database/database")
 const { inPlaceSort } = require("fast-sort")
 const db = getDatabase()
@@ -22,7 +22,7 @@ setInterval(async () => {
             db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
             db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id)
 
-            info(`deleted guild '${guild.id}' from chat reaction data`, types.GUILD)
+            logger.guild(`deleted guild '${guild.id}' from chat reaction data`)
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -119,7 +119,7 @@ setInterval(async () => {
     }
 
     if (count > 0) {
-        info(`${count} chat reactions automatically started`, types.AUTOMATION)
+        logger.auto(`${count} chat reactions automatically started`)
     }
 }, 60000)
 

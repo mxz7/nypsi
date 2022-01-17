@@ -291,11 +291,6 @@ async function getWebhooks(client) {
 
     const webhooks = await guild.fetchWebhooks()
 
-    const allLogs = await webhooks.find((w) => w.id == "830799277407600640")
-
-    webhook.set("logs", allLogs)
-    info(`logs webhook running ${allLogs.id}`)
-
     const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266")
 
     webhook.set("pay", paymentLogs)

@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3")
-const { databaseLog, info, types, error } = require("../logger")
+const { databaseLog, logger} = require("../logger")
 const db = new Database("./utils/database/storage.db", { verbose: databaseLog })
 
 function createTables() {
@@ -83,7 +83,7 @@ function runBackups() {
 runBackups()
 
 function doBackup() {
-    info("data backup starting..", types.DATA)
+    logger.data("data backup starting..")
 
     const date = new Date()
 
@@ -93,11 +93,11 @@ function doBackup() {
         }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
     )
         .then(() => {
-            info("backup complete", types.DATA)
+            logger.data("backup complete")
         })
         .catch((e) => {
-            error("backup failed")
-            error(e)
+            logger.error("backup failed")
+            logger.error(e)
         })
 }
 
