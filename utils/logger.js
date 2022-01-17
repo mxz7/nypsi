@@ -16,7 +16,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
     if (level == "error") {
         return `[${clc.blackBright(timestamp)}] ${clc.red(`[error] ${message}`)}`
     } else if (level == "warn") {
-        return `[${clc.blackBright(timestamp)}] ${clc.red(`[warn] ${message}`)}`
+        return `[${clc.blackBright(timestamp)}] ${clc.yellowBright(`[warn] ${message}`)}`
     } else {
         let color = clc.white
 
