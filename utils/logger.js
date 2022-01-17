@@ -1,4 +1,5 @@
 const { Client, Webhook, User } = require("discord.js")
+const clc = require("cli-color")
 
 /**
  * @type {Map<String, Webhook>}
@@ -16,38 +17,40 @@ function info(string, type) {
 
     switch (type) {
         case types.INFO:
-            color = "\x1b[37m"
+            color = clc.white
             break
         case types.GUILD:
-            color = "\x1b[36m"
+            color = clc.blue
             break
         case types.ECONOMY:
-            color = "\x1b[32m"
+            color = clc.green
             break
         case types.DATA:
-            color = "\x1b[32m"
+            color = clc.green
             break
         case types.AUTOMATION:
-            color = "\x1b[34m"
+            color = clc.blue
             break
         case types.COMMAND:
-            color = "\x1b[33m"
+            color = clc.yellow
             break
         case types.IMAGE:
-            color = "\x1b[32m"
+            color = clc.gren
             break
     }
 
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    const out = `${color}${day}/${month} ${getTimestamp()} [${type}] ${string} \x1b[0m`
+    const out = `[${clc.black(`${day}/${month} ${getTimestamp()}`)}] ${color(string)}`
     console.log(out)
 
+    const webhookLog = `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``
+
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``)
+        nextLogMsg.set("logs", )
     } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [${type}] ${string}\`\`\``)
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + webhookLog)
     }
 }
 
@@ -57,11 +60,11 @@ function error(string) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    console.error(`\x1B[31m${day}/${month} ${getTimestamp()} [error] ${string}\x1B[0m`)
+    console.error(`[${clc.black(`${day}/${month} ${getTimestamp()}`)}] ${clc.red(string)}`)
     if (!nextLogMsg.get("logs")) {
-        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``)
+        nextLogMsg.set("logs", `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
     } else {
-        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} [error] ${string}\`\`\``)
+        nextLogMsg.set("logs", nextLogMsg.get("logs") + `\`\`\`${day}/${month} ${getTimestamp()} ${string}\`\`\``)
     }
 }
 
