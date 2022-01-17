@@ -113,7 +113,7 @@ async function cacheUpdate(links, imgs, name) {
     }
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    logger.img(`${amount} ${name} images loaded (${total})`)
+    logger.img(`${amount.toLocaleString()} ${name} images loaded (${total})`)
 }
 
 async function updateCache() {
