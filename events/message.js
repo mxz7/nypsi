@@ -259,11 +259,13 @@ async function addMention() {
 
     const old = currentInterval
 
-    if (cpuUsage < 95) {
+    if (cpuUsage > 95) {
         currentInterval = 750
-    } else if (cpuUsage < 90) {
+    } else if (cpuUsage > 90) {
         currentInterval = 500
-    } else if (cpuUsage < 75) {
+    } else if (cpuUsage > 80) {
+        currentInterval = 400
+    } else if (cpuUsage < 80) {
         currentInterval = 250
     } else {
         currentInterval = 1000
