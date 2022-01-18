@@ -254,7 +254,7 @@ async function addMention() {
             for (const m of mentions) {
                 mentionQueue.push({
                     type: "delete",
-                    url: m.url
+                    url: m.url,
                 })
             }
         }
