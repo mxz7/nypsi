@@ -1,57 +1,57 @@
 name: CI
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
 
 jobs:
-  lint:
-    name: Linting
-      
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: bahmutov/npm-install@v1
-  
-      - run: npx eslint ./
+    lint:
+        name: Linting
+
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - uses: bahmutov/npm-install@v1
+
+            - run: npx eslint ./
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    test:
+        name: Testing
+
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-  test:
-    name: Testing
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js 16
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+            - run: npm ci
+            - run: node nypsi.js
 
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-      
-    env:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+    deploy:
+        if: github.ref == 'refs/heads/master'
+        needs: test
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js 16
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16
-    - run: npm ci
-    - run: node nypsi.js
+        runs-on: ubuntu-latest
 
-  deploy:
-    if: github.ref == 'refs/heads/master'
-    needs: test
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        USERNAME: ${{ secrets.USERNAME }}
-        PORT: 22
-        KEY: ${{ secrets.KEY }}
-        script: |
-          cd ~/nypsi
-          git pull
-          git status
-          npm install
+        steps:
+            - uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  USERNAME: ${{ secrets.USERNAME }}
+                  PORT: 22
+                  KEY: ${{ secrets.KEY }}
+                  script: |
+                      cd ~/nypsi
+                      git pull
+                      git status
+                      npm install
