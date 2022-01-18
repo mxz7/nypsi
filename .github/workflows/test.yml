@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 
 jobs:
   lint:
-
     name: Linting
       
     runs-on: ubuntu-latest
@@ -20,7 +19,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
+  test:
+    name: Testing
 
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -36,3 +36,22 @@ jobs:
         node-version: 16
     - run: npm ci
     - run: node nypsi.js
+
+  deploy:
+    if: ${{ github.ref == 'master' }}
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PASSWORD }}
+        port: 22
+        script: |
+          cd ~/nypsi
+          git pull
+          git status
+          npm install
