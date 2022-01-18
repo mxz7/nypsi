@@ -2,6 +2,10 @@ const startUp = Date.now()
 
 require("dotenv").config()
 
+const currentCommit = require("child_process").execSync("git rev-parse HEAD").toString().trim()
+
+exports.currentCommit = currentCommit
+
 const Discord = require("discord.js")
 const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
