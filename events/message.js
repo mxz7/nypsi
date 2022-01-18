@@ -263,10 +263,9 @@ async function addMention() {
     }
 
     if (currentInterval != old) {
-        if (Date.now() - lastChange < 15000) return
+        if (Date.now() - lastChange < 5000) return
         clearInterval(mentionInterval)
         mentionInterval = setInterval(async () => await addMention(), currentInterval)
-        logger.info(`mention interval set to ${currentInterval}`)
 
         lastChange = Date.now()
     }
