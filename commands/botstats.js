@@ -40,7 +40,7 @@ async function run(message, args) {
     }, 5000)
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-    const { snipe, eSnipe } = require("../nypsi.js")
+    const { snipe, eSnipe, currentCommit } = require("../nypsi.js")
     const { mentionQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
@@ -151,6 +151,8 @@ async function run(message, args) {
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
+    
+    embed.setFooter(currentCommit)
 
     message.channel.send({ embeds: [embed] })
 }
