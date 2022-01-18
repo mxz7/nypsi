@@ -40,19 +40,21 @@ if (isMainThread) {
 
     let channelMembers = collection.channelMembers
 
-    for (const memberID of Array.from(members.keys())) {
+    const a = Array.from(members.keys())
+
+    const interval = setInterval(() => {
+        const memberID = a.shift()
+
         const member = members.get(memberID)
 
-        members.delete(memberID)
-
-        if (member.user.bot) continue
-        if (member.user.id == collection.message.author.id) continue
+        if (member.user.bot) return
+        if (member.user.id == collection.message.author.id) return
 
         try {
-            if (!channelMembers.has(memberID)) continue
+            if (!channelMembers.has(memberID)) return
         } catch {
             channelMembers = channelMembers.cache
-            if (!channelMembers.has(memberID)) continue
+            if (!channelMembers.has(memberID)) return
         }
 
         insertMention.run(
@@ -82,7 +84,11 @@ if (isMainThread) {
                 deleteMention.run(mention.url)
             }
         }
-    }
-    db.close()
-    parentPort.postMessage(0)
+
+        if (a.length == 0) {
+            clearInterval(interval)
+            db.close()
+            parentPort.postMessage(0)
+        }
+    }, 50)
 }
