@@ -68,7 +68,7 @@ module.exports = async (message) => {
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(async () => await addMention(), 100)
+                mentionInterval = setInterval(async () => await addMention(), 150)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -89,7 +89,7 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 150)
                 }
             }
 
@@ -126,7 +126,7 @@ module.exports = async (message) => {
                 }
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 150)
                 }
             }
         }
@@ -153,7 +153,7 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
-let currentInterval = 100
+let currentInterval = 150
 let lastChange = 0
 
 async function addMention() {
@@ -170,7 +170,7 @@ async function addMention() {
     if (mention.type == "collection") {
         const members = mention.members
 
-        if (members.size > 300) {
+        if (members.size > 200) {
             await doCollection(mention).catch((e) => {
                 logger.error(e)
             })
@@ -191,7 +191,7 @@ async function addMention() {
         let channelMembers = mention.channelMembers
 
         for (const memberID of Array.from(members.keys())) {
-            if (count >= 150) {
+            if (count >= 50) {
                 return mentionQueue.push({
                     type: "collection",
                     members: members.clone(),
@@ -268,7 +268,7 @@ async function addMention() {
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
-        currentInterval = 100
+        currentInterval = 150
     }
 
     const cpuUsage = await cpu.usage()
@@ -280,9 +280,9 @@ async function addMention() {
     } else if (cpuUsage > 80) {
         currentInterval = 450
     } else if (cpuUsage < 80) {
-        currentInterval = 125
+        currentInterval = 150
     } else {
-        currentInterval = 125
+        currentInterval = 150
     }
 
     if (currentInterval != old) {
