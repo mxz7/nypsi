@@ -208,45 +208,37 @@ async function addMention() {
             count++
         }
     } else {
-        for (let i = 0; i < 50; i++) {
-            if (mention.type == "collection") {
-                return mentionQueue.unshift(mention)
+        const guild = mention.guild
+        const data = mention.data
+        const target = mention.target
+
+        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
+
+        const mentions = fetchMentions.all(guild, target)
+
+        let limit = 6
+
+        if (isPremium(target)) {
+            const tier = getTier(target)
+
+            limit += tier * 2
+        }
+
+        if (mentions.length > limit) {
+            mentions.splice(0, limit)
+
+            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
+
+            for (const mention of mentions) {
+                deleteMention.run(mention.url)
             }
+        }
 
-            const guild = mention.guild
-            const data = mention.data
-            const target = mention.target
-
-            addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
-
-            const mentions = fetchMentions.all(guild, target)
-
-            let limit = 6
-
-            if (isPremium(target)) {
-                const tier = getTier(target)
-
-                limit += tier * 2
-            }
-
-            if (mentions.length > limit) {
-                mentions.splice(0, limit)
-
-                const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
-
-                for (const mention of mentions) {
-                    deleteMention.run(mention.url)
-                }
-            }
-
-            if (mentionQueue.length == 0) {
-                clearInterval(mentionInterval)
-                mentionInterval = undefined
-                currentInterval = 100
-                return
-            }
-
-            mention = mentionQueue.shift()
+        if (mentionQueue.length == 0) {
+            clearInterval(mentionInterval)
+            mentionInterval = undefined
+            currentInterval = 100
+            return
         }
     }
 
@@ -260,16 +252,14 @@ async function addMention() {
 
     const old = currentInterval
 
-    if (cpuUsage > 95) {
-        currentInterval = 750
-    } else if (cpuUsage > 90) {
-        currentInterval = 400
+    if (cpuUsage > 90) {
+        currentInterval = 700
     } else if (cpuUsage > 80) {
-        currentInterval = 200
+        currentInterval = 450
     } else if (cpuUsage < 80) {
-        currentInterval = 100
+        currentInterval = 125
     } else {
-        currentInterval = 100
+        currentInterval = 125
     }
 
     if (currentInterval != old) {
