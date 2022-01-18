@@ -38,7 +38,7 @@ jobs:
     - run: node nypsi.js
 
   deploy:
-    if: ${{ github.ref == 'master' }}
+    if: github.ref == 'refs/heads/master'
     needs: test
 
     runs-on: ubuntu-latest
