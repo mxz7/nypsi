@@ -104,9 +104,7 @@ client.on("shardError", (error1, shardID) => logger.error(`shard#${shardID} erro
 client.on("shardReconnecting", (shardID) => logger.info(`shard#${shardID} connecting`))
 
 process.on("unhandledRejection", (e) => {
-    let stack = e.stack.split("\n").join("\n\x1b[31m")
-
-    logger.error(stack)
+    logger.error(e.stack)
 })
 
 async function checkGuild(guildID) {
