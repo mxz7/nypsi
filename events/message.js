@@ -95,7 +95,7 @@ module.exports = async (message) => {
 
             if (message.mentions.members.first()) {
                 if (message.mentions.members.size == 1) {
-                    let content = mention.message.content
+                    let content = message.content
 
                     if (content.length > 100) {
                         content = content.substr(0, 97) + "..."
@@ -109,7 +109,7 @@ module.exports = async (message) => {
                             user: message.author.tag,
                             content: content,
                             date: message.createdTimestamp,
-                            link: mention.message.url
+                            link: message.url
                         },
                         guild: message.guild,
                         target: message.mentions.members.first().user.id
