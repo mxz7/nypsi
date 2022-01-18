@@ -151,7 +151,7 @@ async function run(message, args) {
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
-    
+
     embed.setFooter(currentCommit)
 
     message.channel.send({ embeds: [embed] })
