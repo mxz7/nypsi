@@ -5,6 +5,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { fetchUserMentions } = require("../utils/users/utils")
 const { getDatabase } = require("../utils/database/database")
+const { userExists } = require("../utils/economy/utils")
 
 const cooldown = new Map()
 
@@ -43,15 +44,17 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 15000)
 
-    let limit = 10
+    if (!(message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId)))) {
+        const embed = new ErrorEmbed(
+            `this server does not qualify to track mentions (${getPrefix(
+                message.guild
+            )}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`
+        )
 
-    if (isPremium(message.member)) {
-        const tier = getTier(message.member)
-
-        limit += tier * 2
+        return message.channel.send({ embeds: [embed] })
     }
 
-    const mentions = fetchUserMentions(message.guild, message.member, limit)
+    const mentions = fetchUserMentions(message.guild, message.member)
 
     if (!mentions || mentions.length == 0) {
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })

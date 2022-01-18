@@ -302,7 +302,7 @@ exports.setLastfmUsername = setLastfmUsername
  * @param {Number} amount
  * @returns {Array<{ date: Number, user_tag: String, url: String, content: String }>}
  */
-function fetchUserMentions(guild, member, amount) {
+function fetchUserMentions(guild, member, amount = 100) {
     let id = member
 
     if (member.user) id = member.user.id
