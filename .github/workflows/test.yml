@@ -48,8 +48,8 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         USERNAME: ${{ secrets.USERNAME }}
-        KEY: ${{ secrets.KEY }}
         PORT: 22
+        KEY: ${{ secrets.KEY }}
         script: |
           cd ~/nypsi
           git pull
