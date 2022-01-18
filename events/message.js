@@ -13,6 +13,7 @@ const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 )
 const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
+const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
 let mentionInterval
 
 /**
@@ -230,7 +231,7 @@ async function addMention() {
             })
             count++
         }
-    } else {
+    } else if (mention.type == "mention") {
         const guild = mention.guild
         const data = mention.data
         const target = mention.target
@@ -250,10 +251,11 @@ async function addMention() {
         if (mentions.length > limit) {
             mentions.splice(0, limit)
 
-            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
-
-            for (const mention of mentions) {
-                deleteMention.run(mention.url)
+            for (const m of mentions) {
+                mentionQueue.push({
+                    type: "delete",
+                    url: m.url
+                })
             }
         }
 
@@ -263,6 +265,8 @@ async function addMention() {
             currentInterval = 100
             return
         }
+    } else {
+        deleteMention.run(mention.url)
     }
 
     if (mentionQueue.length == 0) {
