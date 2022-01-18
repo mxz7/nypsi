@@ -151,7 +151,8 @@ async function run(message, args) {
                 collections.toLocaleString() +
                 "\n-- **mentions** " +
                 mentions.toLocaleString() +
-                "\n-- **deletable** " + deletable.toLocaleString(),
+                "\n-- **deletable** " +
+                deletable.toLocaleString(),
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
