@@ -109,10 +109,10 @@ module.exports = async (message) => {
                             user: message.author.tag,
                             content: content,
                             date: message.createdTimestamp,
-                            link: message.url
+                            link: message.url,
                         },
                         guild: message.guild.id,
-                        target: message.mentions.members.first().user.id
+                        target: message.mentions.members.first().user.id,
                     })
                 } else {
                     mentionQueue.push({
