@@ -6,12 +6,14 @@ const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
 const { cpu } = require("node-os-utils")
+const { userExists } = require("../utils/economy/utils")
 
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 )
 const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
+const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
 let mentionInterval
 
 /**
@@ -48,7 +50,7 @@ module.exports = async (message) => {
 
     const { mentionQueue } = require("../utils/users/utils")
 
-    if (message.guild.memberCount < 150000) {
+    if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId))) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
                 await message.guild.members.fetch()
@@ -67,7 +69,7 @@ module.exports = async (message) => {
             })
 
             if (!mentionInterval) {
-                mentionInterval = setInterval(async () => await addMention(), 100)
+                mentionInterval = setInterval(async () => await addMention(), 150)
             }
         } else {
             if (message.mentions.roles.first()) {
@@ -88,22 +90,44 @@ module.exports = async (message) => {
                 })
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 150)
                 }
             }
 
             if (message.mentions.members.first()) {
-                mentionQueue.push({
-                    type: "collection",
-                    members: message.mentions.members.clone(),
-                    message: message,
-                    channelMembers: message.channel.members,
-                    guild: message.guild,
-                    url: message.url,
-                })
+                if (message.mentions.members.size == 1) {
+                    let content = message.content
+
+                    if (content.length > 100) {
+                        content = content.substr(0, 97) + "..."
+                    }
+
+                    content = content.replace(/(\r\n|\n|\r)/gm, " ")
+
+                    mentionQueue.push({
+                        type: "mention",
+                        data: {
+                            user: message.author.tag,
+                            content: content,
+                            date: message.createdTimestamp,
+                            link: message.url,
+                        },
+                        guild: message.guild.id,
+                        target: message.mentions.members.first().user.id,
+                    })
+                } else {
+                    mentionQueue.push({
+                        type: "collection",
+                        members: message.mentions.members.clone(),
+                        message: message,
+                        channelMembers: message.channel.members,
+                        guild: message.guild,
+                        url: message.url,
+                    })
+                }
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 100)
+                    mentionInterval = setInterval(async () => await addMention(), 150)
                 }
             }
         }
@@ -130,7 +154,7 @@ module.exports = async (message) => {
     return runCommand(cmd, message, args)
 }
 
-let currentInterval = 100
+let currentInterval = 150
 let lastChange = 0
 
 async function addMention() {
@@ -147,7 +171,7 @@ async function addMention() {
     if (mention.type == "collection") {
         const members = mention.members
 
-        if (members.size > 300) {
+        if (members.size > 200) {
             await doCollection(mention).catch((e) => {
                 logger.error(e)
             })
@@ -168,7 +192,7 @@ async function addMention() {
         let channelMembers = mention.channelMembers
 
         for (const memberID of Array.from(members.keys())) {
-            if (count >= 150) {
+            if (count >= 50) {
                 return mentionQueue.push({
                     type: "collection",
                     members: members.clone(),
@@ -207,7 +231,7 @@ async function addMention() {
             })
             count++
         }
-    } else {
+    } else if (mention.type == "mention") {
         const guild = mention.guild
         const data = mention.data
         const target = mention.target
@@ -227,10 +251,11 @@ async function addMention() {
         if (mentions.length > limit) {
             mentions.splice(0, limit)
 
-            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
-
-            for (const mention of mentions) {
-                deleteMention.run(mention.url)
+            for (const m of mentions) {
+                mentionQueue.push({
+                    type: "delete",
+                    url: m.url
+                })
             }
         }
 
@@ -240,12 +265,14 @@ async function addMention() {
             currentInterval = 100
             return
         }
+    } else {
+        deleteMention.run(mention.url)
     }
 
     if (mentionQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
-        currentInterval = 100
+        currentInterval = 150
     }
 
     const cpuUsage = await cpu.usage()
@@ -257,9 +284,9 @@ async function addMention() {
     } else if (cpuUsage > 80) {
         currentInterval = 450
     } else if (cpuUsage < 80) {
-        currentInterval = 125
+        currentInterval = 150
     } else {
-        currentInterval = 125
+        currentInterval = 150
     }
 
     if (currentInterval != old) {
