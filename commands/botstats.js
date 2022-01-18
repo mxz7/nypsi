@@ -100,12 +100,15 @@ async function run(message, args) {
 
     let collections = 0
     let mentions = 0
+    let deletable = 0
 
     for (const mention of mentionQueue) {
         if (mention.type == "collection") {
             collections++
-        } else {
+        } else if (mention.type == "mention") {
             mentions++
+        } else {
+            deletable++
         }
     }
 
@@ -147,7 +150,9 @@ async function run(message, args) {
                 "\n-- **collections** " +
                 collections.toLocaleString() +
                 "\n-- **mentions** " +
-                mentions.toLocaleString(),
+                mentions.toLocaleString() +
+                "\n-- **deletable** " +
+                deletable.toLocaleString(),
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
