@@ -45,7 +45,11 @@ async function run(message, args) {
     }, 15000)
 
     if (!(message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId)))) {
-        const embed = new ErrorEmbed(`this server does not qualify to track mentions (${getPrefix(message.guild)}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`)
+        const embed = new ErrorEmbed(
+            `this server does not qualify to track mentions (${getPrefix(
+                message.guild
+            )}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`
+        )
 
         return message.channel.send({ embeds: [embed] })
     }
