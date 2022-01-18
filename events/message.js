@@ -111,7 +111,7 @@ module.exports = async (message) => {
                             date: message.createdTimestamp,
                             link: message.url
                         },
-                        guild: message.guild,
+                        guild: message.guild.id,
                         target: message.mentions.members.first().user.id
                     })
                 } else {
