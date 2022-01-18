@@ -34,7 +34,7 @@ const topggStats = new topgg.Api(process.env.TOPGG_TOKEN)
 const app = express()
 
 const voteCache = new Map()
-const existsCache = new Set()
+const existsCache = new Map()
 
 app.post(
     "/dblwebhook",
@@ -441,15 +441,16 @@ function userExists(member) {
     if (member.user) id = member.user.id
 
     if (existsCache.has(id)) {
-        return true
+        return existsCache.get(id)
     }
 
     const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
 
     if (query) {
-        existsCache.add(id)
+        existsCache.set(id, true)
         return true
     } else {
+        existsCache.set(id, false)
         return false
     }
 }
@@ -837,6 +838,10 @@ function createUser(member) {
     let id = member
 
     if (member.user) id = member.user.id
+
+    if (existsCache.has(id)) {
+        existsCache.delete(id)
+    }
 
     if (userExists(id)) {
         db.prepare("DELETE FROM economy WHERE id = ?").run(id)
