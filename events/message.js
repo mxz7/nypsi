@@ -6,6 +6,7 @@ const { getDatabase } = require("../utils/database/database")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const doCollection = require("../utils/workers/mentions")
 const { cpu } = require("node-os-utils")
+const { userExists } = require("../utils/economy/utils")
 
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
@@ -48,7 +49,7 @@ module.exports = async (message) => {
 
     const { mentionQueue } = require("../utils/users/utils")
 
-    if (message.guild.memberCount < 150000) {
+    if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId))) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
                 await message.guild.members.fetch()
@@ -93,14 +94,36 @@ module.exports = async (message) => {
             }
 
             if (message.mentions.members.first()) {
-                mentionQueue.push({
-                    type: "collection",
-                    members: message.mentions.members.clone(),
-                    message: message,
-                    channelMembers: message.channel.members,
-                    guild: message.guild,
-                    url: message.url,
-                })
+                if (message.mentions.members.size == 1) {
+                    let content = mention.message.content
+
+                    if (content.length > 100) {
+                        content = content.substr(0, 97) + "..."
+                    }
+
+                    content = content.replace(/(\r\n|\n|\r)/gm, " ")
+
+                    mentionQueue.push({
+                        type: "mention",
+                        data: {
+                            user: message.author.tag,
+                            content: content,
+                            date: message.createdTimestamp,
+                            link: mention.message.url
+                        },
+                        guild: message.guild,
+                        target: message.mentions.members.first().user.id
+                    })
+                } else {
+                    mentionQueue.push({
+                        type: "collection",
+                        members: message.mentions.members.clone(),
+                        message: message,
+                        channelMembers: message.channel.members,
+                        guild: message.guild,
+                        url: message.url,
+                    })
+                }
 
                 if (!mentionInterval) {
                     mentionInterval = setInterval(async () => await addMention(), 100)
