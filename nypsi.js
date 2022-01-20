@@ -20,6 +20,9 @@ const client = new Discord.Client({
             lifetime: 60,
             interval: 120,
         },
+        users: {
+            interval: 600 // remove if broken
+        }
     },
     presence: {
         status: "dnd",
