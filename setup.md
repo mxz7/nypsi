@@ -12,3 +12,11 @@ permalink: /
 
 by default, nypsi uses `$` as the prefix, if you are unsure what the current prefix is, tag nypsi to be reminded of the current prefix.
 
+to change the prefix, you can use the prefix command
+
+example:
+```
+$prefix !
+```
+
+## 2. setting up a member counter
