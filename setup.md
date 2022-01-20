@@ -3,7 +3,7 @@ layout: default
 title: quick setup
 nav_order: 2
 description: quick setup for nypsi
-permalink: /
+permalink: /setup
 ---
 
 # quick setup
