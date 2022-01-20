@@ -75,7 +75,7 @@ async function run(message, args) {
 
     if (selected.role == "fish" || selected.role == "prey") {
         worth = Math.floor(worth + worth * multi)
-    } else if (selected.id == "dogecoin" || selected.id == "bitcoin") {
+    } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
         if (!selected.worth) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
@@ -92,7 +92,7 @@ async function run(message, args) {
         `${amount} ${selected.emoji} **${selected.name}** is worth $${worth.toLocaleString()} ${
             multi > 0 && (selected.role == "fish" || selected.role == "prey")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
-                : selected.id == "bitcoin" || selected.id == "dogecoin"
+                : selected.id == "bitcoin" || selected.id == "ethereum"
                 ? "(-**5**% fee)"
                 : ""
         }`

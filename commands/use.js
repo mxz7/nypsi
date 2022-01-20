@@ -14,7 +14,7 @@ const {
     hasPadlock,
     setPadlock,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     getDMsEnabled,
     addItemUse,
 } = require("../utils/economy/utils")
@@ -543,9 +543,9 @@ function openCrate(member, item) {
                 }
                 names.push(`${items[chosen].emoji} ${items[chosen].name}`)
             }
-        } else if (chosen == "dogecoin") {
-            const owned = inventory["dogecoin"] || 0
-            const max = getMaxDogecoin(member)
+        } else if (chosen == "ethereum") {
+            const owned = inventory["ethereum"] || 0
+            const max = getMaxEthereum(member)
 
             if (owned + 1 > max) {
                 i--

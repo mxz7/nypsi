@@ -8,7 +8,7 @@ const {
     getItems,
     setInventory,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     updateBalance,
     getBalance,
     updateXp,
