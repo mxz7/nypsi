@@ -61,16 +61,7 @@ const logger = winston.createLogger({
 
     transports: [
         new winston.transports.DailyRotateFile({
-            filename: "./logs/error-%DATE%.log",
-            datePattern: "YYYY-MM",
-            zippedArchive: true,
-            maxSize: "20m",
-            maxFiles: "14d",
-            format: winston.format.simple(),
-            level: "error",
-        }),
-        new winston.transports.DailyRotateFile({
-            filename: "./logs/warn-%DATE%.log",
+            filename: "./logs/errors-%DATE%.log",
             datePattern: "YYYY-MM",
             zippedArchive: true,
             maxSize: "20m",
@@ -79,7 +70,7 @@ const logger = winston.createLogger({
             level: "warn",
         }),
         new winston.transports.DailyRotateFile({
-            filename: "./logs/info-%DATE%.log",
+            filename: "./logs/out-%DATE%.log",
             datePattern: "YYYY-MM",
             zippedArchive: true,
             maxSize: "20m",
