@@ -31,8 +31,14 @@ logo: "/assets/nypsi_logo.png"
 # Build settings
 remote_theme: pmarsceill/just-the-docs
 color_scheme: dark
-plugins:
-  - jekyll-feed
+
+aux_links:
+  "github":
+    - "https://github.com/tekoh/nypsi"
+
+gh_edit_link: true
+gh_edit_link_text: "edit the docs on github"
+gh_edit_repository: "https://github.com/tekoh/nypsi/tree/docs"
 
 # Exclude from processing.
 # The following items will not be processed, by default.
