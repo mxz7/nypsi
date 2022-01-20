@@ -1177,9 +1177,6 @@ exports.toggleBan = toggleBan
  * @returns {{ deleted: Number, updated: Number }}
  */
 function reset() {
-    let deleted = 0
-    let updated = 0
-
     const query = db.prepare("SELECT * FROM economy").all()
 
     for (const user of query) {
@@ -1200,21 +1197,13 @@ function reset() {
             }
         }
 
-        if (prestige == 0 && Date.now() - lastVote > 43200000 && !inventory && dms) {
-            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
-            logger.info("deleted " + user.id)
-            deleted++
-        } else {
-            db.prepare(
-                "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
-            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
+        db.prepare(
+            "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+        ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
 
-            logger.info("updated " + user.id)
-            updated++
-        }
+        logger.info("updated " + user.id)
     }
     stats = {}
-    return { deleted: deleted, updated: updated }
 }
 
 exports.reset = reset
