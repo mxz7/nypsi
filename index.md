@@ -20,5 +20,5 @@ there are requirements set for pings/mentioned to be tracked,
 as there is massive performance issues when nypsi tracks every mention on every server, no matter how much they use nypsi.<br />
 the requirements are as follows:
  - your server must have less than 150k members
- - your server owner must have an economy profile
+ - your server owner must have an economy profile <br />
 the quick fix for this is to simply check the server owner's balance, if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
