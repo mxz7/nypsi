@@ -13,3 +13,4 @@ logs/
 !items.json
 !package.json
 !package-lock.json
+!slotsmulti.json
