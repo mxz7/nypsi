@@ -63,6 +63,12 @@ async function run(message, args) {
         addCooldown(message.guild, 3600)
     }
 
+    let amount = 1
+
+    if (args[1]) {
+        amount = parseInt(args[1])
+    }
+
     let count = 0
 
     for (let m of members.keys()) {
@@ -73,14 +79,14 @@ async function run(message, args) {
         const inventory = getInventory(m)
 
         if (inventory[selected.id]) {
-            inventory[selected.id]++
+            inventory[selected.id] += amount
         } else {
-            inventory[selected.id] = 1
+            inventory[selected.id] = amount
         }
 
         setInventory(m, inventory)
-        logger.info(`${selected.id} given to ${m.user.tag} (${m.user.id})`)
-        count++
+        logger.info(`${amount} ${selected.id} given to ${m.user.tag} (${m.user.id})`)
+        count += amount
     }
 
     return message.channel.send({
