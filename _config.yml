@@ -28,9 +28,10 @@ twitter_username: xdtekoh
 github_username:  tekoh
 
 # Build settings
-theme: minima
+theme: just-the-docs
+color_scheme: dark
 plugins:
-  - jekyll-feed
+#  - jekyll-feed
 
 # Exclude from processing.
 # The following items will not be processed, by default.
