@@ -13,11 +13,14 @@ const client = new Discord.Client({
         parse: ["users", "roles"],
     },
     makeCache: Discord.Options.cacheWithLimits({
-        MessageManager: 100,
-        ThreadManager: {
-            sweepInterval: 1800,
-        },
+        MessageManager: 100
     }),
+    sweepers: {
+        messages: {
+            lifetime: 60,
+            interval: 120
+        }
+    },
     presence: {
         status: "dnd",
         activity: {
