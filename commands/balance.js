@@ -31,11 +31,7 @@ async function run(message, args) {
 
         if (!target) {
             target = args[0]
-            if (!userExists(target)) {
-                return message.channel.send({
-                    content: "❌ invalid user - you must tag the user for this command or use a user id",
-                })
-            }
+            if (!userExists(target)) createUser(target)
             id = true
         }
 
