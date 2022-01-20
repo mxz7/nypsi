@@ -21,8 +21,8 @@ const client = new Discord.Client({
             interval: 120,
         },
         users: {
-            interval: 600 // remove if broken
-        }
+            interval: 600, // remove if broken
+        },
     },
     presence: {
         status: "dnd",
