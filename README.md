@@ -27,6 +27,9 @@ gimme ur moneis ):< - haha joking but seriously check out the patreon it would h
 
 better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
 
+##### 💬 mentions
+-   nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
+
 ##### 💸 gambling / economy
 
 -   nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
@@ -38,10 +41,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 ##### ⛏ minecraft
 
 -   `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
-
-##### 💬 social media
-
--   the `$socials` command allows you to view other people's social media accounts and allows you to add your own - your accounts will only be displayed if you add them to the bot, run `$socials help` for more information
 
 ##### 📊 server stats
 
@@ -68,10 +67,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 i'm not gonna help with installation if you want to clone the code and make it for yourself, if you believe you're good enough to manage the bot you should be able to figure that out for yourself.
 
 ### 🖼 screenshots
-
--   `$socials`
-
-![socials command](https://i.imgur.com/8htm95Z.png)
 
 -   `$mc`
 

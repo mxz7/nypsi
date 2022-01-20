@@ -3,7 +3,9 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", categories.MONEY).setAliases(["eth"])
+const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", categories.MONEY).setAliases(
+    ["eth"]
+)
 
 /**
  *
