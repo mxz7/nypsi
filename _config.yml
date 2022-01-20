@@ -40,7 +40,7 @@ aux_links:
     - "https://nypsi.xyz"
 
 gh_edit_link: true
-gh_edit_link_text: "edit the docs on github"
+gh_edit_link_text: "edit this page"
 gh_edit_repository: "https://github.com/tekoh/nypsi"
 gh_edit_branch: "docs"
 gh_edit_view_mode: "tree"
