@@ -18,5 +18,6 @@ example:
 ```
 $prefix !
 ```
+this would change the prefix to `!`
 
 ## 2. setting up a member counter
