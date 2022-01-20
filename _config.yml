@@ -28,7 +28,7 @@ twitter_username: xdtekoh
 github_username:  tekoh
 
 # Build settings
-remote_theme: "pmarseceill/just-the-docs"
+remote_theme: pmarsceill/just-the-docs
 color_scheme: dark
 plugins:
   - jekyll-feed
