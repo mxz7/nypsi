@@ -149,12 +149,12 @@ function randomOffset() {
 
 let padlockPrice = 25000 + randomOffset()
 items["padlock"].worth = padlockPrice
-logger.eco("padlock price updated: $" + padlockPrice)
+logger.eco("padlock price updated: $" + padlockPrice.toLocaleString())
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
     items["padlock"].worth = padlockPrice
-    logger.eco("padlock price updated: $" + padlockPrice)
+    logger.eco("padlock price updated: $" + padlockPrice.toLocaleString())
 }, 3600000)
 
 async function updateCryptoWorth() {
@@ -163,19 +163,19 @@ async function updateCryptoWorth() {
     const btcworth = Math.floor(res.bpi.USD.rate_float)
 
     items["bitcoin"].worth = btcworth
-    logger.eco("bitcoin worth updated: $" + items["bitcoin"].worth)
+    logger.eco("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString())
 
-    res = await fetch("https://sochain.com/api/v2/get_price/DOGE/USD").then((res) => res.json())
+    res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json())
 
-    const dogeworth = Math.floor(res.data.prices[0].price * 1000)
+    const ethWorth = Math.floor(res.data.rates.USD)
 
-    if (!dogeworth) {
-        logger.error("INVALID DOGECOIN WORTH")
+    if (!ethWorth) {
+        logger.error("INVALID ETH WORTH")
         return logger.error(res)
     }
 
-    items["dogecoin"].worth = dogeworth
-    logger.eco("dogecoin worth updated: $" + items["dogecoin"].worth)
+    items["ethereum"].worth = ethWorth
+    logger.eco("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString())
 }
 
 setInterval(updateCryptoWorth, 1500000)
@@ -1381,11 +1381,11 @@ exports.getMaxBitcoin = getMaxBitcoin
  * @returns {Number}
  * @param {Guildmember} member
  */
-function getMaxDogecoin(member) {
+function getMaxEthereum(member) {
     return getMaxBitcoin(member) * 10
 }
 
-exports.getMaxDogecoin = getMaxDogecoin
+exports.getMaxEthereum = getMaxEthereum
 
 function deleteUser(member) {
     let id = member

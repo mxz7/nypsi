@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command("dogecoin", "view the current dogecoin value (reflects real life USD x 1000)", categories.MONEY)
+const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", categories.MONEY).setAliases(["eth"])
 
 /**
  *
@@ -12,24 +12,24 @@ const cmd = new Command("dogecoin", "view the current dogecoin value (reflects r
  */
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
-    const dogecoin = getItems()["dogecoin"]
+    const ethereum = getItems()["ethereum"]
     const inventory = getInventory(message.member)
 
-    let dogecoinAmount = 0
+    let ethereumAmount = 0
 
-    if (inventory["dogecoin"]) {
-        dogecoinAmount = inventory["dogecoin"]
+    if (inventory["ethereum"]) {
+        ethereumAmount = inventory["ethereum"]
     }
 
     const embed = new CustomEmbed(
         message.member,
         false,
-        `**worth** $${dogecoin.worth.toLocaleString()}\n**owned** ${dogecoinAmount.toLocaleString()} ($${(
-            dogecoinAmount * dogecoin.worth
+        `**worth** $${ethereum.worth.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
+            ethereumAmount * ethereum.worth
         ).toLocaleString()})`
     )
-        .setFooter("not real dogecoin, although it reflects current worth in USD x 1000")
-        .setTitle("dogecoin | " + message.author.username)
+        .setFooter("not real ethereum, although it reflects current worth in USD")
+        .setTitle("ethereum | " + message.author.username)
 
     return message.channel.send({ embeds: [embed] })
 }
