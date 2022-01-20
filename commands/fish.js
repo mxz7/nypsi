@@ -8,7 +8,7 @@ const {
     getItems,
     setInventory,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     updateBalance,
     getBalance,
     updateXp,
@@ -234,9 +234,9 @@ async function run(message, args) {
                 }
                 foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`)
             }
-        } else if (chosen == "dogecoin") {
-            const owned = inventory["dogecoin"] || 0
-            const max = getMaxDogecoin(message.member)
+        } else if (chosen == "ethereum") {
+            const owned = inventory["ethereum"] || 0
+            const max = getMaxEthereum(message.member)
 
             if (owned + 1 > max) {
                 i--

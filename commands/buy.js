@@ -7,7 +7,7 @@ const {
     getBalance,
     getInventory,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     updateBalance,
     setInventory,
     userExists,
@@ -127,12 +127,12 @@ async function run(message, args) {
         if (owned + amount > max) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] })
         }
-    } else if (selected.id == "dogecoin") {
-        const owned = inventory["dogecoin"] || 0
-        const max = getMaxDogecoin(message.member)
+    } else if (selected.id == "ethereum") {
+        const owned = inventory["ethereum"] || 0
+        const max = getMaxEthereum(message.member)
 
         if (owned + amount > max) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much dogecoin yet")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much ethereum yet")] })
         }
     }
 

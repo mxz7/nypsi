@@ -8,7 +8,7 @@ const {
     getItems,
     getInventory,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     getPrestige,
     getXp,
     setInventory,
@@ -161,13 +161,13 @@ async function run(message, args) {
                 embeds: [new ErrorEmbed("you cannot give this person that much bitcoin")],
             })
         }
-    } else if (selected.id == "dogecoin") {
-        const owned = targetInventory["dogecoin"] || 0
-        const max = getMaxDogecoin(target)
+    } else if (selected.id == "ethereum") {
+        const owned = targetInventory["ethereum"] || 0
+        const max = getMaxEthereum(target)
 
         if (owned + amount > max) {
             return message.channel.send({
-                embeds: [new ErrorEmbed("you cannot give this person that much dogecoin")],
+                embeds: [new ErrorEmbed("you cannot give this person that much ethereum")],
             })
         }
     }

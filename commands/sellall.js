@@ -7,7 +7,7 @@ const {
     getBalance,
     getInventory,
     getMaxBitcoin,
-    getMaxDogecoin,
+    getMaxEthereum,
     updateBalance,
     setInventory,
     getMulti,
@@ -89,7 +89,7 @@ async function run(message, args) {
 
         if (items[item].role == "fish" || items[item].role == "prey") {
             sellWorth = Math.floor(sellWorth + sellWorth * multi)
-        } else if (item == "dogecoin" || item == "bitcoin") {
+        } else if (item == "ethereum" || item == "bitcoin") {
             if (!selected.worth) {
                 return message.channel.send({
                     embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],

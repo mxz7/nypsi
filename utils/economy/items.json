@@ -87,14 +87,14 @@
         "role": "item",
         "aliases": ["btc"]
     },
-    "dogecoin": {
-        "id": "dogecoin",
-        "name": "dogecoin",
+    "ethereum": {
+        "id": "ethereum",
+        "name": "ethereum",
         "emoji": ":coin:",
-        "description": "doge to the moon",
+        "description": "less scary investment",
         "rarity": 0,
         "role": "item",
-        "aliases": ["doge"]
+        "aliases": ["eth"]
     },
     "terrible_gun": {
         "id": "terrible_gun",
