@@ -10,21 +10,19 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: checkout repository
-            - uses: actions/checkout@v2
+                uses: actions/checkout@v2
             - name: setup node
-            - uses: actions/setup-node@v2
+                uses: actions/setup-node@v2
 
-            - name: npm install
-            - run: npm install
+            - name: install packages
+                run: npm install
 
             - name: formatting
-            - run: npm run format
+                run: npm run format
 
             - name: publish to github
-            - run: git status
-            # commit any changed files
-            # https://github.com/mikeal/publish-to-github-action
-            - uses: tekoh/publish-to-github-action@master
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BRANCH_NAME: ${GITHUB_REF##*/}
+                - run: git status
+                - uses: tekoh/publish-to-github-action@master
+                    env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    BRANCH_NAME: ${GITHUB_REF##*/}
