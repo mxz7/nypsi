@@ -47,7 +47,7 @@ if you'd like to use an existing channel, you can replace [channel] with the cha
 
 ## 4. setting up chat reactions
 
-![chat_reaction](https://raw.githubusercontent.com/tekoh/nypsi/docs/assets/chatreaction_1.png)
+<img src="https://raw.githubusercontent.com/tekoh/nypsi/docs/assets/chatreaction_1.png" style="border-radius:15%">
 
 chat reactions can start randomly or be triggered be the `$cr start` command. for them to start randomly, that must be configured using the command below.
 
