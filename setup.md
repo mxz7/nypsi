@@ -44,3 +44,25 @@ $christmas enable [channel]
 ```
 
 if you'd like to use an existing channel, you can replace [channel] with the channel you'd like to use. (**do not** include the brackets)
+
+## 4. setting up chat reactions
+
+![chat_reaction](https://raw.githubusercontent.com/tekoh/nypsi/docs/assets/chatreaction_1.png)
+
+chat reactions can start randomly or be triggered be the `$cr start` command. for them to start randomly, that must be configured using the command below.
+
+```
+$cr settings enable
+```
+
+this will enable random chat reactions in the current channel
+
+## 5. setting up member counter
+
+the member counter is a basic utility that creates a channel (voice channel by default) and updates the name to show how many members are in the server.
+
+```
+$counter enable
+```
+
+the above will create a locked voice channel with the default format
