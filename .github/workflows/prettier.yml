@@ -24,8 +24,12 @@ jobs:
             - name: git status
               run: git status
 
+            - name: getting branch name
+              id: branch-name
+              uses: tj-actions/branch-names@v5.1
+
             - name: publish to github
               uses: tekoh/publish-to-github-action@master
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                BRANCH_NAME: ${GITHUB_REF##*/}
+                BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
