@@ -1,7 +1,7 @@
 name: Prettier
 on:
     push:
-        branches: [main]
+        branches: [docs]
 jobs:
     build:
         name: Prettier
