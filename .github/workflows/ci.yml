@@ -34,13 +34,19 @@ jobs:
             BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
         steps:
-            - uses: actions/checkout@v2
-            - name: Use Node.js 16
+            - name: checkout repository
+              uses: actions/checkout@v2
+              
+            - name: setup node
               uses: actions/setup-node@v2
               with:
-                  node-version: 16
-            - run: npm ci
-            - run: node nypsi.js
+                node-version: 16
+
+            - name: install packages
+              run: npm install
+
+            - name: run bot
+              run: node nypsi.js
 
     deploy:
         if: github.ref == 'refs/heads/master'
@@ -49,7 +55,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: appleboy/ssh-action@master
+            - name: connect to server & pull changes
+              uses: appleboy/ssh-action@master
               with:
                   host: ${{ secrets.HOST }}
                   USERNAME: ${{ secrets.USERNAME }}
