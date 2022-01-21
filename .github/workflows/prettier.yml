@@ -36,8 +36,15 @@ jobs:
             #     github_token: "${{ secrets.GITHUB_TOKEN }}"
             #     commit_message: "formatting"
 
-            - name: publish to github
-              uses: tekoh/publish-to-github-action@master
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
+            # - name: publish to github
+            #   uses: tekoh/publish-to-github-action@master
+            #   env:
+            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            #     BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
+            
+            - name: push changes
+              uses: EndBug/add-and-commit@v8
+              with:
+                message: formatting
+                committer_name: GitHub Actions
+                committer_email: 41898282+github-actions[bot]@users.noreply.github.com
