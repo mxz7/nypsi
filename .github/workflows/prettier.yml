@@ -18,14 +18,32 @@ jobs:
             - name: install packages
               run: npm install
 
+            - name: getting branch name
+              id: branch-name
+              uses: tj-actions/branch-names@v5.1
+
+            # - name: fetch
+            #   run: git fetch
+            # - name: checkout
+            #   run: git branch
+
             - name: formatting
               run: npm run format
 
             - name: git status
               run: git status
 
-            - name: publish to github
-              uses: tekoh/publish-to-github-action@master
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                BRANCH_NAME: ${GITHUB_REF##*/}
+            - name: push changes
+              uses: devops-infra/action-commit-push@master
+              with:
+                github_token: "${{ secrets.GITHUB_TOKEN }}"
+                add_timestamp: true
+                commit_prefix: "[AUTO]"
+                commit_message: "Automatic commit"
+                force: false
+
+            # - name: publish to github
+            #   uses: tekoh/publish-to-github-action@master
+            #   env:
+            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            #     BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
