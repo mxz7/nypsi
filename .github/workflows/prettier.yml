@@ -22,8 +22,9 @@ jobs:
               id: branch-name
               uses: tj-actions/branch-names@v5.1
 
-            - name: checkout to branch
+            - name: fetch
               run: git fetch
+            - name: checkout
               run: git branch
 
             - name: formatting
