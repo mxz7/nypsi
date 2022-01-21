@@ -15,9 +15,11 @@ by default, nypsi uses `$` as the prefix, if you are unsure what the current pre
 to change the prefix, you can use the prefix command
 
 example:
+
 ```
 $prefix !
 ```
+
 this would change the prefix to `!`
 
 ## 2. qualifying your server for $pings
@@ -25,7 +27,8 @@ this would change the prefix to `!`
 you can see if your server is eligible to track mentions by using the `$ping` command.
 
 requirements:
- - your server **must** have less than 150k members
- - your server owner must have an economy profile
- 
+
+-   your server **must** have less than 150k members
+-   your server owner must have an economy profile
+
 the quick fix for this is to simply check the server owner's balance using the `$bal` command, if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
