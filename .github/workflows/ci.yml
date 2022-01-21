@@ -12,12 +12,17 @@ jobs:
 
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v1
-            - uses: bahmutov/npm-install@v1
+            - name: checkout repository
+              uses: actions/checkout@v2
+              
+            - name: setup node
+              uses: actions/setup-node@v2
 
-            - run: npx eslint ./
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: install packages
+              run: npm install
+            
+            - name: linting
+              run: npx eslint ./
 
     test:
         name: Testing
