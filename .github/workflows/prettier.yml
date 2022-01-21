@@ -11,6 +11,7 @@ jobs:
         steps:
             - name: checkout repository
               uses: actions/checkout@v2
+              
             - name: setup node
               uses: actions/setup-node@v2
 
@@ -20,8 +21,9 @@ jobs:
             - name: formatting
               run: npm run format
 
-            - name: publish to github
+            - name: git status
               run: git status
+            - name: publish to github
               uses: tekoh/publish-to-github-action@master
                 env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
