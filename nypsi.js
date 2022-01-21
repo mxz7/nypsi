@@ -1,5 +1,5 @@
 const startUp = Date.now()
-damlndjoa
+
 require("dotenv").config()
 
 const currentCommit = require("child_process").execSync("git rev-parse HEAD").toString().trim()
