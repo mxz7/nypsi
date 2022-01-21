@@ -18,10 +18,6 @@ jobs:
             - name: install packages
               run: npm install
 
-            - name: getting branch name
-              id: branch-name
-              uses: tj-actions/branch-names@v5.1
-
             # - name: fetch
             #   run: git fetch
             # - name: checkout
@@ -30,8 +26,9 @@ jobs:
             - name: formatting
               run: npm run format
 
-            - name: git status
-              run: git status
+            - name: getting branch name
+              id: branch-name
+              uses: tj-actions/branch-names@v5.1
 
             - name: push changes
               uses: devops-infra/action-commit-push@master
@@ -41,6 +38,7 @@ jobs:
                 commit_prefix: "[AUTO]"
                 commit_message: "Automatic commit"
                 force: false
+                target_branch: ${{ steps.branch-name.outputs.current_branch }}
 
             # - name: publish to github
             #   uses: tekoh/publish-to-github-action@master
