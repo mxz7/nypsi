@@ -34,10 +34,7 @@ jobs:
               uses: devops-infra/action-commit-push@master
               with:
                 github_token: "${{ secrets.GITHUB_TOKEN }}"
-                commit_prefix: "[AUTO]"
-                commit_message: "Automatic commit"
-                force: false
-                target_branch: ${{ steps.branch-name.outputs.current_branch }}
+                commit_message: "formatting"
 
             # - name: publish to github
             #   uses: tekoh/publish-to-github-action@master
