@@ -10,15 +10,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: checkout repository
-                uses: actions/checkout@v2
+              uses: actions/checkout@v2
             - name: setup node
-                uses: actions/setup-node@v2
+              uses: actions/setup-node@v2
 
             - name: install packages
-                run: npm install
+              run: npm install
 
             - name: formatting
-                run: npm run format
+              run: npm run format
 
             - name: publish to github
                 - run: git status
