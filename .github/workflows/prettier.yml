@@ -34,13 +34,13 @@ jobs:
               run: git status
 
             - name: push changes
-             uses: devops-infra/action-commit-push@master
-             with:
-              github_token: "${{ secrets.GITHUB_TOKEN }}"
-              add_timestamp: true
-              commit_prefix: "[AUTO]"
-              commit_message: "Automatic commit"
-              force: false
+              uses: devops-infra/action-commit-push@master
+              with:
+                github_token: "${{ secrets.GITHUB_TOKEN }}"
+                add_timestamp: true
+                commit_prefix: "[AUTO]"
+                commit_message: "Automatic commit"
+                force: false
 
             # - name: publish to github
             #   uses: tekoh/publish-to-github-action@master
