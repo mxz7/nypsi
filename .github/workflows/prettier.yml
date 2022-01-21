@@ -30,14 +30,14 @@ jobs:
               id: branch-name
               uses: tj-actions/branch-names@v5.1
 
-            - name: push changes
-              uses: devops-infra/action-commit-push@master
-              with:
-                github_token: "${{ secrets.GITHUB_TOKEN }}"
-                commit_message: "formatting"
+            # - name: push changes
+            #   uses: devops-infra/action-commit-push@master
+            #   with:
+            #     github_token: "${{ secrets.GITHUB_TOKEN }}"
+            #     commit_message: "formatting"
 
-            # - name: publish to github
-            #   uses: tekoh/publish-to-github-action@master
-            #   env:
-            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            #     BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
+            - name: publish to github
+              uses: tekoh/publish-to-github-action@master
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
