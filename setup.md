@@ -35,7 +35,7 @@ the quick fix for this is to simply check the server owner's balance using the `
 
 ## 3. setting up christmas countdown
 
-the christmas countdown is a utility that sends messages counting down to christmas.
+for this feature, nypsi will need the `manage channels` permission. the christmas countdown is a utility that sends messages counting down to christmas.
 
 you can quickly set this up by using the command format below
 
@@ -59,7 +59,7 @@ this will enable random chat reactions in the current channel
 
 ## 5. setting up member counter
 
-the member counter is a basic utility that creates a channel (voice channel by default) and updates the name to show how many members are in the server.
+for this feature, nypsi will need the `manage channels` permission. the member counter is a basic utility that creates a channel (voice channel by default) and updates the name to show how many members are in the server.
 
 ```
 $counter enable
