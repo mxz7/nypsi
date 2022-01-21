@@ -32,3 +32,15 @@ requirements:
 -   your server owner must have an economy profile
 
 the quick fix for this is to simply check the server owner's balance using the `$bal` command, if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
+
+## 3. setting up christmas countdown
+
+the christmas countdown is a utility that sends messages counting down to christmas.
+
+you can quickly set this up by using the command format below
+
+```
+$christmas enable [channel]
+```
+
+if you'd like to use an existing channel, you can replace [channel] with the channel you'd like to use. (**do not** include the brackets)
