@@ -18,15 +18,18 @@ jobs:
             - name: install packages
               run: npm install
 
+            - name: getting branch name
+              id: branch-name
+              uses: tj-actions/branch-names@v5.1
+
+            - name: checkout to branch
+              run: git branch
+
             - name: formatting
               run: npm run format
 
             - name: git status
               run: git status
-
-            - name: getting branch name
-              id: branch-name
-              uses: tj-actions/branch-names@v5.1
 
             - name: publish to github
               uses: tekoh/publish-to-github-action@master
