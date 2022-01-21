@@ -284,9 +284,9 @@ async function addMention() {
     } else if (cpuUsage > 80) {
         currentInterval = 450
     } else if (cpuUsage < 80) {
-        currentInterval = 150
+        currentInterval = 75
     } else {
-        currentInterval = 150
+        currentInterval = 75
     }
 
     if (currentInterval != old) {
