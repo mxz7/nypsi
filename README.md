@@ -28,6 +28,7 @@ gimme ur moneis ):< - haha joking but seriously check out the patreon it would h
 better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
 
 ##### 💬 mentions
+
 -   nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
 
 ##### 💸 gambling / economy
