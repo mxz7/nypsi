@@ -18,30 +18,9 @@ jobs:
             - name: install packages
               run: npm install
 
-            # - name: fetch
-            #   run: git fetch
-            # - name: checkout
-            #   run: git branch
-
             - name: formatting
               run: npm run format
 
-            - name: getting branch name
-              id: branch-name
-              uses: tj-actions/branch-names@v5.1
-
-            # - name: push changes
-            #   uses: devops-infra/action-commit-push@master
-            #   with:
-            #     github_token: "${{ secrets.GITHUB_TOKEN }}"
-            #     commit_message: "formatting"
-
-            # - name: publish to github
-            #   uses: tekoh/publish-to-github-action@master
-            #   env:
-            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            #     BRANCH_NAME: ${{ steps.branch-name.outputs.current_branch }}
-            
             - name: push changes
               uses: EndBug/add-and-commit@v8
               with:
