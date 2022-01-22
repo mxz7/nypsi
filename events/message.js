@@ -57,7 +57,7 @@ module.exports = async (message) => {
                 addCooldown(message.guild, 3600)
             }
 
-            let members = message.channel.members
+            let members = message.channel.members || message.channel.guildMembers
 
             mentionQueue.push({
                 type: "collection",
