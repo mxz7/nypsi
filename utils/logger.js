@@ -3,8 +3,6 @@ const winston = require("winston")
 require("winston-daily-rotate-file")
 const chalk = require("chalk")
 
-chalk.Level = 1
-
 /**
  * @type {Map<String, Webhook>}
  */
