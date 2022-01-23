@@ -14,3 +14,5 @@ logs/
 !package.json
 !package-lock.json
 !slotsmulti.json
+!.eslintrc.json
+!.prettierrc.json
