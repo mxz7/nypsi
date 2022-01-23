@@ -66,3 +66,6 @@ $counter enable
 ```
 
 the above will create a locked voice channel with the default format
+
+
+this will give you a basic running setup of nypsi, however there is a lot more that nypsi is capable of.
