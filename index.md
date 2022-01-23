@@ -1,8 +1,8 @@
 ---
 layout: default
-title: home
+title: nypsi docs
 nav_order: 1
-description: best discord bot
+description: documentation for nypsi
 permalink: /
 ---
 
