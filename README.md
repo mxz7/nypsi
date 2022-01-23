@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://discord.gg/hJTDNST"><img src="https://badgen.net/discord/members/hJTDNST"></a>
   <a href="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml/badge.svg"></a>
-  <a href="https://github.com/tekoh/nypsi/actions/workflows/test.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://github.com/tekoh/nypsi/actions/workflows/ci.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/tekoh/nypsi"><img src ="https://sloc.xyz/github/tekoh/nypsi"></a>
 </p>
 
