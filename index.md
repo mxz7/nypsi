@@ -10,7 +10,7 @@ permalink: /
 
 ## invite to your server
 
-[click here](http://invite.nypsi.xyz) to get started by inviting **nypsi** to your server
+<a href="http://invite.nypsi.xyz" target="_blank">click here</a> to get started by inviting **nypsi** to your server
 
 ## FAQ
 
