@@ -16,7 +16,7 @@ module.exports = async (member) => {
         setTimeout(() => {
             runCheck(member.guild)
             queue.delete(member.guild.id)
-        }, 30000)
+        }, 120000)
     }
 
     if (!profileExists(member.guild)) return
