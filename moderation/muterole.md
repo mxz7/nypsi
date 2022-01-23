@@ -3,6 +3,7 @@ layout: default
 title: mute role
 description: mute role setup for nypsi
 permalink: /mod/muterole
+parent: moderation
 ---
 
 # mute role
