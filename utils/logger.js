@@ -1,7 +1,9 @@
 const { Client, Webhook, User } = require("discord.js")
 const winston = require("winston")
 require("winston-daily-rotate-file")
-const clc = require("cli-color")
+const chalk = require("chalk")
+
+chalk.Level = 1
 
 /**
  * @type {Map<String, Webhook>}
@@ -14,31 +16,31 @@ let nextLogMsg = new Map()
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
     if (level == "error") {
-        return `[${clc.blackBright(timestamp)}] ${clc.red(`[error] ${message}`)}`
+        return `[${chalk.blackBright(timestamp)}] ${chalk.red(`[error] ${message}`)}`
     } else if (level == "warn") {
-        return `[${clc.blackBright(timestamp)}] ${clc.yellowBright(`[warn] ${message}`)}`
+        return `[${chalk.blackBright(timestamp)}] ${chalk.yellowBright(`[warn] ${message}`)}`
     } else {
-        let color = clc.white
+        let color = chalk.white
 
         switch (level) {
             case "guild":
-                color = clc.blue
+                color = chalk.blue
                 break
             case "eco":
-                color = clc.green
+                color = chalk.green
                 break
             case "auto":
-                color = clc.blue
+                color = chalk.blue
                 break
             case "cmd":
-                color = clc.cyan
+                color = chalk.cyan
                 break
             case "img":
-                color = clc.green
+                color = chalk.green
                 break
         }
 
-        return `[${clc.blackBright(timestamp)}] ${color(message)}`
+        return `[${chalk.blackBright(timestamp)}] ${color(message)}`
     }
 })
 
