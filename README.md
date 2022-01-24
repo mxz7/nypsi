@@ -11,6 +11,10 @@
 
 invite link can be found at: [`invite.nypsi.xyz`](http://invite.nypsi.xyz)
 
+### 📔 documentation
+
+the documentation can be found at [`docs.nypsi.xyz`](https://docs.nypsi.xyz)
+
 ### 🍪 top.gg
 
 top.gg url: [`https://top.gg/bot/678711738845102087`](https://top.gg/bot/678711738845102087)
