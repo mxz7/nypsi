@@ -522,7 +522,7 @@ async function runCommand(cmd, message, args) {
             message.react("💀")
         } else {
             logCommand(message, args)
-            return message.channel.send({ embeds: [new ErrorEmbed("nypsi is restarting..")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("nypsi is rebooting..")] })
         }
     }
 
