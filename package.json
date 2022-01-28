@@ -15,7 +15,7 @@
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
     "discord.js": "^13.6.0",
-    "dotenv": "^14.2.0",
+    "dotenv": "^14.3.2",
     "express": "^4.17.2",
     "fast-sort": "^3.1.1",
     "figlet": "^1.5.2",
@@ -30,7 +30,7 @@
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.8",
     "winston": "^3.4.0",
-    "winston-daily-rotate-file": "^4.5.5"
+    "winston-daily-rotate-file": "^4.6.0"
   },
   "devDependencies": {
     "eslint": "^8.7.0",
