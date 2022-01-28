@@ -16,3 +16,7 @@ async function run(message, args) {
         console.log(mentionQueue)
     }
 }
+
+cmd.setRun(run)
+
+module.exports = cmd
