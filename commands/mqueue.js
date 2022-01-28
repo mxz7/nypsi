@@ -1,5 +1,6 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
+const fs = require("fs")
 
 const cmd = new Command("mqueue", "admin command", categories.ADMIN)
 
@@ -13,7 +14,7 @@ async function run(message, args) {
     const { mentionQueue } = require("../utils/users/utils")
 
     if (args.length == 0) {
-        console.log(mentionQueue)
+        fs.writeFileSync("./queue.txt", mentionQueue.toString(), () => {})
     }
 }
 
