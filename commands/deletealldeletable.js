@@ -53,7 +53,6 @@ async function run(message, args) {
             }
         }
     }, 10)
-
 }
 
 cmd.setRun(run)
