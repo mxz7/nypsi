@@ -108,8 +108,6 @@ async function run(message, args) {
         } else if (mention.type == "mention") {
             mentions++
         } else {
-            if (deletable > 500) return
-            logger.info(mention.url)
             deletable++
         }
     }
