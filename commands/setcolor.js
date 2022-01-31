@@ -60,6 +60,9 @@ async function run(message, args) {
                 `your color has been updated to **#${getEmbedColor(message.author.id)}**`
             ),
         ],
+    }).catch(() => {
+        setEmbedColor(message.author.id, "default")
+        return message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
     })
 }
 
