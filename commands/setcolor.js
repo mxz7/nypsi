@@ -52,18 +52,24 @@ async function run(message, args) {
 
     setEmbedColor(message.author.id, color)
 
-    return message.channel.send({
-        embeds: [
-            new CustomEmbed(
-                message.member,
-                false,
-                `your color has been updated to **#${getEmbedColor(message.author.id)}**`
-            ),
-        ],
-    }).catch(() => {
-        setEmbedColor(message.author.id, "default")
-        return message.channel.send({embeds: [new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))")]})
-    })
+    return message.channel
+        .send({
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `your color has been updated to **#${getEmbedColor(message.author.id)}**`
+                ),
+            ],
+        })
+        .catch(() => {
+            setEmbedColor(message.author.id, "default")
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"),
+                ],
+            })
+        })
 }
 
 cmd.setRun(run)
