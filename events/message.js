@@ -158,9 +158,21 @@ let currentInterval = 150
 let lastChange = 0
 
 async function addMention() {
-    const { mentionQueue } = require("../utils/users/utils")
+    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
 
-    let mention = mentionQueue.shift()
+    let mention
+
+    if (mentionQueue.length == 0) {
+        if (deleteQueue.length == 0) {
+            clearInterval(mentionInterval)
+            mentionInterval = undefined
+            currentInterval = 150
+        } else {
+            mention = deleteQueue.shift()
+        }
+    } else {
+        mention = mentionQueue.shift()
+    }
 
     if (!mention) {
         clearInterval(mentionInterval)
@@ -252,24 +264,22 @@ async function addMention() {
             mentions.splice(0, limit)
 
             for (const m of mentions) {
-                mentionQueue.push({
-                    type: "delete",
-                    url: m.url,
-                })
+                if (deleteQueue.indexOf(m.url) != -1) return
+                deleteQueue.push(m.url)
             }
         }
 
-        if (mentionQueue.length == 0) {
+        if (mentionQueue.length == 0 && deleteQueue.length == 0) {
             clearInterval(mentionInterval)
             mentionInterval = undefined
             currentInterval = 100
             return
         }
     } else {
-        deleteMention.run(mention.url)
+        deleteMention.run(mention)
     }
 
-    if (mentionQueue.length == 0) {
+    if (mentionQueue.length == 0 && deleteQueue.length == 0) {
         clearInterval(mentionInterval)
         mentionInterval = undefined
         currentInterval = 150
