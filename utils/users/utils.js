@@ -19,6 +19,14 @@ const mentionQueue = []
  * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
  */
 exports.mentionQueue = mentionQueue
+/**
+ * @type {Array<String>}
+ */
+const deleteQueue = []
+/**
+ * @type {Array<String>}
+ */
+exports.deleteQueue = deleteQueue
 
 /**
  *
