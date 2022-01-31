@@ -41,7 +41,7 @@ async function run(message, args) {
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe, currentCommit } = require("../nypsi.js")
-    const { mentionQueue } = require("../utils/users/utils")
+    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -107,8 +107,6 @@ async function run(message, args) {
             collections++
         } else if (mention.type == "mention") {
             mentions++
-        } else {
-            deletable++
         }
     }
 
@@ -152,7 +150,7 @@ async function run(message, args) {
                 "\n-- **mentions** " +
                 mentions.toLocaleString() +
                 "\n-- **deletable** " +
-                deletable.toLocaleString(),
+                deleteQueue.length.toLocaleString(),
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
