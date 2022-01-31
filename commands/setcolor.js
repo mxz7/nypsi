@@ -62,7 +62,7 @@ async function run(message, args) {
         ],
     }).catch(() => {
         setEmbedColor(message.author.id, "default")
-        return message.channel.send({embeds: [new ErrorEmbed("invalid color")]})
+        return message.channel.send({embeds: [new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))")]})
     })
 }
 
