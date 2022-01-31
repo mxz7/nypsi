@@ -50,6 +50,20 @@ async function run(message, args) {
         color = color.substr(0, 6)
     }
 
+    const embed = new CustomEmbed()
+
+    try {
+        if (color != "default") {
+            embed.setColor(color)
+        }
+    } catch {
+        return message.channel.send({
+            embeds: [
+                new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"),
+            ],
+        })
+    }
+
     setEmbedColor(message.author.id, color)
 
     return message.channel
@@ -61,14 +75,6 @@ async function run(message, args) {
                     `your color has been updated to **#${getEmbedColor(message.author.id)}**`
                 ),
             ],
-        })
-        .catch(() => {
-            setEmbedColor(message.author.id, "default")
-            return message.channel.send({
-                embeds: [
-                    new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"),
-                ],
-            })
         })
 }
 
