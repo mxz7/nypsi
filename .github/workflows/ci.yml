@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on:
     push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
     lint:
-        name: Linting
+        name: linting
 
         runs-on: ubuntu-latest
         steps:
@@ -25,7 +25,7 @@ jobs:
               run: npx eslint ./
 
     test:
-        name: Testing
+        name: testing
 
         runs-on: ubuntu-latest
         timeout-minutes: 5
