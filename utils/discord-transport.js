@@ -19,7 +19,11 @@ module.exports = class DiscordTransport extends Transport {
                 content = content.substring(0, 1900) + "\n..."
             }
 
-            this.hook.send(content)
+            if (content != "") {
+                this.hook.send(content)
+            }
+
+            this.queue = []
         }, opts.interval || 2500)
     }
 
