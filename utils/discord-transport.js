@@ -28,7 +28,11 @@ module.exports = class DiscordTransport extends Transport {
     }
 
     log(info, callback) {
-        this.queue.push(info)
+        setImmediate(() => {
+            this.emit("logged", info)
+        })
+
+        this.queue.push(`\`\`\`ansi\n${info[Symbol.for("message")]}\n\`\`\``)
 
         callback()
     }
