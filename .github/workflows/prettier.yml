@@ -1,10 +1,10 @@
-name: Prettier
+name: prettier
 on:
     push:
         branches: [main]
 jobs:
     build:
-        name: Prettier
+        name: prettier
         runs-on: ubuntu-latest
         steps:
             - name: checkout repository
