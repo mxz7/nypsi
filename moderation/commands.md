@@ -1,6 +1,6 @@
 ---
 layout: default
-title: punishments
+title: commands
 description: explanation of punishment commands for nypsi
 permalink: /mod/commands
 parent: moderation
