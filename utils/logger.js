@@ -231,9 +231,11 @@ async function getWebhooks(client) {
 
     runLogs()
 
-    logger.add(new DiscordTransport({
-        webhook: process.env.WEBHOOK_URL
-    }))
+    logger.add(
+        new DiscordTransport({
+            webhook: process.env.WEBHOOK_URL,
+        })
+    )
 }
 
 exports.getWebhooks = getWebhooks
