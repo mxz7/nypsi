@@ -2,6 +2,7 @@ const { Client, Webhook, User } = require("discord.js")
 const winston = require("winston")
 require("winston-daily-rotate-file")
 const chalk = require("chalk")
+const DiscordTransport = require("./discord-transport")
 
 /**
  * @type {Map<String, Webhook>}
@@ -229,6 +230,10 @@ async function getWebhooks(client) {
     logger.info(`sql logs webhook running ${sqlLogs.id}`)
 
     runLogs()
+
+    logger.add(new DiscordTransport({
+        webhook: process.env.WEBHOOK_URL
+    }))
 }
 
 exports.getWebhooks = getWebhooks
