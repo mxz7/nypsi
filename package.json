@@ -14,6 +14,7 @@
     "better-sqlite3": "^7.5.0",
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
+    "discord-webhook-node": "^1.1.8",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
@@ -30,7 +31,8 @@
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.8",
     "winston": "^3.5.1",
-    "winston-daily-rotate-file": "^4.6.0"
+    "winston-daily-rotate-file": "^4.6.0",
+    "winston-transport": "^4.4.2"
   },
   "devDependencies": {
     "eslint": "^8.8.0",
