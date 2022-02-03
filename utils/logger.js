@@ -93,7 +93,7 @@ function databaseLog(content) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    content = `${day}/${month} ${getTimestamp()} ${content}\n\n`
+    content = `\`\`\`${day}/${month} ${getTimestamp()} ${content}\`\`\``
 
     if (!nextLogMsg.get("sql")) {
         nextLogMsg.set("sql", content)
