@@ -10,7 +10,7 @@ parent: chat reactions
 
 ## default
 
-by default, nypsi will use `[this](https://gist.github.com/tekoh/f8b8d6db6259cad221a679f5015d9f82)` word list
+by default, nypsi will use [`this`](https://gist.github.com/tekoh/f8b8d6db6259cad221a679f5015d9f82) word list
 
 ## adding to word list
 
