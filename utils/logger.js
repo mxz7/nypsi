@@ -2,7 +2,7 @@ const { Client, Webhook, User } = require("discord.js")
 const winston = require("winston")
 require("winston-daily-rotate-file")
 const chalk = require("chalk")
-const DiscordTransport = require("./discord-transport")
+const DiscordTransport = require("winston-discord-webhook")
 
 /**
  * @type {Map<String, Webhook>}
