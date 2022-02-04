@@ -2,7 +2,7 @@ const { Client, Webhook, User } = require("discord.js")
 const winston = require("winston")
 require("winston-daily-rotate-file")
 const chalk = require("chalk")
-const DiscordTransport = require("./discord-transport")
+const DiscordTransport = require("winston-discord-webhook")
 
 /**
  * @type {Map<String, Webhook>}
@@ -93,7 +93,7 @@ function databaseLog(content) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
-    content = `\`\`\`${day}/${month} ${getTimestamp()} ${content}\`\`\``
+    content = `\`\`\`[${day}/${month} ${getTimestamp()}] ${content}\`\`\``
 
     if (!nextLogMsg.get("sql")) {
         nextLogMsg.set("sql", content)
@@ -234,6 +234,7 @@ async function getWebhooks(client) {
     logger.add(
         new DiscordTransport({
             webhook: process.env.WEBHOOK_URL,
+            useCodeblock: true,
         })
     )
 }
