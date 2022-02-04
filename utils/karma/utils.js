@@ -118,7 +118,7 @@ exports.closeKarmaShop = closeKarmaShop
 function deteriorateKarma() {
     const now = Date.now()
 
-    const threshold = now - 7200000
+    const threshold = now - 259200000
 
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
