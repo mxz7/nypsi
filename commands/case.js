@@ -44,8 +44,6 @@ async function run(message, args) {
 
     case0.deleted = case0.deleted === 0 ? false : true
 
-    const date = new Date(case0.time).toLocaleString()
-
     const members = message.guild.members.cache
     const target = members.find((m) => m.user.id == case0.user)
 
@@ -59,7 +57,7 @@ async function run(message, args) {
         .setTitle("case " + case0.case_id + " | " + message.member.user.username)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
-        .addField("date/time", date, true)
+        .addField("date/time", `<t:${Math.floor(case0.time / 1000)}>`, true)
         .addField("user", "`" + case0.user + "`", true)
         .addField("reason", reason, true)
         .addField("deleted", case0.deleted.toString(), true)
