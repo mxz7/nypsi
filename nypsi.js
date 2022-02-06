@@ -173,7 +173,7 @@ async function requestDM(id, content, dontDmTekoh) {
         await member
             .send({ content: content })
             .then(() => {
-                logger.info(`successfully sent DM to ${member.tag} (${member.id})`)
+                logger.success(`successfully sent DM to ${member.tag} (${member.id})`)
             })
             .catch(async () => {
                 logger.warn(`failed to send DM to ${member.tag} (${member.id})`)
