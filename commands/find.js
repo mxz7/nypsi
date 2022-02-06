@@ -14,9 +14,9 @@ const {
     topAmountGlobal,
 } = require("../utils/economy/utils")
 const { getPeaks } = require("../utils/guilds/utils")
-const { getKarma } = require("../utils/karma/utils")
+const { getKarma, getLastCommand } = require("../utils/karma/utils")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { formatDate } = require("../utils/utils")
+const { formatDate, daysAgo } = require("../utils/utils")
 
 const cmd = new Command("find", "find info", categories.NONE).setPermissions(["bot owner"])
 
@@ -148,7 +148,7 @@ async function showUser(message, user) {
         .addField(
             "user",
             `**tag** ${user.tag}
-            **created** ${formatDate(user.createdAt)}`,
+            **created** ${formatDate(user.createdAt)}${getLastCommand(user.id) ? `\n**last command** ${daysAgo(getLastCommand(user.id))} days ago` : ""}`,
             true
         )
         .setFooter(`${getKarma(user.id)} karma`)
@@ -158,7 +158,7 @@ async function showUser(message, user) {
         embed.addField(
             "economy",
             `💰 $**${getBalance(user.id).toLocaleString()}**
-            💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id)}**
+            💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id).toLocaleString()}**
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}
             **prestige** ${getPrestige(user.id)}
