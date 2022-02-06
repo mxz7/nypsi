@@ -128,7 +128,7 @@ function getLastCommand(member) {
 
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
 
-    return query
+    return query.last_command
 }
 
 exports.getLastCommand = getLastCommand
