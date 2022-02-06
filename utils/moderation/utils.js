@@ -254,15 +254,15 @@ function runModerationChecks(client) {
         let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?").all(date)
 
         for (let unmute of query) {
+            logger.auto(`requesting unmute in ${unmute.guild_id} for ${unmute.user}`)
             requestUnmute(unmute.guild_id, unmute.user, client)
-            logger.auto(`requested unmute in ${unmute.guild_id} for ${unmute.user}`)
         }
 
         query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date)
 
         for (let unban of query) {
+            logger.auto(`requesting unban in ${unban.guild_id} for ${unban.user}`)
             requestUnban(unban.guild_id, unban.user, client)
-            logger.auto(`requested unban in ${unban.guild_id} for ${unban.user}`)
         }
     }, 30000)
 }
@@ -343,7 +343,7 @@ function requestUnban(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
     if (!guild) {
-        logger.warn(`unable to find guild ${guild}`)
+        logger.warn("unable to find guild")
         return
     }
 
@@ -358,7 +358,7 @@ async function requestUnmute(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
     if (!guild) {
-        logger.warn(`unable to find guild ${guild}`)
+        logger.warn("unable to find guild ${guild}")
         return
     }
 
