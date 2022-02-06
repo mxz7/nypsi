@@ -342,11 +342,16 @@ exports.setMuteRole = setMuteRole
 function requestUnban(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
-    if (!guild) return
+    if (!guild) {
+        logger.warn(`unable to find guild ${guild}`)
+        return
+    }
 
     deleteBan(guild, member)
 
     guild.members.unban(member, "ban expired")
+
+    logger.success("ban removed")
 }
 
 async function requestUnmute(guild, member, client) {
