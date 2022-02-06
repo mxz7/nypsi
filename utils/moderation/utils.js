@@ -342,17 +342,25 @@ exports.setMuteRole = setMuteRole
 function requestUnban(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
-    if (!guild) return
+    if (!guild) {
+        logger.warn(`unable to find guild ${guild}`)
+        return
+    }
 
     deleteBan(guild, member)
 
     guild.members.unban(member, "ban expired")
+
+    logger.success("ban removed")
 }
 
 async function requestUnmute(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
-    if (!guild) return
+    if (!guild) {
+        logger.warn(`unable to find guild ${guild}`)
+        return
+    }
 
     let members
 
@@ -371,6 +379,7 @@ async function requestUnmute(guild, member, client) {
             newMember = undefined
         })
         if (!newMember) {
+            logger.warn("unable to find member, deleting mute..")
             return deleteMute(guild, member)
         }
     }
@@ -385,9 +394,14 @@ async function requestUnmute(guild, member, client) {
         muteRole = await guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
-    if (!muteRole) return deleteMute(guild, newMember)
+    if (!muteRole) {
+        logger.warn("unable to find mute role, deleting mute..")
+        return deleteMute(guild, newMember)
+    }
 
     deleteMute(guild, member)
+
+    logger.success("mute deleted")
 
     return await newMember.roles.remove(muteRole).catch((e) => {
         logger.error("couldnt remove mute role")
