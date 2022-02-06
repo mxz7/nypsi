@@ -158,7 +158,7 @@ async function showUser(message, user) {
         embed.addField(
             "economy",
             `💰 $**${getBalance(user.id).toLocaleString()}**
-            💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id)}**
+            💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id).toLocaleString()}**
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}
             **prestige** ${getPrestige(user.id)}
