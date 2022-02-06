@@ -32,6 +32,8 @@ module.exports = async (message) => {
         return await message.channel.send({ embeds: [embed] })
     }
 
+    message.content = message.content.replace(/ +(?= )/g, "") // remove any additional spaces
+
     if (hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
