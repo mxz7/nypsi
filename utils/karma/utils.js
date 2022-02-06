@@ -163,7 +163,7 @@ function deteriorateKarma() {
             deteriorateKarma()
         }, 86400000)
         deteriorateKarma()
-    }, 30000)
+    }, needed - now)
 
     logger.auto(`karma deterioration will run in ${MStoTime(needed - now)}`)
 })()
