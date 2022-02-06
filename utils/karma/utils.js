@@ -87,7 +87,7 @@ function updateLastCommand(member) {
     if (!query) {
         db.prepare("INSERT INTO karma (id, last_command) VALUES (?, ?)").run(id, Date.now())
     } else {
-        db.prepare("UPDATE karma SET karma =  ? WHERE id = ?").run(id, Date.now())
+        db.prepare("UPDATE karma SET last_command = ? WHERE id = ?").run(Date.now(), id)
     }
 }
 
@@ -118,7 +118,7 @@ exports.closeKarmaShop = closeKarmaShop
 function deteriorateKarma() {
     const now = Date.now()
 
-    const threshold = now - 259200000
+    const threshold = now - 86400000
 
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
@@ -130,7 +130,7 @@ function deteriorateKarma() {
     for (const user of users) {
         let karmaToRemove = 5
 
-        if (now - 864000000 > user.last_command) {
+        if (now - 604800000 > user.last_command) {
             karmaToRemove = 25
         }
 
@@ -163,7 +163,7 @@ function deteriorateKarma() {
             deteriorateKarma()
         }, 86400000)
         deteriorateKarma()
-    }, needed - now)
+    }, 30000)
 
     logger.auto(`karma deterioration will run in ${MStoTime(needed - now)}`)
 })()
