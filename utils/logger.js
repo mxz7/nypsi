@@ -52,6 +52,7 @@ const levels = {
     auto: 2,
     cmd: 2,
     img: 2,
+    success: 2,
     debug: 3,
 }
 
