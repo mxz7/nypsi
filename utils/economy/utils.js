@@ -188,7 +188,10 @@ setInterval(updateCryptoWorth, 1500000)
 async function doVote(client, vote) {
     const { user } = vote
 
-    if (!userExists(user)) return
+    if (!userExists(user)) {
+        logger.warn(`${user} doesnt exist`)
+        return
+    }
 
     const now = new Date().getTime()
 
@@ -242,6 +245,8 @@ async function doVote(client, vote) {
 
     setInventory(memberID, inventory)
 
+    logger.success(`vote processed for ${memberID}`)
+
     if (!id && getDMsEnabled(memberID)) {
         const embed = new CustomEmbed()
             .setColor("#5efb8f")
@@ -255,7 +260,7 @@ async function doVote(client, vote) {
         await member
             .send({ content: "thank you for voting!", embeds: [embed] })
             .then(() => {
-                logger.eco(`sent vote confirmation to ${member.tag}`)
+                logger.success(`sent vote confirmation to ${member.tag}`)
             })
             .catch(() => {
                 logger.warn(`failed to send vote confirmation to ${member.tag}`)
