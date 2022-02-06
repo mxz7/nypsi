@@ -148,7 +148,9 @@ async function showUser(message, user) {
         .addField(
             "user",
             `**tag** ${user.tag}
-            **created** ${formatDate(user.createdAt)}${getLastCommand(user.id) ? `\n**last command** ${daysAgo(getLastCommand(user.id))} days ago` : ""}`,
+            **created** ${formatDate(user.createdAt)}${
+                getLastCommand(user.id) ? `\n**last command** ${daysAgo(getLastCommand(user.id))} days ago` : ""
+            }`,
             true
         )
         .setFooter(`${getKarma(user.id)} karma`)

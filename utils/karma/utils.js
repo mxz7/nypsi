@@ -116,15 +116,14 @@ function closeKarmaShop() {
 exports.closeKarmaShop = closeKarmaShop
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @returns {number}
  */
 function getLastCommand(member) {
     let id = member
 
     if (member.user) id = member.user.id
-
 
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
 
