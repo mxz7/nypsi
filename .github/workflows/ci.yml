@@ -66,4 +66,4 @@ jobs:
                       cd ~/nypsi
                       git pull
                       git status
-                      npm install
+                      npm ci
