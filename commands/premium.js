@@ -63,7 +63,7 @@ async function run(message, args) {
                         message.member,
                         false,
                         "you currently have no premium membership\n\nhttps://www.patreon.com/nypsi"
-                    ).setFooter(`join the support server if this is an issue (${getPrefix(message.guild)}support)`),
+                    ).setFooter(`want to pay with crypto? (${getPrefix(message.guild)}support)`),
                 ],
             })
         }
