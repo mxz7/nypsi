@@ -101,7 +101,7 @@ async function run(message, args) {
         }
     }
 
-    await message.channel.bulkDelete(collected)
+    await message.channel.bulkDelete(collected).catch(() => {})
 }
 
 cmd.setRun(run)
