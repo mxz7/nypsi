@@ -2,6 +2,7 @@ const { Client } = require("discord.js")
 const { getRandomCommand } = require("../utils/commandhandler")
 const { logger } = require("../utils/logger")
 const { daysUntilChristmas } = require("../utils/utils")
+const { version } = require("../package.json")
 
 /**
  * @param {Client} client
@@ -74,6 +75,7 @@ module.exports = async (client, startUp) => {
     logger.info("server count: " + client.guilds.cache.size.toLocaleString())
     logger.info("user count: " + memberCount.toLocaleString())
     logger.info("commands count: " + commandsSize)
+    logger.info(`version: ${version}`)
 
     logger.info("logged in as " + client.user.tag)
 
