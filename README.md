@@ -5,6 +5,8 @@
   <a href="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml/badge.svg"></a>
   <a href="https://github.com/tekoh/nypsi/actions/workflows/ci.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/tekoh/nypsi"><img src ="https://sloc.xyz/github/tekoh/nypsi"></a>
+  <br>
+  <a href="https://ko-fi.com/U7U4AEDXM"><img src = "https://ko-fi.com/img/githubbutton_sm.svg"></a>
 </p>
 
 ### 🍟 invite / use in your server
