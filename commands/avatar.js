@@ -53,12 +53,15 @@ async function run(message, args) {
 
     const filter = (i) => i.user.id == message.author.id
 
-    const reaction = await msg.awaitMessageComponent({ filter, time: 15000, errors: ["time"] }).then(async (collected) => {
-        await collected.deferUpdate()
-        return collected.customId
-    }).catch(async () => {
-        await msg.edit({ components: [] })
-    })
+    const reaction = await msg
+        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .then(async (collected) => {
+            await collected.deferUpdate()
+            return collected.customId
+        })
+        .catch(async () => {
+            await msg.edit({ components: [] })
+        })
 
     if (reaction == "x") {
         embed.setImage(serverAvatar)
