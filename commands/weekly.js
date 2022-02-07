@@ -67,7 +67,7 @@ async function run(message, args) {
         if (diff >= 604800000 || lastWeekly == "none") {
             setLastWeekly(message.author.id, now)
 
-            let amount = 100000
+            let amount = 150000
             const multi = await getMulti(message.member)
 
             let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
