@@ -31,7 +31,7 @@
     "utf-8-validate": "^5.0.8",
     "winston": "^3.5.1",
     "winston-daily-rotate-file": "^4.6.0",
-    "winston-discord-webhook": "^1.0.0"
+    "winston-discord-webhook": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^8.8.0",
