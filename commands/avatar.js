@@ -1,7 +1,8 @@
-const { Message } = require("discord.js")
+const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const e = require("express")
 
 const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
 
@@ -30,9 +31,40 @@ async function run(message, args) {
 
     const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
 
+    let serverAvatar = member.displayAvatarURL({ dynamic: true, size: 256 })
+
+    if (avatar == serverAvatar) {
+        serverAvatar = undefined
+    }
+
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("x").setLabel("show server avatar").setStyle("PRIMARY")
+    )
+
     const embed = new CustomEmbed(member, false).setTitle(member.user.tag).setImage(avatar)
 
-    message.channel.send({ embeds: [embed] })
+    let msg
+
+    if (serverAvatar) {
+        msg = await message.channel.send({ embeds: [embed], components: [row] })
+    } else {
+        return message.channel.send({ embeds: [embed] })
+    }
+
+    const filter = (i) => i.user.id == message.author.id
+
+    const reaction = await msg.awaitMessageComponent({ filter, time: 15000, errors: ["time"] }).then(async (collected) => {
+        await collected.deferUpdate()
+        return collected.customId
+    }).catch(async () => {
+        await msg.edit({ components: [] })
+    })
+
+    if (reaction == "x") {
+        embed.setImage(serverAvatar)
+
+        await msg.edit({ embeds: [embed], components: [] })
+    }
 }
 
 avatar.setRun(run)
