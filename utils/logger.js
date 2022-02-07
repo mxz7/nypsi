@@ -34,6 +34,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             case "cmd":
                 color = chalk.cyan
                 break
+            case "success":
             case "img":
                 color = chalk.green
                 break
