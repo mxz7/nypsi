@@ -16,3 +16,4 @@ logs/
 !slotsmulti.json
 !.eslintrc.json
 !.prettierrc.json
+!.prettierignore
