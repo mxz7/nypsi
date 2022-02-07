@@ -57,11 +57,18 @@ async function run(message, args) {
 
             return message.channel.send({ embeds: [embed] })
         } else {
-            const embed = new CustomEmbed(message.member, false, "you currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:")
-            
-            embed.addField("payment methods", "[patreon](https://patreon.com/nypsi)\n[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-                "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)")
-            
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "you currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+            )
+
+            embed.addField(
+                "payment methods",
+                "[patreon](https://patreon.com/nypsi)\n[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+                    "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
+            )
+
             return message.channel.send({ embeds: [embed] })
         }
     }
