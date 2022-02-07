@@ -4,6 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
 const { logger } = require("../utils/logger")
+const { version } = require("../package.json")
 
 const cooldown = new Map()
 
@@ -40,7 +41,7 @@ async function run(message, args) {
     }, 5000)
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
-    const { snipe, eSnipe, currentCommit } = require("../nypsi.js")
+    const { snipe, eSnipe } = require("../nypsi.js")
     const { mentionQueue, deleteQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
@@ -155,7 +156,7 @@ async function run(message, args) {
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
 
-    embed.setFooter(currentCommit)
+    embed.setFooter(`v${version}`)
 
     message.channel.send({ embeds: [embed] })
 }
