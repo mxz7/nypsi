@@ -33,16 +33,12 @@ const boobLinks = [
 ]
 const assLinks = [
     "https://www.reddit.com/r/ass.json?limit=777",
-    "https://www.reddit.com/r/asstastic.json?limit=777",
     "https://www.reddit.com/r/facedownassup.json?limit=777",
     "https://www.reddit.com/r/assinthong.json?limit=777",
     "https://www.reddit.com/r/buttplug.json?limit=777",
     "https://www.reddit.com/r/TheUnderbun.json?limit=777",
     "https://www.reddit.com/r/booty.json?limit=777",
-    "https://www.reddit.com/r/HungryButts.json?limit=777",
-    "https://www.reddit.com/r/whooties.json?limit=777",
     "https://www.reddit.com/r/WhiteCheeks.json?limit=777",
-    "https://www.reddit.com/r/AssholeBehindThong.json?limit=777",
     "https://www.reddit.com/r/WomenBendingOver.json?limit=777",
     "https://www.reddit.com/r/thickwhitegirls.json?limit=777",
 ]
@@ -51,9 +47,6 @@ const pornLinks = [
     "https://www.reddit.com/r/realgirls.json?limit=777",
     "https://www.reddit.com/r/legalteens.json?limit=777",
     "https://www.reddit.com/r/amateur.json?limit=777",
-    "https://www.reddit.com/r/nsfw_snapchat.json?limit=777",
-    "https://www.reddit.com/r/bathing.json?limit=777",
-    "https://www.reddit.com/r/porngifs.json?limit=777",
     "https://www.reddit.com/r/gonewild.json?limit=777",
     "https://www.reddit.com/r/gonewild18.json?limit=777",
     "https://www.reddit.com/r/collegeamateurs.json?limit=777",
@@ -63,7 +56,6 @@ const pornLinks = [
     "https://www.reddit.com/r/cumsluts.json?limit=777",
     "https://www.reddit.com/r/cumfetish.json?limit=777",
     "https://www.reddit.com/r/creampies.json?limit=777",
-    "https://www.reddit.com/r/Phatasswhitegirls.json?limit=777",
 ]
 const birbLinks = [
     "https://www.reddit.com/r/birb.json?limit=777",
