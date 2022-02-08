@@ -38,7 +38,7 @@ const client = new Discord.Client({
     ],
 })
 
-const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
+const { getUserCount, updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
 const {
     runCheck,
     checkStats,
@@ -262,6 +262,7 @@ setTimeout(() => {
     logger.info("logging in...")
     client.login(process.env.BOT_TOKEN).then(() => {
         setTimeout(() => {
+            runLotteryInterval(client)
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"])
             runCountdowns(client)
             runChristmas(client)
