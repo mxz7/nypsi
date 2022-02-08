@@ -74,6 +74,10 @@ function createTables() {
     db.prepare(
         "CREATE TABLE IF NOT EXISTS mentions ('guild_id' TEXT NOT NULL, 'target_id' TEXT NOT NULL, 'date' INTEGER NOT NULL, 'user_tag' TEXT NOT NULL, 'url' TEXT NOT NULL, 'content' TEXT NOT NULL)"
     ).run()
+
+    db.prepare(
+        "CREATE TABLE IF NOT EXISTS lottery_tickets ('id' INTEGER NOT NULL PRIMARY KEY, 'user_id' TEXT NOT NULL)"
+    ).run()
 }
 
 createTables()
