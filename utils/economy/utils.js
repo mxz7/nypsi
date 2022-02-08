@@ -19,7 +19,7 @@ if (!process.env.GITHUB_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils
 const topgg = require("@top-gg/sdk")
 const express = require("express")
 const { inCooldown, addCooldown } = require("../guilds/utils")
-const { GuildMember, Guild, Client } = require("discord.js")
+const { GuildMember, Guild, Client, WebhookClient } = require("discord.js")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
 const { Worker, getAllWorkers } = require("./workers")
@@ -27,6 +27,7 @@ const { inPlaceSort } = require("fast-sort")
 const fetch = require("node-fetch")
 const { getDatabase } = require("../database/database")
 const { addKarma, getKarma } = require("../karma/utils")
+const shuffleArray = require("shuffle-array")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -89,6 +90,11 @@ setInterval(() => {
 }, 5 * 60 * 1000)
 
 let items
+
+const lotteryTicketPrice = 25000
+exports.lotteryTicketPrice = lotteryTicketPrice
+
+const lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
 
 /**
  *
@@ -1413,7 +1419,7 @@ exports.deleteUser = deleteUser
 /**
  * 
  * @param {GuildMember} member 
- * @returns {Array<{ user_id: string }>}
+ * @returns {Array<{ user_id: string, id: number }>}
  */
 function getTickets(member) {
     let id = member
@@ -1440,3 +1446,74 @@ function addTicket(member) {
 }
 
 exports.addTicket = addTicket
+
+/**
+ * 
+ * @param {Client} client 
+ */
+async function doLottery(client) {
+    logger.info("performing lottery..")
+    const tickets = db.prepare("SELECT * FROM lottery_tickets").all()
+
+    if (tickets.length < 5) {
+        logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`)
+
+        const embed = new CustomEmbed()
+
+        embed.setTitle("lottery cancelled")
+        embed.setDescription(`the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`)
+        embed.setColor("#111111")
+
+        return lotteryHook.send(embed)
+    }
+
+    const total = Math.floor((tickets.length * lotteryTicketPrice) * 0.9)
+
+    /**
+     * @type {Array<{ user_id: string, id: number }>}
+     */
+    const shuffledTickets = shuffleArray(tickets)
+
+    let chosen
+    let user
+
+    while (!user) {
+        chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)]
+
+        logger.info(`winner: ${chosen.user_id} with ticket #${chosen.id}`)
+
+        user = await client.users.fetch(chosen.user_id)
+    }
+
+    logger.success(`winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`)
+
+    updateBalance(user.id, getBalance(user.id) + total)
+
+    const embed = new CustomEmbed()
+
+    embed.setTitle("lottery winner")
+    embed.setDescription(`**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
+        `they have won a total of $**${total.toLocaleString()}**`)
+    embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`)
+    embed.setColor("#111111")
+
+    await lotteryHook.send(embed)
+
+    if (getDMsEnabled(user.id)) {
+        const embed2 = new CustomEmbed()
+
+        embed.setTitle("you have won the lottery!")
+        embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`)
+        embed.setColor("#111111")
+
+        await user.send(embed).then(() => {
+            logger.success("sent notification to winner")
+        }).catch(() => {
+            logger.warn("failed to send notification to winner")
+        })
+    }
+
+    const { changes } = db.prepare("DELETE FROM lottery_tickets").run()
+
+    logger.info(`${changes.toLocaleString()} tickets deleted from database`)
+}
