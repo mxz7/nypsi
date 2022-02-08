@@ -149,12 +149,12 @@ function randomOffset() {
 
 let padlockPrice = 25000 + randomOffset()
 items["padlock"].worth = padlockPrice
-logger.eco("padlock price updated: $" + padlockPrice.toLocaleString())
+logger.info("padlock price updated: $" + padlockPrice.toLocaleString())
 
 setInterval(() => {
     padlockPrice = 25000 + randomOffset()
     items["padlock"].worth = padlockPrice
-    logger.eco("padlock price updated: $" + padlockPrice.toLocaleString())
+    logger.info("padlock price updated: $" + padlockPrice.toLocaleString())
 }, 3600000)
 
 async function updateCryptoWorth() {
@@ -163,7 +163,7 @@ async function updateCryptoWorth() {
     const btcworth = Math.floor(res.bpi.USD.rate_float)
 
     items["bitcoin"].worth = btcworth
-    logger.eco("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString())
+    logger.info("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString())
 
     res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json())
 
@@ -175,7 +175,7 @@ async function updateCryptoWorth() {
     }
 
     items["ethereum"].worth = ethWorth
-    logger.eco("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString())
+    logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString())
 }
 
 setInterval(updateCryptoWorth, 1500000)
