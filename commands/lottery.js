@@ -68,7 +68,7 @@ async function run(message, args) {
     if (args.length == 0) {
         return help()
     } else if (args[0].toLowerCase() == "buy" || args[0].toLowerCase() == "b") {
-        const prestigeBonus = Math.floor(getPrestige(message.member) / 3)
+        const prestigeBonus = Math.floor(getPrestige(message.member) / 2.5)
         const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
         const karmaBonus = Math.floor(getKarma(message.member) / 100)
 
