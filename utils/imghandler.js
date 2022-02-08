@@ -62,7 +62,13 @@ const birbLinks = [
     "https://www.reddit.com/r/budgies.json?limit=777",
     "https://www.reddit.com/r/parrots.json?limit=777",
 ]
-const catLinks = ["https://www.reddit.com/r/cat.json?limit=777", "https://www.reddit.com/r/kittens.json?limit=777"]
+const catLinks = [
+    "https://www.reddit.com/r/cat.json?limit=777",
+    "https://www.reddit.com/r/catsyawning.json?limit=777",
+    "https://www.reddit.com/r/Kitten.json?limit=777",
+    "https://www.reddit.com/r/kitty.json?limit=777",
+    "https://www.reddit.com/r/catpics.json?limit=777",
+]
 const dogLinks = [
     "https://www.reddit.com/r/dog.json?limit=777",
     "https://www.reddit.com/r/corgi.json?limit=777",
