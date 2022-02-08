@@ -1452,7 +1452,7 @@ function addTicket(member) {
     embed.setColor("#111111")
     embed.setDescription(`**${member.user.username}** has bought a lottery ticket`)
 
-    lotteryHook.send(embed)
+    lotteryHook.send({embeds: [embed]})
 }
 
 exports.addTicket = addTicket
@@ -1474,7 +1474,7 @@ async function doLottery(client) {
         embed.setDescription(`the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`)
         embed.setColor("#111111")
 
-        return lotteryHook.send(embed)
+        return lotteryHook.send({embeds: [embed]})
     }
 
     const total = Math.floor((tickets.length * lotteryTicketPrice) * 0.9)
@@ -1507,7 +1507,7 @@ async function doLottery(client) {
     embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`)
     embed.setColor("#111111")
 
-    await lotteryHook.send(embed)
+    await lotteryHook.send({embeds: [embed]})
 
     if (getDMsEnabled(user.id)) {
         const embed2 = new CustomEmbed()
@@ -1516,7 +1516,7 @@ async function doLottery(client) {
         embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`)
         embed.setColor("#111111")
 
-        await user.send(embed).then(() => {
+        await user.send({embeds: [embed]}).then(() => {
             logger.success("sent notification to winner")
         }).catch(() => {
             logger.warn("failed to send notification to winner")
