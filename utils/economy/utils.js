@@ -1392,6 +1392,10 @@ function getMaxEthereum(member) {
 
 exports.getMaxEthereum = getMaxEthereum
 
+/**
+ * 
+ * @param {GuildMember} member 
+ */
 function deleteUser(member) {
     let id = member
 
