@@ -82,6 +82,12 @@ async function run(message, args) {
             return message.channel.send({embeds: [new ErrorEmbed(`you cannot afford a lottery ticket. they cost $**${lotteryTicketPrice.toLocaleString()}**`)]})
         }
 
+        cooldown.set(message.member.id, new Date())
+
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, cooldownLength * 1000)
+
         updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice)
 
         addTicket(message.member)
