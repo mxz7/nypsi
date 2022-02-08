@@ -28,6 +28,7 @@ const fetch = require("node-fetch")
 const { getDatabase } = require("../database/database")
 const { addKarma, getKarma } = require("../karma/utils")
 const shuffleArray = require("shuffle-array")
+const { MStoTime } = require("../utils")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -1526,3 +1527,26 @@ async function doLottery(client) {
 
     logger.info(`${changes.toLocaleString()} tickets deleted from database`)
 }
+
+/**
+ * 
+ * @param {Client} client 
+ */
+function runLotteryInterval(client) {
+    const now = new Date()
+    const saturday = new Date()
+    saturday.setDate(now.getDate() + (6 - 1 - now.getDay() + 7) % 7 + 1)
+    saturday.setHours(0, 0, 0, 0)
+
+    const needed = saturday.getTime() - now.getTime()
+
+    setTimeout(() => {
+        doLottery(client)
+        setInterval(() => {
+            doLottery(client)
+        }, (86400 * 1000) * 7)
+    }, needed)
+
+    logger.auto(`lottery will run in ${MStoTime(needed)}`)
+}
+exports.runLotteryInterval = runLotteryInterval
