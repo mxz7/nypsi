@@ -1409,3 +1409,34 @@ function deleteUser(member) {
 }
 
 exports.deleteUser = deleteUser
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @returns {Array<{ user_id: string }>}
+ */
+function getTickets(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    const query = db.prepare("SELECT * FROM lottery_tickets WHERE user_id = ?").all(id)
+
+    return query
+}
+
+exports.getTickets = getTickets
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function addTicket(member) {
+    let id = member
+
+    if (member.user) id = member.user.id
+
+    db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id)
+}
+
+exports.addTicket = addTicket
