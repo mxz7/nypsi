@@ -23,7 +23,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
 
         switch (level) {
             case "guild":
-                color = chalk.blue
+                color = chalk.magenta
                 break
             case "auto":
                 color = chalk.blue
