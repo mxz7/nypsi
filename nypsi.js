@@ -262,6 +262,7 @@ setTimeout(() => {
     logger.info("logging in...")
     client.login(process.env.BOT_TOKEN).then(() => {
         setTimeout(() => {
+            runLotteryInterval(client)
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"])
             runCountdowns(client)
             runChristmas(client)
@@ -270,7 +271,6 @@ setTimeout(() => {
             updateCache()
             runModerationChecks(client)
             getWebhooks(client)
-            runLotteryInterval(client)
         }, 10000)
 
         if (process.env.GITHUB_ACTION) {
