@@ -323,4 +323,4 @@ function cleanMentions() {
     if (changes > 0) logger.info(`${changes} mentions deleted`)
 }
 
-setInterval(cleanMentions, 600000)
+setInterval(cleanMentions, 3600 * 1000)
