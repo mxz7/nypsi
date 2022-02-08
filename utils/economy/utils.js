@@ -1549,4 +1549,5 @@ function runLotteryInterval(client) {
 
     logger.auto(`lottery will run in ${MStoTime(needed)}`)
 }
+
 exports.runLotteryInterval = runLotteryInterval
