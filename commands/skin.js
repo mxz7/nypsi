@@ -4,6 +4,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { getSkin } = require("mc-names")
 
 const cooldown = new Map()
 
@@ -64,12 +65,12 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] })
     }
 
-    const skinIMG = `https://mc-heads.net/body/${uuid.id}.png`
+    const skin = await getSkin(username)
 
     const embed = new CustomEmbed(message.member, false, `[download](https://mc-heads.net/download/${uuid.id})`)
         .setTitle(uuid.name)
         .setURL("https://namemc.com/profile/" + username)
-        .setImage(skinIMG)
+        .setImage(skin.render)
 
     return message.channel.send({ embeds: [embed] })
 }
