@@ -1465,7 +1465,7 @@ async function doLottery(client) {
     logger.info("performing lottery..")
     const tickets = db.prepare("SELECT * FROM lottery_tickets").all()
 
-    if (tickets.length < 5) {
+    if (tickets.length < 10) {
         logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`)
 
         const embed = new CustomEmbed()
