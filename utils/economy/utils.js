@@ -1443,6 +1443,15 @@ function addTicket(member) {
     if (member.user) id = member.user.id
 
     db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id)
+
+    if (!member.user) return
+
+    const embed = new CustomEmbed()
+
+    embed.setColor("#111111")
+    embed.setDescription(`**${member.user.username}** has bought a lottery ticket`)
+
+    lotteryHook.send(embed)
 }
 
 exports.addTicket = addTicket
