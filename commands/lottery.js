@@ -67,8 +67,8 @@ async function run(message, args) {
             }
             return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
         }
-        
-        const prestigeBonus = Math.floor(getPrestige(message.member) / 2.5)
+
+        const prestigeBonus = Math.floor(getPrestige(message.member) > 20 ? 20 : getPrestige(message.member) / 2.5)
         const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
         const karmaBonus = Math.floor(getKarma(message.member) / 100)
 
