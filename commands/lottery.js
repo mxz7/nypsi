@@ -15,31 +15,6 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    let cooldownLength = 10
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 2
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
-    }
-
     if (!userExists(message.member)) createUser(message.member)
 
     const tickets = getTickets(message.member)
@@ -68,6 +43,31 @@ async function run(message, args) {
     if (args.length == 0) {
         return help()
     } else if (args[0].toLowerCase() == "buy" || args[0].toLowerCase() == "b") {
+        let cooldownLength = 10
+
+        if (isPremium(message.author.id)) {
+            cooldownLength = 2
+        }
+
+        if (cooldown.has(message.member.id)) {
+            const init = cooldown.get(message.member.id)
+            const curr = new Date()
+            const diff = Math.round((curr - init) / 1000)
+            const time = cooldownLength - diff
+
+            const minutes = Math.floor(time / 60)
+            const seconds = time - minutes * 60
+
+            let remaining
+
+            if (minutes != 0) {
+                remaining = `${minutes}m${seconds}s`
+            } else {
+                remaining = `${seconds}s`
+            }
+            return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        }
+        
         const prestigeBonus = Math.floor(getPrestige(message.member) / 2.5)
         const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
         const karmaBonus = Math.floor(getKarma(message.member) / 100)
