@@ -99,7 +99,11 @@ const lotteryTicketPrice = 10000
  */
 exports.lotteryTicketPrice = lotteryTicketPrice
 
-const lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
+let lotteryHook
+
+if (!process.env.GITHUB_ACTION) {
+    lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
+}
 
 /**
  *
