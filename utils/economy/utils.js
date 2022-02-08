@@ -1451,6 +1451,7 @@ function addTicket(member) {
 
     embed.setColor("#111111")
     embed.setDescription(`**${member.user.username}** has bought a lottery ticket`)
+    embed.setTimestamp()
 
     lotteryHook.send({embeds: [embed]})
 }
