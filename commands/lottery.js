@@ -1,7 +1,16 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getTickets, lotteryTicketPrice, userExists, createUser, getPrestige, getBalance, updateBalance, addTicket } = require("../utils/economy/utils")
+const {
+    getTickets,
+    lotteryTicketPrice,
+    userExists,
+    createUser,
+    getPrestige,
+    getBalance,
+    updateBalance,
+    addTicket,
+} = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getKarma } = require("../utils/karma/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -20,13 +29,16 @@ async function run(message, args) {
     const tickets = getTickets(message.member)
 
     const help = () => {
-
         const embed = new CustomEmbed(message.member, false)
 
         embed.setTitle("lottery")
-        embed.setDescription("nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
-            `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(message.guild)}**lotto buy**`)
-        
+        embed.setDescription(
+            "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
+                `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(
+                    message.guild
+                )}**lotto buy**`
+        )
+
         if (tickets.length > 0) {
             const t = []
 
@@ -75,11 +87,17 @@ async function run(message, args) {
         const max = 5 + prestigeBonus + premiumBonus + karmaBonus
 
         if (tickets.length >= max) {
-            return message.channel.send({embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)]})
+            return message.channel.send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] })
         }
 
         if (getBalance(message.member) < lotteryTicketPrice) {
-            return message.channel.send({embeds: [new ErrorEmbed(`you cannot afford a lottery ticket. they cost $**${lotteryTicketPrice.toLocaleString()}**`)]})
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        `you cannot afford a lottery ticket. they cost $**${lotteryTicketPrice.toLocaleString()}**`
+                    ),
+                ],
+            })
         }
 
         cooldown.set(message.member.id, new Date())
@@ -92,9 +110,13 @@ async function run(message, args) {
 
         addTicket(message.member)
 
-        const embed = new CustomEmbed(message.member, false, `you have bought a lottery ticket for $**${lotteryTicketPrice.toLocaleString()}**`)
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `you have bought a lottery ticket for $**${lotteryTicketPrice.toLocaleString()}**`
+        )
 
-        return message.channel.send({embeds: [embed]})
+        return message.channel.send({ embeds: [embed] })
     } else {
         return help()
     }

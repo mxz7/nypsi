@@ -1400,8 +1400,8 @@ function getMaxEthereum(member) {
 exports.getMaxEthereum = getMaxEthereum
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function deleteUser(member) {
     let id = member
@@ -1418,8 +1418,8 @@ function deleteUser(member) {
 exports.deleteUser = deleteUser
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  * @returns {Array<{ user_id: string, id: number }>}
  */
 function getTickets(member) {
@@ -1435,8 +1435,8 @@ function getTickets(member) {
 exports.getTickets = getTickets
 
 /**
- * 
- * @param {GuildMember} member 
+ *
+ * @param {GuildMember} member
  */
 function addTicket(member) {
     let id = member
@@ -1453,14 +1453,14 @@ function addTicket(member) {
     embed.setDescription(`**${member.user.username}** has bought a lottery ticket`)
     embed.setTimestamp()
 
-    lotteryHook.send({embeds: [embed]})
+    lotteryHook.send({ embeds: [embed] })
 }
 
 exports.addTicket = addTicket
 
 /**
- * 
- * @param {Client} client 
+ *
+ * @param {Client} client
  */
 async function doLottery(client) {
     logger.info("performing lottery..")
@@ -1472,13 +1472,15 @@ async function doLottery(client) {
         const embed = new CustomEmbed()
 
         embed.setTitle("lottery cancelled")
-        embed.setDescription(`the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`)
+        embed.setDescription(
+            `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
+        )
         embed.setColor("#111111")
 
-        return lotteryHook.send({embeds: [embed]})
+        return lotteryHook.send({ embeds: [embed] })
     }
 
-    const total = Math.floor((tickets.length * lotteryTicketPrice) * 0.9)
+    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9)
 
     /**
      * @type {Array<{ user_id: string, id: number }>}
@@ -1503,25 +1505,32 @@ async function doLottery(client) {
     const embed = new CustomEmbed()
 
     embed.setTitle("lottery winner")
-    embed.setDescription(`**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
-        `they have won a total of $**${total.toLocaleString()}**`)
+    embed.setDescription(
+        `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
+            `they have won a total of $**${total.toLocaleString()}**`
+    )
     embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`)
     embed.setColor("#111111")
 
-    await lotteryHook.send({embeds: [embed]})
+    await lotteryHook.send({ embeds: [embed] })
 
     if (getDMsEnabled(user.id)) {
         const embed2 = new CustomEmbed()
 
         embed.setTitle("you have won the lottery!")
-        embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`)
+        embed.setDescription(
+            `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
+        )
         embed.setColor("#111111")
 
-        await user.send({embeds: [embed]}).then(() => {
-            logger.success("sent notification to winner")
-        }).catch(() => {
-            logger.warn("failed to send notification to winner")
-        })
+        await user
+            .send({ embeds: [embed] })
+            .then(() => {
+                logger.success("sent notification to winner")
+            })
+            .catch(() => {
+                logger.warn("failed to send notification to winner")
+            })
     }
 
     const { changes } = db.prepare("DELETE FROM lottery_tickets").run()
@@ -1530,13 +1539,13 @@ async function doLottery(client) {
 }
 
 /**
- * 
- * @param {Client} client 
+ *
+ * @param {Client} client
  */
 function runLotteryInterval(client) {
     const now = new Date()
     const saturday = new Date()
-    saturday.setDate(now.getDate() + (6 - 1 - now.getDay() + 7) % 7 + 1)
+    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1)
     saturday.setHours(0, 0, 0, 0)
 
     const needed = saturday.getTime() - now.getTime()
@@ -1545,7 +1554,7 @@ function runLotteryInterval(client) {
         doLottery(client)
         setInterval(() => {
             doLottery(client)
-        }, (86400 * 1000) * 7)
+        }, 86400 * 1000 * 7)
     }, needed)
 
     logger.auto(`lottery will run in ${MStoTime(needed)}`)
