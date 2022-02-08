@@ -119,7 +119,7 @@ setInterval(async () => {
     }
 
     if (count > 0) {
-        logger.auto(`${count} chat reactions automatically started`)
+        logger.auto(`${count} chat reaction${count > 1 ? "s" : ""} started`)
     }
 }, 60000)
 

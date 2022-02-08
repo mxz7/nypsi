@@ -95,7 +95,7 @@ function doBackup() {
         }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
     )
         .then(() => {
-            logger.info("backup complete")
+            logger.success("backup complete")
         })
         .catch((e) => {
             logger.error("backup failed")
