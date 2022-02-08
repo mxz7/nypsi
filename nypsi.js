@@ -38,7 +38,7 @@ const client = new Discord.Client({
     ],
 })
 
-const { getUserCount, updateStats, doVote } = require("./utils/economy/utils.js")
+const { getUserCount, updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
 const {
     runCheck,
     checkStats,
@@ -270,6 +270,7 @@ setTimeout(() => {
             updateCache()
             runModerationChecks(client)
             getWebhooks(client)
+            runLotteryInterval(client)
         }, 10000)
 
         if (process.env.GITHUB_ACTION) {
