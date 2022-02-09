@@ -302,7 +302,7 @@ async function helpCmd(message, args) {
                 return collected.customId
             })
             .catch(async () => {
-                await msg.edit({ components: [] })
+                await msg.edit({ components: [] }).catch(() => {})
             })
 
         if (!reaction) return
