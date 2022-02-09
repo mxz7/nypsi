@@ -252,6 +252,12 @@ async function doVote(client, vote) {
     updateBalance(memberID, getBalance(memberID) + amount)
     addKarma(memberID, 15)
 
+    const tickets = getTickets(memberID)
+
+    if (tickets.length == 0) {
+        addTicket(memberID)
+    }
+
     if (inventory["vote_crate"]) {
         inventory["vote_crate"] += Math.floor(prestige / 2 + 1)
     } else {
@@ -269,7 +275,8 @@ async function doVote(client, vote) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     `+ **10**% multiplier, total: **${multi}**%\n` +
-                    `+ **${Math.floor(prestige / 2 + 1)}** vote crates`
+                    `+ **${Math.floor(prestige / 2 + 1)}** vote crates` +
+                    `${tickets.length == 0 ? "\n+ **1** lottery ticket" : ""}`
             )
 
         await member
