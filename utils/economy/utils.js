@@ -105,6 +105,30 @@ if (!process.env.GITHUB_ACTION) {
     lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
 }
 
+const lotteryHookQueue = new Map()
+
+setInterval(() => {
+    if (lotteryHookQueue.size == 0) return
+
+    const desc = []
+
+    for (const username of lotteryHookQueue.keys()) {
+        const amount = lotteryHookQueue.get(username)
+
+        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`)
+    }
+
+    lotteryHookQueue.clear()
+
+    const embed = new CustomEmbed()
+
+    embed.setColor("#111111")
+    embed.setDescription(desc.join("\n"))
+    embed.setTimestamp()
+
+    lotteryHook.send({ embeds: [embed] })
+}, 120000)
+
 /**
  *
  * @returns {String}
@@ -1462,13 +1486,11 @@ function addTicket(member) {
 
     if (!member.user) return
 
-    const embed = new CustomEmbed()
-
-    embed.setColor("#111111")
-    embed.setDescription(`**${member.user.username}** has bought a lottery ticket`)
-    embed.setTimestamp()
-
-    lotteryHook.send({ embeds: [embed] })
+    if (lotteryHookQueue.has(member.user.username)) {
+        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1)
+    } else {
+        lotteryHookQueue.set(member.user.username, 1)
+    }
 }
 
 exports.addTicket = addTicket
