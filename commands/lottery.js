@@ -93,7 +93,7 @@ async function run(message, args) {
         }
 
         if (amount < 1) {
-            return message.channel.send({embeds: [new ErrorEmbed("invalid amount")]})
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
 
         if (tickets.length + amount > max) {
@@ -106,11 +106,7 @@ async function run(message, args) {
 
         if (getBalance(message.member) < lotteryTicketPrice * amount) {
             return message.channel.send({
-                embeds: [
-                    new ErrorEmbed(
-                        "you cannot afford this"
-                    ),
-                ],
+                embeds: [new ErrorEmbed("you cannot afford this")],
             })
         }
 
@@ -120,7 +116,7 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
 
-        updateBalance(message.member, getBalance(message.member) - (lotteryTicketPrice * amount))
+        updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice * amount)
 
         for (let i = 0; i < amount; i++) {
             addTicket(message.member)
@@ -129,7 +125,9 @@ async function run(message, args) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            `you have bought **${amount}** lottery ticket${amount > 1 ? "s" : ""} for $**${(lotteryTicketPrice * amount).toLocaleString()}**`
+            `you have bought **${amount}** lottery ticket${amount > 1 ? "s" : ""} for $**${(
+                lotteryTicketPrice * amount
+            ).toLocaleString()}**`
         )
 
         return message.channel.send({ embeds: [embed] })
