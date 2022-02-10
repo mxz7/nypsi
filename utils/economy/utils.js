@@ -126,7 +126,7 @@ setInterval(() => {
     embed.setDescription(desc.join("\n"))
     embed.setTimestamp()
 
-    lotteryHook.send({embeds: [embed]})
+    lotteryHook.send({ embeds: [embed] })
 }, 120000)
 
 /**
