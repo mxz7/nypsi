@@ -28,6 +28,12 @@ async function run(message, args) {
 
     const tickets = getTickets(message.member)
 
+    const prestigeBonus = Math.floor((getPrestige(message.member) > 20 ? 20 : getPrestige(message.member)) / 2.5)
+    const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
+    const karmaBonus = Math.floor(getKarma(message.member) / 100)
+
+    const max = 5 + prestigeBonus + premiumBonus + karmaBonus
+
     const help = () => {
         const embed = new CustomEmbed(message.member, false)
 
@@ -36,7 +42,7 @@ async function run(message, args) {
             "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
                 `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(
                     message.guild
-                )}**lotto buy**`
+                )}**lotto buy**\nyou can have a maximum of **${max}** tickets`
         )
 
         if (tickets.length > 0) {
@@ -80,23 +86,27 @@ async function run(message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
         }
 
-        const prestigeBonus = Math.floor((getPrestige(message.member) > 20 ? 20 : getPrestige(message.member)) / 2.5)
-        const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
-        const karmaBonus = Math.floor(getKarma(message.member) / 100)
+        let amount = 1
 
-        const max = 5 + prestigeBonus + premiumBonus + karmaBonus
+        if (parseInt(args[1])) {
+            amount = parseInt(args[1])
+        }
+
+        if (amount < 1) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+        }
+
+        if (tickets.length + amount > max) {
+            amount = max - tickets.length
+        }
 
         if (tickets.length >= max) {
             return message.channel.send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] })
         }
 
-        if (getBalance(message.member) < lotteryTicketPrice) {
+        if (getBalance(message.member) < lotteryTicketPrice * amount) {
             return message.channel.send({
-                embeds: [
-                    new ErrorEmbed(
-                        `you cannot afford a lottery ticket. they cost $**${lotteryTicketPrice.toLocaleString()}**`
-                    ),
-                ],
+                embeds: [new ErrorEmbed("you cannot afford this")],
             })
         }
 
@@ -106,14 +116,18 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
 
-        updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice)
+        updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice * amount)
 
-        addTicket(message.member)
+        for (let i = 0; i < amount; i++) {
+            addTicket(message.member)
+        }
 
         const embed = new CustomEmbed(
             message.member,
             false,
-            `you have bought a lottery ticket for $**${lotteryTicketPrice.toLocaleString()}**`
+            `you have bought **${amount}** lottery ticket${amount > 1 ? "s" : ""} for $**${(
+                lotteryTicketPrice * amount
+            ).toLocaleString()}**`
         )
 
         return message.channel.send({ embeds: [embed] })
