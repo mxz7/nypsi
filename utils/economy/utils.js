@@ -1517,7 +1517,7 @@ async function doLottery(client) {
         return lotteryHook.send({ embeds: [embed] })
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.95)
+    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9)
 
     /**
      * @type {Array<{ user_id: string, id: number }>}
