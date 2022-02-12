@@ -92,7 +92,11 @@ setInterval(() => {
 
 let items
 
-const lotteryTicketPrice = 25000
+const lotteryTicketPrice = 10000
+/**
+ * higher ticket price = more favourable to rich people cus poor people cant buy tickets resulting in less tickets overall
+ * the goal is to have more tickets overall for a more random outcome
+ */
 exports.lotteryTicketPrice = lotteryTicketPrice
 
 const lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
