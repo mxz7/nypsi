@@ -13,11 +13,6 @@ module.exports = async (client, startUp) => {
         "$help | nypsi.xyz",
         "$help | tekoh.net",
         "$help | nypsi.xyz",
-        "$help | nypsi.xyz",
-        "$help | nypsi.xyz",
-        "have you joined the $support server?",
-        "x0x",
-        "x0x",
         "x0x",
         "xmas",
     ]
@@ -62,7 +57,7 @@ module.exports = async (client, startUp) => {
                 },
             ],
         })
-    }, 15 * 60 * 1000)
+    }, 30 * 60 * 1000)
 
     const { commandsSize } = require("../utils/commandhandler")
 
