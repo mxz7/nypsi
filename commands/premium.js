@@ -88,12 +88,12 @@ async function run(message, args) {
 
         if (!user) return message.channel.send({ embeds: [new ErrorEmbed("user doesnt exist")] })
 
-        if (isPremium(user)) {
-            const embed = new CustomEmbed(user, false)
+        if (isPremium(user.id)) {
+            const embed = new CustomEmbed(message.member, false)
 
             embed.setTitle("premium status")
 
-            const profile = getPremiumProfile(user)
+            const profile = getPremiumProfile(user.id)
 
             const timeStarted = formatDate(profile.startDate)
             const timeAgo = daysAgo(profile.startDate)
