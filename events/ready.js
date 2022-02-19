@@ -9,13 +9,7 @@ const { version } = require("../package.json")
  * @param {Number} startUp
  */
 module.exports = async (client, startUp) => {
-    const games = [
-        "$help | nypsi.xyz",
-        "$help | tekoh.net",
-        "$help | nypsi.xyz",
-        "x0x",
-        "xmas",
-    ]
+    const games = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"]
 
     setTimeout(async () => {
         const a = await getRandomCommand()
