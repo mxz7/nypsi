@@ -75,7 +75,7 @@ async function run(message, args) {
 
     if (args.length == 0) {
         return defaultMessage()
-    } else if (args[0].toLowerCase() == "check") {
+    } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage()
         }
@@ -84,19 +84,42 @@ async function run(message, args) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] })
         }
 
-        const a = check(args[1])
+        const user = await message.client.users.fetch(args[1])
 
-        if (!a) {
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no premium data")] })
+        if (!user) return message.channel.send({ embeds: [new ErrorEmbed("user doesnt exist")] })
+
+        if (isPremium(user)) {
+            const embed = new CustomEmbed(user, false)
+
+            embed.setTitle("premium status")
+
+            const profile = getPremiumProfile(user)
+
+            const timeStarted = formatDate(profile.startDate)
+            const timeAgo = daysAgo(profile.startDate)
+            const expires = formatDate(profile.expireDate)
+            const timeUntil = daysUntil(profile.expireDate)
+            const embedColor = profile.embedColor
+
+            let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`
+
+            if (profile.level > 2) {
+                const cmd = getUserCommand(user.id)
+                description += `\n**custom command** ${cmd ? cmd.content : "none"}`
+            }
+
+            embed.setDescription(description)
+
+            return message.channel.send({ embeds: [embed] })
+        } else {
+            const embed = new CustomEmbed(
+                message.member,
+                false,
+                "no premium membership"
+            )
+
+            return message.channel.send({ embeds: [embed] })
         }
-
-        logger.info(a)
-
-        const embed = new CustomEmbed(message.member, false, `level: ${a.level}\n\ncheck console for all info`).setTitle(
-            args[1]
-        )
-
-        return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "update") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage()
@@ -176,14 +199,6 @@ async function run(message, args) {
         expireUser(args[1])
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ membership expired")] })
-    }
-}
-
-function check(member) {
-    if (isPremium(member)) {
-        return getPremiumProfile(member)
-    } else {
-        return null
     }
 }
 
