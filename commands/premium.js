@@ -112,11 +112,7 @@ async function run(message, args) {
 
             return message.channel.send({ embeds: [embed] })
         } else {
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "no premium membership"
-            )
+            const embed = new CustomEmbed(message.member, false, "no premium membership")
 
             return message.channel.send({ embeds: [embed] })
         }
