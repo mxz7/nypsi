@@ -282,10 +282,14 @@ async function doVote(client, vote) {
         addTicket(memberID)
     }
 
+    let crateAmount = Math.floor(prestige / 2 + 1)
+
+    if (crateAmount > 5) crateAmount = 5
+
     if (inventory["vote_crate"]) {
-        inventory["vote_crate"] += Math.floor(prestige / 2 + 1)
+        inventory["vote_crate"] += crateAmount
     } else {
-        inventory["vote_crate"] = Math.floor(prestige / 2 + 1)
+        inventory["vote_crate"] = crateAmount
     }
 
     setInventory(memberID, inventory)
