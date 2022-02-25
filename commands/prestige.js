@@ -159,11 +159,13 @@ async function run(message, args) {
 
         setInventory(message.member, inventory)
 
+        let crateAmount = Math.floor(getPrestige(message.member) / 2 + 1)
+
+        if (crateAmount > 5) crateAmount = 5
+
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
-                `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**, **${
-                    getPrestige(message.member) + 1
-                }** vote crates\n` +
+                `new vote rewards: $**${(15000 * (getPrestige(message.member) + 1)).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
         )
