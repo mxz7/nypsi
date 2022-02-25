@@ -62,7 +62,9 @@ async function run(message, args) {
     const amount = 15000 * (prestige + 1)
     const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)
-    const crateAmount = Math.floor(prestige / 2 + 1)
+    let crateAmount = Math.floor(prestige / 2 + 1)
+
+    if (crateAmount > 5) crateAmount = 5
 
     const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
