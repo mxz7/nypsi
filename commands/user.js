@@ -122,7 +122,7 @@ async function run(message, args) {
         )
         .setFooter(`${getKarma(member)} karma`)
 
-    if (rolesText != " ") {
+    if (member._roles.length > 0) {
         embed.addField("roles [" + member._roles.length + "]", rolesText)
     }
 

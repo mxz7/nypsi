@@ -28,13 +28,13 @@
     "table": "6.8",
     "tar": "^6.1.11",
     "urban-dictionary": "^3.0.2",
-    "utf-8-validate": "^5.0.8",
+    "utf-8-validate": "^5.0.9",
     "winston": "^3.6.0",
     "winston-daily-rotate-file": "^4.6.1",
     "winston-discord-webhook": "^1.1.0"
   },
   "devDependencies": {
-    "eslint": "^8.9.0",
+    "eslint": "^8.11.0",
     "prettier": "2.5.1"
   },
   "repository": {
