@@ -868,7 +868,13 @@ async function topAmountPrestige(guild, amount) {
             let thing = ["th", "st", "nd", "rd"]
             let v = prestiges.get(user) % 100
             usersFinal[count] =
-                pos + " **" + getMemberID(guild, user).user.tag + "** " + prestiges.get(user) + (thing[(v - 20) % 10] || thing[v] || thing[0]) + " prestige"
+                pos +
+                " **" +
+                getMemberID(guild, user).user.tag +
+                "** " +
+                prestiges.get(user) +
+                (thing[(v - 20) % 10] || thing[v] || thing[0]) +
+                " prestige"
             count++
         }
     }
