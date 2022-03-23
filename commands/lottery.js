@@ -90,6 +90,10 @@ async function run(message, args) {
 
         if (parseInt(args[1])) {
             amount = parseInt(args[1])
+        } else if (args[1].toLowerCase() == "all" || args[1].toLowerCase() == "max") {
+            amount = max
+        } else {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
 
         if (amount < 1) {
