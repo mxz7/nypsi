@@ -2,6 +2,7 @@ const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { startRestart } = require("../utils/commandhandler")
+const { vacuum } = require("../utils/database/database")
 const { logger } = require("../utils/logger")
 
 const cmd = new Command("shutdown", "shutdown bot", categories.NONE).setPermissions(["bot owner"])
@@ -26,12 +27,20 @@ async function run(message, args) {
     } else {
         startRestart()
 
-        logger.info("nypsi shutting down in 60 seconds...")
+        logger.info("nypsi shutting down soon...")
 
         setTimeout(() => {
-            logger.info("nypsi shutting down...")
-            process.exit()
-        }, 60000)
+            logger.info("vacuuming database...")
+            vacuum()
+            logger.info("vacuum finished")
+
+            logger.info("nypsi shutting down in 10 seconds...")
+
+            setTimeout(() => {
+                logger.info("nypsi shutting down...")
+                process.exit()
+            }, 10000)
+        }, 20000)
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")],

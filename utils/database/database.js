@@ -148,3 +148,9 @@ function getDatabase() {
 }
 
 exports.getDatabase = getDatabase
+
+function vacuum() {
+    db.prepare("VACUUM").run()
+}
+
+exports.vacuum = vacuum
