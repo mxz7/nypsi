@@ -20,6 +20,7 @@ const karmaCooldown = new Set()
 const xpCooldown = new Set()
 const cooldown = new Set()
 const handcuffs = new Map()
+const openingCratesBlock = new Set()
 
 const beingChecked = []
 
@@ -552,6 +553,8 @@ async function runCommand(cmd, message, args) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
             })
+        } else if (commands.get(aliases.get(cmd)).category == "money" && openingCratesBlock.has(message.author.id)) {
+            return message.channel.send({embeds: [new ErrorEmbed("wait until you've finished opening crates")]})
         }
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member)
@@ -896,3 +899,23 @@ function startRestart() {
 }
 
 exports.startRestart = startRestart
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function startOpeningCrates(member) {
+    openingCratesBlock.add(member.user.id)
+}
+
+exports.startOpeningCrates = startOpeningCrates
+
+/**
+ * 
+ * @param {GuildMember} member 
+ */
+function stopOpeningCrates(member) {
+    openingCratesBlock.delete(member.user.id)
+}
+
+exports.stopOpeningCrates = stopOpeningCrates
