@@ -43,7 +43,7 @@ async function run(message, args) {
         }, 20000)
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down in 60 seconds")],
+            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down soon")],
         })
     }
 }
