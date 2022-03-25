@@ -372,6 +372,24 @@ async function run(message, args) {
                 }
             }
 
+            if (getTier(message.author.id) >= 4) {
+                let has = false
+                for (let worker1 of Object.keys(personalWorkers)) {
+                    worker1 = personalWorkers[worker1]
+
+                    if (worker1.id == 6) {
+                        has = true
+                        break
+                    }
+                }
+                if (!has) {
+                    addWorker(message.member, 6)
+                    let name = workers.get(6)
+                    name = new name().name
+                    msg += "+ " + name + "\n"
+                }
+            }
+
             if (msg == "") {
                 msg = "you weren't able to claim any free workers"
             }
