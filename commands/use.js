@@ -21,6 +21,8 @@ const {
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { getMember } = require("../utils/utils")
+const { onBankRobCooldown, deleteBankRobCooldown } = require("./bankrob")
+const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
 
 const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
 
@@ -274,13 +276,22 @@ async function run(message, args) {
                 break
 
             case "mask":
-                if (!onRobCooldown(message.member)) {
+                if (!onRobCooldown(message.member) && !onBankRobCooldown(message.member) && !onStoreRobCooldown(message.member)) {
                     return message.channel.send({
-                        embeds: [new ErrorEmbed("you are currently not on rob cooldown")],
+                        embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
                     })
                 }
 
-                deleteRobCooldown(message.member)
+                if (onRobCooldown(message.member)) {
+                    deleteRobCooldown(message.member)
+                    embed.setDescription("you're wearing your **mask** and can now rob someone again")
+                } else if (onBankRobCooldown(message.member)) {
+                    deleteBankRobCooldown(message.member)
+                    embed.setDescription("you're wearing your **mask** and can now rob a bank again")
+                } else if (onStoreRobCooldown(message.member)) {
+                    deleteStoreRobCooldown(message.member)
+                    embed.setDescription("you're wearing your **mask** and can now rob a store again")
+                }
 
                 inventory["mask"]--
 
@@ -291,8 +302,6 @@ async function run(message, args) {
                 addItemUse(message.member, selected.id)
 
                 setInventory(message.member, inventory)
-
-                embed.setDescription("you're wearing your **mask** and can now rob someone again")
                 break
 
             case "radio":
