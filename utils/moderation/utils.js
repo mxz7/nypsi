@@ -358,7 +358,7 @@ async function requestUnmute(guild, member, client) {
     guild = client.guilds.cache.find((g) => g.id == guild)
 
     if (!guild) {
-        logger.warn("unable to find guild ${guild}")
+        logger.warn(`unable to find guild ${guild}`)
         return
     }
 
