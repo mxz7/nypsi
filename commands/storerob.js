@@ -186,6 +186,26 @@ async function run(message, args) {
     })
 }
 
+/**
+ *
+ * @param {GuildMember} member
+ */
+function deleteStoreRobCooldown(member) {
+    cooldown.delete(member.user.id)
+}
+
+cmd.deleteStoreRobCooldown = deleteStoreRobCooldown
+
+/**
+ * @returns {Boolean}
+ * @param {GuildMember} member
+ */
+function onStoreRobCooldown(member) {
+    return cooldown.has(member.user.id)
+}
+
+cmd.onStoreRobCooldown = onStoreRobCooldown
+
 cmd.setRun(run)
 
 module.exports = cmd
