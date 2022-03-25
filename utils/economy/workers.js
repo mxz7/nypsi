@@ -220,6 +220,30 @@ exports.Tailor = Tailor
 
 workers.set(5, Tailor)
 
+class SpaceX extends Worker {
+    /**
+     * @returns {Tailor}
+     */
+    constructor() {
+        super({
+            maxStorage: 85,
+            perItem: 50,
+            perInterval: 1,
+            cost: 1500000,
+            prestige: 7,
+            name: "spacex",
+            id: 6,
+            itemName: "🚀",
+        })
+
+        return this
+    }
+}
+
+exports.SpaceX = SpaceX
+
+workers.set(6, SpaceX)
+
 /**
  *
  * @returns {Map<Number, Worker>}
