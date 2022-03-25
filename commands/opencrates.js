@@ -67,7 +67,9 @@ async function run(message, args) {
 
     for (const item of Array.from(Object.keys(inventory))) {
         if (items[item].role == "crate") {
-            while (crates.length < inventory[item]) {
+            let amount = 0
+            while (amount < inventory[item]) {
+                amount++
                 crates.push(item)
                 if (crates.length >= max) {
                     hitMax = true
