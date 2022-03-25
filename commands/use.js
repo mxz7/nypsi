@@ -277,7 +277,11 @@ async function run(message, args) {
                 break
 
             case "mask":
-                if (!onRobCooldown(message.member) && !onBankRobCooldown(message.member) && !onStoreRobCooldown(message.member)) {
+                if (
+                    !onRobCooldown(message.member) &&
+                    !onBankRobCooldown(message.member) &&
+                    !onStoreRobCooldown(message.member)
+                ) {
                     return message.channel.send({
                         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
                     })
