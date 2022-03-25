@@ -65,7 +65,7 @@ async function run(message, args) {
 
             embed.addField(
                 "payment methods",
-                "[patreon](https://patreon.com/nypsi)\n[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+                "[ko-fi](https://ko-fi.com/tekoh/tiers)\n[patreon](https://patreon.com/nypsi)\n\n" +
                     "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
             )
 
