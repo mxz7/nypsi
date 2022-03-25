@@ -186,6 +186,26 @@ async function run(message, args) {
     })
 }
 
+/**
+ *
+ * @param {GuildMember} member
+ */
+function deleteBankRobCooldown(member) {
+    cooldown.delete(member.user.id)
+}
+
+cmd.deleteBankRobCooldown = deleteBankRobCooldown
+
+/**
+ * @returns {Boolean}
+ * @param {GuildMember} member
+ */
+function onBankRobCooldown(member) {
+    return cooldown.has(member.user.id)
+}
+
+cmd.onBankRobCooldown = onBankRobCooldown
+
 cmd.setRun(run)
 
 module.exports = cmd
