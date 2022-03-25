@@ -1,6 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
 const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -85,6 +86,8 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
+    startOpeningCrates(message.member)
+
     const embed = new CustomEmbed(message.member, false)
 
     embed.setTitle("opening crates")
@@ -126,6 +129,7 @@ async function run(message, args) {
         
         if (finished) {
             clearInterval(interval)
+            stopOpeningCrates(message.member)
         }
     }, 1500)
 }
