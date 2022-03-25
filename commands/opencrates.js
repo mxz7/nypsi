@@ -11,12 +11,11 @@ const cmd = new Command("opencrates", "open all of your crates with one command"
 const cooldown = new Map()
 
 /**
- * 
- * @param {Message} message 
- * @param {Array<String>} args 
+ *
+ * @param {Message} message
+ * @param {Array<String>} args
  */
 async function run(message, args) {
-
     let cooldownLength = 30
 
     if (cooldown.has(message.member.id)) {
@@ -49,7 +48,9 @@ async function run(message, args) {
     }
 
     if (!getDMsEnabled(message.member)) {
-        return message.channel.send({embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)]})
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
+        })
     }
 
     const inventory = getInventory(message.member)
@@ -77,7 +78,7 @@ async function run(message, args) {
     }
 
     if (crates.length == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you dont have any crates to open")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any crates to open")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -99,13 +100,13 @@ async function run(message, args) {
     desc += "\n\nyou found:\n"
 
     let fail = false
-    
+
     const msg = await message.member.send({ embeds: [embed] }).catch(() => {
         fail = true
     })
 
     if (fail) {
-        return message.channel.send({embeds: [new ErrorEmbed("failed to dm you, please check your privacy settings")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("failed to dm you, please check your privacy settings")] })
     } else {
         await message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ check your dms")] })
     }
@@ -126,7 +127,7 @@ async function run(message, args) {
         embed.setDescription(desc)
 
         msg.edit({ embeds: [embed] })
-        
+
         if (finished) {
             clearInterval(interval)
             stopOpeningCrates(message.member)
