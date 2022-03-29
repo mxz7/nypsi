@@ -302,8 +302,9 @@ async function doVote(client, vote) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
+                    "+ **15** karma\n" +
                     `+ **10**% multiplier, total: **${multi}**%\n` +
-                    `+ **${Math.floor(prestige / 2 + 1)}** vote crates` +
+                    `+ **${crateAmount}** vote crates` +
                     `${tickets.length == 0 ? "\n+ **1** lottery ticket" : ""}`
             )
 
