@@ -33,7 +33,8 @@
         "description": "found when mining",
         "worth": 750,
         "role": "item",
-        "rarity": 0
+        "rarity": 0,
+        "aliases": ["cobble"]
     },
     "coal": {
         "id": "coal",
