@@ -63,7 +63,7 @@ setInterval(async () => {
                 continue
             }
 
-            const messages = await channel.messages.fetch({ limit: 15 })
+            const messages = await channel.messages.fetch({ limit: 15 }).catch(() => {})
             let stop = false
 
             await messages.forEach((m) => {
