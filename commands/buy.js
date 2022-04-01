@@ -89,7 +89,9 @@ async function run(message, args) {
         selected.role == "collectable" ||
         selected.role == "prey" ||
         selected.role == "fish" ||
-        selected.role == "car"
+        selected.role == "car" ||
+        selected.role == "sellable" ||
+        selected.role == "ore"
     ) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] })
     }
