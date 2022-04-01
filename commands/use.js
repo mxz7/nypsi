@@ -140,7 +140,7 @@ async function run(message, args) {
     } else if (selected.id.includes("coin")) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] })
     } else if (selected.id.includes("pickaxe")) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)]})
+        return message.channel.send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)] })
     } else if (selected.id.includes("furnace")) {
         return message.channel.send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] })
     }
