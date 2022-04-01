@@ -66,6 +66,8 @@ setInterval(async () => {
             const messages = await channel.messages.fetch({ limit: 15 }).catch(() => {})
             let stop = false
 
+            if (!messages) continue
+
             await messages.forEach((m) => {
                 if (m.author.id == guild.client.user.id) {
                     if (!m.embeds[0]) return
