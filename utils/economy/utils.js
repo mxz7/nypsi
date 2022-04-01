@@ -158,6 +158,12 @@ function loadItems() {
             if (!Array.from(Object.keys(items)).includes(item)) {
                 delete inventory[item]
                 deleted++
+            } else if (!inventory[item]) {
+                delete inventory[item]
+                deleted++
+            } else if (inventory[item] == 0) {
+                delete inventory[item]
+                deleted++
             }
         }
 
