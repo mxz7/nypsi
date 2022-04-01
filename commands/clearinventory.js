@@ -3,7 +3,9 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
 
-const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", categories.MONEY).setAliases(["clearinv"])
+const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", categories.MONEY).setAliases([
+    "clearinv",
+])
 
 /**
  *
@@ -14,7 +16,7 @@ async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
     const inventory = getInventory(message.member)
-    
+
     let amount = 0
 
     for (const item of Array.from(Object.keys(inventory))) {
@@ -22,7 +24,7 @@ async function run(message, args) {
     }
 
     if (amount == 0) {
-        return message.channel.send({embeds: [new ErrorEmbed("you dont have anything in your inventory")]})
+        return message.channel.send({ embeds: [new ErrorEmbed("you dont have anything in your inventory")] })
     }
 
     const embed = new CustomEmbed(message.member, false)
