@@ -26,6 +26,30 @@
         "role": "fish",
         "rarity": 2
     },
+    "wooden_pickaxe": {
+        "id": "wooden_pickaxe",
+        "name": "wooden pickaxe",
+        "emoji": "<:nypsi_wood_pickaxe:959441224731852850>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 0
+    },
+    "iron_pickaxe": {
+        "id": "iron_pickaxe",
+        "name": "iron pickaxe",
+        "emoji": "<:nypsi_iron_pickaxe:959441877956960326>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 1
+    },
+    "diamond_pickaxe": {
+        "id": "diamond pickaxe",
+        "name": "diamond pickaxe",
+        "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 3
+    },
     "terrible_fishing_rod": {
         "id": "terrible_fishing_rod",
         "name": "terrible fishing rod",
