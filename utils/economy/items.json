@@ -116,7 +116,7 @@
         "rarity": 1
     },
     "diamond_pickaxe": {
-        "id": "diamond pickaxe",
+        "id": "diamond_pickaxe",
         "name": "diamond pickaxe",
         "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
         "description": "allows you to mine",
