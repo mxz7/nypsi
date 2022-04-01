@@ -25,3 +25,8 @@ the requirements are as follows:
 -   your server owner must have an economy profile
 
 the quick fix for this is to simply check the server owner's balance using the `$bal` command, if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
+
+### when will karmashop be open
+
+the karmashop (`$karmashop`) opens around once every month. everyone will be notified in the official nypsi server (`$support`) when it is opened.
+make sure to join to stay updated (:
