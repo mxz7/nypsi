@@ -30,3 +30,8 @@ the quick fix for this is to simply check the server owner's balance using the `
 
 the karmashop (`$karmashop`) opens around once every month. everyone will be notified in the official nypsi server (`$support`) when it is opened.
 make sure to join to stay updated (:
+
+### whats with the lowercase?
+
+i (max), personally love how lowercase text looks. which is why nypsi is almost entirely lowercase (no this will not change u loser). it also gives a bit of a 
+unique aesthetic to nypsi.
