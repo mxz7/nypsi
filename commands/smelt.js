@@ -80,7 +80,9 @@ async function run(message, args) {
     }
 
     if (ores.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you ore to smelt. ore can be found in crates and through mining")] })
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you ore to smelt. ore can be found in crates and through mining")],
+        })
     }
 
     if (inventory["coal"] && inventory["coal"] > 0) {
@@ -90,7 +92,9 @@ async function run(message, args) {
     }
 
     if (coal == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you need coal to smelt ore. coal can be found in crates and through mining")] })
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you need coal to smelt ore. coal can be found in crates and through mining")],
+        })
     }
 
     const smelted = new Map()
@@ -134,12 +138,11 @@ async function run(message, args) {
     embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...")
 
     const msg = await message.channel.send({ embeds: [embed] })
-    
+
     setTimeout(() => {
         embed.setDescription(`<:nypsi_furnace:959445132585869373> you have smelted: \n${res}`)
-        msg.edit({embeds: [embed]})
+        msg.edit({ embeds: [embed] })
     }, 2000)
-
 }
 
 cmd.setRun(run)
