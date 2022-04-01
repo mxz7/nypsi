@@ -15,7 +15,7 @@ i love you <3
 premium is for users that would like to donate some money to the creator of nypsi. in return, you receive benefits that give
 extra usability, faster commands and most importantly... bigger penises with `$pp`
 
-premium helps nypsi keep running, most importantly. (:
+most importantly, premium helps nypsi keep running. (:
 
 ## how do i get premium?
 
