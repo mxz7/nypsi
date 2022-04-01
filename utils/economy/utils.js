@@ -158,6 +158,12 @@ function loadItems() {
             if (!Array.from(Object.keys(items)).includes(item)) {
                 delete inventory[item]
                 deleted++
+            } else if (!inventory[item]) {
+                delete inventory[item]
+                deleted++
+            } else if (inventory[item] == 0) {
+                delete inventory[item]
+                deleted++
             }
         }
 
@@ -1725,11 +1731,11 @@ function openCrate(member, item) {
         } else {
             let amount = 1
 
-            if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun") {
+            if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun" || chosen == "wooden_pickaxe") {
                 amount = 5
-            } else if (chosen == "fishing_rod" || chosen == "gun") {
+            } else if (chosen == "fishing_rod" || chosen == "gun" || chosen == "iron_pickaxe") {
                 amount = 10
-            } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun") {
+            } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamond_pickaxe") {
                 amount = 10
             }
 
