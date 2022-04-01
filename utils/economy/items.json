@@ -31,7 +31,7 @@
         "name": "cobblestone",
         "emoji": "<:nypsi_cobblestone:959445739673616484>",
         "description": "found when mining",
-        "worth": 750,
+        "worth": 400,
         "role": "sellable",
         "rarity": 0,
         "aliases": ["cobble"]
