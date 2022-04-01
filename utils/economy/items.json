@@ -26,6 +26,105 @@
         "role": "fish",
         "rarity": 2
     },
+    "cobblestone": {
+        "id": "cobblestone",
+        "name": "cobblestone",
+        "emoji": "<:nypsi_cobblestone:959445739673616484>",
+        "description": "found when mining",
+        "worth": 400,
+        "role": "sellable",
+        "rarity": 0,
+        "aliases": ["cobble"]
+    },
+    "coal": {
+        "id": "coal",
+        "name": "coal",
+        "emoji": "<:nypsi_coal:959442471388082176>",
+        "description": "can be used to smelt 1 ore",
+        "worth": 5000,
+        "role": "fuel",
+        "rarity": 1
+    },
+    "iron_ingot": {
+        "id": "iron_ingot",
+        "name": "iron",
+        "emoji": "<:nypsi_iron:959442548064141362>",
+        "description": "product of smelting iron ore",
+        "worth": 25000,
+        "role": "sellable",
+        "rarity": 69
+    },
+    "gold_ingot": {
+        "id": "gold_ingot",
+        "name": "gold",
+        "emoji": "<:nypsi_gold:959443010205126656>",
+        "description": "product of smelting gold ore",
+        "worth": 50000,
+        "role": "sellable",
+        "rarity": 69
+    },
+    "diamond": {
+        "id": "diamond",
+        "name": "diamond",
+        "emoji": "<:nypsi_diamond:959443043377897502>",
+        "description": "found when mining",
+        "worth": 75000,
+        "role": "sellable",
+        "rarity": 3
+    },
+    "furnace": {
+        "id": "furnace",
+        "name": "furnace",
+        "emoji": "<:nypsi_furnace:959445132585869373>",
+        "description": "used to smelt ore",
+        "worth": 50000,
+        "role": "tool",
+        "rarity": 1
+    },
+    "iron_ore": {
+        "id": "iron_ore",
+        "name": "iron ore",
+        "emoji": "<:nypsi_iron_ore:959444539435778078>",
+        "description": "can be smelted into an iron ingot with a furnace and coal",
+        "worth": 500,
+        "role": "ore",
+        "rarity": 1,
+        "ingot": "iron_ingot"
+    },
+    "gold_ore": {
+        "id": "gold_ore",
+        "name": "gold ore",
+        "emoji": "<:nypsi_gold_ore:959444923139121223>",
+        "description": "can be smelted into a gold ingot with a furnace and coal",
+        "worth": 500,
+        "role": "ore",
+        "rarity": 2,
+        "ingot": "gold_ingot"
+    },
+    "wooden_pickaxe": {
+        "id": "wooden_pickaxe",
+        "name": "wooden pickaxe",
+        "emoji": "<:nypsi_wood_pickaxe:959441224731852850>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 0
+    },
+    "iron_pickaxe": {
+        "id": "iron_pickaxe",
+        "name": "iron pickaxe",
+        "emoji": "<:nypsi_iron_pickaxe:959441877956960326>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 1
+    },
+    "diamond_pickaxe": {
+        "id": "diamond_pickaxe",
+        "name": "diamond pickaxe",
+        "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
+        "description": "allows you to mine",
+        "role": "tool",
+        "rarity": 3
+    },
     "terrible_fishing_rod": {
         "id": "terrible_fishing_rod",
         "name": "terrible fishing rod",
@@ -259,7 +358,7 @@
         "emoji": "🥔",
         "description": "a potato.",
         "rarity": 0,
-        "role": "item",
+        "role": "sellable",
         "worth": 250
     },
     "tooth": {
