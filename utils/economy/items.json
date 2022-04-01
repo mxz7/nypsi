@@ -88,7 +88,8 @@
         "description": "can be smelted into an iron ingot with a furnace and coal",
         "worth": 500,
         "role": "ore",
-        "rarity": 1
+        "rarity": 1,
+        "ingot": "iron_ingot"
     },
     "gold_ore": {
         "id": "gold_ore",
@@ -97,7 +98,8 @@
         "description": "can be smelted into a gold ingot with a furnace and coal",
         "worth": 500,
         "role": "ore",
-        "rarity": 2
+        "rarity": 2,
+        "ingot": "gold_ingot"
     },
     "wooden_pickaxe": {
         "id": "wooden_pickaxe",
