@@ -32,7 +32,7 @@
         "emoji": "<:nypsi_cobblestone:959445739673616484>",
         "description": "found when mining",
         "worth": 750,
-        "role": "item",
+        "role": "sellable",
         "rarity": 0,
         "aliases": ["cobble"]
     },
@@ -51,7 +51,7 @@
         "emoji": "<:nypsi_iron:959442548064141362>",
         "description": "product of smelting iron ore",
         "worth": 25000,
-        "role": "item",
+        "role": "sellable",
         "rarity": 69
     },
     "gold_ingot": {
@@ -60,7 +60,7 @@
         "emoji": "<:nypsi_gold:959443010205126656>",
         "description": "product of smelting gold ore",
         "worth": 50000,
-        "role": "item",
+        "role": "sellable",
         "rarity": 69
     },
     "diamond": {
@@ -69,7 +69,7 @@
         "emoji": "<:nypsi_diamond:959443043377897502>",
         "description": "found when mining",
         "worth": 75000,
-        "role": "item",
+        "role": "sellable",
         "rarity": 3
     },
     "furnace": {
@@ -358,7 +358,7 @@
         "emoji": "🥔",
         "description": "a potato.",
         "rarity": 0,
-        "role": "item",
+        "role": "sellable",
         "worth": 250
     },
     "tooth": {
