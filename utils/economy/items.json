@@ -70,7 +70,7 @@
         "description": "found when mining",
         "worth": 75000,
         "role": "item",
-        "rarity": 4
+        "rarity": 3
     },
     "furnace": {
         "id": "furnace",
@@ -88,7 +88,7 @@
         "description": "can be smelted into an iron ingot with a furnace and coal",
         "worth": 500,
         "role": "ore",
-        "rarity": 2
+        "rarity": 1
     },
     "gold_ore": {
         "id": "gold_ore",
@@ -97,7 +97,7 @@
         "description": "can be smelted into a gold ingot with a furnace and coal",
         "worth": 500,
         "role": "ore",
-        "rarity": 3
+        "rarity": 2
     },
     "wooden_pickaxe": {
         "id": "wooden_pickaxe",
