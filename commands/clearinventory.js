@@ -27,7 +27,7 @@ async function run(message, args) {
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setDescription(`are you sure you want to clear your invntory of **${amount}** items?\n\nthis cannot be undone.`)
+    embed.setDescription(`are you sure you want to clear your inventory of **${amount}** items?\n\nthis cannot be undone.`)
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("❌").setLabel("clear").setStyle("DANGER")
