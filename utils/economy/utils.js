@@ -1735,7 +1735,7 @@ function openCrate(member, item) {
                 amount = 5
             } else if (chosen == "fishing_rod" || chosen == "gun" || chosen == "iron_pickaxe") {
                 amount = 10
-            } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamon_pickaxe") {
+            } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamond_pickaxe") {
                 amount = 10
             }
 
