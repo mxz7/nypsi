@@ -10,7 +10,8 @@ parent: chat reactions
 
 ## enabling automatic start
 
-running the command below will enable automatic chat reactions in the current channel, if you have not changed any of the settings, it will use the default settings.
+running the command below will enable automatic chat reactions in the current channel, if you have not changed any of the
+settings, it will use the default settings.
 
 ```
 $cr settings enable
@@ -18,7 +19,8 @@ $cr settings enable
 
 ## starting a chat reaction manually
 
-you can start a chat reaction manually with `$cr start`. this will still track towards statistics and the chat reactions leaderboard (`$cr lb`)
+you can start a chat reaction manually with `$cr start`. this will still track towards statistics and the chat reactions
+leaderboard (`$cr lb`)
 
 ## setting the channel(s)
 
