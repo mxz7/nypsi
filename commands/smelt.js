@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { userExists, createUser, getInventory, getItems, addItemUse } = require("../utils/economy/utils")
+const { userExists, createUser, getInventory, getItems, addItemUse, setInventory } = require("../utils/economy/utils")
 const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", categories.MONEY)
@@ -127,6 +127,8 @@ async function run(message, args) {
     if (inventory["coal"] <= 0) delete inventory["coal"]
     if (inventory["furnace"] <= 0) delete inventory["furnace"]
 
+    setInventory(message.member, inventory)
+
     const embed = new CustomEmbed(message.member, false)
     embed.setTitle(`furnace | ${message.author.username}`)
     embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...")
@@ -135,6 +137,7 @@ async function run(message, args) {
     
     setTimeout(() => {
         embed.setDescription(`<:nypsi_furnace:959445132585869373> you have smelted: \n${res}`)
+        msg.edit({embeds: [embed]})
     }, 2000)
 
 }
