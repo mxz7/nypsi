@@ -26,7 +26,6 @@ const thighsLinks = [
 ]
 const boobLinks = [
     "https://www.reddit.com/r/Boobies.json?limit=777",
-    "https://www.reddit.com/r/cleavage.json?limit=777",
     "https://www.reddit.com/r/tits.json?limit=777",
     "https://www.reddit.com/r/TinyTits.json?limit=777",
 ]

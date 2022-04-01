@@ -60,7 +60,7 @@ async function run(message, args) {
     const selected = new Map()
 
     for (const item of Array.from(Object.keys(inventory))) {
-        if (items[item].role == "fish" || items[item].role == "prey") {
+        if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
             selected.set(item, inventory[item])
         } else if (items[item].id.includes("watch") || items[item].id == "calendar" || items[item].id == "potato") {
             selected.set(item, inventory[item])
@@ -87,7 +87,7 @@ async function run(message, args) {
 
         let sellWorth = Math.floor(items[item].worth * 0.5 * selected.get(item))
 
-        if (items[item].role == "fish" || items[item].role == "prey") {
+        if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
             sellWorth = Math.floor(sellWorth + sellWorth * multi)
         } else if (item == "ethereum" || item == "bitcoin") {
             if (!selected.worth) {
