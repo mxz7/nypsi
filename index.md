@@ -34,15 +34,18 @@ make sure to join to stay updated (:
 ### how do i disable certain commands
 
 in order to disable a command, run the command below.
+
 ```
 $disablecmd + <cmd>
 ```
+
 to undo, type the following command:
+
 ```
 $disablecmd - <cmd>
 ```
 
 ### whats with the lowercase?
 
-i (max), personally love how lowercase text looks. which is why nypsi is almost entirely lowercase (no this will not change u loser). it also gives a bit of a 
+i (max), personally love how lowercase text looks. which is why nypsi is almost entirely lowercase (no this will not change u loser). it also gives a bit of a
 unique aesthetic to nypsi.

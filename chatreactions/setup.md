@@ -22,7 +22,7 @@ you can start a chat reaction manually with `$cr start`. this will still track t
 
 ## setting the channel(s)
 
-*to use multiple channels for chat reactions you must have a premium membership*
+_to use multiple channels for chat reactions you must have a premium membership_
 
 you can use the command below to enable/disable it for a channel. it acts as a toggle
 

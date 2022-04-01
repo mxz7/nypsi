@@ -32,7 +32,7 @@ top cases can be used to show the staff members that are handing out the most pu
 
 ## deleting all cases
 
-if you would like to delete all cases for your server (restart moderation data), the server owner must run the command below. 
+if you would like to delete all cases for your server (restart moderation data), the server owner must run the command below.
 
 ```
 $dac

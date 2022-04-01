@@ -10,7 +10,7 @@ parent: moderation
 
 ## default value
 
-by default, the mute role will be set to `default`. this means that nypsi will attempt to use the a role with the name of `muted` for muting, unmuting and 
+by default, the mute role will be set to `default`. this means that nypsi will attempt to use the a role with the name of `muted` for muting, unmuting and
 updating channel permissions.
 
 ## changing the mute role
@@ -29,7 +29,7 @@ with a custom mute role, if the bot at some point isn't able to find the role, t
 
 ## fixing mute role permissions
 
-by default, nypsi removes the permission for users with the mute role to be able to send a message in any server. of course, this could be overridden 
+by default, nypsi removes the permission for users with the mute role to be able to send a message in any server. of course, this could be overridden
 by another role's permissions.
 
 if the mute role isnt working as expected, use the command below to reset permissions for the current mute role
@@ -38,7 +38,7 @@ if the mute role isnt working as expected, use the command below to reset permis
 $muterole update
 ```
 
-this will disable the send messages permission for the current muterole in every channel. if there is still problems with the mute role, the 
+this will disable the send messages permission for the current muterole in every channel. if there is still problems with the mute role, the
 problem is most likely with other role permissions.
 
 ## resetting mute role
