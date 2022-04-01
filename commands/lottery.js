@@ -89,7 +89,7 @@ async function run(message, args) {
         let amount = 1
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "😐")]})
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "😐")] })
         }
 
         if (parseInt(args[1])) {
