@@ -143,7 +143,7 @@ async function run(message, args) {
 
     const multi = await getMulti(message.member)
 
-    if (selected.role == "fish" || selected.role == "prey") {
+    if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi)
     } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
         if (!selected.worth) {
@@ -162,7 +162,7 @@ async function run(message, args) {
 
     embed.setDescription(
         `you sold **${amount}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
-            multi > 0 && (selected.role == "fish" || selected.role == "prey")
+            multi > 0 && (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
                 : selected.id == "bitcoin" || selected.id == "ethereum"
                 ? "(-**5**% fee)"
