@@ -3,6 +3,7 @@ layout: default
 title: premium
 description: premium nypsi ranks
 permalink: /premium
+nav_order: 3
 ---
 
 # premium ranks
