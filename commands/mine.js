@@ -117,7 +117,13 @@ async function run(message, args) {
 
         for (const i of mineItems) {
             if (items[i]) {
-                if (items[i].id != "cobblestone" && items[i].id != "coal" && items[i].id != "diamond" && items[i].role != "ore") continue
+                if (
+                    items[i].id != "cobblestone" &&
+                    items[i].id != "coal" &&
+                    items[i].id != "diamond" &&
+                    items[i].role != "ore"
+                )
+                    continue
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15)
                     if (chance == 4 && pickaxe == "diamond_pickaxe") {
@@ -219,13 +225,19 @@ async function run(message, args) {
     const embed = new CustomEmbed(
         message.member,
         false,
-        `you go to the ${["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]} and swing your **${items[pickaxe].name}**`
+        `you go to the ${
+            ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]
+        } and swing your **${items[pickaxe].name}**`
     )
 
     const msg = await message.channel.send({ embeds: [embed] })
 
     embed.setDescription(
-        `you go to the ${["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]} and swing your **${items[pickaxe].name}**\n\nyou found${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`
+        `you go to the ${
+            ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]
+        } and swing your **${items[pickaxe].name}**\n\nyou found${
+            foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
+        }`
     )
 
     setTimeout(() => {
