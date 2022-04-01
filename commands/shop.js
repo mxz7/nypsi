@@ -66,7 +66,9 @@ async function run(message, args) {
             items[item].role == "prey" ||
             items[item].role == "fish" ||
             items[item].role == "collectable" ||
-            items[item].role == "car"
+            items[item].role == "car" ||
+            items[item].role == "sellable" ||
+            items[item].role == "ore"
         )
             continue
         if (pageOfItems.length == 6) {
