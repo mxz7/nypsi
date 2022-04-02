@@ -70,7 +70,7 @@ async function run(message, args) {
             .addField(
                 "game rules",
                 "in yablon, you start with two cards\nyou must guess if the next card drawn will fall between the previous two\n" +
-                "you get a **2**x multiplier if you win\nyou can double down to double your bet before you make your choice",
+                "you get a **1.5**x multiplier if you win\nyou can double down to double your bet before you make your choice",
             )
             .addField(
                 "help",
