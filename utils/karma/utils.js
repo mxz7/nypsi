@@ -140,7 +140,7 @@ function deteriorateKarma() {
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
      */
-    const users = db.prepare("SELECT * FROM karma WHERE karma > 10 AND last_command < ?").all(threshold)
+    const users = db.prepare("SELECT * FROM karma WHERE last_command < ?").all(threshold)
 
     let total = 0
 
