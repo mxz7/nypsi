@@ -70,8 +70,7 @@ async function run(message, args) {
             .addField(
                 "game rules",
                 "in yablon, you start with two cards\nyou must guess if the next card drawn will fall between the previous two\n" +
-                "you get a **2**x multiplier if you win",
-                "note: if the drawn card is equal to one of the other two, it is counted as not between the previous two"
+                "you get a **2**x multiplier if you win\nyou can double down to double your bet before you make your choice",
             )
             .addField(
                 "help",
@@ -236,15 +235,27 @@ async function run(message, args) {
     newNextCard(message.member)
 
     while ((getValue(games.get(message.member.user.id).cards[0]) == getValue(games.get(message.member.user.id).cards[1])) || cardValuesClose(message.member)) {
-        games.set(message.member.user.id, {
-            bet: games.get(message.member.user.id).bet,
-            win: games.get(message.member.user.id).win,
-            deck: games.get(message.member.user.id).deck,
-            cards: [],
-            nextCard: "",
-            id: games.get(message.member.user.id).id,
-            voted: games.get(message.member.user.id).voted,
-        })
+        if (games.get(message.member.user.id).deck.length < 3) {
+            games.set(message.member.user.id, {
+                bet: games.get(message.member.user.id).bet,
+                win: games.get(message.member.user.id).win,
+                deck: shuffle(newDeck),
+                cards: [],
+                nextCard: "",
+                id: games.get(message.member.user.id).id,
+                voted: games.get(message.member.user.id).voted,
+            })
+        } else {
+            games.set(message.member.user.id, {
+                bet: games.get(message.member.user.id).bet,
+                win: games.get(message.member.user.id).win,
+                deck: games.get(message.member.user.id).deck,
+                cards: [],
+                nextCard: "",
+                id: games.get(message.member.user.id).id,
+                voted: games.get(message.member.user.id).voted,
+            })
+        }
         newCard(message.member)
         newCard(message.member)
         newNextCard(message.member)
@@ -342,10 +353,18 @@ function cardValuesClose(member) {
     const value1 = getValue(games.get(member.user.id).cards[0])
     const value2 = getValue(games.get(member.user.id).cards[1])
 
-    const differenceNeeded = 3
+    const differenceNeeded = 4
 
     if (value1 > value2) return !(value1 - value2 >= differenceNeeded)
     else return !(value2 - value1 >= differenceNeeded)
+}
+
+function equalCards(member) {
+    const value1 = getValue(games.get(member.user.id).cards[0])
+    const value2 = getValue(games.get(member.user.id).cards[1])
+    const value3 = getValue(games.get(member.user.id).nextCard)
+    if (value3 == value1 || value2 == value1) return true
+    return false
 }
 
 function nextCardInBetween(member) {
@@ -411,7 +430,7 @@ async function playGame(message, m) {
     }
 
     const win = async () => {
-        let winnings = bet * 2
+        let winnings = Math.round(bet * 1.5)
 
         newEmbed.setColor("#5efb8f")
         if (games.get(message.member.user.id).voted > 0) {
@@ -461,6 +480,23 @@ async function playGame(message, m) {
         return m.edit({ embeds: [newEmbed], components: [] })
     }
 
+    const draw = async () => {
+        gamble(message.author, "yablon", bet, true, bet)
+        addGamble(message.member, "yablon", true)
+        newEmbed.setColor("#E5FF00")
+        newEmbed.setDescription(
+            "**bet** $" +
+                bet.toLocaleString() +
+                "\n\n**draw!!**\nyou win $" +
+                bet.toLocaleString()
+        )
+        newEmbed.addField("cards", getCards(message.member))
+        newEmbed.addField("drawn card", "| " + nextCard + " |")
+        updateBalance(message.member, getBalance(message.member) + bet)
+        games.delete(message.author.id)
+        return await m.edit({ embeds: [newEmbed], components: [] })
+    }
+
     const filter = (i) => i.user.id == message.author.id
 
     let fail = false
@@ -480,9 +516,11 @@ async function playGame(message, m) {
     if (fail) return
 
     if (reaction == "1️⃣") {
+        if (equalCards(message.member)) return draw()
         if (nextCardInBetween(message.member)) return win()
         return lose()
     } else if (reaction == "2️⃣") {
+        if (equalCards(message.member)) return draw()
         if (nextCardInBetween(message.member)) return lose()
         return win()
     } else if (reaction == "3️⃣") {
