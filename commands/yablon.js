@@ -400,7 +400,7 @@ async function playGame(message, m) {
     const doubleDown = async () => {
         newEmbed.setDescription("**bet** $" + bet.toLocaleString())
         newEmbed.addField("cards", getCards(message.member))
-        row = new MessageActionRow().addComponents(
+        let row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
             new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
         )
