@@ -68,7 +68,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] })
     }
 
-    if (args[0] == "all") {
+    if (args[0].toLowerCase() == "all") {
         args[0] = getBankBalance(message.member)
     }
 
