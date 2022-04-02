@@ -363,7 +363,7 @@ function equalCards(member) {
     const value1 = getValue(games.get(member.user.id).cards[0])
     const value2 = getValue(games.get(member.user.id).cards[1])
     const value3 = getValue(games.get(member.user.id).nextCard)
-    if (value3 == value1 || value2 == value1) return true
+    if (value3 == value1 || value3 == value2) return true
     return false
 }
 
