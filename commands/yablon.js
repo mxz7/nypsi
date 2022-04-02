@@ -70,12 +70,11 @@ async function run(message, args) {
             .addField(
                 "game rules",
                 "in yablon, you start with two cards\nyou must guess if the next card drawn will fall between the previous two\n" +
-                "you get a **1.5**x multiplier if you win\nyou can double down to double your bet before you make your choice",
+                    "you get a **1.5**x multiplier if you win\nyou can double down to double your bet before you make your choice"
             )
             .addField(
                 "help",
-                "**J**ack | value of 11\n**Q**ueen | value of 12\n" +
-                    "**K**ing | value of 13\n**A**ce | value of 14\n"
+                "**J**ack | value of 11\n**Q**ueen | value of 12\n" + "**K**ing | value of 13\n**A**ce | value of 14\n"
             )
 
         return message.channel.send({ embeds: [embed] })
@@ -217,7 +216,6 @@ async function run(message, args) {
         voted: voteMulti,
     })
 
-
     setTimeout(() => {
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
@@ -234,7 +232,10 @@ async function run(message, args) {
     newCard(message.member)
     newNextCard(message.member)
 
-    while ((getValue(games.get(message.member.user.id).cards[0]) == getValue(games.get(message.member.user.id).cards[1])) || cardValuesClose(message.member)) {
+    while (
+        getValue(games.get(message.member.user.id).cards[0]) == getValue(games.get(message.member.user.id).cards[1]) ||
+        cardValuesClose(message.member)
+    ) {
         if (games.get(message.member.user.id).deck.length < 3) {
             games.set(message.member.user.id, {
                 bet: games.get(message.member.user.id).bet,
@@ -260,7 +261,7 @@ async function run(message, args) {
         newCard(message.member)
         newNextCard(message.member)
     }
-    
+
     let row
 
     if (getBalance(message.member) >= bet) {
@@ -379,7 +380,8 @@ function nextCardInBetween(member) {
     } else {
         high = value2
         low = value1
-    } if (low < value3 && value3 < high) return true
+    }
+    if (low < value3 && value3 < high) return true
     return false
 }
 
@@ -407,11 +409,7 @@ async function playGame(message, m) {
         gamble(message.author, "yablon", bet, false, 0)
         addGamble(message.member, "yablon", false)
         newEmbed.setColor("#e4334f")
-        newEmbed.setDescription(
-            "**bet** $" +
-                bet.toLocaleString() +
-                "\n\n**you lose!!**"
-        )
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("cards", getCards(message.member))
         newEmbed.addField("drawn card", "| " + nextCard + " |")
         games.delete(message.author.id)
@@ -484,12 +482,7 @@ async function playGame(message, m) {
         gamble(message.author, "yablon", bet, true, bet)
         addGamble(message.member, "yablon", true)
         newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription(
-            "**bet** $" +
-                bet.toLocaleString() +
-                "\n\n**draw!!**\nyou win $" +
-                bet.toLocaleString()
-        )
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("cards", getCards(message.member))
         newEmbed.addField("drawn card", "| " + nextCard + " |")
         updateBalance(message.member, getBalance(message.member) + bet)
@@ -539,7 +532,6 @@ async function playGame(message, m) {
         })
 
         return doubleDown()
-        
     } else {
         games.delete(message.author.id)
         return m.reactions.removeAll()
