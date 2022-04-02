@@ -67,7 +67,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     }
 
-    if (args[0] == "all") {
+    if (args[0].toLowerCase() == "all") {
         args[0] = getBalance(message.member)
         const amount = parseInt(formatBet(args[0]))
         if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
