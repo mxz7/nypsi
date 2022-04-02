@@ -98,7 +98,7 @@ async function run(message, args) {
 
     const maxBet = await calcMaxBet(message.member)
 
-    if (args[0] == "all") {
+    if (args[0].toLowerCase() == "all") {
         args[0] = getBalance(message.member)
         if (getBalance(message.member) > maxBet) {
             args[0] = maxBet
