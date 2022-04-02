@@ -342,8 +342,10 @@ function cardValuesClose(member) {
     const value1 = getValue(games.get(member.user.id).cards[0])
     const value2 = getValue(games.get(member.user.id).cards[1])
 
-    if (value1 - 1 == value2 || value1 + 1 == value2) return true
-    return false
+    const differenceNeeded = 3
+
+    if (value1 > value2) return !(value1 - value2 >= differenceNeeded)
+    else return !(value2 - value1 >= differenceNeeded)
 }
 
 function nextCardInBetween(member) {
