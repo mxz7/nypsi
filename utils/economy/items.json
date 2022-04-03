@@ -50,7 +50,7 @@
         "name": "iron",
         "emoji": "<:nypsi_iron:959442548064141362>",
         "description": "product of smelting iron ore",
-        "worth": 25000,
+        "worth": 35000,
         "role": "sellable",
         "rarity": 69
     },
@@ -59,7 +59,7 @@
         "name": "gold",
         "emoji": "<:nypsi_gold:959443010205126656>",
         "description": "product of smelting gold ore",
-        "worth": 50000,
+        "worth": 65000,
         "role": "sellable",
         "rarity": 69
     },
@@ -68,7 +68,7 @@
         "name": "diamond",
         "emoji": "<:nypsi_diamond:959443043377897502>",
         "description": "found when mining",
-        "worth": 75000,
+        "worth": 80000,
         "role": "sellable",
         "rarity": 3
     },
