@@ -346,6 +346,7 @@ function calcTotal(member) {
     for (let i = 0; i < aces; i++) {
         if (total < 11) {
             total += 11
+            aceAs11 = true
         } else {
             total += 1
         }
@@ -353,7 +354,7 @@ function calcTotal(member) {
 
     if (total > 21) {
         if (aceAs11) {
-            total = total - 10
+            total -= 10
         }
     }
 
