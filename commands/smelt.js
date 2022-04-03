@@ -57,14 +57,6 @@ async function run(message, args) {
         })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
-
-    addItemUse(message.member, "furnace")
-
     if (inventory["iron_ore"] && inventory["iron_ore"] > 0) {
         for (let i = 0; i < inventory["iron_ore"]; i++) {
             ores.push("iron_ore")
@@ -96,6 +88,14 @@ async function run(message, args) {
             embeds: [new ErrorEmbed("you need coal to smelt ore. coal can be found in crates and through mining")],
         })
     }
+
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, cooldownLength * 1000)
+
+    addItemUse(message.member, "furnace")
 
     const smelted = new Map()
 
