@@ -834,6 +834,12 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 
             if (uses > 30) {
                 await channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
+
+                if (uses > 35) {
+                    toggleLock(user)
+                    logger.info(`${tag} (${user}) has been given a captcha`)
+                    await channel.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`)
+                }
             }
         }
         return
