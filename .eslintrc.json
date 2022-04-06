@@ -19,6 +19,7 @@
         "semi": [
             "error",
             "never"
-        ]
+        ],
+        "no-unreachable": "warn"
     }
 }
