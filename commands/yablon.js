@@ -31,7 +31,9 @@ const cmd = new Command("yablon", "play yablon", categories.MONEY).setAliases(["
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "yablon has been temporarily disabled.")]})
+    return message.channel.send({
+        embeds: [new CustomEmbed(message.member, false, "yablon has been temporarily disabled.")],
+    })
 
     let cooldownLength = 30
 
