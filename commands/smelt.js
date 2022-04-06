@@ -73,7 +73,7 @@ async function run(message, args) {
 
     if (ores.length == 0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("you ore to smelt. ore can be found in crates and through mining")],
+            embeds: [new ErrorEmbed("you need ore to smelt. ore can be found in crates and through mining")],
         })
     }
 
