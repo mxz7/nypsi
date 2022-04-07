@@ -2,6 +2,6 @@
     "semi": false,
     "tabWidth": 4,
     "printWidth": 125,
-    "endOfLine": "crlf",
+    "endOfLine": "lf",
     "proseWrap": "always"
 }
