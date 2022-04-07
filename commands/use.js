@@ -212,6 +212,10 @@ async function run(message, args) {
                 break
 
             case "lock_pick":
+                if (message.guild.id == "747056029795221513") {
+                    return message.channel.send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
+                }
+
                 if (args.length == 1) {
                     return message.channel.send({
                         embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)],
