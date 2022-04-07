@@ -16,10 +16,13 @@ const aliases = new Map()
 const popularCommands = new Map()
 const noLifers = new Map()
 const commandUses = new Map()
+const handcuffs = new Map()
+const captchaFails = new Map()
+const captchaPasses = new Map()
+
 const karmaCooldown = new Set()
 const xpCooldown = new Set()
 const cooldown = new Set()
-const handcuffs = new Map()
 const openingCratesBlock = new Set()
 
 const beingChecked = []
@@ -489,11 +492,12 @@ async function runCommand(cmd, message, args) {
         const response = await message.channel
             .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
             .then(async (collected) => {
-                return collected.first().content.toLowerCase()
+                return collected.first()
             })
             .catch(() => {
                 fail = true
                 logger.info(`captcha (${message.author.id}) failed`)
+                failedCaptcha(message.member, message.client)
                 return message.channel.send({
                     content:
                         message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
@@ -506,12 +510,14 @@ async function runCommand(cmd, message, args) {
             return
         }
 
-        if (response == captcha.answer) {
+        if (response.content.toLowerCase() == captcha.answer) {
             logger.info(`captcha (${message.author.id}) passed`)
+            passedCaptcha(message.member, message.client)
             toggleLock(message.author.id)
-            return message.react("✅")
+            return response.react("✅")
         } else {
             logger.info(`captcha (${message.author.id}) failed`)
+            failedCaptcha(message.member, message.client)
             return message.channel.send({
                 content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
             })
@@ -760,13 +766,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         const guild = await client.guilds.fetch(serverID)
 
         if (!guild) {
-            return logger.error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("unable to fetch guild for popular commands", serverID, channelID)
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == channelID[0])
 
         if (!channel) {
-            return logger.error("UNABLE TO FIND CHANNEL FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("unable to find channel for popular commands", serverID, channelID)
         }
 
         const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]))
@@ -818,13 +824,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         const guild = await client.guilds.fetch(serverID)
 
         if (!guild) {
-            return logger.error("UNABLE TO FETCH GUILD FOR POPULAR COMMANDS", serverID, channelID)
+            return logger.error("unable to fetch guild for popular commands", serverID, channelID)
         }
 
         const channel = await guild.channels.cache.find((ch) => ch.id == channelID[1])
 
         if (!channel) {
-            return logger.error("UNABLE TO FIND CHANNEL FOR HOURLY COMMAND USE LOG", serverID, channelID)
+            return logger.error("unable to find channel for hourly command use log", serverID, channelID)
         }
 
         for (const user of commandUses.keys()) {
@@ -883,6 +889,68 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 }
 
 exports.runPopularCommandsTimer = runPopularCommandsTimer
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Client} client 
+ * @returns 
+ */
+async function failedCaptcha(member, client) {
+    const serverID = "747056029795221513"
+    const channelID = "912710094955892817"
+
+    const guild = await client.guilds.fetch(serverID)
+
+    if (!guild) {
+        return logger.error("unable to fetch guild for captcha fail", serverID, channelID)
+    }
+
+    const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+
+    if (!channel) {
+        return logger.error("unable to find channel for anticheat logs", serverID, channelID)
+    }
+
+    if (captchaFails.has(member.user.id)) {
+        captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1)
+    } else {
+        captchaFails.set(member.user.id, 1)
+    }
+
+    await channel.send(`[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(member.user.id)})`)
+}
+
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {Client} client 
+ * @returns 
+ */
+async function passedCaptcha(member, client) {
+    const serverID = "747056029795221513"
+    const channelID = "912710094955892817"
+
+    const guild = await client.guilds.fetch(serverID)
+
+    if (!guild) {
+        return logger.error("unable to fetch guild for captcha pass", serverID, channelID)
+    }
+
+    const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+
+    if (!channel) {
+        return logger.error("unable to find channel for anticheat logs", serverID, channelID)
+    }
+
+    if (captchaPasses.has(member.user.id)) {
+        captchaPasses.set(member.user.id, captchaFails.get(member.user.id) + 1)
+    } else {
+        captchaPasses.set(member.user.id, 1)
+    }
+
+    await channel.send(`[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(member.user.id)})`)
+}
 
 function isHandcuffed(id) {
     return handcuffs.has(id)
