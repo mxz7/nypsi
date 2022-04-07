@@ -284,7 +284,13 @@ async function doVote(client, vote) {
 
     const tickets = getTickets(memberID)
 
-    if (tickets.length == 0) {
+    const prestigeBonus = Math.floor((getPrestige(memberID) > 20 ? 20 : getPrestige(memberID)) / 2.5)
+    const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0)
+    const karmaBonus = Math.floor(getKarma(memberID) / 100)
+
+    const max = 5 + prestigeBonus + premiumBonus + karmaBonus
+
+    if (tickets.length < max) {
         addTicket(memberID)
     }
 
@@ -311,7 +317,7 @@ async function doVote(client, vote) {
                     "+ **15** karma\n" +
                     `+ **10**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
-                    `${tickets.length == 0 ? "\n+ **1** lottery ticket" : ""}`
+                    `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
 
         await member
