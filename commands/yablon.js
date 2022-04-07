@@ -31,10 +31,6 @@ const cmd = new Command("yablon", "play yablon", categories.MONEY).setAliases(["
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
-    return message.channel.send({
-        embeds: [new CustomEmbed(message.member, false, "yablon has been temporarily disabled.")],
-    })
-
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -238,7 +234,7 @@ async function run(message, args) {
 
     while (
         getValue(games.get(message.member.user.id).cards[0]) == getValue(games.get(message.member.user.id).cards[1]) ||
-        cardValuesClose(message.member)
+        invalidCardDistance(message.member)
     ) {
         if (games.get(message.member.user.id).deck.length < 3) {
             games.set(message.member.user.id, {
@@ -266,20 +262,10 @@ async function run(message, args) {
         newNextCard(message.member)
     }
 
-    let row
-
-    if (getBalance(message.member) >= bet) {
-        row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("3️⃣").setLabel("double down").setStyle("SECONDARY")
-        )
-    } else {
-        row = new MessageActionRow().addComponents(
+    let row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
             new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
         )
-    }
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setTitle("yablon | " + message.member.user.username)
@@ -354,14 +340,15 @@ function getValue(card) {
     return parseInt(card.split()[0])
 }
 
-function cardValuesClose(member) {
+function invalidCardDistance(member) {
     const value1 = getValue(games.get(member.user.id).cards[0])
     const value2 = getValue(games.get(member.user.id).cards[1])
 
-    const differenceNeeded = 4
+    const minNeeded = 6
+    const maxAllowed = 7
 
-    if (value1 > value2) return !(value1 - value2 >= differenceNeeded)
-    else return !(value2 - value1 >= differenceNeeded)
+    if (value1 > value2) return !(value1 - value2 >= minNeeded) || !(value1 - value2 <= maxAllowed)
+    return !(value2 - value1 >= minNeeded) || !(value2 - value1 <= maxAllowed)
 }
 
 function equalCards(member) {
@@ -484,7 +471,6 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "yablon", bet, true, bet)
-        addGamble(message.member, "yablon", true)
         newEmbed.setColor("#E5FF00")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("cards", getCards(message.member))
@@ -520,22 +506,6 @@ async function playGame(message, m) {
         if (equalCards(message.member)) return draw()
         if (nextCardInBetween(message.member)) return lose()
         return win()
-    } else if (reaction == "3️⃣") {
-        updateBalance(message.member, getBalance(message.member) - bet)
-
-        bet = bet * 2
-
-        games.set(message.member.user.id, {
-            bet: bet,
-            win: games.get(message.member.user.id).win,
-            deck: games.get(message.member.user.id).deck,
-            cards: games.get(message.member.user.id).cards,
-            nextCard: games.get(message.member.user.id).nextCard,
-            id: games.get(message.member.user.id).id,
-            voted: games.get(message.member.user.id).voted,
-        })
-
-        return doubleDown()
     } else {
         games.delete(message.author.id)
         return m.reactions.removeAll()
