@@ -209,7 +209,9 @@ async function run(message, args) {
 
     games.set(message.member.user.id, {
         bet: bet,
-        deck: shuffle(newDeck),
+        deck: shuffle(newDeck, {
+            copy: true
+        }),
         cards: [],
         nextCard: "",
         id: id,
@@ -240,7 +242,9 @@ async function run(message, args) {
             games.set(message.member.user.id, {
                 bet: games.get(message.member.user.id).bet,
                 win: games.get(message.member.user.id).win,
-                deck: shuffle(newDeck),
+                deck: shuffle(newDeck, {
+                    copy: true
+                }),
                 cards: [],
                 nextCard: "",
                 id: games.get(message.member.user.id).id,
