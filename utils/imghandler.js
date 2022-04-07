@@ -99,7 +99,14 @@ async function cacheUpdate(links, imgs, name) {
             continue
         }
 
-        const allowed = res.data.children.filter((post) => !post.data.is_self)
+        let allowed
+
+        try {
+            allowed = res.data.children.filter((post) => !post.data.is_self)
+        } catch {
+            logger.error(`failed processing ${link}`)
+        }
+
         if (allowed) {
             imgs.set(link, allowed)
             amount += allowed.length
