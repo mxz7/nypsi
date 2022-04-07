@@ -891,10 +891,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
 exports.runPopularCommandsTimer = runPopularCommandsTimer
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Client} client 
- * @returns 
+ *
+ * @param {GuildMember} member
+ * @param {Client} client
+ * @returns
  */
 async function failedCaptcha(member, client) {
     const serverID = "747056029795221513"
@@ -918,14 +918,18 @@ async function failedCaptcha(member, client) {
         captchaFails.set(member.user.id, 1)
     }
 
-    await channel.send(`[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(member.user.id)})`)
+    await channel.send(
+        `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
+            member.user.id
+        )})`
+    )
 }
 
 /**
- * 
- * @param {GuildMember} member 
- * @param {Client} client 
- * @returns 
+ *
+ * @param {GuildMember} member
+ * @param {Client} client
+ * @returns
  */
 async function passedCaptcha(member, client) {
     const serverID = "747056029795221513"
@@ -949,7 +953,11 @@ async function passedCaptcha(member, client) {
         captchaPasses.set(member.user.id, 1)
     }
 
-    await channel.send(`[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(member.user.id)})`)
+    await channel.send(
+        `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
+            member.user.id
+        )})`
+    )
 }
 
 function isHandcuffed(id) {
