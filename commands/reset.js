@@ -15,6 +15,8 @@ const {
     getInventory,
     setInventory,
     getBalance,
+    deleteUser,
+    getItems,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
@@ -53,9 +55,37 @@ async function run(message, args) {
 
     let earnedKarma = 0
 
+    let inventoryWorth = 0
+    const multi = await getMulti(message.member)
+
+    let inventory = getInventory(message.member)
+    const items = getItems()
+
+    let itemIDs = Array.from(Object.keys(inventory))
+
+    for (const item of itemIDs) {
+        if (items[item].worth) {
+            let fee = 0.5
+            if (items[item].emoji == ":coin:") {
+                fee = 0.95
+            }
+            const amount = inventory[item]
+
+            if (items[item].role == "fish" || items[item].role == "prey") {
+                let worth1 = Math.floor(items[item].worth * fee * amount)
+                inventoryWorth += Math.floor(worth1 + worth1 * multi)
+            } else {
+                inventoryWorth += Math.floor(items[item].worth * fee * amount)
+            }
+        } else {
+            inventoryWorth += 1000
+        }
+    }
+
     earnedKarma += getPrestige(message.member) * 30
     earnedKarma += getXp(message.member) / 100
     earnedKarma += getBalance(message.member) / 100000 / 2
+    earnedKarma += inventoryWorth / 100000 / 2
 
     earnedKarma = Math.floor(earnedKarma * 2.2)
 
@@ -63,7 +93,7 @@ async function run(message, args) {
         message.member,
         true,
         "are you sure you want to reset your economy profile?\n\n" +
-            `you will lose **everything**, but you will receive ${earnedKarma} karma`
+            `you will lose **everything**, but you will receive ${earnedKarma.toLocaleString()} karma`
     ).setTitle(`reset | ${message.member.user.username}`)
 
     cooldown.set(message.member.id, new Date())
@@ -93,16 +123,43 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, 1800000)
         earnedKarma = 0
+        inventoryWorth = 0
+
+        inventory = getInventory(message.member)
+
+        itemIDs = Array.from(Object.keys(inventory))
+
+        for (const item of itemIDs) {
+            if (items[item].worth) {
+                let fee = 0.5
+                if (items[item].emoji == ":coin:") {
+                    fee = 0.95
+                }
+                const amount = inventory[item]
+
+                if (items[item].role == "fish" || items[item].role == "prey") {
+                    let worth1 = Math.floor(items[item].worth * fee * amount)
+                    inventoryWorth += Math.floor(worth1 + worth1 * multi)
+                } else {
+                    inventoryWorth += Math.floor(items[item].worth * fee * amount)
+                }
+            } else {
+                inventoryWorth += 1000
+            }
+        }
 
         earnedKarma += getPrestige(message.member) * 30
         earnedKarma += getXp(message.member) / 100
         earnedKarma += getBalance(message.member) / 100000 / 2
+        earnedKarma += inventoryWorth / 100000 / 2
 
         earnedKarma = Math.floor(earnedKarma * 2.2)
 
         addKarma(message.member, earnedKarma)
 
-        embed.setDescription(`your economy profile has been reset.\n\nyou have been given **${earnedKarma}** karma`)
+        deleteUser(message.member)
+
+        embed.setDescription(`your economy profile has been reset.\n\nyou have been given **${earnedKarma.toLocaleString()}** karma`)
 
         await msg.edit({ embeds: [embed], components: [] })
     }
