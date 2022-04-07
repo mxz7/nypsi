@@ -70,7 +70,7 @@ async function run(message, args) {
             .addField(
                 "game rules",
                 "in yablon, you start with two cards\nyou must guess if the next card drawn will fall between the previous two\n" +
-                    "you get a **1.5**x multiplier if you win\nyou can double down to double your bet before you make your choice"
+                    "you get a **1.5**x multiplier if you win"
             )
             .addField(
                 "help",
@@ -406,18 +406,7 @@ async function playGame(message, m) {
         games.delete(message.author.id)
         return await m.edit({ embeds: [newEmbed], components: [] })
     }
-
-    const doubleDown = async () => {
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString())
-        newEmbed.addField("cards", getCards(message.member))
-        let row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
-        )
-        await m.edit({ embeds: [newEmbed], components: [row] })
-        return playGame(message, m)
-    }
-
+    
     const win = async () => {
         let winnings = Math.round(bet * 1.5)
 
@@ -471,6 +460,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "yablon", bet, true, bet)
+        addGamble(message.member, "yablon", true)
         newEmbed.setColor("#E5FF00")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("cards", getCards(message.member))
