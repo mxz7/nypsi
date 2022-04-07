@@ -159,7 +159,9 @@ async function run(message, args) {
 
         deleteUser(message.member)
 
-        embed.setDescription(`your economy profile has been reset.\n\nyou have been given **${earnedKarma.toLocaleString()}** karma`)
+        embed.setDescription(
+            `your economy profile has been reset.\n\nyou have been given **${earnedKarma.toLocaleString()}** karma`
+        )
 
         await msg.edit({ embeds: [embed], components: [] })
     }
