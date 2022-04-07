@@ -411,25 +411,25 @@ function getMulti(member) {
     const voted = hasVoted(id)
 
     if (voted) {
-        multi += 10
+        multi += 5
     }
 
     const prestige = getPrestige(member)
 
-    const prestigeBonus = (prestige > 15 ? 15 : prestige) * 2
+    const prestigeBonus = (prestige > 12 ? 12 : prestige) * 2
 
     multi += prestigeBonus
 
     if (isPremium(id)) {
         switch (getTier(id)) {
             case 2:
-                multi += 5
+                multi += 4
                 break
             case 3:
-                multi += 10
+                multi += 6
                 break
             case 4:
-                multi += 15
+                multi += 10
         }
     }
 
