@@ -210,7 +210,7 @@ async function run(message, args) {
     games.set(message.member.user.id, {
         bet: bet,
         deck: shuffle(newDeck, {
-            copy: true
+            copy: true,
         }),
         cards: [],
         nextCard: "",
@@ -243,7 +243,7 @@ async function run(message, args) {
                 bet: games.get(message.member.user.id).bet,
                 win: games.get(message.member.user.id).win,
                 deck: shuffle(newDeck, {
-                    copy: true
+                    copy: true,
                 }),
                 cards: [],
                 nextCard: "",
@@ -267,9 +267,9 @@ async function run(message, args) {
     }
 
     let row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
-        )
+        new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
+    )
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setTitle("yablon | " + message.member.user.username)
@@ -410,7 +410,7 @@ async function playGame(message, m) {
         games.delete(message.author.id)
         return await m.edit({ embeds: [newEmbed], components: [] })
     }
-    
+
     const win = async () => {
         let winnings = Math.round(bet * 1.5)
 
