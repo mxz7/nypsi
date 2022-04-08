@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@top-gg/sdk": "^3.1.3",
-    "better-sqlite3": "^7.5.0",
+    "better-sqlite3": "^7.5.1",
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
     "discord.js": "^13.6.0",
