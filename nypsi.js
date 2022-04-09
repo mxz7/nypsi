@@ -76,6 +76,7 @@ const channelCreate = require("./events/channelCreate")
 const roleDelete = require("./events/roleDelete")
 const guildMemberRemove = require("./events/guildMemberRemove")
 const userUpdate = require("./events/userUpdate")
+const interactionCreate = require("./events/interactionCreate")
 
 client.once("ready", ready.bind(null, client, startUp))
 if (!process.env.GITHUB_ACTION) {
@@ -95,6 +96,7 @@ if (!process.env.GITHUB_ACTION) {
     client.on("channelCreate", channelCreate.bind(null))
     client.on("roleDelete", roleDelete.bind(null))
     client.on("userUpdate", userUpdate.bind(null))
+    client.on("interactionCreate", interactionCreate.bind(null))
 }
 
 client.on("shardReady", (shardID) => logger.info(`shard#${shardID} ready`))
