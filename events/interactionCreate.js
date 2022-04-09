@@ -15,33 +15,28 @@ module.exports = async (interaction) => {
      */
     message.author = interaction.user
 
-    const string = interaction.options.getString("reason")
-    const user = interaction.options.getUser("user")
-    const integer = interaction.options.getInteger("bet")
-
     const args = [""]
 
-    if (user) {
-        args.push(`<@${user.id}>`)
-        const guildMember = await interaction.guild.members.fetch(user.id)
+    for (const arg of interaction.options.data) {
+        if (arg.type == "USER") {
+            const user = arg.user
+            args.push(`<@${user.id}>`)
+            const guildMember = await interaction.guild.members.fetch(user.id)
 
-        if (guildMember) {
-            const collection = new Collection()
-            collection.set(user.id, guildMember)
-            message.mentions = {
-                members: collection
+            if (guildMember) {
+                const collection = new Collection()
+                collection.set(user.id, guildMember)
+                message.mentions = {
+                    members: collection
+                }
             }
+        } else if (arg.type == "STRING") {
+            for (const str of arg.value.split(" ")) {
+                args.push(str)
+            }
+        } else if (arg.type == "INTEGER") {
+            args.push(arg.value.toString())
         }
-    }
-
-    if (string) {
-        for (const str of string.split(" ")) {
-            args.push(str)
-        }
-    }
-
-    if (integer) {
-        args.push(integer.toString())
     }
 
     message.interaction = true
