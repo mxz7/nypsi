@@ -8,6 +8,13 @@ const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
 
 avatar.setAliases(["av", "pfp", "picture"])
 
+avatar.slashEnabled = true
+
+avatar.slashData.addUserOption(option => 
+    option.setName("user")
+        .setDescription("view avatar of this user")
+        .setRequired(false))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -45,10 +52,26 @@ async function run(message, args) {
 
     let msg
 
+    const send = async (data) => {
+        if (message.interaction) {
+            return await message.reply(data)
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (serverAvatar) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
     } else {
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
+    }
+
+    const edit = async (data) => {
+        if (message.interaction) {
+            return await message.editReply(data)
+        } else {
+            return await msg.edit(data)
+        }
     }
 
     const filter = (i) => i.user.id == message.author.id
@@ -60,13 +83,13 @@ async function run(message, args) {
             return collected.customId
         })
         .catch(async () => {
-            await msg.edit({ components: [] })
+            await edit({ components: [] })
         })
 
     if (reaction == "x") {
         embed.setImage(serverAvatar)
 
-        await msg.edit({ embeds: [embed], components: [] })
+        await edit({ embeds: [embed], components: [] })
     }
 }
 
