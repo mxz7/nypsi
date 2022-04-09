@@ -23,6 +23,9 @@ const cooldown = new Map()
 
 const cmd = new Command("rockpaperscissors", "play rock paper scissors", categories.MONEY).setAliases(["rps"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption(option => option.setName("choice").setDescription("choice for the bet").setRequired(true).addChoice("rock", "rock").addChoice("paper", "paper").addChoice("scissors", "scissors")).addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -35,6 +38,15 @@ async function run(message, args) {
             cooldownLength = 3
         } else {
             cooldownLength = 6
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -54,7 +66,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) {
@@ -72,14 +84,14 @@ async function run(message, args) {
                 "rock paper scissors works exactly how this game does in real life\n" + "**2**x multiplier for winning"
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     let choice = args[0]
     let memberEmoji = ""
 
     if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
         })
     }
@@ -109,7 +121,7 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
             args[1] = formatBet(args[1])
         } else {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
             })
         }
@@ -118,27 +130,27 @@ async function run(message, args) {
     const bet = parseInt(args[1])
 
     if (!bet) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (!bet) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
         })
     }
 
     if (bet <= 0) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
         })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     if (bet > maxBet) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
@@ -217,7 +229,16 @@ async function run(message, args) {
             bet.toLocaleString()
     ).setTitle("rock paper scissors | " + message.member.user.username)
 
-    message.channel.send({ embeds: [embed] }).then((m) => {
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
+    send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             "**threw** " +
                 winning +
@@ -269,7 +290,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit({ embeds: [embed] })
+            edit({ embeds: [embed] }, m)
         }, 1500)
     })
 
