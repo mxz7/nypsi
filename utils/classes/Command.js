@@ -18,6 +18,9 @@ class Command {
 
         this.slashEnabled = true
 
+        /**
+         * @type {SlashCommandBuilder}
+         */
         this.slashData = new SlashCommandBuilder()
             .setName(this.name)
             .setDescription(this.description)
