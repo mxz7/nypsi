@@ -19,7 +19,7 @@ module.exports = async (interaction) => {
     let user = interaction.options.getUser("user")
     const integer = interaction.options.getInteger("bet")
 
-    const args = []
+    const args = [""]
 
     if (user) {
         args.push(`<@${user.id}>`)
@@ -28,7 +28,9 @@ module.exports = async (interaction) => {
         if (guildMember) {
             const collection = new Collection()
             collection.set(user.id, guildMember)
-            message.mentions = collection
+            message.mentions = {
+                members: collection
+            }
         }
     }
 
