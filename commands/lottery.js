@@ -32,7 +32,9 @@ async function run(message, args) {
     const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
     const karmaBonus = Math.floor(getKarma(message.member) / 100)
 
-    const max = 5 + prestigeBonus + premiumBonus + karmaBonus
+    let max = 5 + prestigeBonus + premiumBonus + karmaBonus
+
+    if (max > 20) max = 20
 
     const help = () => {
         const embed = new CustomEmbed(message.member, false)
