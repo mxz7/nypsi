@@ -1,0 +1,46 @@
+const { Interaction, User, Collection } = require("discord.js")
+const { runCommand } = require("../utils/commandhandler")
+
+/**
+ * 
+ * @param {Interaction} interaction 
+ */
+module.exports = async (interaction) => {
+    if (!interaction.isCommand()) return
+
+    const message = interaction
+
+    /**
+     * @type {User}
+     */
+    message.author = interaction.user
+
+    const string = interaction.options.getString("reason")
+    let user = interaction.options.getUser("user")
+    const integer = interaction.options.getInteger("bet")
+
+    const args = []
+
+    if (user) {
+        args.push(`<@${user.id}>`)
+        const guildMember = await interaction.guild.members.fetch(user.id)
+
+        if (guildMember) {
+            const collection = new Collection()
+            collection.set(user.id, guildMember)
+            message.mentions = collection
+        }
+    }
+
+    if (string) {
+        // do string
+    }
+
+    if (integer) {
+        // do string
+    }
+
+    message.interaction = true
+
+    return runCommand(interaction.commandName, message, args)
+}
