@@ -16,7 +16,7 @@ class Command {
         if (Object.values(categories).indexOf(category) == -1) throw new Error("Invalid Category")
         this.category = category
 
-        this.slashEnabled = true
+        this.slashEnabled = false
 
         /**
          * @type {SlashCommandBuilder}
