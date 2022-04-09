@@ -701,13 +701,19 @@ function logCommand(message, args) {
 
     const server = message.guild.name
 
-    let content = message.content
+    let msg
 
-    if (content.length > 100) {
-        content = content.substr(0, 75) + "..."
+    if (message.interaction) {
+        msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`
+    } else {
+        let content = message.content
+
+        if (content.length > 100) {
+            content = content.substr(0, 75) + "..."
+        }
+
+        msg = `${message.guild.id} - ${message.author.tag}: ${content}`
     }
-
-    const msg = `${message.guild.id} - ${message.author.tag}: ${content}`
 
     logger.cmd(msg)
 }
