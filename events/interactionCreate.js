@@ -44,6 +44,9 @@ module.exports = async (interaction) => {
             case "INTEGER":
                 args.push(arg.value.toString())
                 break
+            case "CHANNEL":
+                args.push(arg.value)
+                break
             case "SUB_COMMAND_GROUP":
                 args.push(arg.name)
                 for (const arg1 of arg.options) {
