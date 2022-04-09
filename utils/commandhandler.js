@@ -1016,6 +1016,7 @@ async function uploadGuildCommands(guildID, clientID) {
     const slashData = []
 
     for (const cmd of Array.from(commands.values())) {
+        if (!cmd.slashEnabled) continue
         slashData.push(cmd.slashData.toJSON())
     }
 
