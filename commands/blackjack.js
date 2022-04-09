@@ -24,6 +24,9 @@ const games = new Map()
 
 const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj", "blowjob"])
 
+cmd.slashEnabled = true
+cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -31,8 +34,17 @@ const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAlia
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (games.has(message.member.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you are already playing blackjack")] })
+        return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] })
     }
 
     let cooldownLength = 30
@@ -61,7 +73,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -78,7 +90,7 @@ async function run(message, args) {
                     "if your first 2 cards add up to 21, you get a **2.5**x win"
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args[0] == "info") {
@@ -91,7 +103,7 @@ async function run(message, args) {
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)"
         ).setTitle("blackjack help")
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     const maxBet = await calcMaxBet(message.member)
@@ -110,25 +122,25 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}blackjack <bet>`)] })
+        return send({ embeds: [new ErrorEmbed(`${prefix}blackjack <bet>`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     if (bet > maxBet) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
@@ -252,8 +264,7 @@ async function run(message, args) {
         )
     }
 
-    message.channel
-        .send({ embeds: [embed], components: [row] })
+    send({ embeds: [embed], components: [row] })
         .then((m) => {
             playGame(message, m).catch((e) => {
                 logger.error(e)
@@ -417,6 +428,15 @@ function getDealerCards(member) {
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
 
+    const edit = async (data) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await m.edit(data)
+        }
+    }
+
     let bet = games.get(message.member.user.id).bet
     const first = games.get(message.member.user.id).first
     const dealerPlaya = games.get(message.member.user.id).dealerPlay
@@ -433,7 +453,7 @@ async function playGame(message, m) {
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         games.delete(message.author.id)
-        return await m.edit({ embeds: [newEmbed], components: [] })
+        return await edit({ embeds: [newEmbed], components: [] })
     }
 
     const win = async () => {
@@ -486,7 +506,7 @@ async function playGame(message, m) {
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        return await m.edit({ embeds: [newEmbed], components: [] })
+        return await edit({ embeds: [newEmbed], components: [] })
     }
 
     const draw = async () => {
@@ -498,7 +518,7 @@ async function playGame(message, m) {
         newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        return await m.edit({ embeds: [newEmbed], components: [] })
+        return await edit({ embeds: [newEmbed], components: [] })
     }
 
     if (calcTotalDealer(message.member) > 21) {
@@ -572,7 +592,7 @@ async function playGame(message, m) {
                 .setTitle("blackjack")
                 .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
                 .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-            await m.edit({ embeds: [newEmbed1] })
+            await edit({ embeds: [newEmbed1] })
 
             if (calcTotal(message.member) == 21) {
                 return setTimeout(() => {
@@ -606,7 +626,7 @@ async function playGame(message, m) {
                 .setTitle("blackjack")
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-            m.edit({ embeds: [newEmbed1] })
+            edit({ embeds: [newEmbed1] })
 
             games.set(message.member.user.id, {
                 bet: bet,
@@ -664,7 +684,7 @@ async function playGame(message, m) {
                 .setTitle("blackjack")
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
-            m.edit({ embeds: [newEmbed1] })
+            edit({ embeds: [newEmbed1] })
 
             if (calcTotal(message.member) > 21) {
                 return setTimeout(() => {
