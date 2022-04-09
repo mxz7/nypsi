@@ -35,7 +35,9 @@ module.exports = async (interaction) => {
     }
 
     if (string) {
-        // do string
+        for (const str of string.split(" ")) {
+            args.push(str)
+        }
     }
 
     if (integer) {
