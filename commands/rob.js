@@ -28,6 +28,9 @@ const radioCooldown = new Map()
 
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption(option => option.setName("user").setDescription("who do u wanna rob").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -38,6 +41,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 300
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -57,7 +69,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (radioCooldown.has(message.member.user.id)) {
@@ -76,7 +88,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(
                     `you have been reported to the police, they will continue looking for you for **${remaining}**`
@@ -98,13 +110,13 @@ async function run(message, args) {
                     "you can lose up to **25**% of your balance by failing a robbery"
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
 
     if (message.guild.id == "747056029795221513") {
-        return message.channel.send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
+        return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
     }
 
     let target = message.mentions.members.first()
@@ -114,27 +126,27 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (target.user.bot) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (message.member == target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cant rob yourself")] })
+        return send({ embeds: [new ErrorEmbed("you cant rob yourself")] })
     }
 
     if (!userExists(target) || getBalance(target) <= 500) {
-        return message.channel.send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] })
+        return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] })
     }
 
     if (getBalance(message.member) < 750) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] })
+        return send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] })
     }
 
     const date = new Date()
@@ -305,9 +317,18 @@ async function run(message, args) {
         }
     }
 
-    message.channel.send({ embeds: [embed] }).then(async (m) => {
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
+    send({ embeds: [embed] }).then(async (m) => {
         setTimeout(async () => {
-            await m.edit({ embeds: [embed2] })
+            await edit({ embeds: [embed2] }, m)
 
             if (getDMsEnabled(target)) {
                 if (robberySuccess) {
