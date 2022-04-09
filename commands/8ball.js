@@ -9,7 +9,7 @@ const answers = [
     "better not tell you now",
     "cannot predict now",
     "concentrate and ask again",
-    "don’t count on it",
+    "don't count on it",
     "it is certain",
     "it is decidedly so",
     "most likely",
@@ -22,13 +22,19 @@ const answers = [
     "very doubtful",
     "without a doubt",
     "yes.",
-    "yes – definitely",
+    "yes - definitely",
     "you may rely on it",
 ]
 
 const cooldown = new Map()
 
 const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
+
+cmd.slashData.addStringOption(option => {
+    option.setName("question")
+        .setRequired(true)
+        .setDescription("what would you like to ask the 8ball")
+})
 
 /**
  *
