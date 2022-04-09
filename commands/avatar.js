@@ -54,7 +54,8 @@ async function run(message, args) {
 
     const send = async (data) => {
         if (message.interaction) {
-            return await message.reply(data)
+            await message.reply(data)
+            return await message.fetchReply()
         } else {
             return await message.channel.send(data)
         }
@@ -68,7 +69,8 @@ async function run(message, args) {
 
     const edit = async (data) => {
         if (message.interaction) {
-            return await message.editReply(data)
+            await message.editReply(data)
+            return await message.fetchReply()
         } else {
             return await msg.edit(data)
         }
