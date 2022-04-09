@@ -16,7 +16,7 @@ module.exports = async (interaction) => {
     message.author = interaction.user
 
     const string = interaction.options.getString("reason")
-    let user = interaction.options.getUser("user")
+    const user = interaction.options.getUser("user")
     const integer = interaction.options.getInteger("bet")
 
     const args = [""]
@@ -41,7 +41,7 @@ module.exports = async (interaction) => {
     }
 
     if (integer) {
-        // do string
+        args.push(integer.toString())
     }
 
     message.interaction = true
