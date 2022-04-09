@@ -10,6 +10,8 @@ const { logger, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
 const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
+const { REST } = require("@discordjs/rest")
+const { Routes } = require("discord-api-types/v9")
 
 const commands = new Map()
 const aliases = new Map()
@@ -1001,3 +1003,30 @@ function stopOpeningCrates(member) {
 }
 
 exports.stopOpeningCrates = stopOpeningCrates
+
+/**
+ * 
+ * @param {string} guildID
+ * @param {string} clientID
+ */
+async function uploadGuildCommands(guildID, clientID) {
+    logger.info("started refresh of [/] commands...")
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
+
+    const slashData = []
+
+    for (const cmd of Array.from(commands.values())) {
+        slashData.push(cmd.slashData.toJSON())
+    }
+
+    try {
+        await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: slashData })
+
+        logger.info("finished refresh of [/] commands")
+    } catch (error) {
+        logger.error("failed refresh of [/] commands")
+        logger.error(error)
+    }
+}
+
+exports.uploadGuildCommands = uploadGuildCommands
