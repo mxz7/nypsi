@@ -30,12 +30,6 @@ const cooldown = new Map()
 
 const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
 
-cmd.slashData.addStringOption(option => 
-    option.setName("question")
-        .setRequired(true)
-        .setDescription("what would you like to ask the 8ball")
-)
-
 /**
  *
  * @param {Message} message
