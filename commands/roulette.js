@@ -64,7 +64,7 @@ const cmd = new Command("roulette", "play roulette", categories.MONEY).setAliase
 
 cmd.slashEnabled = true
 cmd.slashData.addStringOption(option =>
-    option.setName("color").setDescription("color to bet on").setRequired(true).addChoice("red", "red").addChoice("black", "black").addChoice("green", "green")).addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+    option.setName("color").setDescription("color to bet on").setRequired(true).addChoice("🔴 red", "red").addChoice("⚫ black", "black").addChoice("🟢 green", "green")).addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
 
 /**
  * @param {Message} message
