@@ -9,8 +9,8 @@ const { userExists } = require("../utils/economy/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases([
-    "pings",
+const cmd = new Command("pings", "view who mentioned you recently", categories.UTILITY).setAliases([
+    "mentions",
     "whothefuckpingedme",
 ])
 
