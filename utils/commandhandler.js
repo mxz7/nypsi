@@ -10,6 +10,8 @@ const { logger, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
 const { start } = require("repl")
 const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
+const { REST } = require("@discordjs/rest")
+const { Routes } = require("discord-api-types/v9")
 
 const commands = new Map()
 const aliases = new Map()
@@ -699,13 +701,19 @@ function logCommand(message, args) {
 
     const server = message.guild.name
 
-    let content = message.content
+    let msg
 
-    if (content.length > 100) {
-        content = content.substr(0, 75) + "..."
+    if (message.interaction) {
+        msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`
+    } else {
+        let content = message.content
+
+        if (content.length > 100) {
+            content = content.substr(0, 75) + "..."
+        }
+
+        msg = `${message.guild.id} - ${message.author.tag}: ${content}`
     }
-
-    const msg = `${message.guild.id} - ${message.author.tag}: ${content}`
 
     logger.cmd(msg)
 }
@@ -1001,3 +1009,61 @@ function stopOpeningCrates(member) {
 }
 
 exports.stopOpeningCrates = stopOpeningCrates
+
+/**
+ *
+ * @param {string} guildID
+ * @param {string} clientID
+ */
+async function uploadGuildCommands(guildID, clientID) {
+    logger.info("started refresh of [/] commands...")
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
+
+    const slashData = []
+
+    for (const cmd of Array.from(commands.values())) {
+        if (!cmd.slashEnabled) continue
+        slashData.push(cmd.slashData.toJSON())
+    }
+
+    try {
+        logger.info(`uploading ${slashData.length} [/] commands`)
+        await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: slashData })
+
+        logger.info("finished refresh of [/] commands")
+    } catch (error) {
+        logger.error("failed refresh of [/] commands")
+        logger.error(error)
+    }
+}
+
+exports.uploadGuildCommands = uploadGuildCommands
+
+/**
+ *
+ * @param {string} guildID
+ * @param {string} clientID
+ */
+async function uploadGuildCommandsGlobal(clientID) {
+    logger.info("started refresh of global [/] commands...")
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
+
+    const slashData = []
+
+    for (const cmd of Array.from(commands.values())) {
+        if (!cmd.slashEnabled) continue
+        slashData.push(cmd.slashData.toJSON())
+    }
+
+    try {
+        logger.info(`uploading ${slashData.length} [/] commands`)
+        await rest.put(Routes.applicationCommands(clientID), { body: slashData })
+
+        logger.info("finished refresh of global [/] commands")
+    } catch (error) {
+        logger.error("failed refresh of global [/] commands")
+        logger.error(error)
+    }
+}
+
+exports.uploadGuildCommandsGlobal = uploadGuildCommandsGlobal

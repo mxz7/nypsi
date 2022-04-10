@@ -7,6 +7,11 @@ const cmd = new Command("addemoji", "add an emoji from a different server to you
     .setPermissions(["MANAGE_EMOJIS"])
     .setAliases(["stealemoji"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption((option) =>
+    option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
+)
+
 const cooldown = new Map()
 
 /**
@@ -15,6 +20,15 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -32,18 +46,18 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("i need the `manage emojis` permission for this command to work")],
         })
     }
 
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage emojis` permission")] })
+            return send({ embeds: [new ErrorEmbed("you need the `manage emojis` permission")] })
         }
         return
     }
@@ -51,7 +65,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0 && !message.attachments.first()) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")],
         })
     }
@@ -60,7 +74,7 @@ async function run(message, args) {
     let url
     let name
 
-    if (args.length == 0 || message.attachments.first()) {
+    if (args.length == 0 || (message.attachments && message.attachments.first())) {
         mode = "attachment"
     } else if (args[0]) {
         if (args[0].startsWith("http")) {
@@ -83,7 +97,7 @@ async function run(message, args) {
         emoji = emoji.split(":")
 
         if (!emoji[2]) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")] })
+            return send({ embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")] })
         }
 
         const emojiID = emoji[2].slice(0, emoji[2].length - 1)
@@ -123,12 +137,12 @@ async function run(message, args) {
     await message.guild.emojis.create(url, name).catch((e) => {
         fail = true
 
-        return message.channel.send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] })
+        return send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] })
     })
 
     if (fail) return
 
-    return message.channel.send({
+    return send({
         embeds: [new CustomEmbed(message.member, false, `✅ emoji added as \`:${name}:\``)],
     })
 }

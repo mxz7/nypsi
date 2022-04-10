@@ -16,6 +16,37 @@ const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
 
+cmd.slashEnabled = true
+cmd.slashData
+    .addSubcommand((start) =>
+        start
+            .setName("start")
+            .setDescription("start a race")
+            .addIntegerOption((option) =>
+                option.setName("bet").setDescription("this is the bet and the entry fee for the race").setRequired(true)
+            )
+    )
+    .addSubcommand((join) =>
+        join
+            .setName("join")
+            .setDescription("join an existing race in the channel")
+            .addStringOption((option) =>
+                option
+                    .setName("car")
+                    .setDescription("what car would you like to use")
+                    .addChoice("🚗 fiat", "fiat")
+                    .addChoice("🚗 ford fiesta", "ford_fiesta")
+                    .addChoice("🚗 mitsubishi lancer evo x", "lancer_evox")
+                    .addChoice("🚗 lightning mcqueen", "lightning_mcqueen")
+                    .addChoice("🏎️ nissan skyline gtr r34", "skyline_r34")
+                    .addChoice("🚗 smart car", "smart_car")
+                    .addChoice("🚗 subuwu", "subaru_wrx")
+                    .addChoice("🚗 tesla model x", "tesla_modelx")
+                    .addChoice("🏎️ toyota supra mk4", "toyota_supra")
+                    .addChoice("🚗 corsa 2003", "vauxhall_corsa")
+            )
+    )
+
 const races = new Map()
 const carCooldown = new Map()
 const cooldown = new Map()
@@ -27,6 +58,15 @@ const cooldown = new Map()
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
 
@@ -37,7 +77,7 @@ async function run(message, args) {
                 `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
         )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -59,17 +99,17 @@ async function run(message, args) {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+            return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
         }
 
         if (args.length == 1) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
             })
         }
 
         if (races.has(message.channel.id)) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("there is already a street race in this channel")],
             })
         }
@@ -78,7 +118,7 @@ async function run(message, args) {
             if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
                 args[1] = formatBet(args[1])
             } else {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
                 })
             }
@@ -87,37 +127,37 @@ async function run(message, args) {
         const bet = parseInt(args[1])
 
         if (!bet) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid entry fee")] })
+            return send({ embeds: [new ErrorEmbed("invalid entry fee")] })
         }
 
         if (bet <= 0) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
             })
         }
 
         if (bet < 1000) {
-            return message.channel.send({ embeds: [new ErrorEmbed("entry fee cannot be less than $1k")] })
+            return send({ embeds: [new ErrorEmbed("entry fee cannot be less than $1k")] })
         }
 
         if (bet > 500000) {
-            return message.channel.send({ embeds: [new ErrorEmbed("entry fee cannot be over $500k")] })
+            return send({ embeds: [new ErrorEmbed("entry fee cannot be over $500k")] })
         }
 
         let speedLimit = 0
 
         if (args[2]) {
             if (!parseInt(args[2])) {
-                return message.channel.send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] })
+                return send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] })
             }
             speedLimit = parseInt(args[2])
 
             if (!speedLimit) {
-                return message.channel.send({ embeds: [new ErrorEmbed("invalid speed limit")] })
+                return send({ embeds: [new ErrorEmbed("invalid speed limit")] })
             }
 
             if (speedLimit > 6 || speedLimit < 1) {
-                return message.channel.send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] })
+                return send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] })
             }
         }
 
@@ -148,6 +188,10 @@ async function run(message, args) {
         embed.setDescription(
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
         )
+
+        if (message.interaction) {
+            message.deferReply()
+        }
 
         const msg = await message.channel.send({ embeds: [embed] })
 
@@ -185,7 +229,7 @@ async function run(message, args) {
         }, 30000)
     } else if (args[0].toLowerCase() == "join") {
         if (!races.get(message.channel.id)) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("there is currently no street race in this channel")],
             })
         }
@@ -195,19 +239,19 @@ async function run(message, args) {
         }
 
         if (races.get(message.channel.id).started) {
-            return message.channel.send({ embeds: [new ErrorEmbed("this race has already started")] })
+            return send({ embeds: [new ErrorEmbed("this race has already started")] })
         }
 
         const race = races.get(message.channel.id)
 
         if (race.bet > getBalance(message.member)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] })
+            return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] })
         }
 
         const maxBet = await calcMaxBet(message.member)
 
         if (race.bet > maxBet) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new ErrorEmbed(
                         `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
@@ -230,7 +274,7 @@ async function run(message, args) {
                     }
                 }
             }
-            if (!car) return message.channel.send({ embeds: [new ErrorEmbed("you don't have a car")] })
+            if (!car) return send({ embeds: [new ErrorEmbed("you don't have a car")] })
         } else {
             const searchTag = args[1].toLowerCase()
             for (const itemName of Array.from(Object.keys(items))) {
@@ -251,16 +295,16 @@ async function run(message, args) {
             car = items[car]
 
             if (!car) {
-                return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
+                return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
             }
 
             if (!inventory[car.id] || inventory[car.id] == 0) {
-                return message.channel.send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] })
+                return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] })
             }
         }
 
         if (race.speedLimit > 0 && car.speed > race.speedLimit) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new ErrorEmbed(
                         `your ${car.name} is too fast for this race, select another with ${getPrefix(
@@ -275,7 +319,7 @@ async function run(message, args) {
             let current = carCooldown.get(message.author.id)
 
             if (current.includes(car.id)) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             `your ${car.name} is on cooldown, select another with ${getPrefix(
@@ -339,7 +383,15 @@ async function run(message, args) {
         embed.setDescription(description)
 
         await race.message.edit({ embeds: [embed] })
-        await message.react("✅")
+
+        if (message.interaction) {
+            await message.reply({
+                embeds: [new CustomEmbed(message.member, false, "you have joined the race")],
+                ephemeral: true,
+            })
+        } else {
+            await message.react("✅")
+        }
 
         if (race.users.size >= 25) {
             race.started = true

@@ -9,7 +9,7 @@ const answers = [
     "better not tell you now",
     "cannot predict now",
     "concentrate and ask again",
-    "don’t count on it",
+    "don't count on it",
     "it is certain",
     "it is decidedly so",
     "most likely",
@@ -22,7 +22,7 @@ const answers = [
     "very doubtful",
     "without a doubt",
     "yes.",
-    "yes – definitely",
+    "yes - definitely",
     "you may rely on it",
 ]
 
