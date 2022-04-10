@@ -1027,6 +1027,7 @@ async function uploadGuildCommands(guildID, clientID) {
     }
 
     try {
+        logger.info(`uploading ${slashData.length} [/] commands`)
         await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: slashData })
 
         logger.info("finished refresh of [/] commands")
