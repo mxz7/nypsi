@@ -8,20 +8,32 @@ const cmd = new Command("kick", "kick one or more users", categories.MODERATION)
     .setPermissions(["KICK_MEMBERS"])
     .setAliases(["fuckoff"])
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption(option => option.setName("user").setDescription("user to kick").setRequired(true)).addStringOption(option => option.setName("reason").setDescription("reason for kick").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (!message.member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `kick members` permission")] })
+            return send({ embeds: [new ErrorEmbed("you need the `kick members` permission")] })
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
         })
     }
@@ -46,7 +58,7 @@ async function run(message, args) {
                 `${prefix}kick @member hacking\n${prefix}kick @member @member2 @member3 hacking\n${prefix}kick @member hacking -s`
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -62,14 +74,14 @@ async function run(message, args) {
         const member = members.find((m) => m.id == args[0])
 
         if (!member) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
             })
         }
 
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
         })
     }
@@ -97,7 +109,7 @@ async function run(message, args) {
             failed.push(members.get(member).user)
         } else {
             if (members.get(member).user.id == message.client.user.id) {
-                await message.channel.send({ content: "well... i guess this is goodbye ):" })
+                await send({ content: "well... i guess this is goodbye ):" })
                 await message.guild.leave()
                 return
             }
@@ -115,7 +127,7 @@ async function run(message, args) {
     }
 
     if (count == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to kick any users")] })
     }
 
     const embed = new CustomEmbed(message.member).setTitle("kick | " + message.member.user.username)
@@ -147,7 +159,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send({ embeds: [embed] })
+        await send({ embeds: [embed] })
     }
 
     const members1 = Array.from(members.keys())
