@@ -8,6 +8,8 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("opencrates", "open all of your crates with one command", categories.MONEY)
 
+cmd.slashEnabled = true
+
 const cooldown = new Map()
 
 /**
@@ -17,6 +19,15 @@ const cooldown = new Map()
  */
 async function run(message, args) {
     let cooldownLength = 30
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -34,7 +45,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!isPremium(message.member)) {
@@ -44,11 +55,11 @@ async function run(message, args) {
             "to open multiple crates a time you need the BRONZE tier or higher"
         ).setFooter(`${getPrefix(message.guild)}patreon`)
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (!getDMsEnabled(message.member)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
         })
     }
@@ -80,7 +91,7 @@ async function run(message, args) {
     }
 
     if (crates.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any crates to open")] })
+        return send({ embeds: [new ErrorEmbed("you dont have any crates to open")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -108,9 +119,19 @@ async function run(message, args) {
     })
 
     if (fail) {
-        return message.channel.send({ embeds: [new ErrorEmbed("failed to dm you, please check your privacy settings")] })
+        const reply = new ErrorEmbed("failed to dm you, please check your privacy settings")
+        if (message.interaction) {
+            return send({ embeds: [reply], ephemeral: true })
+        } else {
+            return send({ embeds: [reply] })
+        }
     } else {
-        await message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ check your dms")] })
+        const reply = new CustomEmbed(message.member, false, "✅ check your dms")
+        if (message.interaction) {
+            await send({ embeds: [reply], ephemeral: true })
+        } else {
+            await send({ embeds: [reply] })
+        }
     }
 
     const interval = setInterval(() => {
