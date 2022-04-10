@@ -6,6 +6,9 @@ const { getInventory, getItems, createUser, userExists, getMulti } = require("..
 
 const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
 
+cmd.slashEnabled = true
+cmd.slashData.addIntegerOption(option => option.setName("page").setDescription("page number"))
+
 const cooldown = new Map()
 
 /**
@@ -14,6 +17,15 @@ const cooldown = new Map()
  */
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -31,7 +43,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -59,7 +71,7 @@ async function run(message, args) {
     const itemIDs = Array.from(Object.keys(inventory))
 
     if (itemIDs.length == 0) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(message.member, false, "your inventory is empty").setTitle(
                     "inventory | " + message.author.username
@@ -134,9 +146,18 @@ async function run(message, args) {
     let msg
 
     if (pages.length == 1) {
-        return await message.channel.send({ embeds: [embed] })
+        return await send({ embeds: [embed] })
     } else {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
+    }
+
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
     }
 
     if (pages.length > 1) {
@@ -154,7 +175,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] })
+                    await edit({ components: [] }, msg)
                 })
 
             const newEmbed = new CustomEmbed(message.member).setTitle("inventory | " + message.author.username)
@@ -186,7 +207,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] }, msg)
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -214,7 +235,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] }, msg)
                     return pageManager()
                 }
             }
