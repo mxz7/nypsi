@@ -32,6 +32,9 @@ abcde.set("e", 4)
 
 const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
 
+cmd.slashEnabled = true
+cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("amount to bet").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -39,8 +42,17 @@ const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).set
 async function run(message, args) {
     if (!userExists(message.member)) createUser(message.member)
 
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (games.has(message.author.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] })
+        return send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] })
     }
 
     let cooldownLength = 30
@@ -69,7 +81,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -91,7 +103,7 @@ async function run(message, args) {
                     "`finish` - this is used to end the game and collect your reward"
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     const maxBet = await calcMaxBet(message.member)
@@ -110,25 +122,25 @@ async function run(message, args) {
     if (parseInt(args[0])) {
         args[0] = formatBet(args[0])
     } else {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ms <bet>`)] })
+        return send({ embeds: [new ErrorEmbed(`${prefix}ms <bet>`)] })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     if (bet > maxBet) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
@@ -216,11 +228,11 @@ async function run(message, args) {
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await send({ embeds: [embed] })
 
     playGame(message, msg).catch((e) => {
         logger.error(e)
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("an error occured while running - join support server")],
         })
     })
@@ -385,6 +397,15 @@ async function playGame(message, msg) {
 
     const embed = new CustomEmbed(message.member, true).setTitle("minesweeper | " + message.author.username)
 
+    const edit = async (data) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
     const lose = async () => {
         gamble(message.author, "minesweeper", bet, false, 0)
         addGamble(message.member, "minesweeper", false)
@@ -400,7 +421,7 @@ async function playGame(message, msg) {
         )
         embed.addField("your grid", table)
         games.delete(message.author.id)
-        return await msg.edit({ embeds: [embed] })
+        return await edit({ embeds: [embed] })
     }
 
     const win1 = async () => {
@@ -461,7 +482,7 @@ async function playGame(message, msg) {
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
-        return await msg.edit({ embeds: [embed] })
+        return await edit({ embeds: [embed] })
     }
 
     const draw = async () => {
@@ -482,7 +503,7 @@ async function playGame(message, msg) {
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
-        return await msg.edit({ embeds: [embed] })
+        return await edit({ embeds: [embed] })
     }
 
     if (win == 15) {
@@ -583,7 +604,7 @@ async function playGame(message, msg) {
             embed.addField("your grid", table)
             embed.addField("help", "type `finish` to stop playing")
 
-            msg.edit({ embeds: [embed] })
+            edit({ embeds: [embed] })
 
             return playGame(message, msg)
     }
