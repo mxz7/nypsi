@@ -11,7 +11,7 @@ const cooldown = new Map()
 const cmd = new Command("hot", "measure how hot you are", categories.FUN).setAliases(["howhot", "sexy"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("hot or not"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("hot or not"))
 
 /**
  * @param {Message} message

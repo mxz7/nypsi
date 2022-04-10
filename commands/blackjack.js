@@ -25,7 +25,9 @@ const games = new Map()
 const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj", "blowjob"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+)
 
 /**
  * @param {Message} message

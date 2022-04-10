@@ -9,7 +9,9 @@ const { inPlaceSort } = require("fast-sort")
 const cmd = new Command("join", "view your join position in the server", categories.INFO).setAliases(["joined"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("view join position for this user").setRequired(false))
+cmd.slashData.addUserOption((option) =>
+    option.setName("user").setDescription("view join position for this user").setRequired(false)
+)
 
 const sortCache = new Map()
 

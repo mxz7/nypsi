@@ -10,7 +10,9 @@ const cmd = new Command("case", "get information about a given case", categories
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("case-number").setDescription("what case would you like to view").setRequired(true))
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("case-number").setDescription("what case would you like to view").setRequired(true)
+)
 
 /**
  * @param {Message} message

@@ -7,7 +7,7 @@ const { getInventory, getItems, createUser, userExists, getMulti } = require("..
 const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("page").setDescription("page number"))
+cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription("page number"))
 
 const cooldown = new Map()
 

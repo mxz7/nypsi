@@ -25,7 +25,7 @@ const games = new Map()
 const cmd = new Command("yablon", "play yablon", categories.MONEY).setAliases(["yb"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("amount to bet").setRequired(true))
+cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true))
 
 /**
  * @param {Message} message

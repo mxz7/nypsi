@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("how big are your boobies"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big are your boobies"))
 
 /**
  * @param {Message} message

@@ -18,7 +18,14 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const cmd = new Command("lottery", "enter the weekly lottery draw", categories.MONEY).setAliases(["lotto"])
 
 cmd.slashEnabled = true
-cmd.slashData.addSubcommand(buy => buy.setName("buy").setDescription("buy lottery tickets").addIntegerOption(option => option.setName("amount").setDescription("amount of lottery tickets to buy"))).addSubcommand(tickets => tickets.setName("tickets").setDescription("view your current tickets"))
+cmd.slashData
+    .addSubcommand((buy) =>
+        buy
+            .setName("buy")
+            .setDescription("buy lottery tickets")
+            .addIntegerOption((option) => option.setName("amount").setDescription("amount of lottery tickets to buy"))
+    )
+    .addSubcommand((tickets) => tickets.setName("tickets").setDescription("view your current tickets"))
 
 const cooldown = new Map()
 

@@ -20,7 +20,6 @@ async function run(message, args) {
 
         return await message.react("✅")
     }
-
 }
 
 cmd.setRun(run)

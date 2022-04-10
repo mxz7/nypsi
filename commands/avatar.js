@@ -10,10 +10,9 @@ avatar.setAliases(["av", "pfp", "picture"])
 
 avatar.slashEnabled = true
 
-avatar.slashData.addUserOption(option => 
-    option.setName("user")
-        .setDescription("view avatar of this user")
-        .setRequired(false))
+avatar.slashData.addUserOption((option) =>
+    option.setName("user").setDescription("view avatar of this user").setRequired(false)
+)
 
 /**
  * @param {Message} message

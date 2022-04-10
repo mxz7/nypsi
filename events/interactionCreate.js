@@ -2,8 +2,8 @@ const { Interaction, User, Collection, CommandInteractionOption } = require("dis
 const { runCommand } = require("../utils/commandhandler")
 
 /**
- * 
- * @param {Interaction} interaction 
+ *
+ * @param {Interaction} interaction
  */
 module.exports = async (interaction) => {
     if (!interaction.isCommand()) return
@@ -18,8 +18,8 @@ module.exports = async (interaction) => {
     const args = [""]
 
     /**
-     * 
-     * @param {CommandInteractionOption} arg 
+     *
+     * @param {CommandInteractionOption} arg
      */
     const parseArgument = async (arg) => {
         switch (arg.type) {
@@ -32,7 +32,7 @@ module.exports = async (interaction) => {
                     const collection = new Collection()
                     collection.set(user.id, guildMember)
                     message.mentions = {
-                        members: collection
+                        members: collection,
                     }
                 }
                 break
