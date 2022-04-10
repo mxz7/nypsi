@@ -27,6 +27,9 @@ const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
 
 const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption(option => option.setName("item").setDescription("the item you want to use").setRequired(true).addChoice("📦 vote", "vote").addChoice("📦 basic", "basic").addChoice("🔒 padlock", "padlock").addChoice("🧰 lock pick", "lock_pick").addChoice("😷 mask", "mask").addChoice("📻 radio", "radio").addChoice("handcuffs", "handcuffs").addChoice("chastity_cage", "chastity_cage"))
+
 const cooldown = new Map()
 
 /**
@@ -41,6 +44,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 10
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -60,11 +72,11 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (args.length == 0) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
@@ -99,21 +111,21 @@ async function run(message, args) {
     selected = items[selected]
 
     if (!selected) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
+        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
     }
 
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] })
+        return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] })
     }
 
     if (selected.role == "car") {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`)],
         })
     }
 
     if (selected.role != "item" && selected.role != "tool" && selected.role != "crate") {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot use this item")] })
+        return send({ embeds: [new ErrorEmbed("you cannot use this item")] })
     }
 
     if (selected.role == "crate") {
@@ -130,19 +142,19 @@ async function run(message, args) {
     }, cooldownLength * 1000)
 
     if (selected.id.includes("gun")) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`)],
         })
     } else if (selected.id.includes("fishing")) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`)],
         })
     } else if (selected.id.includes("coin")) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] })
+        return send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] })
     } else if (selected.id.includes("pickaxe")) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)] })
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)] })
     } else if (selected.id.includes("furnace")) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] })
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] })
     }
 
     const embed = new CustomEmbed(message.member).setTitle("use | " + message.author.username)
@@ -188,7 +200,7 @@ async function run(message, args) {
 
             case "padlock":
                 if (hasPadlock(message.member)) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed("you already have a padlock on your balance")],
                     })
                 }
@@ -213,11 +225,11 @@ async function run(message, args) {
 
             case "lock_pick":
                 if (message.guild.id == "747056029795221513") {
-                    return message.channel.send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
+                    return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
                 }
 
                 if (args.length == 1) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)],
                     })
                 }
@@ -231,7 +243,7 @@ async function run(message, args) {
                 }
 
                 if (!lockPickTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (message.member == lockPickTarget) {
@@ -243,11 +255,11 @@ async function run(message, args) {
                         laterDescription = "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
                         break
                     }
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (!hasPadlock(lockPickTarget)) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
                     })
                 }
@@ -290,7 +302,7 @@ async function run(message, args) {
                     !onBankRobCooldown(message.member) &&
                     !onStoreRobCooldown(message.member)
                 ) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
                     })
                 }
@@ -319,7 +331,7 @@ async function run(message, args) {
 
             case "radio":
                 if (args.length == 1) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)],
                     })
                 }
@@ -333,15 +345,15 @@ async function run(message, args) {
                 }
 
                 if (!radioTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (message.member == radioTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (onRadioCooldown(radioTarget)) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)],
                     })
                 }
@@ -364,7 +376,7 @@ async function run(message, args) {
 
             case "chastity_cage":
                 if (args.length == 1) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use chastity <member>`)],
                     })
                 }
@@ -378,17 +390,17 @@ async function run(message, args) {
                 }
 
                 if (!chastityTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (message.member == chastityTarget) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed("why would you do that to yourself.")],
                     })
                 }
 
                 if (onChastityCooldown(chastityTarget.id)) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)],
                     })
                 }
@@ -411,7 +423,7 @@ async function run(message, args) {
 
             case "handcuffs":
                 if (args.length == 1) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use handcuffs <member>`)],
                     })
                 }
@@ -425,15 +437,15 @@ async function run(message, args) {
                 }
 
                 if (!handcuffsTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
                 if (message.member == handcuffsTarget) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("bit of self bondage huh")] })
+                    return send({ embeds: [new ErrorEmbed("bit of self bondage huh")] })
                 }
 
                 if (isHandcuffed(handcuffsTarget.user.id)) {
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)],
                     })
                 }
@@ -455,17 +467,26 @@ async function run(message, args) {
                 break
 
             default:
-                return message.channel.send({ embeds: [new ErrorEmbed("you cannot use this item")] })
+                return send({ embeds: [new ErrorEmbed("you cannot use this item")] })
         }
     }
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await send({ embeds: [embed] })
 
     if (!laterDescription) return
 
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
     setTimeout(() => {
         embed.setDescription(laterDescription)
-        msg.edit({ embeds: [embed] })
+        edit({ embeds: [embed] }, msg)
     }, 2000)
 }
 
