@@ -17,6 +17,9 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", categories.MONEY).setAliases(["lotto"])
 
+cmd.slashEnabled = true
+cmd.slashData.addSubcommand(buy => buy.setName("buy").setDescription("buy lottery tickets").addIntegerOption(option => option.setName("amount").setDescription("amount of lottery tickets to buy"))).addSubcommand(tickets => tickets.setName("tickets").setDescription("view your current tickets"))
+
 const cooldown = new Map()
 
 /**
@@ -35,6 +38,15 @@ async function run(message, args) {
     let max = 5 + prestigeBonus + premiumBonus + karmaBonus
 
     if (max > 20) max = 20
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
 
     const help = () => {
         const embed = new CustomEmbed(message.member, false)
@@ -57,7 +69,7 @@ async function run(message, args) {
             embed.addField(`your tickets [${tickets.length}]`, t.join("\n"))
         }
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -85,13 +97,13 @@ async function run(message, args) {
             } else {
                 remaining = `${seconds}s`
             }
-            return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+            return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
         }
 
         let amount = 1
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "😐")] })
+            return send({ embeds: [new CustomEmbed(message.member, false, "😐")] })
         }
 
         if (parseInt(args[1])) {
@@ -99,11 +111,11 @@ async function run(message, args) {
         } else if (args[1].toLowerCase() == "all" || args[1].toLowerCase() == "max") {
             amount = max
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+            return send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
 
         if (amount < 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+            return send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
 
         if (tickets.length + amount > max) {
@@ -111,11 +123,11 @@ async function run(message, args) {
         }
 
         if (tickets.length >= max) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] })
+            return send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] })
         }
 
         if (getBalance(message.member) < lotteryTicketPrice * amount) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("you cannot afford this")],
             })
         }
@@ -140,7 +152,7 @@ async function run(message, args) {
             ).toLocaleString()}**`
         )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     } else {
         return help()
     }
