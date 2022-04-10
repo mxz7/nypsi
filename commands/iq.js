@@ -9,6 +9,9 @@ const cooldown = new Map()
 
 const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption(option => option.setName("user").setDescription("how large is your iq"))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -20,6 +23,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         cooldownLength = 1
         cacheTime = 25
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -38,7 +50,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     let member
@@ -53,7 +65,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -130,7 +142,7 @@ async function run(message, args) {
         "iq calculator"
     )
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
