@@ -11,12 +11,24 @@ const cmd = new Command("history", "view punishment history for a given user", c
     .setAliases(["modlogs", "hist"])
     .setPermissions(["MANAGE_MESSAGES"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption(option => option.setName("user").setDescription("use the user's id or username").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
 
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
@@ -35,7 +47,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -45,7 +57,7 @@ async function run(message, args) {
             .setTitle("history help")
             .addField("usage", `${prefix}history @user\n${prefix}history <user ID or tag>`)
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -53,7 +65,7 @@ async function run(message, args) {
     let member
     let unknownMember = false
 
-    if (message.mentions.members.first()) {
+    if (!message.interaction && message.mentions.members.first()) {
         member = message.mentions.members.first()
     } else {
         const members = message.guild.members.cache
@@ -69,7 +81,7 @@ async function run(message, args) {
             member = await getMember(message, args.join(" "))
 
             if (!member) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             `can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`
@@ -90,7 +102,7 @@ async function run(message, args) {
     }
 
     if (cases.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no history to display")] })
+        return send({ embeds: [new ErrorEmbed("no history to display")] })
     }
 
     cooldown.set(message.author.id, new Date())
@@ -146,9 +158,9 @@ async function run(message, args) {
     )
 
     if (pages.length >= 2) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
     } else {
-        return await message.channel.send({ embeds: [embed] })
+        return await send({ embeds: [embed] })
     }
 
     if (pages.length > 1) {
@@ -158,6 +170,15 @@ async function run(message, args) {
 
         const filter = (i) => i.user.id == message.author.id
 
+        const edit = async (data, msg) => {
+            if (message.interaction) {
+                await message.editReply(data)
+                return await message.fetchReply()
+            } else {
+                return await msg.edit(data)
+            }
+        }
+
         const pageManager = async () => {
             const reaction = await msg
                 .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
@@ -166,7 +187,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] }).catch(() => {})
+                    await edit({ components: [] }).catch(() => {}, msg)
                 })
 
             const newEmbed = new CustomEmbed(message.member)
@@ -211,7 +232,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] }, msg)
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -246,7 +267,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] }, msg)
                     return pageManager()
                 }
             }
