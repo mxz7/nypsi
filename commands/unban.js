@@ -7,20 +7,32 @@ const { logger } = require("../utils/logger")
 
 const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption(option => option.setName("user").setDescription("tag/id of user to unban").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
+            return send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
         })
     }
@@ -44,7 +56,7 @@ async function run(message, args) {
                 `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     const members = []
@@ -86,7 +98,7 @@ async function run(message, args) {
     }
 
     if (members.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to unban any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to unban any users")] })
     }
 
     const embed = new CustomEmbed(message.member).setTitle(`unban | ${message.member.user.username}`)
@@ -105,7 +117,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send({ embeds: [embed] })
+        await send({ embeds: [embed] })
     }
 
     const members1 = []
