@@ -9,7 +9,9 @@ const cmd = new Command("purge", "bulk delete/purge messages", categories.MODERA
     .setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("amount").setDescription("amount of messages to delete").setRequired(true))
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
+)
 
 /**
  * @param {Message} message

@@ -14,7 +14,7 @@ const cmd = new Command("horny", "measure how horny you are", categories.FUN).se
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("how horny are u"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how horny are u"))
 
 /**
  * @param {Message} message

@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("how large is your iq"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how large is your iq"))
 
 /**
  * @param {Message} message

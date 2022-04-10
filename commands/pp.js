@@ -14,7 +14,7 @@ const cmd = new Command("pp", "accurate prediction of your pp size", categories.
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("how big is your willy"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big is your willy"))
 
 /**
  * @param {Message} message

@@ -29,7 +29,7 @@ const radioCooldown = new Map()
 const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("who do u wanna rob").setRequired(true))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("who do u wanna rob").setRequired(true))
 
 /**
  * @param {Message} message

@@ -8,7 +8,9 @@ const { getExactMember } = require("../utils/utils")
 const cmd = new Command("warn", "warn one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("user to warn").setRequired(true)).addStringOption(option => option.setName("reason").setDescription("reason for the warn"))
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("user to warn").setRequired(true))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"))
 
 /**
  * @param {Message} message

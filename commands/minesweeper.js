@@ -33,7 +33,7 @@ abcde.set("e", 4)
 const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("amount to bet").setRequired(true))
+cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true))
 
 /**
  * @param {Message} message

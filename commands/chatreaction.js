@@ -24,43 +24,106 @@ const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
 const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases(["cr", "reaction"])
 
 cmd.slashEnabled = true
-cmd.slashData.addSubcommand(option => 
-    option.setName("start").setDescription("start a chat reaction in the current channel"))
-    .addSubcommand(option =>
-        option.setName("stats").setDescription("view your chat reaction stats"))
-    .addSubcommand(option =>
-        option.setName("leaderboard").setDescription("view the chat reaction leaderboard"))
-    .addSubcommandGroup(words => 
-        words.setName("words").setDescription("add or remove words from the chat reactions word list")
-            .addSubcommand(list => list.setName("list").setDescription("show the current word list"))
-            .addSubcommand(reset => reset.setName("reset").setDescription("reset the word list back to default"))
-            .addSubcommand(add =>
-                add.setName("add").setDescription("add word")
-                    .addStringOption(option => option.setName("word").setDescription("what word would you like to add to the word list").setRequired(true)))
-            .addSubcommand(remove =>
-                remove.setName("del").setDescription("remove word")
-                    .addStringOption(option => option.setName("word").setDescription("what word would you like to remove from the word list").setRequired(true))))
-    .addSubcommandGroup(blacklist =>
-        blacklist.setName("blacklist").setDescription("ban a user from chat reactions")
-            .addSubcommand(list => list.setName("list").setDescription("view currently blacklisted users"))
-    .addSubcommand(add => add.setName("add").setDescription("add a user to the blacklist")
-        .addUserOption(option => option.setName("user").setDescription("user to be blacklisted").setRequired(true)))
-    .addSubcommand(remove => remove.setName("del").setDescription("remove a user from the blacklist")
-        .addUserOption(option => option.setName("user").setDescription("user to remove from the blacklist").setRequired(true))))
-    .addSubcommandGroup(settings =>
-        settings.setName("settings").setDescription("settings for chat reactions")
-            .addSubcommand(view => view.setName("view").setDescription("view the current configuration"))
-            .addSubcommand(enable => enable.setName("enable").setDescription("enable chat reactions for the current channel"))
-            .addSubcommand(disable => disable.setName("disable").setDescription("disable chat reactions"))
-            .addSubcommand(offset => offset.setName("offset").setDescription("set a maximum offset to be used with the cooldown").addIntegerOption(option =>
-                option.setName("seconds").setDescription("maximum offset").setRequired(true)))
-            .addSubcommand(length => length.setName("length").setDescription("set the max time a chat reaction can last").addIntegerOption(option =>
-                option.setName("seconds").setDescription("amount of time a chat reaction can last").setRequired(true)))
-            .addSubcommand(cooldown => cooldown.setName("cooldown").setDescription("set the time between automatic chat reactions").addIntegerOption(option =>
-                option.setName("seconds").setDescription("time between chat reactions").setRequired(true)))
-            .addSubcommand(channel => channel.setName("channel").setDescription("add/remove a channel for automatic chat reactions").addChannelOption(option =>
-                option.setName("channel").setDescription("channel to add/remove from automatic starting").setRequired(true))))
-
+cmd.slashData
+    .addSubcommand((option) => option.setName("start").setDescription("start a chat reaction in the current channel"))
+    .addSubcommand((option) => option.setName("stats").setDescription("view your chat reaction stats"))
+    .addSubcommand((option) => option.setName("leaderboard").setDescription("view the chat reaction leaderboard"))
+    .addSubcommandGroup((words) =>
+        words
+            .setName("words")
+            .setDescription("add or remove words from the chat reactions word list")
+            .addSubcommand((list) => list.setName("list").setDescription("show the current word list"))
+            .addSubcommand((reset) => reset.setName("reset").setDescription("reset the word list back to default"))
+            .addSubcommand((add) =>
+                add
+                    .setName("add")
+                    .setDescription("add word")
+                    .addStringOption((option) =>
+                        option
+                            .setName("word")
+                            .setDescription("what word would you like to add to the word list")
+                            .setRequired(true)
+                    )
+            )
+            .addSubcommand((remove) =>
+                remove
+                    .setName("del")
+                    .setDescription("remove word")
+                    .addStringOption((option) =>
+                        option
+                            .setName("word")
+                            .setDescription("what word would you like to remove from the word list")
+                            .setRequired(true)
+                    )
+            )
+    )
+    .addSubcommandGroup((blacklist) =>
+        blacklist
+            .setName("blacklist")
+            .setDescription("ban a user from chat reactions")
+            .addSubcommand((list) => list.setName("list").setDescription("view currently blacklisted users"))
+            .addSubcommand((add) =>
+                add
+                    .setName("add")
+                    .setDescription("add a user to the blacklist")
+                    .addUserOption((option) =>
+                        option.setName("user").setDescription("user to be blacklisted").setRequired(true)
+                    )
+            )
+            .addSubcommand((remove) =>
+                remove
+                    .setName("del")
+                    .setDescription("remove a user from the blacklist")
+                    .addUserOption((option) =>
+                        option.setName("user").setDescription("user to remove from the blacklist").setRequired(true)
+                    )
+            )
+    )
+    .addSubcommandGroup((settings) =>
+        settings
+            .setName("settings")
+            .setDescription("settings for chat reactions")
+            .addSubcommand((view) => view.setName("view").setDescription("view the current configuration"))
+            .addSubcommand((enable) =>
+                enable.setName("enable").setDescription("enable chat reactions for the current channel")
+            )
+            .addSubcommand((disable) => disable.setName("disable").setDescription("disable chat reactions"))
+            .addSubcommand((offset) =>
+                offset
+                    .setName("offset")
+                    .setDescription("set a maximum offset to be used with the cooldown")
+                    .addIntegerOption((option) =>
+                        option.setName("seconds").setDescription("maximum offset").setRequired(true)
+                    )
+            )
+            .addSubcommand((length) =>
+                length
+                    .setName("length")
+                    .setDescription("set the max time a chat reaction can last")
+                    .addIntegerOption((option) =>
+                        option.setName("seconds").setDescription("amount of time a chat reaction can last").setRequired(true)
+                    )
+            )
+            .addSubcommand((cooldown) =>
+                cooldown
+                    .setName("cooldown")
+                    .setDescription("set the time between automatic chat reactions")
+                    .addIntegerOption((option) =>
+                        option.setName("seconds").setDescription("time between chat reactions").setRequired(true)
+                    )
+            )
+            .addSubcommand((channel) =>
+                channel
+                    .setName("channel")
+                    .setDescription("add/remove a channel for automatic chat reactions")
+                    .addChannelOption((option) =>
+                        option
+                            .setName("channel")
+                            .setDescription("channel to add/remove from automatic starting")
+                            .setRequired(true)
+                    )
+            )
+    )
 
 const cooldown = new Map()
 

@@ -9,7 +9,9 @@ const cmd = new Command("kick", "kick one or more users", categories.MODERATION)
     .setAliases(["fuckoff"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("user to kick").setRequired(true)).addStringOption(option => option.setName("reason").setDescription("reason for kick").setRequired(true))
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("user to kick").setRequired(true))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for kick").setRequired(true))
 
 /**
  * @param {Message} message

@@ -22,7 +22,13 @@ const cooldown = new Map()
 const cmd = new Command("pay", "give other users money", categories.MONEY)
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("who would you like to send money to").setRequired(true)).addIntegerOption(option => option.setName("amount").setDescription("how much would you like to send").setRequired(true))
+cmd.slashData
+    .addUserOption((option) =>
+        option.setName("user").setDescription("who would you like to send money to").setRequired(true)
+    )
+    .addIntegerOption((option) =>
+        option.setName("amount").setDescription("how much would you like to send").setRequired(true)
+    )
 
 /**
  * @param {Message} message

@@ -8,7 +8,9 @@ const cmd = new Command("addemoji", "add an emoji from a different server to you
     .setAliases(["stealemoji"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true))
+cmd.slashData.addStringOption((option) =>
+    option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
+)
 
 const cooldown = new Map()
 

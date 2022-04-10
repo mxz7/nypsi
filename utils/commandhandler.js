@@ -1011,7 +1011,7 @@ function stopOpeningCrates(member) {
 exports.stopOpeningCrates = stopOpeningCrates
 
 /**
- * 
+ *
  * @param {string} guildID
  * @param {string} clientID
  */
@@ -1040,7 +1040,7 @@ async function uploadGuildCommands(guildID, clientID) {
 exports.uploadGuildCommands = uploadGuildCommands
 
 /**
- * 
+ *
  * @param {string} guildID
  * @param {string} clientID
  */

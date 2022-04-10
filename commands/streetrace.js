@@ -17,9 +17,35 @@ const { getPrefix } = require("../utils/guilds/utils")
 const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
 
 cmd.slashEnabled = true
-cmd.slashData.addSubcommand(start => start.setName("start").setDescription("start a race").addIntegerOption(option => option.setName("bet").setDescription("this is the bet and the entry fee for the race").setRequired(true)))
-    .addSubcommand(join => join.setName("join").setDescription("join an existing race in the channel").addStringOption(option => option.setName("car").setDescription("what car would you like to use")
-        .addChoice("🚗 fiat", "fiat").addChoice("🚗 ford fiesta", "ford_fiesta").addChoice("🚗 mitsubishi lancer evo x", "lancer_evox").addChoice("🚗 lightning mcqueen", "lightning_mcqueen").addChoice("🏎️ nissan skyline gtr r34", "skyline_r34").addChoice("🚗 smart car", "smart_car").addChoice("🚗 subuwu", "subaru_wrx").addChoice("🚗 tesla model x", "tesla_modelx").addChoice("🏎️ toyota supra mk4", "toyota_supra").addChoice("🚗 corsa 2003", "vauxhall_corsa")))
+cmd.slashData
+    .addSubcommand((start) =>
+        start
+            .setName("start")
+            .setDescription("start a race")
+            .addIntegerOption((option) =>
+                option.setName("bet").setDescription("this is the bet and the entry fee for the race").setRequired(true)
+            )
+    )
+    .addSubcommand((join) =>
+        join
+            .setName("join")
+            .setDescription("join an existing race in the channel")
+            .addStringOption((option) =>
+                option
+                    .setName("car")
+                    .setDescription("what car would you like to use")
+                    .addChoice("🚗 fiat", "fiat")
+                    .addChoice("🚗 ford fiesta", "ford_fiesta")
+                    .addChoice("🚗 mitsubishi lancer evo x", "lancer_evox")
+                    .addChoice("🚗 lightning mcqueen", "lightning_mcqueen")
+                    .addChoice("🏎️ nissan skyline gtr r34", "skyline_r34")
+                    .addChoice("🚗 smart car", "smart_car")
+                    .addChoice("🚗 subuwu", "subaru_wrx")
+                    .addChoice("🚗 tesla model x", "tesla_modelx")
+                    .addChoice("🏎️ toyota supra mk4", "toyota_supra")
+                    .addChoice("🚗 corsa 2003", "vauxhall_corsa")
+            )
+    )
 
 const races = new Map()
 const carCooldown = new Map()
@@ -359,7 +385,10 @@ async function run(message, args) {
         await race.message.edit({ embeds: [embed] })
 
         if (message.interaction) {
-            await message.reply({embeds: [new CustomEmbed(message.member, false, "you have joined the race")], ephemeral: true})
+            await message.reply({
+                embeds: [new CustomEmbed(message.member, false, "you have joined the race")],
+                ephemeral: true,
+            })
         } else {
             await message.react("✅")
         }
