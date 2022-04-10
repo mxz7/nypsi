@@ -13,6 +13,9 @@ const cmd = new Command("horny", "measure how horny you are", categories.FUN).se
     "makemecum",
 ])
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption(option => option.setName("user").setDescription("how horny are u"))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -23,6 +26,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -41,7 +53,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -62,7 +74,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -119,7 +131,7 @@ async function run(message, args) {
         `${member.user.toString()}\n**${hornyAmount}**% horny ${hornyEmoji}\n${hornyText}`
     ).setTitle("horny calculator")
 
-    return await message.channel.send({ embeds: [embed] })
+    return await send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
