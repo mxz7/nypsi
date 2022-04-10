@@ -28,6 +28,8 @@ const cmd = new Command("wholesome", "get a random wholesome picture", categorie
     "ily",
 ])
 
+cmd.slashEnabled = true
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -37,6 +39,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -55,7 +66,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const embed = new CustomEmbed(message.member)
@@ -85,13 +96,13 @@ async function run(message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`you are on upload cooldown for \`${remaining}\``)],
             })
         }
 
         if (args.length == 1 && !message.attachments.first()) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)],
             })
         }
@@ -103,12 +114,12 @@ async function run(message, args) {
         }
 
         if (!url.toLowerCase().startsWith("https")) {
-            return message.channel.send({ embeds: [new ErrorEmbed("must be http**s**")] })
+            return send({ embeds: [new ErrorEmbed("must be http**s**")] })
         }
 
         if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
             if (!isImageUrl(url)) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
@@ -120,7 +131,7 @@ async function run(message, args) {
             const upload = await uploadImage(url)
 
             if (!upload) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
@@ -140,7 +151,7 @@ async function run(message, args) {
         const res = await suggestWholesomeImage(message.member, url)
 
         if (!res) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new ErrorEmbed(
                         `error: maybe that image already exists? if this persists join the ${getPrefix(
@@ -162,7 +173,7 @@ async function run(message, args) {
         if (message.author.id != "672793821850894347") return
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] })
+            return send({ embeds: [new ErrorEmbed("dumbass")] })
         }
 
         const wholesome = getWholesomeImage(parseInt(args[1]))
@@ -192,13 +203,13 @@ async function run(message, args) {
         if (!allow) return
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you must include the suggestion id")] })
+            return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] })
         }
 
         const res = await acceptWholesomeImage(parseInt(args[1]), message.member)
 
         if (!res) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)],
             })
         }
@@ -218,13 +229,13 @@ async function run(message, args) {
         if (!allow) return
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you must include the suggestion id")] })
+            return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] })
         }
 
         const res = await denyWholesomeImage(parseInt(args[1]))
 
         if (!res) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`couldnt find a suggestion with id \`${args[1]}\``)],
             })
         }
@@ -234,7 +245,7 @@ async function run(message, args) {
         if (message.author.id != "672793821850894347") return
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] })
+            return send({ embeds: [new ErrorEmbed("dumbass")] })
         }
 
         const res = await deleteFromWholesome(parseInt(args[1]))
@@ -302,7 +313,7 @@ async function run(message, args) {
             embed.setFooter(`page 1/${pages.size}`)
         }
 
-        const msg = await message.channel.send({ embeds: [embed] })
+        const msg = await send({ embeds: [embed] })
 
         if (pages.size == 0) return
 
@@ -380,7 +391,7 @@ async function run(message, args) {
         if (member) {
             target = member
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed("couldnt find that member ):")] })
+            return send({ embeds: [new ErrorEmbed("couldnt find that member ):")] })
         }
 
         const image = getWholesomeImage()
@@ -400,13 +411,13 @@ async function run(message, args) {
     if (chance == 7) embed.setFooter(`submit your own image with ${getPrefix(message.guild)}wholesome suggest (:`)
 
     if (target) {
-        return message.channel.send({
+        return send({
             content: `${target.user.toString()} you've received a wholesome image (:`,
             embeds: [embed],
         })
     }
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
