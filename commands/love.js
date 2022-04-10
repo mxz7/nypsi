@@ -10,6 +10,9 @@ const cooldown = new Map()
 
 const cmd = new Command("love", "calculate your love with another person", categories.FUN)
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption(option => option.setName("user").setDescription("is this person your one true love?!"))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -19,6 +22,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 1
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -37,7 +49,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -89,12 +101,12 @@ async function run(message, args) {
             target1 = await getMember(message, args[0])
             target2 = await getMember(message, args[1])
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}love <user> (user)`)] })
+            return send({ embeds: [new ErrorEmbed(`${prefix}love <user> (user)`)] })
         }
     }
 
     if (!target1 || !target2) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user(s)")] })
+        return send({ embeds: [new ErrorEmbed("invalid user(s)")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -191,7 +203,7 @@ async function run(message, args) {
         `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`
     )
 
-    message.channel.send({ embeds: [embed] })
+    send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
