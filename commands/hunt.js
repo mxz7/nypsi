@@ -19,6 +19,8 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("hunt", "go to a field and hunt", categories.MONEY)
 
+cmd.slashEnabled = true
+
 const cooldown = new Map()
 
 /**
@@ -33,6 +35,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 900
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -52,7 +63,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const inventory = getInventory(message.member)
@@ -69,7 +80,7 @@ async function run(message, args) {
     }
 
     if (!gun) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you need a gun to hunt")] })
+        return send({ embeds: [new ErrorEmbed("you need a gun to hunt")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -212,7 +223,7 @@ async function run(message, args) {
         `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`
     )
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
@@ -220,8 +231,17 @@ async function run(message, args) {
         }**\n\nyou killed${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`
     )
 
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
     setTimeout(() => {
-        msg.edit({ embeds: [embed] })
+        edit({ embeds: [embed] }, msg)
     }, 1500)
 }
 

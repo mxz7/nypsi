@@ -9,6 +9,11 @@ const cmd = new Command("case", "get information about a given case", categories
     "MANAGE_SERVER",
 ])
 
+cmd.slashEnabled = true
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("case-number").setDescription("what case would you like to view").setRequired(true)
+)
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -17,6 +22,15 @@ async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     const prefix = getPrefix(message.guild)
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
@@ -29,7 +43,7 @@ async function run(message, args) {
                     `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
@@ -37,7 +51,7 @@ async function run(message, args) {
     const case0 = getCase(message.guild, parseInt(args[0]))
 
     if (!case0) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
         })
     }
@@ -73,9 +87,18 @@ async function run(message, args) {
     let msg
 
     if (message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) && !case0.deleted) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
     } else {
-        return await message.channel.send({ embeds: [embed] })
+        return await send({ embeds: [embed] })
+    }
+
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
     }
 
     const filter = (i) => i.user.id == message.author.id
@@ -87,7 +110,7 @@ async function run(message, args) {
             return collected.customId
         })
         .catch(async () => {
-            await msg.edit({ components: [] })
+            await edit({ components: [] }, msg)
         })
 
     if (reaction == "❌") {
@@ -99,7 +122,7 @@ async function run(message, args) {
             "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
         )
 
-        await msg.edit({ embeds: [newEmbed], components: [] })
+        await edit({ embeds: [newEmbed], components: [] }, msg)
     }
 }
 

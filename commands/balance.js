@@ -20,6 +20,12 @@ const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money", "wallet"])
 
+cmd.slashEnabled = true
+
+cmd.slashData.addUserOption((option) =>
+    option.setName("user").setDescription("view balance of this user").setRequired(false)
+)
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -83,20 +89,28 @@ async function run(message, args) {
         )
         .setFooter(footer)
 
+    const send = async (data) => {
+        if (message.interaction) {
+            return await message.reply(data)
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (message.member == target) {
         if (
             getXp(target) >= getPrestigeRequirement(target) &&
             getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
             getPrestige(target) < 20
         ) {
-            return message.channel.send({
+            return send({
                 content: `you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`,
                 embeds: [embed],
             })
         }
     }
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

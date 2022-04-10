@@ -9,6 +9,9 @@ const cooldown = new Map()
 
 const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
 
+cmd.slashEnabled = true
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big are your boobies"))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -20,6 +23,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         cooldownLength = 1
         cacheTime = 25
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -38,7 +50,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -59,7 +71,7 @@ async function run(message, args) {
         }
 
         if (!member) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
     }
 
@@ -108,7 +120,7 @@ async function run(message, args) {
         .setTitle("boob calculator")
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

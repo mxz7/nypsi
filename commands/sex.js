@@ -11,6 +11,9 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
     "letsfuck",
 ])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"))
+
 const cooldown = new Map()
 const chastityCooldown = new Map()
 const looking = new Map()
@@ -26,6 +29,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 10
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -44,7 +56,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (chastityCooldown.has(message.member.user.id)) {
@@ -64,7 +76,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(`you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`),
             ],
@@ -108,7 +120,7 @@ async function run(message, args) {
 
     if (looking.size == 0) {
         addToLooking(description)
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
@@ -119,7 +131,7 @@ async function run(message, args) {
         })
     } else {
         if (looking.has(message.author.id)) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")],
             })
         }
@@ -146,7 +158,7 @@ async function run(message, args) {
                 )
             }
 
-            await message.channel.send({ embeds: [embed] })
+            await send({ embeds: [embed] })
 
             const channel = await key.guild.channels.cache.find((ch) => ch.id == key.channel)
 
@@ -170,7 +182,7 @@ async function run(message, args) {
         }
 
         addToLooking(description)
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
