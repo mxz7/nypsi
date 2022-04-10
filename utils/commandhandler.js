@@ -1038,3 +1038,32 @@ async function uploadGuildCommands(guildID, clientID) {
 }
 
 exports.uploadGuildCommands = uploadGuildCommands
+
+/**
+ * 
+ * @param {string} guildID
+ * @param {string} clientID
+ */
+async function uploadGuildCommandsGlobal(clientID) {
+    logger.info("started refresh of global [/] commands...")
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
+
+    const slashData = []
+
+    for (const cmd of Array.from(commands.values())) {
+        if (!cmd.slashEnabled) continue
+        slashData.push(cmd.slashData.toJSON())
+    }
+
+    try {
+        logger.info(`uploading ${slashData.length} [/] commands`)
+        await rest.put(Routes.applicationCommands(clientID), { body: slashData })
+
+        logger.info("finished refresh of global [/] commands")
+    } catch (error) {
+        logger.error("failed refresh of global [/] commands")
+        logger.error(error)
+    }
+}
+
+exports.uploadGuildCommandsGlobal = uploadGuildCommandsGlobal
