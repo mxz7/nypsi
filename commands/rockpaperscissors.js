@@ -24,7 +24,7 @@ const cooldown = new Map()
 const cmd = new Command("rockpaperscissors", "play rock paper scissors", categories.MONEY).setAliases(["rps"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("choice").setDescription("choice for the bet").setRequired(true).addChoice("rock", "rock").addChoice("paper", "paper").addChoice("scissors", "scissors")).addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+cmd.slashData.addStringOption(option => option.setName("choice").setDescription("choice for the bet").setRequired(true).addChoice("🗿 rock", "rock").addChoice("📰 paper", "paper").addChoice("✂ scissors", "scissors")).addIntegerOption(option => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
 
 /**
  * @param {Message} message
