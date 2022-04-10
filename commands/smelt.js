@@ -6,6 +6,8 @@ const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", categories.MONEY)
 
+cmd.slashEnabled = true
+
 const cooldown = new Map()
 
 /**
@@ -19,6 +21,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 300
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -37,7 +48,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const inventory = getInventory(message.member)
@@ -52,7 +63,7 @@ async function run(message, args) {
     }
 
     if (!hasFurnace) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("you need a furnace to smelt ore. furnaces can be found in crates")],
         })
     }
@@ -72,7 +83,7 @@ async function run(message, args) {
     }
 
     if (ores.length == 0) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("you need ore to smelt. ore can be found in crates and through mining")],
         })
     }
@@ -84,7 +95,7 @@ async function run(message, args) {
     }
 
     if (coal == 0) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("you need coal to smelt ore. coal can be found in crates and through mining")],
         })
     }
@@ -137,11 +148,20 @@ async function run(message, args) {
     embed.setTitle(`furnace | ${message.author.username}`)
     embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...")
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await send({ embeds: [embed] })
+
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
 
     setTimeout(() => {
         embed.setDescription(`<:nypsi_furnace:959445132585869373> you have smelted: \n${res}`)
-        msg.edit({ embeds: [embed] })
+        edit({ embeds: [embed] }, msg)
     }, 2000)
 }
 
