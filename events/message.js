@@ -98,6 +98,7 @@ module.exports = async (message) => {
 
             if (message.mentions.members.first()) {
                 if (message.mentions.members.size == 1) {
+                    if (message.mentions.members.first().user.id == message.author.id) return
                     let content = message.content
 
                     if (content.length > 100) {
