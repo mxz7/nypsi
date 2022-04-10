@@ -19,6 +19,8 @@ const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("sellall", "sell all commonly sold items", categories.MONEY)
 
+cmd.slashEnabled = true
+
 const cooldown = new Map()
 
 /**
@@ -32,6 +34,15 @@ async function run(message, args) {
 
     if (isPremium(message.author.id)) {
         cooldownLength = 2
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -50,7 +61,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const items = getItems()
@@ -68,7 +79,7 @@ async function run(message, args) {
     }
 
     if (selected.size == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you do not have anything to sell")] })
+        return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -91,7 +102,7 @@ async function run(message, args) {
             sellWorth = Math.floor(sellWorth + sellWorth * multi)
         } else if (item == "ethereum" || item == "bitcoin") {
             if (!selected.worth) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
                 })
             }
@@ -110,7 +121,7 @@ async function run(message, args) {
 
     embed.setDescription(`+$**${total.toLocaleString()}**\n${earned}`)
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

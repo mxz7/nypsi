@@ -6,7 +6,12 @@ const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const workerSort = require("../utils/workers/sort")
 const { inPlaceSort } = require("fast-sort")
 
-const cmd = new Command("join", "information about when you joined the server", categories.INFO).setAliases(["joined"])
+const cmd = new Command("join", "view your join position in the server", categories.INFO).setAliases(["joined"])
+
+cmd.slashEnabled = true
+cmd.slashData.addUserOption((option) =>
+    option.setName("user").setDescription("view join position for this user").setRequired(false)
+)
 
 const sortCache = new Map()
 
@@ -27,8 +32,17 @@ async function run(message, args) {
         }
     }
 
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
@@ -58,7 +72,7 @@ async function run(message, args) {
         })
 
         if (membersSorted.length > 1000) {
-            const msg = await message.channel.send({
+            const msg = await send({
                 embeds: [
                     new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
                 ],
@@ -94,7 +108,7 @@ async function run(message, args) {
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)

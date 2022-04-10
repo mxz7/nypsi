@@ -48,6 +48,12 @@ const cooldown = new Map()
 
 const cmd = new Command("slots", "play slots", categories.MONEY)
 
+cmd.slashEnabled = true
+
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+)
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -60,6 +66,14 @@ async function run(message, args) {
             cooldownLength = 3
         } else {
             cooldownLength = 6
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            return await message.reply(data)
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -79,7 +93,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (!userExists(message.member)) {
@@ -93,17 +107,17 @@ async function run(message, args) {
             .setTitle("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField("help", "you should know how a slot machine works..")
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args.length == 1 && args[0] == "info") {
         const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(winBoard())
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (!args[0]) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
         })
     }
@@ -125,7 +139,7 @@ async function run(message, args) {
         if (!isNaN(formatBet(args[0]) || !parseInt(formatBet[args[0]]))) {
             args[0] = formatBet(args[0])
         } else {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
             })
         }
@@ -134,21 +148,21 @@ async function run(message, args) {
     const bet = parseInt(args[0])
 
     if (!bet) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     if (bet <= 0) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
         })
     }
 
     if (bet > getBalance(message.member)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
     }
 
     if (bet > maxBet) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new ErrorEmbed(
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
@@ -248,7 +262,15 @@ async function run(message, args) {
         "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString()
     ).setTitle("slots | " + message.member.user.username)
 
-    message.channel.send({ embeds: [embed] }).then((m) => {
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            return await message.editReply(data)
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
+    send({ embeds: [embed] }).then((m) => {
         if (win) {
             if (voted) {
                 embed.addField(
@@ -287,7 +309,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit({ embeds: [embed] })
+            edit({ embeds: [embed] }, m)
         }, 1500)
     })
 

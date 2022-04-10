@@ -8,20 +8,33 @@ const cmd = new Command("ban", "ban one or more users from the server", categori
     "BAN_MEMBERS",
 ])
 
+cmd.slashEnabled = true
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("member to ban from the server").setRequired(true))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the ban").setRequired(true))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            return await message.reply(data)
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
+            return send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] })
         }
         return
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
         })
     }
@@ -49,7 +62,7 @@ async function run(message, args) {
                 `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s\n${prefix}ban @member 1d annoying`
             )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
@@ -72,7 +85,7 @@ async function run(message, args) {
             message.mentions.members.set(member.user.id, member)
         }
     } else if (message.mentions.members.first() == null) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
         })
     }
@@ -125,7 +138,7 @@ async function run(message, args) {
             }
 
             if (members.get(member).user.id == message.client.user.id) {
-                await message.channel.send({ content: "well... i guess this is goodbye ):" })
+                await send({ content: "well... i guess this is goodbye ):" })
                 await message.guild.leave()
                 return
             }
@@ -142,7 +155,7 @@ async function run(message, args) {
             .catch(() => {
                 if (idOnly) {
                     fail = true
-                    return message.channel.send({
+                    return send({
                         embeds: [new ErrorEmbed(`unable to ban the id: \`${member}\``)],
                     })
                 }
@@ -153,7 +166,7 @@ async function run(message, args) {
     if (fail) return
 
     if (count == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to ban any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to ban any users")] })
     }
 
     let banLength = ""
@@ -204,7 +217,7 @@ async function run(message, args) {
         await message.delete()
         await message.member.send({ embeds: [embed] }).catch()
     } else {
-        await message.channel.send({ embeds: [embed] })
+        await send({ embeds: [embed] })
     }
 
     if (idOnly) {

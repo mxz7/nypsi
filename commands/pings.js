@@ -9,16 +9,27 @@ const { userExists } = require("../utils/economy/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("mentions", "view who mentioned you recently", categories.UTILITY).setAliases([
-    "pings",
+const cmd = new Command("pings", "view who mentioned you recently", categories.UTILITY).setAliases([
+    "mentions",
     "whothefuckpingedme",
 ])
+
+cmd.slashEnabled = true
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -35,7 +46,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -51,13 +62,13 @@ async function run(message, args) {
             )}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`
         )
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     const mentions = fetchUserMentions(message.guild, message.member)
 
     if (!mentions || mentions.length == 0) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
+        return send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] })
     }
 
     const pages = new Map()
@@ -104,14 +115,23 @@ async function run(message, args) {
     let msg
 
     if (pages.size == 1) {
-        return await message.channel.send({ embeds: [embed] })
+        return await send({ embeds: [embed] })
     } else {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
     }
 
     if (pages.size >= 2) {
         let currentPage = 1
         const lastPage = pages.size
+
+        const edit = async (data, msg) => {
+            if (message.interaction) {
+                await message.editReply(data)
+                return await message.fetchReply()
+            } else {
+                return await msg.edit(data)
+            }
+        }
 
         const filter = (i) => i.user.id == message.author.id
 
@@ -123,7 +143,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] }).catch(() => {})
+                    await edit({ components: [] }).catch(() => {}, msg)
                 })
 
             if (!reaction) return

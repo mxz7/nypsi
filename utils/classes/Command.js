@@ -1,3 +1,5 @@
+const { SlashCommandBuilder } = require("@discordjs/builders")
+
 class Command {
     /**
      * @returns {Command}
@@ -13,6 +15,14 @@ class Command {
         this.description = description.toString()
         if (Object.values(categories).indexOf(category) == -1) throw new Error("Invalid Category")
         this.category = category
+
+        this.slashEnabled = false
+
+        /**
+         * @type {SlashCommandBuilder}
+         */
+        this.slashData = new SlashCommandBuilder().setName(this.name).setDescription(this.description)
+
         return this
     }
 

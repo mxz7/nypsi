@@ -12,6 +12,11 @@ const cooldown = new Map()
 
 const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
 
+cmd.slashEnabled = true
+cmd.slashData.addStringOption((option) =>
+    option.setName("username").setDescription("username to get the name history for").setRequired(true)
+)
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -22,6 +27,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 2
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -41,13 +55,13 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)] })
+        return send({ embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -61,7 +75,7 @@ async function run(message, args) {
     const nameHistory = await getNameHistory(username)
 
     if (!nameHistory) {
-        return await message.channel.send({ embeds: [new ErrorEmbed("invalid account")] })
+        return await send({ embeds: [new ErrorEmbed("invalid account")] })
     }
 
     const skin = `https://mc-heads.net/avatar/${nameHistory.uuid}/256`
@@ -90,9 +104,9 @@ async function run(message, args) {
     )
 
     if (names.size >= 2) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] })
     } else {
-        return await message.channel.send({ embeds: [embed] })
+        return await send({ embeds: [embed] })
     }
 
     if (names.size >= 2) {
@@ -100,6 +114,15 @@ async function run(message, args) {
         const lastPage = names.size
 
         const filter = (i) => i.user.id == message.author.id
+
+        const edit = async (data, msg) => {
+            if (message.interaction) {
+                await message.editReply(data)
+                return await message.fetchReply()
+            } else {
+                return await msg.edit(data)
+            }
+        }
 
         const pageManager = async () => {
             const reaction = await msg
@@ -109,7 +132,7 @@ async function run(message, args) {
                     return collected.customId
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] })
+                    await edit({ components: [] }, msg)
                 })
 
             if (!reaction) return
@@ -132,7 +155,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [embed], components: [row] })
+                    await edit({ embeds: [embed], components: [row] }, msg)
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -153,7 +176,7 @@ async function run(message, args) {
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
                         )
                     }
-                    await msg.edit({ embeds: [embed], components: [row] })
+                    await edit({ embeds: [embed], components: [row] }, msg)
                     return pageManager()
                 }
             }

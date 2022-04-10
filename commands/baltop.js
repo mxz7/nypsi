@@ -7,11 +7,21 @@ const cooldown = new Map()
 
 const cmd = new Command("baltop", "view top balances in the server", categories.MONEY).setAliases(["top", "gangsters"])
 
+cmd.slashEnabled = true
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
+    const send = async (data) => {
+        if (message.interaction) {
+            return await message.reply(data)
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -29,7 +39,7 @@ async function run(message, args) {
             remaining = `${seconds}s`
         }
 
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -64,7 +74,7 @@ async function run(message, args) {
         .setTitle("top " + filtered.length)
         .setDescription(filtered.join("\n"))
 
-    message.channel.send({ embeds: [embed] })
+    send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
