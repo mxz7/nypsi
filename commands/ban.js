@@ -9,15 +9,9 @@ const cmd = new Command("ban", "ban one or more users from the server", categori
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => 
-    option.setName("user")
-        .setDescription("member to ban from the server")
-        .setRequired(true))
-    .addStringOption(option =>
-        option.setName("reason")
-            .setDescription("reason for the ban")
-            .setRequired(true)
-    )
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("member to ban from the server").setRequired(true))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the ban").setRequired(true))
 
 /**
  * @param {Message} message

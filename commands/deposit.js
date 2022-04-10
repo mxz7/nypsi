@@ -19,7 +19,7 @@ const cooldown = new Map()
 const cmd = new Command("deposit", "deposit money into your bank", categories.MONEY).setAliases(["dep"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("amount").setDescription("amount to deposit").setRequired(true))
+cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true))
 
 /**
  * @param {Message} message
@@ -146,7 +146,7 @@ async function run(message, args) {
                 "**"
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
-    
+
     const edit = async (data, msg) => {
         if (message.interaction) {
             await message.editReply(data)

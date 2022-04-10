@@ -28,7 +28,20 @@ const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
 const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("item").setDescription("the item you want to use").setRequired(true).addChoice("📦 vote", "vote").addChoice("📦 basic", "basic").addChoice("🔒 padlock", "padlock").addChoice("🧰 lock pick", "lock_pick").addChoice("😷 mask", "mask").addChoice("📻 radio", "radio").addChoice("handcuffs", "handcuffs").addChoice("chastity_cage", "chastity_cage"))
+cmd.slashData.addStringOption((option) =>
+    option
+        .setName("item")
+        .setDescription("the item you want to use")
+        .setRequired(true)
+        .addChoice("📦 vote", "vote")
+        .addChoice("📦 basic", "basic")
+        .addChoice("🔒 padlock", "padlock")
+        .addChoice("🧰 lock pick", "lock_pick")
+        .addChoice("😷 mask", "mask")
+        .addChoice("📻 radio", "radio")
+        .addChoice("handcuffs", "handcuffs")
+        .addChoice("chastity_cage", "chastity_cage")
+)
 
 const cooldown = new Map()
 

@@ -8,7 +8,7 @@ const { getExactMember } = require("../utils/utils")
 const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("user to unmute").setRequired(true))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true))
 
 /**
  * @param {Message} message

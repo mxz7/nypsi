@@ -12,7 +12,9 @@ const cmd = new Command("history", "view punishment history for a given user", c
     .setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("user").setDescription("use the user's id or username").setRequired(true))
+cmd.slashData.addStringOption((option) =>
+    option.setName("user").setDescription("use the user's id or username").setRequired(true)
+)
 
 /**
  * @param {Message} message

@@ -21,7 +21,7 @@ const cooldown = new Map()
 const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases(["with"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("amount").setDescription("amount to withdraw").setRequired(true))
+cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescription("amount to withdraw").setRequired(true))
 
 /**
  * @param {Message} message

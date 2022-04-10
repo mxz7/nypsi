@@ -11,7 +11,7 @@ const cooldown = new Map()
 const cmd = new Command("love", "calculate your love with another person", categories.FUN)
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("is this person your one true love?!"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this person your one true love?!"))
 
 /**
  * @param {Message} message

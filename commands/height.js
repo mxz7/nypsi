@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cmd = new Command("height", "accurate prediction of your height", categories.FUN)
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("i bet ur short"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i bet ur short"))
 
 /**
  * @param {Message} message

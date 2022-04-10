@@ -8,7 +8,7 @@ const { logger } = require("../utils/logger")
 const cmd = new Command("unban", "unban one or more users", categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("user").setDescription("tag/id of user to unban").setRequired(true))
+cmd.slashData.addStringOption((option) => option.setName("user").setDescription("tag/id of user to unban").setRequired(true))
 
 /**
  * @param {Message} message
