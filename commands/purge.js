@@ -4,9 +4,14 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATION)
-    .setAliases(["purge"])
+const cmd = new Command("purge", "bulk delete/purge messages", categories.MODERATION)
+    .setAliases(["del"])
     .setPermissions(["MANAGE_MESSAGES"])
+
+cmd.slashEnabled = true
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
+)
 
 /**
  * @param {Message} message
@@ -15,6 +20,15 @@ const cmd = new Command("del", "bulk delete/purge messages", categories.MODERATI
 async function run(message, args) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
+        }
     }
 
     if (cooldown.has(message.member.id)) {
@@ -33,7 +47,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
@@ -55,7 +69,7 @@ async function run(message, args) {
         }, 30000)
     }
 
-    if (message.mentions.members.first()) {
+    if (!message.interaction && message.mentions.members.first()) {
         await message.delete()
         const target = message.mentions.members.first()
 
@@ -82,6 +96,10 @@ async function run(message, args) {
         }
 
         return await message.channel.bulkDelete(collecteda)
+    }
+
+    if (message.interaction) {
+        message.deferReply()
     }
 
     if (amount <= 100) {
@@ -162,7 +180,7 @@ async function run(message, args) {
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 )
-                await m.edit({ embeds: [embed] })
+                await m.edit({ embeds: [embed] }).catch(() => {})
             }
         }
         return m.delete().catch()

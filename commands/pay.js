@@ -21,6 +21,15 @@ const cooldown = new Map()
 
 const cmd = new Command("pay", "give other users money", categories.MONEY)
 
+cmd.slashEnabled = true
+cmd.slashData
+    .addUserOption((option) =>
+        option.setName("user").setDescription("who would you like to send money to").setRequired(true)
+    )
+    .addIntegerOption((option) =>
+        option.setName("amount").setDescription("how much would you like to send").setRequired(true)
+    )
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -31,6 +40,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 5
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -50,7 +68,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -61,7 +79,7 @@ async function run(message, args) {
             .addField("usage", `${prefix}pay <user> <amount>`)
             .addField("help", "the payment will be taxxed at certain amounts")
 
-        return message.channel.send({ embeds: [embed] })
+        return send({ embeds: [embed] })
     }
 
     let target = message.mentions.members.first()
@@ -71,19 +89,19 @@ async function run(message, args) {
     }
 
     if (!target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (message.member == target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (target.user.bot) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (isEcoBanned(target.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     if (!userExists(target)) createUser(target)
@@ -101,21 +119,21 @@ async function run(message, args) {
     if (parseInt(args[1])) {
         args[1] = formatBet(args[1])
     } else {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+        return send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
     let amount = parseInt(args[1])
 
     if (!amount) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid payment")] })
+        return send({ embeds: [new ErrorEmbed("invalid payment")] })
     }
 
     if (amount > getBalance(message.member)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this payment")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] })
     }
 
     if (amount <= 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid payment")] })
+        return send({ embeds: [new ErrorEmbed("invalid payment")] })
     }
 
     const targetPrestige = getPrestige(target)
@@ -136,7 +154,7 @@ async function run(message, args) {
         payLimit += prestigeBonus
 
         if (amount > payLimit) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] })
+            return send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] })
         }
     }
 
@@ -194,7 +212,16 @@ async function run(message, args) {
         )
     }
 
-    message.channel.send({ embeds: [embed] }).then((m) => {
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
+    send({ embeds: [embed] }).then((m) => {
         const embed = new CustomEmbed(message.member)
             .setTitle("transaction success")
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())
@@ -220,7 +247,7 @@ async function run(message, args) {
         }
 
         setTimeout(() => {
-            m.edit({ embeds: [embed] })
+            edit({ embeds: [embed] }, m)
         }, 1500)
     })
 

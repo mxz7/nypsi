@@ -27,6 +27,8 @@ veins.set("diamond", [1, 2])
 
 const cmd = new Command("mine", "go to a cave and mine", categories.MONEY)
 
+cmd.slashEnabled = true
+
 const cooldown = new Map()
 
 /**
@@ -41,6 +43,15 @@ async function run(message, args) {
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
             cooldownLength = 900
+        }
+    }
+
+    const send = async (data) => {
+        if (message.interaction) {
+            await message.reply(data)
+            return await message.fetchReply()
+        } else {
+            return await message.channel.send(data)
         }
     }
 
@@ -60,7 +71,7 @@ async function run(message, args) {
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     const inventory = getInventory(message.member)
@@ -77,7 +88,7 @@ async function run(message, args) {
     }
 
     if (!pickaxe) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you need a pickaxe to mine")] })
+        return send({ embeds: [new ErrorEmbed("you need a pickaxe to mine")] })
     }
 
     cooldown.set(message.member.id, new Date())
@@ -230,7 +241,7 @@ async function run(message, args) {
         } and swing your **${items[pickaxe].name}**`
     )
 
-    const msg = await message.channel.send({ embeds: [embed] })
+    const msg = await send({ embeds: [embed] })
 
     embed.setDescription(
         `you go to the ${
@@ -240,8 +251,17 @@ async function run(message, args) {
         }`
     )
 
+    const edit = async (data, msg) => {
+        if (message.interaction) {
+            await message.editReply(data)
+            return await message.fetchReply()
+        } else {
+            return await msg.edit(data)
+        }
+    }
+
     setTimeout(() => {
-        msg.edit({ embeds: [embed] })
+        edit({ embeds: [embed] }, msg)
     }, 1500)
 }
 
