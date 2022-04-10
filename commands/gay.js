@@ -10,7 +10,7 @@ const cooldown = new Map()
 const cmd = new Command("gay", "very accurate gay level calculator", categories.FUN).setAliases(["howgay", "lgbtdetector"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("are u gay"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are u gay"))
 
 /**
  * @param {Message} message

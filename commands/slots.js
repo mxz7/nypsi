@@ -50,8 +50,9 @@ const cmd = new Command("slots", "play slots", categories.MONEY)
 
 cmd.slashEnabled = true
 
-cmd.slashData.addIntegerOption(option =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+cmd.slashData.addIntegerOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+)
 
 /**
  * @param {Message} message

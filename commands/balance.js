@@ -22,10 +22,9 @@ const cmd = new Command("balance", "check your balance", categories.MONEY).setAl
 
 cmd.slashEnabled = true
 
-cmd.slashData.addUserOption(option =>
-    option.setName("user")
-        .setDescription("view balance of this user")
-        .setRequired(false))
+cmd.slashData.addUserOption((option) =>
+    option.setName("user").setDescription("view balance of this user").setRequired(false)
+)
 
 /**
  * @param {Message} message
@@ -89,7 +88,7 @@ async function run(message, args) {
                 "**"
         )
         .setFooter(footer)
-    
+
     const send = async (data) => {
         if (message.interaction) {
             return await message.reply(data)

@@ -11,7 +11,7 @@ const cooldown = new Map()
 const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases(["howfurry", "stfufurry"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("is this dude a furry"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"))
 
 /**
  * @param {Message} message

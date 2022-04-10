@@ -25,7 +25,7 @@ const games = new Map()
 const cmd = new Command("highlow", "higher or lower game", categories.MONEY).setAliases(["hl"])
 
 cmd.slashEnabled = true
-cmd.slashData.addIntegerOption(option => option.setName("bet").setDescription("amount to bet").setRequired(true))
+cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true))
 
 /**
  * @param {Message} message

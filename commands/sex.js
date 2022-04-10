@@ -12,7 +12,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FU
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("message").setDescription("a good pickup line always works (;"))
+cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"))
 
 const cooldown = new Map()
 const chastityCooldown = new Map()

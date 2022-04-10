@@ -16,7 +16,9 @@ const { getExactMember } = require("../utils/utils")
 const cmd = new Command("mute", "mute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("user to mute").setRequired(true)).addStringOption(option => option.setName("reason").setDescription("reason for the mute"))
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("user to mute").setRequired(true))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"))
 
 /**
  * @param {Message} message

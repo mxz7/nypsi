@@ -13,7 +13,9 @@ const cooldown = new Map()
 const cmd = new Command("minecraft", "view information about a minecraft account", categories.MINECRAFT).setAliases(["mc"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption(option => option.setName("username").setDescription("username to get the name history for").setRequired(true))
+cmd.slashData.addStringOption((option) =>
+    option.setName("username").setDescription("username to get the name history for").setRequired(true)
+)
 
 /**
  * @param {Message} message

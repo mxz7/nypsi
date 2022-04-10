@@ -21,9 +21,7 @@ class Command {
         /**
          * @type {SlashCommandBuilder}
          */
-        this.slashData = new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description)
+        this.slashData = new SlashCommandBuilder().setName(this.name).setDescription(this.description)
 
         return this
     }

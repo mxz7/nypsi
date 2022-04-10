@@ -14,7 +14,7 @@ const cmd = new Command("slut", "measure how much of a slut you are", categories
 ])
 
 cmd.slashEnabled = true
-cmd.slashData.addUserOption(option => option.setName("user").setDescription("are you slutty 😳"))
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are you slutty 😳"))
 
 /**
  * @param {Message} message
