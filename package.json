@@ -37,7 +37,7 @@
     "winston-discord-webhook": "^1.1.0"
   },
   "devDependencies": {
-    "eslint": "^8.12.0",
+    "eslint": "^8.13.0",
     "prettier": "2.6.2"
   },
   "repository": {
