@@ -315,7 +315,7 @@ async function doVote(client, vote) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     "+ **15** karma\n" +
-                    `+ **10**% multiplier, total: **${multi}**%\n` +
+                    `+ **5**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
