@@ -79,7 +79,7 @@ async function run(message, args) {
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**5**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **15** karma\n× **${crateAmount}** vote crate${
+            `× +**5**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         )

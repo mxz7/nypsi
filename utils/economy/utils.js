@@ -280,7 +280,7 @@ async function doVote(client, vote) {
     const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
-    addKarma(memberID, 15)
+    addKarma(memberID, 10)
 
     const tickets = getTickets(memberID)
 
@@ -314,7 +314,7 @@ async function doVote(client, vote) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
-                    "+ **15** karma\n" +
+                    "+ **10** karma\n" +
                     `+ **5**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
