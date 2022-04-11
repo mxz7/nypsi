@@ -18,7 +18,7 @@ const bonusCooldown = new Map()
 
 const cmd = new Command(
     "vote",
-    "vote every 12 hours to get an extra 10% bonus on gambling wins as well as a money reward",
+    "vote every 12 hours to get an extra 5% bonus on gambling wins as well as a money reward",
     categories.MONEY
 )
 
@@ -73,13 +73,13 @@ async function run(message, args) {
     if (voted) {
         embed.setTitle("vote ✅")
         embed.setColor("#5efb8f")
-        embed.addField("rewards", `✓ +**10**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
+        embed.addField("rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
         embed.setTitle("vote ❌")
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**10**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **15** karma\n× **${crateAmount}** vote crate${
+            `× +**5**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **15** karma\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         )
