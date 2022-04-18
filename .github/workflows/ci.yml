@@ -33,8 +33,6 @@ jobs:
         env:
             BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-        if: env.BOT_TOKEN != null
-
         steps:
             - name: checkout repository
               uses: actions/checkout@v3
@@ -48,6 +46,7 @@ jobs:
               run: npm install
 
             - name: run bot
+              if: env.BOT_TOKEN != null
               run: node nypsi.js
 
     deploy:
