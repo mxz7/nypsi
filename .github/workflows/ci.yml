@@ -27,13 +27,13 @@ jobs:
     test:
         name: testing
 
-        if: github.ref == 'refs/heads/main'
-
         runs-on: ubuntu-latest
         timeout-minutes: 5
 
         env:
             BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+        if: env.BOT_TOKEN != null
 
         steps:
             - name: checkout repository
