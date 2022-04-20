@@ -219,7 +219,7 @@ async function run(message, args) {
             } else if (searchTag == itemName.split("_").join("")) {
                 selected = itemName
                 break
-            } else if (searchTag == items[itemName].name) {
+            } else if (aliases.indexOf(searchTag) != 1) {
                 selected = itemName
                 break
             }
