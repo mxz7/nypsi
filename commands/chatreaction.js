@@ -2,7 +2,6 @@ const { Message, Permissions, MessageActionRow, MessageButton } = require("disco
 const {
     createReactionProfile,
     hasReactionProfile,
-    getWords,
     startReaction,
     getReactionStats,
     hasReactionStatsProfile,

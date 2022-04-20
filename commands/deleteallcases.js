@@ -11,7 +11,7 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", catego
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (

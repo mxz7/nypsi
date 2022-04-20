@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { startRestart } = require("../utils/commandhandler")
 const { vacuum } = require("../utils/database/database")
 const { logger } = require("../utils/logger")
@@ -13,7 +13,7 @@ let confirm = false
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (message.member.user.id != "672793821850894347") return
 
     if (confirm == false) {

@@ -17,7 +17,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 30
 
     const send = async (data) => {

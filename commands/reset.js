@@ -1,19 +1,11 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const {
     getXp,
-    getPrestigeRequirement,
-    getBankBalance,
-    getPrestigeRequirementBal,
-    updateBankBalance,
-    updateXp,
     getPrestige,
-    setPrestige,
     userExists,
     createUser,
     getMulti,
-    calcMaxBet,
     getInventory,
-    setInventory,
     getBalance,
     deleteUser,
     getItems,
@@ -31,7 +23,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
