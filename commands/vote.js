@@ -1,20 +1,16 @@
 const { Message } = require("discord.js")
 const {
     hasVoted,
-    getBalance,
-    updateBalance,
     userExists,
     createUser,
     removeFromVoteCache,
     getPrestige,
     getMulti,
 } = require("../utils/economy/utils.js")
-const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
-const bonusCooldown = new Map()
 
 const cmd = new Command(
     "vote",
@@ -26,7 +22,7 @@ const cmd = new Command(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -58,7 +54,6 @@ async function run(message, args) {
 
     if (prestige > 15) prestige = 15
 
-    const prefix = getPrefix(message.guild)
     const amount = 15000 * (prestige + 1)
     const voted = hasVoted(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100)

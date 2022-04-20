@@ -1,7 +1,6 @@
 const { workMessages } = require("../lists.json")
-const { getColor } = require("../utils/utils")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
-const { MessageEmbed, Message } = require("discord.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -14,7 +13,7 @@ const cmd = new Command("work", "work a random job and safely earn a random amou
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 1800
 
     if (isPremium(message.author.id)) {

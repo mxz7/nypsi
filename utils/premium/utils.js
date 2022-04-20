@@ -1,6 +1,6 @@
 const { GuildMember } = require("discord.js")
 const fs = require("fs")
-const { PremUser, status } = require("../classes/PremStorage")
+const { PremUser } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
 const { logger } = require("../logger")
 const { formatDate } = require("../utils")
@@ -94,19 +94,6 @@ function getTier(member) {
 }
 
 exports.getTier = getTier
-
-function getTierString(member) {
-    let id = member
-    if (member.user) {
-        id = member.user.id
-    }
-
-    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
-
-    const a = createPremUser(query)
-
-    return a.getLevelString()
-}
 
 /**
  * @param {GuildMember} member

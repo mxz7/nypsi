@@ -94,8 +94,6 @@ async function run(message, args) {
     let failed = []
     let error = []
 
-    const messageDM = "you have been warned in **" + message.guild.name + "** for `" + reason + "`"
-
     for (let member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
