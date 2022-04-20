@@ -3,12 +3,10 @@ const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/u
 const fs = require("fs")
 const { Message, Client, MessageActionRow, MessageButton, GuildMember } = require("discord.js")
 const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
-const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
 const { logger, getTimestamp } = require("./logger.js")
 const { getCommand, addUse } = require("./premium/utils.js")
-const { start } = require("repl")
 const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
 const { REST } = require("@discordjs/rest")
 const { Routes } = require("discord-api-types/v9")
@@ -199,7 +197,6 @@ async function helpCmd(message, args) {
         const categories = Array.from(helpCategories.keys()).sort()
 
         let categoriesMsg = ""
-        let categoriesMsg2 = ""
 
         for (const category of categories) {
             categoriesMsg += `» ${prefix}help **${category}**\n`
@@ -442,7 +439,7 @@ async function runCommand(cmd, message, args) {
             contentToCheck = contentToCheck.split(" ")
 
             for (const word of filter) {
-                if (content.indexOf(word.toLowerCase()) != -1) {
+                if (contentToCheck.indexOf(word.toLowerCase()) != -1) {
                     return message.channel.send({
                         embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
                     })
@@ -698,8 +695,6 @@ exports.getRandomCommand = getRandomCommand
  */
 function logCommand(message, args) {
     args.shift()
-
-    const server = message.guild.name
 
     let msg
 

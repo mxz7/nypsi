@@ -16,7 +16,7 @@ const cmd = new Command("inspiration", "generate an inspirational quote (inspiro
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 10
 
     if (isPremium(message.author.id)) {

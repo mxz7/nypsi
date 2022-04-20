@@ -1,5 +1,4 @@
 const { Message, User } = require("discord.js")
-const { getBorderCharacters } = require("table")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const {
@@ -453,7 +452,6 @@ function getRacePosition(emoji, position) {
 
 async function startRace(id) {
     const race = races.get(id)
-    const users = race.users
 
     /**
      * @type {User}

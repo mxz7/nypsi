@@ -12,7 +12,7 @@ const cmd = new Command("lizard", "get a random picture of a lizard", categories
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

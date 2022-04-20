@@ -3,18 +3,14 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const {
     getItems,
-    formatBet,
     getBalance,
     getInventory,
-    getMaxBitcoin,
-    getMaxEthereum,
     updateBalance,
     setInventory,
     getMulti,
     userExists,
     createUser,
 } = require("../utils/economy/utils")
-const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("sellall", "sell all commonly sold items", categories.MONEY)
@@ -27,7 +23,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 10

@@ -6,7 +6,6 @@ const {
     userExists,
     createUser,
     formatBet,
-    getBankBalance,
     getXp,
     getPrestige,
     isEcoBanned,

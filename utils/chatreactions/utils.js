@@ -11,7 +11,7 @@ const enabledCache = new Map()
 const lastGame = new Map()
 
 setInterval(async () => {
-    const { checkGuild, getGuild } = require("../../nypsi")
+    const { checkGuild } = require("../../nypsi")
 
     const query = db.prepare("SELECT id FROM chat_reaction").all()
 
@@ -258,7 +258,7 @@ exports.updateReactionSettings = updateReactionSettings
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
- * @returns {StatsProfile}
+ * @returns {{wins: number, secondPlace: number, thirdPlace: number}}
  */
 function getReactionStats(guild, member) {
     const query = db
@@ -441,7 +441,7 @@ exports.hasReactionStatsProfile = hasReactionStatsProfile
 /**
  *
  * @param {Guild} guild
- * @param {guildMember} member
+ * @param {GuildMember} member
  */
 function createReactionStatsProfile(guild, member) {
     db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id)
@@ -452,7 +452,7 @@ exports.createReactionStatsProfile = createReactionStatsProfile
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
- * @param {StatsProfile} newStats
+ * @param {{wins: number, secondPlace: number, thirdPlace: number}} newStats
  */
 function updateStats(guild, member, newStats) {
     db.prepare("UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?").run(

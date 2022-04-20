@@ -74,7 +74,7 @@ class CustomEmbed extends MessageEmbed {
 
     /**
      * @returns {CustomEmbed}
-     * @param {Sting} text
+     * @param {string} text
      */
     setTitle(text) {
         super.setTitle(text)
@@ -203,7 +203,7 @@ class ErrorEmbed extends MessageEmbed {
 
     /**
      * @returns {ErrorEmbed}
-     * @param {Sting} text
+     * @param {string} text
      */
     setTitle(text) {
         super.setTitle(text)
