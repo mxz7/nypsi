@@ -22,6 +22,6 @@ jobs:
             - name: push changes
               uses: EndBug/add-and-commit@v8
               with:
-                message: formatting
+                message: 'style: prettier formatting'
                 committer_name: GitHub Actions
                 committer_email: 41898282+github-actions[bot]@users.noreply.github.com
