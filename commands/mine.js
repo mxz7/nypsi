@@ -1,14 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const {
-    userExists,
-    createUser,
-    getInventory,
-    getItems,
-    setInventory,
-    addItemUse,
-} = require("../utils/economy/utils")
+const { userExists, createUser, getInventory, getItems, setInventory, addItemUse } = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const veins = new Map()
