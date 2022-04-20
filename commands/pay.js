@@ -166,16 +166,10 @@ async function run(message, args) {
 
     let tax = 0
 
-    if (amount >= 10000000) {
-        tax = 0.4
-    } else if (amount >= 1000000) {
-        tax = 0.3
-    } else if (amount >= 500000) {
-        tax = 0.25
-    } else if (amount >= 250000) {
-        tax = 0.2
-    } else if (amount >= 100000) {
+    if (amount >= 200000) {
         tax = 0.1
+    } else if (amount >= 100000) {
+        tax = 0.05
     }
 
     updateBalance(message.member, getBalance(message.member) - amount)
