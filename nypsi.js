@@ -3,7 +3,6 @@ const startUp = Date.now()
 require("dotenv").config()
 
 const Discord = require("discord.js")
-const { MessageEmbed } = require("discord.js")
 const client = new Discord.Client({
     allowedMentions: {
         parse: ["users", "roles"],
@@ -38,13 +37,9 @@ const client = new Discord.Client({
     ],
 })
 
-const { getUserCount, updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
+const { updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
 const {
-    runCheck,
     checkStats,
-    hasStatsEnabled,
-    checkChristmasCountdown,
-    hasChristmasCountdownEnabled,
     runCountdowns,
     hasGuild,
     createGuild,
@@ -52,7 +47,7 @@ const {
 } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
-const { MStoTime, showTopGlobalBal } = require("./utils/utils")
+const { showTopGlobalBal } = require("./utils/utils")
 const { runModerationChecks } = require("./utils/moderation/utils")
 const { getWebhooks, logger } = require("./utils/logger")
 
@@ -128,14 +123,6 @@ async function runChecks() {
     }, 3600000)
 
     checkStats()
-
-    const now = new Date()
-
-    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
-
-    if (now.getHours() < 3) {
-        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
-    }
 
     if (client.user.id != "678711738845102087") return
 

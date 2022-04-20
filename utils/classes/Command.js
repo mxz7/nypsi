@@ -10,7 +10,7 @@ class Command {
      * @param {*} aliases command aliases
      * @param {*} run command code
      */
-    constructor(name, description, category, permissions, aliases, run) {
+    constructor(name, description, category) {
         this.name = name.toString()
         this.description = description.toString()
         if (Object.values(categories).indexOf(category) == -1) throw new Error("Invalid Category")

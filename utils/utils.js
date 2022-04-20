@@ -1,5 +1,4 @@
 const { GuildMember, Message, Client, Webhook } = require("discord.js")
-const util = require("util")
 const isImageUrl = require("is-image-url")
 const fetch = require("node-fetch")
 const { getZeroWidth } = require("./chatreactions/utils")
@@ -9,7 +8,6 @@ const db = getDatabase()
 const imgur = require("imgur")
 imgur.setClientId(process.env.IMGUR_TOKEN)
 
-const uploadImage = util.promisify(imgur.uploadUrl)
 let uploadDisabled = false
 
 let uploadCount = 0
