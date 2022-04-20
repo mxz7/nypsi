@@ -1,4 +1,3 @@
-const fetch = require("node-fetch")
 const { Message } = require("discord.js")
 const { redditImage } = require("../utils/utils")
 const { Command, categories } = require("../utils/classes/Command")
@@ -13,7 +12,7 @@ const cmd = new Command("rabbit", "get a random picture of a rabbit", categories
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

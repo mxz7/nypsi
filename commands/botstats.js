@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { getUserCount, getUserCountGuild, getVoteCacheSize } = require("../utils/economy/utils.js")
+const { getUserCount, getUserCountGuild } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
@@ -14,7 +14,7 @@ const cmd = new Command("botstats", "view stats for the bot", categories.INFO)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -101,7 +101,6 @@ async function run(message, args) {
 
     let collections = 0
     let mentions = 0
-    let deletable = 0
 
     for (const mention of mentionQueue) {
         if (mention.type == "collection") {

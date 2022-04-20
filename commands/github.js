@@ -8,7 +8,7 @@ const cmd = new Command("github", "view code for the bot on github", categories.
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     const embed = new CustomEmbed(
         message.member,
         true,
