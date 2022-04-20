@@ -38,13 +38,7 @@ const client = new Discord.Client({
 })
 
 const { updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
-const {
-    checkStats,
-    runCountdowns,
-    hasGuild,
-    createGuild,
-    runChristmas,
-} = require("./utils/guilds/utils.js")
+const { checkStats, runCountdowns, hasGuild, createGuild, runChristmas } = require("./utils/guilds/utils.js")
 const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
 const { updateCache } = require("./utils/imghandler")
 const { showTopGlobalBal } = require("./utils/utils")
