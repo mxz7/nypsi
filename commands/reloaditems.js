@@ -9,7 +9,7 @@ const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermi
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (message.member.user.id != "672793821850894347") return
 
     const d = loadItems()

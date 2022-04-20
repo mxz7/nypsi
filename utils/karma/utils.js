@@ -1,3 +1,4 @@
+const { GuildMember } = require("discord.js")
 const { getDatabase } = require("../database/database")
 const { logger } = require("../logger")
 const { MStoTime } = require("../utils")

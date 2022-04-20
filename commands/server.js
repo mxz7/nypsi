@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const { formatDate } = require("../utils/utils")
 const { getPeaks, inCooldown, addCooldown, runCheck } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cmd = new Command("server", "view information about the server", categories.INFO).setAliases([
     "serverinfo",

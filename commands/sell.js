@@ -6,15 +6,12 @@ const {
     formatBet,
     getBalance,
     getInventory,
-    getMaxBitcoin,
-    getMaxEthereum,
     updateBalance,
     setInventory,
     getMulti,
     userExists,
     createUser,
 } = require("../utils/economy/utils")
-const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("sell", "sell items", categories.MONEY)

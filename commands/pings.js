@@ -1,6 +1,6 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
-const { isPremium, getTier } = require("../utils/premium/utils")
+const { isPremium } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { fetchUserMentions } = require("../utils/users/utils")
@@ -20,7 +20,7 @@ cmd.slashEnabled = true
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     const send = async (data) => {
         if (message.interaction) {
             await message.reply(data)
@@ -225,41 +225,3 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
-
-function timeSince(date) {
-    const ms = Math.floor(new Date() - date)
-
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor(daysms / (60 * 60 * 1000))
-    const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor(hoursms / (60 * 1000))
-    const minutesms = ms % (60 * 1000)
-    const sec = Math.floor(minutesms / 1000)
-
-    let output = ""
-
-    if (days > 0) {
-        output = output + days + "d "
-    }
-
-    if (hours > 0) {
-        output = output + hours + "h "
-    }
-
-    if (minutes > 0) {
-        output = output + minutes + "m "
-    }
-
-    if (sec > 0) {
-        output = output + sec + "s"
-    } else if (output != "") {
-        output = output.substr(0, output.length - 1)
-    }
-
-    if (output == "") {
-        output = "0s"
-    }
-
-    return output
-}

@@ -11,7 +11,7 @@ const cmd = new Command("maxbet", "calculate your maximum bet", categories.MONEY
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (cooldown.has(message.member.id)) {
