@@ -15,7 +15,6 @@ const {
     uploadImage,
 } = require("../utils/utils")
 const { getPrefix } = require("../utils/guilds/utils")
-const e = require("express")
 const isImageUrl = require("is-image-url")
 
 const cooldown = new Map()

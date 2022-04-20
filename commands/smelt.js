@@ -14,7 +14,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 600

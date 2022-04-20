@@ -169,7 +169,7 @@ class PremUser {
             return "boost"
         }
 
-        const d = await requestDM(
+        await requestDM(
             this.id,
             `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
         ).catch(() => {})

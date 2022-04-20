@@ -14,8 +14,6 @@ const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const tax = 0.05
-
 const cooldown = new Map()
 
 const cmd = new Command("withdraw", "withdraw money from your bank", categories.MONEY).setAliases(["with"])

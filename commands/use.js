@@ -1,20 +1,14 @@
-const { Message, GuildMember } = require("discord.js")
+const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const {
     getItems,
     getInventory,
     setInventory,
-    updateBalance,
-    getBalance,
     userExists,
     createUser,
-    updateXp,
-    getXp,
     hasPadlock,
     setPadlock,
-    getMaxBitcoin,
-    getMaxEthereum,
     getDMsEnabled,
     addItemUse,
     openCrate,

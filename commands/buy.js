@@ -3,7 +3,6 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const {
     getItems,
-    formatBet,
     getBalance,
     getInventory,
     getMaxBitcoin,

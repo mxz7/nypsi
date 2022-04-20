@@ -13,7 +13,7 @@ const cmd = new Command("weekly", "get your weekly bonus (patreon only)", catego
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

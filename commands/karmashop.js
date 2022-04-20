@@ -1,5 +1,4 @@
 const { Message, MessageButton, MessageActionRow } = require("discord.js")
-const { getMember } = require("../utils/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
@@ -219,7 +218,7 @@ async function run(message, args) {
             } else if (searchTag == itemName.split("_").join("")) {
                 selected = itemName
                 break
-            } else if (searchTag == items[itemName].name) {
+            } else if (aliases.indexOf(searchTag) != 1) {
                 selected = itemName
                 break
             }

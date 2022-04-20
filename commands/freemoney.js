@@ -12,7 +12,7 @@ const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

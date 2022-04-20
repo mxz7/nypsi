@@ -9,7 +9,6 @@ const {
 } = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
-const shuffle = require("shuffle-array")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -188,7 +187,7 @@ async function run(message, args) {
 
 /**
  *
- * @param {GuildMember} member
+ * @param {Discord.GuildMember} member
  */
 function deleteStoreRobCooldown(member) {
     cooldown.delete(member.user.id)
@@ -198,7 +197,7 @@ cmd.deleteStoreRobCooldown = deleteStoreRobCooldown
 
 /**
  * @returns {Boolean}
- * @param {GuildMember} member
+ * @param {Discord.GuildMember} member
  */
 function onStoreRobCooldown(member) {
     return cooldown.has(member.user.id)
