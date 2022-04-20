@@ -12,7 +12,7 @@ const cmd = new Command("dog", "get a random picture of a dog", categories.ANIMA
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

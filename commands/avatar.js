@@ -2,7 +2,6 @@ const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
-const e = require("express")
 
 const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
 

@@ -9,14 +9,12 @@ const {
     setReason,
     addMember,
     renewUser,
-    revokeUser,
     expireUser,
     getUserCommand,
 } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
-const { logger } = require("../utils/logger")
 
 const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
 
@@ -99,7 +97,6 @@ async function run(message, args) {
             const timeAgo = daysAgo(profile.startDate)
             const expires = formatDate(profile.expireDate)
             const timeUntil = daysUntil(profile.expireDate)
-            const embedColor = profile.embedColor
 
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`
 

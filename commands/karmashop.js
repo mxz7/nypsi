@@ -1,5 +1,4 @@
 const { Message, MessageButton, MessageActionRow } = require("discord.js")
-const { getMember } = require("../utils/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
