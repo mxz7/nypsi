@@ -1,7 +1,7 @@
 const { Guild, Client } = require("discord.js")
 const { setPrefix, updateDisabledCommands } = require("../utils/guilds/utils")
 const { removeKarma } = require("../utils/karma/utils")
-const { info, types, logger } = require("../utils/logger")
+const { logger } = require("../utils/logger")
 const { setMuteRole, profileExists } = require("../utils/moderation/utils")
 
 /**

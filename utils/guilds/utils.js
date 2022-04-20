@@ -1,5 +1,4 @@
 const { Guild, Client } = require("discord.js")
-const fs = require("fs")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { Countdown } = require("../classes/GuildStorage")
 const { getDatabase, toArray, toStorage } = require("../database/database")
@@ -13,8 +12,7 @@ setInterval(async () => {
     const now = new Date().getTime()
 
     let snipeCount,
-        eSnipeCount,
-        mentionsCount = 0
+        eSnipeCount = 0
 
     await snipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp

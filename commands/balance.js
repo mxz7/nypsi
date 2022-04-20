@@ -11,7 +11,6 @@ const {
     getPrestigeRequirement,
     getPrestigeRequirementBal,
     getPrestige,
-    createStatsProfile,
     deleteUser,
 } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command")
@@ -33,12 +32,10 @@ cmd.slashData.addUserOption((option) =>
 async function run(message, args) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
         let target = message.mentions.members.first()
-        let id = false
 
         if (!target) {
             target = args[0]
             if (!userExists(target)) createUser(target)
-            id = true
         }
 
         if (args[1] == "reset") {

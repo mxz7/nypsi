@@ -1,20 +1,7 @@
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const {
-    userExists,
-    createUser,
-    getInventory,
-    getItems,
-    setInventory,
-    getMaxBitcoin,
-    getMaxEthereum,
-    updateBalance,
-    getBalance,
-    updateXp,
-    getXp,
-    addItemUse,
-} = require("../utils/economy/utils")
+const { userExists, createUser, getInventory, getItems, setInventory, addItemUse } = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("hunt", "go to a field and hunt", categories.MONEY)
@@ -27,7 +14,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!userExists(message.member)) createUser(message.member)
 
     let cooldownLength = 1800

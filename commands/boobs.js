@@ -18,7 +18,7 @@ const cmd = new Command("boobs", "get a random boob image", categories.NSFW).set
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

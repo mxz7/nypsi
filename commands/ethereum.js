@@ -12,7 +12,7 @@ const cmd = new Command("ethereum", "view the current ethereum value (reflects r
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!userExists(message.member)) createUser(message.member)
     const ethereum = getItems()["ethereum"]
     const inventory = getInventory(message.member)

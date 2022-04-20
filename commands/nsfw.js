@@ -1,5 +1,4 @@
 const { Message, Permissions } = require("discord.js")
-const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
@@ -22,8 +21,6 @@ async function run(message, args) {
             embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")],
         })
     }
-
-    const prefix = getPrefix(message.guild)
 
     let channel
 

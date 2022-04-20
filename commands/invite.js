@@ -8,7 +8,7 @@ const cmd = new Command("invite", "generate an invite link for the bot", categor
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     const embed = new CustomEmbed(
         message.member,
         false,

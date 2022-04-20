@@ -8,7 +8,7 @@ const cmd = new Command("servericon", "get the server icon", categories.INFO)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     return message.channel.send({
         embeds: [
             new CustomEmbed(message.member, false).setImage(

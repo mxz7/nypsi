@@ -65,7 +65,7 @@ async function run(message, args) {
         new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
     )
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] })
+    await message.channel.send({ embeds: [embed], components: [row] })
 
     const reactions = []
 
