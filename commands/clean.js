@@ -1,7 +1,7 @@
 const { getPrefix } = require("../utils/guilds/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
-const { Permissions } = require("discord.js")
+const { Permissions, Message } = require("discord.js")
 
 const cooldown = new Map()
 
@@ -13,7 +13,7 @@ const cmd = new Command("clean", "clean up bot commands and responses", categori
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (cooldown.has(message.member.id)) {

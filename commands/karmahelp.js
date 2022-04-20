@@ -1,7 +1,6 @@
 const { Message } = require("discord.js")
-const { getMember } = require("../utils/utils")
 const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("karmahelp", "help about the karma system", categories.INFO)
@@ -10,7 +9,7 @@ const cmd = new Command("karmahelp", "help about the karma system", categories.I
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     const embed = new CustomEmbed(message.member, false).setTitle("karma help")
 
     embed.setDescription(

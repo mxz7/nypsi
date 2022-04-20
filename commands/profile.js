@@ -27,7 +27,7 @@ const cmd = new Command("profile", "view an overview of your profile and data", 
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

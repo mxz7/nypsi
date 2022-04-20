@@ -10,7 +10,7 @@ const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let requiredBet = 1000
 
     if (getPrestige(message.member) > 2) requiredBet = 10000
