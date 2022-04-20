@@ -863,9 +863,9 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         for (const user of commandUses.keys()) {
             let modifier = 2
 
-            if (getKarma(user) > 200) modifier = 2.5
-            if (getKarma(user) > 400) modifier = 3
-            if (getKarma(user) > 500) modifier = 3.3
+            if (getKarma(user) > 200) modifier = 3
+            if (getKarma(user) > 400) modifier = 4
+            if (getKarma(user) > 500) modifier = 5
 
             const amount = Math.floor(commandUses.get(user) / modifier)
 
