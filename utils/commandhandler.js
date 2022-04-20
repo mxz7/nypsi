@@ -3,7 +3,6 @@ const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/u
 const fs = require("fs")
 const { Message, Client, MessageActionRow, MessageButton, GuildMember } = require("discord.js")
 const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
-const { Command, categories } = require("./classes/Command")
 const { CustomEmbed, ErrorEmbed } = require("./classes/EmbedBuilders.js")
 const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
 const { logger, getTimestamp } = require("./logger.js")
