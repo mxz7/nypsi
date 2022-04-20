@@ -1,12 +1,5 @@
 const { Message } = require("discord.js")
-const {
-    hasVoted,
-    userExists,
-    createUser,
-    removeFromVoteCache,
-    getPrestige,
-    getMulti,
-} = require("../utils/economy/utils.js")
+const { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } = require("../utils/economy/utils.js")
 const { Command, categories } = require("../utils/classes/Command.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 
