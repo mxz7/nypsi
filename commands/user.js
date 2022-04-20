@@ -93,7 +93,6 @@ async function run(message, args) {
     if (joinPos == 0) joinPos = "invalid"
 
     const joined = formatDate(member.joinedAt)
-    const daysAgo = timeSince(new Date(member.joinedAt))
     const created = formatDate(member.user.createdAt)
     const roles = member.roles.cache
 
@@ -132,11 +131,3 @@ async function run(message, args) {
 cmd.setRun(run)
 
 module.exports = cmd
-
-function timeSince(date) {
-    const ms = Math.floor(new Date() - date)
-
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-
-    return days
-}

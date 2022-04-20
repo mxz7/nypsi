@@ -1,5 +1,5 @@
 const { inCooldown, addCooldown } = require("../guilds/utils")
-const { Guild, Message, GuildMember, Client, Role } = require("discord.js")
+const { Guild, GuildMember, Client, Role } = require("discord.js")
 const { logger } = require("../logger")
 const { getDatabase } = require("../database/database")
 
@@ -403,7 +403,7 @@ async function requestUnmute(guild, member, client) {
 
     logger.success("mute deleted")
 
-    return await newMember.roles.remove(muteRole).catch((e) => {
+    return await newMember.roles.remove(muteRole).catch(() => {
         logger.error("couldnt remove mute role")
     })
 }

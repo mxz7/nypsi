@@ -18,7 +18,6 @@ if (!process.env.GITHUB_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils
 
 const topgg = require("@top-gg/sdk")
 const express = require("express")
-const { inCooldown, addCooldown } = require("../guilds/utils")
 const { GuildMember, Guild, Client, WebhookClient } = require("discord.js")
 const { CustomEmbed } = require("../classes/EmbedBuilders")
 const { isPremium, getTier } = require("../premium/utils")
@@ -500,7 +499,7 @@ exports.getMultiplier = getMultiplier
 
 /**
  *
- * @param {GuildManager} member
+ * @param {GuildMember} member
  * @returns {Boolean}
  */
 function userExists(member) {
@@ -995,7 +994,7 @@ exports.updateStats = updateStats
 
 /**
  * @returns {Number}
- * @param {Guildmember} member
+ * @param {GuildMember} member
  */
 function getPrestige(member) {
     let id = member
@@ -1083,7 +1082,7 @@ exports.setDMsEnabled = setDMsEnabled
 
 /**
  * @returns {Number}
- * @param {Member} member
+ * @param {GuildMember} member
  */
 async function calcMaxBet(member) {
     const base = 100000
@@ -1301,7 +1300,7 @@ function createStatsProfile(member) {
         id = member.user.id
     }
 
-    stats[member.user.id] = {
+    stats[id] = {
         gamble: {},
         items: {},
         rob: {
@@ -1425,7 +1424,7 @@ exports.getItems = getItems
 
 /**
  * @returns {Number}
- * @param {Guildmember} member
+ * @param {GuildMember} member
  */
 function getMaxBitcoin(member) {
     const base = 2
@@ -1445,7 +1444,7 @@ exports.getMaxBitcoin = getMaxBitcoin
 
 /**
  * @returns {Number}
- * @param {Guildmember} member
+ * @param {GuildMember} member
  */
 function getMaxEthereum(member) {
     return getMaxBitcoin(member) * 10
@@ -1567,8 +1566,6 @@ async function doLottery(client) {
     await lotteryHook.send({ embeds: [embed] })
 
     if (getDMsEnabled(user.id)) {
-        const embed2 = new CustomEmbed()
-
         embed.setTitle("you have won the lottery!")
         embed.setDescription(
             `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`

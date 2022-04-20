@@ -1,4 +1,4 @@
-const { GuildMember } = require("discord.js")
+const { GuildMember, Collection, Message, Guild } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
 const { getDatabase } = require("../database/database")
 const { default: fetch } = require("node-fetch")
