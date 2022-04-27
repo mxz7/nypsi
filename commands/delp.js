@@ -5,7 +5,7 @@ const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("delp", "bulk delete/purge your own messages", categories.MODERATION).setAliases(["dp"])
+const cmd = new Command("delp", "bulk delete/purge your own messages", categories.MODERATION).setAliases(["dp", "d"])
 
 /**
  * @param {Message} message
