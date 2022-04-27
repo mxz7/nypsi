@@ -1,5 +1,4 @@
 const { Message, Collection } = require("discord.js")
-const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
@@ -12,7 +11,7 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", categorie
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message) {
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -41,22 +40,15 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (args.length == 0) {
-        args[0] = 5
-        if (isPremium(message.author.id)) {
-            if (getTier(message.author.id) == 4) {
-                args[0] = 100
-            }
+    let amount = 7
+
+    if (isPremium(message.author.id)) {
+        if (getTier(message.author.id) == 4) {
+            amount = 100
+        } else {
+            amount = 50
         }
     }
-
-    const prefix = getPrefix(message.guild)
-
-    if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}delp <amount>`)] })
-    }
-
-    let amount = parseInt(args[0])
 
     cooldown.set(message.member.id, new Date())
 
@@ -64,17 +56,9 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    if (amount > 100) amount = 100
-
-    if (!isPremium(message.author.id)) {
-        if (amount > 20) {
-            amount = 20
-        }
-    }
-
     let collected
 
-    if (amount <= 6) {
+    if (amount == 7) {
         collected = await message.channel.messages.fetch({ limit: 25 })
     } else {
         collected = await message.channel.messages.fetch({ limit: 100 })
