@@ -21,6 +21,10 @@ class StatsProfile {
     setData(data) {
         for (const d of data) {
             if (d.gamble) {
+                this.gamble[d.type] = {
+                    wins: 0,
+                    lose: 0
+                }
                 this.gamble[d.type].wins = d.win
                 this.gamble[d.type].lose = d.lose
             } else {
