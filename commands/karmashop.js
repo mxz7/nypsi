@@ -211,14 +211,10 @@ async function run(message, args) {
         let selected
 
         for (const itemName of Array.from(Object.keys(items))) {
-            const aliases = items[itemName].aliases ? items[itemName].aliases : []
             if (searchTag == itemName) {
                 selected = itemName
                 break
             } else if (searchTag == itemName.split("_").join("")) {
-                selected = itemName
-                break
-            } else if (aliases.indexOf(searchTag) != 1) {
                 selected = itemName
                 break
             }
