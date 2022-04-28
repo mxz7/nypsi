@@ -12,6 +12,11 @@ const cooldown = new Map()
 const items = require("../utils/karma/items.json")
 
 /**
+ * @type {Map<string, number>}
+ */
+const amount = new Map()
+
+/**
  * @param {Message} message
  * @param {Array<String>} args
  */
@@ -56,6 +61,15 @@ async function run(message, args) {
         return message.channel.send({ embeds: [embed] })
     }
 
+    let limit = 15
+
+    if (isPremium(message.author.id)) {
+        limit = 20
+        if (getTier(message.author.id) == 4) {
+            limit = 50
+        }
+    }
+
     const itemIDs = Array.from(Object.keys(items))
 
     if (args.length == 0 || args.length == 1) {
@@ -79,10 +93,25 @@ async function run(message, args) {
 
         const page = 0
 
-        const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
+        const embed = new CustomEmbed(message.member)
+
+        /**
+         *
+         * @returns {string}
+         */
+        const displayItemsLeft = () => {
+            let text
+            if (amount.has(message.author.id)) {
+                text = `| ${amount.get(message.author.id)}/${limit}`
+            } else {
+                text = `| 0/${limit}`
+            }
+
+            return text
+        }
 
         embed.setTitle("karma shop | " + message.author.username)
-        embed.setFooter(`you have ${getKarma(message.member).toLocaleString()} karma`)
+        embed.setFooter(`you have ${getKarma(message.member).toLocaleString()} karma ${displayItemsLeft()}`)
 
         for (let item of pages[page]) {
             item = items[item]
@@ -151,7 +180,7 @@ async function run(message, args) {
                         newEmbed.setFooter(
                             `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
                                 message.member
-                            ).toLocaleString()} karma`
+                            ).toLocaleString()} karma ${displayItemsLeft()}`
                         )
                         if (currentPage == 0) {
                             row = new MessageActionRow().addComponents(
@@ -185,7 +214,7 @@ async function run(message, args) {
                         newEmbed.setFooter(
                             `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
                                 message.member
-                            ).toLocaleString()} karma`
+                            ).toLocaleString()} karma ${displayItemsLeft()}`
                         )
                         if (currentPage + 1 == lastPage) {
                             row = new MessageActionRow().addComponents(
@@ -206,6 +235,20 @@ async function run(message, args) {
             return pageManager()
         }
     } else if (args[0].toLowerCase() == "buy") {
+        const amountBought = amount.get(message.author.id)
+
+        if (amountBought >= limit) {
+            return message.channel.send({
+                embeds: [
+                    new CustomEmbed(
+                        message.member,
+                        false,
+                        `you have reached your limit for buying from the karma shop (${limit} items)`
+                    ),
+                ],
+            })
+        }
+
         let searchTag = args[1].toLowerCase()
 
         let selected
@@ -306,6 +349,12 @@ async function run(message, args) {
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
             setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15))
+        }
+
+        if (amount.has(message.author.id)) {
+            amount.set(message.author.id, amount.get(message.author.id) + 1)
+        } else {
+            amount.set(message.author.id, 1)
         }
 
         removeKarma(message.member, selected.cost)
