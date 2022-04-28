@@ -57,7 +57,9 @@ async function run(message, args) {
 
     if (!isKarmaShopOpen()) {
         const embed = new CustomEmbed(message.member, false)
-        embed.setDescription("the karma shop is currently closed\nyou can join the [official nypsi server](https://discord.gg/hJTDNST) to be notified when it is opened")
+        embed.setDescription(
+            "the karma shop is currently closed\nyou can join the [official nypsi server](https://discord.gg/hJTDNST) to be notified when it is opened"
+        )
         return message.channel.send({ embeds: [embed] })
     }
 
