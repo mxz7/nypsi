@@ -20,7 +20,7 @@ for (const user in stats) {
     robDB.run(user, "rob", data.rob.wins, data.rob.lose)
 
     for (const item in data.items) {
-       itemDB.run(user, item, data.items[item])
+        itemDB.run(user, item, data.items[item])
     }
 
     for (const game in data.gamble) {
