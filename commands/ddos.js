@@ -70,7 +70,7 @@ async function run(message, args) {
             "**port** *waiting...*" +
             "\n\n" +
             "**status** *online*"
-    ).setTitle("ddos tool | " + message.member.user.username)
+    ).setTitle("ddos tool")
 
     return message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(

@@ -105,7 +105,7 @@ async function run(message, args) {
             message.member,
             false,
             statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
-        ).setTitle(`kick | ${message.author.username}`)
+        )
     }
 
     /**
@@ -183,7 +183,7 @@ async function run(message, args) {
         return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] })
     }
 
-    const embed = new CustomEmbed(message.member).setTitle("kick | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member)
 
     if (reason.split(": ")[1] == "no reason given") {
         embed.setDescription(`✅ **${count}** members kicked`)
