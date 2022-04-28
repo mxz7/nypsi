@@ -136,7 +136,7 @@ exports.getLastCommand = getLastCommand
 function deteriorateKarma() {
     const now = Date.now()
 
-    const threshold = now - 86400000
+    const threshold = now - 43200000
 
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
@@ -149,7 +149,7 @@ function deteriorateKarma() {
         let karmaToRemove = 5
 
         if (now - 604800000 > user.last_command) {
-            karmaToRemove = 25
+            karmaToRemove = 35
         }
 
         if (karmaToRemove > user.karma) {
