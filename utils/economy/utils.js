@@ -28,6 +28,7 @@ const { getDatabase } = require("../database/database")
 const { addKarma, getKarma } = require("../karma/utils")
 const shuffleArray = require("shuffle-array")
 const { MStoTime } = require("../utils")
+const { StatsProfile } = require("../classes/StatsProfile")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -1278,7 +1279,15 @@ exports.reset = reset
  * @param {GuildMember} member
  */
 function getStats(member) {
-    return stats[member.user.id]
+    let id = member
+
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").run(id)
+
+    return new StatsProfile(query)
 }
 
 exports.getStats = getStats
