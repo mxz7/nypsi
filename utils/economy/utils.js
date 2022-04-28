@@ -1360,12 +1360,18 @@ exports.addRob = addRob
  * @param {GuildMember} member
  */
 function addItemUse(member, item) {
-    if (!stats[member.user.id].items) stats[member.user.id].items = {} // remove after season 1
+    let id = member
 
-    if (stats[member.user.id].items[item]) {
-        stats[member.user.id].items[item]++
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item)
+
+    if (query) {
+        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item)
     } else {
-        stats[member.user.id].items[item] = 1
+        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item)
     }
 }
 
