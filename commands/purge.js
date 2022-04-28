@@ -119,7 +119,7 @@ async function run(message, args) {
             message.member,
             false,
             "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
-        ).setTitle("delete | " + message.member.user.tag)
+        ).setTitle("delete")
 
         const m = await message.channel.send({ embeds: [embed] })
         for (let i = 0; i < amount1 / 100; i++) {

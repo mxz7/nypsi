@@ -132,7 +132,7 @@ async function run(message, args) {
         return send({ embeds: [new ErrorEmbed("i was unable to kick any users")] })
     }
 
-    const embed = new CustomEmbed(message.member).setTitle("kick | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member)
 
     if (reason.split(": ")[1] == "no reason given") {
         embed.setDescription(`✅ **${count}** members kicked`)

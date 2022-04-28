@@ -25,7 +25,7 @@ async function run(message, args) {
     if (args.length == 0) {
         const countdowns = getCountdowns(message.guild)
 
-        const embed = new CustomEmbed(message.member, false).setTitle("countdown | " + message.author.username)
+        const embed = new CustomEmbed(message.member, false).setTitle("countdown")
 
         if (Object.keys(countdowns).length == 0) {
             embed.setDescription(`use ${getPrefix(message.guild)}**countdown create** to create a countdown`)
@@ -225,7 +225,7 @@ async function run(message, args) {
     } else {
         const embed = new CustomEmbed(message.member, true)
 
-        embed.setTitle("countdown | " + message.author.username)
+        embed.setTitle("countdown")
         embed.setDescription(
             `${getPrefix(message.guild)}**countdown create** *create a countdown*\n${getPrefix(
                 message.guild
