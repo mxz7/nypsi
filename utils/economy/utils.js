@@ -1,15 +1,6 @@
 const { logger } = require("../logger")
 const fs = require("fs")
 
-let stats
-if (process.env.GITHUB_ACTION) {
-    stats = {}
-} else {
-    stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-}
-
-logger.info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`)
-
 let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 
@@ -28,6 +19,7 @@ const { getDatabase } = require("../database/database")
 const { addKarma, getKarma } = require("../karma/utils")
 const shuffleArray = require("shuffle-array")
 const { MStoTime } = require("../utils")
+const { StatsProfile } = require("../classes/StatsProfile")
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -47,21 +39,6 @@ app.post(
 )
 
 app.listen(5000)
-
-if (!process.env.GITHUB_ACTION) {
-    setInterval(() => {
-        const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-
-        if (JSON.stringify(stats) != JSON.stringify(stats1)) {
-            fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
-                if (err) {
-                    return logger.error(err)
-                }
-                logger.info("economy stats data saved")
-            })
-        }
-    }, 120000 + Math.floor(Math.random() * 60) * 1000)
-}
 
 setInterval(() => {
     const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
@@ -1268,49 +1245,28 @@ function reset() {
 
         logger.info("updated " + user.id)
     }
-    stats = {}
+    db.prepare("DELETE FROM economy_stats")
 }
 
 exports.reset = reset
 
 /**
- * @returns {{}}
+ * @returns {StatsProfile}
  * @param {GuildMember} member
  */
 function getStats(member) {
-    return stats[member.user.id]
-}
-
-exports.getStats = getStats
-
-function hasStatsProfile(member) {
-    if (stats[member.user.id]) {
-        return true
-    } else {
-        return false
-    }
-}
-
-exports.hasStatsProfile = hasStatsProfile
-
-function createStatsProfile(member) {
     let id = member
 
     if (member.user) {
         id = member.user.id
     }
 
-    stats[id] = {
-        gamble: {},
-        items: {},
-        rob: {
-            wins: 0,
-            lose: 0,
-        },
-    }
+    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").all(id)
+
+    return new StatsProfile(query)
 }
 
-exports.createStatsProfile = createStatsProfile
+exports.getStats = getStats
 
 /**
  *
@@ -1319,25 +1275,25 @@ exports.createStatsProfile = createStatsProfile
  * @param {Boolean} win
  */
 function addGamble(member, game, win) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
+    let id = member
 
-    if (stats[member.user.id].gamble[game]) {
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game)
+
+    if (query) {
         if (win) {
-            stats[member.user.id].gamble[game].wins++
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game)
         } else {
-            stats[member.user.id].gamble[game].lose++
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game)
         }
     } else {
         if (win) {
-            stats[member.user.id].gamble[game] = {
-                wins: 1,
-                lose: 0,
-            }
+            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
         } else {
-            stats[member.user.id].gamble[game] = {
-                wins: 0,
-                lose: 1,
-            }
+            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
         }
     }
 }
@@ -1350,12 +1306,26 @@ exports.addGamble = addGamble
  * @param {Boolean} win
  */
 function addRob(member, win) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
+    let id = member
 
-    if (win) {
-        stats[member.user.id].rob.wins++
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = rob").get(id)
+
+    if (query) {
+        if (win) {
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = rob").run(id)
+        } else {
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = rob").run(id)
+        }
     } else {
-        stats[member.user.id].rob.lose++
+        if (win) {
+            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, "rob", 1)
+        } else {
+            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, "rob", 1)
+        }
     }
 }
 
@@ -1366,14 +1336,18 @@ exports.addRob = addRob
  * @param {GuildMember} member
  */
 function addItemUse(member, item) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
+    let id = member
 
-    if (!stats[member.user.id].items) stats[member.user.id].items = {} // remove after season 1
+    if (member.user) {
+        id = member.user.id
+    }
 
-    if (stats[member.user.id].items[item]) {
-        stats[member.user.id].items[item]++
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item)
+
+    if (query) {
+        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item)
     } else {
-        stats[member.user.id].items[item] = 1
+        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item)
     }
 }
 
