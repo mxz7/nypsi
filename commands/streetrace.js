@@ -264,6 +264,7 @@ async function run(message, args) {
         const inventory = getInventory(message.member)
 
         let car
+        let cycle = false
 
         if (args.length == 1) {
             for (const item of Array.from(Object.keys(inventory))) {
@@ -274,7 +275,7 @@ async function run(message, args) {
                     }
                 }
             }
-            if (!car) return send({ embeds: [new ErrorEmbed("you don't have a car")] })
+            if (!car) cycle = true
         } else {
             const searchTag = args[1].toLowerCase()
             for (const itemName of Array.from(Object.keys(items))) {
@@ -292,15 +293,19 @@ async function run(message, args) {
                 }
             }
 
-            car = items[car]
-
             if (!car) {
                 return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
             }
 
-            if (!inventory[car.id] || inventory[car.id] == 0) {
+            car = items[car]
+
+            if ((!inventory[car.id] || inventory[car.id] == 0) && car.id != "cycle") {
                 return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] })
             }
+        }
+
+        if (cycle) {
+            car = items["cycle"]
         }
 
         if (race.speedLimit > 0 && car.speed > race.speedLimit) {
@@ -330,10 +335,27 @@ async function run(message, args) {
                 })
             } else {
                 current.push(car.id)
-                carCooldown.set(message.author.id, current)
+                if (car.id != "cycle") {
+                    carCooldown.set(message.author.id, current)
+
+                    setTimeout(() => {
+                        current = carCooldown.get(message.author.id)
+                        current.splice(current.indexOf(car.id), 1)
+
+                        if (current.length == 0) {
+                            carCooldown.delete(message.author.id)
+                        } else {
+                            carCooldown.set(message.author.id, current)
+                        }
+                    }, 120000)
+                }
+            }
+        } else {
+            if (car.id != "cycle") {
+                carCooldown.set(message.author.id, [car.id])
 
                 setTimeout(() => {
-                    current = carCooldown.get(message.author.id)
+                    const current = carCooldown.get(message.author.id)
                     current.splice(current.indexOf(car.id), 1)
 
                     if (current.length == 0) {
@@ -343,19 +365,6 @@ async function run(message, args) {
                     }
                 }, 120000)
             }
-        } else {
-            carCooldown.set(message.author.id, [car.id])
-
-            setTimeout(() => {
-                const current = carCooldown.get(message.author.id)
-                current.splice(current.indexOf(car.id), 1)
-
-                if (current.length == 0) {
-                    carCooldown.delete(message.author.id)
-                } else {
-                    carCooldown.set(message.author.id, current)
-                }
-            }, 120000)
         }
 
         updateBalance(message.member, getBalance(message.member) - race.bet)
