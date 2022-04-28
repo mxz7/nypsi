@@ -28,7 +28,7 @@ cmd.slashData
     .addSubcommand((join) =>
         join
             .setName("join")
-            .setDescription("join an existing race in the channel")
+            .setDescription("join an existing race in the channel (you will need a car, or you can use the bicycle)")
             .addStringOption((option) =>
                 option
                     .setName("car")
@@ -43,6 +43,7 @@ cmd.slashData
                     .addChoice("🚗 tesla model x", "tesla_modelx")
                     .addChoice("🏎️ toyota supra mk4", "toyota_supra")
                     .addChoice("🚗 corsa 2003", "vauxhall_corsa")
+                    .addChoice("🚲 bicycle", "bike")
             )
     )
 
