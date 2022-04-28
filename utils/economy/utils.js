@@ -1309,9 +1309,9 @@ function addGamble(member, game, win) {
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ?").run(id)
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game)
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ?").run(id)
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game)
         }
     } else {
         if (win) {
