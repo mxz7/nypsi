@@ -1,15 +1,6 @@
 const { logger } = require("../logger")
 const fs = require("fs")
 
-let stats
-if (process.env.GITHUB_ACTION) {
-    stats = {}
-} else {
-    stats = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-}
-
-logger.info(`${Array.from(Object.keys(stats)).length.toLocaleString()} economy stats users loaded`)
-
 let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
 
@@ -48,21 +39,6 @@ app.post(
 )
 
 app.listen(5000)
-
-if (!process.env.GITHUB_ACTION) {
-    setInterval(() => {
-        const stats1 = JSON.parse(fs.readFileSync("./utils/economy/stats.json"))
-
-        if (JSON.stringify(stats) != JSON.stringify(stats1)) {
-            fs.writeFile("./utils/economy/stats.json", JSON.stringify(stats), (err) => {
-                if (err) {
-                    return logger.error(err)
-                }
-                logger.info("economy stats data saved")
-            })
-        }
-    }, 120000 + Math.floor(Math.random() * 60) * 1000)
-}
 
 setInterval(() => {
     const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
@@ -1269,7 +1245,7 @@ function reset() {
 
         logger.info("updated " + user.id)
     }
-    stats = {}
+    db.prepare("DELETE FROM economy_stats")
 }
 
 exports.reset = reset
