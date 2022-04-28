@@ -42,9 +42,7 @@ async function run(message, args) {
 
     setReason(message.guild, caseID, reason)
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle("reason")
-        .setDescription("✅ case updated")
+    const embed = new CustomEmbed(message.member).setTitle("reason").setDescription("✅ case updated")
 
     return message.channel.send({ embeds: [embed] })
 }
