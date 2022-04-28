@@ -1292,16 +1292,6 @@ function getStats(member) {
 
 exports.getStats = getStats
 
-function hasStatsProfile(member) {
-    if (stats[member.user.id]) {
-        return true
-    } else {
-        return false
-    }
-}
-
-exports.hasStatsProfile = hasStatsProfile
-
 function createStatsProfile(member) {
     let id = member
 
@@ -1328,8 +1318,6 @@ exports.createStatsProfile = createStatsProfile
  * @param {Boolean} win
  */
 function addGamble(member, game, win) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
-
     if (stats[member.user.id].gamble[game]) {
         if (win) {
             stats[member.user.id].gamble[game].wins++
@@ -1359,8 +1347,6 @@ exports.addGamble = addGamble
  * @param {Boolean} win
  */
 function addRob(member, win) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
-
     if (win) {
         stats[member.user.id].rob.wins++
     } else {
@@ -1375,8 +1361,6 @@ exports.addRob = addRob
  * @param {GuildMember} member
  */
 function addItemUse(member, item) {
-    if (!hasStatsProfile(member)) createStatsProfile(member)
-
     if (!stats[member.user.id].items) stats[member.user.id].items = {} // remove after season 1
 
     if (stats[member.user.id].items[item]) {
