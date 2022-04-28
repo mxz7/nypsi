@@ -171,7 +171,7 @@ async function run(message, args) {
     const prefix = getPrefix(message.guild)
 
     const helpCmd = () => {
-        const embed = new CustomEmbed(message.member, true).setTitle("chat reactions | " + message.author.username)
+        const embed = new CustomEmbed(message.member, true).setTitle("chat reactions")
 
         embed.setDescription(
             `${prefix}**cr start** *start a random chat reaction*\n` +
@@ -192,7 +192,7 @@ async function run(message, args) {
             cooldown.delete(message.author.id)
         }, cooldownLength * 1000)
 
-        const embed = new CustomEmbed(message.member, false).setTitle("chat reaction stats | " + message.author.username)
+        const embed = new CustomEmbed(message.member, false).setTitle(`${message.author.username}'s stats`)
 
         const stats = getReactionStats(message.guild, message.member)
 
@@ -402,7 +402,7 @@ async function run(message, args) {
         if (args.length == 1 || args[1].toLowerCase() == "view") {
             const embed = new CustomEmbed(message.member, false)
 
-            embed.setTitle("chat reactions | " + message.author.username)
+            embed.setTitle("chat reactions ")
 
             const settings = getReactionSettings(message.guild)
 
@@ -429,7 +429,7 @@ async function run(message, args) {
             if (args[1].toLowerCase() == "help") {
                 const embed = new CustomEmbed(message.member, false)
 
-                embed.setTitle("chat reactions | " + message.author.username)
+                embed.setTitle("chat reactions")
 
                 embed.setDescription(
                     `${prefix}**cr settings enable** *enable automatic starting*\n` +
@@ -651,7 +651,7 @@ async function run(message, args) {
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions | " + message.author.username)
+            const embed = new CustomEmbed(message.member, false).setTitle("chat reactions")
 
             embed.setDescription(
                 `${prefix}**cr words list** *view the current wordlist*\n` +
@@ -750,7 +750,7 @@ async function run(message, args) {
                 embed.setDescription(
                     "using [default word list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)"
                 )
-                embed.setTitle("chat reactions | " + message.author.username)
+                embed.setTitle("chat reactions")
             } else {
                 /**
                  * @type {Map<Number, Array<String>>}
