@@ -1275,7 +1275,7 @@ function reset() {
 exports.reset = reset
 
 /**
- * @returns {{}}
+ * @returns {StatsProfile}
  * @param {GuildMember} member
  */
 function getStats(member) {
