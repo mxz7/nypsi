@@ -3,7 +3,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
 const { inPlaceSort } = require("fast-sort")
-const { isPremium, getTier } = require("../utils/premium/utils")
+const { isPremium, getTier, setExpireDate } = require("../utils/premium/utils")
 const { updateXp, getXp, userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
 
 const cmd = new Command("karmashop", "buy stuff with your karma", categories.INFO)
@@ -211,14 +211,10 @@ async function run(message, args) {
         let selected
 
         for (const itemName of Array.from(Object.keys(items))) {
-            const aliases = items[itemName].aliases ? items[itemName].aliases : []
             if (searchTag == itemName) {
                 selected = itemName
                 break
             } else if (searchTag == itemName.split("_").join("")) {
-                selected = itemName
-                break
-            } else if (aliases.indexOf(searchTag) != 1) {
                 selected = itemName
                 break
             }
@@ -306,6 +302,10 @@ async function run(message, args) {
                 }
 
                 setInventory(message.member, inventory)
+        }
+
+        if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
+            setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15))
         }
 
         removeKarma(message.member, selected.cost)
