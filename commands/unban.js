@@ -101,7 +101,7 @@ async function run(message, args) {
         return send({ embeds: [new ErrorEmbed("i was unable to unban any users")] })
     }
 
-    const embed = new CustomEmbed(message.member).setTitle(`unban | ${message.member.user.username}`)
+    const embed = new CustomEmbed(message.member)
 
     if (members.length == 1) {
         embed.setDescription("✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned")
