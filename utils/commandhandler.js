@@ -951,7 +951,7 @@ async function passedCaptcha(member, client) {
     }
 
     if (captchaPasses.has(member.user.id)) {
-        captchaPasses.set(member.user.id, captchaFails.get(member.user.id) + 1)
+        captchaPasses.set(member.user.id, captchaPasses.get(member.user.id) + 1)
     } else {
         captchaPasses.set(member.user.id, 1)
     }
