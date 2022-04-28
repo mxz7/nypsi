@@ -1315,9 +1315,9 @@ function addGamble(member, game, win) {
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, game, 1)
+            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, game, 1)
+            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
         }
     }
 }
