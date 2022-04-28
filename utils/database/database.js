@@ -78,6 +78,10 @@ function createTables() {
     db.prepare(
         "CREATE TABLE IF NOT EXISTS lottery_tickets ('id' INTEGER NOT NULL PRIMARY KEY, 'user_id' TEXT NOT NULL)"
     ).run()
+
+    db.prepare(
+        "CREATE TABLE IF NOT EXISTS economy_stats ('id' TEXT NOT NULL, 'type' TEXT NOT NULL, 'win' INTEGER NOT NULL DEFAULT 0, 'lose' INTEGER NOT NULL DEFAULT 0, 'gamble' INTEGER NOT NULL DEFAULT 0)"
+    ).run()
 }
 
 createTables()
