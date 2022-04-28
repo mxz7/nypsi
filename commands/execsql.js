@@ -24,7 +24,7 @@ async function run(message, args) {
 
     console.log(
         "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---\n" +
-            "captcha generated to reset economy\n" +
+            "enter the captcha into discord\n" +
             captcha.display +
             "\n--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---"
     )
