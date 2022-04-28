@@ -171,8 +171,9 @@ async function run(message, args) {
 
     let banLength = ""
 
-    const embed = new CustomEmbed(message.member)
-        .setDescription("✅ **" + count + "** members banned for: " + reason.split(": ")[1])
+    const embed = new CustomEmbed(message.member).setDescription(
+        "✅ **" + count + "** members banned for: " + reason.split(": ")[1]
+    )
 
     if (temporary) {
         banLength = getTime(duration * 1000)
