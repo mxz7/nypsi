@@ -54,7 +54,7 @@ async function run(message, args) {
         console.log(res)
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, res)],
+            embeds: [new CustomEmbed(message.member, false, `\`\`\`${JSON.stringify(res)}\`\`\``)],
         })
     }
 }
