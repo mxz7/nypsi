@@ -149,13 +149,11 @@ async function run(message, args) {
 
             setInventory(message.member, inventory)
 
+            updateBalance(message.member, getBalance(message.member) - Math.floor(amountLost * 0.25))
+
             embed2.addField(
                 "**you were caught**",
-                "your lawyer stopped you from losing any money\nyou would have lost $" +
-                    amountLost.toLocaleString() +
-                    " (" +
-                    percentLost +
-                    "%)"
+                `thanks to your lawyer, you only lost $**${Math.floor(amountLost * 0.25).toLocaleString()}**`
             )
             embed2.setColor("#e4334f")
         } else {
