@@ -1,7 +1,7 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getStats, hasStatsProfile, createStatsProfile } = require("../utils/economy/utils")
+const { getStats } = require("../utils/economy/utils")
 
 const cmd = new Command("stats", "view your economy stats", categories.MONEY)
 
@@ -37,8 +37,6 @@ async function run(message, args) {
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 15000)
-
-    if (!hasStatsProfile(message.member)) createStatsProfile(message.member)
 
     const normalStats = () => {
         const stats = getStats(message.member)
