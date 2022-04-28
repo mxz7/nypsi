@@ -447,7 +447,7 @@ exports.showTopGlobalBal = showTopGlobalBal
  * @returns {captcha}
  */
 function createCaptcha() {
-    return new captcha(Math.floor(Math.random() * 16777215).toString(16))
+    return new captcha(Math.random().toString(36).substr(2, 7))
 }
 
 exports.createCaptcha = createCaptcha
