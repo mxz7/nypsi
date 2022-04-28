@@ -1285,7 +1285,7 @@ function getStats(member) {
         id = member.user.id
     }
 
-    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").run(id)
+    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").all(id)
 
     return new StatsProfile(query)
 }
@@ -1293,7 +1293,15 @@ function getStats(member) {
 exports.getStats = getStats
 
 function hasStatsProfile(member) {
-    if (stats[member.user.id]) {
+    let id = member
+
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ?").get(id)
+
+    if (query) {
         return true
     } else {
         return false
