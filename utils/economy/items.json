@@ -545,6 +545,16 @@
         "worth": 400000,
         "aliases": ["handcuff"]
     },
+    "cycle": {
+        "id": "cycle",
+        "name": "cycle",
+        "emoji": "🚲",
+        "description": "wow",
+        "rarity": 100,
+        "role": "car",
+        "speed": 0,
+        "worth": 0
+    },
     "smart_car": {
         "id": "smart_car",
         "name": "smart car",
