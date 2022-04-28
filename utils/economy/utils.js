@@ -1312,13 +1312,13 @@ function addRob(member, win) {
         id = member.user.id
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = rob").get(id)
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = 'rob'").get(id)
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = rob").run(id)
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = 'rob'").run(id)
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = rob").run(id)
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = 'rob'").run(id)
         }
     } else {
         if (win) {
