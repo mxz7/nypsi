@@ -6,7 +6,7 @@
         "id": "bronze",
         "cost": 100,
         "unlimited": false,
-        "items_left": 5
+        "items_left": 3
     },
     "silver": {
         "name": "silver membership",
@@ -15,7 +15,7 @@
         "id": "silver",
         "cost": 300,
         "unlimited": false,
-        "items_left": 3
+        "items_left": 2
     },
     "gold": {
         "name": "gold membership",
