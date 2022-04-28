@@ -445,6 +445,28 @@ function addUse(id) {
 
 exports.addUse = addUse
 
+/**
+ * 
+ * @param {GuildMember} member 
+ * @param {number} date 
+ */
+function setExpireDate(member, date) {
+    let id = member
+    if (member.user) {
+        id = member.user.id
+    }
+
+    db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(date, id)
+
+    const { requestDM } = require("../../nypsi")
+    requestDM(
+        id,
+        `your membership will now expire on **${formatDate(date)}**`
+    )
+}
+
+exports.setExpireDate = setExpireDate
+
 function createPremUser(query) {
     return PremUser.fromData({
         id: query.id,
