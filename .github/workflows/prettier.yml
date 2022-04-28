@@ -19,9 +19,13 @@ jobs:
             - name: formatting
               run: npm run format
 
-            - name: push changes
-              uses: EndBug/add-and-commit@v8
+            - name: create pr
+              uses: peter-evans/create-pull-request@v4
               with:
-                message: "style: prettier formatting"
-                committer_name: GitHub Actions
-                committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+                commit-message: 'style: prettier formatting'
+                title: 'style: prettier formatting'
+                body: 'code formatting'
+                branch: formatting
+                delete-branch: true
+                labels: style
+                assignees: tekoh
