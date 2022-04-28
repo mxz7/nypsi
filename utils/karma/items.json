@@ -2,7 +2,7 @@
     "bronze": {
         "name": "bronze membership",
         "emoji": "<:xbronze:820243846461128736>",
-        "description": "access to nypsi's bronze tier for 35 days",
+        "description": "access to nypsi's bronze tier for 15 days",
         "id": "bronze",
         "cost": 100,
         "unlimited": false,
@@ -11,7 +11,7 @@
     "silver": {
         "name": "silver membership",
         "emoji": "<:xsilver:820243846507003924>",
-        "description": "access to nypsi's silver tier for 35 days",
+        "description": "access to nypsi's silver tier for 15 days",
         "id": "silver",
         "cost": 300,
         "unlimited": false,
@@ -20,7 +20,7 @@
     "gold": {
         "name": "gold membership",
         "emoji": "<:xgold:820243845950341122>",
-        "description": "access to nypsi's gold tier for 35 days",
+        "description": "access to nypsi's gold tier for 15 days",
         "id": "gold",
         "cost": 500,
         "unlimited": false,
