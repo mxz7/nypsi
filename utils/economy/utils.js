@@ -1299,23 +1299,25 @@ exports.getStats = getStats
  * @param {Boolean} win
  */
 function addGamble(member, game, win) {
-    if (stats[member.user.id].gamble[game]) {
+    let id = member
+
+    if (member.user) {
+        id = member.user.id
+    }
+
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game)
+
+    if (query) {
         if (win) {
-            stats[member.user.id].gamble[game].wins++
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ?").run(id)
         } else {
-            stats[member.user.id].gamble[game].lose++
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ?").run(id)
         }
     } else {
         if (win) {
-            stats[member.user.id].gamble[game] = {
-                wins: 1,
-                lose: 0,
-            }
+            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, game, 1)
         } else {
-            stats[member.user.id].gamble[game] = {
-                wins: 0,
-                lose: 1,
-            }
+            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, game, 1)
         }
     }
 }
