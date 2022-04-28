@@ -1,7 +1,7 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
-const { getStats, createStatsProfile } = require("../utils/economy/utils")
+const { getStats } = require("../utils/economy/utils")
 
 const cmd = new Command("stats", "view your economy stats", categories.MONEY)
 

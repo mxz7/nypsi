@@ -1292,25 +1292,6 @@ function getStats(member) {
 
 exports.getStats = getStats
 
-function createStatsProfile(member) {
-    let id = member
-
-    if (member.user) {
-        id = member.user.id
-    }
-
-    stats[id] = {
-        gamble: {},
-        items: {},
-        rob: {
-            wins: 0,
-            lose: 0,
-        },
-    }
-}
-
-exports.createStatsProfile = createStatsProfile
-
 /**
  *
  * @param {GuildMember} member
