@@ -97,7 +97,7 @@ async function run(message) {
         })
 
         const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked").setTitle(
-            "lockdown | " + message.member.user.username
+            "lockdown"
         )
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
@@ -108,7 +108,7 @@ async function run(message) {
             SEND_MESSAGES: null,
         })
         const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked").setTitle(
-            "lockdown | " + message.member.user.username
+            "lockdown"
         )
 
         return message.channel.send({ embeds: [embed] }).catch(() => {
