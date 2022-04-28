@@ -46,7 +46,7 @@ async function run(message, args) {
                     )}**muterole update** *update mute permissions for every channel*\n\ncurrent mute role: ${
                         role ? role.toString() : "default"
                     }`
-                ).setTitle("muterole | " + message.author.username),
+                ).setTitle("muterole"),
             ],
         })
     }

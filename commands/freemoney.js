@@ -62,7 +62,7 @@ async function run(message) {
     updateBalance(message.member, getBalance(message.member) + amount)
 
     const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setTitle(
-        "freemoney | " + message.member.user.username
+        "freemoney"
     )
 
     message.channel.send({ embeds: [embed] }).then((msg) => {

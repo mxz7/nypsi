@@ -123,9 +123,7 @@ async function run(message, args) {
         return send({ embeds: [new ErrorEmbed("i was unable to warn any users")] })
     }
 
-    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason).setTitle(
-        "warn | " + message.member.user.username
-    )
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason)
 
     if (count == 1 && failed.length == 0) {
         embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason)

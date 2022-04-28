@@ -68,7 +68,7 @@ async function run(message, args) {
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle("case " + case0.case_id + " | " + message.member.user.username)
+        .setTitle("case " + case0.case_id)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
         .addField("date/time", `<t:${Math.floor(case0.time / 1000)}>`, true)

@@ -48,7 +48,7 @@ async function run(message, args) {
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const embed = new CustomEmbed(message.member, true).setTitle("top cases | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, true).setTitle("top cases")
 
     const prefix = getPrefix(message.guild)
 
