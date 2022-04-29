@@ -407,7 +407,7 @@ exports.getCommand = getCommand
  * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  */
 function getUserCommand(id) {
-    return commands[id]
+    return db.prepare("SELECT * FROM premium_commands WHERE owner = ?").get(id)
 }
 
 exports.getUserCommand = getUserCommand
