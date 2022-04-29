@@ -1,34 +1,14 @@
 const { GuildMember } = require("discord.js")
-const fs = require("fs")
 const { PremUser } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
 const { logger } = require("../logger")
 const { formatDate } = require("../utils")
 
-let commands = {}
-if (!process.env.GITHUB_ACTION) commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
-
-logger.info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`)
 const db = getDatabase()
 
 const isPremiumCache = new Map()
 const tierCache = new Map()
 const colorCache = new Map()
-
-if (!process.env.GITHUB_ACTION) {
-    setInterval(() => {
-        const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
-
-        if (JSON.stringify(commands) != JSON.stringify(data1)) {
-            fs.writeFile("./utils/premium/commands.json", JSON.stringify(commands), (err) => {
-                if (err) {
-                    return logger.error(err)
-                }
-                logger.info("premium commands data saved")
-            })
-        }
-    }, 120000 + Math.floor(Math.random() * 60) * 1000)
-}
 
 setInterval(async () => {
     const now = new Date().getTime()
@@ -385,23 +365,18 @@ function getLastWeekly(member) {
 exports.getLastWeekly = getLastWeekly
 
 /**
- * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number } || null}
  * @param {String} name
  */
 function getCommand(name) {
-    for (let cmd in commands) {
-        cmd = commands[cmd]
-
-        if (cmd.trigger == name) {
-            if (!isPremium(cmd.owner) || getTier(cmd.owner) < 3) {
-                delete commands[cmd]
-                return null
-            }
-
-            return cmd
-        }
+    const query = db.prepare("SELECT * FROM premium_commands WHERE trigger = ?").get(name)
+    
+    if (query) {
+        if (!isPremium(query.owner)) return null
+        return query
+    } else {
+        return null
     }
-    return null
 }
 
 exports.getCommand = getCommand
@@ -412,7 +387,7 @@ exports.getCommand = getCommand
  * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  */
 function getUserCommand(id) {
-    return commands[id]
+    return db.prepare("SELECT * FROM premium_commands WHERE owner = ?").get(id)
 }
 
 exports.getUserCommand = getUserCommand
@@ -425,22 +400,19 @@ exports.getUserCommand = getUserCommand
  * @param {Number} uses
  */
 function setCommand(id, trigger, content) {
-    commands[id] = {
-        trigger: trigger,
-        content: content,
-        owner: id,
-        uses: 0,
+    const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").get(id)
+
+    if (query) {
+        db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(trigger, content, id)
+    } else {
+        db.prepare("INSERT INTO premium_commands (trigger, content, owner, uses) VALUES (?, ?, ?, 0)").run(trigger, content, id)
     }
 }
 
 exports.setCommand = setCommand
 
 function addUse(id) {
-    if (!commands[id].uses) {
-        commands[id].uses = 1
-    } else {
-        commands[id].uses++
-    }
+    db.prepare("UPDATE premium_commands SET uses = uses + 1 WHERE owner = ?").run(id)
 }
 
 exports.addUse = addUse
