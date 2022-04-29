@@ -370,7 +370,7 @@ exports.getLastWeekly = getLastWeekly
  */
 function getCommand(name) {
     const query = db.prepare("SELECT * FROM premium_commands WHERE trigger = ?").get(name)
-    
+
     if (query) {
         if (!isPremium(query.owner)) return null
         return query
@@ -403,9 +403,17 @@ function setCommand(id, trigger, content) {
     const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").get(id)
 
     if (query) {
-        db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(trigger, content, id)
+        db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(
+            trigger,
+            content,
+            id
+        )
     } else {
-        db.prepare("INSERT INTO premium_commands (trigger, content, owner, uses) VALUES (?, ?, ?, 0)").run(trigger, content, id)
+        db.prepare("INSERT INTO premium_commands (trigger, content, owner, uses) VALUES (?, ?, ?, 0)").run(
+            trigger,
+            content,
+            id
+        )
     }
 }
 
