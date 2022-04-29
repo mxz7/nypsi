@@ -1,34 +1,14 @@
 const { GuildMember } = require("discord.js")
-const fs = require("fs")
 const { PremUser } = require("../classes/PremStorage")
 const { getDatabase } = require("../database/database")
 const { logger } = require("../logger")
 const { formatDate } = require("../utils")
 
-let commands = {}
-if (!process.env.GITHUB_ACTION) commands = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
-
-logger.info(`${Array.from(Object.keys(commands)).length.toLocaleString()} custom commands loaded`)
 const db = getDatabase()
 
 const isPremiumCache = new Map()
 const tierCache = new Map()
 const colorCache = new Map()
-
-if (!process.env.GITHUB_ACTION) {
-    setInterval(() => {
-        const data1 = JSON.parse(fs.readFileSync("./utils/premium/commands.json"))
-
-        if (JSON.stringify(commands) != JSON.stringify(data1)) {
-            fs.writeFile("./utils/premium/commands.json", JSON.stringify(commands), (err) => {
-                if (err) {
-                    return logger.error(err)
-                }
-                logger.info("premium commands data saved")
-            })
-        }
-    }, 120000 + Math.floor(Math.random() * 60) * 1000)
-}
 
 setInterval(async () => {
     const now = new Date().getTime()
