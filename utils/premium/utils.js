@@ -432,11 +432,7 @@ function setCommand(id, trigger, content) {
 exports.setCommand = setCommand
 
 function addUse(id) {
-    if (!commands[id].uses) {
-        commands[id].uses = 1
-    } else {
-        commands[id].uses++
-    }
+    db.prepare("UPDATE premium_commands SET uses = uses + 1 WHERE owner = ?").run(id)
 }
 
 exports.addUse = addUse
