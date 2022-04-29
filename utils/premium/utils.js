@@ -385,23 +385,18 @@ function getLastWeekly(member) {
 exports.getLastWeekly = getLastWeekly
 
 /**
- * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
+ * @returns {{ trigger: String, content: String, owner: String, uses: Number } || null}
  * @param {String} name
  */
 function getCommand(name) {
-    for (let cmd in commands) {
-        cmd = commands[cmd]
-
-        if (cmd.trigger == name) {
-            if (!isPremium(cmd.owner) || getTier(cmd.owner) < 3) {
-                delete commands[cmd]
-                return null
-            }
-
-            return cmd
-        }
+    const query = db.prepare("SELECT * FROM premium_commands WHERE trigger = ?").get(name)
+    
+    if (query) {
+        if (!isPremium(query.owner)) return null
+        return query
+    } else {
+        return null
     }
-    return null
 }
 
 exports.getCommand = getCommand
