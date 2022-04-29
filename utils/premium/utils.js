@@ -420,7 +420,7 @@ exports.getUserCommand = getUserCommand
  * @param {Number} uses
  */
 function setCommand(id, trigger, content) {
-    const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").run(id)
+    const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").get(id)
 
     if (query) {
         db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(trigger, content, id)
