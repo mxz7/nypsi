@@ -22,7 +22,6 @@ const bdsmLinks = [
 const thighsLinks = [
     "https://www.reddit.com/r/legs.json?limit=777",
     "https://www.reddit.com/r/thickthighs.json?limit=777",
-    "https://www.reddit.com/r/thighs.json?limit=777",
 ]
 const boobLinks = [
     "https://www.reddit.com/r/Boobies.json?limit=777",
