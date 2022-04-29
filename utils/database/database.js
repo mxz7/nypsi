@@ -84,7 +84,7 @@ function createTables() {
     ).run()
 
     db.prepare(
-        "CREATE TABLE IF NOT EXISTS premium_commands ('owner' TEXT NOT NULL PRIMARY KEY, 'trigger' TEXT NOT NULL, 'response' TEXT NOT NULL, 'uses' INTEGER NOT NULL DEFAULT 0)"
+        "CREATE TABLE IF NOT EXISTS premium_commands ('owner' TEXT NOT NULL PRIMARY KEY, 'trigger' TEXT NOT NULL, 'content' TEXT NOT NULL, 'uses' INTEGER NOT NULL DEFAULT 0)"
     ).run()
 }
 
