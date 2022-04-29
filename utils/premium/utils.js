@@ -420,11 +420,12 @@ exports.getUserCommand = getUserCommand
  * @param {Number} uses
  */
 function setCommand(id, trigger, content) {
-    commands[id] = {
-        trigger: trigger,
-        content: content,
-        owner: id,
-        uses: 0,
+    const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").run(id)
+
+    if (query) {
+        db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(trigger, content, id)
+    } else {
+        db.prepare("INSERT INTO premium_commands (trigger, content, owner, uses) VALUES (?, ?, ?, 0)").run(trigger, content, id)
     }
 }
 
