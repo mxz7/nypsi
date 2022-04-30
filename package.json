@@ -2,7 +2,7 @@
   "name": "nypsi",
   "version": "3.0.1",
   "description": "",
-  "main": "nypsi.js",
+  "main": "dist/nypsi.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
