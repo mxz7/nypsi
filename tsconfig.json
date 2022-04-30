@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "target": "ESNext",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "allowJs": true
+    },
+}
