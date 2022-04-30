@@ -1,4 +1,4 @@
-const { workMessages } = require("../lists.json")
+const { workMessages } = require("../../lists.json")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const { Command, categories } = require("../utils/classes/Command")
