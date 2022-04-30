@@ -41,6 +41,7 @@
     "eslint-plugin-jsdoc": "^39.2.9",
     "husky": "^7.0.4",
     "install": "^0.13.0",
+    "lint-staged": "^12.4.1",
     "prettier": "2.6.2"
   },
   "repository": {
