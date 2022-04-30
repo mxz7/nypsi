@@ -149,7 +149,7 @@ function toStorage(array, seperator) {
 exports.toStorage = toStorage
 
 /**
- * @returns {Database}
+ * @returns {Database.Database}
  */
 function getDatabase() {
     return db
