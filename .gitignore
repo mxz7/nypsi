@@ -18,3 +18,4 @@ dist/
 !.eslintrc.json
 !.prettierrc.json
 !.prettierignore
+!tsconfig.json
