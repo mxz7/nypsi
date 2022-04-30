@@ -534,11 +534,13 @@ async function runCommand(cmd, message, args) {
 
     logCommand(message, args)
     if (alias) {
-        if (isEcoBanned(message.author.id)) {
-            if (commands.get(aliases.get(cmd)).category == "money") {
+        if (commands.get(aliases.get(cmd)).category == "money") {
+            if (isEcoBanned(message.author.id)) {
                 return
             }
-        } else if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
+        }
+        
+        if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
@@ -570,11 +572,13 @@ async function runCommand(cmd, message, args) {
         commands.get(aliases.get(cmd)).run(message, args)
         updateLastCommand(message.member)
     } else {
-        if (isEcoBanned(message.author.id)) {
-            if (commands.get(cmd).category == "money") {
+        if (commands.get(cmd).category == "money") {
+            if (isEcoBanned(message.author.id)) {
                 return
             }
-        } else if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
+        }
+        
+        if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
             const diff = Math.round((curr - init) / 1000)
