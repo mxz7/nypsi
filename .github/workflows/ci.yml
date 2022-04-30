@@ -47,6 +47,7 @@ jobs:
 
             - name: build
               run: tsc
+              run: ./setup.sh
 
             - name: run bot
               if: env.BOT_TOKEN != null
