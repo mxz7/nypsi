@@ -116,7 +116,7 @@ setInterval(() => {
  */
 function loadItems() {
     let txt = ""
-    items = JSON.parse(fs.readFileSync("./utils/economy/items.json"))
+    items = JSON.parse(fs.readFileSync("./items.json"))
     logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`)
 
     txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`

@@ -13,6 +13,7 @@ out/
 
 !lists.json
 !items.json
+!karmashop.json
 !package.json
 !package-lock.json
 !slotsmulti.json
