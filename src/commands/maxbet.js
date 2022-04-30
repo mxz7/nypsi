@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
 const { calcMaxBet, userExists, createUser } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command("maxbet", "calculate your maximum bet", categories.MONEY)
+const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY)
 
 /**
  * @param {Message} message

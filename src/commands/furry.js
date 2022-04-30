@@ -1,14 +1,14 @@
 const { Message } = require("discord.js")
 const { updateXp, getXp, userExists, createUser } = require("../utils/economy/utils.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getMember } = require("../utils/utils")
 
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("furry", "measure how much of a furry you are", categories.FUN).setAliases(["howfurry", "stfufurry"])
+const cmd = new Command("furry", "measure how much of a furry you are", Categories.FUN).setAliases(["howfurry", "stfufurry"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"))

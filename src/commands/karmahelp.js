@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("karmahelp", "help about the karma system", categories.INFO)
+const cmd = new Command("karmahelp", "help about the karma system", Categories.INFO)
 
 /**
  * @param {Message} message

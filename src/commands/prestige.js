@@ -15,10 +15,10 @@ const {
     getInventory,
     setInventory,
 } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
-const cmd = new Command("prestige", "prestige to gain extra benefits", categories.MONEY)
+const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY)
 
 const cooldown = new Map()
 

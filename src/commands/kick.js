@@ -1,10 +1,10 @@
 const { Message, Permissions } = require("discord.js")
 const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("kick", "kick one or more users", categories.MODERATION)
+const cmd = new Command("kick", "kick one or more users", Categories.MODERATION)
     .setPermissions(["KICK_MEMBERS"])
     .setAliases(["fuckoff"])
 

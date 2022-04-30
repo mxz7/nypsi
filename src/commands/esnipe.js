@@ -1,8 +1,8 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("esnipe", "snipe the most recently edited message", categories.FUN).setAliases(["es"])
+const cmd = new Command("esnipe", "snipe the most recently edited message", Categories.FUN).setAliases(["es"])
 
 /**
  * @param {Message} message

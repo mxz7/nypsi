@@ -14,7 +14,7 @@ const {
     addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -46,7 +46,7 @@ const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "
 
 const cooldown = new Map()
 
-const cmd = new Command("slots", "play slots", categories.MONEY)
+const cmd = new Command("slots", "play slots", Categories.MONEY)
 
 cmd.slashEnabled = true
 

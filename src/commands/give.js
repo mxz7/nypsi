@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     isEcoBanned,
@@ -18,7 +18,7 @@ const { payment } = require("../utils/logger")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { getMember } = require("../utils/utils")
 
-const cmd = new Command("give", "give other users items from your inventory", categories.MONEY)
+const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY)
 
 const cooldown = new Map()
 

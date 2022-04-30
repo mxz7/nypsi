@@ -1,13 +1,13 @@
 const { getMember } = require("../utils/utils")
 const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("history", "view punishment history for a given user", categories.MODERATION)
+const cmd = new Command("history", "view punishment history for a given user", Categories.MODERATION)
     .setAliases(["modlogs", "hist"])
     .setPermissions(["MANAGE_MESSAGES"])
 

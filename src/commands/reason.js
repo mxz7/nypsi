@@ -1,10 +1,10 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, setReason } = require("../utils/moderation/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("reason", "set a reason for a case/punishment", categories.MODERATION).setPermissions([
+const cmd = new Command("reason", "set a reason for a case/punishment", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
 ])
 

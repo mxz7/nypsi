@@ -1,5 +1,5 @@
 const { Message, User } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     userExists,
@@ -13,7 +13,7 @@ const {
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("streetrace", "create or join a street race", categories.MONEY).setAliases(["sr"])
+const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"])
 
 cmd.slashEnabled = true
 cmd.slashData

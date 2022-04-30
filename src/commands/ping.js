@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command(
     "ping",
     "measured by timing how long it takes for a message to be sent - rate limiting can affect this",
-    categories.INFO
+    Categories.INFO
 ).setAliases(["latency"])
 
 /**

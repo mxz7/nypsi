@@ -15,13 +15,13 @@ const {
     getInventory,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { daysAgo, daysUntil } = require("../utils/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("profile", "view an overview of your profile and data", categories.INFO)
+const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO)
 
 /**
  * @param {Message} message

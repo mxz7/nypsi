@@ -13,7 +13,7 @@ const {
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -21,7 +21,7 @@ const { gamble } = require("../utils/logger.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("rockpaperscissors", "play rock paper scissors", categories.MONEY).setAliases(["rps"])
+const cmd = new Command("rockpaperscissors", "play rock paper scissors", Categories.MONEY).setAliases(["rps"])
 
 cmd.slashEnabled = true
 cmd.slashData

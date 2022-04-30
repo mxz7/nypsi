@@ -1,5 +1,5 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
 const {
@@ -11,7 +11,7 @@ const {
 } = require("../utils/users/utils")
 const { getMember, formatDate } = require("../utils/utils")
 
-const cmd = new Command("usernamehistory", "view a user's username history", categories.INFO).setAliases(["un", "usernames"])
+const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases(["un", "usernames"])
 
 const cooldown = new Map()
 

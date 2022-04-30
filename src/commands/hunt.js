@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getInventory, getItems, setInventory, addItemUse } = require("../utils/economy/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const cmd = new Command("hunt", "go to a field and hunt", categories.MONEY)
+const cmd = new Command("hunt", "go to a field and hunt", Categories.MONEY)
 
 cmd.slashEnabled = true
 

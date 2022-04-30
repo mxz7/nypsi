@@ -1,10 +1,10 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
 const { setMuteRole, getMuteRole, createProfile, profileExists } = require("../utils/moderation/utils")
 
-const cmd = new Command("muterole", "set the muterole for the server", categories.ADMIN).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"])
 
 /**
  * @param {Message} message

@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getPrestige } = require("../utils/economy/utils")
 
-const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", categories.MONEY)
+const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", Categories.MONEY)
 
 /**
  *

@@ -10,13 +10,13 @@ const {
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
 const shuffle = require("shuffle-array")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", categories.MONEY)
+const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY)
 
 /**
  * @param {Message} message

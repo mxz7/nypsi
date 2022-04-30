@@ -1,10 +1,10 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("purge", "bulk delete/purge messages", categories.MODERATION)
+const cmd = new Command("purge", "bulk delete/purge messages", Categories.MODERATION)
     .setAliases(["del"])
     .setPermissions(["MANAGE_MESSAGES"])
 

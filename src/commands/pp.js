@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -7,7 +7,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("pp", "accurate prediction of your pp size", categories.FUN).setAliases([
+const cmd = new Command("pp", "accurate prediction of your pp size", Categories.FUN).setAliases([
     "penis",
     "12inchmonster",
     "1inchwarrior",

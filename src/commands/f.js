@@ -1,11 +1,11 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command("f", "pay your respects", categories.FUN)
+const cmd = new Command("f", "pay your respects", Categories.FUN)
 
 /**
  *

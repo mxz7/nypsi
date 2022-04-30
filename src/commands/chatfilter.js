@@ -1,9 +1,9 @@
 const { Message, Permissions } = require("discord.js")
 const { getChatFilter, updateChatFilter, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("chatfilter", "change the chat filter for your server", categories.ADMIN)
+const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
     .setAliases(["filter"])
     .setPermissions(["MANAGE_SERVER"])
 
