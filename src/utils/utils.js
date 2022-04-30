@@ -406,7 +406,7 @@ async function showTopGlobalBal(client) {
 
     const postGlobalBalTop = async () => {
         const { topAmountGlobal } = require("./economy/utils")
-        const { CustomEmbed } = require("./classes/EmbedBuilders")
+        const { CustomEmbed } = require("./models/EmbedBuilders")
         const guild = await client.guilds.fetch("747056029795221513")
 
         if (!guild) {
@@ -516,7 +516,7 @@ async function suggestWholesomeImage(submitter, image) {
 
     query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image)
 
-    const { CustomEmbed } = require("./classes/EmbedBuilders")
+    const { CustomEmbed } = require("./models/EmbedBuilders")
 
     const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + query.id)
 

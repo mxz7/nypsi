@@ -1,6 +1,6 @@
 const { Guild, Client } = require("discord.js")
-const { CustomEmbed } = require("../classes/EmbedBuilders")
-const { Countdown } = require("../classes/GuildStorage")
+const { CustomEmbed } = require("../models/EmbedBuilders")
+const { Countdown } = require("../models/GuildStorage")
 const { getDatabase, toArray, toStorage } = require("../database/database")
 const { logger } = require("../logger")
 const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")

@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
+const { Command, categories } = require("../utils/models/Command")
 const { toggleLock } = require("../utils/utils")
 
 const cmd = new Command("captchatest", "test an account", categories.NONE)

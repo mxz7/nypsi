@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
+const { Command, categories } = require("../utils/models/Command")
 const { uploadGuildCommands, uploadGuildCommandsGlobal } = require("../utils/commandhandler")
 
 const cmd = new Command("reloadslash", "reload data for slash commands", categories.NONE).setPermissions(["bot owner"])

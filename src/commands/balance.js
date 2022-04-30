@@ -13,8 +13,8 @@ const {
     getPrestige,
     deleteUser,
 } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money", "wallet"])

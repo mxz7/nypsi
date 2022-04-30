@@ -13,8 +13,8 @@ const {
     addGamble,
 } = require("../utils/economy/utils.js")
 const shuffle = require("shuffle-array")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { gamble, logger } = require("../utils/logger.js")

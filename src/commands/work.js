@@ -1,8 +1,8 @@
 const { workMessages } = require("../../lists.json")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()

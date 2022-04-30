@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getKarma } = require("../utils/karma/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 

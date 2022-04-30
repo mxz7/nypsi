@@ -15,8 +15,8 @@ const {
     getInventory,
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { daysAgo, daysUntil } = require("../utils/utils")
 
 const cooldown = new Map()
