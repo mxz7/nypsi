@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getPrestige,
     getWorkers,

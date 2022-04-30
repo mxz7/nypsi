@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
-const { Command, categories } = require("../utils/classes/Command")
+const { Command, categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()

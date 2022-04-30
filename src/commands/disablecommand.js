@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix, getDisabledCommands, updateDisabledCommands } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { commandExists } = require("../utils/commandhandler")
 
 const cmd = new Command("disablecommand", "disable certain commands in your server", categories.ADMIN)

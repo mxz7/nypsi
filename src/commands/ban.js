@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
 const { newCase, profileExists, createProfile, newBan } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("ban", "ban one or more users from the server", categories.MODERATION).setPermissions([
     "BAN_MEMBERS",

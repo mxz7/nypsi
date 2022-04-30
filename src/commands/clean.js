@@ -1,6 +1,6 @@
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 const { Permissions, Message } = require("discord.js")
 
 const cooldown = new Map()

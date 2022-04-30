@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
 const fetch = require("node-fetch")
 const isImageUrl = require("is-image-url")
