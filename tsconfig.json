@@ -5,6 +5,6 @@
         "target": "ESNext",
         "module": "commonjs",
         "noImplicitAny": true,
-        "allowJs": true
+        "allowJs": true,
     },
 }
