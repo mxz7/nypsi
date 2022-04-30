@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { doBackup } = require("../utils/database/database")
 
-const cmd = new Command("dobackup", "start a database backup", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("dobackup", "start a database backup", Categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message

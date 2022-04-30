@@ -13,7 +13,7 @@ const {
     addGamble,
 } = require("../utils/economy/utils.js")
 const shuffle = require("shuffle-array")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -22,7 +22,7 @@ const { gamble, logger } = require("../utils/logger.js")
 const cooldown = new Map()
 const games = new Map()
 
-const cmd = new Command("blackjack", "play blackjack", categories.MONEY).setAliases(["bj", "blowjob"])
+const cmd = new Command("blackjack", "play blackjack", Categories.MONEY).setAliases(["bj", "blowjob"])
 
 cmd.slashEnabled = true
 cmd.slashData.addIntegerOption((option) =>

@@ -1,12 +1,12 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("freemoney", "get $1k every 5 minutes", categories.MONEY).setAliases(["poor", "imbroke"])
+const cmd = new Command("freemoney", "get $1k every 5 minutes", Categories.MONEY).setAliases(["poor", "imbroke"])
 
 /**
  * @param {Message} message

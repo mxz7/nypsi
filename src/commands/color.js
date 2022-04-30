@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("color", "get a random hex color code", categories.INFO).setAliases(["colour"])
+const cmd = new Command("color", "get a random hex color code", Categories.INFO).setAliases(["colour"])
 
 /**
  * @param {Message} message

@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("nsfw", "toggle nsfw on a channel", categories.ADMIN).setPermissions(["MANAGE_CHANNELS"])
+const cmd = new Command("nsfw", "toggle nsfw on a channel", Categories.ADMIN).setPermissions(["MANAGE_CHANNELS"])
 
 /**
  * @param {Message} message

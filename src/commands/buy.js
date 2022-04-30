@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getItems,
@@ -14,7 +14,7 @@ const {
 } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("buy", "buy items from the shop", categories.MONEY)
+const cmd = new Command("buy", "buy items from the shop", Categories.MONEY)
 
 const cooldown = new Map()
 

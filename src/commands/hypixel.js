@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const fetch = require("node-fetch")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { cleanString } = require("../utils/utils")
 const { logger } = require("../utils/logger")
@@ -23,7 +23,7 @@ ranks.set("MVP", "MVP")
 ranks.set("VIP_PLUS", "VIP+")
 ranks.set("VIP", "VIP")
 
-const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", categories.MINECRAFT).setAliases(["h"])
+const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", Categories.MINECRAFT).setAliases(["h"])
 
 /**
  * @param {Message} message

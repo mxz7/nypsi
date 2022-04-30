@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("ddos", "ddos other users (fake)", categories.FUN).setAliases(["hitoff"])
+const cmd = new Command("ddos", "ddos other users (fake)", Categories.FUN).setAliases(["hitoff"])
 
 /**
  * @param {Message} message

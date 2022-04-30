@@ -1,11 +1,11 @@
 const { topAmountPrestige } = require("../utils/economy/utils.js")
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("prestigetop", "view top prestiges in the server", categories.MONEY).setAliases(["topprestige"])
+const cmd = new Command("prestigetop", "view top prestiges in the server", Categories.MONEY).setAliases(["topprestige"])
 
 /**
  * @param {Message} message

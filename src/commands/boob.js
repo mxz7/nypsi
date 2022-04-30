@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium } = require("../utils/premium/utils")
@@ -7,7 +7,7 @@ const { isPremium } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("boob", "accurate prediction of your boob size", categories.FUN).setAliases(["howbigaremyboobies"])
+const cmd = new Command("boob", "accurate prediction of your boob size", Categories.FUN).setAliases(["howbigaremyboobies"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big are your boobies"))

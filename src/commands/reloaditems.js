@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { loadItems } = require("../utils/economy/utils")
 
-const cmd = new Command("reloaditems", "reload items", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("reloaditems", "reload items", Categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message

@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -7,7 +7,7 @@ const { isPremium, getTier } = require("../utils/premium/utils")
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("iq", "accurate prediction of your iq", categories.FUN)
+const cmd = new Command("iq", "accurate prediction of your iq", Categories.FUN)
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how large is your iq"))

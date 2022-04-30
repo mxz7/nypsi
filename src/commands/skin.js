@@ -2,13 +2,13 @@ const { Message } = require("discord.js")
 const fetch = require("node-fetch")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getSkin } = require("mc-names")
 
 const cooldown = new Map()
 
-const cmd = new Command("skin", "view the skin of a minecraft account", categories.MINECRAFT)
+const cmd = new Command("skin", "view the skin of a minecraft account", Categories.MINECRAFT)
 
 /**
  * @param {Message} message

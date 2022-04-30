@@ -1,12 +1,12 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("poll", "create a poll with a lot of customisation", categories.UTILITY)
+const cmd = new Command("poll", "create a poll with a lot of customisation", Categories.UTILITY)
 
 /**
  * @param {Message} message

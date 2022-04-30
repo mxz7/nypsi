@@ -17,7 +17,7 @@ const {
     addItemUse,
 } = require("../utils/economy/utils.js")
 const { Message, GuildMember } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -26,7 +26,7 @@ const cooldown = new Map()
 const playerCooldown = new Set()
 const radioCooldown = new Map()
 
-const cmd = new Command("rob", "rob other server members", categories.MONEY).setAliases(["steal"])
+const cmd = new Command("rob", "rob other server members", Categories.MONEY).setAliases(["steal"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("who do u wanna rob").setRequired(true))

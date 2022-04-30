@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { getUserCount, getUserCountGuild } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
 const { logger } = require("../utils/logger")
@@ -8,7 +8,7 @@ const { version } = require("../../package.json")
 
 const cooldown = new Map()
 
-const cmd = new Command("botstats", "view stats for the bot", categories.INFO)
+const cmd = new Command("botstats", "view stats for the bot", Categories.INFO)
 
 /**
  * @param {Message} message

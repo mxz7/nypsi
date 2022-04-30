@@ -13,11 +13,11 @@ const {
     getPrestige,
     deleteUser,
 } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("balance", "check your balance", categories.MONEY).setAliases(["bal", "money", "wallet"])
+const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"])
 
 cmd.slashEnabled = true
 

@@ -1,8 +1,8 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { toggleBan } = require("../utils/economy/utils")
 
-const cmd = new Command("ecoban", "ban an account from eco", categories.NONE)
+const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE)
 
 /**
  * @param {Message} message

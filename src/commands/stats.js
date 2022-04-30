@@ -1,9 +1,9 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getStats } = require("../utils/economy/utils")
 
-const cmd = new Command("stats", "view your economy stats", categories.MONEY)
+const cmd = new Command("stats", "view your economy stats", Categories.MONEY)
 
 const cooldown = new Map()
 

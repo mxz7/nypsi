@@ -1,5 +1,5 @@
 const { Message, Guild, User } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const {
     topAmount,
@@ -18,7 +18,7 @@ const { getKarma, getLastCommand } = require("../utils/karma/utils")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 const { formatDate, daysAgo } = require("../utils/utils")
 
-const cmd = new Command("find", "find info", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"])
 
 /**
  * @param {Message} message

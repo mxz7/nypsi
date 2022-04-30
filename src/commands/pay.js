@@ -10,7 +10,7 @@ const {
     getPrestige,
     isEcoBanned,
 } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -18,7 +18,7 @@ const { payment } = require("../utils/logger")
 
 const cooldown = new Map()
 
-const cmd = new Command("pay", "give other users money", categories.MONEY)
+const cmd = new Command("pay", "give other users money", Categories.MONEY)
 
 cmd.slashEnabled = true
 cmd.slashData

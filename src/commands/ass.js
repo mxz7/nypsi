@@ -1,12 +1,12 @@
 const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { redditImage } = require("../utils/utils.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("ass", "get a random ass image", categories.NSFW).setAliases(["peach"])
+const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAliases(["peach"])
 
 /**
  * @param {Message} message

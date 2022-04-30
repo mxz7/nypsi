@@ -1,11 +1,11 @@
 const { Message, Permissions } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } = require("../utils/moderation/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getExactMember } = require("../utils/utils")
 
-const cmd = new Command("unmute", "unmute one or more users", categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true))

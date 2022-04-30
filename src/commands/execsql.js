@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getDatabase } = require("../utils/database/database")
 const { createCaptcha } = require("../utils/utils")
 
-const cmd = new Command("execsql", "execute sql on the database", categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("execsql", "execute sql on the database", Categories.NONE).setPermissions(["bot owner"])
 
 /**
  *

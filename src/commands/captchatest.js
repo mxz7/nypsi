@@ -1,8 +1,8 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { toggleLock } = require("../utils/utils")
 
-const cmd = new Command("captchatest", "test an account", categories.NONE)
+const cmd = new Command("captchatest", "test an account", Categories.NONE)
 
 /**
  * @param {Message} message

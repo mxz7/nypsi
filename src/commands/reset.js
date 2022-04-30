@@ -10,11 +10,11 @@ const {
     deleteUser,
     getItems,
 } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 const { addKarma } = require("../utils/karma/utils.js")
 
-const cmd = new Command("reset", "reset your economy profile to gain karma", categories.MONEY)
+const cmd = new Command("reset", "reset your economy profile to gain karma", Categories.MONEY)
 
 const cooldown = new Map()
 
