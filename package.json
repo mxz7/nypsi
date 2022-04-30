@@ -14,7 +14,10 @@
     }
   },
   "lint-staged": {
-    "**/*.{js}": ["eslint ./", "prettier --write ."]
+    "**/*.{js}": [
+      "eslint ./",
+      "prettier --write ."
+    ]
   },
   "author": "tekoh",
   "license": "ISC",
@@ -39,6 +42,7 @@
     "shuffle-array": "^1.0.1",
     "table": "6.8",
     "tar": "^6.1.11",
+    "typescript": "^4.6.4",
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.9",
     "winston": "^3.7.2",
