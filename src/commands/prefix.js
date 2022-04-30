@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix, setPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("prefix", "change the bot's prefix", categories.ADMIN).setPermissions(["MANAGE_GUILD"])
 

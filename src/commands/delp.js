@@ -1,7 +1,7 @@
 const { Message, Collection } = require("discord.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 

@@ -17,8 +17,8 @@ const {
 } = require("../utils/chatreactions/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases(["cr", "reaction"])
 

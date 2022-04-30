@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(

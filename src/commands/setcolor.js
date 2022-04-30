@@ -1,8 +1,8 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getEmbedColor, setEmbedColor } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", categories.UTILITY).setAliases([
     "setcolour",

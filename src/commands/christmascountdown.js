@@ -9,8 +9,8 @@ const {
     hasChristmasCountdown,
     createNewChristmasCountdown,
 } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { daysUntilChristmas } = require("../utils/utils")
 
 const cmd = new Command("christmascountdown", "create a christmas countdown", categories.ADMIN)

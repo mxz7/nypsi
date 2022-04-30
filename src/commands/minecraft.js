@@ -1,8 +1,8 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getNameHistory } = require("mc-names")
 const { cleanString } = require("../utils/utils")
 
