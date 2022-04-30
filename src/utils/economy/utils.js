@@ -1,9 +1,6 @@
 const { logger } = require("../logger")
 const fs = require("fs")
 
-let banned
-// if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./dist/utils/economy/ban.json")) todo
-
 const multiplier = {
     "🍒": 10,
     "🍋": 5,
@@ -33,6 +30,7 @@ const app = express()
 
 const voteCache = new Map()
 const existsCache = new Map()
+const bannedCache = new Map()
 
 app.post(
     "/dblwebhook",
@@ -1189,32 +1187,31 @@ function upgradeWorker(member, id) {
 exports.upgradeWorker = upgradeWorker
 
 function isEcoBanned(id) {
-    if (banned.banned.indexOf(id) != -1) {
-        return true
+    if (bannedCache.has(id)) {
+        return bannedCache.get(id)
     } else {
-        return false
+        const query = db.prepare("SELECT banned FROM economy WHERE id = ?").get(id)
+
+        if (query) {
+            bannedCache.set(id, true)
+            return true
+        } else {
+            bannedCache.set(id, false)
+            return false
+        }
     }
 }
 
 exports.isEcoBanned = isEcoBanned
 
 function toggleBan(id) {
-    if (banned.banned.indexOf(id) != -1) {
-        banned.banned.splice(banned.banned.indexOf(id), 1)
+    if (isEcoBanned(id)) {
+        db.prepare("UPDATE economy SET banned = 0 WHERE id = ?").run(id)
     } else {
-        banned.banned.push(id)
+        db.prepare("UPDATE economy SET banned = 1 WHERE id = ?").run(id)
     }
 
-    const banned1 = JSON.parse(fs.readFileSync("./utils/economy/ban.json"))
-
-    if (JSON.stringify(banned) != JSON.stringify(banned1)) {
-        fs.writeFile("./utils/economy/ban.json", JSON.stringify(banned), (err) => {
-            if (err) {
-                return logger.error(err)
-            }
-            logger.info("banned data saved")
-        })
-    }
+    bannedCache.delete(id)
 }
 
 exports.toggleBan = toggleBan
