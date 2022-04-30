@@ -2,12 +2,12 @@ const { Message } = require("discord.js")
 const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getLastWeekly, setLastWeekly } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cooldown = new Map()
 
-const cmd = new Command("weekly", "get your weekly bonus (patreon only)", categories.MONEY)
+const cmd = new Command("weekly", "get your weekly bonus (patreon only)", Categories.MONEY)
 
 /**
  * @param {Message} message

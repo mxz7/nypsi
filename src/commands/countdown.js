@@ -1,11 +1,11 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { formatDate, daysUntil } = require("../utils/utils")
 
-const cmd = new Command("countdown", "create and manage your server countdowns", categories.ADMIN)
+const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
     .setAliases(["countdowns"])
     .setPermissions(["MANAGE_SERVER"])
 

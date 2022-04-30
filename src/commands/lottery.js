@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getTickets,
@@ -15,7 +15,7 @@ const { getPrefix } = require("../utils/guilds/utils")
 const { getKarma } = require("../utils/karma/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const cmd = new Command("lottery", "enter the weekly lottery draw", categories.MONEY).setAliases(["lotto"])
+const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"])
 
 cmd.slashEnabled = true
 cmd.slashData

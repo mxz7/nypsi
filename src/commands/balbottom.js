@@ -1,11 +1,11 @@
 const { bottomAmount } = require("../utils/economy/utils.js")
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("balbottom", "view bottom balances in the server", categories.MONEY).setAliases([
+const cmd = new Command("balbottom", "view bottom balances in the server", Categories.MONEY).setAliases([
     "bottom",
     "brokeboys",
 ])

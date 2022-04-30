@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { commandExists } = require("../utils/commandhandler")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getTier, getUserCommand, getCommand, setCommand, isPremium } = require("../utils/premium/utils")
 
-const cmd = new Command("customcommand", "create a custom command", categories.FUN).setAliases(["mycommand", "mycmd"])
+const cmd = new Command("customcommand", "create a custom command", Categories.FUN).setAliases(["mycommand", "mycmd"])
 
 const filterxd = [
     "nigger",

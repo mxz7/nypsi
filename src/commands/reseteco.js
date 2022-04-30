@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 const { reset } = require("../utils/economy/utils")
 const { createCaptcha } = require("../utils/utils")
 
-const cmd = new Command("reseteco", "reset economy except prestige", categories.NONE)
+const cmd = new Command("reseteco", "reset economy except prestige", Categories.NONE)
 
 /**
  *

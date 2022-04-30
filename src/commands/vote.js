@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } = require("../utils/economy/utils.js")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -8,7 +8,7 @@ const cooldown = new Map()
 const cmd = new Command(
     "vote",
     "vote every 12 hours to get an extra 5% bonus on gambling wins as well as a money reward",
-    categories.MONEY
+    Categories.MONEY
 )
 
 /**

@@ -17,10 +17,10 @@ const {
 } = require("../utils/chatreactions/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
-const cmd = new Command("chatreaction", "see who can type the fastest", categories.FUN).setAliases(["cr", "reaction"])
+const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"])
 
 cmd.slashEnabled = true
 cmd.slashData

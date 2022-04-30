@@ -1,11 +1,11 @@
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 const { Permissions, Message } = require("discord.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("clean", "clean up bot commands and responses", categories.MODERATION).setPermissions([
+const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
 ])
 

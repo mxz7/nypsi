@@ -12,7 +12,7 @@ const {
     addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
@@ -30,7 +30,7 @@ abcde.set("c", 2)
 abcde.set("d", 3)
 abcde.set("e", 4)
 
-const cmd = new Command("minesweeper", "play minesweeper", categories.MONEY).setAliases(["sweeper", "ms"])
+const cmd = new Command("minesweeper", "play minesweeper", Categories.MONEY).setAliases(["sweeper", "ms"])
 
 cmd.slashEnabled = true
 cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true))

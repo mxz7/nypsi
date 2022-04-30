@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getItems,
@@ -19,7 +19,7 @@ const { getMember } = require("../utils/utils")
 const { onBankRobCooldown, deleteBankRobCooldown } = require("./bankrob")
 const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
 
-const cmd = new Command("use", "use an item or open crates", categories.MONEY).setAliases(["open"])
+const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"])
 
 cmd.slashEnabled = true
 cmd.slashData.addStringOption((option) =>

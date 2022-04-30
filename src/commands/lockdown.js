@@ -1,6 +1,6 @@
 const { Message, Permissions } = require("discord.js")
 const Discord = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -8,7 +8,7 @@ const cooldown = new Map()
 const cmd = new Command(
     "lockdown",
     "lockdown a channel (will only work if permissions are setup correctly)",
-    categories.MODERATION
+    Categories.MODERATION
 )
     .setAliases(["lock", "shutup"])
     .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])

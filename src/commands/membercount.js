@@ -1,10 +1,10 @@
 const { Message, Permissions } = require("discord.js")
 const { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { logger } = require("../utils/logger")
 
-const cmd = new Command("membercount", "create an updating member count channel for your server", categories.ADMIN)
+const cmd = new Command("membercount", "create an updating member count channel for your server", Categories.ADMIN)
     .setAliases(["counter"])
     .setPermissions(["MANAGE_SERVER"])
 

@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getPrestige,
@@ -16,7 +16,7 @@ const { getAllWorkers, Worker } = require("../utils/economy/workers")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const cmd = new Command("workers", "view the available workers and manage your own", categories.MONEY).setAliases([
+const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
     "worker",
     "minion",
     "minions",

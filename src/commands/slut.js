@@ -1,13 +1,13 @@
 const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getMember } = require("../utils/utils")
 
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("slut", "measure how much of a slut you are", categories.FUN).setAliases([
+const cmd = new Command("slut", "measure how much of a slut you are", Categories.FUN).setAliases([
     "howslut",
     "whore",
     "cumslut",

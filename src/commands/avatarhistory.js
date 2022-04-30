@@ -1,5 +1,5 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
 const {
@@ -12,7 +12,7 @@ const {
 } = require("../utils/users/utils")
 const { getMember, formatDate, uploadImage } = require("../utils/utils")
 
-const cmd = new Command("avatarhistory", "view a user's avatar history", categories.INFO).setAliases([
+const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
     "avh",
     "avhistory",
     "pfphistory",

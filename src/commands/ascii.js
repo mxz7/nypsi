@@ -1,13 +1,13 @@
 const ascii = require("figlet")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getDMsEnabled } = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("ascii", "create ascii text", categories.FUN)
+const cmd = new Command("ascii", "create ascii text", Categories.FUN)
 
 /**
  * @param {Message} message

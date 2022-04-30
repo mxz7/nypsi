@@ -9,7 +9,7 @@ const {
     addGamble,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getExactMember } = require("../utils/utils.js")
@@ -20,7 +20,7 @@ const cooldown = new Map()
 
 const waiting = []
 
-const cmd = new Command("coinflip", "flip a coin, double or nothing", categories.MONEY).setAliases(["cf"])
+const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories.MONEY).setAliases(["cf"])
 
 /**
  * @param {Message} message

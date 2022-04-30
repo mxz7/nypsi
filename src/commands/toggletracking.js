@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getPrefix } = require("../utils/guilds/utils")
 const {
@@ -10,7 +10,7 @@ const {
     createUsernameProfile,
 } = require("../utils/users/utils")
 
-const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", categories.INFO)
+const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO)
 
 const cooldown = new Map()
 

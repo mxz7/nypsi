@@ -1,10 +1,10 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
 
-const cmd = new Command("cars", "view the current cars available", categories.MONEY).setAliases(["car"])
+const cmd = new Command("cars", "view the current cars available", Categories.MONEY).setAliases(["car"])
 
 const cooldown = new Map()
 

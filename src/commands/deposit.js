@@ -9,14 +9,14 @@ const {
     formatBet,
 } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("deposit", "deposit money into your bank", categories.MONEY).setAliases(["dep"])
+const cmd = new Command("deposit", "deposit money into your bank", Categories.MONEY).setAliases(["dep"])
 
 cmd.slashEnabled = true
 cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true))

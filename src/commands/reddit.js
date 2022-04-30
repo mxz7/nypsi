@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
 const { redditImage } = require("../utils/utils")
 const fetch = require("node-fetch")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
@@ -10,7 +10,7 @@ const cooldown = new Map()
 
 const blacklisted = ["body", "shit"]
 
-const cmd = new Command("reddit", "get a random image from any subreddit", categories.UTILITY)
+const cmd = new Command("reddit", "get a random image from any subreddit", Categories.UTILITY)
 
 /**
  * @param {Message} message

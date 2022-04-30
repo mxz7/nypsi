@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const {
     getWholesomeImage,
@@ -20,7 +20,7 @@ const isImageUrl = require("is-image-url")
 const cooldown = new Map()
 const uploadCooldown = new Map()
 
-const cmd = new Command("wholesome", "get a random wholesome picture", categories.FUN).setAliases([
+const cmd = new Command("wholesome", "get a random wholesome picture", Categories.FUN).setAliases([
     "iloveyou",
     "loveu",
     "ws",

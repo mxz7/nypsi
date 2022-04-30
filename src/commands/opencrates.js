@@ -1,12 +1,12 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
 const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
-const cmd = new Command("opencrates", "open all of your crates with one command", categories.MONEY)
+const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY)
 
 cmd.slashEnabled = true
 

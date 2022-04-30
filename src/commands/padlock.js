@@ -1,10 +1,10 @@
 const { getPadlockPrice, userExists, createUser, hasPadlock } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command.js")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("padlock", "buy a padlock to protect your wallet", categories.MONEY)
+const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categories.MONEY)
 
 /**
  * @param {Message} message

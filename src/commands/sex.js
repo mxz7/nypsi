@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
 const { getDMsEnabled } = require("../utils/economy/utils.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
-const cmd = new Command("sex", "find horny milfs in ur area 😏", categories.FUN).setAliases([
+const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
     "findhornymilfsinmyarea",
     "milffinder",
     "findamilf",

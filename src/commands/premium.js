@@ -12,11 +12,11 @@ const {
     expireUser,
     getUserCommand,
 } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
 
-const cmd = new Command("premium", "view your premium status", categories.INFO).setAliases(["patreon"])
+const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon"])
 
 /**
  * @param {Message} message

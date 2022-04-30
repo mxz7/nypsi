@@ -9,13 +9,13 @@ const {
 } = require("../utils/economy/utils.js")
 const Discord = require("discord.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("storerob", "attempt to rob a store for a reward", categories.MONEY).setAliases(["shoprob"])
+const cmd = new Command("storerob", "attempt to rob a store for a reward", Categories.MONEY).setAliases(["shoprob"])
 
 /**
  * @param {Message} message
