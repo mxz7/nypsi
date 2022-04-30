@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3")
 const { databaseLog, logger } = require("../logger")
-const db = new Database("./utils/database/storage.db", { verbose: databaseLog })
+const db = new Database("./out/data/storage.db", { verbose: databaseLog })
 
 db.pragma("journal_mode = WAL")
 
@@ -102,7 +102,7 @@ function doBackup() {
     const date = new Date()
 
     db.backup(
-        `./utils/database/backups/${date.getDate()}.${
+        `./out/data/backups/${date.getDate()}.${
             date.getMonth() + 1
         }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
     )
