@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getSnipeFilter, updateFilter, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command.js")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command.js")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("snipefilter", "change the snipe filter for your server", categories.ADMIN)
     .setAliases(["sf"])

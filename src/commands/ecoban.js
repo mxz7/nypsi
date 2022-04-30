@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
+const { Command, categories } = require("../utils/models/Command")
 const { toggleBan } = require("../utils/economy/utils")
 
 const cmd = new Command("ecoban", "ban an account from eco", categories.NONE)

@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("flip", "flip a coin", categories.UTILITY)
 

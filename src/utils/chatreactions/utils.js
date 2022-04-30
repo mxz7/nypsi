@@ -298,7 +298,7 @@ async function startReaction(guild, channel) {
         displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
     }
 
-    const { CustomEmbed } = require("../classes/EmbedBuilders")
+    const { CustomEmbed } = require("../models/EmbedBuilders")
 
     const embed = new CustomEmbed().setColor("#5efb8f")
 

@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
 const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", categories.ADMIN)
     .setPermissions(["ADMINISTRATOR"])

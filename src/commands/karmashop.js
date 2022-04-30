@@ -1,6 +1,6 @@
 const { Message, MessageButton, MessageActionRow } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
 const { inPlaceSort } = require("fast-sort")
 const { isPremium, getTier, setExpireDate } = require("../utils/premium/utils")

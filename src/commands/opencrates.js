@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
 const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")

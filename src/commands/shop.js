@@ -1,7 +1,7 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
-const { Command, categories } = require("../utils/classes/Command")
-const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getItems } = require("../utils/economy/utils")
 
 const cmd = new Command("shop", "view current items that are available to buy/sell", categories.MONEY).setAliases(["store"])

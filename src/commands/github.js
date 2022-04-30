@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("github", "view code for the bot on github", categories.INFO).setAliases(["git"])
 

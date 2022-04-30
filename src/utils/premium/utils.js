@@ -1,5 +1,5 @@
 const { GuildMember } = require("discord.js")
-const { PremUser } = require("../classes/PremStorage")
+const { PremUser } = require("../models/PremStorage")
 const { getDatabase } = require("../database/database")
 const { logger } = require("../logger")
 const { formatDate } = require("../utils")

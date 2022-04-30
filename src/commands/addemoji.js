@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("addemoji", "add an emoji from a different server to your server", categories.UTILITY)
     .setPermissions(["MANAGE_EMOJIS"])

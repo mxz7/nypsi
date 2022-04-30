@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/classes/Command")
-const { CustomEmbed } = require("../utils/classes/EmbedBuilders")
+const { Command, categories } = require("../utils/models/Command")
+const { CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("servericon", "get the server icon", categories.INFO)
 
