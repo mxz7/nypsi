@@ -4,8 +4,13 @@ const fs = require("fs")
 let banned
 if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./dist/utils/economy/ban.json"))
 
-let multiplier
-if (!process.env.GITHUB_ACTION) multiplier = JSON.parse(fs.readFileSync("./utils/economy/slotsmulti.json"))
+const multiplier = {
+    "🍒": 10,
+    "🍋": 5,
+    "🍊": 4,
+    "🍇": 3.5,
+    "🍉": 3
+}
 
 const topgg = require("@top-gg/sdk")
 const express = require("express")
