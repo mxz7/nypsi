@@ -28,6 +28,7 @@
             "never"
         ],
         "no-unreachable": "warn",
-        "no-case-declarations": "off"
+        "no-case-declarations": "off",
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }
