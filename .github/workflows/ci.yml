@@ -20,6 +20,9 @@ jobs:
 
             - name: install packages
               run: npm install
+
+            - name: build
+              run: tsc
             
             - name: linting
               run: npx eslint ./src/
