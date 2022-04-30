@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const answers = [
@@ -28,7 +28,7 @@ const answers = [
 
 const cooldown = new Map()
 
-const cmd = new Command("8ball", "ask the 8ball a question", categories.FUN)
+const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
 
 /**
  *

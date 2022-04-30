@@ -1,9 +1,9 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
 
-const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", categories.MONEY).setAliases([
+const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", Categories.MONEY).setAliases([
     "clearinv",
 ])
 

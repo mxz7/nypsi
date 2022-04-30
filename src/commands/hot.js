@@ -1,6 +1,6 @@
 const { Message } = require("discord.js")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getMember } = require("../utils/utils")
 const { updateBalance, getBalance, userExists, createUser } = require("../utils/economy/utils")
@@ -8,7 +8,7 @@ const { updateBalance, getBalance, userExists, createUser } = require("../utils/
 const cache = new Map()
 const cooldown = new Map()
 
-const cmd = new Command("hot", "measure how hot you are", categories.FUN).setAliases(["howhot", "sexy"])
+const cmd = new Command("hot", "measure how hot you are", Categories.FUN).setAliases(["howhot", "sexy"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("hot or not"))

@@ -1,11 +1,11 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("inrole", "get the members in a role", categories.UTILITY)
+const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY)
 
 /**
  * @param {Message} message

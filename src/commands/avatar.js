@@ -1,9 +1,9 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const avatar = new Command("avatar", "get a person's avatar", categories.INFO)
+const avatar = new Command("avatar", "get a person's avatar", Categories.INFO)
 
 avatar.setAliases(["av", "pfp", "picture"])
 

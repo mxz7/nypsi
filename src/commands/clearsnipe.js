@@ -1,8 +1,8 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
-const cmd = new Command("clearsnipe", "delete the current sniped thing", categories.MODERATION)
+const cmd = new Command("clearsnipe", "delete the current sniped thing", Categories.MODERATION)
     .setAliases(["cs"])
     .setPermissions(["MANAGE_MESSAGES"])
 

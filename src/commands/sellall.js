@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     getItems,
@@ -13,7 +13,7 @@ const {
 } = require("../utils/economy/utils")
 const { isPremium } = require("../utils/premium/utils")
 
-const cmd = new Command("sellall", "sell all commonly sold items", categories.MONEY)
+const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY)
 
 cmd.slashEnabled = true
 

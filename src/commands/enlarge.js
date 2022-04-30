@@ -1,9 +1,9 @@
 const { Message } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
-const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", categories.UTILITY).setAliases([
+const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", Categories.UTILITY).setAliases([
     "emoji",
     "makebig",
 ])

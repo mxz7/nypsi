@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
 
-const cmd = new Command("raffle", "select a random user all server members or from a specific role", categories.FUN)
+const cmd = new Command("raffle", "select a random user all server members or from a specific role", Categories.FUN)
 
 /**
  * @param {Message} message

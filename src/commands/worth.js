@@ -1,10 +1,10 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getItems, formatBet, getMulti } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("worth", "check the worth of items", categories.MONEY)
+const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
 
 //DO THIS AND CRATE ALL COMMAND
 //and error logs should look same as info logs

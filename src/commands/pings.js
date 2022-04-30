@@ -1,7 +1,7 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { fetchUserMentions } = require("../utils/users/utils")
 const { getDatabase } = require("../utils/database/database")
@@ -9,7 +9,7 @@ const { userExists } = require("../utils/economy/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("pings", "view who mentioned you recently", categories.UTILITY).setAliases([
+const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([
     "mentions",
     "whothefuckpingedme",
 ])

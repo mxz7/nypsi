@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium } = require("../utils/premium/utils")
 const fetch = require("node-fetch")
@@ -7,7 +7,7 @@ const isImageUrl = require("is-image-url")
 
 const cooldown = new Map()
 
-const cmd = new Command("inspiration", "generate an inspirational quote (inspirobot.me)", categories.FUN).setAliases([
+const cmd = new Command("inspiration", "generate an inspirational quote (inspirobot.me)", Categories.FUN).setAliases([
     "quote",
     "inspire",
 ])

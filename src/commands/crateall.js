@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getItems, userExists, getInventory, setInventory } = require("../utils/economy/utils")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { logger } = require("../utils/logger")
 
-const cmd = new Command("crateall", "give every user in the current guild a crate", categories.NONE).setPermissions([
+const cmd = new Command("crateall", "give every user in the current guild a crate", Categories.NONE).setPermissions([
     "bot owner",
 ])
 

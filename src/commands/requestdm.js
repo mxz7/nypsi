@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command(
     "requestdm",
     "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
-    categories.NONE
+    Categories.NONE
 )
 
 /**

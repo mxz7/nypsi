@@ -1,6 +1,6 @@
 const urban = require("urban-dictionary")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium } = require("../utils/premium/utils")
@@ -8,7 +8,7 @@ const { inPlaceSort } = require("fast-sort")
 
 const cooldown = new Map()
 
-const cmd = new Command("urban", "get a definition from urban dictionary", categories.INFO).setAliases(["define"])
+const cmd = new Command("urban", "get a definition from urban dictionary", Categories.INFO).setAliases(["define"])
 
 /**
  * @param {Message} message

@@ -1,13 +1,13 @@
 const { workMessages } = require("../../lists.json")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("work", "work a random job and safely earn a random amount of money", categories.MONEY)
+const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY)
 
 /**
  * @param {Message} message

@@ -1,12 +1,12 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember, formatDate, daysAgo } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const workerSort = require("../utils/workers/sort")
 const { inPlaceSort } = require("fast-sort")
 
-const cmd = new Command("join", "view your join position in the server", categories.INFO).setAliases(["joined"])
+const cmd = new Command("join", "view your join position in the server", Categories.INFO).setAliases(["joined"])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) =>

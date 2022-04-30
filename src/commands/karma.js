@@ -1,11 +1,11 @@
 const { Message } = require("discord.js")
 const { getMember } = require("../utils/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getKarma } = require("../utils/karma/utils")
 const { getPrefix } = require("../utils/guilds/utils")
 
-const cmd = new Command("karma", "check how much karma you have", categories.INFO)
+const cmd = new Command("karma", "check how much karma you have", Categories.INFO)
 
 /**
  * @param {Message} message

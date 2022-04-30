@@ -1,7 +1,7 @@
 const { Message } = require("discord.js")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 
-const cmd = new Command("support", "join the nypsi support server", categories.INFO)
+const cmd = new Command("support", "join the nypsi support server", Categories.INFO)
 
 /**
  *

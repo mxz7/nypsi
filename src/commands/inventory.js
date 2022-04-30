@@ -1,10 +1,10 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
 const { inPlaceSort } = require("fast-sort")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { getInventory, getItems, createUser, userExists, getMulti } = require("../utils/economy/utils")
 
-const cmd = new Command("inventory", "view items in your inventory", categories.MONEY).setAliases(["inv"])
+const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"])
 
 cmd.slashEnabled = true
 cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription("page number"))

@@ -1,13 +1,13 @@
 const { Message, Permissions } = require("discord.js")
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
-const { Command, categories } = require("../utils/models/Command")
+const { Command, Categories } = require("../utils/models/Command")
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
 const cooldown = new Map()
 
-const cmd = new Command("topcases", "see who has the top moderation cases", categories.MODERATION).setPermissions(
+const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions(
     "MANAGE_MESSAGES"
 )
 
