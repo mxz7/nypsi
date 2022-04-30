@@ -6,7 +6,8 @@ export class Command {
     public description: string
     public category: string
     public permissions?: Array<string>
-    public data: SlashCommandBuilder
+    public aliases?: Array<string>
+    public slashData: SlashCommandBuilder
     public slashEnabled: boolean
     public run: (message: Message, args: Array<string>) => void
 
@@ -17,13 +18,18 @@ export class Command {
 
         this.slashEnabled = false
 
-        this.data = new SlashCommandBuilder().setName(this.name).setDescription(this.description)
+        this.slashData = new SlashCommandBuilder().setName(this.name).setDescription(this.description)
 
         return this
     }
 
     public setPermissions(permissions: Array<string>) {
         this.permissions = permissions
+        return this
+    }
+
+    public setAliases(aliases: Array<string>) {
+        this.aliases = aliases
         return this
     }
 
