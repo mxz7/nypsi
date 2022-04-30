@@ -1,12 +1,20 @@
-const { GuildMember, Message, Client, Webhook } = require("discord.js")
-const isImageUrl = require("is-image-url")
-const fetch = require("node-fetch")
-const { getZeroWidth } = require("./chatreactions/utils")
-const { getDatabase } = require("./database/database")
-const { logger } = require("./logger")
+import dayjs = require("dayjs")
+import { Client, Collection, GuildMember, Message, Webhook } from "discord.js"
+import { ImgurClient } from "imgur"
+import { getZeroWidth } from "./chatreactions/utils"
+import { getDatabase } from "./database/database"
+import { logger } from "./logger"
+
+declare function require(name: string)
+
 const db = getDatabase()
-const imgur = require("imgur")
-imgur.setClientId(process.env.IMGUR_TOKEN)
+
+const imgur = new ImgurClient({
+    // accessToken: process.env.IMGUR_ACCESSTOKEN,
+    clientId: process.env.IMGUR_CLIENTID,
+    clientSecret: process.env.IMGUR_CLIENTSECRET,
+    refreshToken: process.env.IMGUR_REFRESHTOKEN
+})
 
 let uploadDisabled = false
 
@@ -16,28 +24,27 @@ setInterval(() => {
     logger.info("imgur upload count reset")
 }, 86400000)
 
-const news = {
+interface News {
+    text: string,
+    date: number
+}
+
+const news: News = {
     text: "",
     date: new Date().getTime(),
 }
 
-const locked = []
+const locked: Array<string> = []
 
-/**
- * @type {Webhook}
- */
-let wholesomeWebhook
+let wholesomeWebhook: Webhook
 
-/**
- * @type {Array<{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }>}
- */
-let wholesomeCache
+let wholesomeCache: Array<{ id: number, image: string, submitter: string, submitter_id: string, accepter: string, date: Date }>
 
-/**
- * @returns {String}
- * @param {GuildMember} member member to get color of
- */
-function getColor(member) {
+export function isImageUrl(url: string): boolean {
+    return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url)
+}
+
+function getColor(member: GuildMember) {
     if (member.displayHexColor == "#ffffff") {
         return "#111111"
     } else {
@@ -47,12 +54,7 @@ function getColor(member) {
 
 exports.getColor = getColor
 
-/**
- * @returns {string}
- * @param {JSON} post
- * @param {Array} allowed
- */
-async function redditImage(post, allowed) {
+async function redditImage(post: any, allowed: any): Promise<string> {
     let image = post.data.url
 
     if (image.includes("imgur.com/a/")) {
@@ -121,7 +123,7 @@ async function redditImage(post, allowed) {
         let newTitle = ""
         let count = 0
 
-        for (let char of a) {
+        for (const char of a) {
             if (count == 145) {
                 newTitle = newTitle + "..."
                 break
@@ -139,12 +141,7 @@ async function redditImage(post, allowed) {
 
 exports.redditImage = redditImage
 
-/**
- * @returns {GuildMember} member object
- * @param {Message} message
- * @param {String} memberName name of member
- */
-async function getMember(message, memberName) {
+async function getMember(message: Message, memberName: string): Promise<GuildMember> {
     if (!message.guild) return null
 
     let members
@@ -156,10 +153,10 @@ async function getMember(message, memberName) {
     }
 
     let target
-    let possible = new Map()
+    const possible = new Map()
 
-    for (let member of members.keys()) {
-        member = members.get(member)
+    for (const m of members.keys()) {
+        const member = members.get(m)
 
         if (member.user.id == memberName) {
             target = member
@@ -224,10 +221,10 @@ exports.getMember = getMember
  * @param {Message} message
  * @param {String} memberName
  */
-async function getExactMember(message, memberName) {
+async function getExactMember(message: Message, memberName: string): Promise<GuildMember> {
     if (!message.guild) return null
 
-    let members
+    let members: Collection<string, GuildMember>
 
     if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
         members = message.guild.members.cache
@@ -235,15 +232,7 @@ async function getExactMember(message, memberName) {
         members = await message.guild.members.fetch()
     }
 
-    let target = members.find((member) => {
-        if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
-            return member
-        } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
-            return member
-        } else if (member.user.id == memberName) {
-            return member
-        }
-    })
+    const target = members.find(member => (member.user.username.toLowerCase() == memberName.toLowerCase()) || (member.user.tag.toLowerCase() == memberName.toLowerCase()) || (member.user.id == memberName))
 
     return target
 }
@@ -254,19 +243,15 @@ exports.getExactMember = getExactMember
  * @returns {String}
  * @param {Date} date
  */
-function formatDate(date) {
-    const options = { year: "numeric", month: "short", day: "numeric" }
-    return new Intl.DateTimeFormat("en-US", options).format(date).toLowerCase().split(",").join("")
+function formatDate(date: Date): string {
+    return dayjs(date).format("MMM D YYYY").toLowerCase()
 }
 
 exports.formatDate = formatDate
 
-/**
- * @returns {Number}
- * @param {Date} date
- */
-function daysAgo(date) {
-    const ms = Math.floor(new Date() - date)
+function daysAgo(date: Date | number): number {
+    date = new Date(date)
+    const ms = Math.floor(Date.now() - date.getTime())
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
@@ -278,7 +263,7 @@ exports.daysAgo = daysAgo
 /**
  * @returns {String}
  */
-function daysUntilChristmas() {
+function daysUntilChristmas(): string {
     let date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear()}`))
     const current = new Date()
 
@@ -295,12 +280,10 @@ function daysUntilChristmas() {
 
 exports.daysUntilChristmas = daysUntilChristmas
 
-/**
- * @returns {Number}
- * @param {Date} date
- */
-function daysUntil(date) {
-    const ms = Math.floor(date - new Date())
+
+function daysUntil(date: Date | number): number {
+    date = new Date(date)
+    const ms = Math.floor(date.getTime() - Date.now())
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
@@ -344,16 +327,13 @@ exports.MStoTime = MStoTime
 /**
  * @returns {String}
  */
-function getNews() {
+function getNews(): News {
     return news
 }
 
 exports.getNews = getNews
 
-/**
- * @param {Object} string
- */
-function setNews(string) {
+function setNews(string: string) {
     news.text = string
     news.date = new Date().getTime()
 }
@@ -365,7 +345,7 @@ exports.setNews = setNews
  * @param {String} string user id
  * @returns {Boolean}
  */
-function isLockedOut(string) {
+function isLockedOut(string: string): boolean {
     if (locked.indexOf(string) == -1) {
         return false
     } else {
@@ -379,7 +359,7 @@ exports.isLockedOut = isLockedOut
  *
  * @param {String} string user id
  */
-function toggleLock(string) {
+function toggleLock(string: string) {
     if (isLockedOut(string)) {
         locked.splice(locked.indexOf(string), 1)
     } else {
@@ -389,11 +369,7 @@ function toggleLock(string) {
 
 exports.toggleLock = toggleLock
 
-/**
- *
- * @param {Client} client
- */
-async function showTopGlobalBal(client) {
+async function showTopGlobalBal(client: Client) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -413,11 +389,13 @@ async function showTopGlobalBal(client) {
             return logger.error("UNABLE TO FETCH GUILD FOR GLOBAL BAL TOP")
         }
 
-        const channel = await guild.channels.cache.find((ch) => ch.id == "833052442069434429")
+        const channel = guild.channels.cache.find((ch) => ch.id == "833052442069434429")
 
         if (!channel) {
             return logger.error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP")
         }
+
+        if (channel.type != "GUILD_TEXT") return
 
         const baltop = await topAmountGlobal(10, client, true)
 
@@ -428,7 +406,10 @@ async function showTopGlobalBal(client) {
         embed.setColor("#111111")
 
         await channel.send({ embeds: [embed] })
-        logger.auto("sent global bal top")
+        logger.log({
+            level: "auto",
+            message: "sent global bal top"
+        })
     }
 
     setTimeout(async () => {
@@ -436,9 +417,12 @@ async function showTopGlobalBal(client) {
             postGlobalBalTop()
         }, 86400000)
         postGlobalBalTop()
-    }, needed - now)
+    }, needed.getTime() - now.getTime())
 
-    logger.auto(`global bal top will run in ${MStoTime(needed - now)}`)
+    logger.log({
+        level: "auto",
+        message: `global bal top will run in ${MStoTime(needed.getTime() - now.getTime())}`
+    })
 }
 
 exports.showTopGlobalBal = showTopGlobalBal
@@ -446,19 +430,21 @@ exports.showTopGlobalBal = showTopGlobalBal
 /**
  * @returns {captcha}
  */
-function createCaptcha() {
+function createCaptcha(): captcha {
     return new captcha(Math.random().toString(36).substr(2, 7))
 }
 
 exports.createCaptcha = createCaptcha
 
 class captcha {
+    public answer: string
+    public display: string
     /**
      *
      * @param {String} d random letters
      * @returns {captcha}
      */
-    constructor(d) {
+    constructor(d: string) {
         this.answer = d
 
         const zeroWidthCount = d.length / 2
@@ -470,7 +456,7 @@ class captcha {
         for (let i = 0; i < zeroWidthCount; i++) {
             const pos = Math.floor(Math.random() * d.length + 1)
 
-            displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
+            displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos)
         }
 
         this.display = displayWord
@@ -484,7 +470,7 @@ class captcha {
  * @param {GuildMember} submitter
  * @param {String} image
  */
-async function suggestWholesomeImage(submitter, image) {
+async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
         const { getGuild } = require("../nypsi")
         const guild = await getGuild("747056029795221513")
@@ -538,7 +524,7 @@ exports.suggestWholesomeImage = suggestWholesomeImage
  * @param {Number} id
  * @param {GuildMember} accepter
  */
-function acceptWholesomeImage(id, accepter) {
+function acceptWholesomeImage(id: number, accepter: GuildMember): boolean {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
 
     if (!query) return false
@@ -571,7 +557,7 @@ exports.acceptWholesomeImage = acceptWholesomeImage
  * @returns {Boolean}
  * @param {Number} id
  */
-function denyWholesomeImage(id) {
+function denyWholesomeImage(id: number): boolean {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
 
     if (!query) return false
@@ -587,7 +573,7 @@ exports.denyWholesomeImage = denyWholesomeImage
  * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
  * @param {id} Number
  */
-function getWholesomeImage(id) {
+function getWholesomeImage(id): { id: number; image: string; submitter: string; submitter_id: string; accepter: string; date: Date } {
     if (id) {
         const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
         return query
@@ -616,7 +602,7 @@ exports.clearWholesomeCache = clearWholesomeCache
  * @returns {Boolean}
  * @param {Number} id
  */
-function deleteFromWholesome(id) {
+function deleteFromWholesome(id: number): boolean {
     const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
 
     clearWholesomeCache()
@@ -633,7 +619,7 @@ exports.deleteFromWholesome = deleteFromWholesome
 /**
  * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
  */
-function getAllSuggestions() {
+function getAllSuggestions(): { Array() } {
     const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
 
     return query
@@ -645,7 +631,7 @@ exports.getAllSuggestions = getAllSuggestions
  * @returns {String}
  * @param {String} url
  */
-async function uploadImageToImgur(url) {
+async function uploadImageToImgur(url: string): Promise<string> {
     let fallback = false
 
     if (uploadCount >= 775) fallback = true
@@ -653,7 +639,9 @@ async function uploadImageToImgur(url) {
     let fail = false
 
     logger.info(`uploading ${url}`)
-    const boobies = await imgur.uploadUrl(url).catch((e) => {
+    const boobies: any = await imgur.upload({
+        image: url
+    }).catch((e) => {
         logger.error(e)
         fail = true
     })
@@ -682,13 +670,12 @@ async function uploadImageToImgur(url) {
     }
 
     logger.info("uploaded")
-
-    return boobies.link
+    return boobies.data.link
 }
 
 exports.uploadImage = uploadImageToImgur
 
-async function fallbackUpload(url) {
+async function fallbackUpload(url: string) {
     const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
         res.json()
     )
@@ -704,7 +691,7 @@ async function fallbackUpload(url) {
  * @returns {String}
  * @param {String} string
  */
-function cleanString(string) {
+function cleanString(string: string): string {
     return string.replace(/[^A-z0-9\s]/g, "")
 }
 
