@@ -39,6 +39,7 @@
   "devDependencies": {
     "eslint": "^8.14.0",
     "eslint-plugin-jsdoc": "^39.2.9",
+    "husky": "^7.0.4",
     "install": "^0.13.0",
     "prettier": "2.6.2"
   },
