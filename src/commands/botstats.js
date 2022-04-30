@@ -4,7 +4,7 @@ const { Command, categories } = require("../utils/classes/Command")
 const { ErrorEmbed, CustomEmbed } = require("../utils/classes/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
 const { logger } = require("../utils/logger")
-const { version } = require("../package.json")
+const { version } = require("../../package.json")
 
 const cooldown = new Map()
 

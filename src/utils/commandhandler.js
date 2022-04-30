@@ -30,7 +30,7 @@ const beingChecked = []
 let restarting = false
 
 function loadCommands() {
-    const commandFiles = fs.readdirSync("./commands/").filter((file) => file.endsWith(".js"))
+    const commandFiles = fs.readdirSync("./dist/commands/").filter((file) => file.endsWith(".js"))
     const failedTable = []
 
     if (commands.size > 0) {
