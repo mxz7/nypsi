@@ -2,7 +2,7 @@ const { Client } = require("discord.js")
 const { getRandomCommand } = require("../utils/commandhandler")
 const { logger } = require("../utils/logger")
 const { daysUntilChristmas } = require("../utils/utils")
-const { version } = require("../package.json")
+const { version } = require("../../package.json")
 
 /**
  * @param {Client} client
