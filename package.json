@@ -5,7 +5,16 @@
   "main": "nypsi.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js}": ["eslint ./", "prettier --write ."]
   },
   "author": "tekoh",
   "license": "ISC",
@@ -39,7 +48,9 @@
   "devDependencies": {
     "eslint": "^8.14.0",
     "eslint-plugin-jsdoc": "^39.2.9",
+    "husky": "^7.0.4",
     "install": "^0.13.0",
+    "lint-staged": "^12.4.1",
     "prettier": "2.6.2"
   },
   "repository": {
