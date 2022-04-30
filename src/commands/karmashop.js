@@ -9,7 +9,7 @@ const { updateXp, getXp, userExists, createUser, getInventory, setInventory } = 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO)
 
 const cooldown = new Map()
-const items = require("../../karmashop.json")
+const items = require("../../data/karmashop.json")
 
 /**
  * @type {Map<string, number>}
