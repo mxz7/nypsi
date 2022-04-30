@@ -45,9 +45,11 @@ jobs:
             - name: install packages
               run: npm install
 
+            - name: setup
+              run: ./setup.sh
+
             - name: build
               run: tsc
-              run: ./setup.sh
 
             - name: run bot
               if: env.BOT_TOKEN != null
