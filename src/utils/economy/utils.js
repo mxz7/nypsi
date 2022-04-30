@@ -2,7 +2,7 @@ const { logger } = require("../logger")
 const fs = require("fs")
 
 let banned
-if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./dist/utils/economy/ban.json"))
+// if (!process.env.GITHUB_ACTION) banned = JSON.parse(fs.readFileSync("./dist/utils/economy/ban.json")) todo
 
 const multiplier = {
     "🍒": 10,
