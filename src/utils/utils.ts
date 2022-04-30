@@ -292,7 +292,7 @@ function daysUntil(date: Date | number): number {
 
 exports.daysUntil = daysUntil
 
-function MStoTime(ms) {
+function MStoTime(ms: number) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
     const hours = Math.floor(daysms / (60 * 60 * 1000))
