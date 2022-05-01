@@ -123,7 +123,7 @@ export function doBackup() {
  * @param {String} string string from database
  * @param {String} seperator optional seperator
  */
-export function toArray(string: string, seperator?: string): Array<any> {
+export function toArray(string: string, seperator?: string): Array<string> {
     const d = string.split(seperator || "#@|@#")
 
     for (const thing of d) {
