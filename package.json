@@ -6,17 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
-    "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\""
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
+    "prepare": "husky install"
   },
   "lint-staged": {
-    "./src**/*.{js,ts}": [
+    "**/*.{js,ts,md}": [
       "eslint ./",
-      "prettier --write ./src"
+      "prettier --write ."
     ]
   },
   "author": "tekoh",
