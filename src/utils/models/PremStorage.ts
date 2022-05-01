@@ -57,7 +57,7 @@ export class PremUser {
      */
     setLastDaily(date: Date | number): PremUser {
         if (date instanceof Date) {
-            this.lastDaily  = date.getTime()
+            this.lastDaily = date.getTime()
         } else {
             this.lastDaily = date
         }

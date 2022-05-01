@@ -140,7 +140,9 @@ function deteriorateKarma() {
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
      */
-    const users: Array<{ id: string; karma: number; last_command: number }> = db.prepare("SELECT * FROM karma WHERE last_command < ?").all(threshold)
+    const users: Array<{ id: string; karma: number; last_command: number }> = db
+        .prepare("SELECT * FROM karma WHERE last_command < ?")
+        .all(threshold)
 
     let total = 0
 
@@ -162,7 +164,7 @@ function deteriorateKarma() {
 
     logger.log({
         level: "auto",
-        message: `${total} total karma deteriorated`
+        message: `${total} total karma deteriorated`,
     })
 }
 

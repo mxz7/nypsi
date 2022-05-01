@@ -13,7 +13,7 @@ const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
     clientId: process.env.IMGUR_CLIENTID,
     clientSecret: process.env.IMGUR_CLIENTSECRET,
-    refreshToken: process.env.IMGUR_REFRESHTOKEN
+    refreshToken: process.env.IMGUR_REFRESHTOKEN,
 })
 
 let uploadDisabled = false
@@ -25,7 +25,7 @@ setInterval(() => {
 }, 86400000)
 
 interface News {
-    text: string,
+    text: string
     date: number
 }
 
@@ -38,7 +38,14 @@ const locked: Array<string> = []
 
 let wholesomeWebhook: Webhook
 
-let wholesomeCache: Array<{ id: number, image: string, submitter: string, submitter_id: string, accepter: string, date: Date }>
+let wholesomeCache: Array<{
+    id: number
+    image: string
+    submitter: string
+    submitter_id: string
+    accepter: string
+    date: Date
+}>
 
 export function isImageUrl(url: string): boolean {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url)
@@ -226,7 +233,12 @@ export async function getExactMember(message: Message, memberName: string): Prom
         members = await message.guild.members.fetch()
     }
 
-    const target = members.find(member => (member.user.username.toLowerCase() == memberName.toLowerCase()) || (member.user.tag.toLowerCase() == memberName.toLowerCase()) || (member.user.id == memberName))
+    const target = members.find(
+        (member) =>
+            member.user.username.toLowerCase() == memberName.toLowerCase() ||
+            member.user.tag.toLowerCase() == memberName.toLowerCase() ||
+            member.user.id == memberName
+    )
 
     return target
 }
@@ -265,7 +277,6 @@ export function daysUntilChristmas(): string {
 
     return (daysUntil(date) + 1).toString()
 }
-
 
 export function daysUntil(date: Date | number): number {
     date = new Date(date)
@@ -382,7 +393,7 @@ export async function showTopGlobalBal(client: Client) {
         await channel.send({ embeds: [embed] })
         logger.log({
             level: "auto",
-            message: "sent global bal top"
+            message: "sent global bal top",
         })
     }
 
@@ -395,7 +406,7 @@ export async function showTopGlobalBal(client: Client) {
 
     logger.log({
         level: "auto",
-        message: `global bal top will run in ${MStoTime(needed.getTime() - now.getTime())}`
+        message: `global bal top will run in ${MStoTime(needed.getTime() - now.getTime())}`,
     })
 }
 
@@ -537,7 +548,14 @@ export function denyWholesomeImage(id: number): boolean {
  * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
  * @param {id} Number
  */
-export function getWholesomeImage(id): { id: number; image: string; submitter: string; submitter_id: string; accepter: string; date: Date } {
+export function getWholesomeImage(id): {
+    id: number
+    image: string
+    submitter: string
+    submitter_id: string
+    accepter: string
+    date: Date
+} {
     if (id) {
         const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
         return query
@@ -595,12 +613,14 @@ export async function uploadImageToImgur(url: string): Promise<string> {
     let fail = false
 
     logger.info(`uploading ${url}`)
-    const boobies: any = await imgur.upload({
-        image: url
-    }).catch((e) => {
-        logger.error(e)
-        fail = true
-    })
+    const boobies: any = await imgur
+        .upload({
+            image: url,
+        })
+        .catch((e) => {
+            logger.error(e)
+            fail = true
+        })
 
     if (fail) {
         uploadDisabled = true
