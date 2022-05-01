@@ -1,17 +1,17 @@
-const { Client, Webhook, User } = require("discord.js")
-const winston = require("winston")
-require("winston-daily-rotate-file")
-const chalk = require("chalk")
-const DiscordTransport = require("winston-discord-webhook")
+import * as chalk from "chalk"
+import { Client, User, Webhook } from "discord.js"
+import * as winston from "winston"
+import "winston-daily-rotate-file"
+import * as DiscordTransport from "winston-discord-webhook"
 
 /**
  * @type {Map<String, Webhook>}
  */
-let webhook = new Map()
+const webhook: Map<string, Webhook> = new Map()
 /**
  * @type {Map<String, String>}
  */
-let nextLogMsg = new Map()
+const nextLogMsg: Map<string, string> = new Map()
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
     if (level == "error") {
@@ -81,13 +81,13 @@ const logger = winston.createLogger({
     ],
 })
 
-exports.logger = logger
+export { logger }
 
 /**
  *
  * @param {String} content
  */
-function databaseLog(content) {
+export function databaseLog(content: string) {
     const day = new Date().getDate()
     const month = new Date().getMonth() + 1
 
@@ -101,7 +101,7 @@ function databaseLog(content) {
         if (current.length >= 1500) {
             let lastLine = current.substr(current.lastIndexOf("\n"), 50)
 
-            const amount = parseInt(lastLine.split(" ")[0].substr("1", lastLine.length))
+            const amount = parseInt(lastLine.split(" ")[0].substring(1, lastLine.length))
 
             if (!amount) {
                 lastLine = "+1 more"
@@ -118,15 +118,13 @@ function databaseLog(content) {
     }
 }
 
-exports.databaseLog = databaseLog
-
 /**
  *
  * @param {User} from
  * @param {User} to
  * @param {Number} amount
  */
-function payment(from, to, amount) {
+export function payment(from: User, to: User, amount: number) {
     if (!nextLogMsg.get("pay")) {
         nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`)
     } else {
@@ -138,8 +136,6 @@ function payment(from, to, amount) {
     }
 }
 
-exports.payment = payment
-
 /**
  *
  * @param {User} user
@@ -148,7 +144,7 @@ exports.payment = payment
  * @param {Boolean} win
  * @param {Number} winAmount
  */
-function gamble(user, game, amount, win, winAmount) {
+export function gamble(user: User, game: string, amount: number, win: boolean, winAmount: number) {
     if (!nextLogMsg.get("gamble")) {
         nextLogMsg.set(
             "gamble",
@@ -167,12 +163,10 @@ function gamble(user, game, amount, win, winAmount) {
     }
 }
 
-exports.gamble = gamble
-
 /**
  * @returns {String}
  */
-function getTimestamp() {
+export function getTimestamp(): string {
     const date = new Date()
     let hours = date.getHours().toString()
     let minutes = date.getMinutes().toString()
@@ -195,13 +189,11 @@ function getTimestamp() {
     return timestamp
 }
 
-exports.getTimestamp = getTimestamp
-
 /**
  *
  * @param {Client} client
  */
-async function getWebhooks(client) {
+export async function getWebhooks(client: Client) {
     if (client.user.id != "678711738845102087") return
 
     const guild = await client.guilds.fetch("747056029795221513")
@@ -237,13 +229,11 @@ async function getWebhooks(client) {
     )
 }
 
-exports.getWebhooks = getWebhooks
-
 function runLogs() {
     if (process.env.GITHUB_ACTION) return
     setInterval(() => {
         webhook.forEach((v, k) => {
-            let msg = nextLogMsg.get(k)
+            const msg = nextLogMsg.get(k)
 
             if (msg != "" && msg) {
                 v.send({ content: msg })
