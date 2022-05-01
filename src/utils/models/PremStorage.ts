@@ -211,7 +211,7 @@ export class PremUser {
      * @returns {PremUser}
      * @param {Object} object
      */
-    static fromData(object: PremUser): PremUser {
+    static fromData(object: any): PremUser {
         const a = new PremUser(object.id, object.level)
         a.setEmbedColor(object.embedColor)
         a.setLastDaily(object.lastDaily)
