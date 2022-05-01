@@ -43,9 +43,16 @@ export enum PunishmentType {
 }
 
 export interface CounterProfile {
-    guild_id?: number
+    guild_id?: string
     enabled?: number,
     format?: string,
     filter_bots?: number,
+    channel?: string
+}
+
+export interface ChristmasProfile {
+    guild_id?: string,
+    enabled?: number,
+    format?: string,
     channel?: string
 }
