@@ -1,4 +1,4 @@
-import { ColorResolvable, GuildMember } from "discord.js"
+import { GuildMember } from "discord.js"
 import { getDatabase } from "../database/database"
 import { logger } from "../logger"
 import { PremUser } from "../models/PremStorage"
