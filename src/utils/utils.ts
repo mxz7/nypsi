@@ -44,7 +44,7 @@ export function isImageUrl(url: string): boolean {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url)
 }
 
-function getColor(member: GuildMember) {
+export function getColor(member: GuildMember) {
     if (member.displayHexColor == "#ffffff") {
         return "#111111"
     } else {
@@ -52,9 +52,7 @@ function getColor(member: GuildMember) {
     }
 }
 
-exports.getColor = getColor
-
-async function redditImage(post: any, allowed: any): Promise<string> {
+export async function redditImage(post: any, allowed: any): Promise<string> {
     let image = post.data.url
 
     if (image.includes("imgur.com/a/")) {
@@ -139,12 +137,10 @@ async function redditImage(post: any, allowed: any): Promise<string> {
     return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author
 }
 
-exports.redditImage = redditImage
-
-async function getMember(message: Message, memberName: string): Promise<GuildMember> {
+export async function getMember(message: Message, memberName: string): Promise<GuildMember> {
     if (!message.guild) return null
 
-    let members
+    let members: Collection<string, GuildMember>
 
     if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
         members = message.guild.members.cache
@@ -152,7 +148,7 @@ async function getMember(message: Message, memberName: string): Promise<GuildMem
         members = await message.guild.members.fetch()
     }
 
-    let target
+    let target: GuildMember
     const possible = new Map()
 
     for (const m of members.keys()) {
@@ -214,14 +210,12 @@ async function getMember(message: Message, memberName: string): Promise<GuildMem
     return target
 }
 
-exports.getMember = getMember
-
 /**
  *
  * @param {Message} message
  * @param {String} memberName
  */
-async function getExactMember(message: Message, memberName: string): Promise<GuildMember> {
+export async function getExactMember(message: Message, memberName: string): Promise<GuildMember> {
     if (!message.guild) return null
 
     let members: Collection<string, GuildMember>
@@ -237,19 +231,15 @@ async function getExactMember(message: Message, memberName: string): Promise<Gui
     return target
 }
 
-exports.getExactMember = getExactMember
-
 /**
  * @returns {String}
  * @param {Date} date
  */
-function formatDate(date: Date): string {
+export function formatDate(date: Date | number): string {
     return dayjs(date).format("MMM D YYYY").toLowerCase()
 }
 
-exports.formatDate = formatDate
-
-function daysAgo(date: Date | number): number {
+export function daysAgo(date: Date | number): number {
     date = new Date(date)
     const ms = Math.floor(Date.now() - date.getTime())
 
@@ -258,12 +248,10 @@ function daysAgo(date: Date | number): number {
     return days
 }
 
-exports.daysAgo = daysAgo
-
 /**
  * @returns {String}
  */
-function daysUntilChristmas(): string {
+export function daysUntilChristmas(): string {
     let date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear()}`))
     const current = new Date()
 
@@ -278,10 +266,8 @@ function daysUntilChristmas(): string {
     return (daysUntil(date) + 1).toString()
 }
 
-exports.daysUntilChristmas = daysUntilChristmas
 
-
-function daysUntil(date: Date | number): number {
+export function daysUntil(date: Date | number): number {
     date = new Date(date)
     const ms = Math.floor(date.getTime() - Date.now())
 
@@ -290,9 +276,7 @@ function daysUntil(date: Date | number): number {
     return days
 }
 
-exports.daysUntil = daysUntil
-
-function MStoTime(ms: number) {
+export function MStoTime(ms: number) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
     const hours = Math.floor(daysms / (60 * 60 * 1000))
@@ -322,30 +306,24 @@ function MStoTime(ms: number) {
     return output
 }
 
-exports.MStoTime = MStoTime
-
 /**
  * @returns {String}
  */
-function getNews(): News {
+export function getNews(): News {
     return news
 }
 
-exports.getNews = getNews
-
-function setNews(string: string) {
+export function setNews(string: string) {
     news.text = string
     news.date = new Date().getTime()
 }
-
-exports.setNews = setNews
 
 /**
  *
  * @param {String} string user id
  * @returns {Boolean}
  */
-function isLockedOut(string: string): boolean {
+export function isLockedOut(string: string): boolean {
     if (locked.indexOf(string) == -1) {
         return false
     } else {
@@ -353,13 +331,11 @@ function isLockedOut(string: string): boolean {
     }
 }
 
-exports.isLockedOut = isLockedOut
-
 /**
  *
  * @param {String} string user id
  */
-function toggleLock(string: string) {
+export function toggleLock(string: string) {
     if (isLockedOut(string)) {
         locked.splice(locked.indexOf(string), 1)
     } else {
@@ -367,9 +343,7 @@ function toggleLock(string: string) {
     }
 }
 
-exports.toggleLock = toggleLock
-
-async function showTopGlobalBal(client: Client) {
+export async function showTopGlobalBal(client: Client) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -425,16 +399,12 @@ async function showTopGlobalBal(client: Client) {
     })
 }
 
-exports.showTopGlobalBal = showTopGlobalBal
-
 /**
  * @returns {captcha}
  */
-function createCaptcha(): captcha {
+export function createCaptcha(): captcha {
     return new captcha(Math.random().toString(36).substr(2, 7))
 }
-
-exports.createCaptcha = createCaptcha
 
 class captcha {
     public answer: string
@@ -470,7 +440,7 @@ class captcha {
  * @param {GuildMember} submitter
  * @param {String} image
  */
-async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
+export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
         const { getGuild } = require("../nypsi")
         const guild = await getGuild("747056029795221513")
@@ -517,14 +487,12 @@ async function suggestWholesomeImage(submitter: GuildMember, image: string): Pro
     return true
 }
 
-exports.suggestWholesomeImage = suggestWholesomeImage
-
 /**
  * @returns {Boolean}
  * @param {Number} id
  * @param {GuildMember} accepter
  */
-function acceptWholesomeImage(id: number, accepter: GuildMember): boolean {
+export function acceptWholesomeImage(id: number, accepter: GuildMember): boolean {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
 
     if (!query) return false
@@ -551,13 +519,11 @@ function acceptWholesomeImage(id: number, accepter: GuildMember): boolean {
     return true
 }
 
-exports.acceptWholesomeImage = acceptWholesomeImage
-
 /**
  * @returns {Boolean}
  * @param {Number} id
  */
-function denyWholesomeImage(id: number): boolean {
+export function denyWholesomeImage(id: number): boolean {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
 
     if (!query) return false
@@ -567,13 +533,11 @@ function denyWholesomeImage(id: number): boolean {
     return true
 }
 
-exports.denyWholesomeImage = denyWholesomeImage
-
 /**
  * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
  * @param {id} Number
  */
-function getWholesomeImage(id): { id: number; image: string; submitter: string; submitter_id: string; accepter: string; date: Date } {
+export function getWholesomeImage(id): { id: number; image: string; submitter: string; submitter_id: string; accepter: string; date: Date } {
     if (id) {
         const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
         return query
@@ -590,19 +554,15 @@ function getWholesomeImage(id): { id: number; image: string; submitter: string; 
     }
 }
 
-exports.getWholesomeImage = getWholesomeImage
-
-function clearWholesomeCache() {
+export function clearWholesomeCache() {
     wholesomeCache = undefined
 }
-
-exports.clearWholesomeCache = clearWholesomeCache
 
 /**
  * @returns {Boolean}
  * @param {Number} id
  */
-function deleteFromWholesome(id: number): boolean {
+export function deleteFromWholesome(id: number): boolean {
     const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id)
 
     clearWholesomeCache()
@@ -614,24 +574,20 @@ function deleteFromWholesome(id: number): boolean {
     }
 }
 
-exports.deleteFromWholesome = deleteFromWholesome
-
 /**
  * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
  */
-function getAllSuggestions(): { Array() } {
+export function getAllSuggestions(): { Array() } {
     const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
 
     return query
 }
 
-exports.getAllSuggestions = getAllSuggestions
-
 /**
  * @returns {String}
  * @param {String} url
  */
-async function uploadImageToImgur(url: string): Promise<string> {
+export async function uploadImageToImgur(url: string): Promise<string> {
     let fallback = false
 
     if (uploadCount >= 775) fallback = true
@@ -673,8 +629,6 @@ async function uploadImageToImgur(url: string): Promise<string> {
     return boobies.data.link
 }
 
-exports.uploadImage = uploadImageToImgur
-
 async function fallbackUpload(url: string) {
     const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
         res.json()
@@ -691,8 +645,6 @@ async function fallbackUpload(url: string) {
  * @returns {String}
  * @param {String} string
  */
-function cleanString(string: string): string {
+export function cleanString(string: string): string {
     return string.replace(/[^A-z0-9\s]/g, "")
 }
-
-exports.cleanString = cleanString
