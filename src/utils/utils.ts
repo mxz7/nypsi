@@ -595,7 +595,13 @@ export function deleteFromWholesome(id: number): boolean {
 /**
  * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
  */
-export function getAllSuggestions(): { Array() } {
+export function getAllSuggestions(): Array<{
+    id: number
+    image: string
+    submitter: string
+    submitter_id: string
+    date: number
+}> {
     const query = db.prepare("SELECT * FROM wholesome_suggestions").all()
 
     return query
