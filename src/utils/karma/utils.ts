@@ -1,7 +1,7 @@
-const { GuildMember } = require("discord.js")
-const { getDatabase } = require("../database/database")
-const { logger } = require("../logger")
-const { MStoTime } = require("../utils")
+import { GuildMember } from "discord.js"
+import { getDatabase } from "../database/database"
+import { logger } from "../logger"
+import { MStoTime } from "../utils"
 
 const db = getDatabase()
 
@@ -12,10 +12,13 @@ let karmaShop = false
  * @param {GuildMember} member
  * @returns {Number}
  */
-function getKarma(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function getKarma(member: GuildMember | string): number {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -27,17 +30,18 @@ function getKarma(member) {
     }
 }
 
-exports.getKarma = getKarma
-
 /**
  *
  * @param {GuildMember} member
  * @param {Number} amount
  */
-function addKarma(member, amount) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function addKarma(member: GuildMember | string, amount: number) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -48,17 +52,18 @@ function addKarma(member, amount) {
     }
 }
 
-exports.addKarma = addKarma
-
 /**
  *
  * @param {GuildMember} member
  * @param {Number} amount
  */
-function removeKarma(member, amount) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function removeKarma(member: GuildMember | string, amount: number) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -72,16 +77,17 @@ function removeKarma(member, amount) {
     }
 }
 
-exports.removeKarma = removeKarma
-
 /**
  *
  * @param {GuildMember} member
  */
-function updateLastCommand(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function updateLastCommand(member: GuildMember | string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -92,46 +98,39 @@ function updateLastCommand(member) {
     }
 }
 
-exports.updateLastCommand = updateLastCommand
-
 /**
  *
  * @returns {Boolean}
  */
-function isKarmaShopOpen() {
+export function isKarmaShopOpen(): boolean {
     return karmaShop
 }
 
-exports.isKarmaShopOpen = isKarmaShopOpen
-
-function openKarmaShop() {
+export function openKarmaShop() {
     karmaShop = true
 }
 
-exports.openKarmaShop = openKarmaShop
-
-function closeKarmaShop() {
+export function closeKarmaShop() {
     karmaShop = false
 }
-
-exports.closeKarmaShop = closeKarmaShop
 
 /**
  *
  * @param {GuildMember} member
  * @returns {number}
  */
-function getLastCommand(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function getLastCommand(member: GuildMember | string): number {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
 
     return query.last_command
 }
-
-exports.getLastCommand = getLastCommand
 
 function deteriorateKarma() {
     const now = Date.now()
@@ -141,7 +140,7 @@ function deteriorateKarma() {
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
      */
-    const users = db.prepare("SELECT * FROM karma WHERE last_command < ?").all(threshold)
+    const users: Array<{ id: string; karma: number; last_command: number }> = db.prepare("SELECT * FROM karma WHERE last_command < ?").all(threshold)
 
     let total = 0
 
@@ -161,7 +160,10 @@ function deteriorateKarma() {
         db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id)
     }
 
-    logger.auto(`${total} total karma deteriorated`)
+    logger.log({
+        level: "auto",
+        message: `${total} total karma deteriorated`
+    })
 }
 
 // prettier-ignore
@@ -174,14 +176,17 @@ function deteriorateKarma() {
         d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`
     }
 
-    const needed = new Date(Date.parse(d) + 10800000)
+    const needed = new Date(Date.parse(d) + 10800000).getTime()
 
     setTimeout(async () => {
         setInterval(() => {
             deteriorateKarma()
         }, 86400000)
         deteriorateKarma()
-    }, needed - now)
+    }, needed - now.getTime())
 
-    logger.auto(`karma deterioration will run in ${MStoTime(needed - now)}`)
+    logger.log({
+        level: "auto",
+        message: `karma deterioration will run in ${MStoTime(needed - now.getTime())}`
+    })
 })()
