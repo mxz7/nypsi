@@ -9,7 +9,7 @@ export class CustomEmbed extends MessageEmbed {
      * @param {Boolean} footer
      * @param {String} text
      */
-    constructor(member: GuildMember, footer: boolean, text: string) {
+    constructor(member?: GuildMember, footer?: boolean, text?: string) {
         super()
 
         if (member) {
