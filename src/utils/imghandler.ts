@@ -1,5 +1,5 @@
-const fetch = require("node-fetch")
-const { logger } = require("./logger")
+import { logger } from "./logger"
+import fetch from "node-fetch"
 
 const pornCache = new Map()
 const bdsmCache = new Map()
@@ -84,10 +84,10 @@ const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
  * @param {Map} imgs
  * @param {String} name
  */
-async function cacheUpdate(links, imgs, name) {
+async function cacheUpdate(links: Array<string>, imgs: Map<string, string>, name: string) {
     const start = new Date().getTime()
     let amount = 0
-    for (let link of links) {
+    for (const link of links) {
         const res = await fetch(link).then((a) => a.json())
 
         if (res.message == "Forbidden") {
@@ -112,12 +112,18 @@ async function cacheUpdate(links, imgs, name) {
     }
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    logger.img(`${amount.toLocaleString()} ${name} images loaded (${total})`)
+    logger.log({
+        level: "img",
+        message: `${amount.toLocaleString()} ${name} images loaded (${total})`,
+    })
 }
 
-async function updateCache() {
+export async function updateCache() {
     const start = new Date().getTime()
-    logger.img("img caches updating..")
+    logger.log({
+        level: "img",
+        message: "img caches updating..",
+    })
     await cacheUpdate(bdsmLinks, bdsmCache, "bdsm")
     exports.bdsmCache = bdsmCache
     await cacheUpdate(thighsLinks, thighsCache, "thighs")
@@ -144,7 +150,8 @@ async function updateCache() {
     exports.snekCache = snekCache
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
-    logger.img("images updated (" + total + ")")
+    logger.log({
+        level: "img",
+        message: "images updated (" + total + ")",
+    })
 }
-
-exports.updateCache = updateCache
