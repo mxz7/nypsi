@@ -1,8 +1,7 @@
-const { GuildMember, Collection, Message, Guild } = require("discord.js")
-const { inPlaceSort } = require("fast-sort")
-const { getDatabase } = require("../database/database")
-const { default: fetch } = require("node-fetch")
-const { cleanString } = require("../utils")
+import { Collection, Guild, GuildMember, Message, User } from "discord.js"
+import { inPlaceSort } from "fast-sort"
+import { getDatabase } from "../database/database"
+import { cleanString } from "../utils"
 
 const db = getDatabase()
 const existsCache = new Set()
@@ -11,52 +10,34 @@ const usernameCache = new Map()
 const avatarCache = new Map()
 const lastfmUsernameCache = new Map()
 
-/**
- * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
- */
-const mentionQueue = []
-/**
- * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
- */
-exports.mentionQueue = mentionQueue
-/**
- * @type {Array<String>}
- */
-const deleteQueue = []
-/**
- * @type {Array<String>}
- */
-exports.deleteQueue = deleteQueue
+const mentionQueue: Array<{ type: string; members: Collection<string, GuildMember>; message: Message; guild: string }> = []
+
+export { mentionQueue }
+
+const deleteQueue: Array<string> = []
+
+export { deleteQueue }
 
 /**
  *
  * @param {GuildMember} member
  */
-function createUsernameProfile(member, tag, url) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function createUsernameProfile(member: GuildMember | User, tag: string, url?: string) {
+    const id = member.id
 
     db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(id)
-    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(
-        id,
-        member.user ? member.user.tag : tag,
-        Date.now()
-    )
+    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(id, tag, Date.now())
     if (url)
         db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(id, url, "avatar", Date.now())
 }
 
-exports.createUsernameProfile = createUsernameProfile
-
-/**
- * @returns {Boolean}
- * @param {GuildMember} member
- */
-function usernameProfileExists(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function usernameProfileExists(member: GuildMember | string): boolean {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     if (existsCache.has(id)) return true
 
@@ -70,12 +51,13 @@ function usernameProfileExists(member) {
     }
 }
 
-exports.usernameProfileExists = usernameProfileExists
-
-function isTracking(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function isTracking(member: GuildMember | string): boolean {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     if (optCache.has(id)) {
         return optCache.get(id)
@@ -92,12 +74,13 @@ function isTracking(member) {
     }
 }
 
-exports.isTracking = isTracking
-
-function disableTracking(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function disableTracking(member: GuildMember | string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("UPDATE usernames_optout SET tracking = 0 WHERE id = ?").run(id)
 
@@ -106,12 +89,13 @@ function disableTracking(member) {
     }
 }
 
-exports.disableTracking = disableTracking
-
-function enableTracking(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function enableTracking(member: GuildMember | string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("UPDATE usernames_optout SET tracking = 1 WHERE id = ?").run(id)
 
@@ -120,17 +104,18 @@ function enableTracking(member) {
     }
 }
 
-exports.enableTracking = enableTracking
-
 /**
  *
  * @param {GuildMember} member
  * @param {String} username
  */
-function addNewUsername(member, username) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function addNewUsername(member: GuildMember | string, username: string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "username", username, Date.now())
 
@@ -139,16 +124,17 @@ function addNewUsername(member, username) {
     }
 }
 
-exports.addNewUsername = addNewUsername
-
 /**
  * @returns {Array<{ value: String, date: Number }>}
  * @param {GuildMember} member
  */
-function fetchUsernameHistory(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function fetchUsernameHistory(member: GuildMember | string): Array<{ value: string; date: number }> {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     if (usernameCache.has(id)) {
         return usernameCache.get(id)
@@ -163,16 +149,17 @@ function fetchUsernameHistory(member) {
     return query
 }
 
-exports.fetchUsernameHistory = fetchUsernameHistory
-
 /**
  *
  * @param {GuildMember} member
  */
-function clearUsernameHistory(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function clearUsernameHistory(member: GuildMember | string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username'").run(id)
 
@@ -181,17 +168,18 @@ function clearUsernameHistory(member) {
     }
 }
 
-exports.clearUsernameHistory = clearUsernameHistory
-
 /**
  *
  * @param {GuildMember} member
  * @param {String} url
  */
-function addNewAvatar(member, url) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function addNewAvatar(member: GuildMember | string, url: string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "avatar", url, Date.now())
 
@@ -200,16 +188,17 @@ function addNewAvatar(member, url) {
     }
 }
 
-exports.addNewAvatar = addNewAvatar
-
 /**
  * @returns {Array<{ value: String, date: Number }>}
  * @param {GuildMember} member
  */
-function fetchAvatarHistory(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function fetchAvatarHistory(member: GuildMember | string): Array<{ value: string; date: number }> {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     if (avatarCache.has(id)) {
         return avatarCache.get(id)
@@ -224,16 +213,17 @@ function fetchAvatarHistory(member) {
     return query
 }
 
-exports.fetchAvatarHistory = fetchAvatarHistory
-
 /**
  *
  * @param {GuildMember} member
  */
-function clearAvatarHistory(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function clearAvatarHistory(member: GuildMember | string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar'").run(id)
 
@@ -242,17 +232,18 @@ function clearAvatarHistory(member) {
     }
 }
 
-exports.clearAvatarHistory = clearAvatarHistory
-
 /**
  *
  * @param {GuildMember} member
  * @returns {({username: String}|undefined)}
  */
-function getLastfmUsername(member) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function getLastfmUsername(member: GuildMember | string): { username: string } | undefined {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     if (lastfmUsernameCache.has(id)) {
         return lastfmUsernameCache.get(id)
@@ -267,17 +258,18 @@ function getLastfmUsername(member) {
     }
 }
 
-exports.getLastfmUsername = getLastfmUsername
-
 /**
  *
  * @param {GuildMember} member
  * @param {String} username
  */
-async function setLastfmUsername(member, username) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export async function setLastfmUsername(member: GuildMember, username: string) {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     username = cleanString(username)
 
@@ -302,18 +294,23 @@ async function setLastfmUsername(member, username) {
     return true
 }
 
-exports.setLastfmUsername = setLastfmUsername
-
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
  * @param {Number} amount
  * @returns {Array<{ date: Number, user_tag: String, url: String, content: String }>}
  */
-function fetchUserMentions(guild, member, amount = 100) {
-    let id = member
-
-    if (member.user) id = member.user.id
+export function fetchUserMentions(
+    guild: Guild,
+    member: GuildMember | string,
+    amount = 100
+): Array<{ date: number; user_tag: string; url: string; content: string }> {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
 
     const mentions = db
         .prepare(
@@ -323,5 +320,3 @@ function fetchUserMentions(guild, member, amount = 100) {
 
     return mentions
 }
-
-exports.fetchUserMentions = fetchUserMentions
