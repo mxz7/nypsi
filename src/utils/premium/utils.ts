@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js"
+import { ColorResolvable, GuildMember } from "discord.js"
 import { getDatabase } from "../database/database"
 import { logger } from "../logger"
 import { PremUser } from "../models/PremStorage"
@@ -183,7 +183,7 @@ export function setEmbedColor(member: GuildMember, color: string) {
  * @returns {String}
  * @param {String} member id
  */
-export function getEmbedColor(member: string): string {
+export function getEmbedColor(member: string): string | ColorResolvable {
     if (colorCache.has(member)) {
         return colorCache.get(member)
     }
