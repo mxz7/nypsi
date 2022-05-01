@@ -1,17 +1,28 @@
-const { logger } = require("../logger")
+import { logger } from "../logger"
 
-class PremUser {
+declare function require(name: string)
+
+export class PremUser {
+    public id: string
+    public level: number
+    public embedColor: string
+    public lastDaily: number
+    public lastWeekly: number
+    public status: number
+    public revokeReason: string
+    public startDate: number
+    public expireDate: number
     /**
      * @returns {PremUser}
      * @param {String} id user id
      * @param {Number} level tier level
      */
-    constructor(id, level) {
+    constructor(id: string, level: number) {
         this.id = id
         this.level = level
         this.embedColor = "default" // for custom embed color on all messages
-        this.lastDaily = "none"
-        this.lastWeekly = "none"
+        this.lastDaily = 0
+        this.lastWeekly = 0
         this.status = status.ACTIVE
         this.revokeReason = "none"
         this.startDate = new Date().getTime()
@@ -24,7 +35,7 @@ class PremUser {
      * @returns {PremUser}
      * @param {Number} level
      */
-    setLevel(level) {
+    setLevel(level: number): PremUser {
         this.level = level
 
         return this
@@ -34,7 +45,7 @@ class PremUser {
      * @returns {PremUser}
      * @param {String} color
      */
-    setEmbedColor(color) {
+    setEmbedColor(color: string): PremUser {
         this.embedColor = color
 
         return this
@@ -44,8 +55,12 @@ class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setLastDaily(date) {
-        this.lastDaily = date
+    setLastDaily(date: Date | number): PremUser {
+        if (date instanceof Date) {
+            this.lastDaily  = date.getTime()
+        } else {
+            this.lastDaily = date
+        }
 
         return this
     }
@@ -54,8 +69,12 @@ class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setLastWeekly(date) {
-        this.lastWeekly = date
+    setLastWeekly(date: Date | number): PremUser {
+        if (date instanceof Date) {
+            this.lastWeekly = date.getTime()
+        } else {
+            this.lastWeekly = date
+        }
 
         return this
     }
@@ -64,7 +83,7 @@ class PremUser {
      * @returns {PremUser}
      * @param {Number} status
      */
-    setStatus(status) {
+    setStatus(status: number): PremUser {
         this.status = status
 
         return this
@@ -74,7 +93,7 @@ class PremUser {
      * @returns {PremUser}
      * @param {String} reason
      */
-    setReason(reason) {
+    setReason(reason: string): PremUser {
         this.revokeReason = reason
 
         return this
@@ -84,8 +103,12 @@ class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setStartDate(date) {
-        this.startDate = date
+    setStartDate(date: Date | number): PremUser {
+        if (date instanceof Date) {
+            this.startDate = date.getTime()
+        } else {
+            this.startDate = date
+        }
 
         return this
     }
@@ -94,8 +117,12 @@ class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setExpireDate(date) {
-        this.expireDate = date
+    setExpireDate(date: Date | number): PremUser {
+        if (date instanceof Date) {
+            this.expireDate = date.getTime()
+        } else {
+            this.expireDate = date
+        }
 
         return this
     }
@@ -103,7 +130,7 @@ class PremUser {
     /**
      * @returns {String}
      */
-    getLevelString() {
+    getLevelString(): string {
         switch (this.level) {
             case 0:
                 return "none"
@@ -118,7 +145,7 @@ class PremUser {
         }
     }
 
-    static getLevelString(number) {
+    static getLevelString(number: number): string {
         switch (number) {
             case 0:
                 return "none"
@@ -141,7 +168,7 @@ class PremUser {
      *
      * @returns {PremUser}
      */
-    async expire() {
+    async expire(): Promise<PremUser | string> {
         const { requestDM, requestRemoveRole } = require("../../nypsi")
 
         let roleID
@@ -184,7 +211,7 @@ class PremUser {
      * @returns {PremUser}
      * @param {Object} object
      */
-    static fromData(object) {
+    static fromData(object: PremUser): PremUser {
         const a = new PremUser(object.id, object.level)
         a.setEmbedColor(object.embedColor)
         a.setLastDaily(object.lastDaily)
@@ -200,10 +227,8 @@ class PremUser {
 
 exports.PremUser = PremUser
 
-const status = {
-    INACTIVE: 0,
-    ACTIVE: 1,
-    REVOKED: 2,
+export enum status {
+    INACTIVE = 0,
+    ACTIVE = 1,
+    REVOKED = 2,
 }
-
-exports.status = status
