@@ -41,3 +41,11 @@ export enum PunishmentType {
     WARN = "warn",
     KICK = "kick",
 }
+
+export interface CounterProfile {
+    guild_id?: number
+    enabled?: number,
+    format?: string,
+    filter_bots?: number,
+    channel?: string
+}
