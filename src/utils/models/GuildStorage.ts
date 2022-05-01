@@ -22,3 +22,22 @@ export class Countdown {
         return this
     }
 }
+
+export interface Case {
+    case_id: string
+    type: PunishmentType
+    user: string
+    moderator: string
+    command: string
+    time: number
+    deleted: boolean
+    guild_id: string
+}
+
+export enum PunishmentType {
+    MUTE = "mute",
+    BAN = "ban",
+    UNMUTE = "unmute",
+    WARN = "warn",
+    KICK = "kick",
+}
