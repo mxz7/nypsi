@@ -10,12 +10,10 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "**/*.{js,ts}": [
+    "**/*.{js,ts,md}": [
       "eslint ./",
       "prettier --write ."
-    ],
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md,ts}": "prettier --write"
+    ]
   },
   "author": "tekoh",
   "license": "ISC",
