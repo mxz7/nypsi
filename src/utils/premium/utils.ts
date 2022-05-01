@@ -1,8 +1,10 @@
-const { GuildMember } = require("discord.js")
-const { PremUser } = require("../models/PremStorage")
-const { getDatabase } = require("../database/database")
-const { logger } = require("../logger")
-const { formatDate } = require("../utils")
+import { GuildMember } from "discord.js"
+import { getDatabase } from "../database/database"
+import { logger } from "../logger"
+import { PremUser } from "../models/PremStorage"
+import { formatDate } from "../utils"
+
+declare function require(name: string)
 
 const db = getDatabase()
 
@@ -24,10 +26,12 @@ setInterval(async () => {
  * @returns {Boolean}
  * @param {GuildMember} member
  */
-function isPremium(member) {
-    let id = member
-    if (member.user) {
+export function isPremium(member: GuildMember | string): boolean {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     if (isPremiumCache.has(id)) {
@@ -50,16 +54,16 @@ function isPremium(member) {
     }
 }
 
-exports.isPremium = isPremium
-
 /**
  * @returns {Number}
  * @param {GuildMember} member
  */
-function getTier(member) {
-    let id = member
-    if (member.user) {
+export function getTier(member: GuildMember | string): number {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     if (tierCache.has(id)) {
@@ -73,16 +77,16 @@ function getTier(member) {
     return query.level
 }
 
-exports.getTier = getTier
-
 /**
  * @param {GuildMember} member
  * @param {Number} level
  */
-function addMember(member, level) {
-    let id = member
-    if (member.user) {
+export function addMember(member: GuildMember, level: number) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     const start = new Date().getTime()
@@ -111,16 +115,16 @@ function addMember(member, level) {
     }
 }
 
-exports.addMember = addMember
-
 /**
  * @returns {PremUser}
  * @param {GuildMember} member
  */
-function getPremiumProfile(member) {
-    let id = member
-    if (member.user) {
+export function getPremiumProfile(member: GuildMember | string): PremUser {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id)
@@ -128,16 +132,16 @@ function getPremiumProfile(member) {
     return createPremUser(query)
 }
 
-exports.getPremiumProfile = getPremiumProfile
-
 /**
  * @param {GuildMember} member
  * @param {Number} level
  */
-function setTier(member, level) {
-    let id = member
-    if (member.user) {
+export function setTier(member: GuildMember, level: number) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET level = ? WHERE id = ?").run(level, id)
@@ -156,16 +160,16 @@ function setTier(member, level) {
     }
 }
 
-exports.setTier = setTier
-
 /**
  * @param {GuildMember} member
  * @param {String} color
  */
-function setEmbedColor(member, color) {
-    let id = member
-    if (member.user) {
+export function setEmbedColor(member: GuildMember, color: string) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET embed_color = ? WHERE id = ?").run(color, id)
@@ -175,13 +179,11 @@ function setEmbedColor(member, color) {
     }
 }
 
-exports.setEmbedColor = setEmbedColor
-
 /**
  * @returns {String}
  * @param {String} member id
  */
-function getEmbedColor(member) {
+export function getEmbedColor(member: string): string {
     if (colorCache.has(member)) {
         return colorCache.get(member)
     }
@@ -193,87 +195,85 @@ function getEmbedColor(member) {
     return query.embed_color
 }
 
-exports.getEmbedColor = getEmbedColor
-
 /**
  * @param {GuildMember} member
  * @param {Date} date
  */
-function setLastDaily(member, date) {
-    let id = member
-    if (member.user) {
+export function setLastDaily(member: GuildMember, date: Date) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET last_daily = ? WHERE id = ?").run(date, id)
 }
 
-exports.setLastDaily = setLastDaily
-
 /**
  * @param {GuildMember} member
  * @param {Date} date
  */
-function setLastWeekly(member, date) {
-    let id = member
-    if (member.user) {
+export function setLastWeekly(member: GuildMember, date: Date) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET last_weekly = ? WHERE id = ?").run(date, id)
 }
 
-exports.setLastWeekly = setLastWeekly
-
 /**
  * @param {GuildMember} member
  * @param {Number} status
  */
-function setStatus(member, status) {
-    let id = member
-    if (member.user) {
+export function setStatus(member: GuildMember, status: number) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET status = ? WHERE id = ?").run(status, id)
 }
 
-exports.setStatus = setStatus
-
 /**
  * @param {GuildMember} member
  * @param {String} reason
  */
-function setReason(member, reason) {
-    let id = member
-    if (member.user) {
+export function setReason(member: GuildMember, reason: string) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET revoke_reason = ? WHERE id = ?").run(reason, id)
 }
 
-exports.setReason = setReason
-
 /**
  * @param {GuildMember} member
  * @param {Date} date
  */
-function setStartDate(member, date) {
-    let id = member
-    if (member.user) {
+export function setStartDate(member: GuildMember, date: Date) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET start_date = ? WHERE id = ?").run(date, id)
 }
 
-exports.setStartDate = setStartDate
-
 /**
  * @param {String} member id
  */
-function renewUser(member) {
+export function renewUser(member: string) {
     const profile = getPremiumProfile(member)
 
     profile.renew()
@@ -296,12 +296,10 @@ function renewUser(member) {
     }
 }
 
-exports.renewUser = renewUser
-
 /**
  * @param {String} member id
  */
-async function expireUser(member) {
+export async function expireUser(member: string) {
     const profile = getPremiumProfile(member)
 
     const expire = await profile.expire()
@@ -325,50 +323,42 @@ async function expireUser(member) {
     }
 }
 
-exports.expireUser = expireUser
-
 /**
  * @param {String} member id
  * @param {String} reason
  */
-function revokeUser(member, reason) {
+export function revokeUser(member: string, reason: string) {
     db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(reason, member)
 
     const { requestDM } = require("../../nypsi")
     requestDM(member, "your membership has been revoked")
 }
 
-exports.revokeUser = revokeUser
-
 /**
  * @returns {Date}
  * @param {String} member id
  */
-function getLastDaily(member) {
+export function getLastDaily(member: string): Date {
     const query = db.prepare("SELECT last_daily FROM premium WHERE id = ?").get(member)
 
     return query.last_daily
 }
 
-exports.getLastDaily = getLastDaily
-
 /**
  * @returns {Date}
  * @param {String} member id
  */
-function getLastWeekly(member) {
+export function getLastWeekly(member: string): Date {
     const query = db.prepare("SELECT last_weekly FROM premium WHERE id = ?").get(member)
 
     return query.last_weekly
 }
 
-exports.getLastWeekly = getLastWeekly
-
 /**
  * @returns {{ trigger: String, content: String, owner: String, uses: Number } || null}
  * @param {String} name
  */
-function getCommand(name) {
+export function getCommand(name: string): { trigger: string; content: string; owner: string; uses: number } {
     const query = db.prepare("SELECT * FROM premium_commands WHERE trigger = ?").get(name)
 
     if (query) {
@@ -379,18 +369,14 @@ function getCommand(name) {
     }
 }
 
-exports.getCommand = getCommand
-
 /**
  *
  * @param {String} id
  * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
  */
-function getUserCommand(id) {
+export function getUserCommand(id: string): { trigger: string; content: string; owner: string; uses: number } {
     return db.prepare("SELECT * FROM premium_commands WHERE owner = ?").get(id)
 }
-
-exports.getUserCommand = getUserCommand
 
 /**
  *
@@ -399,7 +385,7 @@ exports.getUserCommand = getUserCommand
  * @param {String} content
  * @param {Number} uses
  */
-function setCommand(id, trigger, content) {
+export function setCommand(id: string, trigger: string, content: string) {
     const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").get(id)
 
     if (query) {
@@ -417,23 +403,21 @@ function setCommand(id, trigger, content) {
     }
 }
 
-exports.setCommand = setCommand
-
-function addUse(id) {
+export function addUse(id: string) {
     db.prepare("UPDATE premium_commands SET uses = uses + 1 WHERE owner = ?").run(id)
 }
-
-exports.addUse = addUse
 
 /**
  *
  * @param {GuildMember} member
  * @param {number} date
  */
-function setExpireDate(member, date) {
-    let id = member
-    if (member.user) {
+export function setExpireDate(member: GuildMember | string, date: number) {
+    let id: string
+    if (member instanceof GuildMember) {
         id = member.user.id
+    } else {
+        id = member
     }
 
     db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(date, id)
@@ -442,9 +426,7 @@ function setExpireDate(member, date) {
     requestDM(id, `your membership will now expire on **${formatDate(date)}**`)
 }
 
-exports.setExpireDate = setExpireDate
-
-function createPremUser(query) {
+export function createPremUser(query: any) {
     return PremUser.fromData({
         id: query.id,
         level: query.level,
