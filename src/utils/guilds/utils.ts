@@ -1,9 +1,12 @@
-const { Guild, Client } = require("discord.js")
-const { CustomEmbed } = require("../models/EmbedBuilders")
-const { Countdown } = require("../models/GuildStorage")
-const { getDatabase, toArray, toStorage } = require("../database/database")
-const { logger } = require("../logger")
-const { daysUntilChristmas, MStoTime, daysUntil } = require("../utils")
+import { Client, Collection, Guild, GuildMember } from "discord.js"
+import { getDatabase, toArray, toStorage } from "../database/database"
+import { logger } from "../logger"
+import { CustomEmbed } from "../models/EmbedBuilders"
+import { ChristmasProfile, Countdown, CounterProfile } from "../models/GuildStorage"
+import { daysUntil, daysUntilChristmas, MStoTime } from "../utils"
+
+declare function require(name: string)
+
 const db = getDatabase()
 
 setInterval(async () => {
@@ -11,8 +14,8 @@ setInterval(async () => {
 
     const now = new Date().getTime()
 
-    let snipeCount,
-        eSnipeCount = 0
+    let snipeCount = 0
+    let eSnipeCount = 0
 
     await snipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp
@@ -24,7 +27,10 @@ setInterval(async () => {
     })
 
     if (snipeCount > 0) {
-        logger.auto("deleted " + snipeCount.toLocaleString() + " sniped messages")
+        logger.log({
+            level: "auto",
+            message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
+        })
     }
 
     await eSnipe.forEach((msg) => {
@@ -37,7 +43,10 @@ setInterval(async () => {
     })
 
     if (eSnipeCount > 0) {
-        logger.auto("deleted " + eSnipeCount.toLocaleString() + " edit sniped messages")
+        logger.log({
+            level: "auto",
+            message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
+        })
     }
 }, 3600000)
 
@@ -46,7 +55,7 @@ setInterval(async () => {
 
     const query = db.prepare("SELECT id FROM guilds").all()
 
-    for (let guild of query) {
+    for (const guild of query) {
         const exists = await checkGuild(guild.id)
 
         if (!exists) {
@@ -56,7 +65,10 @@ setInterval(async () => {
 
             if (existsCooldown.has(guild)) existsCooldown.delete(guild)
 
-            logger.guild(`deleted guild '${guild.id}' from guild data`)
+            logger.log({
+                level: "guild",
+                message: `deleted guild '${guild.id}' from guild data`,
+            })
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -72,7 +84,7 @@ const snipeFilterCache = new Map()
  *
  * @param {Guild} guild run check for guild
  */
-function runCheck(guild) {
+export function runCheck(guild: Guild) {
     if (!hasGuild(guild)) createGuild(guild)
 
     const query = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
@@ -84,7 +96,10 @@ function runCheck(guild) {
 
         if (existsCooldown.has(guild)) existsCooldown.delete(guild)
 
-        logger.guild(`deleted guild '${guild.id}' from guild data`)
+        logger.log({
+            level: "guild",
+            message: `deleted guild '${guild.id}' from guild data`,
+        })
         return
     }
 
@@ -92,24 +107,24 @@ function runCheck(guild) {
 
     if (guild.memberCount > currentMembersPeak) {
         db.prepare("UPDATE guilds SET peak = ? WHERE id = ?").run(guild.memberCount, guild.id)
-        logger.auto(
-            "members peak updated for '" +
+        logger.log({
+            level: "auto",
+            message:
+                "members peak updated for '" +
                 guild.name +
                 "' " +
                 currentMembersPeak.toLocaleString() +
                 " -> " +
-                guild.memberCount.toLocaleString()
-        )
+                guild.memberCount.toLocaleString(),
+        })
     }
 }
-
-exports.runCheck = runCheck
 
 /**
  * @returns {Boolean}
  * @param {Guild} guild
  */
-function hasGuild(guild) {
+export function hasGuild(guild: Guild): boolean {
     if (existsCooldown.has(guild.id)) return true
     const query = db.prepare("SELECT id FROM guilds WHERE id = ?").get(guild.id)
 
@@ -126,25 +141,21 @@ function hasGuild(guild) {
     }
 }
 
-exports.hasGuild = hasGuild
-
 /**
  * @returns {JSON}
  * @param {Guild} guild
  */
-function getPeaks(guild) {
+export function getPeaks(guild: Guild): number {
     const query = db.prepare("SELECT peak FROM guilds WHERE id = ?").get(guild.id)
 
     return query.peak
 }
 
-exports.getPeaks = getPeaks
-
 /**
  *
  * @param {Guild} guild create guild profile
  */
-function createGuild(guild) {
+export function createGuild(guild: Guild) {
     db.prepare("INSERT INTO guilds (id) VALUES (?)").run(guild.id)
     db.prepare("INSERT INTO guilds_counters (guild_id) VALUES (?)").run(guild.id)
     db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
@@ -157,13 +168,11 @@ function createGuild(guild) {
     }, 43200000)
 }
 
-exports.createGuild = createGuild
-
 /**
  * @param {Guild} guild get snipe filter
  * @returns {Array<String>}
  */
-function getSnipeFilter(guild) {
+export function getSnipeFilter(guild: Guild): Array<string> {
     if (snipeFilterCache.has(guild.id)) {
         return snipeFilterCache.get(guild.id)
     }
@@ -181,27 +190,23 @@ function getSnipeFilter(guild) {
     return filter
 }
 
-exports.getSnipeFilter = getSnipeFilter
-
 /**
  *
  * @param {Guild} guild
  * @param {Array<String>} array
  */
-function updateFilter(guild, array) {
+export function updateFilter(guild: Guild, array: Array<string>) {
     const filter = toStorage(array)
 
     db.prepare("UPDATE guilds SET snipe_filter = ? WHERE id = ?").run(filter, guild.id)
     if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id)
 }
 
-exports.updateFilter = updateFilter
-
 /**
  * @returns {Boolean}
  * @param {Guild} guild
  */
-function hasStatsEnabled(guild) {
+export function hasStatsEnabled(guild: Guild): boolean {
     const query = db.prepare("SELECT enabled FROM guilds_counters WHERE guild_id = ?").get(guild.id)
 
     if (query.enabled === 1) {
@@ -211,26 +216,22 @@ function hasStatsEnabled(guild) {
     }
 }
 
-exports.hasStatsEnabled = hasStatsEnabled
-
 /**
  * @returns {JSON}
  * @param {Guild} guild
  */
-function getStatsProfile(guild) {
+export function getStatsProfile(guild: Guild): CounterProfile {
     const query = db.prepare("SELECT * FROM guilds_counters WHERE guild_id = ?").get(guild.id)
 
     return query
 }
-
-exports.getStatsProfile = getStatsProfile
 
 /**
  *
  * @param {Guild} guild
  * @param {JSON} profile
  */
-function setStatsProfile(guild, profile) {
+export function setStatsProfile(guild: Guild, profile: CounterProfile) {
     db.prepare("UPDATE guilds_counters SET enabled = ?, format = ?, filter_bots = ?, channel = ? WHERE guild_id = ?").run(
         profile.enabled ? 1 : 0,
         profile.format,
@@ -240,9 +241,7 @@ function setStatsProfile(guild, profile) {
     )
 }
 
-exports.setStatsProfile = setStatsProfile
-
-function checkStats() {
+export function checkStats() {
     setInterval(async () => {
         const query = db.prepare("SELECT * from guilds_counters WHERE enabled = 1").all()
 
@@ -252,14 +251,14 @@ function checkStats() {
 
             if (!guild) continue
 
-            let memberCount
+            let memberCount: number
 
             if (profile.filter_bots && guild.memberCount >= 500) {
                 profile.filter_bots = 0
                 setStatsProfile(guild, profile)
                 memberCount = guild.memberCount
             } else if (profile.filter_bots) {
-                let members
+                let members: Collection<string, GuildMember>
 
                 if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
                     members = guild.members.cache
@@ -299,7 +298,10 @@ function checkStats() {
                 await channel
                     .edit({ name: format })
                     .then(() => {
-                        logger.auto("counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'")
+                        logger.log({
+                            level: "auto",
+                            message: "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
+                        })
                     })
                     .catch(() => {
                         logger.warn("error updating counter in " + guild.name)
@@ -312,14 +314,12 @@ function checkStats() {
     }, 600000)
 }
 
-exports.checkStats = checkStats
-
 /**
  *
  * @param {Guild} guild
  * @param {Number} seconds
  */
-function addCooldown(guild, seconds) {
+export function addCooldown(guild: Guild, seconds: number) {
     fetchCooldown.add(guild.id)
 
     setTimeout(() => {
@@ -327,13 +327,11 @@ function addCooldown(guild, seconds) {
     }, seconds * 1000)
 }
 
-exports.addCooldown = addCooldown
-
 /**
  * @returns {Boolean}
  * @param {Guild} guild
  */
-function inCooldown(guild) {
+export function inCooldown(guild: Guild): boolean {
     if (fetchCooldown.has(guild.id)) {
         return true
     } else {
@@ -341,13 +339,11 @@ function inCooldown(guild) {
     }
 }
 
-exports.inCooldown = inCooldown
-
 /**
  * @returns {String}
  * @param {Guild} guild
  */
-function getPrefix(guild) {
+export function getPrefix(guild: Guild): string {
     try {
         if (prefixCache.has(guild.id)) {
             return prefixCache.get(guild.id)
@@ -370,26 +366,22 @@ function getPrefix(guild) {
     }
 }
 
-exports.getPrefix = getPrefix
-
 /**
  *
  * @param {Guild} guild
  * @param {String} prefix
  */
-function setPrefix(guild, prefix) {
+export function setPrefix(guild: Guild, prefix: string) {
     db.prepare("UPDATE guilds SET prefix = ? WHERE id = ?").run(prefix, guild.id)
 
     if (prefixCache.has(guild.id)) prefixCache.delete(guild.id)
 }
 
-exports.setPrefix = setPrefix
-
 /**
  * @returns {Boolean}
  * @param {Guild} guild
  */
-function hasChristmasCountdown(guild) {
+export function hasChristmasCountdown(guild: Guild): boolean {
     const query = db.prepare("SELECT guild_id FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     if (query) {
@@ -399,32 +391,26 @@ function hasChristmasCountdown(guild) {
     }
 }
 
-exports.hasChristmasCountdown = hasChristmasCountdown
-
-function createNewChristmasCountdown(guild) {
+export function createNewChristmasCountdown(guild: Guild) {
     db.prepare("INSERT INTO guilds_christmas (guild_id) VALUES (?)").run(guild.id)
 }
-
-exports.createNewChristmasCountdown = createNewChristmasCountdown
 
 /**
  * @returns {JSON}
  * @param {Guild} guild
  */
-function getChristmasCountdown(guild) {
+export function getChristmasCountdown(guild: Guild): ChristmasProfile {
     const query = db.prepare("SELECT * FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     return query
 }
-
-exports.getChristmasCountdown = getChristmasCountdown
 
 /**
  *
  * @param {Guild} guild
  * @param {JSON} xmas
  */
-function setChristmasCountdown(guild, xmas) {
+export function setChristmasCountdown(guild: Guild, xmas: ChristmasProfile) {
     db.prepare("UPDATE guilds_christmas SET enabled = ?, format = ?, channel = ? WHERE guild_id = ?").run(
         xmas.enabled ? 1 : 0,
         xmas.format,
@@ -433,13 +419,11 @@ function setChristmasCountdown(guild, xmas) {
     )
 }
 
-exports.setChristmasCountdown = setChristmasCountdown
-
 /**
  * @returns {Boolean}
  * @param {Guild} guild
  */
-function hasChristmasCountdownEnabled(guild) {
+export function hasChristmasCountdownEnabled(guild: Guild): boolean {
     const query = db.prepare("SELECT enabled FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     if (query.enabled) {
@@ -449,13 +433,11 @@ function hasChristmasCountdownEnabled(guild) {
     }
 }
 
-exports.hasChristmasCountdownEnabled = hasChristmasCountdownEnabled
-
 /**
  *
  * @param {Guild} guild
  */
-async function checkChristmasCountdown(guild) {
+export async function checkChristmasCountdown(guild: Guild) {
     const profile = db.prepare("SELECT * FROM guilds_christmas WHERE guild_id = ?").get(guild.id)
 
     const channel = guild.channels.cache.find((c) => c.id == profile.channel)
@@ -477,12 +459,17 @@ async function checkChristmasCountdown(guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
     }
 
+    if (channel.type != "GUILD_TEXT") return
+
     return await channel
         .send({
             embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
         })
         .then(() => {
-            logger.auto(`sent christmas countdown in ${guild.name} ~ ${format}`)
+            logger.log({
+                level: "auto",
+                message: `sent christmas countdown in ${guild.name} ~ ${format}`,
+            })
         })
         .catch(() => {
             logger.error(`error sending christmas countdown in ${guild.name}`)
@@ -493,13 +480,11 @@ async function checkChristmasCountdown(guild) {
         })
 }
 
-exports.checkChristmasCountdown = checkChristmasCountdown
-
 /**
  * @param {Guild} guild get chat filter
  * @returns {Array<String>}
  */
-function getChatFilter(guild) {
+export function getChatFilter(guild: Guild): Array<string> {
     if (chatFilterCache.has(guild.id)) {
         return chatFilterCache.get(guild.id)
     }
@@ -517,14 +502,12 @@ function getChatFilter(guild) {
     return filter
 }
 
-exports.getChatFilter = getChatFilter
-
 /**
  *
  * @param {Guild} guild
  * @param {Array<String>} array
  */
-function updateChatFilter(guild, array) {
+export function updateChatFilter(guild: Guild, array: Array<string>) {
     const filter = toStorage(array)
 
     db.prepare("UPDATE guilds SET chat_filter = ? WHERE id = ?").run(filter, guild.id)
@@ -532,13 +515,11 @@ function updateChatFilter(guild, array) {
     if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id)
 }
 
-exports.updateChatFilter = updateChatFilter
-
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-function getDisabledCommands(guild) {
+export function getDisabledCommands(guild: Guild): Array<string> {
     if (disableCache.has(guild.id)) {
         return disableCache.get(guild.id)
     }
@@ -556,34 +537,30 @@ function getDisabledCommands(guild) {
     return disabled
 }
 
-exports.getDisabledCommands = getDisabledCommands
-
 /**
  *
  * @param {Guild} guild
  * @param {Array<String>} array
  */
-function updateDisabledCommands(guild, array) {
+export function updateDisabledCommands(guild: Guild, array: Array<string>) {
     const disabled = toStorage(array)
 
     db.prepare("UPDATE guilds SET disabled_commands = ? WHERE id = ?").run(disabled, guild.id)
     if (disableCache.has(guild.id)) disableCache.delete(guild.id)
 }
 
-exports.updateDisabledCommands = updateDisabledCommands
-
 /**
  *
  * @param {Guild} guild
  * @returns {{}}
  */
-function getCountdowns(guild) {
+export function getCountdowns(guild: Guild | string): any {
     let guildID
 
-    if (!guild.id) {
-        guildID = guild
-    } else {
+    if (guild instanceof Guild) {
         guildID = guild.id
+    } else {
+        guildID = guild
     }
 
     const query = db.prepare("SELECT countdowns FROM guilds WHERE id = ?").get(guildID)
@@ -593,8 +570,6 @@ function getCountdowns(guild) {
     return countdowns
 }
 
-exports.getCountdowns = getCountdowns
-
 /**
  *
  * @param {Guild} guild
@@ -603,7 +578,7 @@ exports.getCountdowns = getCountdowns
  * @param {String} finalFormat
  * @param {String} channel
  */
-function addCountdown(guild, date, format, finalFormat, channel) {
+export function addCountdown(guild: Guild, date: Date | number, format: string, finalFormat: string, channel: string) {
     const countdowns = getCountdowns(guild)
 
     let id = 1
@@ -612,25 +587,35 @@ function addCountdown(guild, date, format, finalFormat, channel) {
         id++
     }
 
-    countdowns[id] = new Countdown(date, format, finalFormat, channel, id)
+    if (date instanceof Date) {
+        date = date.getTime()
+    }
+
+    const c: Countdown = {
+        date: date,
+        format: format,
+        finalFormat: finalFormat,
+        channel: channel,
+        id: id,
+    }
+
+    countdowns[id] = c
 
     db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guild.id)
 }
-
-exports.addCountdown = addCountdown
 
 /**
  *
  * @param {Guild} guild
  * @param {String} id
  */
-function deleteCountdown(guild, id) {
-    let guildID
+export function deleteCountdown(guild: Guild | string, id: string | number) {
+    let guildID: string
 
-    if (!guild.id) {
-        guildID = guild
-    } else {
+    if (guild instanceof Guild) {
         guildID = guild.id
+    } else {
+        guildID = guild
     }
 
     const countdowns = getCountdowns(guildID)
@@ -640,13 +625,11 @@ function deleteCountdown(guild, id) {
     db.prepare("UPDATE guilds SET countdowns = ? WHERE id = ?").run(JSON.stringify(countdowns), guildID)
 }
 
-exports.deleteCountdown = deleteCountdown
-
 /**
  *
  * @param {Client} client
  */
-function runCountdowns(client) {
+export function runCountdowns(client: Client) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -667,17 +650,17 @@ function runCountdowns(client) {
             if (!countdowns) continue
             if (Object.keys(countdowns).length == 0) continue
 
-            for (let countdown in countdowns) {
-                countdown = countdowns[countdown]
+            for (const countdown of Array.from(Object.keys(countdowns))) {
+                const c: Countdown = countdowns[countdown]
 
-                let days = daysUntil(new Date(countdown.date)) + 1
+                const days = daysUntil(new Date(c.date)) + 1
 
                 let message
 
                 if (days == 0) {
-                    message = countdown.finalFormat
+                    message = c.finalFormat
                 } else {
-                    message = countdown.format.split("%days%").join(days.toLocaleString())
+                    message = c.format.split("%days%").join(days.toLocaleString())
                 }
 
                 const embed = new CustomEmbed()
@@ -689,21 +672,26 @@ function runCountdowns(client) {
 
                 if (!guildToSend) continue
 
-                const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel)
+                const channel = guildToSend.channels.cache.find((ch) => ch.id == c.channel)
 
                 if (!channel) continue
+
+                if (channel.type != "GUILD_TEXT") return
 
                 await channel
                     .send({ embeds: [embed] })
                     .then(() => {
-                        logger.auto(`sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`)
+                        logger.log({
+                            level: "auto",
+                            message: `sent custom countdown (${c.id}) in ${guildToSend.name} (${guildID})`,
+                        })
                     })
                     .catch(() => {
-                        logger.error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`)
+                        logger.error(`error sending custom countdown (${c.id}) ${guildToSend.name} (${guildID})`)
                     })
 
                 if (days <= 0) {
-                    deleteCountdown(guildID, countdown.id)
+                    deleteCountdown(guildID, c.id)
                 }
             }
         }
@@ -714,18 +702,19 @@ function runCountdowns(client) {
             runCountdowns()
         }, 86400000)
         runCountdowns()
-    }, needed - now)
+    }, needed.getTime() - now.getTime())
 
-    logger.auto(`custom countdowns will run in ${MStoTime(needed - now)}`)
+    logger.log({
+        level: "auto",
+        message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    })
 }
-
-exports.runCountdowns = runCountdowns
 
 /**
  *
  * @param {Client} client
  */
-function runChristmas(client) {
+export function runChristmas(client: Client) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -761,12 +750,17 @@ function runChristmas(client) {
                 format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
             }
 
+            if (channel.type != "GUILD_TEXT") return
+
             await channel
                 .send({
                     embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
                 })
                 .then(() => {
-                    logger.auto(`sent christmas countdown in ${guild.name} ~ ${format}`)
+                    logger.log({
+                        level: "auto",
+                        message: `sent christmas countdown in ${guild.name} ~ ${format}`,
+                    })
                 })
                 .catch(() => {
                     logger.error(`error sending christmas countdown in ${guild.name}`)
@@ -783,9 +777,10 @@ function runChristmas(client) {
             runChristmasThing()
         }, 86400000)
         runChristmasThing()
-    }, needed - now)
+    }, needed.getTime() - now.getTime())
 
-    logger.auto(`christmas countdowns will run in ${MStoTime(needed - now)}`)
+    logger.log({
+        level: "auto",
+        message: `christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    })
 }
-
-exports.runChristmas = runChristmas
