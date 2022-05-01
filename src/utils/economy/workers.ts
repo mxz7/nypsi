@@ -1,11 +1,34 @@
 const workers = new Map()
 
-class Worker {
+interface Settings {
+    maxStorage: number
+    perItem: number
+    perInterval: number
+    cost: number
+    prestige: number
+    name: string
+    itemName: string
+    level?: number
+    stored?: number
+    id: number
+}
+
+export class Worker {
+    public maxStorage: number
+    public perItem: number
+    public perInterval: number
+    public cost: number
+    public prestige: number
+    public name: string
+    public id: number
+    public itemName: string
+    public level: number
+    public stored: number
     /**
      * @returns {Worker}
      * @param {JSON} settings
      */
-    constructor(settings) {
+    constructor(settings: Settings) {
         this.maxStorage = settings.maxStorage
         this.perItem = settings.perItem
         this.perInterval = settings.perInterval
@@ -31,7 +54,7 @@ class Worker {
     /**
      * @returns {Number}
      */
-    getUpgradeCost() {
+    getUpgradeCost(): number {
         const base = this.cost
         const currentLevel = this.level
 
@@ -42,7 +65,7 @@ class Worker {
      *
      * @returns {Number}
      */
-    getHourlyRate() {
+    getHourlyRate(): number {
         return this.perInterval * 12
     }
 
@@ -56,7 +79,7 @@ class Worker {
      * @returns {Worker}
      * @param {Worker} json
      */
-    static fromJSON(json) {
+    static fromJSON(json: Worker): Worker {
         const a = new Worker({
             maxStorage: json.maxStorage,
             perItem: json.perItem,
@@ -74,9 +97,7 @@ class Worker {
     }
 }
 
-exports.Worker = Worker
-
-class PotatoFarmer extends Worker {
+export class PotatoFarmer extends Worker {
     /**
      * @returns {PotatoFarmer}
      */
@@ -96,11 +117,9 @@ class PotatoFarmer extends Worker {
     }
 }
 
-exports.PotatoFarmer = PotatoFarmer
-
 workers.set(0, PotatoFarmer)
 
-class Fisherman extends Worker {
+export class Fisherman extends Worker {
     /**
      * @returns {Fisherman}
      */
@@ -120,11 +139,9 @@ class Fisherman extends Worker {
     }
 }
 
-exports.Fisherman = Fisherman
-
 workers.set(1, Fisherman)
 
-class Miner extends Worker {
+export class Miner extends Worker {
     /**
      * @returns {Miner}
      */
@@ -144,11 +161,9 @@ class Miner extends Worker {
     }
 }
 
-exports.Miner = Miner
-
 workers.set(2, Miner)
 
-class LumberJack extends Worker {
+export class LumberJack extends Worker {
     /**
      * @returns {Butcher}
      */
@@ -168,11 +183,9 @@ class LumberJack extends Worker {
     }
 }
 
-exports.LumberJack = LumberJack
-
 workers.set(3, LumberJack)
 
-class Butcher extends Worker {
+export class Butcher extends Worker {
     /**
      * @returns {Butcher}
      */
@@ -192,11 +205,9 @@ class Butcher extends Worker {
     }
 }
 
-exports.Butcher = Butcher
-
 workers.set(4, Butcher)
 
-class Tailor extends Worker {
+export class Tailor extends Worker {
     /**
      * @returns {Tailor}
      */
@@ -216,11 +227,9 @@ class Tailor extends Worker {
     }
 }
 
-exports.Tailor = Tailor
-
 workers.set(5, Tailor)
 
-class SpaceX extends Worker {
+export class SpaceX extends Worker {
     /**
      * @returns {Tailor}
      */
@@ -240,16 +249,12 @@ class SpaceX extends Worker {
     }
 }
 
-exports.SpaceX = SpaceX
-
 workers.set(6, SpaceX)
 
 /**
  *
  * @returns {Map<Number, Worker>}
  */
-function getAllWorkers() {
+export function getAllWorkers(): Map<number, Worker> {
     return workers
 }
-
-exports.getAllWorkers = getAllWorkers
