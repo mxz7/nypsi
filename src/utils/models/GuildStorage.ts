@@ -1,4 +1,9 @@
-class Countdown {
+export class Countdown {
+    public date: Date | number
+    public format: string
+    public finalFormat: string
+    public channel: string
+    public id: string
     /**
      * @returns {Countdown}
      * @param {Date} date
@@ -7,7 +12,7 @@ class Countdown {
      * @param {String} channel
      * @param {String} id
      */
-    constructor(date, format, finalFormat, channel, id) {
+    constructor(date: Date | number, format: string, finalFormat: string, channel: string, id: string) {
         this.date = date
         this.format = format
         this.finalFormat = finalFormat
@@ -17,5 +22,3 @@ class Countdown {
         return this
     }
 }
-
-exports.Countdown = Countdown
