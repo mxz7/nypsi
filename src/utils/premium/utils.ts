@@ -183,7 +183,7 @@ export function setEmbedColor(member: GuildMember, color: string) {
  * @returns {String}
  * @param {String} member id
  */
-export function getEmbedColor(member: string): string | ColorResolvable {
+export function getEmbedColor(member: string): `#${string}` | "default" {
     if (colorCache.has(member)) {
         return colorCache.get(member)
     }
