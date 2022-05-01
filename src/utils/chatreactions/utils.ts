@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember, TextChannel } from "discord.js"
 import { inPlaceSort } from "fast-sort"
 import { getDatabase, toArray, toStorage } from "../database/database"
 import { logger } from "../logger"
+import fetch from "node-fetch"
 
 declare function require(name: string)
 
