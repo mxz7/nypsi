@@ -1,8 +1,10 @@
-const { Guild, TextChannel, GuildMember } = require("discord.js")
-const fetch = require("node-fetch")
-const { logger } = require("../logger")
-const { getDatabase, toArray, toStorage } = require("../database/database")
-const { inPlaceSort } = require("fast-sort")
+import { Collection, Guild, GuildMember, TextChannel } from "discord.js"
+import { inPlaceSort } from "fast-sort"
+import { getDatabase, toArray, toStorage } from "../database/database"
+import { logger } from "../logger"
+
+declare function require(name: string)
+
 const db = getDatabase()
 
 const currentChannels = new Set()
@@ -15,14 +17,17 @@ setInterval(async () => {
 
     const query = db.prepare("SELECT id FROM chat_reaction").all()
 
-    for (let guild of query) {
+    for (const guild of query) {
         const exists = await checkGuild(guild.id)
 
         if (!exists) {
             db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
             db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id)
 
-            logger.guild(`deleted guild '${guild.id}' from chat reaction data`)
+            logger.log({
+                level: "guild",
+                message: `deleted guild '${guild.id}' from chat reaction data`,
+            })
         }
     }
 }, 24 * 60 * 60 * 1000)
@@ -121,23 +126,24 @@ setInterval(async () => {
     }
 
     if (count > 0) {
-        logger.auto(`${count} chat reaction${count > 1 ? "s" : ""} started`)
+        logger.log({
+            level: "auto",
+            message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
+        })
     }
 }, 60000)
 
 /**
  * @param {Guild} guild
  */
-function createReactionProfile(guild) {
+export function createReactionProfile(guild: Guild) {
     db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id)
 }
-
-exports.createReactionProfile = createReactionProfile
 
 /**
  * @param {Guild} guild
  */
-function hasReactionProfile(guild) {
+export function hasReactionProfile(guild: Guild) {
     if (existsCache.has(guild.id)) {
         return true
     }
@@ -152,13 +158,11 @@ function hasReactionProfile(guild) {
     }
 }
 
-exports.hasReactionProfile = hasReactionProfile
-
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-async function getWords(guild) {
+export async function getWords(guild: Guild): Promise<Array<string>> {
     const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
 
     const wordList = toArray(query.word_list)
@@ -172,51 +176,49 @@ async function getWords(guild) {
     }
 }
 
-exports.getWords = getWords
-
 /**
  * @param {Guild} guild
  * @param {Array<String>} newWordList
  */
-async function updateWords(guild, newWordList) {
+export function updateWords(guild: Guild, newWordList: Array<string>) {
     const list = toStorage(newWordList)
 
     db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id)
 }
 
-exports.updateWords = updateWords
-
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-function getWordList(guild) {
+export function getWordList(guild: Guild): Array<string> {
     const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
 
     return toArray(query.word_list)
 }
 
-exports.getWordList = getWordList
-
 /**
  * @param {Guild} guild
  * @returns {Boolean}
  */
-async function isUsingDefaultWords(guild) {
-    if (getWordList(guild.id).length == 0) {
+export function isUsingDefaultWords(guild: Guild): boolean {
+    if (getWordList(guild).length == 0) {
         return true
     } else {
         return false
     }
 }
 
-exports.isUsingDefaultWords = isUsingDefaultWords
-
 /**
  * @param {Guild} guild
  * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
-function getReactionSettings(guild) {
+export function getReactionSettings(guild: Guild): {
+    randomStart: boolean
+    randomChannels: Array<string>
+    timeBetweenEvents: number
+    randomModifier: number
+    timeout: number
+} {
     const query = db
         .prepare(
             "SELECT random_start, random_channels, between_events, random_modifier, timeout FROM chat_reaction WHERE id = ?"
@@ -232,13 +234,20 @@ function getReactionSettings(guild) {
     }
 }
 
-exports.getReactionSettings = getReactionSettings
-
 /**
  * @param {Guild} guild
  * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
-function updateReactionSettings(guild, settings) {
+export function updateReactionSettings(
+    guild: Guild,
+    settings: {
+        randomStart: boolean
+        randomChannels: Array<string>
+        timeBetweenEvents: number
+        randomModifier: number
+        timeout: number
+    }
+) {
     db.prepare(
         "UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?"
     ).run(
@@ -253,14 +262,15 @@ function updateReactionSettings(guild, settings) {
     if (enabledCache.has(guild.id)) enabledCache.delete(guild.id)
 }
 
-exports.updateReactionSettings = updateReactionSettings
-
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
  * @returns {{wins: number, secondPlace: number, thirdPlace: number}}
  */
-function getReactionStats(guild, member) {
+export function getReactionStats(
+    guild: Guild,
+    member: GuildMember
+): { wins: number; secondPlace: number; thirdPlace: number } {
     const query = db
         .prepare("SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
         .get(guild.id, member.user.id)
@@ -272,13 +282,11 @@ function getReactionStats(guild, member) {
     }
 }
 
-exports.getReactionStats = getReactionStats
-
 /**
  * @param {Guild} guild
  * @param {TextChannel} channel
  */
-async function startReaction(guild, channel) {
+export async function startReaction(guild: Guild, channel: TextChannel) {
     if (currentChannels.has(channel.id)) return "xoxo69"
 
     currentChannels.add(channel.id)
@@ -328,14 +336,14 @@ async function startReaction(guild, channel) {
         time: timeout * 1000,
     })
 
-    collector.on("collect", async (message) => {
+    collector.on("collect", async (message): Promise<void> => {
         if (msg.deleted) {
             currentChannels.delete(channel.id)
             collector.stop()
             return
         }
 
-        let time = new Date().getTime()
+        let time: number | string = new Date().getTime()
 
         time = ((time - start) / 1000).toFixed(2)
 
@@ -395,9 +403,10 @@ async function startReaction(guild, channel) {
         })
         winnersIDs.push(message.author.id)
         if (!waiting) {
-            return await msg.edit({ embeds: [embed] }).catch(() => {
+            await msg.edit({ embeds: [embed] }).catch(() => {
                 collector.stop()
             })
+            return
         }
     })
 
@@ -416,15 +425,13 @@ async function startReaction(guild, channel) {
     })
 }
 
-exports.startReaction = startReaction
-
 /**
  *
  * @param {Guild} guild
  * @param {GuildMember} member
  * @returns {Boolean}
  */
-function hasReactionStatsProfile(guild, member) {
+export function hasReactionStatsProfile(guild: Guild, member: GuildMember): boolean {
     const query = db
         .prepare("SELECT user_id FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
         .get(guild.id, member.user.id)
@@ -436,25 +443,25 @@ function hasReactionStatsProfile(guild, member) {
     }
 }
 
-exports.hasReactionStatsProfile = hasReactionStatsProfile
-
 /**
  *
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-function createReactionStatsProfile(guild, member) {
+export function createReactionStatsProfile(guild: Guild, member: GuildMember) {
     db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id)
 }
-
-exports.createReactionStatsProfile = createReactionStatsProfile
 
 /**
  * @param {Guild} guild
  * @param {GuildMember} member
  * @param {{wins: number, secondPlace: number, thirdPlace: number}} newStats
  */
-function updateStats(guild, member, newStats) {
+export function updateStats(
+    guild: Guild,
+    member: GuildMember,
+    newStats: { wins: number; secondPlace: number; thirdPlace: number }
+) {
     db.prepare("UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?").run(
         newStats.wins,
         newStats.secondPlace,
@@ -464,59 +471,51 @@ function updateStats(guild, member, newStats) {
     )
 }
 
-exports.updateStats = updateStats
-
 /**
  *
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-function addWin(guild, member) {
+export function addWin(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
     )
 }
 
-exports.addWin = addWin
-
 /**
  *
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-function add2ndPlace(guild, member) {
+export function add2ndPlace(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
     )
 }
 
-exports.add2ndPlace = add2ndPlace
-
 /**
  *
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-function add3rdPlace(guild, member) {
+export function add3rdPlace(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
     )
 }
 
-exports.add3rdPlace = add3rdPlace
-
 /**
  * @param {Guild} guild
  * @param {Number} amount
  * @returns {Map}
  */
-async function getServerLeaderboard(guild, amount) {
+export async function getServerLeaderboard(guild: Guild, amount: number): Promise<Map<string, string>> {
     const { inCooldown, addCooldown } = require("../guilds/utils")
 
-    let members
+    let members: Collection<string, GuildMember>
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
         members = guild.members.cache
@@ -592,7 +591,7 @@ async function getServerLeaderboard(guild, amount) {
     let count = 1
 
     for (const user of usersWins) {
-        let pos = count
+        let pos: string | number = count
 
         if (count == 1) {
             pos = "🥇"
@@ -609,7 +608,7 @@ async function getServerLeaderboard(guild, amount) {
     count = 1
 
     for (const user of usersSecond) {
-        let pos = count
+        let pos: string | number = count
 
         if (count == 1) {
             pos = "🥇"
@@ -626,7 +625,7 @@ async function getServerLeaderboard(guild, amount) {
     count = 1
 
     for (const user of usersThird) {
-        let pos = count
+        let pos: string | number = count
 
         if (count == 1) {
             pos = "🥇"
@@ -643,7 +642,7 @@ async function getServerLeaderboard(guild, amount) {
     count = 1
 
     for (const user of overallWins) {
-        let pos = count
+        let pos: string | number = count
 
         if (count == 1) {
             pos = "🥇"
@@ -660,13 +659,11 @@ async function getServerLeaderboard(guild, amount) {
     return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
 }
 
-exports.getServerLeaderboard = getServerLeaderboard
-
 /**
  * @param {Guild} guild
  * @returns {Boolean}
  */
-function hasRandomReactionsEnabled(guild) {
+export function hasRandomReactionsEnabled(guild: Guild): boolean {
     if (enabledCache.has(guild.id)) {
         return enabledCache.get(guild.id)
     }
@@ -682,67 +679,57 @@ function hasRandomReactionsEnabled(guild) {
     }
 }
 
-exports.hasRandomReactionsEnabled = hasRandomReactionsEnabled
-
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-function getRandomChannels(guild) {
+export function getRandomChannels(guild: Guild): Array<string> {
     const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id)
 
     return toArray(query.random_channels)
 }
 
-exports.getRandomChannels = getRandomChannels
-
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-function getBlacklisted(guild) {
+export function getBlacklisted(guild: Guild): Array<string> {
     const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id)
 
     return toArray(query.blacklisted)
 }
 
-exports.getBlacklisted = getBlacklisted
-
 /**
  * @param {Guild} guild
  * @param {Array<String>} blacklisted
  */
-function setBlacklisted(guild, blacklisted) {
+export function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
     db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id)
 }
-
-exports.setBlacklisted = setBlacklisted
 
 /**
  *
  * @param {Guild} guild
  */
-function deleteStats(guild) {
+export function deleteStats(guild: Guild) {
     db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
 }
-
-exports.deleteStats = deleteStats
 
 /**
  * @returns {Array<String>}
  */
-async function getDefaultWords() {
+async function getDefaultWords(): Promise<Array<string>> {
     const res = await fetch(
         "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"
     )
     const body = await res.text()
 
-    let words = body.split("\n")
+    const words = body.split("\n")
 
     return words
 }
 
-function getZeroWidth() {
+export function getZeroWidth() {
     return "​"
 }
 
