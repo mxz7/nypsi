@@ -539,7 +539,7 @@ async function runCommand(cmd, message, args) {
                 return
             }
         }
-        
+
         if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
@@ -577,7 +577,7 @@ async function runCommand(cmd, message, args) {
                 return
             }
         }
-        
+
         if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
             const curr = new Date()
