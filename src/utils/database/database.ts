@@ -2,8 +2,6 @@ import * as Database from "better-sqlite3"
 import { databaseLog, logger } from "../logger"
 const db = new Database("./out/data/storage.db", { verbose: databaseLog })
 
-
-
 db.pragma("journal_mode = WAL")
 
 function createTables() {
@@ -111,7 +109,7 @@ export function doBackup() {
         .then(() => {
             logger.log({
                 level: "success",
-                message: "backup complete"
+                message: "backup complete",
             })
         })
         .catch((e) => {

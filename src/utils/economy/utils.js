@@ -6,7 +6,7 @@ const multiplier = {
     "🍋": 5,
     "🍊": 4,
     "🍇": 3.5,
-    "🍉": 3
+    "🍉": 3,
 }
 
 const topgg = require("@top-gg/sdk")
