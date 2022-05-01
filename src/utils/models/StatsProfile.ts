@@ -1,9 +1,12 @@
-class StatsProfile {
+export class StatsProfile {
+    public gamble: any
+    public items: any
+    public rob: { wins: number, lose: number }
     /**
      *
      * @param {Array<{id: string, type: string, win: number, lose: number, gamble: number}>} data
      */
-    constructor(data) {
+    constructor(data: Array<{ id: string; type: string; win: number; lose: number; gamble: number }>) {
         this.gamble = {}
         this.items = {}
         this.rob = {
@@ -38,5 +41,3 @@ class StatsProfile {
         }
     }
 }
-
-exports.StatsProfile = StatsProfile
