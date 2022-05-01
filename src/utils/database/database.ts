@@ -1,6 +1,8 @@
-const Database = require("better-sqlite3")
-const { databaseLog, logger } = require("../logger")
+import * as Database from "better-sqlite3"
+import { databaseLog, logger } from "../logger"
 const db = new Database("./out/data/storage.db", { verbose: databaseLog })
+
+
 
 db.pragma("journal_mode = WAL")
 
@@ -96,7 +98,7 @@ function runBackups() {
 
 runBackups()
 
-function doBackup() {
+export function doBackup() {
     logger.info("data backup starting..")
 
     const date = new Date()
@@ -107,7 +109,10 @@ function doBackup() {
         }.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}.db`
     )
         .then(() => {
-            logger.success("backup complete")
+            logger.log({
+                level: "success",
+                message: "backup complete"
+            })
         })
         .catch((e) => {
             logger.error("backup failed")
@@ -115,14 +120,12 @@ function doBackup() {
         })
 }
 
-exports.doBackup = doBackup
-
 /**
  *
  * @param {String} string string from database
  * @param {String} seperator optional seperator
  */
-function toArray(string, seperator) {
+export function toArray(string: string, seperator: string): Array<any> {
     const d = string.split(seperator || "#@|@#")
 
     for (const thing of d) {
@@ -134,31 +137,23 @@ function toArray(string, seperator) {
     return d
 }
 
-exports.toArray = toArray
-
 /**
  *
  * @param {Array<String>} array
  * @param {String} seperator
  * @returns
  */
-function toStorage(array, seperator) {
+export function toStorage(array: Array<string>, seperator: string): string {
     return array.join(seperator || "#@|@#")
 }
-
-exports.toStorage = toStorage
 
 /**
  * @returns {Database.Database}
  */
-function getDatabase() {
+export function getDatabase(): Database.Database {
     return db
 }
 
-exports.getDatabase = getDatabase
-
-function vacuum() {
+export function vacuum() {
     db.prepare("VACUUM").run()
 }
-
-exports.vacuum = vacuum
