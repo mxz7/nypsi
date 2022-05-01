@@ -141,7 +141,7 @@ export function toArray(string: string, seperator?: string): Array<any> {
  * @param {String} seperator
  * @returns
  */
-export function toStorage(array: Array<string>, seperator: string): string {
+export function toStorage(array: Array<string>, seperator?: string): string {
     return array.join(seperator || "#@|@#")
 }
 
