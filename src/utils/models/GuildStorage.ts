@@ -1,8 +1,8 @@
 export interface Countdown {
-    date: number | Date,
-    format: string,
-    finalFormat: string,
-    channel: string,
+    date: number | Date
+    format: string
+    finalFormat: string
+    channel: string
     id: number
 }
 
@@ -27,15 +27,15 @@ export enum PunishmentType {
 
 export interface CounterProfile {
     guild_id?: string
-    enabled?: number,
-    format?: string,
-    filter_bots?: number,
+    enabled?: number
+    format?: string
+    filter_bots?: number
     channel?: string
 }
 
 export interface ChristmasProfile {
-    guild_id?: string,
-    enabled?: number,
-    format?: string,
+    guild_id?: string
+    enabled?: number
+    format?: string
     channel?: string
 }
