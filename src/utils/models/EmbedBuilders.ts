@@ -1,22 +1,23 @@
-const { MessageEmbed, GuildMember } = require("discord.js")
-const { isPremium, getTier, getEmbedColor } = require("../premium/utils")
-const { getColor } = require("../utils")
+import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js"
+import { getEmbedColor, getTier, isPremium } from "../premium/utils"
+import { getColor } from "../utils"
 
-class CustomEmbed extends MessageEmbed {
+export class CustomEmbed extends MessageEmbed {
     /**
      * @returns {CustomEmbed}
      * @param {GuildMember} member
      * @param {Boolean} footer
      * @param {String} text
      */
-    constructor(member, footer, text) {
+    constructor(member: GuildMember, footer: boolean, text: string) {
         super()
 
         if (member) {
             if (isPremium(member.user.id)) {
                 if (getTier(member.user.id) >= 1) {
-                    if (getEmbedColor(member.user.id) != "default") {
-                        super.setColor(getEmbedColor(member.user.id))
+                    const color = getEmbedColor(member.user.id)
+                    if (color != "default") {
+                        super.setColor(color)
                     } else {
                         super.setColor(getColor(member))
                     }
@@ -30,7 +31,7 @@ class CustomEmbed extends MessageEmbed {
 
         if (text) {
             if (text.length > 2000) {
-                text = text.substr(0, 2000)
+                text = text.substring(0, 2000)
             }
 
             super.setDescription(text)
@@ -47,7 +48,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} text
      */
-    setDescription(text) {
+    setDescription(text: string) {
         if (text.length > 2000) {
             text = text.substr(0, 2000)
         }
@@ -62,7 +63,7 @@ class CustomEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title, text, inline) {
+    addField(title: string, text: string, inline: boolean) {
         if (text.length > 1000) {
             text = text.substr(0, 1000)
         }
@@ -76,7 +77,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {string} text
      */
-    setTitle(text) {
+    setTitle(text: string) {
         super.setTitle(text)
 
         return this
@@ -86,7 +87,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} url
      */
-    setImage(url) {
+    setImage(url: string) {
         super.setImage(url)
 
         return this
@@ -96,7 +97,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} url
      */
-    setThumbnail(url) {
+    setThumbnail(url: string) {
         super.setThumbnail(url)
 
         return this
@@ -106,7 +107,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} url
      */
-    setURL(url) {
+    setURL(url: string) {
         super.setURL(url)
 
         return this
@@ -116,18 +117,8 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} text
      */
-    setHeader(text) {
+    setHeader(text: string) {
         super.setAuthor({ name: text })
-
-        return this
-    }
-
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} text
-     */
-    setFooter(text) {
-        super.setFooter({ text: text })
 
         return this
     }
@@ -136,7 +127,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} color
      */
-    setColor(color) {
+    setColor(color: `#${string}` | ColorResolvable) {
         super.setColor(color)
 
         return this
@@ -146,7 +137,7 @@ class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {Date} date
      */
-    setTimestamp(date) {
+    setTimestamp(date: Date | number) {
         if (date) {
             super.setTimestamp(date)
         } else {
@@ -157,15 +148,14 @@ class CustomEmbed extends MessageEmbed {
     }
 }
 
-exports.CustomEmbed = CustomEmbed
-
-class ErrorEmbed extends MessageEmbed {
+export class ErrorEmbed extends MessageEmbed {
     /**
      * @returns {ErrorEmbed}
      * @param {String} text
      */
-    constructor(text) {
-        super().setColor("#e31937")
+    constructor(text: string) {
+        super()
+        super.setColor("#e31937")
         super.setTitle("`❌`")
         super.setDescription(text)
 
@@ -176,9 +166,9 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} text
      */
-    setDescription(text) {
+    setDescription(text: string) {
         if (text.length > 2000) {
-            text = text.substr(0, 2000)
+            text = text.substring(0, 2000)
         }
         super.setDescription(text)
 
@@ -191,9 +181,9 @@ class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title, text, inline) {
+    addField(title: string, text: string, inline: boolean) {
         if (text.length > 1000) {
-            text = text.substr(0, 1000)
+            text = text.substring(0, 1000)
         }
 
         super.addField(title, text, inline)
@@ -205,7 +195,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {string} text
      */
-    setTitle(text) {
+    setTitle(text: string) {
         super.setTitle(text)
 
         return this
@@ -215,7 +205,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} url
      */
-    setImage(url) {
+    setImage(url: string) {
         super.setImage(url)
 
         return this
@@ -225,7 +215,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} url
      */
-    setThumbnail(url) {
+    setThumbnail(url: string) {
         super.setThumbnail(url)
 
         return this
@@ -235,7 +225,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} url
      */
-    setURL(url) {
+    setURL(url: string) {
         super.setURL(url)
 
         return this
@@ -245,18 +235,8 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} text
      */
-    setHeader(text) {
+    setHeader(text: string): ErrorEmbed {
         super.setAuthor({ name: text })
-
-        return this
-    }
-
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} text
-     */
-    setFooter(text) {
-        super.setFooter({ text: text })
 
         return this
     }
@@ -265,7 +245,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {ErrorEmbed}
      * @param {String} color
      */
-    setColor(color) {
+    setColor(color: `#${string}` | ColorResolvable) {
         super.setColor(color)
 
         return this
@@ -275,7 +255,7 @@ class ErrorEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {Date} date
      */
-    setTimestamp(date) {
+    setTimestamp(date: Date | number) {
         if (date) {
             super.setTimestamp(date)
         } else {
@@ -285,5 +265,3 @@ class ErrorEmbed extends MessageEmbed {
         return this
     }
 }
-
-exports.ErrorEmbed = ErrorEmbed
