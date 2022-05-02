@@ -1,8 +1,10 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { redditImage } = require("../utils/utils.js")
+import { redditImage } from "../utils/utils.js"
+
+declare function require(name: string)
 
 const cooldown = new Map()
 
@@ -12,7 +14,7 @@ const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAli
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

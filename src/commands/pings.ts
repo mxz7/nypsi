@@ -20,7 +20,7 @@ cmd.slashEnabled = true
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
