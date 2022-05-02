@@ -1,17 +1,15 @@
-import { Collection, CommandInteractionOption, GuildMember } from "discord.js"
+import { Collection, CommandInteraction, CommandInteractionOption, GuildMember, Interaction } from "discord.js"
 import { runCommand } from "../utils/commandhandler"
-import { NypsiCommandInteraction } from "../utils/models/Command"
+import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command"
 
 /**
  *
  * @param {Interaction} interaction
  */
-module.exports = async (interaction: any): Promise<NypsiCommandInteraction> => {
+module.exports = async (interaction: Interaction): Promise<CommandInteraction> => {
     if (!interaction.isCommand()) return
 
-    interaction.author = interaction.user
-
-    const message: NypsiCommandInteraction = interaction
+    const message: CommandInteraction & NypsiCommandInteraction = createNypsiInteraction(interaction)
 
     const args = [""]
 

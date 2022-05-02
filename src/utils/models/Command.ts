@@ -10,7 +10,7 @@ export class Command {
     public slashData?: SlashCommandBuilder
     public slashEnabled: boolean
     public data?: any
-    public run: (message: Message | NypsiCommandInteraction, args?: Array<string>) => void
+    public run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: Array<string>) => void
 
     constructor(name: string, description: string, category: Categories) {
         this.name = name.toLowerCase()
@@ -53,20 +53,17 @@ export enum Categories {
     NSFW = "nsfw",
 }
 
-export class NypsiCommandInteraction extends CommandInteraction {
-    public author: User
-    declare member: GuildMember
-    public mentions?: {
-        members: Collection<string, GuildMember>
+export interface NypsiCommandInteraction extends CommandInteraction {
+    author?: User
+    mentions?: {
+        members?: Collection<string, GuildMember>
     }
+    member: GuildMember
+    interaction?: boolean
 }
 
-// export type NypsiCommandInteraction = CommandInteraction & {
-//     author: User
-// }
-
-// export class NypsiCommandInteraction extends CommandInteraction {
-//     constructor(data) {
-//         super()
-//     }
-// }
+export function createNypsiInteraction(interaction: any): NypsiCommandInteraction & CommandInteraction {
+    interaction.author = interaction.user
+    interaction.interaction = true
+    return interaction
+}
