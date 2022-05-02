@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 const { updateXp, getXp, userExists, createUser } = require("../utils/economy/utils.js")
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getMember } from "../utils/utils"
 
 const cache = new Map()
@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args[0])
+            member = await getMember(message.guild, args[0])
         } else {
             member = message.mentions.members.first()
         }
