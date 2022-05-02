@@ -22,7 +22,7 @@ const client = new Discord.Client({
             name: "nypsi.xyz",
         },
     },
-    restTimeOffset: 169,
+    restTimeOffset: 69,
     shards: "auto",
     intents: [
         Discord.Intents.FLAGS.DIRECT_MESSAGES,
