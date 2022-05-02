@@ -251,10 +251,12 @@ export class SpaceX extends Worker {
 
 workers.set(6, SpaceX)
 
+export type Constructor<T> = new (...args: any[]) => T
+
 /**
  *
  * @returns {Map<Number, Worker>}
  */
-export function getAllWorkers(): Map<number, Worker> {
+export function getAllWorkers(): Map<number, Constructor<Worker>> {
     return workers
 }
