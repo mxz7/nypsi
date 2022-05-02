@@ -1,4 +1,6 @@
-const { Worker, isMainThread, parentPort, workerData } = require("worker_threads")
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
+
+declare function require(name: string)
 
 if (isMainThread) {
     /**
@@ -7,7 +9,7 @@ if (isMainThread) {
      * @param {Map<String, Number>} members
      * @returns {Array<String>}
      */
-    module.exports = (array, members) => {
+    module.exports = (array: Array<string>, members: Map<string, number>): Promise<Array<string>> => {
         return new Promise((resolve, reject) => {
             const worker = new Worker(__filename, {
                 workerData: [array, members],
