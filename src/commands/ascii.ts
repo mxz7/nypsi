@@ -1,8 +1,8 @@
-const ascii = require("figlet")
-import { Message } from "discord.js"
+import * as ascii from "figlet"
+import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { getDMsEnabled } = require("../utils/economy/utils.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { getDMsEnabled }  from "../utils/economy/utils.js"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cooldown = new Map()
