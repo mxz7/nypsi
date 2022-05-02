@@ -81,7 +81,7 @@ export function getTier(member: GuildMember | string): number {
  * @param {GuildMember} member
  * @param {Number} level
  */
-export function addMember(member: GuildMember, level: number) {
+export function addMember(member: GuildMember | string, level: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
