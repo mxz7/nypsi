@@ -8,10 +8,8 @@ please make sure to follow the [semantic commit messages guide](https://gist.git
 
 ## before you commit
 
-make sure to check that there are no linting errors.
+before you commit, husky will lint your code and format your code with prettier.
 
-if you don't have eslint installed as an extension, you can run `npx eslint ./` on the commandline.
+linting helps keep your code correct, making sure you dont contribute any errors
 
-## before you create your pull request
-
-please format your code with prettier, you can do this with `npm run format` on the commandline. this helps make it easier for your code to be understood (:
+prettier formatting helps keep the code nicely formatted
