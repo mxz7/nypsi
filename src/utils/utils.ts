@@ -1,5 +1,5 @@
 import dayjs = require("dayjs")
-import { Client, Collection, GuildMember, Message, Webhook } from "discord.js"
+import { Client, Collection, Guild, GuildMember, Message, Webhook } from "discord.js"
 import { ImgurClient } from "imgur"
 import { getZeroWidth } from "./chatreactions/utils"
 import { getDatabase } from "./database/database"
@@ -144,15 +144,15 @@ export async function redditImage(post: any, allowed: any): Promise<string> {
     return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author
 }
 
-export async function getMember(message: Message, memberName: string): Promise<GuildMember> {
-    if (!message.guild) return null
+export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
+    if (!guild) return null
 
     let members: Collection<string, GuildMember>
 
-    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
-        members = message.guild.members.cache
+    if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
+        members = guild.members.cache
     } else {
-        members = await message.guild.members.fetch()
+        members = await guild.members.fetch()
     }
 
     let target: GuildMember
