@@ -671,13 +671,13 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
         return !m.user.bot
     })
 
-    const query = db.prepare("SELECT id, money FROM economy").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 500").all()
 
     const userIDs = []
     const balances = new Map()
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id) && user.money != 0) {
+        if (members.has(user.id) && user.money > 0) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
