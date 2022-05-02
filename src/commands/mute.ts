@@ -1,17 +1,9 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
-const {
-    profileExists,
-    createProfile,
-    newCase,
-    newMute,
-    isMuted,
-    deleteMute,
-    getMuteRole,
-} = require("../utils/moderation/utils")
-const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
+import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js"
+import { profileExists, createProfile, newCase, newMute, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils"
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { getExactMember } = require("../utils/utils")
+import { getExactMember } from "../utils/utils"
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -89,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        const member = await getExactMember(message, args[0])
+        const member = await getExactMember(message.guild, args[0])
 
         if (!member) {
             return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
@@ -99,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const members = message.mentions.members
-    let reason = ""
+    let reason: string | string[] = ""
 
     if (args.length != members.size) {
         for (let i = 0; i < members.size; i++) {
@@ -109,18 +101,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
-    let failed = []
+    const failed = []
 
-    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
+    let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild))
 
     if (!getMuteRole(message.guild)) {
-        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
     if (!muteRole) {
         let channelError = false
         try {
-            muteRole = await message.guild.roles
+            const newMuteRole = await message.guild.roles
                 .create({
                     name: "muted",
                 })
@@ -128,7 +120,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     channelError = true
                 })
 
+            if (newMuteRole instanceof Role) {
+                muteRole = newMuteRole
+            }
+
             message.guild.channels.cache.forEach(async (channel) => {
+                if (channel instanceof ThreadChannel) return
                 await channel.permissionOverwrites
                     .edit(muteRole, {
                         SEND_MESSAGES: false,
@@ -177,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let fail = false
 
-    for (let member of members.keys()) {
+    for (const member of members.keys()) {
         if (members.get(member).user.id == message.client.user.id) {
             await send({ content: "youll never shut me up 😏" })
             continue
@@ -219,7 +216,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (timedMute && time < 600) {
         setTimeout(async () => {
-            for (let member of members.keys()) {
+            for (const member of members.keys()) {
                 await members.get(member).roles.remove(muteRole).catch()
             }
         }, time * 1000)
@@ -251,7 +248,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (failed.length != 0) {
         const failedTags = []
-        for (let fail1 of failed) {
+        for (const fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -259,8 +256,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await send({ embeds: [embed] }).catch()
+        if (message instanceof Message) {
+            await message.delete()
+            await message.member.send({ embeds: [embed] }).catch()
+        } else {
+            await message.reply({ embeds: [embed], ephemeral: true })
+        }
     } else {
         await send({ embeds: [embed] })
     }
@@ -276,7 +277,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
-        for (let fail1 of failed) {
+        for (const fail1 of failed) {
             if (members1.includes(fail1.id)) {
                 members1.splice(members1.indexOf(fail1.id), 1)
             }
@@ -285,7 +286,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     newCase(message.guild, "mute", members1, message.author.tag, storeReason)
 
-    for (let m of members1) {
+    for (const m of members1) {
         if (isMuted(message.guild, members.get(m))) {
             deleteMute(message.guild, members.get(m))
         }
@@ -300,10 +301,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) return
-    for (let m of members1) {
-        m = members.get(m)
+    for (const m of members1) {
+        const mem = members.get(m)
         if (!timedMute) {
-            const embed = new CustomEmbed(m)
+            const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
                 .addField("length", "`permanent`", true)
 
@@ -311,9 +312,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("reason", `\`${reason}\``, true)
             }
 
-            await m.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
         } else {
-            const embed = new CustomEmbed(m)
+            const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
                 .addField("length", `\`${mutedLength}\``, true)
                 .setFooter("unmuted at:")
@@ -323,7 +324,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("reason", `\`${reason}\``, true)
             }
 
-            await m.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
         }
     }
 }
