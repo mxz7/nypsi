@@ -1,5 +1,5 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
@@ -17,7 +17,7 @@ avatar.slashData.addUserOption((option) =>
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     let member
 
     if (args.length == 0) {
@@ -51,9 +51,12 @@ async function run(message: Message, args: string[]) {
     let msg
 
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }

@@ -10,7 +10,7 @@ const {
 const Discord = require("discord.js")
 import { Message } from "discord.js"
 const shuffle = require("shuffle-array")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { isPremium, getTier } = require("../utils/premium/utils")
 
@@ -22,7 +22,7 @@ const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Ca
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {

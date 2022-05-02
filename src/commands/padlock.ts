@@ -1,8 +1,8 @@
 const { getPadlockPrice, userExists, createUser, hasPadlock } = require("../utils/economy/utils.js")
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categories.MONEY)
 
@@ -10,7 +10,7 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categ
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!userExists(message.member)) createUser(message.member)
 
     const embed = new CustomEmbed(message.member).setTitle("padlock | " + message.member.user.username)

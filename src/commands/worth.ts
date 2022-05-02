@@ -1,8 +1,8 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getItems, formatBet, getMulti } = require("../utils/economy/utils")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
 
@@ -13,7 +13,7 @@ const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 0) {

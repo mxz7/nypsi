@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../utils/economy/utils.js")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 

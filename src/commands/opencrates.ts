@@ -1,9 +1,9 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
 const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")
 
 const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY)
@@ -21,9 +21,12 @@ async function run(message) {
     let cooldownLength = 30
 
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }

@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 const { calcMaxBet, userExists, createUser } = require("../utils/economy/utils.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cooldown = new Map()

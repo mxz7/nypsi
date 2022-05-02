@@ -1,8 +1,8 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { commandExists } = require("../utils/commandhandler")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { getTier, getUserCommand, getCommand, setCommand, isPremium } = require("../utils/premium/utils")
 
 const cmd = new Command("customcommand", "create a custom command", Categories.FUN).setAliases(["mycommand", "mycmd"])
@@ -35,7 +35,7 @@ const filterxd = [
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!isPremium(message.author.id)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be at least GOLD tier for this command")],
