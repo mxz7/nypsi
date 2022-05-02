@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../utils/guilds/utils")
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 const { formatDate, daysUntil } = require("../utils/utils")
 
 const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
