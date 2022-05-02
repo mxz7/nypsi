@@ -681,3 +681,9 @@ export function encrypt(content: string): string {
 
     return ciphertext.toString()
 }
+
+export function decrypt(ciphertext: string): string {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.ENCRYPT_KEY)
+
+    return bytes.toString(CryptoJS.enc.Utf8)
+}

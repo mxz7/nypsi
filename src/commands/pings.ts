@@ -6,6 +6,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { fetchUserMentions } from "../utils/users/utils"
 import { getDatabase } from "../utils/database/database"
 import { userExists } from "../utils/economy/utils"
+import { decrypt } from "../utils/utils"
 
 const cooldown = new Map()
 
@@ -79,17 +80,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const i of mentions) {
         if (pages.size == 0) {
             const page1 = []
-            page1.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
+            page1.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`)
             pages.set(1, page1)
         } else {
             const lastPage = pages.size
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = []
-                newPage.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
+                newPage.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`)
                 pages.set(lastPage + 1, newPage)
             } else {
-                pages.get(lastPage).push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
+                pages.get(lastPage).push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`)
             }
         }
     }
