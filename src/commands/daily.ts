@@ -1,8 +1,8 @@
 import { Message } from "discord.js"
 const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier, getLastDaily, setLastDaily } = require("../utils/premium/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cooldown = new Map()

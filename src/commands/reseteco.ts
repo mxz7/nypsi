@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { reset } = require("../utils/economy/utils")
 const { createCaptcha } = require("../utils/utils")

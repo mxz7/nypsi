@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { toggleBan } = require("../utils/economy/utils")
 
 const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE)
@@ -8,7 +8,7 @@ const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (message.author.id != "672793821850894347") return
 
     if (args.length == 0 || args[0].length != 18) {

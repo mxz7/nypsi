@@ -1,7 +1,7 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { fetchUserMentions } = require("../utils/users/utils")
 const { getDatabase } = require("../utils/database/database")
@@ -22,9 +22,12 @@ cmd.slashEnabled = true
  */
 async function run(message) {
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }

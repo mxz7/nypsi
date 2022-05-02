@@ -1,6 +1,6 @@
-const { Message, Permissions } = require("discord.js")
+import { CommandInteraction, Message, Permissions } from "discord.js"
 const Discord = require("discord.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()

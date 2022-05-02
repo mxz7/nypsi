@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const answers = [
@@ -35,7 +35,7 @@ const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const {
     isEcoBanned,
@@ -13,7 +13,7 @@ const {
     getXp,
     setInventory,
 } = require("../utils/economy/utils")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { payment } = require("../utils/logger")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { getMember } = require("../utils/utils")
@@ -26,7 +26,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     let cooldownLength = 15
 
     if (isPremium(message.author.id)) {

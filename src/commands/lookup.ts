@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 const fetch = require("node-fetch")
-const { getPrefix } = require("../utils/guilds/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { getPrefix } from "../utils/guilds/utils"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -12,7 +12,7 @@ const cmd = new Command("lookup", "lookup ip addresses and domains", Categories.
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {

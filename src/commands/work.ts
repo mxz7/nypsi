@@ -1,7 +1,7 @@
 const { workMessages } = require("../../data/lists.json")
 const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { isPremium, getTier } = require("../utils/premium/utils")
 

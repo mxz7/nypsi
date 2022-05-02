@@ -1,7 +1,7 @@
-const { Message, Permissions } = require("discord.js")
+import { CommandInteraction, Message, Permissions } from "discord.js"
 const { newCase, profileExists, createProfile, newBan } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
@@ -17,7 +17,7 @@ cmd.slashData
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (message.interaction) {
             return await message.reply(data)

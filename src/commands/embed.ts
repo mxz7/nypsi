@@ -1,6 +1,6 @@
-const { Message, Permissions } = require("discord.js")
-const { getPrefix } = require("../utils/guilds/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { CommandInteraction, Message, Permissions } from "discord.js"
+import { getPrefix } from "../utils/guilds/utils"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cooldown = new Map()
@@ -11,7 +11,7 @@ const cmd = new Command("embed", "create an embed message", Categories.UTILITY).
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         return
     }
