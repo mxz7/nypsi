@@ -73,7 +73,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 -   nypsi is able to calculate join positions and join dates of any user in any server, this can be seen with `$join` or `$user`
 -   there is also a `$lookup` command which allows you to lookup information about domain names and IP addresses
 
-
 ### 🖼 screenshots
 
 -   `$mc`
