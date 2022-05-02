@@ -8,7 +8,7 @@ import { profileExists, setMuteRole } from "../utils/moderation/utils"
  * @param {Client} client
  * @param {Guild} guild
  */
-module.exports = async (client: Client, guild: Guild) => {
+export default async function guildDelete(client: Client, guild: Guild) {
     if (!guild.name) {
         return
     }

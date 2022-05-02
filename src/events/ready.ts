@@ -11,7 +11,7 @@ declare function require(name: string)
  * @param {Client} client
  * @param {Number} startUp
  */
-module.exports = (client: Client, startUp: number) => {
+export default function ready(client: Client, startUp: number) {
     const games = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"]
 
     setTimeout(() => {

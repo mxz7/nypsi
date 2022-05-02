@@ -6,7 +6,7 @@ import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models
  *
  * @param {Interaction} interaction
  */
-module.exports = async (interaction: Interaction): Promise<CommandInteraction> => {
+export default async function interactionCreate(interaction: Interaction): Promise<CommandInteraction> {
     if (!interaction.isCommand()) return
 
     const message: CommandInteraction & NypsiCommandInteraction = createNypsiInteraction(interaction)
