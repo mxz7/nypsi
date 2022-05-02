@@ -7,7 +7,7 @@ export class Command {
     public category: string
     public permissions?: Array<string>
     public aliases?: Array<string>
-    public slashData: SlashCommandBuilder
+    public slashData?: SlashCommandBuilder
     public slashEnabled: boolean
     public data?: any
     public run: (message: Message | NypsiCommandInteraction, args?: Array<string>) => void
