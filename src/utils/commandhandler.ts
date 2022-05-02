@@ -1,18 +1,19 @@
-const { table, getBorderCharacters } = require("table")
-const { updateXp, getXp, userExists, isEcoBanned } = require("../utils/economy/utils.js")
-const fs = require("fs")
-const { Message, Client, MessageActionRow, MessageButton, GuildMember } = require("discord.js")
-const { getPrefix, getDisabledCommands, getChatFilter, hasGuild, createGuild } = require("../utils/guilds/utils")
-const { CustomEmbed, ErrorEmbed } = require("./models/EmbedBuilders.js")
-const { MStoTime, getNews, formatDate, isLockedOut, createCaptcha, toggleLock } = require("./utils.js")
-const { logger, getTimestamp } = require("./logger.js")
-const { getCommand, addUse } = require("./premium/utils.js")
-const { addKarma, updateLastCommand, getKarma } = require("./karma/utils.js")
-const { REST } = require("@discordjs/rest")
-const { Routes } = require("discord-api-types/v9")
+import { table, getBorderCharacters } from "table"
+import * as fs from "fs"
+import { REST } from "@discordjs/rest"
+import { Routes } from "discord-api-types/v9"
+import { Command, NypsiCommandInteraction } from "./models/Command"
+import { getTimestamp, logger } from "./logger"
+import { Client, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
+import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils"
+import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders"
+import { createCaptcha, formatDate, getNews, isLockedOut, MStoTime, toggleLock } from "./utils"
+import { addUse, getCommand } from "./premium/utils"
+import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils"
+import { addKarma, getKarma, updateLastCommand } from "./karma/utils"
 
-const commands = new Map()
-const aliases = new Map()
+const commands: Map<string, Command> = new Map()
+const aliases: Map<string, string> = new Map()
 const popularCommands = new Map()
 const noLifers = new Map()
 const commandUses = new Map()
@@ -29,19 +30,19 @@ const beingChecked = []
 
 let restarting = false
 
-function loadCommands() {
+export function loadCommands() {
     const commandFiles = fs.readdirSync("./dist/commands/").filter((file) => file.endsWith(".js"))
     const failedTable = []
 
     if (commands.size > 0) {
-        for (let command of commands.keys()) {
+        for (const command of commands.keys()) {
             delete require.cache[require.resolve(`../commands/${command}.js`)]
         }
         commands.clear()
         aliases.clear()
     }
 
-    for (let file of commandFiles) {
+    for (const file of commandFiles) {
         let command
 
         try {
@@ -56,7 +57,7 @@ function loadCommands() {
             if (enabled) {
                 commands.set(command.name, command)
                 if (command.aliases) {
-                    for (let a of command.aliases) {
+                    for (const a of command.aliases) {
                         if (aliases.has(a)) {
                             logger.warn(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`
@@ -91,10 +92,10 @@ function loadCommands() {
  *
  * @param {Array} commandsArray
  */
-function reloadCommand(commandsArray) {
+export function reloadCommand(commandsArray: Array<string>) {
     const reloadTable = []
 
-    for (let cmd of commandsArray) {
+    for (const cmd of commandsArray) {
         try {
             commands.delete(cmd)
             try {
@@ -103,18 +104,18 @@ function reloadCommand(commandsArray) {
                 return logger.error("error deleting from cache")
             }
 
-            const commandData = require(`../commands/${cmd}`)
+            let commandData: Command | number = 0
+
+            commandData = require(`../commands/${cmd}`)
 
             let enabled = true
 
-            if (!commandData.name || !commandData.description || !commandData.run || !commandData.category) {
-                enabled = false
-            }
+            if (!(commandData instanceof Command)) enabled = false
 
-            if (enabled) {
+            if (enabled && commandData instanceof Command) {
                 commands.set(commandData.name, commandData)
                 if (commandData.aliases) {
-                    for (let a of commandData.aliases) {
+                    for (const a of commandData.aliases) {
                         if (aliases.has(a) && aliases.get(a) != commandData.name) {
                             logger.error(
                                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
@@ -148,14 +149,14 @@ function reloadCommand(commandsArray) {
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function helpCmd(message, args) {
+async function helpCmd(message: Message, args: Array<string>) {
     logCommand(message, args)
 
     const helpCategories = new Map()
 
     const prefix = getPrefix(message.guild)
 
-    for (let cmd of commands.keys()) {
+    for (const cmd of commands.keys()) {
         const category = getCmdCategory(cmd)
 
         if (category == "none") continue
@@ -238,7 +239,7 @@ async function helpCmd(message, args) {
             embed.setDescription(pages.get(1).join("\n"))
             embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
-            let cmd
+            let cmd: Command
 
             if (aliases.has(args[0].toLowerCase())) {
                 cmd = commands.get(aliases.get(args[0].toLowerCase()))
@@ -260,7 +261,7 @@ async function helpCmd(message, args) {
             embed.setTitle(`${cmd.name} command`)
             embed.setDescription(desc)
         } else if (getCommand(args[0].toLowerCase())) {
-            const member = await message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner)
+            const member = message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner)
             embed.setTitle("custom command")
             embed.setDescription(
                 `this is a custom command${
@@ -277,7 +278,7 @@ async function helpCmd(message, args) {
     /**
      * @type {Message}
      */
-    let msg
+    let msg: Message
 
     let row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
@@ -299,7 +300,7 @@ async function helpCmd(message, args) {
 
     const pageManager = async () => {
         const reaction = await msg
-            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
                 await collected.deferUpdate()
                 return collected.customId
@@ -364,8 +365,10 @@ async function helpCmd(message, args) {
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function runCommand(cmd, message, args) {
+export async function runCommand(cmd: string, message: Message | NypsiCommandInteraction, args: Array<string>) {
     if (!hasGuild(message.guild)) createGuild(message.guild)
+
+    if (message.channel.type != "GUILD_TEXT") return
 
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
         return message.member
@@ -400,12 +403,12 @@ async function runCommand(cmd, message, args) {
         })
     }
 
-    if (cmd == "help") {
+    if (cmd == "help" && message instanceof Message) {
         return helpCmd(message, args)
     }
 
     let alias = false
-    if (!commandExists(cmd)) {
+    if (!commandExists(cmd) && !(message instanceof NypsiCommandInteraction)) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return
             const customCommand = getCommand(cmd)
@@ -432,7 +435,7 @@ async function runCommand(cmd, message, args) {
 
             const filter = getChatFilter(message.guild)
 
-            let contentToCheck = content.toLowerCase().normalize("NFD")
+            let contentToCheck: string | string[] = content.toLowerCase().normalize("NFD")
 
             contentToCheck = contentToCheck.replace(/[^A-z0-9\s]/g, "")
 
@@ -524,7 +527,7 @@ async function runCommand(cmd, message, args) {
     }
 
     if (restarting) {
-        if (message.author.id == "672793821850894347") {
+        if (message.author.id == "672793821850894347" && message instanceof Message) {
             message.react("💀")
         } else {
             logCommand(message, args)
@@ -542,14 +545,14 @@ async function runCommand(cmd, message, args) {
 
         if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
-            const curr = new Date()
+            const curr = new Date().getTime()
             const diff = Math.round((curr - init) / 1000)
             const time = 60 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
 
-            let remaining
+            let remaining: string
 
             if (minutes != 0) {
                 remaining = `${minutes}m${seconds}s`
@@ -557,17 +560,31 @@ async function runCommand(cmd, message, args) {
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send({
-                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
-            })
+            if (message instanceof Message) {
+                return message.channel.send({
+                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+                })
+            } else {
+                return message.reply({
+                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+                })
+            }
         } else if (commands.get(aliases.get(cmd)).category == "money" && openingCratesBlock.has(message.author.id)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] })
+            if (message instanceof Message) {
+                return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] })
+            } else {
+                return message.reply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] })
+            }
         }
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member)
 
         if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            if (message instanceof Message) {
+                return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            } else {
+                return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            }
         }
         commands.get(aliases.get(cmd)).run(message, args)
         updateLastCommand(message.member)
@@ -580,14 +597,14 @@ async function runCommand(cmd, message, args) {
 
         if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id)
-            const curr = new Date()
+            const curr = new Date().getTime()
             const diff = Math.round((curr - init) / 1000)
             const time = 120 - diff
 
             const minutes = Math.floor(time / 60)
             const seconds = time - minutes * 60
 
-            let remaining
+            let remaining: string
 
             if (minutes != 0) {
                 remaining = `${minutes}m${seconds}s`
@@ -649,7 +666,7 @@ async function runCommand(cmd, message, args) {
  *
  * @param {String} cmd
  */
-function commandExists(cmd) {
+export function commandExists(cmd: string) {
     if (commands.has(cmd)) {
         return true
     } else {
@@ -657,28 +674,22 @@ function commandExists(cmd) {
     }
 }
 
-exports.helpCmd = helpCmd
-exports.loadCommands = loadCommands
-exports.reloadCommand = reloadCommand
-exports.runCommand = runCommand
-exports.commandExists = commandExists
-
-function getCmdName(cmd) {
+function getCmdName(cmd: string): string {
     return commands.get(cmd).name
 }
 
-function getCmdDesc(cmd) {
+function getCmdDesc(cmd: string): string {
     return commands.get(cmd).description
 }
 
-function getCmdCategory(cmd) {
+function getCmdCategory(cmd: string): string {
     return commands.get(cmd).category
 }
 
-async function getRandomCommand() {
+export function getRandomCommand(): Command {
     const a = []
 
-    await commands.forEach((d) => {
+    commands.forEach((d) => {
         if (d.category != "none" && d.category != "nsfw") {
             a.push(d)
         }
@@ -689,20 +700,18 @@ async function getRandomCommand() {
     return choice
 }
 
-exports.getRandomCommand = getRandomCommand
-
 /**
  *
  * @param {Message} message
  * @param {Array<String>} args
  * @param {String} commandName
  */
-function logCommand(message, args) {
+export function logCommand(message: Message | NypsiCommandInteraction, args: Array<string>) {
     args.shift()
 
-    let msg
+    let msg: string
 
-    if (message.interaction) {
+    if (message instanceof NypsiCommandInteraction) {
         msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`
     } else {
         let content = message.content
@@ -714,14 +723,17 @@ function logCommand(message, args) {
         msg = `${message.guild.id} - ${message.author.tag}: ${content}`
     }
 
-    logger.cmd(msg)
+    logger.log({
+        level: "cmd",
+        message: msg,
+    })
 }
 
 /**
  * @param {String} command
  * @param {GuildMember} member
  */
-function updatePopularCommands(command, member) {
+function updatePopularCommands(command: string, member: GuildMember) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1)
     } else {
@@ -758,7 +770,7 @@ function updatePopularCommands(command, member) {
  * @param {String} serverID
  * @param {Array<String>} channelID
  */
-function runPopularCommandsTimer(client, serverID, channelID) {
+export function runPopularCommandsTimer(client: Client, serverID: string, channelID: Array<string>) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -776,7 +788,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             return logger.error("unable to fetch guild for popular commands", serverID, channelID)
         }
 
-        const channel = await guild.channels.cache.find((ch) => ch.id == channelID[0])
+        const channel = guild.channels.cache.find((ch) => ch.id == channelID[0])
 
         if (!channel) {
             return logger.error("unable to find channel for popular commands", serverID, channelID)
@@ -789,10 +801,10 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         let msg = ""
         let count = 1
 
-        for (let [key, value] of sortedCommands) {
+        for (const [key, value] of sortedCommands) {
             if (count >= 11) break
 
-            let pos = count
+            let pos: string | number = count
 
             if (pos == 1) {
                 pos = "🥇"
@@ -820,8 +832,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)`)
         }
 
+        if (channel.type != "GUILD_TEXT") return
+
         await channel.send({ embeds: [embed] })
-        logger.auto("sent popular commands")
+        logger.log({
+            level: "auto",
+            message: "sent popular commands",
+        })
 
         popularCommands.clear()
         noLifers.clear()
@@ -834,11 +851,13 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             return logger.error("unable to fetch guild for popular commands", serverID, channelID)
         }
 
-        const channel = await guild.channels.cache.find((ch) => ch.id == channelID[1])
+        const channel = guild.channels.cache.find((ch) => ch.id == channelID[1])
 
         if (!channel) {
             return logger.error("unable to find channel for hourly command use log", serverID, channelID)
         }
+
+        if (channel.type != "GUILD_TEXT") return
 
         for (const user of commandUses.keys()) {
             const uses = commandUses.get(user)
@@ -881,7 +900,7 @@ function runPopularCommandsTimer(client, serverID, channelID) {
             postPopularCommands()
         }, 86400000)
         postPopularCommands()
-    }, needed - now)
+    }, needed.getTime() - now.getTime())
 
     setTimeout(async () => {
         setInterval(async () => {
@@ -892,10 +911,11 @@ function runPopularCommandsTimer(client, serverID, channelID) {
         setTimeout(updateKarma, 60000)
     }, 3600000)
 
-    logger.auto(`popular commands will run in ${MStoTime(needed - now)}`)
+    logger.log({
+        level: "auto",
+        message: `popular commands will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    })
 }
-
-exports.runPopularCommandsTimer = runPopularCommandsTimer
 
 /**
  *
@@ -903,7 +923,7 @@ exports.runPopularCommandsTimer = runPopularCommandsTimer
  * @param {Client} client
  * @returns
  */
-async function failedCaptcha(member, client) {
+async function failedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513"
     const channelID = "912710094955892817"
 
@@ -913,7 +933,7 @@ async function failedCaptcha(member, client) {
         return logger.error("unable to fetch guild for captcha fail", serverID, channelID)
     }
 
-    const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+    const channel = guild.channels.cache.find((ch) => ch.id == channelID)
 
     if (!channel) {
         return logger.error("unable to find channel for anticheat logs", serverID, channelID)
@@ -924,6 +944,8 @@ async function failedCaptcha(member, client) {
     } else {
         captchaFails.set(member.user.id, 1)
     }
+
+    if (channel.type != "GUILD_TEXT") return
 
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
@@ -938,7 +960,7 @@ async function failedCaptcha(member, client) {
  * @param {Client} client
  * @returns
  */
-async function passedCaptcha(member, client) {
+async function passedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513"
     const channelID = "912710094955892817"
 
@@ -948,7 +970,7 @@ async function passedCaptcha(member, client) {
         return logger.error("unable to fetch guild for captcha pass", serverID, channelID)
     }
 
-    const channel = await guild.channels.cache.find((ch) => ch.id == channelID)
+    const channel = guild.channels.cache.find((ch) => ch.id == channelID)
 
     if (!channel) {
         return logger.error("unable to find channel for anticheat logs", serverID, channelID)
@@ -960,6 +982,8 @@ async function passedCaptcha(member, client) {
         captchaPasses.set(member.user.id, 1)
     }
 
+    if (channel.type != "GUILD_TEXT") return
+
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
             member.user.id
@@ -967,13 +991,11 @@ async function passedCaptcha(member, client) {
     )
 }
 
-function isHandcuffed(id) {
+export function isHandcuffed(id: string): boolean {
     return handcuffs.has(id)
 }
 
-exports.isHandcuffed = isHandcuffed
-
-function addHandcuffs(id) {
+export function addHandcuffs(id: string) {
     handcuffs.set(id, new Date())
 
     setTimeout(() => {
@@ -981,40 +1003,32 @@ function addHandcuffs(id) {
     }, 60000)
 }
 
-exports.addHandcuffs = addHandcuffs
-
-function startRestart() {
+export function startRestart() {
     restarting = true
 }
 
-exports.startRestart = startRestart
-
 /**
  *
  * @param {GuildMember} member
  */
-function startOpeningCrates(member) {
+export function startOpeningCrates(member: GuildMember) {
     openingCratesBlock.add(member.user.id)
 }
 
-exports.startOpeningCrates = startOpeningCrates
-
 /**
  *
  * @param {GuildMember} member
  */
-function stopOpeningCrates(member) {
+export function stopOpeningCrates(member: GuildMember) {
     openingCratesBlock.delete(member.user.id)
 }
-
-exports.stopOpeningCrates = stopOpeningCrates
 
 /**
  *
  * @param {string} guildID
  * @param {string} clientID
  */
-async function uploadGuildCommands(guildID, clientID) {
+export async function uploadGuildCommands(guildID: string, clientID: string) {
     logger.info("started refresh of [/] commands...")
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
 
@@ -1036,14 +1050,12 @@ async function uploadGuildCommands(guildID, clientID) {
     }
 }
 
-exports.uploadGuildCommands = uploadGuildCommands
-
 /**
  *
  * @param {string} guildID
  * @param {string} clientID
  */
-async function uploadGuildCommandsGlobal(clientID) {
+export async function uploadGuildCommandsGlobal(clientID: string) {
     logger.info("started refresh of global [/] commands...")
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN)
 
@@ -1064,5 +1076,3 @@ async function uploadGuildCommandsGlobal(clientID) {
         logger.error(error)
     }
 }
-
-exports.uploadGuildCommandsGlobal = uploadGuildCommandsGlobal
