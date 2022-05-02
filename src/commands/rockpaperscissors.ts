@@ -14,7 +14,7 @@ const {
 import { Message } from "discord.js"
 const shuffle = require("shuffle-array")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { gamble } = require("../utils/logger.js")

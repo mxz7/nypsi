@@ -1,6 +1,6 @@
 const { Message, MessageButton, MessageActionRow } = require("discord.js")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
 const { inPlaceSort } = require("fast-sort")
 const { isPremium, getTier, setExpireDate } = require("../utils/premium/utils")

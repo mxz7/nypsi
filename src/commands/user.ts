@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getMember, formatDate } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const workerSort = require("../utils/workers/sort")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
 const { inPlaceSort } = require("fast-sort")
