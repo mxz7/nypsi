@@ -9,6 +9,7 @@ import { getTier, isPremium } from "../utils/premium/utils"
 import doCollection from "../utils/workers/mentions"
 import { cpu } from "node-os-utils"
 import { getKarma } from "../utils/karma/utils"
+import { encrypt } from "../utils/utils"
 
 declare function require(name: string)
 
@@ -268,7 +269,9 @@ async function addMention() {
         const data = mention.data
         const target = mention.target
 
-        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, data.content)
+        const content = encrypt(data.content)
+
+        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, content)
 
         const mentions = fetchMentions.all(guild, target)
 
