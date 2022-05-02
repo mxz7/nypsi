@@ -2,26 +2,20 @@ import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 
 declare function require(name: string)
 
-if (isMainThread) {
-    /**
-     *
-     * @param {Array<String>} array
-     * @param {Map<String, Number>} members
-     * @returns {Array<String>}
-     */
-    module.exports = (array: Array<string>, members: Map<string, number>): Promise<Array<string>> => {
-        return new Promise((resolve, reject) => {
-            const worker = new Worker(__filename, {
-                workerData: [array, members],
-            })
-            worker.on("message", resolve)
-            worker.on("error", reject)
-            worker.on("exit", (code) => {
-                if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`))
-            })
+export default function doCollection(array: Array<string>): Promise<Array<string>> {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker(__filename, {
+            workerData: [array],
         })
-    }
-} else {
+        worker.on("message", resolve)
+        worker.on("error", reject)
+        worker.on("exit", (code) => {
+            if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`))
+        })
+    })
+}
+
+if (!isMainThread) {
     const db = require("better-sqlite3")("./utils/database/storage.db")
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
