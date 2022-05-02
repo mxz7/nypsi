@@ -7,7 +7,7 @@ import {
     setInventory,
     addItemUse,
 } from "../utils/economy/utils.js"
-import { CommandInteraction, Message } from "discord.js"
+import { CommandInteraction, GuildMember, Message } from "discord.js"
 import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -183,21 +183,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
 }
 
-/**
- *
- * @param {Discord.GuildMember} member
- */
-function deleteBankRobCooldown(member) {
+function deleteBankRobCooldown(member: GuildMember): void {
     cooldown.delete(member.user.id)
 }
 
 cmd.data.deleteBankRobCooldown = deleteBankRobCooldown
 
-/**
- * @returns {Boolean}
- * @param {Discord.GuildMember} member
- */
-function onBankRobCooldown(member) {
+function onBankRobCooldown(member: GuildMember): boolean {
     return cooldown.has(member.user.id)
 }
 
