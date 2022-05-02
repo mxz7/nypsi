@@ -15,7 +15,7 @@ const {
     getInventory,
     setInventory,
 } = require("../utils/economy/utils.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY)

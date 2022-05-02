@@ -1,8 +1,8 @@
 import { Message } from "discord.js"
 const fetch = require("node-fetch")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { cleanString } = require("../utils/utils")
 const { logger } = require("../utils/logger")
@@ -29,7 +29,7 @@ const cmd = new Command("hypixel", "view hypixel stats for a minecraft account",
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const prefix = getPrefix(message.guild)
 
     if (args.length == 0) {

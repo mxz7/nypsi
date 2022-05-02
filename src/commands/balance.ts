@@ -13,9 +13,9 @@ const {
     getPrestige,
     deleteUser,
 } = require("../utils/economy/utils.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"])
 
@@ -29,7 +29,7 @@ cmd.slashData.addUserOption((option) =>
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
         let target = message.mentions.members.first()
 

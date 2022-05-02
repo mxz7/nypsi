@@ -1,5 +1,5 @@
 const { Message, Guild, User } = require("discord.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const {
     topAmount,
@@ -24,7 +24,7 @@ const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["b
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) {

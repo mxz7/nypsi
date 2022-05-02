@@ -1,7 +1,7 @@
-const { Message, Permissions } = require("discord.js")
-import { Command, Categories } from "../utils/models/Command"
+import { CommandInteraction, Message, Permissions } from "discord.js"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 const { setMuteRole, getMuteRole, createProfile, profileExists } = require("../utils/moderation/utils")
 
 const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"])
@@ -10,7 +10,7 @@ const cmd = new Command("muterole", "set the muterole for the server", Categorie
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })

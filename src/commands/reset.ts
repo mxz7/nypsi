@@ -10,7 +10,7 @@ const {
     deleteUser,
     getItems,
 } = require("../utils/economy/utils.js")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { addKarma } = require("../utils/karma/utils.js")
 
