@@ -1,11 +1,11 @@
-const { GuildMember } = require("discord.js")
-const { expireUser, setTier } = require("../utils/premium/utils")
+import { GuildMember } from "discord.js"
+import { expireUser, setTier } from "../utils/premium/utils"
 
 /**
  *
  * @param {GuildMember} member
  */
-module.exports = async (member) => {
+module.exports = async (member: GuildMember) => {
     if (member.guild.id != "747056029795221513") return
 
     if (member.roles.cache.has("747066190530347089")) {
