@@ -22,3 +22,8 @@ export interface EconomyProfile {
     inventory?: any
     workers?: any
 }
+
+export interface LotteryTicket {
+    user_id: string
+    id: number
+}
