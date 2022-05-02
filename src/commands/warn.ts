@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { newCase, profileExists, createProfile } = require("../utils/moderation/utils")
-const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
+import { newCase, profileExists, createProfile } from "../utils/moderation/utils"
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { getExactMember } = require("../utils/utils")
+import { getExactMember } from "../utils/utils"
 
 const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         message.mentions.members.set(member.user.id, member)
     } else if (message.mentions.members.first() == null) {
-        const member = await getExactMember(message, args[0])
+        const member = await getExactMember(message.guild, args[0])
 
         if (!member) {
             return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
@@ -94,10 +94,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
-    let failed = []
-    let error = []
+    const failed = []
+    const error = []
 
-    for (let member of members.keys()) {
+    for (const member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -134,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (failed.length != 0) {
         const failedTags = []
-        for (let fail of failed) {
+        for (const fail of failed) {
             failedTags.push(fail.tag)
         }
 
@@ -143,7 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (error.length != 0) {
         const errorTags = []
-        for (let err of error) {
+        for (const err of error) {
             errorTags.push(err.tag)
         }
 
@@ -151,8 +151,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await send({ embeds: [embed] }).catch()
+        if (message instanceof Message) {
+            await message.delete()
+            await message.member.send({ embeds: [embed] }).catch()
+        } else {
+            await message.reply({ embeds: [embed], ephemeral: true })
+        }
     } else {
         await send({ embeds: [embed] })
     }
@@ -160,7 +164,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
-        for (let fail of failed) {
+        for (const fail of failed) {
             if (members1.includes(fail.id)) {
                 members1.splice(members1.indexOf(fail.id), 1)
             }
