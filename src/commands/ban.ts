@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { newCase, profileExists, createProfile, newBan } = require("../utils/moderation/utils")
-const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
+import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils"
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -42,6 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!profileExists(message.guild)) createProfile(message.guild)
 
     let idOnly = false
+    let id: string
 
     const prefix = getPrefix(message.guild)
 
@@ -80,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!member) {
             idOnly = true
 
-            message.mentions.members.set(args[0], args[0])
+            id = args[0]
         } else {
             message.mentions.members.set(member.user.id, member)
         }
@@ -121,11 +122,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
-    let failed = []
+    const failed = []
     let fail = false
 
-    for (let member of members.keys()) {
-        if (!idOnly) {
+    if (idOnly) {
+        await message.guild.members
+            .ban(id, {
+                days: days,
+                reason: reason,
+            })
+            .then(() => {
+                count++
+            })
+            .catch(() => {
+                if (idOnly) {
+                    fail = true
+                    return send({
+                        embeds: [new ErrorEmbed(`unable to ban the id: \`${id}\``)],
+                    })
+                }
+                failed.push(id)
+            })
+    } else {
+        for (const member of members.keys()) {
             const targetHighestRole = members.get(member).roles.highest
             const memberHighestRole = message.member.roles.highest
 
@@ -142,25 +161,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await message.guild.leave()
                 return
             }
-        }
 
-        await message.guild.members
-            .ban(member, {
-                days: days,
-                reason: reason,
-            })
-            .then(() => {
-                count++
-            })
-            .catch(() => {
-                if (idOnly) {
-                    fail = true
-                    return send({
-                        embeds: [new ErrorEmbed(`unable to ban the id: \`${member}\``)],
-                    })
-                }
-                failed.push(members.get(member).user)
-            })
+            await message.guild.members
+                .ban(member, {
+                    days: days,
+                    reason: reason,
+                })
+                .then(() => {
+                    count++
+                })
+                .catch(() => {
+                    if (idOnly) {
+                        fail = true
+                        return send({
+                            embeds: [new ErrorEmbed(`unable to ban the id: \`${member}\``)],
+                        })
+                    }
+                    failed.push(members.get(member).user)
+                })
+        }
     }
 
     if (fail) return
@@ -206,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (failed.length != 0) {
         const failedTags = []
-        for (let fail1 of failed) {
+        for (const fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -214,22 +233,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await message.member.send({ embeds: [embed] }).catch()
+        if (message instanceof Message) {
+            await message.delete()
+            await message.member.send({ embeds: [embed] }).catch()
+        } else {
+            await message.reply({ embeds: [embed], ephemeral: true })
+        }
     } else {
         await send({ embeds: [embed] })
     }
 
     if (idOnly) {
-        newCase(message.guild, "ban", members.first(), message.member.user.tag, reason.split(": ")[1])
+        newCase(message.guild, "ban", id, message.member.user.tag, reason.split(": ")[1])
         if (temporary) {
-            newBan(message.guild, members.first(), unbanDate)
+            newBan(message.guild, id, unbanDate)
         }
     } else {
         const members1 = Array.from(members.keys())
 
         if (failed.length != 0) {
-            for (fail of failed) {
+            for (const fail of failed) {
                 if (members1.includes(fail.id)) {
                     members1.splice(members1.indexOf(fail.id), 1)
                 }
@@ -243,7 +266,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.join(" ").includes("-s")) return
-        for (let member of members1) {
+        for (const member of members1) {
             const m = members.get(member)
 
             if (reason.split(": ")[1] == "no reason given") {
