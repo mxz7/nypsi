@@ -14,7 +14,7 @@ const {
     deleteUser,
 } = require("../utils/economy/utils.js")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"])

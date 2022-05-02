@@ -3,7 +3,7 @@ const fetch = require("node-fetch")
 import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { cleanString } = require("../utils/utils")
 const { logger } = require("../utils/logger")
 

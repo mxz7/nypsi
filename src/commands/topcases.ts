@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getMember } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cooldown = new Map()

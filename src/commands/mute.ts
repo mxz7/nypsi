@@ -10,7 +10,7 @@ const {
 } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { getExactMember } = require("../utils/utils")
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])

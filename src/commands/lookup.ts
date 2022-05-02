@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 const fetch = require("node-fetch")
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cooldown = new Map()
 
