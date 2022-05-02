@@ -1,12 +1,12 @@
-const { GuildMember } = require("discord.js")
-const { addKarma } = require("../utils/karma/utils")
-const { isPremium, setTier, renewUser, addMember, getTier, expireUser } = require("../utils/premium/utils")
+import { GuildMember } from "discord.js"
+import { addKarma } from "../utils/karma/utils"
+import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils"
 
 /**
  * @param {GuildMember} oldMember
  * @param {GuildMember} newMember
  */
-module.exports = async (oldMember, newMember) => {
+module.exports = async (oldMember: GuildMember, newMember: GuildMember) => {
     if (newMember.guild.id == "747056029795221513") {
         if (oldMember.roles.cache.size < newMember.roles.cache.size) {
             let tier = 0
