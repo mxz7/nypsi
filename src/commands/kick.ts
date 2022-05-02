@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
-const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
+import { profileExists, createProfile, newCase } from "../utils/moderation/utils"
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -104,9 +104,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
-    let failed = []
+    const failed = []
 
-    for (let member of members.keys()) {
+    for (const member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest
         const memberHighestRole = message.member.roles.highest
 
@@ -145,7 +145,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (failed.length != 0) {
         const failedTags = []
-        for (let fail1 of failed) {
+        for (const fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -161,8 +161,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await message.member.send({ embeds: [embed] }).catch()
+        if (message instanceof Message) {
+            await message.delete()
+            await message.member.send({ embeds: [embed] }).catch()
+        } else {
+            await message.reply({ embeds: [embed], ephemeral: true })
+        }
     } else {
         await send({ embeds: [embed] })
     }
@@ -170,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
-        for (let fail of failed) {
+        for (const fail of failed) {
             if (members1.includes(fail.id)) {
                 members1.splice(members1.indexOf(fail.id), 1)
             }
@@ -180,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
 
     if (args.join(" ").includes("-s")) return
-    for (let member of members1) {
+    for (const member of members1) {
         const m = members.get(member)
 
         if (reason.split(": ")[1] == "no reason given") {
