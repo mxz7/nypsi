@@ -1,10 +1,10 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
-const { getMember, formatDate, daysAgo } = require("../utils/utils")
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const workerSort = require("../utils/workers/sort")
-const { inPlaceSort } = require("fast-sort")
+import { Collection, CommandInteraction, GuildMember, Message } from "discord.js"
+import { inPlaceSort } from "fast-sort"
+import { addCooldown, inCooldown } from "../utils/guilds/utils"
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { daysAgo, formatDate, getMember } from "../utils/utils"
+import workerSort from "../utils/workers/sort"
 
 const cmd = new Command("join", "view your join position in the server", Categories.INFO).setAliases(["joined"])
 
@@ -15,27 +15,26 @@ cmd.slashData.addUserOption((option) =>
 
 const sortCache = new Map()
 
-/**
- * @param {Message} message
- * @param {Array<String>} args
- */
-async function run(message, args) {
-    let member
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+    let member: GuildMember
 
     if (args.length == 0) {
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args[0])
+            member = await getMember(message.guild, args[0])
         } else {
             member = message.mentions.members.first()
         }
     }
 
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }
@@ -48,7 +47,7 @@ async function run(message, args) {
     const joinedServer = formatDate(member.joinedAt).toLowerCase()
     const timeAgo = daysAgo(new Date(member.joinedAt))
 
-    let members
+    let members: Collection<string, GuildMember>
 
     if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size) {
         members = message.guild.members.cache
@@ -57,7 +56,7 @@ async function run(message, args) {
         addCooldown(message.guild, 3600)
     }
 
-    let membersSorted = []
+    let membersSorted: string[] = []
 
     if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
         membersSorted = sortCache.get(message.guild.id)
@@ -94,7 +93,7 @@ async function run(message, args) {
         }, 60000 * 10)
     }
 
-    let joinPos = membersSorted.indexOf(member.id) + 1
+    let joinPos: number | string = membersSorted.indexOf(member.id) + 1
 
     if (joinPos == 0) joinPos = "invalid"
 
