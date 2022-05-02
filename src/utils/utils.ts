@@ -1,9 +1,10 @@
 import dayjs = require("dayjs")
-import { Client, Collection, Guild, GuildMember, Message, Webhook } from "discord.js"
+import { Client, Collection, Guild, GuildMember, Webhook } from "discord.js"
 import { ImgurClient } from "imgur"
 import { getZeroWidth } from "./chatreactions/utils"
 import { getDatabase } from "./database/database"
 import { logger } from "./logger"
+import * as CryptoJS from "crypto-js"
 
 declare function require(name: string)
 
@@ -673,4 +674,16 @@ async function fallbackUpload(url: string) {
  */
 export function cleanString(string: string): string {
     return string.replace(/[^A-z0-9\s]/g, "")
+}
+
+export function encrypt(content: string): string {
+    const ciphertext = CryptoJS.AES.encrypt(content, process.env.ENCRYPT_KEY)
+
+    return ciphertext.toString()
+}
+
+export function decrypt(ciphertext: string): string {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.ENCRYPT_KEY)
+
+    return bytes.toString(CryptoJS.enc.Utf8)
 }
