@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getItems, formatBet, getMulti } = require("../utils/economy/utils")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -13,7 +13,7 @@ const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!userExists(message.member)) createUser(message.member)
 
     if (args.length == 0) {

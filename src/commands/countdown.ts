@@ -1,6 +1,6 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
+import { Command, Categories } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../utils/guilds/utils")
 const { isPremium, getTier } = require("../utils/premium/utils")
 const { formatDate, daysUntil } = require("../utils/utils")
@@ -14,7 +14,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })

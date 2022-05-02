@@ -9,7 +9,7 @@ const {
     hasChristmasCountdown,
     createNewChristmasCountdown,
 } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { daysUntilChristmas } = require("../utils/utils")
 
@@ -21,7 +21,7 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", Ca
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })

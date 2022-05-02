@@ -1,6 +1,6 @@
 const { Message, Permissions } = require("discord.js")
 const { getChatFilter, updateChatFilter, getPrefix } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
@@ -11,7 +11,7 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })

@@ -1,6 +1,6 @@
 const { getPadlockPrice, userExists, createUser, hasPadlock } = require("../utils/economy/utils.js")
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
@@ -10,7 +10,7 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categ
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!userExists(message.member)) createUser(message.member)
 
     const embed = new CustomEmbed(message.member).setTitle("padlock | " + message.member.user.username)

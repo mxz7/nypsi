@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getMember } = require("../utils/utils")
 const {
     getBalance,
@@ -13,7 +13,7 @@ const {
     getPrestige,
     deleteUser,
 } = require("../utils/economy/utils.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getPrefix } = require("../utils/guilds/utils")
 
@@ -29,7 +29,7 @@ cmd.slashData.addUserOption((option) =>
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
         let target = message.mentions.members.first()
 

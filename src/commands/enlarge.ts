@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", Categories.UTILITY).setAliases([
@@ -15,17 +15,17 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 3 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

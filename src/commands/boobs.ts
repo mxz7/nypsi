@@ -1,8 +1,8 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { redditImage } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { isPremium } = require("../utils/premium/utils")
+import { isPremium } from "../utils/premium/utils"
 
 const cooldown = new Map()
 
@@ -28,13 +28,13 @@ async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`
