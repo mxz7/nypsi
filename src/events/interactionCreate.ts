@@ -1,19 +1,17 @@
-const { Interaction, User, Collection, CommandInteractionOption } = require("discord.js")
-const { runCommand } = require("../utils/commandhandler")
+import { Collection, CommandInteractionOption, GuildMember } from "discord.js"
+import { runCommand } from "../utils/commandhandler"
+import { NypsiCommandInteraction } from "../utils/models/Command"
 
 /**
  *
  * @param {Interaction} interaction
  */
-module.exports = async (interaction) => {
+module.exports = async (interaction: any): Promise<NypsiCommandInteraction> => {
     if (!interaction.isCommand()) return
 
-    const message = interaction
+    interaction.author = interaction.user
 
-    /**
-     * @type {User}
-     */
-    message.author = interaction.user
+    const message: NypsiCommandInteraction = interaction
 
     const args = [""]
 
@@ -21,7 +19,7 @@ module.exports = async (interaction) => {
      *
      * @param {CommandInteractionOption} arg
      */
-    const parseArgument = async (arg) => {
+    const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
             case "USER":
                 const user = arg.user
@@ -29,7 +27,7 @@ module.exports = async (interaction) => {
                 const guildMember = await interaction.guild.members.fetch(user.id)
 
                 if (guildMember) {
-                    const collection = new Collection()
+                    const collection: Collection<string, GuildMember> = new Collection()
                     collection.set(user.id, guildMember)
                     message.mentions = {
                         members: collection,
@@ -37,7 +35,7 @@ module.exports = async (interaction) => {
                 }
                 break
             case "STRING":
-                for (const str of arg.value.split(" ")) {
+                for (const str of arg.value.toString().split(" ")) {
                     args.push(str)
                 }
                 break
@@ -45,6 +43,7 @@ module.exports = async (interaction) => {
                 args.push(arg.value.toString())
                 break
             case "CHANNEL":
+                // @ts-expect-error will always error bc typescript doesnt know type has been validated
                 args.push(arg.value)
                 break
             case "SUB_COMMAND_GROUP":
@@ -65,8 +64,6 @@ module.exports = async (interaction) => {
     for (const arg of interaction.options.data) {
         await parseArgument(arg)
     }
-
-    message.interaction = true
 
     return runCommand(interaction.commandName, message, args)
 }
