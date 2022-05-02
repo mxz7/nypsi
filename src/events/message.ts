@@ -1,12 +1,15 @@
-const { Message, MessageEmbed, Collection, Permissions } = require("discord.js")
-const { getChatFilter, getPrefix, inCooldown, addCooldown, hasGuild } = require("../utils/guilds/utils")
-const { runCommand } = require("../utils/commandhandler")
-const { logger } = require("../utils/logger")
-const { getDatabase } = require("../utils/database/database")
-const { isPremium, getTier } = require("../utils/premium/utils")
-const doCollection = require("../utils/workers/mentions")
-const { cpu } = require("node-os-utils")
-const { userExists } = require("../utils/economy/utils")
+import { Collection, GuildMember, Message, Permissions, ThreadMember, ThreadMemberManager } from "discord.js"
+import { runCommand } from "../utils/commandhandler"
+import { getDatabase } from "../utils/database/database"
+import { userExists } from "../utils/economy/utils"
+import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils"
+import { logger } from "../utils/logger"
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { getTier, isPremium } from "../utils/premium/utils"
+import doCollection from "../utils/workers/mentions"
+import { cpu } from "node-os-utils"
+
+declare function require(name: string)
 
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
@@ -19,13 +22,13 @@ let mentionInterval
 /**
  * @param {Message} message
  */
-module.exports = async (message) => {
+module.exports = async (message: Message) => {
     if (message.author.bot) return
 
-    if (!message.guild) {
+    if (message.channel.type == "DM") {
         logger.info("message in DM from " + message.author.tag + ": " + message.content)
 
-        const embed = new MessageEmbed()
+        const embed = new CustomEmbed()
             .setTitle("support")
             .setColor("#36393f")
             .setDescription("support server: https://discord.gg/hJTDNST")
@@ -37,13 +40,13 @@ module.exports = async (message) => {
     if (hasGuild(message.guild)) {
         const filter = getChatFilter(message.guild)
 
-        let content = message.content.toLowerCase().normalize("NFD")
+        let content: string | string[] = message.content.toLowerCase().normalize("NFD")
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
         content = content.split(" ")
 
-        for (let word of filter) {
+        for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
                 if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return await message.delete()
             }
@@ -54,12 +57,16 @@ module.exports = async (message) => {
 
     if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId))) {
         if (message.mentions.everyone) {
-            if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
+            if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                 await message.guild.members.fetch()
                 addCooldown(message.guild, 3600)
             }
 
-            let members = message.channel.members || message.channel.guildMembers
+            let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members
+
+            if (members instanceof ThreadMemberManager) {
+                members = members.cache
+            }
 
             mentionQueue.push({
                 type: "collection",
@@ -75,9 +82,15 @@ module.exports = async (message) => {
             }
         } else {
             if (message.mentions.roles.first()) {
-                if (!inCooldown(message.guild) && message.guild.members.cache != message.guild.memberCount) {
+                if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                     await message.guild.members.fetch()
                     addCooldown(message.guild, 3600)
+                }
+
+                let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members
+
+                if (members instanceof ThreadMemberManager) {
+                    members = members.cache
                 }
 
                 message.mentions.roles.forEach((r) => {
@@ -85,7 +98,7 @@ module.exports = async (message) => {
                         type: "collection",
                         members: r.members.clone(),
                         message: message,
-                        channelMembers: message.channel.members,
+                        channelMembers: members,
                         guild: message.guild,
                         url: message.url,
                     })
