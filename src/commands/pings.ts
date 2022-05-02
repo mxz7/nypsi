@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let currentPage = 1
         const lastPage = pages.size
 
-        const edit = async (data, msg) => {
+        const edit = async (data) => {
             if (!(message instanceof Message)) {
                 await message.editReply(data)
                 return await message.fetchReply()
@@ -146,7 +146,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return collected.customId
                 })
                 .catch(async () => {
-                    await edit({ components: [] }).catch(() => {}, msg)
+                    await edit({ components: [] }).catch(() => {})
                 })
 
             if (!reaction) return
@@ -159,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 } else {
                     currentPage--
 
-                    for (let i of pages.get(currentPage)) {
+                    for (const i of pages.get(currentPage)) {
                         const fieldName = i.split("|6|9|")[0]
                         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
                         newEmbed.addField(fieldName, fieldValue)
@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 } else {
                     currentPage++
 
-                    for (let i of pages.get(currentPage)) {
+                    for (const i of pages.get(currentPage)) {
                         const fieldName = i.split("|6|9|")[0]
                         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
                         newEmbed.addField(fieldName, fieldValue)
