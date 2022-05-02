@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 const { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } = require("../utils/guilds/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { logger } = require("../utils/logger")
 
 const cmd = new Command("membercount", "create an updating member count channel for your server", Categories.ADMIN)

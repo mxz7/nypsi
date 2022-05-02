@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
     .setPermissions(["ADMINISTRATOR"])

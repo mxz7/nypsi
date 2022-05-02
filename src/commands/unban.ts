@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { logger } = require("../utils/logger")
 
 const cmd = new Command("unban", "unban one or more users", Categories.MODERATION).setPermissions(["BAN_MEMBERS"])

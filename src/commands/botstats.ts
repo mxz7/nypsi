@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 const { getUserCount, getUserCountGuild } = require("../utils/economy/utils.js")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { cpu } = require("node-os-utils")
 const { logger } = require("../utils/logger")
 const { version } = require("../../package.json")

@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { logger } = require("../utils/logger")
 
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"])

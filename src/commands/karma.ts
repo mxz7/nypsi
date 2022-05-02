@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 const { getMember } = require("../utils/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { getKarma } = require("../utils/karma/utils")
 import { getPrefix } from "../utils/guilds/utils"
 
