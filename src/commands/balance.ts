@@ -1,6 +1,6 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { getMember } from "../utils/utils"
-const {
+import {
     getBalance,
     createUser,
     userExists,
@@ -12,7 +12,7 @@ const {
     getPrestigeRequirementBal,
     getPrestige,
     deleteUser,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"

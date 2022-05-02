@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 const fetch = require("node-fetch")
 import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")

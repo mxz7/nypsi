@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { getMember } from "../utils/utils"
 const {
     updateBalance,
