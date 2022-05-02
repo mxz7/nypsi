@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0 && !message.attachments.first()) {
+    if (args.length == 0 && message instanceof Message && !message.attachments.first()) {
         return send({
             embeds: [new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")],
         })
@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let url
     let name
 
-    if (args.length == 0 || (message.attachments && message.attachments.first())) {
+    if (args.length == 0 || (message instanceof Message && message.attachments && message.attachments.first())) {
         mode = "attachment"
     } else if (args[0]) {
         if (args[0].startsWith("http")) {
@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (mode == "attachment") {
+    if (mode == "attachment" && message instanceof Message) {
         url = message.attachments.first().attachment
         if (args.length != 0) {
             name = args[0]
@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             name = message.attachments.first().name.split(".")[0]
         }
     } else if (mode == "emoji") {
-        let emoji = args[0]
+        let emoji: string | string[] = args[0]
 
         emoji = emoji.split(":")
 
