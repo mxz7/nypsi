@@ -62,6 +62,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
     }
     member: GuildMember
     interaction?: boolean
+    content?: string
 }
 
 export function createNypsiInteraction(interaction: any): NypsiCommandInteraction & CommandInteraction {
