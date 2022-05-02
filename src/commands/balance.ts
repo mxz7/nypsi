@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js"
+import { CommandInteraction, GuildMember, Message } from "discord.js"
 import { getMember } from "../utils/utils"
 import {
     getBalance,
@@ -31,7 +31,7 @@ cmd.slashData.addUserOption((option) =>
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
-        let target = message.mentions.members.first()
+        let target: GuildMember | string = message.mentions.members.first()
 
         if (!target) {
             target = args[0]
@@ -40,6 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (args[1] == "reset") {
             deleteUser(target)
+            if (!(message instanceof Message)) return
             return message.react("✅")
         }
 
@@ -47,6 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         updateBalance(target, amount)
 
+        if (!(message instanceof Message)) return
         return message.react("✅")
     }
 
@@ -56,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         target = message.mentions.members.first()
 
         if (!target) {
-            target = await getMember(message, args.join(" "))
+            target = await getMember(message.guild, args.join(" "))
         }
 
         if (!target) {
