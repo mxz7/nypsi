@@ -4,7 +4,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
 const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 
 const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY)
 

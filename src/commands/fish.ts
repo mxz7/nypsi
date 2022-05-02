@@ -15,7 +15,7 @@ const {
     getXp,
     addItemUse,
 } = require("../utils/economy/utils")
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 
 const cmd = new Command("fish", "go to a pond and fish", Categories.MONEY)
 

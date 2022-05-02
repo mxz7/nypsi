@@ -12,11 +12,11 @@ const {
     getPrestige,
     addGamble,
 } = require("../utils/economy/utils.js")
-const shuffle = require("shuffle-array")
+import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 const { gamble, logger } = require("../utils/logger.js")
 
 const cooldown = new Map()
