@@ -12,7 +12,7 @@ const cmd = new Command("freemoney", "get $1k every 5 minutes", Categories.MONEY
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

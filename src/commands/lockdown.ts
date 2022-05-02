@@ -17,7 +17,7 @@ const cmd = new Command(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     if (
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)

@@ -9,7 +9,7 @@ const cmd = new Command("dobackup", "start a database backup", Categories.NONE).
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     if (message.member.user.id != "672793821850894347") return
 
     doBackup()
