@@ -7,7 +7,7 @@ const queue = new Set()
 /**
  * @param {GuildMember} member
  */
-module.exports = async (member: GuildMember) => {
+export default async function guildMemberAdd(member: GuildMember) {
     if (!hasGuild(member.guild)) createGuild(member.guild)
 
     if (!queue.has(member.guild.id)) {
