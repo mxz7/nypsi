@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 

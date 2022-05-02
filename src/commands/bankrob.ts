@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     createUser,
     updateBalance,
@@ -6,13 +6,12 @@ const {
     getInventory,
     setInventory,
     addItemUse,
-} = require("../utils/economy/utils.js")
-const Discord = require("discord.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
-const shuffle = require("shuffle-array")
+import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 
 const cooldown = new Map()
 
@@ -31,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    const bankWorth = new Discord.Collection()
+    const bankWorth = new Map()
 
     if (getBalance(message.member) > 100000000) {
         bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.01))
@@ -192,7 +191,7 @@ function deleteBankRobCooldown(member) {
     cooldown.delete(member.user.id)
 }
 
-cmd.deleteBankRobCooldown = deleteBankRobCooldown
+cmd.data.deleteBankRobCooldown = deleteBankRobCooldown
 
 /**
  * @returns {Boolean}
@@ -202,7 +201,7 @@ function onBankRobCooldown(member) {
     return cooldown.has(member.user.id)
 }
 
-cmd.onBankRobCooldown = onBankRobCooldown
+cmd.data.onBankRobCooldown = onBankRobCooldown
 
 cmd.setRun(run)
 

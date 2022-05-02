@@ -1,5 +1,5 @@
 const { Message, Collection } = require("discord.js")
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 
