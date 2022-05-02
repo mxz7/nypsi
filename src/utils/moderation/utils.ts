@@ -67,7 +67,13 @@ export function getCaseCount(guild: Guild): number {
  * @param {String} moderator moderator issuing punishment
  * @param {String} command entire message
  */
-export function newCase(guild: Guild, caseType: string, userIDs: Array<string>, moderator: string, command: string) {
+export function newCase(
+    guild: Guild,
+    caseType: string,
+    userIDs: Array<string> | string,
+    moderator: string,
+    command: string
+) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
@@ -178,7 +184,7 @@ export function newMute(guild: Guild, userIDs: Array<string>, date: Date) {
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export function newBan(guild: Guild, userIDs: Array<string>, date: Date) {
+export function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
