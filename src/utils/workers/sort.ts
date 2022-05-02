@@ -2,7 +2,7 @@ import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 
 declare function require(name: string)
 
-export default function sort(array: Array<string>, members: Map<string, number>): Promise<Array<string>> {
+export default function workerSort(array: Array<string>, members: Map<string, number>): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
             workerData: [array, members],
