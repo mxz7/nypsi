@@ -1,10 +1,7 @@
 import { GuildChannel } from "discord.js"
 import { getMuteRole, profileExists } from "../utils/moderation/utils"
 
-/**
- * @param {GuildChannel} channel
- */
-module.exports = async (channel: GuildChannel) => {
+export default async function channelCreate(channel: GuildChannel) {
     if (!channel.guild) return
 
     if (!profileExists(channel.guild)) return

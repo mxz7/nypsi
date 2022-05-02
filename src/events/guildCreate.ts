@@ -3,11 +3,7 @@ import { createGuild, hasGuild, runCheck } from "../utils/guilds/utils"
 import { addKarma } from "../utils/karma/utils"
 import { logger } from "../utils/logger"
 
-/**
- * @param {Client} client
- * @param {Guild} guild
- */
-module.exports = async (client: Client, guild: Guild) => {
+export default async function guildCreate(client: Client, guild: Guild) {
     logger.log({
         level: "guild",
         message: `added to ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,

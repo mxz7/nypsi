@@ -2,7 +2,7 @@ import { Message, Permissions } from "discord.js"
 import { eSnipe } from "../nypsi"
 import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils"
 
-module.exports = async (message: Message, newMessage: Message) => {
+export default async function messageUpdate(message: Message, newMessage: Message) {
     if (!message) return
 
     if (!message.member) return
