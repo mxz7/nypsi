@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
+import { Collection, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton, Role } from "discord.js"
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const roles = message.guild.roles.cache
 
-    let role
+    let role: Role
 
     if (message.mentions.roles.first()) {
         role = message.mentions.roles.first()
@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)] })
     }
 
-    let members
+    let members: Collection<string, GuildMember>
 
     if (
         inCooldown(message.guild) ||
@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const memberList = new Map()
     let count = 0
 
-    await members.forEach((m) => {
+    members.forEach((m) => {
         if (m.roles.cache.has(role.id)) {
             count++
             if (memberList.size >= 1) {
