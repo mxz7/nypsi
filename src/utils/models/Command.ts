@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
-import { CommandInteraction, Message, User } from "discord.js"
+import { CommandInteraction, GuildMember, Message, User } from "discord.js"
 
 export class Command {
     public name: string
@@ -54,6 +54,7 @@ export enum Categories {
 
 export class NypsiCommandInteraction extends CommandInteraction {
     public author: User
+    declare member: GuildMember
 }
 
 // export type NypsiCommandInteraction = CommandInteraction & {
