@@ -56,7 +56,7 @@ async function run(message: Message | NypsiCommandInteraction & CommandInteracti
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    const assLinks = Array.from(assCache.keys())
+    const assLinks: string[] = Array.from(assCache.keys())
 
     const subredditChoice = assLinks[Math.floor(Math.random() * assLinks.length)]
 
