@@ -1,18 +1,21 @@
-const { Client } = require("discord.js")
-const { getRandomCommand } = require("../utils/commandhandler")
-const { logger } = require("../utils/logger")
-const { daysUntilChristmas } = require("../utils/utils")
-const { version } = require("../../package.json")
+import { Client } from "discord.js"
+// @ts-ignore
+import { version } from "../../package.json"
+import { getRandomCommand } from "../utils/commandhandler"
+import { logger } from "../utils/logger"
+import { daysUntilChristmas } from "../utils/utils"
+
+declare function require(name: string)
 
 /**
  * @param {Client} client
  * @param {Number} startUp
  */
-module.exports = async (client, startUp) => {
+module.exports = (client: Client, startUp: number) => {
     const games = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"]
 
-    setTimeout(async () => {
-        const a = await getRandomCommand()
+    setTimeout(() => {
+        const a = getRandomCommand()
 
         let game = games[Math.floor(Math.random() * games.length)]
 
@@ -32,8 +35,8 @@ module.exports = async (client, startUp) => {
         })
     }, 5000)
 
-    setInterval(async () => {
-        const a = await getRandomCommand()
+    setInterval(() => {
+        const a = getRandomCommand()
 
         let game = games[Math.floor(Math.random() * games.length)]
 
@@ -57,7 +60,7 @@ module.exports = async (client, startUp) => {
 
     let memberCount = 0
 
-    await client.guilds.cache.forEach((g) => {
+    client.guilds.cache.forEach((g) => {
         memberCount = memberCount + g.memberCount
     })
 
