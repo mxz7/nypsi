@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { redditImage } from "../utils/utils.js"
 const fetch = require("node-fetch")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"

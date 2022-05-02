@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 const { formatDate } = require("../utils/utils")
 const { getPeaks, inCooldown, addCooldown, runCheck } = require("../utils/guilds/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"

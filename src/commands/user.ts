@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getMember, formatDate } = require("../utils/utils")
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
