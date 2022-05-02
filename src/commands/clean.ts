@@ -1,5 +1,5 @@
 const { getPrefix } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 const { Permissions, Message } = require("discord.js")
 
@@ -19,13 +19,13 @@ async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 30 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

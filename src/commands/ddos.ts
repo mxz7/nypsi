@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
@@ -11,17 +11,17 @@ const cmd = new Command("ddos", "ddos other users (fake)", Categories.FUN).setAl
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 5 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

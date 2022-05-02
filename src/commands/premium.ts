@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getPrefix } = require("../utils/guilds/utils")
 const {
     isPremium,
@@ -12,7 +12,7 @@ const {
     expireUser,
     getUserCommand,
 } = require("../utils/premium/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
 
@@ -22,7 +22,7 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO).
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const defaultMessage = () => {
         if (isPremium(message.member)) {
             const embed = new CustomEmbed(message.member, false)

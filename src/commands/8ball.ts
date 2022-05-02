@@ -1,7 +1,7 @@
-const { Message } = require("discord.js")
-const { isPremium } = require("../utils/premium/utils")
-const { Command, Categories } = require("../utils/models/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
+import { Message } from "discord.js"
+import { isPremium } from "../utils/premium/utils"
+import { Command, Categories } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const answers = [
     "as i see it, yes",
@@ -35,7 +35,7 @@ const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
@@ -45,13 +45,13 @@ async function run(message, args) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

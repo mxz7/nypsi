@@ -1,6 +1,6 @@
 const ascii = require("figlet")
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getDMsEnabled } = require("../utils/economy/utils.js")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -13,7 +13,7 @@ const cmd = new Command("ascii", "create ascii text", Categories.FUN)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const prefix = getPrefix(message.guild)
 
     if (!getDMsEnabled(message.member)) {
@@ -25,13 +25,13 @@ async function run(message, args) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 5 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { logger } = require("../utils/logger")
 
@@ -14,7 +14,7 @@ cmd.slashData.addStringOption((option) => option.setName("user").setDescription(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const send = async (data) => {
         if (message.interaction) {
             await message.reply(data)

@@ -1,6 +1,6 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { isPremium } = require("../utils/premium/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { isPremium } from "../utils/premium/utils"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cooldown = new Map()
@@ -12,7 +12,7 @@ const cmd = new Command("f", "pay your respects", Categories.FUN)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
@@ -22,13 +22,13 @@ async function run(message, args) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = cooldownLength - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`
