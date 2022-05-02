@@ -9,7 +9,7 @@ const cmd = new Command("karmahelp", "help about the karma system", Categories.I
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     const embed = new CustomEmbed(message.member, false).setTitle("karma help")
 
     embed.setDescription(

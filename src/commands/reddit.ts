@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-const { redditImage } = require("../utils/utils")
+import{ redditImage } from "../utils/utils.js"
 const fetch = require("node-fetch")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
