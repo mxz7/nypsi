@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 const { getDMsEnabled } = require("../utils/economy/utils.js")
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
     "findhornymilfsinmyarea",

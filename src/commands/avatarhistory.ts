@@ -1,16 +1,16 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
+import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
-const {
+import {
     usernameProfileExists,
     createUsernameProfile,
     fetchAvatarHistory,
     addNewAvatar,
     clearAvatarHistory,
     isTracking,
-} = require("../utils/users/utils")
-const { getMember, formatDate, uploadImage } = require("../utils/utils")
+} from "../utils/users/utils"
+import { getMember, formatDate, uploadImageToImgur } from "../utils/utils"
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
     "avh",
@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    let member
+    let member: GuildMember
 
     if (args.length == 0) {
         member = message.member
@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args[0])
+            member = await getMember(message.guild, args[0])
         } else {
             member = message.mentions.members.first()
         }
