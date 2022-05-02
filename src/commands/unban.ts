@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
+import { profileExists, createProfile, newCase, deleteBan } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { logger } = require("../utils/logger")
+import { logger } from "../utils/logger"
 
 const cmd = new Command("unban", "unban one or more users", Categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members = []
     const failed = []
 
-    for (let arg of args) {
+    for (const arg of args) {
         if (arg.length == 18) {
             await message.guild.members
                 .unban(arg, message.member.user.tag)
@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         .unban(id, message.member.user.tag)
                         .then((user) => {
                             members.push(user)
-                            deleteBan(message.guild, user)
+                            deleteBan(message.guild, user.id)
                         })
                         .catch(() => {
                             failed.push(arg)
@@ -117,15 +117,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-s")) {
-        await message.delete()
-        await message.member.send({ embeds: [embed] }).catch()
+        if (message instanceof Message) {
+            await message.delete()
+            await message.member.send({ embeds: [embed] }).catch()
+        } else {
+            await message.reply({ embeds: [embed], ephemeral: true })
+        }
     } else {
         await send({ embeds: [embed] })
     }
 
     const members1 = []
 
-    for (let m of members) {
+    for (const m of members) {
         members1.push(m.id)
     }
 
