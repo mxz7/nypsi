@@ -1,7 +1,7 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { formatDate } = require("../utils/utils")
 const { getPeaks, inCooldown, addCooldown, runCheck } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("server", "view information about the server", Categories.INFO).setAliases([
@@ -13,7 +13,7 @@ const cmd = new Command("server", "view information about the server", Categorie
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const server = message.guild
 
     runCheck(server)

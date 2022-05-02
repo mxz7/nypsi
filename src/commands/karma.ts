@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getMember } = require("../utils/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { getKarma } = require("../utils/karma/utils")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -11,7 +11,7 @@ const cmd = new Command("karma", "check how much karma you have", Categories.INF
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     let target = message.member
 
     if (args.length >= 1) {

@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getNews, formatDate, setNews } = require("../utils/utils")
 
 const cmd = new Command("news", "set the news for the help command", Categories.INFO)
@@ -9,7 +9,7 @@ const cmd = new Command("news", "set the news for the help command", Categories.
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (args.length == 0 || message.member.user.id != "672793821850894347") {
         const news = getNews()
 

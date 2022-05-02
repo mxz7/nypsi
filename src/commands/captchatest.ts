@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { toggleLock } = require("../utils/utils")
 
 const cmd = new Command("captchatest", "test an account", Categories.NONE)
@@ -8,7 +8,7 @@ const cmd = new Command("captchatest", "test an account", Categories.NONE)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (message.author.id != "672793821850894347") return
 
     if (args.length == 0 || args[0].length != 18) {

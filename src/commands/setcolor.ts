@@ -1,7 +1,7 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getPrefix } = require("../utils/guilds/utils")
 const { isPremium, getTier, getEmbedColor, setEmbedColor } = require("../utils/premium/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", Categories.UTILITY).setAliases([
@@ -12,7 +12,7 @@ const cmd = new Command("setcolor", "set the color of the bot's messages (premiu
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!isPremium(message.author.id)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi")],

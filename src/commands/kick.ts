@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("kick", "kick one or more users", Categories.MODERATION)
@@ -17,7 +17,7 @@ cmd.slashData
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const send = async (data) => {
         if (message.interaction) {
             await message.reply(data)

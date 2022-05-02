@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
+import { Message } from "discord.js"
 const { getUserCount, getUserCountGuild } = require("../utils/economy/utils.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { cpu } = require("node-os-utils")
 const { logger } = require("../utils/logger")
@@ -18,13 +18,13 @@ async function run(message) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
-        const diff = Math.round((curr - init) / 1000)
+        const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 5 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
 
-        let remaining
+        let remaining: string
 
         if (minutes != 0) {
             remaining = `${minutes}m${seconds}s`

@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("flip", "flip a coin", Categories.UTILITY)
 
@@ -8,7 +8,7 @@ const cmd = new Command("flip", "flip a coin", Categories.UTILITY)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     const headTails = [
         "heads",
         "tails",

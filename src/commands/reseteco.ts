@@ -1,6 +1,6 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
-const { CustomEmbed, ErrorEmbed } = require("../utils/models/EmbedBuilders")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { reset } = require("../utils/economy/utils")
 const { createCaptcha } = require("../utils/utils")
 

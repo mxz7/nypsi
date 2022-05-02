@@ -1,6 +1,6 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix, getDisabledCommands, updateDisabledCommands } = require("../utils/guilds/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { commandExists } = require("../utils/commandhandler")
 
@@ -12,7 +12,7 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
