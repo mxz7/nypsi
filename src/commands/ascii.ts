@@ -2,7 +2,7 @@ import * as ascii from "figlet"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { getDMsEnabled }  from "../utils/economy/utils.js"
+import { getDMsEnabled } from "../utils/economy/utils.js"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cooldown = new Map()

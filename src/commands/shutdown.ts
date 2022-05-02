@@ -13,7 +13,7 @@ let confirm = false
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.member.user.id != "672793821850894347") return
 
     if (confirm == false) {

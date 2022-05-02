@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
+import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -18,13 +18,13 @@ avatar.slashData.addUserOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let member
+    let member: GuildMember
 
     if (args.length == 0) {
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args.join(" "))
+            member = await getMember(message.guild, args.join(" "))
         } else {
             member = message.mentions.members.first()
         }

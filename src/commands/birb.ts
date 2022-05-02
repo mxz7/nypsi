@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import{ redditImage } from "../utils/utils.js"
+import { redditImage } from "../utils/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
@@ -12,7 +12,7 @@ const cmd = new Command("birb", "get a random picture of a birb", Categories.ANI
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
