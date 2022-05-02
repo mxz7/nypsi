@@ -225,8 +225,6 @@ export class PremUser {
     }
 }
 
-exports.PremUser = PremUser
-
 export enum status {
     INACTIVE = 0,
     ACTIVE = 1,
