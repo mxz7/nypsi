@@ -169,7 +169,7 @@ export function getCase(guild: Guild, caseID: number): Case {
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export function newMute(guild: Guild, userIDs: Array<string>, date: Date) {
+export function newMute(guild: Guild, userIDs: Array<string>, date: number) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs]
     }
