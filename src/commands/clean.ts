@@ -13,7 +13,7 @@ const cmd = new Command("clean", "clean up bot commands and responses", Categori
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (cooldown.has(message.member.id)) {

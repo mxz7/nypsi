@@ -13,7 +13,7 @@ const cmd = new Command("work", "work a random job and safely earn a random amou
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     let cooldownLength = 1800
 
     if (isPremium(message.author.id)) {
