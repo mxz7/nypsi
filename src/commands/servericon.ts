@@ -8,7 +8,7 @@ const cmd = new Command("servericon", "get the server icon", Categories.INFO)
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     return message.channel.send({
         embeds: [
             new CustomEmbed(message.member, false).setImage(

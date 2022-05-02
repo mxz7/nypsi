@@ -12,7 +12,7 @@ const cmd = new Command(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message) {
+async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
     const now = new Date().getTime()
 
     const msg = await message.channel.send({ content: "pinging.." })
