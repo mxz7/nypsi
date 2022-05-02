@@ -1398,7 +1398,7 @@ export function getMaxEthereum(member: GuildMember): number {
  *
  * @param {GuildMember} member
  */
-export function deleteUser(member: GuildMember) {
+export function deleteUser(member: GuildMember | string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
