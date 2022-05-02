@@ -3,7 +3,7 @@ const { updateXp, getXp, userExists, createUser } = require("../utils/economy/ut
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 
 const cache = new Map()
 const cooldown = new Map()

@@ -1,4 +1,4 @@
-const { Message, MessageActionRow, MessageButton } = require("discord.js")
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
@@ -12,7 +12,7 @@ const cmd = new Command("clearinventory", "clear your inventory. this cannot be 
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!userExists(message.member)) createUser(message.member)
 
     const inventory = getInventory(message.member)

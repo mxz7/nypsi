@@ -15,7 +15,7 @@ const {
 } = require("../utils/economy/utils")
 import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier } = require("../utils/premium/utils")
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 const { onBankRobCooldown, deleteBankRobCooldown } = require("./bankrob")
 const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
 

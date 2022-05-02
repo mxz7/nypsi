@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { getKarma } = require("../utils/karma/utils")

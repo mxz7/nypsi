@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { isPremium, getTier } = require("../utils/premium/utils")
 

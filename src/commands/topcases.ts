@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 
