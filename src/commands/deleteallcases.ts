@@ -11,7 +11,7 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", Catego
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (

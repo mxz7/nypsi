@@ -17,7 +17,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     let cooldownLength = 30
 
     const send = async (data) => {

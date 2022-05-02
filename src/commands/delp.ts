@@ -11,7 +11,7 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", Categorie
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     let cooldownLength = 30
 
     if (isPremium(message.author.id)) {
