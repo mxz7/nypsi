@@ -6,3 +6,4 @@ mkdir backup
 cd ..
 mkdir logs
 cd ..
+mv .env.example .env
