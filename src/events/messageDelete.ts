@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 import { snipe } from "../nypsi"
 import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils"
 
-module.exports = (message: Message) => {
+export default async function messageDelete(message: Message) {
     if (!message) return
 
     if (!message.member) return

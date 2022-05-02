@@ -7,7 +7,7 @@ import { uploadImageToImgur } from "../utils/utils"
 const queue: User[] = []
 let interval
 
-module.exports = async (oldUser: User, newUser: User) => {
+export default async function userUpdate(oldUser: User, newUser: User) {
     if (oldUser.tag != newUser.tag) {
         if (!usernameProfileExists(newUser.id)) {
             createUsernameProfile(newUser, oldUser.tag)
