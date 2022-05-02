@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { startRestart } = require("../utils/commandhandler")

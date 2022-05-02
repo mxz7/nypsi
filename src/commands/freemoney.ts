@@ -1,5 +1,5 @@
 const { userExists, updateBalance, getBalance, createUser } = require("../utils/economy/utils.js")
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { isPremium, getTier } = require("../utils/premium/utils")
