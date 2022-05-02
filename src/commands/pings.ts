@@ -1,4 +1,4 @@
-const { Message, MessageActionRow, MessageButton } = require("discord.js")
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -20,7 +20,7 @@ cmd.slashEnabled = true
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)

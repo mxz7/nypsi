@@ -3,7 +3,7 @@ const { default: fetch } = require("node-fetch")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getLastfmUsername } = require("../utils/users/utils")
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("nowplaying", "view yours or another user's currently playing song", Categories.INFO).setAliases([
