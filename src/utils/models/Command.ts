@@ -9,6 +9,7 @@ export class Command {
     public aliases?: Array<string>
     public slashData: SlashCommandBuilder
     public slashEnabled: boolean
+    public data?: any
     public run: (message: Message | NypsiCommandInteraction, args?: Array<string>) => void
 
     constructor(name: string, description: string, category: Categories) {
