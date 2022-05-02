@@ -63,7 +63,7 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title: string, text: string, inline: boolean) {
+    addField(title: string, text: string, inline?: boolean) {
         if (text.length > 1000) {
             text = text.substr(0, 1000)
         }
@@ -181,7 +181,7 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title: string, text: string, inline: boolean) {
+    addField(title: string, text: string, inline?: boolean) {
         if (text.length > 1000) {
             text = text.substring(0, 1000)
         }
