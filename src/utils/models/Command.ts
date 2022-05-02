@@ -9,7 +9,7 @@ export class Command {
     public aliases?: Array<string>
     public slashData: SlashCommandBuilder
     public slashEnabled: boolean
-    public run: (message: Message, args: Array<string>) => void
+    public run: (message: Message | NypsiCommandInteraction, args?: Array<string>) => void
 
     constructor(name: string, description: string, category: Categories) {
         this.name = name.toLowerCase()
