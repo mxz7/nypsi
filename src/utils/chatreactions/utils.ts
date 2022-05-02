@@ -733,5 +733,3 @@ async function getDefaultWords(): Promise<Array<string>> {
 export function getZeroWidth() {
     return "​"
 }
-
-exports.getZeroWidth = getZeroWidth
