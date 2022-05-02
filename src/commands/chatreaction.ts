@@ -15,9 +15,9 @@ const {
     setBlacklisted,
     deleteStats,
 } = require("../utils/chatreactions/utils")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"])
@@ -130,7 +130,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     let cooldownLength = 10
 
     if (isPremium(message.author.id)) {
@@ -138,9 +138,12 @@ async function run(message: Message, args: string[]) {
     }
 
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }

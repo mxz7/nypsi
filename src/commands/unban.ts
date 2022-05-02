@@ -1,7 +1,7 @@
-const { Message, Permissions } = require("discord.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { CommandInteraction, Message, Permissions } from "discord.js"
+import { getPrefix } from "../utils/guilds/utils"
 const { profileExists, createProfile, newCase, deleteBan } = require("../utils/moderation/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const { logger } = require("../utils/logger")
 
@@ -14,11 +14,14 @@ cmd.slashData.addStringOption((option) => option.setName("user").setDescription(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply(data)
-            return await message.fetchReply()
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
         } else {
             return await message.channel.send(data)
         }

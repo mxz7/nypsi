@@ -1,5 +1,5 @@
-const { getPrefix } = require("../utils/guilds/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { getPrefix } from "../utils/guilds/utils"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
 const { Permissions, Message } = require("discord.js")
 

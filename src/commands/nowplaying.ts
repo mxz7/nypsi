@@ -1,10 +1,10 @@
 import { Message } from "discord.js"
 const { default: fetch } = require("node-fetch")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getLastfmUsername } = require("../utils/users/utils")
 const { getMember } = require("../utils/utils")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("nowplaying", "view yours or another user's currently playing song", Categories.INFO).setAliases([
     "np",
@@ -16,7 +16,7 @@ const cooldown = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()

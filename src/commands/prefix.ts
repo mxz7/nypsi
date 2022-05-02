@@ -1,6 +1,6 @@
-const { Message, Permissions } = require("discord.js")
+import { CommandInteraction, Message, Permissions } from "discord.js"
 const { getPrefix, setPrefix } = require("../utils/guilds/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).setPermissions(["MANAGE_GUILD"])
@@ -9,7 +9,7 @@ const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).s
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const prefix = getPrefix(message.guild)
 
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {

@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 const { getNews, formatDate, setNews } = require("../utils/utils")
 
@@ -9,7 +9,7 @@ const cmd = new Command("news", "set the news for the help command", Categories.
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (args.length == 0 || message.member.user.id != "672793821850894347") {
         const news = getNews()
 

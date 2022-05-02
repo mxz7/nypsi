@@ -1,9 +1,9 @@
-const { Message, Permissions } = require("discord.js")
+import { CommandInteraction, Message, Permissions } from "discord.js"
 const { profileExists, getAllCases } = require("../utils/moderation/utils")
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 
 const cooldown = new Map()
 
@@ -15,7 +15,7 @@ const cmd = new Command("topcases", "see who has the top moderation cases", Cate
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })

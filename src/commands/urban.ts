@@ -1,8 +1,8 @@
 const urban = require("urban-dictionary")
 import { Message } from "discord.js"
-import { Command, Categories } from "../utils/models/Command"
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { getPrefix } = require("../utils/guilds/utils")
+import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 const { inPlaceSort } = require("fast-sort")
 
@@ -14,7 +14,7 @@ const cmd = new Command("urban", "get a definition from urban dictionary", Categ
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message, args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {
