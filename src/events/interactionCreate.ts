@@ -63,5 +63,7 @@ export default async function interactionCreate(interaction: Interaction): Promi
         await parseArgument(arg)
     }
 
+    message.content = `[/]${interaction.commandName} ${args.join(" ")}`
+
     return runCommand(interaction.commandName, message, args)
 }
