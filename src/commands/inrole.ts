@@ -1,4 +1,4 @@
-const { Message, MessageActionRow, MessageButton } = require("discord.js")
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
