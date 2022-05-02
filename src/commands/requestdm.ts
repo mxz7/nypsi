@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed } = require("../utils/models/EmbedBuilders")
 
 const cmd = new Command(
@@ -12,7 +12,7 @@ const cmd = new Command(
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (message.author.id != "672793821850894347") return
 
     if (args.length < 2) {

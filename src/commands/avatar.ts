@@ -1,5 +1,5 @@
 const { Message, MessageActionRow, MessageButton } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { getMember } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
@@ -17,7 +17,7 @@ avatar.slashData.addUserOption((option) =>
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     let member
 
     if (args.length == 0) {

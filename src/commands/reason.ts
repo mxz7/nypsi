@@ -1,7 +1,7 @@
 const { Message, Permissions } = require("discord.js")
 const { getPrefix } = require("../utils/guilds/utils")
 const { getCase, setReason } = require("../utils/moderation/utils")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("reason", "set a reason for a case/punishment", Categories.MODERATION).setPermissions([
@@ -12,7 +12,7 @@ const cmd = new Command("reason", "set a reason for a case/punishment", Categori
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
 
     const prefix = getPrefix(message.guild)

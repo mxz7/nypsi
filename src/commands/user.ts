@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { getMember, formatDate } = require("../utils/utils")
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const workerSort = require("../utils/workers/sort")
@@ -15,7 +15,7 @@ const sortCache = new Map()
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     let member
 
     if (args.length == 0) {

@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
 const { commandExists } = require("../utils/commandhandler")
 const { getPrefix } = require("../utils/guilds/utils")
@@ -35,7 +35,7 @@ const filterxd = [
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!isPremium(message.author.id)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be at least GOLD tier for this command")],

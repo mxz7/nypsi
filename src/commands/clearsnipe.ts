@@ -1,5 +1,5 @@
 const { Message, Permissions } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Command, Categories } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 
 const cmd = new Command("clearsnipe", "delete the current sniped thing", Categories.MODERATION)
@@ -10,7 +10,7 @@ const cmd = new Command("clearsnipe", "delete the current sniped thing", Categor
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
     const { snipe, eSnipe } = require("../nypsi.js")
 

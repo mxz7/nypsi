@@ -1,5 +1,5 @@
-const { Message } = require("discord.js")
-const { Command, Categories } = require("../utils/models/Command")
+import { Message } from "discord.js"
+import { Command, Categories } from "../utils/models/Command"
 const { uploadGuildCommands, uploadGuildCommandsGlobal } = require("../utils/commandhandler")
 
 const cmd = new Command("reloadslash", "reload data for slash commands", Categories.NONE).setPermissions(["bot owner"])
@@ -8,7 +8,7 @@ const cmd = new Command("reloadslash", "reload data for slash commands", Categor
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message, args) {
+async function run(message: Message, args: string[]) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) {
