@@ -176,7 +176,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const filter = (i) => i.user.id == message.author.id
 
         const edit = async (data, msg) => {
-            if (message.interaction) {
+            if (!(message instanceof Message)) {
                 await message.editReply(data)
                 return await message.fetchReply()
             } else {

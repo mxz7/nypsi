@@ -3,9 +3,9 @@ import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { fetchUserMentions } = require("../utils/users/utils")
-const { getDatabase } = require("../utils/database/database")
-const { userExists } = require("../utils/economy/utils")
+import { fetchUserMentions } from "../utils/users/utils"
+import { getDatabase } from "../utils/database/database"
+import { userExists } from "../utils/economy/utils"
 
 const cooldown = new Map()
 
@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const pages = new Map()
 
-    for (let i of mentions) {
+    for (const i of mentions) {
         if (pages.size == 0) {
             const page1 = []
             page1.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${i.content}\n[jump](${i.url})`)
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, false).setTitle("recent mentions")
 
-    for (let i of pages.get(1)) {
+    for (const i of pages.get(1)) {
         const fieldName = i.split("|6|9|")[0]
         const fieldValue = i.split("|6|9|").splice(-1, 1).join("")
         embed.addField(fieldName, fieldValue)
@@ -128,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const lastPage = pages.size
 
         const edit = async (data, msg) => {
-            if (message.interaction) {
+            if (!(message instanceof Message)) {
                 await message.editReply(data)
                 return await message.fetchReply()
             } else {
