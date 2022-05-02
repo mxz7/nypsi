@@ -136,7 +136,7 @@ export function getPremiumProfile(member: GuildMember | string): PremUser {
  * @param {GuildMember} member
  * @param {Number} level
  */
-export function setTier(member: GuildMember, level: number) {
+export function setTier(member: GuildMember | string, level: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
