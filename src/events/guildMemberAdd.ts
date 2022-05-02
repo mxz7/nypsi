@@ -1,13 +1,13 @@
-const { GuildMember } = require("discord.js")
-const { runCheck, hasGuild, createGuild } = require("../utils/guilds/utils")
-const { profileExists, isMuted, deleteMute, getMuteRole } = require("../utils/moderation/utils")
+import { GuildMember } from "discord.js"
+import { createGuild, hasGuild, runCheck } from "../utils/guilds/utils"
+import { deleteMute, getMuteRole, isMuted, profileExists } from "../utils/moderation/utils"
 
 const queue = new Set()
 
 /**
  * @param {GuildMember} member
  */
-module.exports = async (member) => {
+module.exports = async (member: GuildMember) => {
     if (!hasGuild(member.guild)) createGuild(member.guild)
 
     if (!queue.has(member.guild.id)) {
