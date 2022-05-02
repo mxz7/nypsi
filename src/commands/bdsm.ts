@@ -39,7 +39,7 @@ async function run(message: Message | NypsiCommandInteraction & CommandInteracti
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (!message.channel.nsfw) {
+    if (message.channel.type == "GUILD_TEXT" && !message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
