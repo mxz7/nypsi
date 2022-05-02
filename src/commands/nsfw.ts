@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("nsfw", "toggle nsfw on a channel", Categories.ADMIN).setPermissions(["MANAGE_CHANNELS"])
 

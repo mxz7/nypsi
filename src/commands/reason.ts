@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
 const { getCase, setReason } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("reason", "set a reason for a case/punishment", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",

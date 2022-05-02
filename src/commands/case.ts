@@ -2,7 +2,7 @@ const { Message, Permissions, MessageActionRow, MessageButton } = require("disco
 import { getPrefix } from "../utils/guilds/utils"
 const { getCase, deleteCase, profileExists, createProfile } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("case", "get information about a given case", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",

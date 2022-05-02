@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 const { getChatFilter, updateChatFilter, getPrefix } = require("../utils/guilds/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
     .setAliases(["filter"])

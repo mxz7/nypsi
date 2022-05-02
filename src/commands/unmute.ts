@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 const { inCooldown, addCooldown, getPrefix } = require("../utils/guilds/utils")
 const { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const { getExactMember } = require("../utils/utils")
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
