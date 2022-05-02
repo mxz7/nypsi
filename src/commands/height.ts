@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args[0])
+            member = await getMember(message.guild, args[0])
         } else {
             member = message.mentions.members.first()
         }

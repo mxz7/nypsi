@@ -2,7 +2,7 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 const { inPlaceSort } = require("fast-sort")
 
 const cmd = new Command(

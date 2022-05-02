@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", Categories.UTILITY).setAliases([
     "emoji",

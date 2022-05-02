@@ -16,7 +16,7 @@ const {
 } = require("../utils/economy/utils.js")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 const { daysAgo, daysUntil } = require("../utils/utils")
 
 const cooldown = new Map()

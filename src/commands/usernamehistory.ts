@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
 const {
     usernameProfileExists,
