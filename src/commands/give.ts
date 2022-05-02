@@ -15,7 +15,7 @@ const {
 } = require("../utils/economy/utils")
 import { getPrefix } from "../utils/guilds/utils"
 const { payment } = require("../utils/logger")
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 import { getMember } from "../utils/utils"
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY)

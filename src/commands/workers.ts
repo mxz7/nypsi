@@ -14,7 +14,7 @@ const {
 } = require("../utils/economy/utils")
 const { getAllWorkers, Worker } = require("../utils/economy/workers")
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
     "worker",

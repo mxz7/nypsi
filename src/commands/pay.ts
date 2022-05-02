@@ -13,7 +13,7 @@ const {
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier } = require("../utils/premium/utils")
+import { isPremium, getTier } from "../utils/premium/utils"
 const { payment } = require("../utils/logger")
 
 const cooldown = new Map()
