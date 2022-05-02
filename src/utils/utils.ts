@@ -219,18 +219,18 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
 /**
  *
- * @param {Message} message
+ * @param {Message} guild
  * @param {String} memberName
  */
-export async function getExactMember(message: Message, memberName: string): Promise<GuildMember> {
-    if (!message.guild) return null
+export async function getExactMember(guild: Guild, memberName: string): Promise<GuildMember> {
+    if (!guild) return null
 
     let members: Collection<string, GuildMember>
 
-    if (message.guild.memberCount == message.guild.members.cache.size && message.guild.memberCount <= 25) {
-        members = message.guild.members.cache
+    if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
+        members = guild.members.cache
     } else {
-        members = await message.guild.members.fetch()
+        members = await guild.members.fetch()
     }
 
     const target = members.find(
