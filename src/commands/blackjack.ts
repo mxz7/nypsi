@@ -1,4 +1,4 @@
-const { Message, MessageActionRow, MessageButton } = require("discord.js")
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 const {
     userExists,
     createUser,

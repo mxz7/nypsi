@@ -1,4 +1,4 @@
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"

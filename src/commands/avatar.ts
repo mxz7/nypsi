@@ -1,6 +1,6 @@
-const { Message, MessageActionRow, MessageButton } = require("discord.js")
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const avatar = new Command("avatar", "get a person's avatar", Categories.INFO)

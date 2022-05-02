@@ -1,4 +1,4 @@
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 const {
     userExists,
     updateBalance,

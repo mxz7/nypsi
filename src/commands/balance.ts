@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 const {
     getBalance,
     createUser,

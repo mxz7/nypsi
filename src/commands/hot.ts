@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 const { ErrorEmbed, CustomEmbed } = require("../utils/models/EmbedBuilders")
-const { getMember } = require("../utils/utils")
+import { getMember } from "../utils/utils"
 const { updateBalance, getBalance, userExists, createUser } = require("../utils/economy/utils")
 
 const cache = new Map()
