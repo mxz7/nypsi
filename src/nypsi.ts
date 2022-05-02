@@ -1,8 +1,29 @@
 const startUp = Date.now()
 
-require("dotenv").config()
+import "dotenv/config"
+import * as Discord from "discord.js"
+import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler"
+import guildCreate from "./events/guildCreate"
+import ready from "./events/ready"
+import guildDelete from "./events/guildDelete"
+import guildMemberUpdate from "./events/guildMemberUpdate"
+import guildMemberAdd from "./events/guildMemberAdd"
+import guildMemberRemove from "./events/guildMemberRemove"
+import messageDelete from "./events/messageDelete"
+import messageUpdate from "./events/messageUpdate"
+import messageCreate from "./events/message"
+import channelCreate from "./events/channelCreate"
+import roleDelete from "./events/roleDelete"
+import userUpdate from "./events/userUpdate"
+import interactionCreate from "./events/interactionCreate"
+import { getWebhooks, logger } from "./utils/logger"
+import { checkStats, createGuild, hasGuild, runChristmas, runCountdowns } from "./utils/guilds/utils"
+import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils"
+import { showTopGlobalBal } from "./utils/utils"
+import { updateCache } from "./utils/imghandler"
+import { runModerationChecks } from "./utils/moderation/utils"
+import { WebhookPayload } from "@top-gg/sdk"
 
-const Discord = require("discord.js")
 const client = new Discord.Client({
     allowedMentions: {
         parse: ["users", "roles"],
@@ -18,9 +39,11 @@ const client = new Discord.Client({
     },
     presence: {
         status: "dnd",
-        activity: {
-            name: "nypsi.xyz",
-        },
+        activities: [
+            {
+                name: "nypsi.xyz",
+            },
+        ],
     },
     restTimeOffset: 69,
     shards: "auto",
@@ -37,35 +60,12 @@ const client = new Discord.Client({
     ],
 })
 
-const { updateStats, doVote, runLotteryInterval } = require("./utils/economy/utils.js")
-const { checkStats, runCountdowns, hasGuild, createGuild, runChristmas } = require("./utils/guilds/utils.js")
-const { loadCommands, runPopularCommandsTimer } = require("./utils/commandhandler")
-const { updateCache } = require("./utils/imghandler")
-const { showTopGlobalBal } = require("./utils/utils")
-const { runModerationChecks } = require("./utils/moderation/utils")
-const { getWebhooks, logger } = require("./utils/logger")
-
 const snipe = new Map()
 const eSnipe = new Map()
 
-exports.eSnipe = eSnipe
-exports.snipe = snipe
+export { eSnipe, snipe }
 
 loadCommands()
-
-const ready = require("./events/ready")
-const guildCreate = require("./events/guildCreate")
-const guildDelete = require("./events/guildDelete")
-const guildMemberUpdate = require("./events/guildMemberUpdate")
-const guildMemberAdd = require("./events/guildMemberAdd")
-const messageDelete = require("./events/messageDelete")
-const messageUpdate = require("./events/messageUpdate")
-const message = require("./events/message")
-const channelCreate = require("./events/channelCreate")
-const roleDelete = require("./events/roleDelete")
-const guildMemberRemove = require("./events/guildMemberRemove")
-const userUpdate = require("./events/userUpdate")
-const interactionCreate = require("./events/interactionCreate")
 
 client.once("ready", ready.bind(null, client, startUp))
 if (!process.env.GITHUB_ACTION) {
@@ -81,24 +81,32 @@ if (!process.env.GITHUB_ACTION) {
     client.on("guildMemberRemove", guildMemberRemove.bind(null))
     client.on("messageDelete", messageDelete.bind(null))
     client.on("messageUpdate", messageUpdate.bind(null))
-    client.on("messageCreate", message.bind(null))
+    client.on("messageCreate", messageCreate.bind(null))
     client.on("channelCreate", channelCreate.bind(null))
     client.on("roleDelete", roleDelete.bind(null))
     client.on("userUpdate", userUpdate.bind(null))
     client.on("interactionCreate", interactionCreate.bind(null))
 }
 
-client.on("shardReady", (shardID) => logger.info(`shard#${shardID} ready`))
-client.on("shardDisconnect", (s, shardID) => logger.info(`shard#${shardID} disconnected`))
-client.on("shardError", (error1, shardID) => logger.error(`shard#${shardID} error: ${error1}`))
-client.on("shardReconnecting", (shardID) => logger.info(`shard#${shardID} connecting`))
+client.on("shardReady", (shardID) => {
+    logger.info(`shard#${shardID} ready`)
+})
+client.on("shardDisconnect", (s, shardID) => {
+    logger.info(`shard#${shardID} disconnected`)
+})
+client.on("shardError", (error1, shardID) => {
+    logger.error(`shard#${shardID} error: ${error1}`)
+})
+client.on("shardReconnecting", (shardID) => {
+    logger.info(`shard#${shardID} connecting`)
+})
 
-process.on("unhandledRejection", (e) => {
+process.on("unhandledRejection", (e: any) => {
     logger.error(e.stack)
 })
 
-async function checkGuild(guildID) {
-    const g = await client.guilds.cache.find((gi) => gi.id == guildID)
+export function checkGuild(guildID: string) {
+    const g = client.guilds.cache.find((gi) => gi.id == guildID)
 
     if (g) {
         return true
@@ -107,10 +115,8 @@ async function checkGuild(guildID) {
     }
 }
 
-exports.checkGuild = checkGuild
-
-async function runChecks() {
-    setInterval(async () => {
+function runChecks() {
+    setInterval(() => {
         client.guilds.cache.forEach((guild) => {
             if (!hasGuild(guild)) return createGuild(guild)
         })
@@ -120,31 +126,35 @@ async function runChecks() {
 
     if (client.user.id != "678711738845102087") return
 
-    setInterval(async () => {
-        await updateStats(client.guilds.cache.size, client.options.shardCount)
-        logger.auto("guild count posted to top.gg: " + client.guilds.cache.size)
+    setInterval(() => {
+        updateStats(client.guilds.cache.size, client.options.shardCount)
+        logger.log({
+            level: "auto",
+            message: "guild count posted to top.gg: " + client.guilds.cache.size,
+        })
     }, 3600000)
 
-    await updateStats(client.guilds.cache.size, client.options.shardCount)
-    logger.auto("guild count posted to top.gg: " + client.guilds.cache.size)
+    updateStats(client.guilds.cache.size, client.options.shardCount)
+    logger.log({
+        level: "auto",
+        message: "guild count posted to top.gg: " + client.guilds.cache.size,
+    })
 }
 
 /**
  *
  * @param {JSON} vote
  */
-async function onVote(vote) {
+export async function onVote(vote: WebhookPayload) {
     doVote(client, vote)
 }
-
-exports.onVote = onVote
 
 /**
  * @returns {Boolean}
  * @param {String} id
  * @param {Boolean} dontDmTekoh
  */
-async function requestDM(id, content, dontDmTekoh) {
+export async function requestDM(id: string, content, dontDmTekoh: boolean): Promise<boolean> {
     logger.info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
@@ -152,7 +162,10 @@ async function requestDM(id, content, dontDmTekoh) {
         await member
             .send({ content: content })
             .then(() => {
-                logger.success(`successfully sent DM to ${member.tag} (${member.id})`)
+                logger.log({
+                    level: "success",
+                    message: `successfully sent DM to ${member.tag} (${member.id})`,
+                })
             })
             .catch(async () => {
                 logger.warn(`failed to send DM to ${member.tag} (${member.id})`)
@@ -174,13 +187,11 @@ async function requestDM(id, content, dontDmTekoh) {
     }
 }
 
-exports.requestDM = requestDM
-
 /**
  * @param {String} id
  * @param {String} roleid
  */
-async function requestRemoveRole(id, roleID) {
+export async function requestRemoveRole(id: string, roleID: string) {
     const guild = await client.guilds.fetch("747056029795221513")
 
     if (!guild) {
@@ -221,16 +232,14 @@ async function requestRemoveRole(id, roleID) {
     return await user.roles.remove(role)
 }
 
-exports.requestRemoveRole = requestRemoveRole
-
 /**
  * @param {String} guildID
  * @returns {Discord.Guild}
  */
-async function getGuild(guildID) {
+export async function getGuild(guildID: string): Promise<Discord.Guild | void> {
     let a = true
 
-    let guild = await client.guilds.fetch(guildID).catch(() => {
+    const guild = await client.guilds.fetch(guildID).catch(() => {
         a = false
     })
 
@@ -238,8 +247,6 @@ async function getGuild(guildID) {
 
     return guild
 }
-
-exports.getGuild = getGuild
 
 setTimeout(() => {
     logger.info("logging in...")
