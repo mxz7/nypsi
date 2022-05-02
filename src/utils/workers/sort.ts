@@ -2,10 +2,10 @@ import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 
 declare function require(name: string)
 
-export default function workerSort(array: Array<string>, members: Map<string, number>): Promise<Array<string>> {
+export default function workerSort(array: Array<string>, sortData: Map<string, number>): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
-            workerData: [array, members],
+            workerData: [array, sortData],
         })
         worker.on("message", resolve)
         worker.on("error", reject)
@@ -18,10 +18,10 @@ export default function workerSort(array: Array<string>, members: Map<string, nu
 if (!isMainThread) {
     const { inPlaceSort } = require("fast-sort")
 
-    const arr = workerData[0]
-    const members = workerData[1]
+    const arr: string[] = workerData[0]
+    const sortData: Map<string, number> = workerData[1]
 
-    inPlaceSort(arr).asc((i) => members.get(i))
+    inPlaceSort(arr).asc((i) => sortData.get(i))
 
     parentPort.postMessage(arr)
 }
