@@ -8,6 +8,7 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getTier, isPremium } from "../utils/premium/utils"
 import doCollection from "../utils/workers/mentions"
 import { cpu } from "node-os-utils"
+import { getKarma } from "../utils/karma/utils"
 
 declare function require(name: string)
 
@@ -55,7 +56,7 @@ export default async function messageCreate(message: Message) {
 
     const { mentionQueue } = require("../utils/users/utils")
 
-    if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId))) {
+    if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId) || getKarma(message.guild.ownerId) >= 7)) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                 await message.guild.members.fetch()
