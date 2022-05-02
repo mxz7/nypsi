@@ -16,7 +16,7 @@ now in your WSL thingy, do the following:
  - run `npm install`
  - open the folder with vs code, or another editor
  - fill out the .env file with your api keys / tokens
- - if all went will, `node .` should start your version of nypsi (:
+ - if all went well, `node .` should start your version of nypsi (:
 
 ### 🐧 linux/macos
 
