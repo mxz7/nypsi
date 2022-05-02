@@ -4,7 +4,7 @@ import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v9"
 import { Command, NypsiCommandInteraction } from "./models/Command"
 import { getTimestamp, logger } from "./logger"
-import { Client, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
+import { Client, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils"
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders"
 import { createCaptcha, formatDate, getNews, isLockedOut, MStoTime, toggleLock } from "./utils"
@@ -365,7 +365,11 @@ async function helpCmd(message: Message, args: Array<string>) {
  * @param {Message} message
  * @param {Array<String>} args
  */
-export async function runCommand(cmd: string, message: Message | NypsiCommandInteraction, args: Array<string>) {
+export async function runCommand(
+    cmd: string,
+    message: Message | (NypsiCommandInteraction & CommandInteraction),
+    args: Array<string>
+) {
     if (!hasGuild(message.guild)) createGuild(message.guild)
 
     if (message.channel.type != "GUILD_TEXT") return
@@ -408,7 +412,7 @@ export async function runCommand(cmd: string, message: Message | NypsiCommandInt
     }
 
     let alias = false
-    if (!commandExists(cmd) && !(message instanceof NypsiCommandInteraction)) {
+    if (!commandExists(cmd) && message instanceof Message) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return
             const customCommand = getCommand(cmd)
@@ -716,12 +720,12 @@ export function getRandomCommand(): Command {
  * @param {Array<String>} args
  * @param {String} commandName
  */
-export function logCommand(message: Message | NypsiCommandInteraction, args: Array<string>) {
+export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     args.shift()
 
     let msg: string
 
-    if (message instanceof NypsiCommandInteraction) {
+    if (!(message instanceof Message)) {
         msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`
     } else {
         let content = message.content
