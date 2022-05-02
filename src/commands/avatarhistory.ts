@@ -80,12 +80,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    if (!usernameProfileExists(member)) createUsernameProfile(member)
+    if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag)
 
     let history = fetchAvatarHistory(member)
 
     if (history.length == 0) {
-        const url = await uploadImage(member.user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+        const url = await uploadImageToImgur(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
         if (url) {
             addNewAvatar(member, url)
             history = fetchAvatarHistory(member)
@@ -96,8 +96,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let index = 0
 
-    if (parseInt(args[1] - 1)) {
-        index = parseInt(args[1] - 1)
+    if (parseInt(args[1]) - 1) {
+        index = parseInt(args[1]) - 1
 
         if (!history[index]) index = 0
     }
