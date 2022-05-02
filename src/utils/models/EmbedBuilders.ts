@@ -137,7 +137,7 @@ export class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {Date} date
      */
-    setTimestamp(date: Date | number) {
+    setTimestamp(date?: Date | number) {
         if (date) {
             super.setTimestamp(date)
         } else {
