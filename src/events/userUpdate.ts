@@ -1,30 +1,16 @@
-const { User } = require("discord.js")
-const { userExists, getPrestige } = require("../utils/economy/utils")
-const { isPremium } = require("../utils/premium/utils")
-const {
-    usernameProfileExists,
-    createUsernameProfile,
-    addNewUsername,
-    addNewAvatar,
-    isTracking,
-} = require("../utils/users/utils")
-const { uploadImage } = require("../utils/utils")
+import { User } from "discord.js"
+import { getPrestige, userExists } from "../utils/economy/utils"
+import { isPremium } from "../utils/premium/utils"
+import { addNewAvatar, addNewUsername, createUsernameProfile, isTracking, usernameProfileExists } from "../utils/users/utils"
+import { uploadImageToImgur } from "../utils/utils"
 
-/**
- * @type {Array<User>}
- */
-const queue = []
+const queue: User[] = []
 let interval
 
-/**
- *
- * @param {User} oldUser
- * @param {User} newUser
- */
-module.exports = async (oldUser, newUser) => {
+module.exports = async (oldUser: User, newUser: User) => {
     if (oldUser.tag != newUser.tag) {
         if (!usernameProfileExists(newUser.id)) {
-            createUsernameProfile(newUser.id, oldUser.tag)
+            createUsernameProfile(newUser, oldUser.tag)
             addNewUsername(newUser.id, newUser.tag)
         } else {
             if (!isTracking(newUser.id)) return
@@ -37,9 +23,9 @@ module.exports = async (oldUser, newUser) => {
         if (!isPremium(newUser.id) && getPrestige(newUser.id) < 2) return
 
         if (!usernameProfileExists(newUser.id)) {
-            const url = await uploadImage(newUser.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+            const url = await uploadImageToImgur(newUser.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
             if (!url) return
-            createUsernameProfile(newUser.id, newUser.tag, url)
+            createUsernameProfile(newUser, newUser.tag, url)
         } else {
             if (!isTracking(newUser.id)) return
 
@@ -55,7 +41,7 @@ module.exports = async (oldUser, newUser) => {
 async function doQueue() {
     const user = queue.shift()
 
-    const url = await uploadImage(user.displayAvatarURL({ format: "png", dynamic: "true", size: 256 }))
+    const url = await uploadImageToImgur(user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
 
     if (!url) return
 
