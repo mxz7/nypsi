@@ -1,4 +1,4 @@
-import { Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
 import { getPrefix } from "../utils/guilds/utils"
 const { isPremium, getTier, getLastWeekly, setLastWeekly } = require("../utils/premium/utils")
