@@ -14,7 +14,7 @@ const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAli
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     let cooldownLength = 7
 
     if (isPremium(message.author.id)) {

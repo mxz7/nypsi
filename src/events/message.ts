@@ -56,7 +56,10 @@ export default async function messageCreate(message: Message) {
 
     const { mentionQueue } = require("../utils/users/utils")
 
-    if (message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId) || getKarma(message.guild.ownerId) >= 7)) {
+    if (
+        message.guild.memberCount < 150000 &&
+        (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId) || getKarma(message.guild.ownerId) >= 7)
+    ) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                 await message.guild.members.fetch()

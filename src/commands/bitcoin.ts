@@ -12,7 +12,7 @@ const cmd = new Command("bitcoin", "view the current bitcoin value (reflects rea
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | NypsiCommandInteraction & CommandInteraction) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!userExists(message.member)) createUser(message.member)
     const bitcoin = getItems()["bitcoin"]
     const inventory = getInventory(message.member)
