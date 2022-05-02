@@ -10,13 +10,13 @@ install nodejs on your WSL [tutorial](https://www.digitalocean.com/community/tut
 
 now in your WSL thingy, do the following:
 
- - run `git clone https://github.com/tekoh/nypsi`
- - run `cd nypsi`
- - run the ./setup.sh file
- - run `npm install`
- - open the folder with vs code, or another editor
- - fill out the .env file with your api keys / tokens
- - if all went well, `node .` should start your version of nypsi (:
+-   run `git clone https://github.com/tekoh/nypsi`
+-   run `cd nypsi`
+-   run the ./setup.sh file
+-   run `npm install`
+-   open the folder with vs code, or another editor
+-   fill out the .env file with your api keys / tokens
+-   if all went well, `node .` should start your version of nypsi (:
 
 ### 🐧 linux/macos
 
