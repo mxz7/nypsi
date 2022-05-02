@@ -612,15 +612,25 @@ export async function runCommand(cmd: string, message: Message | NypsiCommandInt
                 remaining = `${seconds}s`
             }
 
-            return message.channel.send({
-                embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
-            })
+            if (message instanceof Message) {
+                return message.channel.send({
+                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+                })
+            } else {
+                return message.reply({
+                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
+                })
+            }
         }
 
         updatePopularCommands(commands.get(cmd).name, message.member)
 
         if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            if (message instanceof Message) {
+                return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            } else {
+                return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] })
+            }
         }
         commands.get(cmd).run(message, args)
         updateLastCommand(message.member)
