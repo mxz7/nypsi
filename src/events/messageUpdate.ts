@@ -1,12 +1,8 @@
-const { eSnipe } = require("../nypsi")
-const { hasGuild, createGuild, getSnipeFilter, getChatFilter } = require("../utils/guilds/utils")
-const { Message, Permissions } = require("discord.js")
+import { Message, Permissions } from "discord.js"
+import { eSnipe } from "../nypsi"
+import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils"
 
-/**
- * @param {Message} message
- * @param {Message} newMessage
- */
-module.exports = async (message, newMessage) => {
+module.exports = async (message: Message, newMessage: Message) => {
     if (!message) return
 
     if (!message.member) return
@@ -18,7 +14,7 @@ module.exports = async (message, newMessage) => {
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
-        for (let word of filter) {
+        for (const word of filter) {
             if (content.includes(word.toLowerCase())) {
                 return await message.delete()
             }
@@ -34,13 +30,13 @@ module.exports = async (message, newMessage) => {
 
         content = content.replace(/[^A-z0-9\s]/g, "")
 
-        for (let word of filter) {
+        for (const word of filter) {
             if (content.includes(word.toLowerCase())) return
         }
 
         const chatFilter = getChatFilter(message.guild)
 
-        for (let word of chatFilter) {
+        for (const word of chatFilter) {
             if (content.includes(word.toLowerCase())) return
         }
 
@@ -52,7 +48,5 @@ module.exports = async (message, newMessage) => {
                 id: message.channel.id,
             },
         })
-
-        exports.eSnipe = eSnipe
     }
 }
