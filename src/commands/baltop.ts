@@ -1,4 +1,4 @@
-const { topAmount } = require("../utils/economy/utils.js")
+import { topAmount } from "../utils/economy/utils.js"
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -51,11 +51,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let amount
 
     if (args.length == 0) {
-        args[0] = 5
+        args[0] = "5"
     }
 
-    if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
-        args[0] = 5
+    if (isNaN(parseInt(args[0])) || parseInt(args[0]) <= 0) {
+        args[0] = "5"
     }
 
     amount = parseInt(args[0])
@@ -64,9 +64,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount < 5) amount = 5
 
+    if (!(message instanceof Message)) {
+        message.deferReply()
+    }
+
     const balTop = await topAmount(message.guild, amount)
 
-    let filtered = balTop.filter(function (el) {
+    const filtered = balTop.filter(function (el) {
         return el != null
     })
 
