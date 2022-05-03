@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton } from "di
 import { inPlaceSort } from "fast-sort"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getItems } = require("../utils/economy/utils")
+import { getItems } from "../utils/economy/utils"
 
 const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"])
 
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!parseInt(args[0])) {
             page = 1
         } else {
-            page = args[0] - 1
+            page = parseInt(args[0]) - 1
             if (page < 0) {
                 page = 0
             }
