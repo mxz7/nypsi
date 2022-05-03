@@ -111,26 +111,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
-    if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member)
-        if (getBalance(message.member) > maxBet) {
-            args[0] = maxBet
-        }
-    }
-
-    if (args[0] == "half") {
-        args[0] = getBalance(message.member) / 2
-    }
-
-    if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
-    } else {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] })
-    }
-
-    const bet = parseInt(args[0])
+    const bet = formatBet(args[0], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
