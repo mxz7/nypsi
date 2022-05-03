@@ -1,9 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getItems,
-    formatBet,
     getBalance,
     getInventory,
     updateBalance,
@@ -11,7 +10,7 @@ const {
     getMulti,
     userExists,
     createUser,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { isPremium } from "../utils/premium/utils"
 
 const cmd = new Command("sell", "sell items", Categories.MONEY)
@@ -65,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const items = getItems()
     const inventory = getInventory(message.member)
 
-    let searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase()
 
     let selected
 
@@ -94,15 +93,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length != 1) {
         if (args[1].toLowerCase() == "all") {
             args[1] = inventory[selected.id]
-        } else if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-                args[1] = formatBet(args[1])
-            }
+        } else if (isNaN(parseInt(args[1])) || parseInt(args[1]) <= 0) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
         }
         amount = parseInt(args[1])
     }
 
-    if (!parseInt(amount)) {
+    if (!parseInt(amount.toString())) {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 

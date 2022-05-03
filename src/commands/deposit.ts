@@ -6,7 +6,7 @@ import {
     updateBankBalance,
     userExists,
     createUser,
-    formatBet,
+    formatNumber,
 } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -84,23 +84,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[0].toLowerCase() == "all") {
         args[0] = getBalance(message.member).toString()
-        const amount = formatBet(args[0])
+        const amount = parseInt(args[0])
         if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
             args[0] = (getMaxBankBalance(message.member) - getBankBalance(message.member)).toString()
         }
     }
 
     if (args[0] == "half") {
-        args[0] = (getBalance(message.member) / 2).toString()
+        args[0] = (getBankBalance(message.member) / 2).toString()
     }
 
-    if (parseInt(args[0])) {
-        args[0] = formatBet(args[0]).toString()
-    } else {
+    const amount = formatNumber(args[0])
+
+    if (!amount || isNaN(amount)) {
         return send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
-
-    const amount = parseInt(args[0])
 
     if (amount > getBalance(message.member)) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] })
