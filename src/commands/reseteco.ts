@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const { reset } = require("../utils/economy/utils")
-const { createCaptcha } = require("../utils/utils")
+import { reset } from "../utils/economy/utils"
+import { createCaptcha } from "../utils/utils"
 
 const cmd = new Command("reseteco", "reset economy except prestige", Categories.NONE)
 
@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const filter = (msg) => message.author.id == msg.author.id
 
-    let response = await message.channel.awaitMessages({
+    let response: any = await message.channel.awaitMessages({
         filter,
         max: 1,
     })
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const c = reset()
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `${c.deleted} users deleted\n${c.updated} users updated`)],
+            embeds: [new CustomEmbed(message.member, false, `${c} users reset`)],
         })
     }
 }
