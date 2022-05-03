@@ -20,9 +20,12 @@ jobs:
 
             - name: install packages
               run: npm install
+
+            - name: build
+              run: tsc
             
             - name: linting
-              run: npx eslint ./
+              run: npx eslint ./src/
 
     test:
         name: testing
@@ -45,9 +48,15 @@ jobs:
             - name: install packages
               run: npm install
 
+            - name: setup
+              run: ./setup.sh
+
+            - name: build
+              run: tsc
+
             - name: run bot
               if: env.BOT_TOKEN != null
-              run: node nypsi.js
+              run: node dist/nypsi.js
 
     deploy:
         if: github.ref == 'refs/heads/main'
