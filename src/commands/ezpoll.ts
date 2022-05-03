@@ -93,6 +93,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
 
+    if (!(message instanceof Message)) return
+
     message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
