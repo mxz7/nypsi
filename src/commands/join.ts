@@ -70,14 +70,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         })
 
-        if (membersSorted.length > 1000) {
-            const msg = await send({
-                embeds: [
-                    new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
-                ],
-            })
+        if (membersSorted.length > 500) {
+            let msg
+            if (message instanceof Message) {
+                msg = await send({
+                    embeds: [
+                        new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
+                    ],
+                })
+            } else {
+                await message.deferReply()
+            }
             membersSorted = await workerSort(membersSorted, membersMap)
-            await msg.delete()
+            if (message instanceof Message) {
+                await msg.delete()
+            }
         } else {
             inPlaceSort(membersSorted).asc((i) => membersMap.get(i))
         }
