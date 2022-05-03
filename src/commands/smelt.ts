@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { userExists, createUser, getInventory, getItems, addItemUse, setInventory } = require("../utils/economy/utils")
+import { userExists, createUser, getInventory, getItems, addItemUse, setInventory } from "../utils/economy/utils"
 import { isPremium } from "../utils/premium/utils"
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", Categories.MONEY)
