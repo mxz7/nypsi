@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     createUser,
     updateBalance,
@@ -6,8 +6,7 @@ const {
     setInventory,
     getInventory,
     addItemUse,
-} = require("../utils/economy/utils.js")
-const Discord = require("discord.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -30,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    const shopWorth = new Discord.Collection()
+    const shopWorth = new Map()
 
     if (getBalance(message.member) > 100000000) {
         shopWorth.set("primark", Math.round(getBalance(message.member) * 0.0005))
@@ -191,8 +190,6 @@ function deleteStoreRobCooldown(member) {
     cooldown.delete(member.user.id)
 }
 
-cmd.deleteStoreRobCooldown = deleteStoreRobCooldown
-
 /**
  * @returns {Boolean}
  * @param {Discord.GuildMember} member
@@ -201,7 +198,10 @@ function onStoreRobCooldown(member) {
     return cooldown.has(member.user.id)
 }
 
-cmd.onStoreRobCooldown = onStoreRobCooldown
+cmd.data = {
+    deleteStoreRobCooldown: deleteStoreRobCooldown,
+    onStoreRobCooldown: onStoreRobCooldown,
+}
 
 cmd.setRun(run)
 
