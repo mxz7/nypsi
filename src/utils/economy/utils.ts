@@ -913,13 +913,33 @@ export function winBoard(): string {
  * @returns {Number} formatted bet
  * @param {String} number to format
  */
-export function formatBet(number: string | number): number {
-    let a = number.toString().toLowerCase().replace("t", "000000000000")
-    a = a.replace("b", "000000000")
-    a = a.replace("m", "000000")
-    a = a.replace("k", "000")
+export function formatBet(bet: string | number, member: GuildMember): number | void {
+    const maxBet = calcMaxBet(member)
 
-    return parseInt(a)
+    if (bet.toString().toLowerCase() == "all") {
+        bet = getBalance(member)
+        if (bet > maxBet) {
+            bet = maxBet
+        }
+    } else if (bet.toString().toLowerCase() == "max") {
+        bet = maxBet
+    } else if (bet.toString().toLowerCase() == "half") {
+        bet = Math.floor(getBalance(member) / 2)
+    }
+
+    bet = bet.toString().toLowerCase().replace("t", "000000000000")
+
+    bet = bet.replace("b", "000000000")
+    bet = bet.replace("m", "000000")
+    bet = bet.replace("k", "000")
+
+    if (isNaN(parseInt(bet))) return null
+
+    bet = Math.floor(parseInt(bet))
+
+    if (bet <= 0) return null
+
+    return bet
 }
 
 /**
