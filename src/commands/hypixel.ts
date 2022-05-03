@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js"
-const fetch = require("node-fetch")
+import fetch from "node-fetch"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { cleanString } = require("../utils/utils")
-const { logger } = require("../utils/logger")
+import { cleanString } from "../utils/utils"
+import { logger } from "../utils/logger"
 
 const cooldown = new Map()
 const cache = new Map()
@@ -210,7 +210,7 @@ function getLevel(exp) {
 }
 
 function timeSince(date) {
-    const ms = Math.floor(new Date() - date)
+    const ms = Math.floor(new Date().getTime() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
