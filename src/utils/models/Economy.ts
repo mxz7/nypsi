@@ -4,7 +4,7 @@ export interface Item {
     emoji: string
     description: string
     worth?: number
-    role?: number
+    role?: string
     aliases?: Array<string>
     speed?: number
     boobies?: string
