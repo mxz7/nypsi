@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-const {
+import {
     getXp,
     getPrestige,
     userExists,
@@ -9,10 +9,10 @@ const {
     getBalance,
     deleteUser,
     getItems,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const { addKarma } = require("../utils/karma/utils.js")
+import { addKarma } from "../utils/karma/utils.js"
 
 const cmd = new Command("reset", "reset your economy profile to gain karma", Categories.MONEY)
 
@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const amount = inventory[item]
 
             if (items[item].role == "fish" || items[item].role == "prey") {
-                let worth1 = Math.floor(items[item].worth * fee * amount)
+                const worth1 = Math.floor(items[item].worth * fee * amount)
                 inventoryWorth += Math.floor(worth1 + worth1 * multi)
             } else {
                 inventoryWorth += Math.floor(items[item].worth * fee * amount)
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     earnedKarma = Math.floor(earnedKarma * 2.2)
 
-    let embed = new CustomEmbed(
+    const embed = new CustomEmbed(
         message.member,
         true,
         "are you sure you want to reset your economy profile?\n\n" +
@@ -99,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
             await collected.deferUpdate()
             return collected.customId
@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const amount = inventory[item]
 
                 if (items[item].role == "fish" || items[item].role == "prey") {
-                    let worth1 = Math.floor(items[item].worth * fee * amount)
+                    const worth1 = Math.floor(items[item].worth * fee * amount)
                     inventoryWorth += Math.floor(worth1 + worth1 * multi)
                 } else {
                     inventoryWorth += Math.floor(items[item].worth * fee * amount)
