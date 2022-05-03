@@ -1,7 +1,7 @@
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
-const { Permissions, Message } = require("discord.js")
+import { ErrorEmbed } from "../utils/models/EmbedBuilders.js"
+import { Permissions, Message } from "discord.js"
 
 const cooldown = new Map()
 
