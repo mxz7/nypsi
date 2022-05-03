@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (amount < 5) amount = 5
 
     if (!(message instanceof Message)) {
-        message.deferReply()
+        await message.deferReply()
     }
 
     const balTop = await topAmount(message.guild, amount)
