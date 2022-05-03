@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getDatabase } = require("../utils/database/database")
-const { createCaptcha } = require("../utils/utils")
+import { getDatabase } from "../utils/database/database"
+import { createCaptcha } from "../utils/utils"
 
 const cmd = new Command("execsql", "execute sql on the database", Categories.NONE).setPermissions(["bot owner"])
 
@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const filter = (msg) => message.author.id == msg.author.id
 
-    let response = await message.channel.awaitMessages({
+    let response: any = await message.channel.awaitMessages({
         filter,
         max: 1,
     })
