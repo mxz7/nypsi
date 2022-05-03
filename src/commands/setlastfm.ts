@@ -2,8 +2,8 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getPrefix } from "../utils/guilds/utils"
-const { setLastfmUsername, getLastfmUsername } = require("../utils/users/utils")
-const { cleanString } = require("../utils/utils")
+import { setLastfmUsername, getLastfmUsername } from "../utils/users/utils"
+import { cleanString } from "../utils/utils"
 
 const cmd = new Command("setlastfm", "set your last.fm username", Categories.INFO).setAliases(["slfm"])
 
