@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!channel.isText()) {
-        return message.channek.send({ embeds: [new ErrorEmbed("this is not a text channel")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("this is not a text channel")] })
     }
 
     if (!channel.nsfw) {
