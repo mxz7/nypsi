@@ -1,7 +1,9 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { logger } = require("../utils/logger")
+import { logger } from "../utils/logger"
+
+declare function require(name: string)
 
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"])
 
@@ -15,7 +17,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         loadCommands()
-        message.react("✅")
+        if (message instanceof Message) {
+            message.react("✅")
+        }
         logger.info("commands reloaded")
     } else {
         let msg

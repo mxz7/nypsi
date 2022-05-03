@@ -1,6 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed } = require("../utils/models/EmbedBuilders")
+import { ErrorEmbed } from "../utils/models/EmbedBuilders"
+
+declare function require(name: string)
 
 const cmd = new Command(
     "requestdm",
@@ -26,6 +28,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     args.shift()
 
     const a = await requestDM(user, args.join(" "))
+
+    if (!(message instanceof Message)) return
 
     if (a) {
         message.react("✅")
