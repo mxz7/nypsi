@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders")
-const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils"
 
 const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", Categories.MONEY).setAliases(
     ["eth"]
