@@ -6,9 +6,13 @@ import { getLastfmUsername } from "../utils/users/utils"
 import { getMember } from "../utils/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
-const cmd = new Command("nowplaying", "view yours or another user's currently playing song", Categories.INFO).setAliases([
-    "np",
-])
+const cmd = new Command(
+    "nowplaying",
+    "view yours or another user's currently playing song using last.fm",
+    Categories.INFO
+).setAliases(["np"])
+
+cmd.slashEnabled = true
 
 const cooldown = new Map()
 
@@ -17,6 +21,18 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+    const send = async (data) => {
+        if (!(message instanceof Message)) {
+            await message.reply(data)
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
+        } else {
+            return await message.channel.send(data)
+        }
+    }
+
     if (cooldown.has(message.member.id)) {
         const init = cooldown.get(message.member.id)
         const curr = new Date()
@@ -33,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
     let member
@@ -49,18 +65,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
     let username: any = getLastfmUsername(member)
 
     if (!username) {
         if (message.author.id == member.user.id) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)],
             })
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] })
+            return send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] })
         }
     }
 
@@ -69,6 +85,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setTimeout(() => {
         cooldown.delete(message.author.id)
     }, 10000)
+
+    if (!(message instanceof Message)) {
+        await message.deferReply()
+    }
 
     username = username.username
 
@@ -79,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!res.recenttracks) {
         if (message.author.id == member.user.id) {
             if (res.error == 17) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(`error: ${res.message}
                 
@@ -87,9 +107,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ],
                 })
             }
-            return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
+            return send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
+            return send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
         }
     }
 
@@ -100,17 +120,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!track) {
         if (message.author.id == member.user.id) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
+            return send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
+            return send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
         }
     }
 
     if (!track["@attr"] || !track["@attr"].nowplaying) {
         if (message.author.id == member.user.id) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
+            return send({ embeds: [new ErrorEmbed("you are not listening to a song")] })
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
+            return send({ embeds: [new ErrorEmbed(`${member.toString()} is not listening to a song`)] })
         }
     }
 
@@ -122,7 +142,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
 
-    return message.channel.send({ embeds: [embed] })
+    return send({ embeds: [embed] })
 }
 
 cmd.setRun(run)
