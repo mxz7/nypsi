@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { getMember, formatDate } = require("../utils/utils")
+import { getMember, formatDate } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const workerSort = require("../utils/workers/sort")
-const { inCooldown, addCooldown } = require("../utils/guilds/utils")
+import workerSort from "../utils/workers/sort"
+import { inCooldown, addCooldown } from "../utils/guilds/utils"
 import { inPlaceSort } from "fast-sort"
-const { getKarma } = require("../utils/karma/utils")
+import { getKarma } from "../utils/karma/utils"
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"])
 
@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 username = username.split("-id ").join("")
             }
 
-            member = await getMember(message, username)
+            member = await getMember(message.guild, username)
         } else {
             member = message.mentions.members.first()
         }
@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setTimeout(() => sortCache.delete(message.guild.id), 60000 * 10)
     }
 
-    let joinPos = membersSorted.indexOf(member.id) + 1
+    let joinPos: number | string = membersSorted.indexOf(member.id) + 1
 
     if (joinPos == 0) joinPos = "invalid"
 
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const created = formatDate(member.user.createdAt)
     const roles = member.roles.cache
 
-    let rolesText = []
+    let rolesText: any = []
 
     roles.forEach((role) => {
         rolesText[role.position] = role.toString()
