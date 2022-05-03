@@ -1,4 +1,4 @@
-const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
+import { Message, Permissions, MessageActionRow, MessageButton } from "discord.js"
 const {
     createReactionProfile,
     hasReactionProfile,
