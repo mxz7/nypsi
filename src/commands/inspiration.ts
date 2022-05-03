@@ -2,8 +2,8 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
-const fetch = require("node-fetch")
-const isImageUrl = require("is-image-url")
+import fetch from "node-fetch"
+import { isImageUrl } from "../utils/utils"
 
 const cooldown = new Map()
 
