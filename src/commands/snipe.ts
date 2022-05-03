@@ -4,6 +4,8 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"])
 
+declare function require(name: string)
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -11,7 +13,7 @@ const cmd = new Command("snipe", "snipe the most recently deleted message", Cate
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const { snipe } = require("../nypsi.js")
 
-    let channel = message.channel
+    let channel: any = message.channel
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
@@ -53,7 +55,7 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-    const ms = Math.floor(new Date() - date)
+    const ms = Math.floor(new Date().getTime() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
