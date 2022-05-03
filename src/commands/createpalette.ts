@@ -69,11 +69,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    let roles = await message.guild.roles.fetch()
+    const roles = await message.guild.roles.fetch()
 
     const sortedRoleIDs = []
 
-    await roles.forEach((r) => sortedRoleIDs.push(r.id))
+    roles.forEach((r) => sortedRoleIDs.push(r.id))
 
     inPlaceSort(sortedRoleIDs).desc((i) => roles.find((r) => r.id == i).position)
 
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (let i = 0; i < sortedRoleIDs.length; i++) {
         if (colors.length >= 100) break
-        const role = await roles.find((r) => r.id == sortedRoleIDs[i])
+        const role = roles.find((r) => r.id == sortedRoleIDs[i])
 
         if (role.hexColor != "#000000") {
             if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) continue
@@ -112,10 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let color = args[1]
 
     if (!color) {
-        color = Math.floor(Math.random() * 16777215).toString(16)
-        while (color.length != 6) {
-            color = Math.floor(Math.random() * 16777215).toString(16)
-        }
+        color = "dbdbdb"
     } else {
         if (color.startsWith("#")) {
             color = color.substr(1, color.length)
