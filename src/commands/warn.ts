@@ -4,6 +4,7 @@ import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getExactMember } from "../utils/utils"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -171,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, "warn", members1, message.author.tag, reason)
+    newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason)
 }
 
 cmd.setRun(run)
