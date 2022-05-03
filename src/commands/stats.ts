@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getStats } = require("../utils/economy/utils")
+import { getStats } from "../utils/economy/utils"
 
 const cmd = new Command("stats", "view your economy stats", Categories.MONEY)
 
@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }\n**${stats.rob.lose.toLocaleString()}** loss${stats.rob.lose == 1 ? "" : "es"}`,
             true
         )
-        embed.addField("items", `**${itemsUsed.toLocaleString()}** item use${stats.padlock == 1 ? "d" : "s"}`, true)
+        embed.addField("items", `**${itemsUsed.toLocaleString()}** item use${itemsUsed == 1 ? "d" : "s"}`, true)
 
         return message.channel.send({ embeds: [embed] })
     }
