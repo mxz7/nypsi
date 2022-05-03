@@ -1,5 +1,5 @@
 import { getMember } from "../utils/utils"
-const {
+import {
     userExists,
     updateBalance,
     createUser,
@@ -15,12 +15,12 @@ const {
     getInventory,
     setInventory,
     addItemUse,
-} = require("../utils/economy/utils.js")
-const { Message, GuildMember } = require("discord.js")
+} from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
+import { CommandInteraction, Message } from "discord.js"
 
 const cooldown = new Map()
 const playerCooldown = new Set()
@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target = message.mentions.members.first()
 
     if (!target) {
-        target = await getMember(message, args[0])
+        target = await getMember(message.guild, args[0])
     }
 
     if (!target) {
@@ -321,7 +321,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
@@ -356,8 +356,6 @@ function deleteRobCooldown(member) {
     cooldown.delete(member.user.id)
 }
 
-cmd.deleteRobCooldown = deleteRobCooldown
-
 /**
  * @returns {Boolean}
  * @param {GuildMember} member
@@ -365,8 +363,6 @@ cmd.deleteRobCooldown = deleteRobCooldown
 function onRobCooldown(member) {
     return cooldown.has(member.user.id)
 }
-
-cmd.onRobCooldown = onRobCooldown
 
 /**
  *
@@ -380,8 +376,6 @@ function addRadioCooldown(id) {
     }, 900000)
 }
 
-cmd.addRadioCooldown = addRadioCooldown
-
 /**
  *
  * @param {GuildMember} member
@@ -391,6 +385,11 @@ function onRadioCooldown(member) {
     return radioCooldown.has(member.user.id)
 }
 
-cmd.onRadioCooldown = onRadioCooldown
+cmd.data = {
+    onRadioCooldown: onRadioCooldown,
+    addRadioCooldown: addRadioCooldown,
+    onRobCooldown: onRobCooldown,
+    deleteRobCooldown: deleteRobCooldown,
+}
 
 module.exports = cmd
