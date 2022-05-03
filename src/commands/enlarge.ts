@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    let emoji = args[0]
+    let emoji: string | string[] = args[0]
 
     emoji = emoji.split(":")
 
