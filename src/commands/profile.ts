@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-const {
+import {
     userExists,
     createUser,
     getBalance,
@@ -13,11 +13,11 @@ const {
     hasPadlock,
     getWorkers,
     getInventory,
-} = require("../utils/economy/utils.js")
-const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
+} from "../utils/economy/utils.js"
+import { isPremium, getPremiumProfile } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { daysAgo, daysUntil } = require("../utils/utils")
+import { daysAgo, daysUntil } from "../utils/utils"
 
 const cooldown = new Map()
 
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let inventoryItems
 
     try {
-        inventoryItems = Array.from(Object.values(inventory)).reduce((a, b) => a + b)
+        inventoryItems = Array.from(Object.values(inventory)).reduce((a: any, b: any) => a + b)
     } catch {
         inventoryItems = 0
     }
@@ -97,12 +97,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         tier = profile.level
         tierString = profile.getLevelString()
         embedColor = profile.embedColor
-        if (profile.lastDaily != "none") {
+        if (profile.lastDaily != 0) {
             lastDaily = daysAgo(profile.lastDaily) + " days ago"
         } else {
             lastDaily = profile.lastDaily
         }
-        if (profile.lastWeekly != "none") {
+        if (profile.lastWeekly != 0) {
             lastWeekly = daysAgo(profile.lastWeekly) + " days ago"
         } else {
             lastWeekly = profile.lastWeekly
