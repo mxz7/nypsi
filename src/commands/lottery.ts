@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getTickets,
     lotteryTicketPrice,
     userExists,
@@ -10,9 +10,9 @@ const {
     getBalance,
     updateBalance,
     addTicket,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
-const { getKarma } = require("../utils/karma/utils")
+import { getKarma } from "../utils/karma/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"])
