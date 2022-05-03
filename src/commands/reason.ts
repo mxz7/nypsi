@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { getCase, setReason } = require("../utils/moderation/utils")
+import { getCase, setReason } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const reason = args.join(" ")
 
-    const case0 = getCase(message.guild, caseID)
+    const case0 = getCase(message.guild, parseInt(caseID))
 
     if (!case0) {
         return message.channel.send({
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    setReason(message.guild, caseID, reason)
+    setReason(message.guild, parseInt(caseID), reason)
 
     const embed = new CustomEmbed(message.member).setTitle("reason").setDescription("✅ case updated")
 
