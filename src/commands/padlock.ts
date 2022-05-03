@@ -1,4 +1,4 @@
-const { getPadlockPrice, userExists, createUser, hasPadlock } = require("../utils/economy/utils.js")
+import { getPadlockPrice, userExists, createUser, hasPadlock } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
