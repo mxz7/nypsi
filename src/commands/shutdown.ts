@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
-const { startRestart } = require("../utils/commandhandler")
-const { vacuum } = require("../utils/database/database")
-const { logger } = require("../utils/logger")
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { startRestart } from "../utils/commandhandler"
+import { vacuum } from "../utils/database/database"
+import { logger } from "../utils/logger"
 
 const cmd = new Command("shutdown", "shutdown bot", Categories.NONE).setPermissions(["bot owner"])
 
