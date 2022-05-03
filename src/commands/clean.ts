@@ -1,7 +1,7 @@
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed } from "../utils/models/EmbedBuilders.js"
-import { Permissions, Message } from "discord.js"
+import { Permissions, Message, CommandInteraction } from "discord.js"
 
 const cooldown = new Map()
 
@@ -34,6 +34,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
+
+    if (message.channel.type != "GUILD_TEXT") return
 
     setTimeout(() => {
         cooldown.delete(message.author.id)
