@@ -3,8 +3,8 @@ import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { getNameHistory } = require("mc-names")
-const { cleanString } = require("../utils/utils")
+import { getNameHistory } from "mc-names"
+import { cleanString } from "../utils/utils"
 
 const cooldown = new Map()
 
