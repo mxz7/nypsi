@@ -678,7 +678,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
     const balances = new Map()
 
     for (const user of query) {
-        if (members.has(user.id) && user.money > 0) {
+        if (members.has(user.id)) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
