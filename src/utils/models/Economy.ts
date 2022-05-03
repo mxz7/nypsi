@@ -7,6 +7,7 @@ export interface Item {
     role?: string
     aliases?: Array<string>
     speed?: number
+    rarity?: number
     boobies?: string
 }
 
