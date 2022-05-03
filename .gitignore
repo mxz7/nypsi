@@ -1,6 +1,8 @@
 node_modules/
 backup/
 logs/
+dist/
+out/
 
 *.json
 *.env
@@ -11,9 +13,11 @@ logs/
 
 !lists.json
 !items.json
+!karmashop.json
 !package.json
 !package-lock.json
 !slotsmulti.json
 !.eslintrc.json
 !.prettierrc.json
 !.prettierignore
+!tsconfig.json

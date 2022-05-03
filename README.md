@@ -17,6 +17,10 @@ invite link can be found at: [`invite.nypsi.xyz`](http://invite.nypsi.xyz)
 
 the documentation can be found at [`docs.nypsi.xyz`](https://docs.nypsi.xyz)
 
+### 🏗 installation / cloning
+
+[setup tutorial](https://github.com/tekoh/nypsi/blob/main/SETUP.md)
+
 ### 🍪 top.gg
 
 top.gg url: [`https://top.gg/bot/678711738845102087`](https://top.gg/bot/678711738845102087)
@@ -68,10 +72,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 -   nypsi is able to calculate join positions and join dates of any user in any server, this can be seen with `$join` or `$user`
 -   there is also a `$lookup` command which allows you to lookup information about domain names and IP addresses
-
-### 🏗 installation / cloning
-
-i'm not gonna help with installation if you want to clone the code and make it for yourself, if you believe you're good enough to manage the bot you should be able to figure that out for yourself.
 
 ### 🖼 screenshots
 

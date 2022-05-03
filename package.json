@@ -2,7 +2,7 @@
   "name": "nypsi",
   "version": "3.0.1",
   "description": "",
-  "main": "nypsi.js",
+  "main": "dist/nypsi.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
@@ -10,8 +10,7 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "**/*.{js,ts,md}": [
-      "eslint ./",
+    "**/*.{js,ts}": [
       "prettier --write ."
     ]
   },
@@ -21,23 +20,24 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.4.1",
     "@top-gg/sdk": "^3.1.3",
+    "@types/express": "^4.17.13",
     "better-sqlite3": "^7.5.1",
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
+    "crypto-js": "^4.1.1",
+    "dayjs": "^1.11.1",
     "discord-api-types": "^0.32.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
     "fast-sort": "^3.1.3",
     "figlet": "^1.5.2",
-    "imgur": "^1.0.2",
-    "is-image-url": "^1.1.8",
+    "imgur": "^2.2.0",
     "mc-names": "^1.0.1",
     "node-fetch": "^2.6.7",
     "node-os-utils": "^1.3.6",
     "shuffle-array": "^1.0.1",
     "table": "6.8",
-    "tar": "^6.1.11",
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.9",
     "winston": "^3.7.2",
@@ -45,12 +45,18 @@
     "winston-discord-webhook": "^1.1.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.5.0",
+    "@types/crypto-js": "^4.1.1",
+    "@types/node-os-utils": "^1.2.0",
+    "@types/shuffle-array": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
+    "@typescript-eslint/parser": "^5.21.0",
     "eslint": "^8.14.0",
     "eslint-plugin-jsdoc": "^39.2.9",
     "husky": "^7.0.4",
-    "install": "^0.13.0",
     "lint-staged": "^12.4.1",
-    "prettier": "2.6.2"
+    "prettier": "2.6.2",
+    "typescript": "^4.6.4"
   },
   "repository": {
     "type": "git",

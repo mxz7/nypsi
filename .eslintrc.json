@@ -1,17 +1,22 @@
+
 {
     "env": {
         "commonjs": true,
         "es2021": true,
         "node": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "parserOptions": {
         "ecmaVersion": 12
     },
-    "plugins": ["jsdoc"],
+    "plugins": ["@typescript-eslint"],
     "rules": {
-        "no-unused-vars": "error",
-        "jsdoc/no-undefined-types": 1,
+        // "no-unused-vars": "error",
+        // "jsdoc/no-undefined-types": 1,
         "indent": "off",
         "linebreak-style": "off",
         "quotes": [
@@ -23,6 +28,9 @@
             "never"
         ],
         "no-unreachable": "warn",
-        "no-case-declarations": "off"
+        "no-case-declarations": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/ban-ts-comment": "warn"
     }
 }
