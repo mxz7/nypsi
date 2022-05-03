@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     createUser,
     updateBalance,
@@ -7,14 +7,14 @@ const {
     calcMaxBet,
     isEcoBanned,
     addGamble,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { getExactMember } = require("../utils/utils.js")
+import { getExactMember } from "../utils/utils.js"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { gamble } = require("../utils/logger.js")
+import { gamble } from "../utils/logger.js"
 
 const cooldown = new Map()
 

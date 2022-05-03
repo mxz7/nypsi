@@ -18,7 +18,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { gamble } = require("../utils/logger.js")
+import { gamble } from "../utils/logger.js"
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = [
