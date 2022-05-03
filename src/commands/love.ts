@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         target1 = message.member
 
         if (!message.mentions.members.first()) {
-            target2 = await getMember(message, args[0])
+            target2 = await getMember(message.guild, args[0])
         } else {
             target2 = message.mentions.members.first()
         }
@@ -94,15 +94,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (args[0].startsWith("<@")) {
                 target1 = message.mentions.members.first()
 
-                target2 = await getMember(message, args[1])
+                target2 = await getMember(message.guild, args[1])
             } else {
                 target2 = message.mentions.members.first()
 
-                target1 = await getMember(message, args[0])
+                target1 = await getMember(message.guild, args[0])
             }
         } else if (message.mentions.members.size == 0) {
-            target1 = await getMember(message, args[0])
-            target2 = await getMember(message, args[1])
+            target1 = await getMember(message.guild, args[0])
+            target2 = await getMember(message.guild, args[1])
         } else {
             return send({ embeds: [new ErrorEmbed(`${prefix}love <user> (user)`)] })
         }
@@ -174,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         loveEmoji = "💔"
     }
 
-    let loveBarNum = Math.ceil(lovePercent / 10) * 10
+    const loveBarNum = Math.ceil(lovePercent / 10) * 10
 
     if (loveBarNum == 100) {
         loveBar = "**❤❤❤❤❤❤❤❤❤**"
