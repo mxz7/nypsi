@@ -1,5 +1,6 @@
-const { workMessages } = require("../../data/lists.json")
-const { getBalance, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
+// @ts-expect-error doesnt like getting from json file
+import { workMessages } from "../../data/lists.json"
+import { getBalance, updateBalance, userExists, createUser } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
