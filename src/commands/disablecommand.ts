@@ -1,8 +1,8 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { getPrefix, getDisabledCommands, updateDisabledCommands } = require("../utils/guilds/utils")
+import { getPrefix, getDisabledCommands, updateDisabledCommands } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { commandExists } = require("../utils/commandhandler")
+import { commandExists } from "../utils/commandhandler"
 
 const cmd = new Command("disablecommand", "disable certain commands in your server", Categories.ADMIN)
     .setAliases(["disablecmd", "disable"])
@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)] })
         }
 
-        let word = args[1]
+        const word = args[1]
             .toString()
             .toLowerCase()
             .normalize("NFD")
@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)] })
         }
 
-        let word = args[1]
+        const word = args[1]
             .toString()
             .toLowerCase()
             .normalize("NFD")
