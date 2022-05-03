@@ -108,19 +108,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = calcMaxBet(message.member)
 
-    if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member).toString()
+    if (args[1].toLowerCase() == "all") {
+        args[1] = getBalance(message.member).toString()
         if (getBalance(message.member) > maxBet) {
-            args[0] = maxBet.toString()
+            args[1] = maxBet.toString()
         }
     }
 
-    if (args[0] == "half") {
-        args[0] = (getBalance(message.member) / 2).toString()
+    if (args[1] == "half") {
+        args[1] = (getBalance(message.member) / 2).toString()
     }
 
-    if (parseInt(args[0])) {
-        args[0] = formatBet(args[0]).toString()
+    if (parseInt(args[1])) {
+        args[1] = formatBet(args[1]).toString()
     } else {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
