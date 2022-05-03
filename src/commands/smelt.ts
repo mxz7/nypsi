@@ -154,7 +154,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const msg = await send({ embeds: [embed] })
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
