@@ -4,6 +4,7 @@ import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getExactMember } from "../utils/utils"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -172,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, "unmute", members1, message.author.tag, message.content)
+    newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content)
 }
 
 cmd.setRun(run)
