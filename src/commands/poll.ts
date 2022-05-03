@@ -130,6 +130,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader(message.member.user.tag)
     }
 
+    if (!(message instanceof Message)) return
+
     message.channel.send({ embeds: [embed] }).then(async (m) => {
         await message.delete().catch()
 
