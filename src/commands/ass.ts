@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const assLinks: string[] = Array.from(assCache.keys())
 
-    const subredditChoice = assLinks[Math.floor(Math.random() * assLinks.length)]
+    const subredditChoice: any = assLinks[Math.floor(Math.random() * assLinks.length)]
 
     const allowed = assCache.get(subredditChoice)
 

@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const catLinks = Array.from(catCache.keys())
 
-    const subredditChoice = catLinks[Math.floor(Math.random() * catLinks.length)]
+    const subredditChoice: any = catLinks[Math.floor(Math.random() * catLinks.length)]
 
     const allowed = catCache.get(subredditChoice)
 
