@@ -13,7 +13,7 @@ export interface Case {
     moderator: string
     command: string
     time: number
-    deleted: boolean
+    deleted: boolean | number
     guild_id: string
 }
 
