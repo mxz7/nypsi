@@ -1,7 +1,7 @@
-const { Message, User } = require("discord.js")
+import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     userExists,
     createUser,
     getInventory,
@@ -10,8 +10,9 @@ const {
     getBalance,
     calcMaxBet,
     updateBalance,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
+import { Item } from "../utils/models/Economy"
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"])
 
@@ -117,20 +118,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-                args[1] = formatBet(args[1])
-            } else {
-                return send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
-                })
-            }
+        if (parseInt(args[1])) {
+            args[1] = formatBet(args[1]).toString()
+        } else {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
         }
 
         const bet = parseInt(args[1])
 
         if (!bet) {
-            return send({ embeds: [new ErrorEmbed("invalid entry fee")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+        }
+
+        if (isNaN(bet)) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
         }
 
         if (bet <= 0) {
@@ -168,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setTimeout(() => {
             cooldown.delete(message.author.id)
-        }, 300 * 1000)
+        }, 150 * 1000)
 
         const id = Math.random()
 
@@ -192,8 +193,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
         )
 
-        if (message.interaction) {
-            message.deferReply()
+        if (!(message instanceof Message)) {
+            await message.deferReply()
         }
 
         const msg = await message.channel.send({ embeds: [embed] })
@@ -251,7 +252,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] })
         }
 
-        const maxBet = await calcMaxBet(message.member)
+        const maxBet = calcMaxBet(message.member)
 
         if (race.bet > maxBet) {
             return send({
@@ -263,44 +264,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        const items = getItems(message.member)
+        const items = getItems()
         const inventory = getInventory(message.member)
 
-        let car
+        let car: Item
         let cycle = false
 
         if (args.length == 1) {
             for (const item of Array.from(Object.keys(inventory))) {
                 if (items[item].role == "car") {
                     if (inventory[item] && inventory[item] > 0) {
-                        car = items[item]
-                        break
+                        if (car) {
+                            if (car.speed < items[item].speed) {
+                                car = items[item]
+                            }
+                        } else {
+                            car = items[item]
+                        }
                     }
                 }
             }
             if (!car) cycle = true
         } else {
+            let carName: string
+
             const searchTag = args[1].toLowerCase()
             for (const itemName of Array.from(Object.keys(items))) {
                 if (items[itemName].role != "car") continue
                 const aliases = items[itemName].aliases ? items[itemName].aliases : []
                 if (searchTag == itemName) {
-                    car = itemName
+                    carName = itemName
                     break
                 } else if (searchTag == itemName.split("_").join("")) {
-                    car = itemName
+                    carName = itemName
                     break
                 } else if (aliases.indexOf(searchTag) != -1) {
-                    car = itemName
+                    carName = itemName
                     break
                 }
             }
 
-            if (!car) {
+            if (!carName) {
                 return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] })
+            } else {
+                car = items[carName]
             }
-
-            car = items[car]
 
             if ((!inventory[car.id] || inventory[car.id] == 0) && car.id != "cycle") {
                 return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] })
@@ -396,7 +404,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await race.message.edit({ embeds: [embed] })
 
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.reply({
                 embeds: [new CustomEmbed(message.member, false, "you have joined the race")],
                 ephemeral: true,
@@ -474,7 +482,7 @@ async function startRace(id) {
     for (let user of race.users.keys()) {
         user = race.users.get(user)
 
-        let newPos = getNewPosition(user.position, user.car.speed)
+        const newPos = getNewPosition(user.position, user.car.speed)
 
         user.position = newPos
 
@@ -504,7 +512,7 @@ async function startRace(id) {
     races.set(id, race)
 
     if (winner) {
-        let winnings = race.bet * race.users.size
+        const winnings = race.bet * race.users.size
 
         updateBalance(winner.id, getBalance(winner.id) + race.bet * race.users.size)
 
