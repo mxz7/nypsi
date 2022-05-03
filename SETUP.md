@@ -13,8 +13,8 @@ now in your WSL thingy, do the following:
 -   run `git clone https://github.com/tekoh/nypsi`
 -   run `cd nypsi`
 -   run the ./setup.sh file
--   run `npm install`
--   open the folder with vs code, or another editor
+-   run `npm install` this will install all packages needed for nypsi
+-   run `npx tsc` this will compile the typescript into javascript
 -   fill out the .env file with your api keys / tokens
 -   if all went well, `node .` should start your version of nypsi (:
 
