@@ -1,5 +1,17 @@
-import { Message, Permissions, MessageActionRow, MessageButton } from "discord.js"
-const {
+import {
+    Message,
+    Permissions,
+    MessageActionRow,
+    MessageButton,
+    CommandInteraction,
+    TextChannel,
+    GuildMember,
+    GuildChannel,
+    DMChannel,
+    ThreadChannel,
+    PartialDMChannel,
+} from "discord.js"
+import {
     createReactionProfile,
     hasReactionProfile,
     startReaction,
@@ -14,7 +26,7 @@ const {
     getBlacklisted,
     setBlacklisted,
     deleteStats,
-} = require("../utils/chatreactions/utils")
+} from "../utils/chatreactions/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -258,6 +270,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+        if (!(message.channel instanceof TextChannel)) return
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
@@ -268,7 +281,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "stats") {
         if (args.length == 2 && args[1].toLowerCase() == "reset") {
             if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-                if (message.author.id != message.guild.owner.id) {
+                if (message.author.id != message.guild.ownerId) {
                     return send({
                         embeds: [new ErrorEmbed("you need the to be the server owner for this command")],
                     })
@@ -311,7 +324,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)] })
                 }
 
-                let user = args[2]
+                let user: string | GuildMember = args[2]
 
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
@@ -497,7 +510,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         } else if (args.length == 3) {
             if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
-                let channel = args[2]
+                let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[2]
 
                 if (channel.length != 18) {
                     if (!message.mentions.channels.first()) {
@@ -512,11 +525,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         channel = message.mentions.channels.first()
                     }
                 } else {
-                    channel = await message.guild.channels.cache.find((ch) => ch.id == channel)
+                    channel = message.guild.channels.cache.find((ch) => ch.id == channel)
                 }
 
                 if (!channel) {
                     return send({ embeds: [new ErrorEmbed("invalid channel")] })
+                }
+
+                if (!(channel instanceof GuildChannel)) {
+                    return send({ embeds: [new ErrorEmbed("invalid cahnnel")] })
                 }
 
                 const settings = getReactionSettings(message.guild)
@@ -760,7 +777,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                  */
                 const pages = new Map()
 
-                for (let word of words) {
+                for (const word of words) {
                     if (pages.size == 0) {
                         pages.set(1, [`\`${word}\``])
                     } else if (pages.get(pages.size).length >= 10) {
@@ -791,7 +808,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     const filter = (i) => i.user.id == message.author.id
 
                     const edit = async (data, msg) => {
-                        if (message.interaction) {
+                        if (!(message instanceof Message)) {
                             await message.editReply(data)
                             return await message.fetchReply()
                         } else {
@@ -801,7 +818,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     const pageManager = async () => {
                         const reaction = await msg
-                            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                            .awaitMessageComponent({ filter, time: 30000 })
                             .then(async (collected) => {
                                 await collected.deferUpdate()
                                 return collected.customId
