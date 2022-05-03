@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg
             }
         } else {
-            return await send(data)
+            return await message.channel.send(data)
         }
     }
 
