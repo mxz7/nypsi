@@ -554,7 +554,7 @@ export function updateDisabledCommands(guild: Guild, array: Array<string>) {
  * @param {Guild} guild
  * @returns {{}}
  */
-export function getCountdowns(guild: Guild | string): any {
+export function getCountdowns(guild: Guild | string): { [key: number]: Countdown } {
     let guildID
 
     if (guild instanceof Guild) {
