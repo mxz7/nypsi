@@ -816,19 +816,23 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<A
         return !m.user.bot
     })
 
-    const query = db.prepare("SELECT id, prestige FROM economy").all()
+    const query = db.prepare("SELECT id, prestige FROM economy WHERE prestige > 0").all()
 
-    const userIDs = []
+    let userIDs = []
     const prestiges = new Map()
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id) && user.prestige != 0) {
+        if (members.find((member) => member.user.id == user.id)) {
             userIDs.push(user.id)
             prestiges.set(user.id, user.prestige)
         }
     }
 
-    inPlaceSort(userIDs).desc((i) => prestiges.get(i))
+    if (userIDs.length > 500) {
+        userIDs = await workerSort(userIDs, prestiges)
+    } else {
+        inPlaceSort(userIDs).desc((i) => prestiges.get(i))
+    }
 
     const usersFinal = []
 
