@@ -3,7 +3,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { inPlaceSort } = require("fast-sort")
+import { inPlaceSort } from "fast-sort"
 
 const cmd = new Command(
     "createpalette",

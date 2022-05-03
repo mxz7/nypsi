@@ -4,7 +4,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
-const { inPlaceSort } = require("fast-sort")
+import { inPlaceSort } from "fast-sort"
 
 const cooldown = new Map()
 
