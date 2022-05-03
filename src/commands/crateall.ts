@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getItems, userExists, getInventory, setInventory } = require("../utils/economy/utils")
-const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const { logger } = require("../utils/logger")
+import { getItems, userExists, getInventory, setInventory } from "../utils/economy/utils"
+import { inCooldown, addCooldown } from "../utils/guilds/utils"
+import { logger } from "../utils/logger"
 
 const cmd = new Command("crateall", "give every user in the current guild a crate", Categories.NONE).setPermissions([
     "bot owner",
@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems()
 
-    let searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase()
 
     let selected
 
