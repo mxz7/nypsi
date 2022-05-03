@@ -4,6 +4,8 @@ import { redditImage } from "../utils/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
+declare function require(name: string)
+
 const cooldown = new Map()
 
 const cmd = new Command("bdsm", "get a random bdsm image", Categories.NSFW)
@@ -57,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const bdsmLinks = Array.from(bdsmCache.keys())
 
-    const subredditChoice = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)]
+    const subredditChoice: any = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)]
 
     const allowed = bdsmCache.get(subredditChoice)
 
