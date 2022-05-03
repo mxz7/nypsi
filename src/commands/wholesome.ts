@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const {
+import {
     getWholesomeImage,
     suggestWholesomeImage,
     formatDate,
@@ -12,10 +12,10 @@ const {
     clearWholesomeCache,
     getMember,
     getAllSuggestions,
-    uploadImage,
-} = require("../utils/utils")
+    uploadImageToImgur,
+    isImageUrl,
+} from "../utils/utils"
 import { getPrefix } from "../utils/guilds/utils"
-const isImageUrl = require("is-image-url")
 
 const cooldown = new Map()
 const uploadCooldown = new Map()
@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let target
 
-    if (args.length == 0) {
+    if (args.length == 0 || !(message instanceof Message)) {
         const image = getWholesomeImage()
 
         embed.setHeader(`<3 | #${image.id}`)
@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 })
             }
 
-            const upload = await uploadImage(url)
+            const upload = await uploadImageToImgur(url)
 
             if (!upload) {
                 return send({
@@ -385,7 +385,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let member
 
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args.join(" "))
+            member = await getMember(message.guild, args.join(" "))
         } else {
             member = message.mentions.members.first()
         }
