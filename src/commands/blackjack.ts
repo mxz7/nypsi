@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-const {
+import {
     userExists,
     createUser,
     getBalance,
@@ -11,13 +11,13 @@ const {
     getMulti,
     getPrestige,
     addGamble,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { gamble, logger } = require("../utils/logger.js")
+import { gamble, logger } from "../utils/logger.js"
 
 const cooldown = new Map()
 const games = new Map()
