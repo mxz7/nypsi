@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 const { doBackup } = require("../utils/database/database")
 
 const cmd = new Command("dobackup", "start a database backup", Categories.NONE).setPermissions(["bot owner"])
