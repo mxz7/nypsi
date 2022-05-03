@@ -1,5 +1,4 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const Discord = require("discord.js")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -13,17 +12,32 @@ const cmd = new Command(
     .setAliases(["lock", "shutup"])
     .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"])
 
+cmd.slashEnabled = true
+cmd.slashData.addChannelOption((option) => option.setName("channel").setDescription("channel to lock").setRequired(false))
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    const send = async (data) => {
+        if (!(message instanceof Message)) {
+            await message.reply(data)
+            const replyMsg = await message.fetchReply()
+            if (replyMsg instanceof Message) {
+                return replyMsg
+            }
+        } else {
+            return await send(data)
+        }
+    }
+
     if (
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
         !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)
     ) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("you need the `manage channels` and `manage messages` permission")],
             })
         }
@@ -34,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
         !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)
     ) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work")],
         })
     }
@@ -43,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const init = cooldown.get(message.member.id)
         const curr = new Date()
         const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 2 - diff
+        const time = 1 - diff
 
         const minutes = Math.floor(time / 60)
         const seconds = time - minutes * 60
@@ -55,22 +69,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             remaining = `${seconds}s`
         }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    /**
-     * @type {Discord.TextChannel}
-     */
     let channel = message.channel
 
     if (message.mentions.channels.first()) {
         channel = message.mentions.channels.first()
     }
 
+    if (channel.type != "GUILD_TEXT") return
+
     cooldown.set(message.member.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 1500)
+    }, 1)
 
     let locked = false
 
@@ -85,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (!a.deny.bitfield) {
         locked = false
     } else {
-        const b = new Discord.Permissions(a.deny.bitfield).toArray()
+        const b = new Permissions(a.deny.bitfield).toArray()
         if (b.includes("SEND_MESSAGES")) {
             locked = true
         }
@@ -100,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "lockdown"
         )
 
-        return message.channel.send({ embeds: [embed] }).catch(() => {
+        return send({ embeds: [embed] }).catch(() => {
             return message.member.send({ embeds: [embed] }).catch()
         })
     } else {
@@ -111,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "lockdown"
         )
 
-        return message.channel.send({ embeds: [embed] }).catch(() => {
+        return send({ embeds: [embed] }).catch(() => {
             return message.member.send({ embeds: [embed] })
         })
     }
