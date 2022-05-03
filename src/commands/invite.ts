@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("invite", "generate an invite link for the bot", Categories.INFO).setAliases(["bot"])
 
