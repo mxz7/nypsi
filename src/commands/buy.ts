@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getItems,
     getBalance,
     getInventory,
@@ -11,7 +11,7 @@ const {
     setInventory,
     userExists,
     createUser,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("buy", "buy items from the shop", Categories.MONEY)
@@ -59,25 +59,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const items = getItems()
     const inventory = getInventory(message.member)
 
-    let searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase()
 
-    let selected
+    let selectedName: string
 
     for (const itemName of Array.from(Object.keys(items))) {
         const aliases = items[itemName].aliases ? items[itemName].aliases : []
         if (searchTag == itemName) {
-            selected = itemName
+            selectedName = itemName
             break
         } else if (searchTag == itemName.split("_").join("")) {
-            selected = itemName
+            selectedName = itemName
             break
         } else if (aliases.indexOf(searchTag) != -1) {
-            selected = itemName
+            selectedName = itemName
             break
         }
     }
 
-    selected = items[selected]
+    const selected = items[selectedName]
 
     if (!selected) {
         return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
