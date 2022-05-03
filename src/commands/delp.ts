@@ -1,7 +1,7 @@
-const { Message, Collection } = require("discord.js")
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed } from "../utils/models/EmbedBuilders.js"
+import { Collection, CommandInteraction, Message } from "discord.js"
 
 const cooldown = new Map()
 
@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    let collected
+    let collected: Collection<string, Message>
 
     if (amount == 7) {
         collected = await message.channel.messages.fetch({ limit: 25 })
@@ -84,6 +84,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             collected.set(msg.id, msg)
         }
     }
+
+    if (message.channel.type != "GUILD_TEXT") return
 
     await message.channel.bulkDelete(collected).catch(() => {})
 }
