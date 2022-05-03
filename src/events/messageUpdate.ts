@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { Message, Permissions } from "discord.js"
 import { eSnipe } from "../nypsi"
 import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils"
 
