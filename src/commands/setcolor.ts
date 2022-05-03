@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier, getEmbedColor, setEmbedColor } = require("../utils/premium/utils")
+import { isPremium, getTier, getEmbedColor, setEmbedColor } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 
@@ -50,10 +50,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         color = color.substr(0, 6)
     }
 
+    if (!color.startsWith("#")) color = `#${color}`
+
     const embed = new CustomEmbed()
 
     try {
         if (color != "default") {
+            // @ts-expect-error hate colours lol ):<
             embed.setColor(color)
         }
     } catch {
