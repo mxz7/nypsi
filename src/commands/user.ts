@@ -4,7 +4,7 @@ const { getMember, formatDate } = require("../utils/utils")
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const workerSort = require("../utils/workers/sort")
 const { inCooldown, addCooldown } = require("../utils/guilds/utils")
-const { inPlaceSort } = require("fast-sort")
+import { inPlaceSort } from "fast-sort"
 const { getKarma } = require("../utils/karma/utils")
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"])

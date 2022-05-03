@@ -16,7 +16,7 @@ export default function workerSort(array: Array<string>, sortData: Map<string, n
 }
 
 if (!isMainThread) {
-    const { inPlaceSort } = require("fast-sort")
+    import { inPlaceSort } from "fast-sort"
 
     const arr: string[] = workerData[0]
     const sortData: Map<string, number> = workerData[1]
