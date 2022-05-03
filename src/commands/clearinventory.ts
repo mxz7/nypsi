@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
+import { userExists, createUser, getInventory, setInventory } from "../utils/economy/utils"
 
 const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", Categories.MONEY).setAliases([
     "clearinv",
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
             await collected.deferUpdate()
             return collected.customId
