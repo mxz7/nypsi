@@ -1,5 +1,5 @@
 import { Client } from "discord.js"
-// @ts-ignore
+// @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { getRandomCommand } from "../utils/commandhandler"
 import { logger } from "../utils/logger"
