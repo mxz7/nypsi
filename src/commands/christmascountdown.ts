@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const {
+import {
     hasGuild,
     createGuild,
     getChristmasCountdown,
@@ -8,10 +8,10 @@ const {
     checkChristmasCountdown,
     hasChristmasCountdown,
     createNewChristmasCountdown,
-} = require("../utils/guilds/utils")
+} from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { daysUntilChristmas } = require("../utils/utils")
+import { daysUntilChristmas } from "../utils/utils"
 
 const cmd = new Command("christmascountdown", "create a christmas countdown", Categories.ADMIN)
     .setAliases(["christmas", "xmas"])
@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let channel
 
         if (args.length == 1) {
-            channel = await message.guild.channels.create("christmas")
+            channel = await message.guild.channels.create("christmas", {})
         } else {
             if (args[1].length != 18) {
                 if (message.mentions.channels.first()) {
