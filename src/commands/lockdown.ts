@@ -83,8 +83,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid channel")] })
         } else if (message instanceof Message && message.mentions.channels.first()) {
             channel = message.mentions.channels.first()
-        } else {
-            return
         }
 
         if (channel.type != "GUILD_TEXT") {
