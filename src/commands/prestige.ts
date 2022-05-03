@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-const {
+import {
     getXp,
     getPrestigeRequirement,
     getBankBalance,
@@ -14,7 +14,7 @@ const {
     calcMaxBet,
     getInventory,
     setInventory,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    let embed = new CustomEmbed(
+    const embed = new CustomEmbed(
         message.member,
         true,
         "are you sure you want to prestige?\n\n" +
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const filter = (i) => i.user.id == message.author.id
 
     const reaction = await msg
-        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
             await collected.deferUpdate()
             return collected.customId
