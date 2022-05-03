@@ -91,13 +91,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         sizeMsg = cache.get(member.user.id).msg
         sizeEmoji = cache.get(member.user.id).emoji
     } else {
-        let size
-
-        size = Math.floor(Math.random() * 9) * 2 + 30
+        const size = Math.floor(Math.random() * 9) * 2 + 30
 
         const index = Math.floor(Math.random() * letters.length)
 
-        let letter = letters[index]
+        const letter = letters[index]
 
         if (index > 4) {
             sizeEmoji = "🍈"
