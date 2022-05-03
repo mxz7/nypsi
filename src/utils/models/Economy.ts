@@ -9,6 +9,7 @@ export interface Item {
     speed?: number
     rarity?: number
     boobies?: string
+    ingot?: string
 }
 
 export interface EconomyProfile {
