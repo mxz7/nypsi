@@ -108,26 +108,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
-    if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member)
-        if (getBalance(message.member) > maxBet) {
-            args[0] = maxBet
-        }
-    }
-
-    if (args[0] == "half") {
-        args[0] = getBalance(message.member) / 2
-    }
-
-    if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
-    } else {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] })
-    }
-
-    const bet = parseInt(args[0])
+    const bet = formatBet(args[0], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
@@ -281,7 +264,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         newNextCard(message.member)
     }
 
-    let row = new MessageActionRow().addComponents(
+    const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
         new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
     )
@@ -355,7 +338,7 @@ function getValue(card) {
     if (card.includes("k")) return 13
     if (card.includes("q")) return 12
     if (card.includes("j")) return 11
-    if (!parseInt(card.split()[0])) return "ERROR"
+    // if (!parseInt(card.split()[0])) return "ERROR"
     return parseInt(card.split()[0])
 }
 
@@ -410,8 +393,8 @@ function getCards(member) {
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return
 
-    let bet = games.get(message.member.user.id).bet
-    let nextCard = games.get(message.member.user.id).nextCard
+    const bet = games.get(message.member.user.id).bet
+    const nextCard = games.get(message.member.user.id).nextCard
 
     const newEmbed = new CustomEmbed(message.member, true).setTitle("yablon | " + message.member.user.username)
 
@@ -472,7 +455,7 @@ async function playGame(message, m) {
             newEmbed.setDescription(
                 "**bet** $" +
                     bet.toLocaleString() +
-                    Math.round(bet * win).toLocaleString() +
+                    Math.round(bet).toLocaleString() +
                     "\n\n**winner!!**\n**you win** $" +
                     winnings.toLocaleString()
             )
