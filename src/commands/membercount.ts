@@ -1,8 +1,8 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } = require("../utils/guilds/utils")
+import { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { logger } = require("../utils/logger")
+import { logger } from "../utils/logger"
 
 const cmd = new Command("membercount", "create an updating member count channel for your server", Categories.ADMIN)
     .setAliases(["counter"])
@@ -236,7 +236,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let format = ""
 
         format = profile.format.split("%count%").join(memberCount.size.toLocaleString())
-        format = format.split("%peak%").join(getPeaks(message.guild).members)
+        format = format.split("%peak%").join(getPeaks(message.guild).toString())
 
         const old = channel.name
 
@@ -245,7 +245,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await channel
             .edit({ name: format })
             .then(() => {
-                logger.auto("counter updated for '" + message.guild.name + "' ~ '" + old + "' -> '" + format + "'")
+                logger.log({
+                    level: "auto",
+                    message: "counter updated for '" + message.guild.name + "' ~ '" + old + "' -> '" + format + "'",
+                })
             })
             .catch(() => {
                 logger.error("error updating counter in " + message.guild.name)

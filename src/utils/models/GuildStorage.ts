@@ -27,9 +27,9 @@ export enum PunishmentType {
 
 export interface CounterProfile {
     guild_id?: string
-    enabled?: number
+    enabled?: number | boolean
     format?: string
-    filter_bots?: number
+    filter_bots?: number | boolean
     channel?: string
 }
 
