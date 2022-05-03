@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getItems,
     getBalance,
     getInventory,
@@ -10,7 +10,7 @@ const {
     getMulti,
     userExists,
     createUser,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { isPremium } from "../utils/premium/utils"
 
 const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY)
@@ -99,13 +99,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
             sellWorth = Math.floor(sellWorth + sellWorth * multi)
-        } else if (item == "ethereum" || item == "bitcoin") {
-            if (!selected.worth) {
-                return send({
-                    embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
-                })
-            }
-            sellWorth = Math.floor(selected.worth * 0.95 * selected.get(item))
         }
 
         total += sellWorth
