@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getPrestige,
     getWorkers,
     getBalance,
@@ -11,8 +11,8 @@ const {
     createUser,
     emptyWorkersStored,
     upgradeWorker,
-} = require("../utils/economy/utils")
-const { getAllWorkers, Worker } = require("../utils/economy/workers")
+} from "../utils/economy/utils"
+import { getAllWorkers, Worker } from "../utils/economy/workers"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 
@@ -71,9 +71,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .setTitle("workers | " + message.author.username)
             .setFooter(`${getPrefix(message.guild)}workers help`)
 
-        for (let worker of Array.from(workers.keys())) {
-            worker = workers.get(worker)
-            worker = new worker()
+        for (const w of Array.from(workers.keys())) {
+            const Worker = workers.get(w)
+            const worker = new Worker()
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
@@ -99,8 +99,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .setTitle("your workers")
             .setFooter(`${getPrefix(message.guild)}workers help`)
 
-        for (let worker of Object.keys(personalWorkers)) {
-            worker = Worker.fromJSON(personalWorkers[worker])
+        for (const w of Object.keys(personalWorkers)) {
+            const worker = Worker.fromJSON(personalWorkers[w])
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
@@ -149,9 +149,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
-                for (let worker1 of Array.from(workers.keys())) {
-                    worker1 = workers.get(worker1)
-                    worker1 = new worker1()
+                for (const w of Array.from(workers.keys())) {
+                    const Worker1 = workers.get(w)
+                    const worker1 = new Worker1()
                     if (worker1.name == name) {
                         worker = worker1
                         break
@@ -183,8 +183,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const personalWorkers = getWorkers(message.member)
 
-            for (let worker1 of Object.keys(personalWorkers)) {
-                worker1 = personalWorkers[worker1]
+            for (const w of Object.keys(personalWorkers)) {
+                const worker1 = personalWorkers[w]
 
                 if (worker1.id == worker.id) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this worker")] })
@@ -204,8 +204,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let amountEarned = 0
             let earnedBreakdown = ""
 
-            for (let worker of Object.keys(personalWorkers)) {
-                worker = personalWorkers[worker]
+            for (const w of Object.keys(personalWorkers)) {
+                const worker = personalWorkers[w]
 
                 amountEarned += Math.floor(worker.perItem * worker.stored)
                 earnedBreakdown += `\n${worker.name} +$${Math.floor(
@@ -253,9 +253,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (!worker) {
                 args.shift()
                 const name = args.join(" ").toLowerCase()
-                for (let worker1 of Array.from(workers.keys())) {
-                    worker1 = workers.get(worker1)
-                    worker1 = new worker1()
+                for (const w of Array.from(workers.keys())) {
+                    const Worker1 = workers.get(w)
+                    const worker1 = new Worker1()
                     if (worker1.name == name) {
                         worker = worker1
                         break
@@ -338,8 +338,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (getTier(message.author.id) >= 2) {
                 let has = false
-                for (let worker1 of Object.keys(personalWorkers)) {
-                    worker1 = personalWorkers[worker1]
+                for (const w of Object.keys(personalWorkers)) {
+                    const worker1 = personalWorkers[w]
 
                     if (worker1.id == 1) {
                         has = true
@@ -348,7 +348,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 if (!has) {
                     addWorker(message.member, 1)
-                    let name = workers.get(1)
+                    let name: any = workers.get(1)
                     name = new name().name
                     msg += "+ " + name + "\n"
                 }
@@ -356,8 +356,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (getTier(message.author.id) >= 3) {
                 let has = false
-                for (let worker1 of Object.keys(personalWorkers)) {
-                    worker1 = personalWorkers[worker1]
+                for (const w of Object.keys(personalWorkers)) {
+                    const worker1 = personalWorkers[w]
 
                     if (worker1.id == 3) {
                         has = true
@@ -366,7 +366,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 if (!has) {
                     addWorker(message.member, 3)
-                    let name = workers.get(3)
+                    let name: any = workers.get(3)
                     name = new name().name
                     msg += "+ " + name + "\n"
                 }
@@ -374,8 +374,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (getTier(message.author.id) >= 4) {
                 let has = false
-                for (let worker1 of Object.keys(personalWorkers)) {
-                    worker1 = personalWorkers[worker1]
+                for (const w of Object.keys(personalWorkers)) {
+                    const worker1 = personalWorkers[w]
 
                     if (worker1.id == 6) {
                         has = true
@@ -384,7 +384,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 if (!has) {
                     addWorker(message.member, 6)
-                    let name = workers.get(6)
+                    let name: any = workers.get(6)
                     name = new name().name
                     msg += "+ " + name + "\n"
                 }
