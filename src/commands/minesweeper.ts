@@ -16,7 +16,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { gamble, logger } = require("../utils/logger.js")
+import { gamble, logger } from "../utils/logger.js"
 
 const cooldown = new Map()
 const games = new Map()
