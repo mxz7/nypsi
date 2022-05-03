@@ -111,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
     if (args[0].toLowerCase() == "all") {
         args[0] = getBalance(message.member).toString()
