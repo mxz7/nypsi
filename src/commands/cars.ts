@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton } from "di
 const { inPlaceSort } = require("fast-sort")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getItems, getInventory, userExists, createUser } = require("../utils/economy/utils")
+import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils"
 
 const cmd = new Command("cars", "view the current cars available", Categories.MONEY).setAliases(["car"])
 

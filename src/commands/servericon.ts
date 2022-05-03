@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders")
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("servericon", "get the server icon", Categories.INFO)
 
