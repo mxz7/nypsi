@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-const { inPlaceSort } = require("fast-sort")
+import { inPlaceSort } from "fast-sort"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 const { getItems } = require("../utils/economy/utils")
