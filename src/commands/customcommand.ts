@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { commandExists } = require("../utils/commandhandler")
+import { commandExists } from "../utils/commandhandler"
 import { getPrefix } from "../utils/guilds/utils"
-const { getTier, getUserCommand, getCommand, setCommand, isPremium } = require("../utils/premium/utils")
+import { getTier, getUserCommand, getCommand, setCommand, isPremium } from "../utils/premium/utils"
 
 const cmd = new Command("customcommand", "create a custom command", Categories.FUN).setAliases(["mycommand", "mycmd"])
 
@@ -99,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let fail = false
 
-        let res = await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] }).catch(() => {
+        let res: any = await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] }).catch(() => {
             fail = true
             return message.channel.send({ embeds: [new ErrorEmbed("you took too long")] })
         })
@@ -128,10 +128,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("this command already exists")] })
         }
 
-        let trigger = getUserCommand(message.author.id)
+        const command = getUserCommand(message.author.id)
+        let trigger: string
 
-        if (trigger) {
-            trigger = trigger.trigger
+        if (command) {
+            trigger = command.trigger
         }
 
         if (getCommand(res) && trigger != res) {
