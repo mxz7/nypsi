@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { userExists, createUser, getInventory, getItems, setInventory, addItemUse } = require("../utils/economy/utils")
+import { userExists, createUser, getInventory, getItems, setInventory, addItemUse } from "../utils/economy/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 
 const veins = new Map()
