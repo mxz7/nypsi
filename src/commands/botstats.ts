@@ -1,10 +1,13 @@
 import { CommandInteraction, Message } from "discord.js"
-const { getUserCount, getUserCountGuild } = require("../utils/economy/utils.js")
+import { getUserCount, getUserCountGuild } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { cpu } = require("node-os-utils")
-const { logger } = require("../utils/logger")
-const { version } = require("../../package.json")
+import { cpu } from "node-os-utils"
+import { logger } from "../utils/logger"
+// @ts-expect-error typescript doesnt like opening package.json
+import { version } from "../../package.json"
+
+declare function require(name: string)
 
 const cooldown = new Map()
 
@@ -61,31 +64,31 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let imgCache = 0
 
     try {
-        for (let link of Array.from(bdsmCache.keys())) {
+        for (const link of Array.from(bdsmCache.keys())) {
             imgCache = imgCache + bdsmCache.get(link).length
         }
-        for (let link of Array.from(assCache.keys())) {
+        for (const link of Array.from(assCache.keys())) {
             imgCache = imgCache + assCache.get(link).length
         }
-        for (let link of Array.from(thighsCache.keys())) {
+        for (const link of Array.from(thighsCache.keys())) {
             imgCache = imgCache + thighsCache.get(link).length
         }
-        for (let link of Array.from(pornCache.keys())) {
+        for (const link of Array.from(pornCache.keys())) {
             imgCache = imgCache + pornCache.get(link).length
         }
-        for (let link of Array.from(birbCache.keys())) {
+        for (const link of Array.from(birbCache.keys())) {
             imgCache = imgCache + birbCache.get(link).length
         }
-        for (let link of Array.from(catCache.keys())) {
+        for (const link of Array.from(catCache.keys())) {
             imgCache = imgCache + catCache.get(link).length
         }
-        for (let link of Array.from(dogCache.keys())) {
+        for (const link of Array.from(dogCache.keys())) {
             imgCache = imgCache + dogCache.get(link).length
         }
-        for (let link of Array.from(rabbitCache.keys())) {
+        for (const link of Array.from(rabbitCache.keys())) {
             imgCache = imgCache + rabbitCache.get(link).length
         }
-        for (let link of Array.from(snekCache.keys())) {
+        for (const link of Array.from(snekCache.keys())) {
             imgCache = imgCache + snekCache.get(link).length
         }
     } catch {
