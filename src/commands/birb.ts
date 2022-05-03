@@ -4,6 +4,8 @@ import { redditImage } from "../utils/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
+declare function require(name: string)
+
 const cooldown = new Map()
 
 const cmd = new Command("birb", "get a random picture of a birb", Categories.ANIMALS)
@@ -52,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const birbLinks = Array.from(birbCache.keys())
 
-    const subredditChoice = birbLinks[Math.floor(Math.random() * birbLinks.length)]
+    const subredditChoice: any = birbLinks[Math.floor(Math.random() * birbLinks.length)]
 
     const allowed = birbCache.get(subredditChoice)
 
