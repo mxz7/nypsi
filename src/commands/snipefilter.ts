@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { getSnipeFilter, updateFilter, getPrefix } = require("../utils/guilds/utils")
+import { getSnipeFilter, updateFilter, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)] })
         }
 
-        let word = args[1]
+        const word = args[1]
             .toString()
             .toLowerCase()
             .normalize("NFD")
