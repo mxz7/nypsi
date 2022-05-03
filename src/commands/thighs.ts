@@ -4,6 +4,8 @@ import { redditImage } from "../utils/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
+declare function require(name: string)
+
 const cooldown = new Map()
 
 const cmd = new Command("thighs", "get a random thighs image", Categories.NSFW)
