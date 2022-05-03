@@ -114,18 +114,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const maxBet = await calcMaxBet(message.member)
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member)
+        args[0] = getBalance(message.member).toString()
         if (getBalance(message.member) > maxBet) {
-            args[0] = maxBet
+            args[0] = maxBet.toString()
         }
     }
 
     if (args[0] == "half") {
-        args[0] = getBalance(message.member) / 2
+        args[0] = (getBalance(message.member) / 2).toString()
     }
 
     if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
+        args[0] = formatBet(args[0]).toString()
     } else {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
@@ -383,8 +383,6 @@ function calcTotalDealer(member) {
     let total = 0
     let aces = 0
 
-    let aceAs11 = false
-
     for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join()
 
@@ -402,12 +400,6 @@ function calcTotalDealer(member) {
             total += 11
         } else {
             total += 1
-        }
-    }
-
-    if (total > 21) {
-        if (aceAs11) {
-            total = total - 10
         }
     }
 
