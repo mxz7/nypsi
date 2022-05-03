@@ -4,6 +4,7 @@ import { profileExists, createProfile, newCase, deleteBan } from "../utils/moder
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { logger } from "../utils/logger"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("unban", "unban one or more users", Categories.MODERATION).setPermissions(["BAN_MEMBERS"])
 
@@ -133,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         members1.push(m.id)
     }
 
-    newCase(message.guild, "unban", members1, message.member.user.tag, message.content)
+    newCase(message.guild, PunishmentType.UNBAN, members1, message.member.user.tag, message.content)
 }
 
 cmd.setRun(run)
