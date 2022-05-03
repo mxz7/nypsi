@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     isEcoBanned,
     userExists,
     createUser,
@@ -12,9 +12,9 @@ const {
     getPrestige,
     getXp,
     setInventory,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
-const { payment } = require("../utils/logger")
+import { payment } from "../utils/logger"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { getMember } from "../utils/utils"
 
@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target = message.mentions.members.first()
 
     if (!target) {
-        target = await getMember(message, args[0])
+        target = await getMember(message.guild, args[0])
     }
 
     if (!target) {
@@ -132,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] })
     }
 
-    if (args[2] > 50) args[2] = 50
+    if (parseInt(args[2]) > 50) args[2] = "50"
 
     let amount = parseInt(args[2])
 
