@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-const { calcMaxBet, userExists, createUser } = require("../utils/economy/utils.js")
+import { calcMaxBet, userExists, createUser } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
     return message.channel.send({
         embeds: [new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`)],
