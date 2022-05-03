@@ -4,6 +4,8 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
+declare function require(name: string)
+
 const cooldown = new Map()
 
 const cmd = new Command("rabbit", "get a random picture of a rabbit", Categories.ANIMALS).setAliases(["bunny"])
