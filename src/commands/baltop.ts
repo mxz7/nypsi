@@ -15,8 +15,8 @@ cmd.slashEnabled = true
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
-        if (message.interaction) {
-            return await message.reply(data)
+        if (!(message instanceof Message)) {
+            return await message.editReply(data)
         } else {
             return await message.channel.send(data)
         }
