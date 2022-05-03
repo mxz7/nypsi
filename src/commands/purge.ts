@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!(message instanceof Message)) {
-        message.deferReply()
+        await message.deferReply()
     }
 
     if (amount <= 100) {
