@@ -1182,6 +1182,11 @@ export function isEcoBanned(id: string) {
     } else {
         const query = db.prepare("SELECT banned FROM economy WHERE id = ?").get(id)
 
+        if (!query) {
+            bannedCache.set(id, false)
+            return false
+        }
+
         if (query.banned) {
             bannedCache.set(id, true)
             return true
