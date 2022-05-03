@@ -189,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
         if (!(message instanceof Message)) {
-            message.reply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")], ephemeral: true })
+            message.editReply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")] }).catch(() => {})
         }
         return m.delete().catch()
     }
