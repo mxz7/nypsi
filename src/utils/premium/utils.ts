@@ -164,7 +164,7 @@ export function setTier(member: GuildMember | string, level: number) {
  * @param {GuildMember} member
  * @param {String} color
  */
-export function setEmbedColor(member: GuildMember, color: string) {
+export function setEmbedColor(member: GuildMember | string, color: string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -229,7 +229,7 @@ export function setLastWeekly(member: GuildMember | string, date: number) {
  * @param {GuildMember} member
  * @param {Number} status
  */
-export function setStatus(member: GuildMember, status: number) {
+export function setStatus(member: GuildMember | string, status: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -244,7 +244,7 @@ export function setStatus(member: GuildMember, status: number) {
  * @param {GuildMember} member
  * @param {String} reason
  */
-export function setReason(member: GuildMember, reason: string) {
+export function setReason(member: GuildMember | string, reason: string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id

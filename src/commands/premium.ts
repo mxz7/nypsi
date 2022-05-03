@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-const {
+import {
     isPremium,
     getPremiumProfile,
     setTier,
@@ -11,10 +11,10 @@ const {
     renewUser,
     expireUser,
     getUserCommand,
-} = require("../utils/premium/utils")
+} from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { formatDate, daysAgo, daysUntil } = require("../utils/utils")
+import { formatDate, daysAgo, daysUntil } from "../utils/utils"
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon"])
 
