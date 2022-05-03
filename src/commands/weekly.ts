@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
-const { getBalance, getMulti, updateBalance, userExists, createUser } = require("../utils/economy/utils.js")
+import { getBalance, getMulti, updateBalance, userExists, createUser } from "../utils/economy/utils.js"
 import { getPrefix } from "../utils/guilds/utils"
-const { isPremium, getTier, getLastWeekly, setLastWeekly } = require("../utils/premium/utils")
+import { isPremium, getTier, getLastWeekly, setLastWeekly } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 
@@ -64,11 +64,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const lastWeekly = getLastWeekly(message.author.id)
         const diff = now - lastWeekly
 
-        if (diff >= 604800000 || lastWeekly == "none") {
+        if (diff >= 604800000) {
             setLastWeekly(message.author.id, now)
 
             let amount = 150000
-            const multi = await getMulti(message.member)
+            const multi = getMulti(message.member)
 
             let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 
@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 }
 
 function timeUntil(date) {
-    const ms = Math.floor(date - new Date())
+    const ms = Math.floor(date - new Date().getTime())
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
