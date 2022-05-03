@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const rabbitLinks = Array.from(rabbitCache.keys())
 
-    const subredditChoice = rabbitLinks[Math.floor(Math.random() * rabbitLinks.length)]
+    const subredditChoice: any = rabbitLinks[Math.floor(Math.random() * rabbitLinks.length)]
 
     const allowed = rabbitCache.get(subredditChoice)
 

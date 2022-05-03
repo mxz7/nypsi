@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const pornLinks = Array.from(pornCache.keys())
 
-    const subredditChoice = pornLinks[Math.floor(Math.random() * pornLinks.length)]
+    const subredditChoice: any = pornLinks[Math.floor(Math.random() * pornLinks.length)]
 
     const allowed = await pornCache.get(subredditChoice)
 
