@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { toggleLock } = require("../utils/utils")
+import { toggleLock } from "../utils/utils"
 
 const cmd = new Command("captchatest", "test an account", Categories.NONE)
 
@@ -18,6 +18,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const user of args) {
         toggleLock(user)
     }
+
+    if (!(message instanceof Message)) return
 
     message.react("✅")
 }
