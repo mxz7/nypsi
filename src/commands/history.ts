@@ -1,5 +1,5 @@
 import { getMember } from "../utils/utils"
-const { Message, Permissions, MessageActionRow, MessageButton } = require("discord.js")
+import { Message, Permissions, MessageActionRow, MessageButton } from "discord.js"
 const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
