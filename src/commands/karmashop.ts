@@ -1,12 +1,14 @@
-const { Message, MessageButton, MessageActionRow } = require("discord.js")
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } = require("../utils/karma/utils")
+import { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } from "../utils/karma/utils"
 import { inPlaceSort } from "fast-sort"
-const { isPremium, getTier, setExpireDate } = require("../utils/premium/utils")
-const { updateXp, getXp, userExists, createUser, getInventory, setInventory } = require("../utils/economy/utils")
+import { isPremium, getTier, setExpireDate } from "../utils/premium/utils"
+import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils"
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO)
+
+declare function require(name: string)
 
 const cooldown = new Map()
 const items = require("../../data/karmashop.json")
@@ -251,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        let searchTag = args[1].toLowerCase()
+        const searchTag = args[1].toLowerCase()
 
         let selected
 
