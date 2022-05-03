@@ -2,13 +2,13 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getPrefix } from "../utils/guilds/utils"
-const {
+import {
     isTracking,
     disableTracking,
     enableTracking,
     usernameProfileExists,
     createUsernameProfile,
-} = require("../utils/users/utils")
+} from "../utils/users/utils"
 
 const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO)
 
@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member)
+    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member, message.author.tag)
 
     cooldown.set(message.member.id, new Date())
 
