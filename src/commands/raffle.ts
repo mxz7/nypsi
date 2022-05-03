@@ -36,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, 3000)
 
-    let members = []
+    const members = []
 
     if (args.length == 0) {
         const members1 = message.guild.members.cache
