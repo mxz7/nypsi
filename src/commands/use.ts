@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     getItems,
     getInventory,
     setInventory,
@@ -12,12 +12,12 @@ const {
     getDMsEnabled,
     addItemUse,
     openCrate,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { getMember } from "../utils/utils"
-const { onBankRobCooldown, deleteBankRobCooldown } = require("./bankrob")
-const { onStoreRobCooldown, deleteStoreRobCooldown } = require("./storerob")
+
+declare function require(name: string)
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"])
 
@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const items = getItems()
     const inventory = getInventory(message.member)
 
-    let searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase()
 
     let selected
 
@@ -179,9 +179,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
-        const { onRadioCooldown, addRadioCooldown, onRobCooldown, deleteRobCooldown } = require("./rob")
-        const { onChastityCooldown, addChastityCooldown, deleteChastityCooldown } = require("./sex")
+        const { data: robData } = require("./rob")
+        const { data: sexData } = require("./sex")
         const { isHandcuffed, addHandcuffs } = require("../utils/commandhandler")
+        const { data: bankRobData } = require("./bankrob")
+        const { data: storeRobData } = require("./storerob")
 
         switch (selected.id) {
             case "standard_watch":
@@ -247,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let lockPickTarget // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
-                    lockPickTarget = await getMember(message, args[1])
+                    lockPickTarget = await getMember(message.guild, args[1])
                 } else {
                     lockPickTarget = message.mentions.members.first()
                 }
@@ -257,9 +259,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
 
                 if (message.member == lockPickTarget) {
-                    if (onChastityCooldown(message.author.id)) {
+                    if (sexData.onChastityCooldown(message.author.id)) {
                         addItemUse(message.member, selected.id)
-                        deleteChastityCooldown(message.author.id)
+                        sexData.deleteChastityCooldown(message.author.id)
 
                         embed.setDescription("picking chastity cage...")
                         laterDescription = "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
@@ -308,23 +310,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             case "mask":
                 if (
-                    !onRobCooldown(message.member) &&
-                    !onBankRobCooldown(message.member) &&
-                    !onStoreRobCooldown(message.member)
+                    !robData.onRobCooldown(message.member) &&
+                    !bankRobData.onBankRobCooldown(message.member) &&
+                    !storeRobData.onStoreRobCooldown(message.member)
                 ) {
                     return send({
                         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
                     })
                 }
 
-                if (onRobCooldown(message.member)) {
-                    deleteRobCooldown(message.member)
+                if (robData.onRobCooldown(message.member)) {
+                    robData.deleteRobCooldown(message.member)
                     embed.setDescription("you're wearing your **mask** and can now rob someone again")
-                } else if (onBankRobCooldown(message.member)) {
-                    deleteBankRobCooldown(message.member)
+                } else if (bankRobData.onBankRobCooldown(message.member)) {
+                    bankRobData.deleteBankRobCooldown(message.member)
                     embed.setDescription("you're wearing your **mask** and can now rob a bank again")
-                } else if (onStoreRobCooldown(message.member)) {
-                    deleteStoreRobCooldown(message.member)
+                } else if (storeRobData.onStoreRobCooldown(message.member)) {
+                    storeRobData.deleteStoreRobCooldown(message.member)
                     embed.setDescription("you're wearing your **mask** and can now rob a store again")
                 }
 
@@ -349,7 +351,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let radioTarget // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
-                    radioTarget = await getMember(message, args[1])
+                    radioTarget = await getMember(message.guild, args[1])
                 } else {
                     radioTarget = message.mentions.members.first()
                 }
@@ -362,7 +364,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
-                if (onRadioCooldown(radioTarget)) {
+                if (robData.onRadioCooldown(radioTarget)) {
                     return send({
                         embeds: [new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)],
                     })
@@ -370,7 +372,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 addItemUse(message.member, selected.id)
 
-                addRadioCooldown(radioTarget.id)
+                robData.addRadioCooldown(radioTarget.id)
 
                 inventory["radio"]--
 
@@ -394,7 +396,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let chastityTarget // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
-                    chastityTarget = await getMember(message, args[1])
+                    chastityTarget = await getMember(message.guild, args[1])
                 } else {
                     chastityTarget = message.mentions.members.first()
                 }
@@ -409,7 +411,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     })
                 }
 
-                if (onChastityCooldown(chastityTarget.id)) {
+                if (sexData.onChastityCooldown(chastityTarget.id)) {
                     return send({
                         embeds: [new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)],
                     })
@@ -417,7 +419,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 addItemUse(message.member, selected.id)
 
-                addChastityCooldown(chastityTarget.id)
+                sexData.addChastityCooldown(chastityTarget.id)
 
                 inventory["chastity_cage"]--
 
@@ -441,7 +443,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let handcuffsTarget // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
-                    handcuffsTarget = await getMember(message, args[1])
+                    handcuffsTarget = await getMember(message.guild, args[1])
                 } else {
                     handcuffsTarget = message.mentions.members.first()
                 }
