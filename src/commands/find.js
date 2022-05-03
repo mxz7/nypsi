@@ -24,7 +24,7 @@ const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["b
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return
 
     if (args.length == 0) {
