@@ -1207,7 +1207,7 @@ export function toggleBan(id: string) {
     bannedCache.delete(id)
 }
 
-export function reset() {
+export function reset(): number {
     const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all()
 
     for (const user of query) {
@@ -1235,6 +1235,8 @@ export function reset() {
         logger.info("updated " + user.id)
     }
     db.prepare("DELETE FROM economy_stats")
+
+    return query.length
 }
 
 /**
