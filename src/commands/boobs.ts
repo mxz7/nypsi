@@ -4,6 +4,8 @@ import { redditImage } from "../utils/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"
 
+declare function require(name: string)
+
 const cooldown = new Map()
 
 const cmd = new Command("boobs", "get a random boob image", Categories.NSFW).setAliases([
@@ -63,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const boobLinks = Array.from(boobCache.keys())
 
-    const subredditChoice = boobLinks[Math.floor(Math.random() * boobLinks.length)]
+    const subredditChoice: any = boobLinks[Math.floor(Math.random() * boobLinks.length)]
 
     const allowed = boobCache.get(subredditChoice)
 

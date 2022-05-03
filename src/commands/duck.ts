@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const duckLinks = Array.from(duckCache.keys())
 
-    const subredditChoice = duckLinks[Math.floor(Math.random() * duckLinks.length)]
+    const subredditChoice: any = duckLinks[Math.floor(Math.random() * duckLinks.length)]
 
     const allowed = duckCache.get(subredditChoice)
 
