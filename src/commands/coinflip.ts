@@ -131,6 +131,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
+    if (isNaN(bet)) {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
+    }
+
     if (bet <= 0) {
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] })
     }
