@@ -77,3 +77,4 @@ jobs:
                       git pull
                       git status
                       npm ci
+                      npx tsc
