@@ -486,7 +486,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!laterDescription) return
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
