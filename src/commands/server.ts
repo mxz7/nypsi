@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
-const { formatDate } = require("../utils/utils")
-const { getPeaks, inCooldown, addCooldown, runCheck } = require("../utils/guilds/utils")
+import { formatDate } from "../utils/utils"
+import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command("server", "view information about the server", Categories.INFO).setAliases([
     "serverinfo",
