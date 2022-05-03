@@ -1,15 +1,15 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
+import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
-const {
+import {
     usernameProfileExists,
     createUsernameProfile,
     fetchUsernameHistory,
     clearUsernameHistory,
     isTracking,
-} = require("../utils/users/utils")
-const { getMember, formatDate } = require("../utils/utils")
+} from "../utils/users/utils"
+import { getMember, formatDate } from "../utils/utils"
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases(["un", "usernames"])
 
@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    let member
+    let member: GuildMember
 
     if (args.length == 0) {
         member = message.member
@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args.join(" "))
+            member = await getMember(message.guild, args.join(" "))
         } else {
             member = message.mentions.members.first()
         }
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, cooldownLength * 1000)
 
-    if (!usernameProfileExists(member)) createUsernameProfile(member)
+    if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag)
 
     const isUserTracking = isTracking(member)
 
