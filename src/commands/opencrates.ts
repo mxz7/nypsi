@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { startOpeningCrates, stopOpeningCrates } = require("../utils/commandhandler")
-const { getInventory, getItems, openCrate, getDMsEnabled } = require("../utils/economy/utils")
+import { startOpeningCrates, stopOpeningCrates } from "../utils/commandhandler"
+import { getInventory, getItems, openCrate, getDMsEnabled } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 
@@ -18,7 +18,7 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let cooldownLength = 30
+    const cooldownLength = 30
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -121,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         fail = true
     })
 
-    if (fail) {
+    if (fail || !(msg instanceof Message)) {
         const reply = new ErrorEmbed("failed to dm you, please check your privacy settings")
         if (message.interaction) {
             return send({ embeds: [reply], ephemeral: true })
