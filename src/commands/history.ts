@@ -1,6 +1,6 @@
 import { getMember } from "../utils/utils"
-import { Message, Permissions, MessageActionRow, MessageButton } from "discord.js"
-const { getCases, profileExists, createProfile } = require("../utils/moderation/utils")
+import { Message, Permissions, MessageActionRow, MessageButton, CommandInteraction } from "discord.js"
+import { getCases, profileExists, createProfile } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 member = args[0]
             }
         } else {
-            member = await getMember(message, args.join(" "))
+            member = await getMember(message.guild, args.join(" "))
 
             if (!member) {
                 return send({
@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let cases
-    let pages = []
+    const pages = []
 
     if (!unknownMember) {
         cases = getCases(message.guild, member.user.id)
@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let count = 0
     let page = []
-    for (let case0 of cases) {
+    for (const case0 of cases) {
         if (count == 5) {
             pages.push(page)
             page = []
@@ -141,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader("history for " + member.user.tag)
     }
 
-    for (let case0 of pages[0]) {
+    for (const case0 of pages[0]) {
         if (case0.deleted) {
             embed.addField("case " + case0.case_id, "`[deleted]`")
         } else {
@@ -175,7 +175,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const filter = (i) => i.user.id == message.author.id
 
-        const edit = async (data, msg) => {
+        const edit = async (data, msg?) => {
             if (!(message instanceof Message)) {
                 await message.editReply(data)
                 return await message.fetchReply()
@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return collected.customId
                 })
                 .catch(async () => {
-                    await edit({ components: [] }).catch(() => {}, msg)
+                    await edit({ components: [] }).catch(() => {})
                 })
 
             const newEmbed = new CustomEmbed(message.member)
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager()
                 } else {
                     currentPage--
-                    for (let case0 of pages[currentPage]) {
+                    for (const case0 of pages[currentPage]) {
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
@@ -245,7 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager()
                 } else {
                     currentPage++
-                    for (let case0 of pages[currentPage]) {
+                    for (const case0 of pages[currentPage]) {
                         if (case0.deleted) {
                             newEmbed.addField("case " + case0.case_id, "`[deleted]`")
                         } else {
