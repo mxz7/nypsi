@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { redditImage } from "../utils/utils.js"
-const fetch = require("node-fetch")
+import fetch from "node-fetch"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
@@ -48,7 +48,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}reddit <subreddit>`)] })
     }
 
-    for (let bannedSubReddit of blacklisted) {
+    if (message.channel.type != "GUILD_TEXT") return
+
+    for (const bannedSubReddit of blacklisted) {
         if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
             return message.channel.send({
                 embeds: [
