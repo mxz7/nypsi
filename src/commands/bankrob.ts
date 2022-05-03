@@ -187,13 +187,14 @@ function deleteBankRobCooldown(member: GuildMember): void {
     cooldown.delete(member.user.id)
 }
 
-cmd.data.deleteBankRobCooldown = deleteBankRobCooldown
-
 function onBankRobCooldown(member: GuildMember): boolean {
     return cooldown.has(member.user.id)
 }
 
-cmd.data.onBankRobCooldown = onBankRobCooldown
+cmd.data = {
+    deleteBankRobCooldown: deleteBankRobCooldown,
+    onBankRobCooldown: onBankRobCooldown,
+}
 
 cmd.setRun(run)
 
