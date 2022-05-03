@@ -187,10 +187,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
         )
 
-        if (!(message instanceof Message)) {
-            await message.deferReply()
-        }
-
         const msg = await message.channel.send({ embeds: [embed] })
 
         game.message = msg

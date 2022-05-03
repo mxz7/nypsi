@@ -86,10 +86,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, 10000)
 
-    if (!(message instanceof Message)) {
-        await message.deferReply()
-    }
-
     username = username.username
 
     const res = await fetch(
