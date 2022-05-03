@@ -21,3 +21,4 @@ out/
 !.prettierrc.json
 !.prettierignore
 !tsconfig.json
+!.commitlintrc.json
