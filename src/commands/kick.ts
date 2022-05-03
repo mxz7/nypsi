@@ -3,6 +3,7 @@ import { profileExists, createProfile, newCase } from "../utils/moderation/utils
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("kick", "kick one or more users", Categories.MODERATION)
     .setPermissions(["KICK_MEMBERS"])
@@ -181,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
+    newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1])
 
     if (args.join(" ").includes("-s")) return
     for (const member of members1) {

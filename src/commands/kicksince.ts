@@ -3,6 +3,7 @@ import { profileExists, createProfile, newCase } from "../utils/moderation/utils
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
     .setPermissions(["ADMINISTRATOR"])
@@ -224,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
+    newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1])
 
     for (const member of members1) {
         const m = members.get(member)

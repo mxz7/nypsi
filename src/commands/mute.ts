@@ -4,6 +4,7 @@ import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getExactMember } from "../utils/utils"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -284,7 +285,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, "mute", members1, message.author.tag, storeReason)
+    newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason)
 
     for (const m of members1) {
         if (isMuted(message.guild, members.get(m))) {
