@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { getPrefix, setPrefix } = require("../utils/guilds/utils")
+import { getPrefix, setPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
