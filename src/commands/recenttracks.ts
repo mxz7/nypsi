@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
-const { default: fetch } = require("node-fetch")
+import fetch from "node-fetch"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const { getLastfmUsername } = require("../utils/users/utils")
+import { getLastfmUsername } from "../utils/users/utils"
 import { getMember } from "../utils/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         member = message.member
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message, args.join(" "))
+            member = await getMember(message.guild, args.join(" "))
         } else {
             member = message.mentions.members.first()
         }
@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
-    let username = getLastfmUsername(member)
+    let username: any = getLastfmUsername(member)
 
     if (!username) {
         if (message.author.id == member.user.id) {
