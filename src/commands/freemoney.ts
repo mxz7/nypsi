@@ -1,4 +1,4 @@
-const { userExists, updateBalance, getBalance, createUser } = require("../utils/economy/utils.js")
+import { userExists, updateBalance, getBalance, createUser } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
