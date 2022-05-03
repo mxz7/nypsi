@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { getDMsEnabled, setDMsEnabled, userExists, createUser } = require("../utils/economy/utils.js")
+import { getDMsEnabled, setDMsEnabled, userExists, createUser } from "../utils/economy/utils.js"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("dms", "enable/disable dms with the bot", Categories.INFO).setAliases([
