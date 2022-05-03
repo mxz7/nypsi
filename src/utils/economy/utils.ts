@@ -14,6 +14,7 @@ import { StatsProfile } from "../models/StatsProfile"
 import * as shufflearray from "shuffle-array"
 import { MStoTime } from "../utils"
 import fetch from "node-fetch"
+import workerSort from "../workers/sort"
 
 declare function require(name: string)
 
@@ -673,7 +674,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
 
     const query = db.prepare("SELECT id, money FROM economy WHERE money > 500").all()
 
-    const userIDs = []
+    let userIDs = []
     const balances = new Map()
 
     for (const user of query) {
@@ -683,7 +684,11 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
         }
     }
 
-    inPlaceSort(userIDs).desc((i) => balances.get(i))
+    if (userIDs.length > 500) {
+        userIDs = await workerSort(userIDs, balances)
+    } else {
+        inPlaceSort(userIDs).desc((i) => balances.get(i))
+    }
 
     const usersFinal = []
 
