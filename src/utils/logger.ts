@@ -144,7 +144,7 @@ export function payment(from: User, to: User, amount: number) {
  * @param {Boolean} win
  * @param {Number} winAmount
  */
-export function gamble(user: User, game: string, amount: number, win: boolean, winAmount: number) {
+export function gamble(user: User, game: string, amount: number, win: boolean, winAmount?: number) {
     if (!nextLogMsg.get("gamble")) {
         nextLogMsg.set(
             "gamble",
