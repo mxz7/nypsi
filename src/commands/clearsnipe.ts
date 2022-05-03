@@ -2,6 +2,8 @@ import { CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
+declare function require(name: string)
+
 const cmd = new Command("clearsnipe", "delete the current sniped thing", Categories.MODERATION)
     .setAliases(["cs"])
     .setPermissions(["MANAGE_MESSAGES"])
@@ -14,7 +16,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
     const { snipe, eSnipe } = require("../nypsi.js")
 
-    let channel = message.channel
+    let channel: any = message.channel
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
