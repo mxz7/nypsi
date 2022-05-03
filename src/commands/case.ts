@@ -1,6 +1,6 @@
-import { Message, Permissions, MessageActionRow, MessageButton } from "discord.js"
+import { Message, Permissions, MessageActionRow, MessageButton, CommandInteraction } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils")
+import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
