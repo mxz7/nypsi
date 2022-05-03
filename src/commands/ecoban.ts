@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { toggleBan } = require("../utils/economy/utils")
+import { toggleBan } from "../utils/economy/utils"
 
 const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE)
 
@@ -16,6 +16,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     toggleBan(args[0])
+
+    if (!(message instanceof Message)) return
 
     message.react("✅")
 }
