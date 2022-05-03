@@ -45,7 +45,7 @@ let wholesomeCache: Array<{
     submitter: string
     submitter_id: string
     accepter: string
-    date: Date
+    upload: number
 }>
 
 export function isImageUrl(url: string): boolean {
@@ -549,13 +549,13 @@ export function denyWholesomeImage(id: number): boolean {
  * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
  * @param {id} Number
  */
-export function getWholesomeImage(id): {
+export function getWholesomeImage(id?: number): {
     id: number
     image: string
     submitter: string
     submitter_id: string
     accepter: string
-    date: Date
+    upload: number
 } {
     if (id) {
         const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id)
