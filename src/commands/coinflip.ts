@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target
 
     if (!message.mentions.members.first()) {
-        target = await getExactMember(message, args[0])
+        target = await getExactMember(message.guild, args[0])
     } else {
         target = message.mentions.members.first()
     }
@@ -106,20 +106,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
-    if (args[1] == "all") {
-        args[1] = getBalance(message.member)
-    }
+    const maxBet = calcMaxBet(message.member)
 
-    if (args[1] == "half") {
-        args[1] = getBalance(message.member) / 2
-    }
-
-    if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-        if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-            args[1] = formatBet(args[1])
-        } else {
-            return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] })
+    if (args[0].toLowerCase() == "all") {
+        args[0] = getBalance(message.member).toString()
+        if (getBalance(message.member) > maxBet) {
+            args[0] = maxBet.toString()
         }
+    }
+
+    if (args[0] == "half") {
+        args[0] = (getBalance(message.member) / 2).toString()
+    }
+
+    if (parseInt(args[0])) {
+        args[0] = formatBet(args[0]).toString()
+    } else {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
     }
 
     const bet = parseInt(args[1])
@@ -140,8 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] })
     }
 
-    const maxBet = await calcMaxBet(message.member)
-    const targetMaxBet = await calcMaxBet(target)
+    const targetMaxBet = calcMaxBet(target)
 
     if (bet > maxBet) {
         return message.channel.send({
