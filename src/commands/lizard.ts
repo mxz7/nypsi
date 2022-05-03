@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send(new ErrorEmbed("unable to find lizard image"))
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find lizard image")] })
     }
 
     const image = a.split("|")[0]
