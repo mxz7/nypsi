@@ -1,4 +1,4 @@
-const {
+import {
     userExists,
     createUser,
     getBalance,
@@ -10,7 +10,7 @@ const {
     getMulti,
     getPrestige,
     addGamble,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -109,26 +109,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
-    if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member)
-        if (getBalance(message.member) > maxBet) {
-            args[0] = maxBet
-        }
-    }
-
-    if (args[0] == "half") {
-        args[0] = getBalance(message.member) / 2
-    }
-
-    if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
-    } else {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] })
-    }
-
-    const bet = parseInt(args[0])
+    const bet = formatBet(args[0], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
@@ -248,7 +231,7 @@ module.exports = cmd
 function getFront(grid) {
     const gridFront = []
 
-    for (let item of grid) {
+    for (const item of grid) {
         switch (item) {
             case "a":
                 gridFront.push(":white_large_square:")
@@ -271,7 +254,7 @@ function getFront(grid) {
 function getExposedFront(grid) {
     const gridFront = []
 
-    for (let item of grid) {
+    for (const item of grid) {
         switch (item) {
             case "a":
                 gridFront.push(":white_large_square:")
@@ -299,7 +282,7 @@ function toTable(grid) {
 
     grid = getFront(grid)
 
-    for (let item of grid) {
+    for (const item of grid) {
         if (count == 5) {
             count = 0
 
@@ -339,7 +322,7 @@ function toExposedTable(grid) {
 
     grid = getExposedFront(grid)
 
-    for (let item of grid) {
+    for (const item of grid) {
         if (count == 5) {
             count = 0
 
@@ -551,14 +534,14 @@ async function playGame(message, msg) {
         let check = false
         let check1 = false
 
-        for (let n of possibleLetters) {
+        for (const n of possibleLetters) {
             if (n == letter) {
                 check = true
                 break
             }
         }
 
-        for (let n of possibleNumbers) {
+        for (const n of possibleNumbers) {
             if (n == number) {
                 check1 = true
                 break

@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { userExists, createUser, getItems, formatBet, getMulti } = require("../utils/economy/utils")
+import { userExists, createUser, getItems, getMulti } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems()
 
-    let searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase()
 
     let selected
 
@@ -51,15 +51,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let amount = 1
 
     if (args.length != 1) {
-        if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-            if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-                args[1] = formatBet(args[1])
-            }
-        }
         amount = parseInt(args[1])
     }
 
-    if (!parseInt(amount)) {
+    if (!amount || isNaN(amount)) {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 

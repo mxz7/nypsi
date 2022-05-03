@@ -1,20 +1,20 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getMember } from "../utils/utils"
-const {
+import {
     updateBalance,
     getBalance,
     userExists,
     createUser,
-    formatBet,
     getXp,
     getPrestige,
     isEcoBanned,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { payment } = require("../utils/logger")
+import { formatNumber } from "../utils/economy/utils"
+import { payment } from "../utils/logger"
 
 const cooldown = new Map()
 
@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target = message.mentions.members.first()
 
     if (!target) {
-        target = await getMember(message, args[0])
+        target = await getMember(message.guild, args[0])
     }
 
     if (!target) {
@@ -110,21 +110,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!userExists(message.member)) createUser(message.member)
 
-    if (args[1] == "all") {
-        args[1] = getBalance(message.member)
-    }
-
-    if (args[1] == "half") {
-        args[1] = getBalance(message.member) / 2
-    }
-
-    if (parseInt(args[1])) {
-        args[1] = formatBet(args[1])
-    } else {
-        return send({ embeds: [new ErrorEmbed("invalid amount")] })
-    }
-
-    let amount = parseInt(args[1])
+    const amount = formatNumber(args[1])
 
     if (!amount) {
         return send({ embeds: [new ErrorEmbed("invalid payment")] })
@@ -209,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {

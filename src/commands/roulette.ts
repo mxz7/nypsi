@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     createUser,
     updateBalance,
@@ -10,7 +10,7 @@ const {
     getMulti,
     getPrestige,
     addGamble,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -176,34 +176,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         args[0] = "b"
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = calcMaxBet(message.member)
 
-    if (args[1] == "all") {
-        args[1] = getBalance(message.member)
-        if (getBalance(message.member) > maxBet) {
-            args[1] = maxBet
-        }
-    }
-
-    if (args[1] == "half") {
-        args[1] = getBalance(message.member) / 2
-    }
-
-    if (isNaN(args[1]) || parseInt(args[1]) <= 0) {
-        if (!isNaN(formatBet(args[1]) || !parseInt(formatBet[args[1]]))) {
-            args[1] = formatBet(args[1])
-        } else {
-            return send({
-                embeds: [
-                    new ErrorEmbed(
-                        `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
-                    ),
-                ],
-            })
-        }
-    }
-
-    const bet = parseInt(args[1])
+    const bet = formatBet(args[1], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
@@ -309,7 +284,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ).setTitle("roulette wheel | " + message.member.user.username)
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             return await message.editReply(data)
         } else {
             return await msg.edit(data)
