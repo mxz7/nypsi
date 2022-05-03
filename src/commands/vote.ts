@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-const { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } = require("../utils/economy/utils.js")
+import { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
