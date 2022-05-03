@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-const { getDMsEnabled } = require("../utils/economy/utils.js")
+import { getDMsEnabled } from "../utils/economy/utils.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
@@ -243,8 +243,6 @@ function addChastityCooldown(id) {
     }, 10800000)
 }
 
-cmd.addChastityCooldown = addChastityCooldown
-
 /**
  *
  * @param {String} id
@@ -254,8 +252,6 @@ function onChastityCooldown(id) {
     return chastityCooldown.has(id)
 }
 
-cmd.onChastityCooldown = onChastityCooldown
-
 /**
  *
  * @param {String} id
@@ -264,4 +260,8 @@ function deleteChastityCooldown(id) {
     chastityCooldown.delete(id)
 }
 
-cmd.deleteChastityCooldown = deleteChastityCooldown
+cmd.data = {
+    deleteChastityCooldown: deleteChastityCooldown,
+    onChastityCooldown: onChastityCooldown,
+    addChastityCooldown: addChastityCooldown,
+}
