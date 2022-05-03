@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     getBankBalance,
     getMaxBankBalance,
@@ -7,7 +7,7 @@ const {
     userExists,
     createUser,
     formatBet,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -83,19 +83,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member)
-        const amount = parseInt(formatBet(args[0]))
+        args[0] = getBalance(message.member).toString()
+        const amount = formatBet(args[0])
         if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
-            args[0] = getMaxBankBalance(message.member) - getBankBalance(message.member)
+            args[0] = (getMaxBankBalance(message.member) - getBankBalance(message.member)).toString()
         }
     }
 
     if (args[0] == "half") {
-        args[0] = getBalance(message.member) / 2
+        args[0] = (getBalance(message.member) / 2).toString()
     }
 
     if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
+        args[0] = formatBet(args[0]).toString()
     } else {
         return send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
@@ -151,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**")
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {

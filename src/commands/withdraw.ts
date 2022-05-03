@@ -1,4 +1,4 @@
-const {
+import {
     getBalance,
     getBankBalance,
     getMaxBankBalance,
@@ -7,7 +7,7 @@ const {
     userExists,
     createUser,
     formatBet,
-} = require("../utils/economy/utils.js")
+} from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -82,20 +82,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBankBalance(message.member)
+        args[0] = getBankBalance(message.member).toString()
     }
 
     if (args[0] == "half") {
-        args[0] = getBankBalance(message.member) / 2
+        args[0] = (getBankBalance(message.member) / 2).toString()
     }
 
     if (parseInt(args[0])) {
-        args[0] = formatBet(args[0])
+        args[0] = formatBet(args[0]).toString()
     } else {
         return send({ embeds: [new ErrorEmbed("invalid amount")] })
     }
 
-    let amount = parseInt(args[0])
+    const amount = parseInt(args[0])
 
     if (amount > getBankBalance(message.member)) {
         return send({
@@ -149,7 +149,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**")
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
