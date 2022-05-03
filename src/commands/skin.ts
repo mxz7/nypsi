@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js"
-const fetch = require("node-fetch")
+import fetch from "node-fetch"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { getSkin } = require("mc-names")
+import { getSkin } from "mc-names"
 
 const cooldown = new Map()
 
