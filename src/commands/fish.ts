@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const {
+import {
     userExists,
     createUser,
     getInventory,
@@ -14,7 +14,7 @@ const {
     updateXp,
     getXp,
     addItemUse,
-} = require("../utils/economy/utils")
+} from "../utils/economy/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 
 const cmd = new Command("fish", "go to a pond and fish", Categories.MONEY)
@@ -307,7 +307,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
 
     const edit = async (data, msg) => {
-        if (message.interaction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data)
             return await message.fetchReply()
         } else {
