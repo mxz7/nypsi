@@ -1,5 +1,5 @@
 const { Message, Guild, User } = require("discord.js")
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
+const { Command, Categories, NypsiCommandInteraction } = require("../utils/models/Command")
 const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
 const {
     topAmount,
