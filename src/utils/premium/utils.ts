@@ -338,7 +338,7 @@ export function revokeUser(member: string, reason: string) {
  * @returns {Date}
  * @param {String} member id
  */
-export function getLastDaily(member: string): Date {
+export function getLastDaily(member: string): number {
     const query = db.prepare("SELECT last_daily FROM premium WHERE id = ?").get(member)
 
     return query.last_daily
@@ -348,7 +348,7 @@ export function getLastDaily(member: string): Date {
  * @returns {Date}
  * @param {String} member id
  */
-export function getLastWeekly(member: string): Date {
+export function getLastWeekly(member: string): number {
     const query = db.prepare("SELECT last_weekly FROM premium WHERE id = ?").get(member)
 
     return query.last_weekly
