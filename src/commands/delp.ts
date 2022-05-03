@@ -1,7 +1,7 @@
 const { Message, Collection } = require("discord.js")
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-const { ErrorEmbed } = require("../utils/models/EmbedBuilders.js")
+import { ErrorEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cooldown = new Map()
 
