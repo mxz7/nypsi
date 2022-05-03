@@ -93,6 +93,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setColor(color)
     }
 
+    if (!(message instanceof Message)) return
+
     message.channel
         .send({ embeds: [embed] })
         .then(() => {
