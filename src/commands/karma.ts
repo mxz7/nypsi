@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js"
 import { getMember } from "../utils/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-const { getKarma } = require("../utils/karma/utils")
+import { getKarma } from "../utils/karma/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO)
@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         target = message.mentions.members.first()
 
         if (!target) {
-            target = await getMember(message, args.join(" "))
+            target = await getMember(message.guild, args.join(" "))
         }
 
         if (!target) {
