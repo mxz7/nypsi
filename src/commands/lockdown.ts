@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { CommandInteraction, GuildBasedChannel, Message, Permissions, TextBasedChannel } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -19,7 +19,7 @@ cmd.slashData.addChannelOption((option) => option.setName("channel").setDescript
  * @param {Message} message
  * @param {Array<String>} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -72,10 +72,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    let channel = message.channel
+    let channel: TextBasedChannel | GuildBasedChannel = message.channel
 
-    if (message.mentions.channels.first()) {
-        channel = message.mentions.channels.first()
+    if (args.length != 0) {
+        const id = args[0]
+
+        channel = message.guild.channels.cache.find((ch) => ch.id == id)
+
+        if (!channel) {
+            return send({ embeds: [new ErrorEmbed("invalid channel")] })
+        } else if (message instanceof Message && message.mentions.channels.first()) {
+            channel = message.mentions.channels.first()
+        } else {
+            return
+        }
+
+        if (channel.type != "GUILD_TEXT") {
+            return send({ embeds: [new ErrorEmbed("invalid channel")] })
+        }
     }
 
     if (channel.type != "GUILD_TEXT") return
@@ -83,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     cooldown.set(message.member.id, new Date())
     setTimeout(() => {
         cooldown.delete(message.author.id)
-    }, 1)
+    }, 1000)
 
     let locked = false
 
