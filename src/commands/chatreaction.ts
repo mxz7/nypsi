@@ -532,7 +532,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid channel")] })
                 }
 
-                if (!(channel instanceof GuildChannel)) {
+                if (channel.type != "GUILD_TEXT") {
                     return send({ embeds: [new ErrorEmbed("invalid cahnnel")] })
                 }
 
