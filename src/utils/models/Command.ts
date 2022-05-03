@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
-import { Collection, CommandInteraction, GuildChannel, GuildMember, Message, Role, User } from "discord.js"
+import { Collection, CommandInteraction, GuildMember, Message, Role, TextBasedChannel, User } from "discord.js"
 
 export class Command {
     public name: string
@@ -58,7 +58,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
     mentions?: {
         members?: Collection<string, GuildMember>
         roles?: Collection<string, Role>
-        channels?: Collection<string, GuildChannel>
+        channels?: Collection<string, TextBasedChannel>
     }
     member: GuildMember
     interaction?: boolean
