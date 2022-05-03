@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (isNaN(args[0]) || parseInt(args[0]) <= 0) {
+    if (isNaN(parseInt(args[0])) || parseInt(args[0]) <= 0) {
         return message.channel.send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] })
     }
 
@@ -72,7 +72,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 30000)
     }
 
-    if (!message.interaction && message.mentions.members.first()) {
+    if (message.channel.type != "GUILD_TEXT") return
+
+    if (message instanceof Message && message.mentions.members.first()) {
         await message.delete()
         const target = message.mentions.members.first()
 
@@ -89,10 +91,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let count = 0
 
-        for (let msg of collecteda.keys()) {
-            msg = collecteda.get(msg)
+        for (const m of collecteda.keys()) {
+            const msg = collecteda.get(m)
             if (count >= amount) {
-                await collecteda.delete(msg.id)
+                collecteda.delete(msg.id)
             } else {
                 count++
             }
@@ -101,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await message.channel.bulkDelete(collecteda)
     }
 
-    if (message.interaction) {
+    if (!(message instanceof Message)) {
         message.deferReply()
     }
 
@@ -186,6 +188,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await m.edit({ embeds: [embed] }).catch(() => {})
             }
         }
+        if (!(message instanceof Message)) {
+            message.reply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")], ephemeral: true })
+        }
         return m.delete().catch()
     }
 }
@@ -195,7 +200,7 @@ cmd.setRun(run)
 module.exports = cmd
 
 function timeSince(date) {
-    const ms = Math.floor(new Date() - date)
+    const ms = Math.floor(new Date().getTime() - date)
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
 
