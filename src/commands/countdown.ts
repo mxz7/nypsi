@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const { getCountdowns, getPrefix, addCountdown, deleteCountdown } = require("../utils/guilds/utils")
+import { getCountdowns, getPrefix, addCountdown, deleteCountdown } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-const { formatDate, daysUntil } = require("../utils/utils")
+import { formatDate, daysUntil } from "../utils/utils"
 
 const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
     .setAliases(["countdowns"])
@@ -30,8 +30,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (Object.keys(countdowns).length == 0) {
             embed.setDescription(`use ${getPrefix(message.guild)}**countdown create** to create a countdown`)
         } else {
-            for (let countdown in countdowns) {
-                countdown = countdowns[countdown]
+            for (const c in countdowns) {
+                const countdown = countdowns[c]
                 const date = formatDate(new Date(countdown.date).getTime())
 
                 embed.addField(
@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let fail = false
 
-        let res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
+        let res: any = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
             fail = true
             return message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] })
         })
