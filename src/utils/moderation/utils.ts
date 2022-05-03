@@ -2,7 +2,7 @@ import { Client, Guild, GuildMember, Role } from "discord.js"
 import { getDatabase } from "../database/database"
 import { addCooldown, inCooldown } from "../guilds/utils"
 import { logger } from "../logger"
-import { Case } from "../models/GuildStorage"
+import { Case, PunishmentType } from "../models/GuildStorage"
 
 declare function require(name: string)
 
@@ -69,7 +69,7 @@ export function getCaseCount(guild: Guild): number {
  */
 export function newCase(
     guild: Guild,
-    caseType: string,
+    caseType: PunishmentType,
     userIDs: Array<string> | string,
     moderator: string,
     command: string
@@ -132,7 +132,7 @@ export function getCases(guild: Guild, userID: string): Array<Case> {
  * @returns {Object}
  * @param {Guild} guild guild to get cases of
  */
-export function getAllCases(guild: Guild): object {
+export function getAllCases(guild: Guild): Case[] {
     const query = db.prepare("SELECT user, moderator, type, deleted FROM moderation_cases WHERE guild_id = ?").all(guild.id)
 
     return query.reverse()

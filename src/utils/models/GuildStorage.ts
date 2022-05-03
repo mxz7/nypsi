@@ -23,6 +23,7 @@ export enum PunishmentType {
     UNMUTE = "unmute",
     WARN = "warn",
     KICK = "kick",
+    UNBAN = "unban",
 }
 
 export interface CounterProfile {

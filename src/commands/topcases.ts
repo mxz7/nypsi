@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { profileExists, getAllCases } = require("../utils/moderation/utils")
+import { profileExists, getAllCases } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -7,9 +7,9 @@ import { getPrefix } from "../utils/guilds/utils"
 
 const cooldown = new Map()
 
-const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions(
-    "MANAGE_MESSAGES"
-)
+const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+])
 
 /**
  * @param {Message} message
@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let deletedCaseCount = 0
 
-        for (let case0 of cases) {
+        for (const case0 of cases) {
             if (case0.deleted) {
                 deletedCaseCount++
                 continue
@@ -80,11 +80,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const staff = []
         const members = []
 
-        for (let s of topStaff.keys()) {
+        for (const s of topStaff.keys()) {
             staff.push(s)
         }
 
-        for (let m of topMembers.keys()) {
+        for (const m of topMembers.keys()) {
             members.push(m)
         }
 
@@ -96,12 +96,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return topMembers.get(b) - topMembers.get(a)
         })
 
-        let staffText = []
-        let memberText = []
+        const staffText = []
+        const memberText = []
 
         let count = 0
 
-        for (let s of staff) {
+        for (const s of staff) {
             if (count >= 5) break
 
             staffText[count] = count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
@@ -111,10 +111,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         count = 0
 
-        for (let m of members) {
+        for (const m of members) {
             if (count >= 5) break
 
-            let username = await message.guild.members.cache.find((mem) => mem.id == m)
+            let username: any = message.guild.members.cache.find((mem) => mem.id == m)
 
             if (!username) {
                 username = m
@@ -153,7 +153,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     member = args[0]
                 }
             } else {
-                member = await getMember(message, args.join(" "))
+                member = await getMember(message.guild, args.join(" "))
 
                 if (!member) {
                     return message.channel.send({
@@ -176,7 +176,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let unbans = 0
         let unmutes = 0
 
-        for (let case0 of cases) {
+        for (const case0 of cases) {
             if (case0.moderator == member.user.tag) {
                 if (case0.deleted) {
                     deletedCasesModerator++
