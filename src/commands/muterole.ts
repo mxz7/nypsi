@@ -1,8 +1,8 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getPrefix } from "../utils/guilds/utils"
-const { setMuteRole, getMuteRole, createProfile, profileExists } = require("../utils/moderation/utils")
+import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils/moderation/utils"
 
 const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"])
 
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `${getPrefix(message.guild)}**muterole set <role>** *set the muterole for the server*\n${getPrefix(
                         message.guild
                     )}**muterole reset** *reset the mute role to default*\n${getPrefix(
-                        message.member
+                        message.guild
                     )}**muterole update** *update mute permissions for every channel*\n\ncurrent mute role: ${
                         role ? role.toString() : "default"
                     }`
@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "set") {
         if (args.length == 1) {
             return message.channel.send({
-                embed: [
+                embeds: [
                     new ErrorEmbed(
                         `${getPrefix(
                             message.guild
@@ -108,16 +108,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (!muteRole) {
-                muteRole = await message.guild.roles
+                const newMuteRole = await message.guild.roles
                     .create({
                         name: "muted",
                     })
                     .catch(() => {
                         channelError = true
                     })
+
+                if (newMuteRole instanceof Role) {
+                    muteRole = newMuteRole
+                }
             }
 
             await message.guild.channels.cache.forEach(async (channel) => {
+                if (channel instanceof ThreadChannel) return
                 await channel.permissionOverwrites
                     .edit(muteRole, {
                         SEND_MESSAGES: false,
