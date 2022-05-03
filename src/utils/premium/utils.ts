@@ -199,7 +199,7 @@ export function getEmbedColor(member: string): `#${string}` | "default" {
  * @param {GuildMember} member
  * @param {Date} date
  */
-export function setLastDaily(member: GuildMember, date: Date) {
+export function setLastDaily(member: GuildMember | string, date: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -214,7 +214,7 @@ export function setLastDaily(member: GuildMember, date: Date) {
  * @param {GuildMember} member
  * @param {Date} date
  */
-export function setLastWeekly(member: GuildMember, date: Date) {
+export function setLastWeekly(member: GuildMember | string, date: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
