@@ -1,4 +1,4 @@
-const urban = require("urban-dictionary")
+import * as urban from "urban-dictionary"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] })
     })
 
-    inPlaceSort(results).desc((i) => i.thumbs_up)
+    inPlaceSort(results).desc((i: any) => i.thumbs_up)
 
     const result = results[0]
 
