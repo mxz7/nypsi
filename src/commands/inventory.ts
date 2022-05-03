@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton } from "di
 import { inPlaceSort } from "fast-sort"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-const { getInventory, getItems, createUser, userExists, getMulti } = require("../utils/economy/utils")
+import { getInventory, getItems, createUser, userExists, getMulti } from "../utils/economy/utils"
 
 const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"])
 
@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!parseInt(args[0])) {
             page = 1
         } else {
-            page = args[0] - 1
+            page = parseInt(args[0]) - 1
             if (page < 0) {
                 page = 0
             }
@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const amount = inventory[item]
 
             if (items[item].role == "fish" || items[item].role == "prey") {
-                let worth1 = Math.floor(items[item].worth * fee * amount)
+                const worth1 = Math.floor(items[item].worth * fee * amount)
                 worth += Math.floor(worth1 + worth1 * multi)
             } else {
                 worth += Math.floor(items[item].worth * fee * amount)
