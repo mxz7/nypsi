@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-const { getNews, formatDate, setNews } = require("../utils/utils")
+import { getNews, formatDate, setNews } from "../utils/utils"
 
 const cmd = new Command("news", "set the news for the help command", Categories.INFO)
 
@@ -14,7 +14,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const news = getNews()
 
         if (news.text == "") {
-            return message.channel.send(new ErrorEmbed("no news has been set"))
+            return message.channel.send({ embeds: [new ErrorEmbed("no news has been set")] })
         }
 
         const lastSet = formatDate(news.date)
