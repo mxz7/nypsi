@@ -913,33 +913,42 @@ export function winBoard(): string {
  * @returns {Number} formatted bet
  * @param {String} number to format
  */
-export function formatBet(bet: string | number, member: GuildMember): number | void {
+export function formatBet(bet: string, member: GuildMember): number | void {
     const maxBet = calcMaxBet(member)
 
-    if (bet.toString().toLowerCase() == "all") {
-        bet = getBalance(member)
-        if (bet > maxBet) {
-            bet = maxBet
+    let newBet = parseInt(bet)
+
+    if (newBet.toString().toLowerCase() == "all") {
+        newBet = getBalance(member)
+        if (newBet > maxBet) {
+            newBet = maxBet
         }
-    } else if (bet.toString().toLowerCase() == "max") {
-        bet = maxBet
-    } else if (bet.toString().toLowerCase() == "half") {
-        bet = Math.floor(getBalance(member) / 2)
+    } else if (newBet.toString().toLowerCase() == "max") {
+        newBet = maxBet
+    } else if (newBet.toString().toLowerCase() == "half") {
+        newBet = Math.floor(getBalance(member) / 2)
     }
 
-    bet = bet.toString().toLowerCase().replace("t", "000000000000")
+    const formatted = formatNumber(newBet.toString())
 
-    bet = bet.replace("b", "000000000")
-    bet = bet.replace("m", "000000")
-    bet = bet.replace("k", "000")
+    if (formatted) {
+        newBet = formatted
+    }
 
-    if (isNaN(parseInt(bet))) return null
+    if (newBet <= 0) return null
 
-    bet = Math.floor(parseInt(bet))
+    return newBet
+}
 
-    if (bet <= 0) return null
+export function formatNumber(number: string): number | void {
+    number = number.toString().toLowerCase().replace("t", "000000000000")
+    number = number.replace("b", "000000000")
+    number = number.replace("m", "000000")
+    number = number.replace("k", "000")
 
-    return bet
+    if (isNaN(parseInt(number))) return null
+
+    return Math.floor(parseInt(number))
 }
 
 /**
