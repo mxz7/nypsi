@@ -3,6 +3,7 @@ import { newCase, profileExists, createProfile, newBan } from "../utils/moderati
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
     "BAN_MEMBERS",
@@ -244,7 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (idOnly) {
-        newCase(message.guild, "ban", id, message.member.user.tag, reason.split(": ")[1])
+        newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1])
         if (temporary) {
             newBan(message.guild, id, unbanDate)
         }
@@ -259,7 +260,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        newCase(message.guild, "ban", members1, message.author.tag, reason.split(": ")[1])
+        newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1])
 
         if (temporary) {
             newBan(message.guild, members1, unbanDate)
