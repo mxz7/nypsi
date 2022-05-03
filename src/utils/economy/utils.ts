@@ -72,7 +72,7 @@ setInterval(() => {
     }
 }, 5 * 60 * 1000)
 
-let items: Array<Item>
+let items: { [key: string]: Item }
 
 const lotteryTicketPrice = 10000
 /**
@@ -1369,7 +1369,7 @@ export function setInventory(member: GuildMember | string, inventory: object) {
     db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id)
 }
 
-export function getItems() {
+export function getItems(): { [key: string]: Item } {
     return items
 }
 
