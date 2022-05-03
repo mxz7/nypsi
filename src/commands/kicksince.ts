@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-const { profileExists, createProfile, newCase } = require("../utils/moderation/utils")
+import { profileExists, createProfile, newCase } from "../utils/moderation/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!time) {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid time length")] })
-    } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerID) {
+    } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerId) {
         return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] })
     } else if (time < Date.now() - 604800000 * 2) {
         return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] })
@@ -126,10 +126,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
-    let failed = []
+    const failed = []
     let interval = 0
 
-    for (let member of members.keys()) {
+    for (const member of members.keys()) {
         interval++
 
         if (status) {
@@ -193,7 +193,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (failed.length != 0) {
         const failedTags = []
-        for (let fail1 of failed) {
+        for (const fail1 of failed) {
             failedTags.push(fail1.tag)
         }
 
@@ -217,7 +217,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members1 = Array.from(members.keys())
 
     if (failed.length != 0) {
-        for (let fail of failed) {
+        for (const fail of failed) {
             if (members1.includes(fail.id)) {
                 members1.splice(members1.indexOf(fail.id), 1)
             }
@@ -226,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1])
 
-    for (let member of members1) {
+    for (const member of members1) {
         const m = members.get(member)
 
         if (reason.split(": ")[1] == "no reason given") {
