@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!parseInt(args[0])) {
             page = 1
         } else {
-            page = args[0] - 1
+            page = parseInt(args[0]) - 1
             if (page < 0) {
                 page = 0
             }
