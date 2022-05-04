@@ -5,6 +5,8 @@ import { MStoTime } from "../utils"
 
 const db = getDatabase()
 
+const karmaCache: Map<string, number> = new Map()
+
 let karmaShop = false
 
 /**
@@ -20,12 +22,15 @@ export function getKarma(member: GuildMember | string): number {
         id = member
     }
 
+    if (karmaCache.has(id)) return karmaCache.get(id)
+
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
     if (!query) {
         db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now())
         return 1
     } else {
+        karmaCache.set(id, query.karma)
         return query.karma
     }
 }
@@ -42,6 +47,8 @@ export function addKarma(member: GuildMember | string, amount: number) {
     } else {
         id = member
     }
+
+    if (karmaCache.has(id)) karmaCache.delete(id)
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -64,6 +71,8 @@ export function removeKarma(member: GuildMember | string, amount: number) {
     } else {
         id = member
     }
+
+    if (karmaCache.has(id)) karmaCache.delete(id)
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -141,7 +150,7 @@ function deteriorateKarma() {
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
      */
     const users: Array<{ id: string; karma: number; last_command: number }> = db
-        .prepare("SELECT * FROM karma WHERE last_command < ?")
+        .prepare("SELECT * FROM karma WHERE last_command < ? AND karma > 1")
         .all(threshold)
 
     let total = 0
@@ -158,6 +167,8 @@ function deteriorateKarma() {
         }
 
         total += karmaToRemove
+
+        if (karmaCache.has(user.id)) karmaCache.delete(user.id)
 
         db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id)
     }
