@@ -95,6 +95,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
+    cooldown.set(message.member.id, new Date())
+
+    setTimeout(() => {
+        cooldown.delete(message.author.id)
+    }, cooldownLength * 1000)
+
     const board = createBoard()
     const word = getWord()
 
