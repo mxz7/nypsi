@@ -22,20 +22,22 @@ declare function require(name: string)
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"])
 
 cmd.slashEnabled = true
-cmd.slashData.addStringOption((option) =>
-    option
-        .setName("item")
-        .setDescription("the item you want to use")
-        .setRequired(true)
-        .addChoice("📦 vote", "vote")
-        .addChoice("📦 basic", "basic")
-        .addChoice("🔒 padlock", "padlock")
-        .addChoice("🧰 lock pick", "lock_pick")
-        .addChoice("😷 mask", "mask")
-        .addChoice("📻 radio", "radio")
-        .addChoice("handcuffs", "handcuffs")
-        .addChoice("chastity_cage", "chastity_cage")
-)
+cmd.slashData
+    .addStringOption((option) =>
+        option
+            .setName("item")
+            .setDescription("the item you want to use")
+            .setRequired(true)
+            .addChoice("📦 vote", "vote")
+            .addChoice("📦 basic", "basic")
+            .addChoice("🔒 padlock", "padlock")
+            .addChoice("🧰 lock pick", "lock_pick")
+            .addChoice("😷 mask", "mask")
+            .addChoice("📻 radio", "radio")
+            .addChoice("handcuffs", "handcuffs")
+            .addChoice("chastity_cage", "chastity_cage")
+    )
+    .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"))
 
 const cooldown = new Map()
 
