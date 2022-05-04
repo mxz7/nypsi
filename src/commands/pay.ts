@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = getPrefix(message.guild)
 
-    if (args.length == 0) {
+    if (args.length < 2) {
         const embed = new CustomEmbed(message.member)
             .setTitle("pay help")
             .addField("usage", `${prefix}pay <user> <amount>`)
