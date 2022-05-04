@@ -24,7 +24,8 @@ the requirements are as follows:
 -   your server **must** have less than 150k members
 -   your server owner must have an economy profile
 
-the quick fix for this is to simply check the server owner's balance using the `$bal` command, if this doesn't work, try paying the owner with `$pay @owner 1`
+the quick fix for this is to simply check the server owner's balance using the `$bal` command, if this doesn't work, try
+paying the owner with `$pay @owner 1`
 
 if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
 
