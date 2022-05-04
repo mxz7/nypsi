@@ -409,7 +409,8 @@ function getWord(): string {
     return wordList[Math.floor(Math.random() * wordList.length)]
 }
 
-;(async () => {
+// prettier-ignore
+(async () => {
     const res = await fetch(
         "https://gist.githubusercontent.com/cfreshman/a7b776506c73284511034e63af1017ee/raw/845966807347a7b857d53294525263408be967ce/wordle-nyt-answers-alphabetical.txt"
     )
