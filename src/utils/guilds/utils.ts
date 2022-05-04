@@ -1,4 +1,4 @@
-import { Client, Collection, Guild, GuildMember } from "discord.js"
+import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js"
 import { getDatabase, toArray, toStorage } from "../database/database"
 import { logger } from "../logger"
 import { CustomEmbed } from "../models/EmbedBuilders"
@@ -676,7 +676,7 @@ export function runCountdowns(client: Client) {
 
                 if (!channel) continue
 
-                if (channel.type != "GUILD_TEXT") continue
+                if (!(channel instanceof BaseGuildTextChannel)) continue
 
                 await channel
                     .send({ embeds: [embed] })
@@ -750,7 +750,7 @@ export function runChristmas(client: Client) {
                 format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
             }
 
-            if (channel.type != "GUILD_TEXT") continue
+            if (!(channel instanceof BaseGuildTextChannel)) continue
 
             await channel
                 .send({
