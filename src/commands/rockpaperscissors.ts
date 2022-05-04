@@ -8,8 +8,8 @@ import {
     updateXp,
     getMulti,
     calcMaxBet,
-    getPrestige,
     addGamble,
+    calcEarnedXp,
 } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import * as shuffle from "shuffle-array"
@@ -194,19 +194,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
 
-    let voted = false
-    let voteMulti = 0
+    let multi = 0
 
     if (win) {
-        voteMulti = await getMulti(message.member)
+        multi = getMulti(message.member)
 
-        if (voteMulti > 0) {
-            voted = true
-        }
-
-        if (voted) {
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * voteMulti))
-            winnings = winnings + Math.round(winnings * voteMulti)
+        if (multi > 0) {
+            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi))
+            winnings = winnings + Math.round(winnings * multi)
         }
     }
 
@@ -245,34 +240,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
 
         if (win) {
-            if (voted) {
+            if (multi > 0) {
                 embed.addField(
                     "**winner!!**",
                     "**you win** $" +
                         winnings.toLocaleString() +
                         "\n" +
                         "+**" +
-                        Math.round(voteMulti * 100).toString() +
+                        Math.round(multi * 100).toString() +
                         "**% bonus"
                 )
-
-                let requiredBet = 1000
-
-                if (getPrestige(message.member) > 2) requiredBet = 10000
-
-                requiredBet += getPrestige(message.member) * 5000
-
-                if (bet >= requiredBet) {
-                    const xpBonus =
-                        Math.floor(Math.random() * 2) + (getPrestige(message.member) == 0 ? 1 : getPrestige(message.member))
-
-                    const givenXp = xpBonus > 5 ? 5 : xpBonus
-
-                    updateXp(message.member, getXp(message.member) + givenXp)
-                    embed.setFooter("+" + givenXp + "xp")
-                }
             } else {
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+            }
+
+            const earnedXp = calcEarnedXp(message.member, bet)
+
+            if (earnedXp > 0) {
+                updateXp(message.member, getXp(message.member) + earnedXp)
+                embed.setFooter(`+${earnedXp}xp`)
             }
 
             embed.setColor("#5efb8f")
