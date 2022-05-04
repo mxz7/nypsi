@@ -74,7 +74,7 @@ setInterval(() => {
 
 let items: { [key: string]: Item }
 
-const lotteryTicketPrice = 10000
+const lotteryTicketPrice = 15000
 /**
  * higher ticket price = more favourable to rich people cus poor people cant buy tickets resulting in less tickets overall
  * the goal is to have more tickets overall for a more random outcome
