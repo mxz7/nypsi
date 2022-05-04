@@ -676,7 +676,7 @@ export function runCountdowns(client: Client) {
 
                 if (!channel) continue
 
-                if (channel.type != "GUILD_TEXT") return
+                if (channel.type != "GUILD_TEXT") continue
 
                 await channel
                     .send({ embeds: [embed] })
@@ -714,7 +714,7 @@ export function runCountdowns(client: Client) {
  *
  * @param {Client} client
  */
-export function runChristmas(client: Client, force?: boolean) {
+export function runChristmas(client: Client) {
     const now = new Date()
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`
@@ -728,14 +728,10 @@ export function runChristmas(client: Client, force?: boolean) {
     const runChristmasThing = async () => {
         const query = db.prepare("SELECT * FROM guilds_christmas WHERE enabled = 1").all()
 
-        console.log("1")
-
         for (const profile of query) {
             const guild = client.guilds.cache.find((g) => g.id == profile.guild_id)
             if (!guild) continue
             const channel = guild.channels.cache.find((c) => c.id == profile.channel)
-
-            console.log("2")
 
             if (!channel) {
                 profile.enabled = false
@@ -743,8 +739,6 @@ export function runChristmas(client: Client, force?: boolean) {
                 setChristmasCountdown(guild, profile)
                 continue
             }
-
-            console.log("3")
 
             let format = profile.format
 
@@ -756,9 +750,7 @@ export function runChristmas(client: Client, force?: boolean) {
                 format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO"
             }
 
-            if (channel.type != "GUILD_TEXT") return
-
-            console.log("4")
+            if (channel.type != "GUILD_TEXT") continue
 
             await channel
                 .send({
@@ -775,13 +767,8 @@ export function runChristmas(client: Client, force?: boolean) {
                     profile.enabled = false
                     profile.channel = "none"
                     setChristmasCountdown(guild, profile)
-                    return
                 })
         }
-    }
-
-    if (force) {
-        return runChristmasThing()
     }
 
     setTimeout(async () => {
@@ -789,7 +776,7 @@ export function runChristmas(client: Client, force?: boolean) {
             runChristmasThing()
         }, 86400000)
         runChristmasThing()
-    }, 10000)
+    }, needed.getTime() - now.getTime())
 
     logger.log({
         level: "auto",
