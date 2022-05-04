@@ -9,8 +9,8 @@ import {
     updateXp,
     calcMaxBet,
     getMulti,
-    getPrestige,
     addGamble,
+    calcEarnedXp,
 } from "../utils/economy/utils.js"
 import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -447,20 +447,11 @@ async function playGame(message, m) {
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
-            let requiredBet = 1000
+            const earnedXp = calcEarnedXp(message.member, bet)
 
-            if (getPrestige(message.member) > 2) requiredBet = 10000
-
-            requiredBet += getPrestige(message.member) * 5000
-
-            if (bet >= requiredBet) {
-                const xpBonus =
-                    Math.floor(Math.random() * 2) + (getPrestige(message.member) == 0 ? 1 : getPrestige(message.member))
-
-                const givenXp = xpBonus > 5 ? 5 : xpBonus
-
-                updateXp(message.member, getXp(message.member) + givenXp)
-                newEmbed.setFooter("+" + givenXp + "xp")
+            if (earnedXp > 0) {
+                updateXp(message.member, getXp(message.member) + earnedXp)
+                newEmbed.setFooter(`+${earnedXp}xp`)
             }
 
             newEmbed.setDescription(
