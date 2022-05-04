@@ -1,7 +1,7 @@
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed } from "../utils/models/EmbedBuilders.js"
-import { Collection, CommandInteraction, Message } from "discord.js"
+import { BaseGuildTextChannel, Collection, CommandInteraction, Message } from "discord.js"
 
 const cooldown = new Map()
 
@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (message.channel.type != "GUILD_TEXT") return
+    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
 
     await message.channel.bulkDelete(collected).catch(() => {})
 }

@@ -4,7 +4,15 @@ import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v9"
 import { Command, NypsiCommandInteraction } from "./models/Command"
 import { getTimestamp, logger } from "./logger"
-import { Client, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
+import {
+    BaseGuildTextChannel,
+    Client,
+    CommandInteraction,
+    GuildMember,
+    Message,
+    MessageActionRow,
+    MessageButton,
+} from "discord.js"
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils"
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders"
 import { createCaptcha, formatDate, getNews, isLockedOut, MStoTime, toggleLock } from "./utils"
@@ -372,7 +380,7 @@ export async function runCommand(
 ) {
     if (!hasGuild(message.guild)) createGuild(message.guild)
 
-    if (message.channel.type != "GUILD_TEXT") return
+    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
 
     if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
         return message.member

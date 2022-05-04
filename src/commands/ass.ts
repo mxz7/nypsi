@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -40,7 +40,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    if (message.channel.type == "GUILD_TEXT" && !message.channel.nsfw) {
+    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
+
+    if (message.channel instanceof ThreadChannel) {
+        return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
+    }
+
+    if (!message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
