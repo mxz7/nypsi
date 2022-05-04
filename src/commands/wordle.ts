@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setTitle("wordle | " + message.author.username)
+    embed.setTitle(`${message.author.username}'s wordle`)
     embed.setDescription(renderBoard(board))
     embed.setFooter("type your guess in chat")
 
