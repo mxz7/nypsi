@@ -8,8 +8,9 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getTier, isPremium } from "../utils/premium/utils"
 import doCollection from "../utils/workers/mentions"
 import { cpu } from "node-os-utils"
-import { getKarma } from "../utils/karma/utils"
+import { getKarma, getLastCommand } from "../utils/karma/utils"
 import { encrypt } from "../utils/utils"
+import ms = require("ms")
 
 declare function require(name: string)
 
@@ -59,7 +60,10 @@ export default async function messageCreate(message: Message) {
 
     if (
         message.guild.memberCount < 150000 &&
-        (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId) || getKarma(message.guild.ownerId) >= 7)
+        (userExists(message.guild.ownerId) ||
+            isPremium(message.guild.ownerId) ||
+            getKarma(message.guild.ownerId) >= 5 ||
+            getLastCommand(message.guild.ownerId) >= Date.now() - ms("1 week"))
     ) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
