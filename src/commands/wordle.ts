@@ -4,6 +4,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getTier, isPremium } from "../utils/premium/utils"
+import { MStoTime } from "../utils/utils"
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN)
 
@@ -19,6 +20,7 @@ interface Game {
     guesses: string[]
     board: string[][]
     embed: MessageEmbed | CustomEmbed
+    start: number
 }
 
 enum Response {
@@ -111,6 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         guesses: [],
         board: board,
         embed: embed,
+        start: Date.now(),
     })
 
     return play(message)
@@ -242,7 +245,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = games.get(message.author.id).embed
     embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations")
     embed.setColor("#5efb8f")
-    embed.setFooter(null)
+    embed.setFooter(`completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}`)
 
     edit({ embeds: [embed] })
     games.delete(message.author.id)
