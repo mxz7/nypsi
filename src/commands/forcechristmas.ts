@@ -12,4 +12,4 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
 cmd.setRun(run)
 
-export default cmd
+module.exports = cmd
