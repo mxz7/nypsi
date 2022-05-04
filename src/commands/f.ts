@@ -72,7 +72,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const collector = message.channel.createMessageComponentCollector({ time: 60000 })
 
     collector.on("collect", async (i): Promise<any> => {
-        if (reactions.includes(i.user.id)) return
+        if (reactions.includes(i.user.id)) {
+            return await i.reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
+        }
 
         i.deferUpdate()
 
