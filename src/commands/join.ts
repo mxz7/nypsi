@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            if (membersSorted.length > 500) {
+            if (message.deferred) {
                 await message.editReply(data)
             } else {
                 await message.reply(data)
