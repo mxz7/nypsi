@@ -886,10 +886,10 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
 
             const tag = client.users.cache.find((u) => u.id == user).tag
 
-            if (uses > 30) {
+            if (uses > 20) {
                 await channel.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`)
 
-                if (uses > 35) {
+                if (uses > 25) {
                     toggleLock(user)
                     logger.info(`${tag} (${user}) has been given a captcha`)
                     await channel.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`)
