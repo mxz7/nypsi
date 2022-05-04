@@ -164,11 +164,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (two == three && one != two) {
         const chance = Math.floor(Math.random() * 10)
-        let chanceScore = 4
-
-        if (getBalance(message.member) >= 1000000) {
-            chanceScore = 2
-        }
+        const chanceScore = 4
 
         if (chance < chanceScore) {
             one = two
@@ -177,18 +173,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (one == two && one != three) {
         const chance = Math.floor(Math.random() * 10)
-        let chanceScore = 4
-
-        if (getBalance(message.member) >= 1000000) {
-            chanceScore = 2
-        }
+        const chanceScore = 4
 
         if (chance < chanceScore) {
             three = two
         }
     }
 
-    if (one == two && one == three && one != "🍒" && one != "🍋" && getBalance(message.member) < 1000000) {
+    if (one == two && one == three && one != "🍒" && one != "🍋") {
         const chance = Math.floor(Math.random() * 10)
 
         if (chance < 3) {
