@@ -276,7 +276,7 @@ function createBoard(): string[][] {
     for (let c = 0; c < 6; c++) {
         board[c] = []
         for (let r = 0; r < 5; r++) {
-            board[c][r] = ":black_large_square:"
+            board[c][r] = "<:spacer:971524938139852870>"
         }
     }
 
