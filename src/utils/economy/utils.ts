@@ -893,11 +893,7 @@ export function createUser(member: GuildMember | string) {
         existsCache.delete(id)
     }
 
-    if (userExists(id)) {
-        db.prepare("DELETE FROM economy WHERE id = ?").run(id)
-    }
-
-    db.prepare("INSERT INTO economy (id) VALUES (?)").run(id)
+    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 5000, 0)
 }
 
 /**
@@ -1262,7 +1258,7 @@ export function reset(): number {
         }
 
         db.prepare(
-            "UPDATE economy SET money = 500, bank = 4500, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+            "UPDATE economy SET money = 5000, bank = 0, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
         ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
 
         logger.info("updated " + user.id)
