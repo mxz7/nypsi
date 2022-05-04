@@ -1748,3 +1748,40 @@ export function openCrate(member: GuildMember, item: Item): string[] {
 
     return names
 }
+
+export function getRequiredBetForXp(member: GuildMember): number {
+    let requiredBet = 1000
+
+    const prestige = getPrestige(member)
+
+    if (prestige > 2) requiredBet = 10000
+
+    requiredBet += prestige * 1000
+
+    return requiredBet
+}
+
+export function calcMinimumEarnedXp(member: GuildMember): number {
+    let earned = 1
+    earned += getPrestige(member)
+
+    return earned
+}
+
+export function calcEarnedXp(member: GuildMember, bet: number): number {
+    const requiredBet = getRequiredBetForXp(member)
+
+    if (bet < requiredBet) {
+        return 0
+    }
+
+    let earned = calcMinimumEarnedXp(member)
+
+    const random = Math.floor(Math.random() * 3)
+
+    earned += random
+
+    if (earned > 7) earned = 7
+
+    return earned
+}
