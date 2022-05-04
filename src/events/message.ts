@@ -273,7 +273,13 @@ async function addMention() {
         const data = mention.data
         const target = mention.target
 
-        const content = encrypt(data.content)
+        let content: string
+
+        try {
+            content = encrypt(data.content)
+        } catch {
+            return logger.error(`failed to encrypt: ${data.content}`)
+        }
 
         addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, content)
 
