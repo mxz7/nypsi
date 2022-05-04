@@ -1414,7 +1414,7 @@ export function getItems(): { [key: string]: Item } {
  * @param {GuildMember} member
  */
 export function getMaxBitcoin(member: GuildMember): number {
-    const base = 2
+    const base = 10
 
     const prestige = getPrestige(member)
 
