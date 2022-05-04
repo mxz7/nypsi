@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, Message, Permissions } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 30000)
     }
 
-    if (message.channel.type != "GUILD_TEXT") return
+    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
 
     if (message instanceof Message && message.mentions.members.first()) {
         await message.delete()

@@ -270,7 +270,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return helpCmd()
     } else if (args[0].toLowerCase() == "start") {
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
-        if (!(message.channel instanceof TextChannel)) return
+        if (!(message.channel instanceof TextChannel)) {
+            return send({ embeds: [new ErrorEmbed("this is an invalid channel")] })
+        }
         const a = await startReaction(message.guild, message.channel)
 
         if (a == "xoxo69") {
