@@ -1,13 +1,22 @@
 import { Collection, CommandInteraction, CommandInteractionOption, GuildMember, Interaction } from "discord.js"
 import { runCommand } from "../utils/commandhandler"
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command"
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 
 /**
  *
  * @param {Interaction} interaction
  */
-export default async function interactionCreate(interaction: Interaction): Promise<CommandInteraction> {
+export default async function interactionCreate(interaction: Interaction) {
     if (!interaction.isCommand()) return
+
+    if (interaction.channel.type == "DM") {
+        const embed = new CustomEmbed()
+            .setTitle("support")
+            .setColor("#36393f")
+            .setDescription("support server: https://discord.gg/hJTDNST")
+        return await interaction.reply({ embeds: [embed] })
+    }
 
     const message: CommandInteraction & NypsiCommandInteraction = createNypsiInteraction(interaction)
 
