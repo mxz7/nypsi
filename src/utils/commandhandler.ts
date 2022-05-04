@@ -543,7 +543,15 @@ export async function runCommand(
             message.react("💀")
         } else {
             logCommand(message, args)
-            return message.channel.send({ embeds: [new ErrorEmbed("nypsi is rebooting..")] })
+            if (message instanceof Message) {
+                return message.channel.send({
+                    embeds: [new CustomEmbed(message.member, false, "nypsi is rebooting, try again in a few minutes")],
+                })
+            } else {
+                return message.reply({
+                    embeds: [new CustomEmbed(message.member, false, "nypsi is rebooting, try again in a few minutes")],
+                })
+            }
         }
     }
 
