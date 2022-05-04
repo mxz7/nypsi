@@ -174,23 +174,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const targetPrestige = getPrestige(target)
 
-    if (selected.worth && targetPrestige < 4) {
+    if (targetPrestige < 2) {
         const targetXp = getXp(target)
 
-        let payLimit = 100000
+        let payLimit = 150000
 
-        let xpBonus = targetXp * 1000
+        let xpBonus = targetXp * 2500
 
-        if (xpBonus > 1000000) xpBonus = 1000000
+        if (xpBonus > 1000000) xpBonus = 200000
 
         payLimit += xpBonus
 
-        const prestigeBonus = targetPrestige * 1000000
+        const prestigeBonus = targetPrestige * 100000
 
         payLimit += prestigeBonus
 
-        if (selected.worth * amount > payLimit) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you can't give this user that much yet")] })
+        if (amount > payLimit) {
+            return message.channel.send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] })
         }
     }
 
