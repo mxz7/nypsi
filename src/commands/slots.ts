@@ -106,7 +106,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member)
             .setTitle("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
-            .addField("help", "you should know how a slot machine works..")
+            .addField(
+                "help",
+                "[slots has a ~33% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L166)"
+            )
         return send({ embeds: [embed] })
     }
 
@@ -162,9 +165,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const two = reel2[Math.floor(Math.random() * reel2.length)]
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
+    /**
+     * the shit below results in an approximate 33% win rate overtime, resulting in an overall loss, without counting multiplier
+     * https://i.imgur.com/4o7LQ5V.png
+     */
+
     if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 10)
-        const chanceScore = 4
+        const chance = Math.floor(Math.random() * 16)
+        const chanceScore = 10
 
         if (chance < chanceScore) {
             one = two
@@ -172,8 +180,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 10)
-        const chanceScore = 4
+        const chance = Math.floor(Math.random() * 16)
+        const chanceScore = 6
 
         if (chance < chanceScore) {
             three = two
@@ -183,7 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (one == two && one == three && one != "🍒" && one != "🍋") {
         const chance = Math.floor(Math.random() * 10)
 
-        if (chance < 3) {
+        if (chance < 4) {
             one == "🍋"
             two == "🍋"
             three == "🍋"
