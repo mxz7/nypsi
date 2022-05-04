@@ -1765,6 +1765,8 @@ export function calcMinimumEarnedXp(member: GuildMember): number {
     let earned = 1
     earned += getPrestige(member)
 
+    if (earned > 7) earned = 7
+
     return earned
 }
 
