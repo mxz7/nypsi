@@ -6,6 +6,7 @@ import { MStoTime } from "../utils"
 const db = getDatabase()
 
 const karmaCache: Map<string, number> = new Map()
+const lastCommandCache: Map<string, number> = new Map()
 
 let karmaShop = false
 
@@ -98,6 +99,8 @@ export function updateLastCommand(member: GuildMember | string) {
         id = member
     }
 
+    if (lastCommandCache.has(id)) lastCommandCache.delete(id)
+
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
     if (!query) {
@@ -136,7 +139,15 @@ export function getLastCommand(member: GuildMember | string): number {
         id = member
     }
 
+    if (lastCommandCache.has(id)) return lastCommandCache.get(id)
+
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
+
+    if (!query) {
+        lastCommandCache.set(id, 0)
+    }
+
+    lastCommandCache.set(id, query.last_command)
 
     return query.last_command
 }
