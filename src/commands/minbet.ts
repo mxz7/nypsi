@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getPrestige } from "../utils/economy/utils"
+import { calcMinimumEarnedXp, getRequiredBetForXp } from "../utils/economy/utils"
 
 const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", Categories.MONEY)
 
@@ -11,16 +11,12 @@ const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let requiredBet = 1000
+    const requiredBet = getRequiredBetForXp(message.member)
 
-    if (getPrestige(message.member) > 2) requiredBet = 10000
+    let max = calcMinimumEarnedXp(message.member) + 2
 
-    requiredBet += getPrestige(message.member) * 5000
-
-    let max = 2 + getPrestige(message.member) == 0 ? 1 : getPrestige(message.member)
-
-    if (max > 5) {
-        max = 5
+    if (max > 7) {
+        max = 7
     }
 
     const embed = new CustomEmbed(message.member, false)
