@@ -7,6 +7,8 @@ import { fetchUserMentions } from "../utils/users/utils"
 import { getDatabase } from "../utils/database/database"
 import { userExists } from "../utils/economy/utils"
 import { decrypt } from "../utils/utils"
+import { getKarma, getLastCommand } from "../utils/karma/utils"
+import ms = require("ms")
 
 const cooldown = new Map()
 
@@ -59,7 +61,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, 15000)
 
-    if (!(message.guild.memberCount < 150000 && (userExists(message.guild.ownerId) || isPremium(message.guild.ownerId)))) {
+    let qualified = false
+
+    if (
+        message.guild.memberCount < 150000 &&
+        (userExists(message.guild.ownerId) ||
+            isPremium(message.guild.ownerId) ||
+            getKarma(message.guild.ownerId) >= 5 ||
+            getLastCommand(message.guild.ownerId) >= Date.now() - ms("1 week"))
+    ) {
+        qualified = true
+    }
+
+    if (!qualified) {
         const embed = new ErrorEmbed(
             `this server does not qualify to track mentions (${getPrefix(
                 message.guild
