@@ -586,7 +586,7 @@ export function getMaxBankBalance(member: GuildMember): number {
  * @param {Boolean} anon
  */
 export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<Array<string>> {
-    const query = db.prepare("SELECT id, money FROM economy").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
 
     const userIDs = []
     const balances = new Map()
@@ -656,7 +656,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
         return !m.user.bot
     })
 
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 500").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
 
     let userIDs = []
     const balances = new Map()
@@ -877,7 +877,7 @@ export function createUser(member: GuildMember | string) {
         existsCache.delete(id)
     }
 
-    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 5000, 0)
+    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000)
 }
 
 /**
@@ -1229,7 +1229,7 @@ export function reset(): number {
         }
 
         db.prepare(
-            "UPDATE economy SET money = 5000, bank = 0, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+            "UPDATE economy SET money = 1000, bank = 4000, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
         ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
 
         logger.info("updated " + user.id)
