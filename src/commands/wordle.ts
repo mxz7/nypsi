@@ -1,6 +1,8 @@
 import { CommandInteraction, Message, MessageEmbed } from "discord.js"
+import ms = require("ms")
 import fetch from "node-fetch"
 import { getPrefix } from "../utils/guilds/utils"
+import { addKarma } from "../utils/karma/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getTier, isPremium } from "../utils/premium/utils"
@@ -32,6 +34,7 @@ enum Response {
 const emojis: Map<string, string> = new Map()
 const games: Map<string, Game> = new Map()
 const cooldown = new Map()
+const karmaCooldown: Set<string> = new Set()
 
 let wordList: string[]
 
@@ -255,6 +258,16 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 
     edit({ embeds: [embed] })
     games.delete(message.author.id)
+
+    if (!karmaCooldown.has(message.author.id)) {
+        karmaCooldown.add(message.author.id)
+
+        setTimeout(() => {
+            karmaCooldown.delete(message.author.id)
+        }, ms("15m"))
+
+        addKarma(message.author.id, 5)
+    }
 }
 
 async function lose(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
