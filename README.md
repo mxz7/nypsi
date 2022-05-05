@@ -42,6 +42,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 -   nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
 
 #### 📖 wordle
+
 -   you can play wordle on discord, with nypsi. no limit to how much you play per day
 
 ##### 💸 gambling / economy
