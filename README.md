@@ -2,8 +2,7 @@
 
 <p align="center">
   <a href="https://discord.gg/hJTDNST"><img src="https://badgen.net/discord/members/hJTDNST"></a>
-  <a href="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/codeql-analysis.yml/badge.svg"></a>
-  <a href="https://github.com/tekoh/nypsi/actions/workflows/ci.yml"><img src="https://github.com/tekoh/nypsi/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://top.gg/bot/678711738845102087"><img src="https://top.gg/api/widget/servers/678711738845102087.svg"></a>
   <a href="https://github.com/tekoh/nypsi"><img src ="https://sloc.xyz/github/tekoh/nypsi"></a>
   <br>
   <a href="https://ko-fi.com/U7U4AEDXM"><img src = "https://ko-fi.com/img/githubbutton_sm.svg"></a>
