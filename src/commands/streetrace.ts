@@ -407,6 +407,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         } else {
             await message.react("✅")
+
+            setTimeout(async () => {
+                await message.delete().catch(() => {})
+            }, 1500)
         }
 
         if (race.users.size >= 25) {
