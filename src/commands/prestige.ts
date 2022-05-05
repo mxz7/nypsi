@@ -73,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     message.member,
                     false,
                     `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-                ).setTitle(`prestige | ${message.member.user.username}`),
+                ).setHeader("prestige", message.author.avatarURL()),
             ],
         })
     }
@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         true,
         "are you sure you want to prestige?\n\n" +
             `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
-    ).setTitle(`prestige | ${message.member.user.username}`)
+    ).setHeader("prestige", message.author.avatarURL())
 
     cooldown.set(message.member.id, new Date())
 
@@ -129,7 +129,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         message.member,
                         false,
                         `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-                    ).setTitle(`prestige | ${message.member.user.username}`),
+                    ).setHeader("prestige", message.author.avatarURL()),
                 ],
             })
         }

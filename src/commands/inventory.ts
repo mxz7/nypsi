@@ -76,8 +76,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (itemIDs.length == 0) {
         return send({
             embeds: [
-                new CustomEmbed(message.member, false, "your inventory is empty").setTitle(
-                    "inventory | " + message.author.username
+                new CustomEmbed(message.member, false, "your inventory is empty").setHeader(
+                    "your inventory",
+                    message.author.avatarURL()
                 ),
             ],
         })
@@ -123,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `page ${page + 1}/${pages.length} | worth: $${worth.toLocaleString()}`
     )
 
-    embed.setTitle("inventory | " + message.author.username)
+    embed.setHeader("your inventory", message.author.avatarURL())
 
     if (!pages[page]) {
         page = 0
@@ -181,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     await edit({ components: [] }, msg)
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle("inventory | " + message.author.username)
+            const newEmbed = new CustomEmbed(message.member).setHeader("your inventory", message.author.avatarURL())
 
             if (!reaction) return
 

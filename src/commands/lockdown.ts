@@ -121,9 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             SEND_MESSAGES: false,
         })
 
-        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked").setTitle(
-            "lockdown"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been locked")
 
         return send({ embeds: [embed] }).catch(() => {
             return message.member.send({ embeds: [embed] }).catch()
@@ -132,9 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await channel.permissionOverwrites.edit(role, {
             SEND_MESSAGES: null,
         })
-        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked").setTitle(
-            "lockdown"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ " + channel.toString() + " has been unlocked")
 
         return send({ embeds: [embed] }).catch(() => {
             return message.member.send({ embeds: [embed] })

@@ -83,7 +83,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!fishingRod) {
-        return send({ embeds: [new ErrorEmbed("you need a fishing rod to fish")] })
+        return send({
+            embeds: [
+                new ErrorEmbed(
+                    "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/eco/fishingandhunting)"
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())

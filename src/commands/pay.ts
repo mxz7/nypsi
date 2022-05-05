@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length < 2) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("pay help")
+            .setHeader("pay help")
             .addField("usage", `${prefix}pay <user> <amount>`)
             .addField("help", "the payment will be taxxed at certain amounts")
 
@@ -175,7 +175,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member)
-        .setTitle("processing payment..")
+        .setHeader("payment", message.author.avatarURL())
         .addField(
             message.member.user.tag,
             "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString()
@@ -211,7 +211,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     send({ embeds: [embed] }).then((m) => {
         const embed = new CustomEmbed(message.member)
-            .setTitle("transaction success")
+            .setHeader("payment", message.author.avatarURL())
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())
             .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString())
 

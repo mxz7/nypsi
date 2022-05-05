@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("case help")
+            .setHeader("case help")
             .addField("usage", `${prefix}case <caseID>`)
             .addField(
                 "help",
@@ -61,8 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     case0.deleted = case0.deleted === 0 ? false : true
 
-    const members = message.guild.members.cache
-    const target = members.find((m) => m.user.id == case0.user)
+    const target = await message.guild.members.fetch(case0.user)
 
     let reason = case0.command
 
@@ -71,7 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle("case " + case0.case_id)
+        .setHeader("case " + case0.case_id)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
         .addField("date/time", `<t:${Math.floor(case0.time / 1000)}>`, true)

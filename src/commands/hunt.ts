@@ -70,7 +70,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!gun) {
-        return send({ embeds: [new ErrorEmbed("you need a gun to hunt")] })
+        return send({
+            embeds: [
+                new ErrorEmbed(
+                    "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/eco/fishingandhunting)"
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())

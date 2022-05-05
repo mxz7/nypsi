@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("coinflip help")
+            .setHeader("coinflip help")
             .addField("usage", `${prefix}coinflip @user <bet>`)
             .addField("help", "if you win, you will double your bet")
             .addField("example", `${prefix}coinflip @user 100`)
@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.member,
             true,
             `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
-        ).setTitle("coinflip")
+        ).setHeader("coinflip")
 
         return message.channel.send({ embeds: [embed] }).then((msg) => {
             if (winner == message.member) {

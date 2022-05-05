@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("highlow help")
+            .setHeader("highlow help")
             .addField("usage", `${prefix}highlow <bet>\n${prefix}highlow info`)
             .addField(
                 "game rules",
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/highlow.js#L123)"
-        ).setTitle("highlow help")
+        ).setHeader("highlow help")
 
         return send({ embeds: [embed] })
     }
@@ -238,7 +238,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
-        .setTitle("highlow | " + message.member.user.username)
+        .setHeader("highlow", message.author.avatarURL())
         .addField("card", "| " + games.get(message.member.user.id).card + " |")
 
     send({ embeds: [embed], components: [row] }).then((m) => {
@@ -304,7 +304,7 @@ async function playGame(message, m) {
     let win = games.get(message.member.user.id).win
     let card = games.get(message.member.user.id).card
 
-    const newEmbed = new CustomEmbed(message.member, true).setTitle("highlow | " + message.member.user.username)
+    const newEmbed = new CustomEmbed(message.member, true).setHeader("highlow", message.author.avatarURL())
 
     const edit = async (data) => {
         if (message.interaction) {

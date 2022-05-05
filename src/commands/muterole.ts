@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     )}**muterole update** *update mute permissions for every channel*\n\ncurrent mute role: ${
                         role ? role.toString() : "default"
                     }`
-                ).setTitle("muterole"),
+                ).setHeader("mute role"),
             ],
         })
     }

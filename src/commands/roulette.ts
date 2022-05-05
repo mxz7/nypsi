@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("roulette help")
+            .setHeader("roulette help")
             .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
             .addField(
                 "help",
@@ -276,7 +276,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         true,
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
-    ).setTitle("roulette wheel | " + message.member.user.username)
+    ).setHeader("roulette", message.author.avatarURL())
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {

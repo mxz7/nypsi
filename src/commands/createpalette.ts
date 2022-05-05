@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "create a color palette from the roles in the server, uses https://color.tekoh.net"
         )
 
-        embed.setTitle("create palette")
+        embed.setHeader("create palette")
         embed.addField(
             "usage",
             `${getPrefix(

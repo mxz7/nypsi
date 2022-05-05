@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("ezpoll help")
+            .setHeader("ezpoll help")
             .addField("usage", `${prefix}ezpoll <choices..>`)
             .addField(
                 "help",
@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false, choices)
-        .setTitle("poll by " + message.member.user.username)
+        .setHeader("poll by " + message.member.user.username)
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices)
 

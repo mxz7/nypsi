@@ -1,5 +1,6 @@
 import { Collection, Guild, GuildMember, Message, User } from "discord.js"
 import { inPlaceSort } from "fast-sort"
+import fetch from "node-fetch"
 import { getDatabase } from "../database/database"
 import { cleanString } from "../utils"
 

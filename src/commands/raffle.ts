@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     chosen = await message.guild.members.fetch(chosen)
 
     const embed = new CustomEmbed(message.member)
-        .setTitle(`${message.member.user.username}'s raffle`)
+        .setHeader(`${message.member.user.username}'s raffle`, message.author.avatarURL())
         .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``)
 
     return message.channel.send({ embeds: [embed] })

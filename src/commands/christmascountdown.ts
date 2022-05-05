@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**xmas disable** *disables the christmas countdown*\n` +
                 `${prefix}**xmas channel <channel>** *change the channel used*\n` +
                 `${prefix}**xmas format <new format>** *change the format for the countdown*`
-        ).setTitle("christmas countdown")
+        ).setHeader("christmas countdown")
         return message.channel.send({ embeds: [embed] })
     }
 
@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n` +
                 `**format** ${profile.format}\n**channel** \`${profile.channel}\``
         )
-            .setTitle("christmas countdown")
+            .setHeader("christmas countdown")
             .setFooter(`use ${prefix}xmas help to view additional commands`)
 
         return message.channel.send({ embeds: [embed] })
@@ -138,7 +138,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "this is how the message will appear\n%days% will be replaced with how many days are left until christmas"
             )
-                .setTitle("christmas countdown")
+                .setHeader("christmas countdown")
                 .addField("current format", `\`${profile.format}\``, true)
                 .addField("example", format, true)
                 .addField("help", `to change this format, do ${prefix}**xmas format <new format>**`)
@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ format updated").setTitle("christmas countdown")
+        const embed = new CustomEmbed(message.member, false, "✅ format updated").setHeader("christmas countdown")
 
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "channel") {
@@ -190,7 +190,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "by setting the channel it will change the channel that the message is sent in"
             )
-                .setTitle("christmas countdown")
+                .setHeader("christmas countdown")
                 .addField("current value", "`" + profile.channel + "`")
                 .addField("help", `to change this value, do ${prefix}**xmas channel <channel id>**`)
 
@@ -237,7 +237,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setTitle("christmas countdown")
+        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setHeader("christmas countdown")
 
         return message.channel.send({ embeds: [embed] })
     } else {

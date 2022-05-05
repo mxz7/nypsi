@@ -117,8 +117,8 @@ export class CustomEmbed extends MessageEmbed {
      * @returns {CustomEmbed}
      * @param {String} text
      */
-    setHeader(text: string) {
-        super.setAuthor({ name: text })
+    setHeader(text: string, image?: string) {
+        super.setAuthor({ name: text, iconURL: image })
 
         return this
     }
