@@ -44,7 +44,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
             content: message.content,
             member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
-            messageAvatar: message.author.avatarURL(),
+            memberAvatar: message.author.avatarURL(),
             channel: {
                 id: message.channel.id,
             },
