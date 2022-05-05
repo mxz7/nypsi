@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
-            .setTitle("current snipe filter")
+            .setHeader("current snipe filter")
             .setFooter(`use ${prefix}sf (add/del/+/-) to modify the filter`)
 
         if (filter.length == 0) {
@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (filter.indexOf(word) > -1) {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
-                .setTitle("snipe filter")
+                .setHeader("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
             return message.channel.send({ embeds: [embed] })
@@ -69,14 +69,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 message.member,
                 true,
                 `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`
-            ).setTitle("snipe filter")
+            ).setHeader("snipe filter")
 
             return message.channel.send({ embeds: [embed] })
         }
 
         updateFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setTitle("snipe filter")
+        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setHeader(
+            "snipe filter"
+        )
         return message.channel.send({ embeds: [embed] })
     }
 
@@ -95,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             filter.splice(filter.indexOf(word), 1)
         } else {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` not found in the filter")
-                .setTitle("snipe filter")
+                .setHeader("snipe filter")
                 .setFooter(`you can use ${prefix}sf to view the filter`)
 
             return message.channel.send({ embeds: [embed] })
@@ -104,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         updateFilter(message.guild, filter)
 
         const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
-            .setTitle("snipe filter")
+            .setHeader("snipe filter")
             .setFooter(`you can use ${prefix}sf reset to reset the filter`)
 
         return message.channel.send({ embeds: [embed] })
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         updateFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setTitle("snipe filter")
+        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setHeader("snipe filter")
 
         return message.channel.send({ embeds: [embed] })
     }

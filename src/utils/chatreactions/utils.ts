@@ -311,7 +311,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
     const embed = new CustomEmbed().setColor("#5efb8f")
 
-    embed.setTitle("chat reaction")
+    embed.setHeader("chat reaction")
     embed.setDescription(`type: \`${displayWord}\``)
 
     const msg = await channel.send({ embeds: [embed] })

@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("warn help")
+            .setHeader("warn help")
             .addField("usage", `${prefix}warn <@user(s)> (reason) [-s`)
             .addField(
                 "help",

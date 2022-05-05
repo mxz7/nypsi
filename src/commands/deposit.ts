@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("deposit help")
+            .setHeader("deposit help")
             .addField("usage", `${prefix}deposit <amount>`)
             .addField(
                 "help",
@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle("bank deposit | processing")
+        .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +
@@ -136,8 +136,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     updateBankBalance(message.member, getBankBalance(message.member) + amount)
 
     const embed1 = new CustomEmbed(message.member, false)
-        .setTitle("bank deposit | success")
-        .setColor("#5efb8f")
+        .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +

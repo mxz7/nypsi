@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `page ${page + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`
     )
 
-    embed.setTitle("car magazine")
+    embed.setHeader("car magazine", message.author.avatarURL())
 
     if (!pages[page]) {
         page = 0
@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     await msg.edit({ components: [] })
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle("car magazine")
+            const newEmbed = new CustomEmbed(message.member).setHeader("car magazine", message.author.avatarURL())
 
             if (!reaction) return
 

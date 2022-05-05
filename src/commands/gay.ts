@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
-    ).setTitle("gay calculator")
+    ).setHeader("gay calculator", member.user.avatarURL())
 
     return await send({ embeds: [embed] })
 }

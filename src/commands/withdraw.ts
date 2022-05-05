@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("withdraw help")
+            .setHeader("withdraw help")
             .addField("usage", `${prefix}withdraw <amount>`)
             .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank")
         return send({ embeds: [embed] })
@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }, cooldownLength * 1000)
 
     const embed = new CustomEmbed(message.member, true)
-        .setTitle("bank withdrawal | processing")
+        .setHeader("bank withdrawal", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +
@@ -129,8 +129,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     updateBalance(message.member, getBalance(message.member) + amount)
 
     const embed1 = new CustomEmbed(message.member, true)
-        .setTitle("bank withdrawal | success")
-        .setColor("#5efb8f")
+        .setHeader("bank withdrawal", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +

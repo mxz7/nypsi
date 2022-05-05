@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("rob help")
+            .setHeader("rob help")
             .addField("usage", `${prefix}rob <@user>`)
             .addField(
                 "help",
@@ -162,12 +162,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }, cooldownLength * 1000)
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setTitle(
-        "robbery | " + message.member.user.username
+    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setHeader(
+        "robbery",
+        message.author.avatarURL()
     )
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setTitle(
-        "robbery | " + message.member.user.username
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setHeader(
+        "robbery",
+        message.author.avatarURL()
     )
 
     const embed3 = new CustomEmbed().setFooter("use $optout to optout of bot dms")

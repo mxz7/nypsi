@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const help = () => {
         const embed = new CustomEmbed(message.member, false)
 
-        embed.setTitle("lottery")
+        embed.setHeader("lottery", message.author.avatarURL())
         embed.setDescription(
             "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
                 `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(

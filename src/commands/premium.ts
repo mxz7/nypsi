@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (isPremium(message.member)) {
             const embed = new CustomEmbed(message.member, false)
 
-            embed.setTitle("premium status")
+            embed.setHeader("premium status", message.author.avatarURL())
 
             const profile = getPremiumProfile(message.member)
 
@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (isPremium(user.id)) {
             const embed = new CustomEmbed(message.member, false)
 
-            embed.setTitle("premium status")
+            embed.setHeader("premium status", message.author.avatarURL())
 
             const profile = getPremiumProfile(user.id)
 

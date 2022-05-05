@@ -70,7 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "**port** *waiting...*" +
             "\n\n" +
             "**status** *online*"
-    ).setTitle("ddos tool")
+    ).setHeader("ddos tool")
 
     return message.channel.send({ embeds: [embed] }).then((m) => {
         embed.setDescription(

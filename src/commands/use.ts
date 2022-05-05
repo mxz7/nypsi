@@ -94,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     message.member,
                     false,
                     `${getPrefix(message.guild)}use <item>\n\nuse items to open crates or to simply use the item's function`
-                ).setTitle("use | " + message.author.username),
+                ).setHeader("use", message.author.avatarURL()),
             ],
         })
     }
@@ -169,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] })
     }
 
-    const embed = new CustomEmbed(message.member).setTitle("use | " + message.author.username)
+    const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL())
 
     let laterDescription
 

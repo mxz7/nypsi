@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const help = () => {
-        const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
+        const embed = new CustomEmbed(message.member, false).setHeader("street race")
 
         embed.setDescription(
             `${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
@@ -177,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             speedLimit: speedLimit,
         }
 
-        const embed = new CustomEmbed(message.member).setTitle("street race")
+        const embed = new CustomEmbed(message.member).setHeader(`${message.author.tag}'s street race`)
 
         embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`)
 

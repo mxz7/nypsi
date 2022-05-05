@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("yablon help")
+            .setHeader("yablon help")
             .addField("usage", `${prefix}yablon <bet>\n${prefix}yablon info`)
             .addField(
                 "game rules",
@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/yablon.js#L123)"
-        ).setTitle("yablon help")
+        ).setHeader("yablon help")
 
         return send({ embeds: [embed] })
     }
@@ -270,7 +270,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
-        .setTitle("yablon | " + message.member.user.username)
+        .setHeader("yablon", message.author.avatarURL())
         .addField("cards", getCards(message.member))
 
     send({ embeds: [embed], components: [row] }).then((m) => {
@@ -396,7 +396,7 @@ async function playGame(message, m) {
     const bet = games.get(message.member.user.id).bet
     const nextCard = games.get(message.member.user.id).nextCard
 
-    const newEmbed = new CustomEmbed(message.member, true).setTitle("yablon | " + message.member.user.username)
+    const newEmbed = new CustomEmbed(message.member, true).setHeader("yablon", message.author.avatarURL())
 
     const edit = async (data) => {
         if (message.interaction) {

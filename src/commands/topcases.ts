@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         cooldown.delete(message.author.id)
     }, 5000)
 
-    const embed = new CustomEmbed(message.member, true).setTitle("top cases")
+    const embed = new CustomEmbed(message.member, true).setHeader("top cases")
 
     const prefix = getPrefix(message.guild)
 

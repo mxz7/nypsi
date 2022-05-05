@@ -30,6 +30,7 @@ export default async function messageDelete(message: Message) {
             content: message.content,
             member: message.author.tag,
             createdTimestamp: message.createdTimestamp,
+            memberAvatar: message.author.avatarURL(),
             channel: {
                 id: message.channel.id,
             },

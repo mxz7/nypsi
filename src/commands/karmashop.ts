@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return text
         }
 
-        embed.setTitle("karma shop | " + message.author.username)
+        embed.setHeader("karma shop", message.author.avatarURL())
         embed.setFooter(`you have ${getKarma(message.member).toLocaleString()} karma ${displayItemsLeft()}`)
 
         for (let item of pages[page]) {
@@ -162,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         await msg.edit({ components: [] })
                     })
 
-                const newEmbed = new CustomEmbed(message.member).setTitle("karma shop | " + message.author.username)
+                const newEmbed = new CustomEmbed(message.member).setHeader("karma shop", message.author.avatarURL())
 
                 if (!reaction) return
 

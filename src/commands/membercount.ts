@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 profile.filter_bots == 1 ? "true" : "false"
             }\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
-            .setTitle("member count")
+            .setHeader("member count")
             .setFooter(`use ${prefix}counter help to view additional commands`)
 
         return message.channel.send({ embeds: [embed] })
@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter filterbots** *view/change the setting to filter bots*\n` +
                 `${prefix}**counter channel** *set a channel as the channel to be used*`
         )
-            .setTitle("member count")
+            .setHeader("member count")
             .setFooter("channel will be updated every 10 minutes")
 
         return message.channel.send({ embeds: [embed] })
@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setStatsProfile(message.guild, profile)
 
         const embed = new CustomEmbed(message.member, false, "✅ channel successfully created")
-            .setTitle("member count")
+            .setHeader("member count")
             .setFooter("channel will be updated every 10 minutes")
 
         return message.channel.send({ embeds: [embed] })
@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setStatsProfile(message.guild, profile)
 
-        const embed = new CustomEmbed(message.member, false, "✅ counter successfully disabled").setTitle("member count")
+        const embed = new CustomEmbed(message.member, false, "✅ counter successfully disabled").setHeader("member count")
 
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "format") {
@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "this is how your channel will appear\n %count% is replaced with the member count\n%peak% is replaced with the total member peak"
             )
-                .setTitle("member count")
+                .setHeader("member count")
                 .addField("current format", "`" + profile.format + "`")
                 .addField("help", `to change this format, do ${prefix}**counter format <new format>**`)
 
@@ -150,7 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setStatsProfile(message.guild, profile)
 
         const embed = new CustomEmbed(message.member, false, "✅ format updated - will update channel on next interval")
-            .setTitle("member count")
+            .setHeader("member count")
             .addField("new format", "`" + newFormat + "`")
 
         return message.channel.send({ embeds: [embed] })
@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "if this is true, bots will not be counted towards the member count"
             )
-                .setTitle("member count")
+                .setHeader("member count")
                 .addField("current value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
                 .addField("help", `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`)
 
@@ -181,7 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setStatsProfile(message.guild, profile)
 
         const embed = new CustomEmbed(message.member, false, "✅ value updated - will update channel on next interval")
-            .setTitle("member count")
+            .setHeader("member count")
             .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
 
         return message.channel.send({ embeds: [embed] })
@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "by setting the channel it will change the channel that is used to display the counter"
             )
-                .setTitle("member count")
+                .setHeader("member count")
                 .addField("current value", "`" + profile.channel + "`")
                 .addField("help", `to change this value, do ${prefix}**counter channel <channel id>**`)
 
@@ -263,7 +263,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         const embed = new CustomEmbed(message.member, false, "✅ channel updated")
-            .setTitle("member count")
+            .setHeader("member count")
             .addField("new value", "`" + profile.channel + "`")
 
         return message.channel.send({ embeds: [embed] })
@@ -276,7 +276,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter format** *view/change the current channel format*\n` +
                 `${prefix}**counter filterbots** *view/change the setting to filter bots*`
         )
-            .setTitle("member count")
+            .setHeader("member count")
             .setFooter("member count will be updated every 10 minutes")
 
         return message.channel.send({ embeds: [embed] })
