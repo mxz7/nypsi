@@ -217,6 +217,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     payment(message.author, target.user, selected.worth * amount)
 
+    if (selected.id == "ring") {
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, "you may now kiss the bride :heart:")],
+        })
+    }
+
     return message.channel.send({
         embeds: [
             new CustomEmbed(
