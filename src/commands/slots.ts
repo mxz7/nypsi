@@ -1,10 +1,8 @@
 import {
     getBalance,
     createUser,
-    getMultiplier,
     updateBalance,
     userExists,
-    winBoard,
     formatBet,
     getXp,
     updateXp,
@@ -19,6 +17,14 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { gamble } from "../utils/logger.js"
+
+const multipliers = {
+    "🍒": 10,
+    "🍋": 5,
+    "🍊": 4,
+    "🍇": 3.5,
+    "🍉": 3,
+}
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = [
@@ -114,7 +120,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.length == 1 && args[0] == "info") {
-        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(winBoard())
+        let txt = ""
+
+        for (const item in multipliers) {
+            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`
+        }
+
+        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(txt)
 
         return send({ embeds: [embed] })
     }
@@ -214,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let winnings = 0
 
     if (one == two && two == three) {
-        const multiplier = getMultiplier(one)
+        const multiplier = multipliers[one]
 
         win = true
         winnings = Math.round(multiplier * bet)
