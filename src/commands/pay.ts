@@ -139,11 +139,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let xpBonus = targetXp * 2500
 
-        if (xpBonus > 1000000) xpBonus = 200000
+        if (xpBonus > 200000) xpBonus = 200000
 
         payLimit += xpBonus
 
-        const prestigeBonus = targetPrestige * 100000
+        const prestigeBonus = targetPrestige * 750000
 
         payLimit += prestigeBonus
 
