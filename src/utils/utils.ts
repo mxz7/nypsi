@@ -193,6 +193,8 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
                 possible.set(3, member)
             }
         }
+
+        if (possible.size == 7) break
     }
 
     if (!target) {
