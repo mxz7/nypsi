@@ -137,7 +137,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n**${hotAmount}**% hot ${hotEmoji}\n${hotText}`
-    ).setTitle("hotness calculator")
+    ).setHeader("hotness calculator", member.user.avatarURL())
 
     if (hotAmount >= 95) {
         embed.setFooter("+$1,069")

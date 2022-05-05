@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("kick help")
+            .setHeader("kick help")
             .addField("usage", `${prefix}kick <@user(s)> (reason) [-s]`)
             .addField(
                 "help",

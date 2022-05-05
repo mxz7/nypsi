@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("minesweeper help")
+            .setHeader("minesweeper help")
             .addField("usage", `${prefix}ms <bet>`)
             .addField(
                 "game rules",
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
-        .setTitle("minesweeper | " + message.author.username)
+        .setHeader("minesweeper", message.author.avatarURL())
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing")
 
@@ -381,7 +381,7 @@ async function playGame(message, msg) {
 
     let table
 
-    const embed = new CustomEmbed(message.member, true).setTitle("minesweeper | " + message.author.username)
+    const embed = new CustomEmbed(message.member, true).setHeader("minesweeper", message.author.avatarURL())
 
     const edit = async (data) => {
         if (message.interaction) {

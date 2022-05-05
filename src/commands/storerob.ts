@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         shopList = shopList + "the most you can recieve on one robbery is 90% of the store's balance"
 
-        const embed = new CustomEmbed(message.member, false, shopList).setTitle("current store balances")
+        const embed = new CustomEmbed(message.member, false, shopList).setHeader("current store balances")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -123,12 +123,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let percentLost
     let amountLost
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + shop + "..").setTitle(
-        "store robbery | " + message.member.user.username
+    const embed = new CustomEmbed(message.member, true, "robbing " + shop + "..").setHeader(
+        "store robbery",
+        message.author.avatarURL()
     )
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + shop + "..").setTitle(
-        "store robbery | " + message.member.user.username
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + shop + "..").setHeader(
+        "store robbery",
+        message.author.avatarURL()
     )
 
     if (caught <= 5) {

@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.react("❌")
         }
 
-        embed.setTitle(`image #${wholesome.id}`)
+        embed.setHeader(`image #${wholesome.id}`)
 
         embed.setDescription(
             `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
@@ -305,7 +305,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             )
         }
 
-        embed.setTitle("wholesome queue")
+        embed.setHeader("wholesome queue")
 
         if (queue.length == 0) {
             embed.setDescription("no wholesome suggestions")
@@ -341,7 +341,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!reaction) return
 
-            const newEmbed = new CustomEmbed(message.member, false).setTitle("wholesome queue")
+            const newEmbed = new CustomEmbed(message.member, false).setHeader("wholesome queue")
 
             if (reaction == "⬅") {
                 if (currentPage <= 1) {

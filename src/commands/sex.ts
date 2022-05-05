@@ -129,7 +129,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     message.member,
                     false,
                     "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
-                ).setTitle("milf finder"),
+                ).setHeader("milf finder"),
             ],
         })
     } else {
@@ -151,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 true,
                 `a match has been made from **${key.guild.name}**\n\n` +
                     `go ahead and send **${key.user.tag}** a *private* message 😉😏`
-            ).setTitle("milf finder")
+            ).setHeader("milf finder")
 
             if (key.description != "") {
                 embed.setDescription(
@@ -170,7 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 true,
                 `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
             )
-                .setTitle("milf finder")
+                .setHeader("milf finder")
                 .setColor("#5efb8f")
 
             if (description != "") {
@@ -191,7 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     message.member,
                     false,
                     "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
-                ).setTitle("milf finder"),
+                ).setHeader("milf finder"),
             ],
         })
     }
@@ -216,7 +216,7 @@ setInterval(() => {
                         embeds: [
                             new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢")
                                 .setColor("#e4334f")
-                                .setTitle("milf finder"),
+                                .setHeader("milf finder"),
                         ],
                     })
                     .catch(() => {})

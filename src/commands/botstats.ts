@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member)
-        .setTitle("stats")
+        .setHeader("nypsi stats")
         .addField(
             "bot",
             "**server count** " +

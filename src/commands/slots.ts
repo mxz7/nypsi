@@ -110,7 +110,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("slots help")
+            .setHeader("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
@@ -126,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`
         }
 
-        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(txt)
+        const embed = new CustomEmbed(message.member).setHeader("win board").setDescription(txt)
 
         return send({ embeds: [embed] })
     }
@@ -253,8 +253,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(
         message.member,
         true,
-        "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString()
-    ).setTitle("slots | " + message.member.user.username)
+        "~~---------------~~\n" +
+            one +
+            " **|** " +
+            two +
+            " **|** " +
+            three +
+            "\n~~---------------~~\n**bet** $" +
+            bet.toLocaleString()
+    ).setHeader("slots", message.author.avatarURL())
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {

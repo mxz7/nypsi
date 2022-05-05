@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
 
     const embed = new CustomEmbed(message.member, false)
-        .setTitle("top " + filtered.length)
+        .setHeader("top " + filtered.length)
         .setDescription(filtered.join("\n"))
 
     message.channel.send({ embeds: [embed] })

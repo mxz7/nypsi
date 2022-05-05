@@ -10,7 +10,7 @@ import {
     clearAvatarHistory,
     isTracking,
 } from "../utils/users/utils"
-import { getMember, formatDate, uploadImageToImgur } from "../utils/utils"
+import { formatDate, uploadImageToImgur } from "../utils/utils"
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
     "avh",
@@ -62,12 +62,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")],
             })
         }
-
-        if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
-        } else {
-            member = message.mentions.members.first()
-        }
     }
 
     if (!member) {
@@ -103,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, true)
-        .setTitle(`${member.user.tag} [${index + 1}]`)
+        .setHeader(`${member.user.tag} [${index + 1}]`)
         .setImage(history[index].value)
         .setFooter(formatDate(history[index].date))
 
@@ -161,7 +155,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage--
 
-                newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
+                newEmbed.setHeader(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
                 newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
                 if (currentPage == 1) {
@@ -184,7 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage++
 
-                newEmbed.setTitle(`${member.user.tag} [${currentPage}]`)
+                newEmbed.setHeader(`${member.user.tag} [${currentPage}]`)
                 newEmbed.setImage(history[currentPage - 1].value)
                 newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`)
                 if (currentPage == lastPage) {

@@ -148,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setInventory(message.member, inventory)
 
     const embed = new CustomEmbed(message.member, false)
-    embed.setTitle(`furnace | ${message.author.username}`)
+    embed.setHeader("furnace", message.author.avatarURL())
     embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...")
 
     const msg = await send({ embeds: [embed] })
