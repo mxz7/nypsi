@@ -447,13 +447,6 @@ async function playGame(message, m) {
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
-            const earnedXp = calcEarnedXp(message.member, bet)
-
-            if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp)
-                newEmbed.setFooter(`+${earnedXp}xp`)
-            }
-
             newEmbed.setDescription(
                 "**bet** $" +
                     bet.toLocaleString() +
@@ -468,6 +461,13 @@ async function playGame(message, m) {
             newEmbed.setDescription(
                 "**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString()
             )
+        }
+
+        const earnedXp = calcEarnedXp(message.member, bet)
+
+        if (earnedXp > 0) {
+            updateXp(message.member, getXp(message.member) + earnedXp)
+            newEmbed.setFooter(`+${earnedXp}xp`)
         }
 
         gamble(message.author, "blackjack", bet, true, winnings)

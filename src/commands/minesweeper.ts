@@ -417,13 +417,6 @@ async function playGame(message, msg) {
         if (games.get(message.author.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
 
-            const earnedXp = calcEarnedXp(message.member, bet)
-
-            if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp)
-                embed.setFooter(`+${earnedXp}xp`)
-            }
-
             embed.setDescription(
                 "**bet** $" +
                     bet.toLocaleString() +
@@ -454,8 +447,17 @@ async function playGame(message, msg) {
                     winnings.toLocaleString()
             )
         }
+
+        const earnedXp = calcEarnedXp(message.member, bet)
+
+        if (earnedXp > 0) {
+            updateXp(message.member, getXp(message.member) + earnedXp)
+            embed.setFooter(`+${earnedXp}xp`)
+        }
+
         gamble(message.author, "minesweeper", bet, true, winnings)
         addGamble(message.member, "minesweeper", true)
+
         embed.addField("your grid", table)
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
