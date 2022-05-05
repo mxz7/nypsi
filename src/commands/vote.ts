@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (voted) {
         embed.setTitle("vote ✅")
         embed.setColor("#5efb8f")
-        embed.addField("rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
+        embed.addField("active rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
         embed.setTitle("vote ❌")
         embed.setColor("#e4334f")
