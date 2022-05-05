@@ -74,8 +74,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setTitle("street race | " + message.author.username)
 
-        embed.setFooter("you must have a car to join a street race")
-
         embed.setDescription(
             `${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
                 `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
