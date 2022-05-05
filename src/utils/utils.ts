@@ -677,12 +677,22 @@ export function cleanString(string: string): string {
 }
 
 export function encrypt(content: string): string {
-    const ciphertext = CryptoJS.AES.encrypt(content, process.env.ENCRYPT_KEY)
+    let ciphertext
+
+    try {
+        ciphertext = CryptoJS.AES.encrypt(content, process.env.ENCRYPT_KEY)
+    } catch {
+        return "noencrypt:@:"
+    }
 
     return ciphertext.toString()
 }
 
 export function decrypt(ciphertext: string): string {
+    if (ciphertext.startsWith("noencrypt:@:")) {
+        return ciphertext.split("noencrypt:@:")[1]
+    }
+
     const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.ENCRYPT_KEY)
 
     return bytes.toString(CryptoJS.enc.Utf8)
