@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("mute help")
+            .setHeader("mute help")
             .addField("usage", `${prefix}mute <@user(s)> (time) [-s]`)
             .addField(
                 "help",

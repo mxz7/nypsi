@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false).setTitle("give | " + message.author.tag)
+        const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL())
 
         embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
         embed.addField("help", "give members items from your inventory")
@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     try {
         searchTag = args[1].toLowerCase()
     } catch {
-        const embed = new CustomEmbed(message.member, false).setTitle("give | " + message.author.tag)
+        const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL())
 
         embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`)
         embed.addField("help", "give members items from your inventory")

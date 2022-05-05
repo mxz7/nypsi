@@ -19,7 +19,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length <= 1) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("reason help")
+            .setHeader("reason help")
             .addField("usage", `${prefix}reason <case ID> <new reason>`)
             .addField("help", "use this command to change the current reason for a punishment case")
 
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     setReason(message.guild, parseInt(caseID), reason)
 
-    const embed = new CustomEmbed(message.member).setTitle("reason").setDescription("✅ case updated")
+    const embed = new CustomEmbed(message.member).setDescription("✅ case updated")
 
     return message.channel.send({ embeds: [embed] })
 }

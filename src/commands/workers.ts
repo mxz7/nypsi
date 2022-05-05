@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const listAllWorkers = () => {
         const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")
-            .setTitle("workers | " + message.author.username)
+            .setHeader("workers", message.author.avatarURL())
             .setFooter(`${getPrefix(message.guild)}workers help`)
 
         for (const w of Array.from(workers.keys())) {
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             false,
             `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
-            .setTitle("your workers")
+            .setHeader("your workers", message.author.avatarURL())
             .setFooter(`${getPrefix(message.guild)}workers help`)
 
         for (const w of Object.keys(personalWorkers)) {
@@ -226,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 message.member,
                 false,
                 `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`
-            ).setTitle("workers | " + message.author.username)
+            ).setHeader("workers", message.author.avatarURL())
 
             return message.channel.send({ embeds: [embed] })
         } else if (args[0].toLowerCase() == "upgrade") {
@@ -299,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(message.member, true)
 
-            embed.setTitle("workers | " + message.author.username)
+            embed.setHeader("workers", message.author.avatarURL())
 
             worker = getWorkers(message.member)[worker.id]
 
@@ -396,7 +396,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             return message.channel.send({ embeds: [new CustomEmbed(message.member, false, msg)] })
         } else {
-            const embed = new CustomEmbed(message.member, false).setTitle("workers | " + message.author.username)
+            const embed = new CustomEmbed(message.member, false).setHeader("workers", message.author.avatarURL())
 
             embed.setDescription(
                 `${getPrefix(message.guild)}**workers list** *list all available workers*\n` +

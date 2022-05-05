@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
-            .setTitle("current chat filter")
+            .setHeader("current chat filter")
             .setFooter(`use ${prefix}filter (add/del/+/-) to modify the filter`)
 
         if (filter.length == 0) {
@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (filter.indexOf(word) > -1) {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
-                .setTitle("chat filter")
+                .setHeader("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`)
 
             return message.channel.send({ embeds: [embed] })
@@ -71,14 +71,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 message.member,
                 true,
                 `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`
-            ).setTitle("chat filter")
+            ).setHeader("chat filter")
 
             return message.channel.send({ embeds: [embed] })
         }
 
         updateChatFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setTitle("chat filter")
+        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setHeader("chat filter")
         return message.channel.send({ embeds: [embed] })
     }
 
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             filter.splice(filter.indexOf(word), 1)
         } else {
             const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` not found in the filter")
-                .setTitle("chat filter")
+                .setHeader("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`)
 
             return message.channel.send({ embeds: [embed] })
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         updateChatFilter(message.guild, filter)
 
         const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
-            .setTitle("chat filter")
+            .setHeader("chat filter")
             .setFooter(`you can use ${prefix}filter reset to reset the filter`)
 
         return message.channel.send({ embeds: [embed] })
@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         updateChatFilter(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setTitle("chat filter")
+        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setHeader("chat filter")
 
         return message.channel.send({ embeds: [embed] })
     }

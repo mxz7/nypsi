@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
     }
 
-    embed.setTitle(message.author.tag)
+    embed.setHeader(message.author.tag)
     embed.setThumbnail(message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
 
     return message.channel.send({ embeds: [embed] })

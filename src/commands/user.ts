@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-id")) {
-        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setTitle(member.user.tag)
+        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setHeader(member.user.tag)
         return message.channel.send({ embeds: [embed] })
     }
 
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, false, member.user.toString())
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
-        .setTitle(member.user.tag)
+        .setHeader(member.user.tag)
 
         .addField("account", `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`, true)
 

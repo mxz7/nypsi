@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("history help")
+            .setHeader("history help")
             .addField("usage", `${prefix}history @user\n${prefix}history <user ID or tag>`)
 
         return send({ embeds: [embed] })

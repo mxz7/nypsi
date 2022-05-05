@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         bankList = bankList + "the most you can recieve on one robbery is 75% of the bank's balance"
 
-        const embed = new CustomEmbed(message.member, false, bankList).setTitle("current bank balances")
+        const embed = new CustomEmbed(message.member, false, bankList).setHeader("current bank balances")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -124,12 +124,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let percentLost
     let amountLost
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
-        "bank robbery | " + message.member.user.username
+    const embed = new CustomEmbed(message.member, true, "robbing " + bank + "..").setHeader(
+        "bank robbery",
+        message.author.avatarURL()
     )
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + bank + "..").setTitle(
-        "bank robbery | " + message.member.user.username
+    const embed2 = new CustomEmbed(message.member, true, "robbing " + bank + "..").setHeader(
+        "bank robbery",
+        message.author.avatarURL()
     )
 
     if (caught <= 10) {

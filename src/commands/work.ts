@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     updateBalance(message.member, getBalance(message.member) + earned)
 
-    const embed = new CustomEmbed(message.member, true, work).setTitle("work | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member, true, work).setHeader("work", message.author.avatarURL())
 
     message.channel.send({ embeds: [embed] }).then((m) => {
         if (getBalance(message.member) >= 2000000) {

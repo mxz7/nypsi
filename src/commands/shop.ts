@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
 
-    embed.setTitle("shop | " + message.author.username)
+    embed.setHeader("shop", message.author.avatarURL())
 
     if (!pages[page]) {
         page = 0
@@ -134,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     await msg.edit({ components: [] })
                 })
 
-            const newEmbed = new CustomEmbed(message.member).setTitle("shop | " + message.author.username)
+            const newEmbed = new CustomEmbed(message.member).setHeader("shop", message.author.avatarURL())
 
             if (!reaction) return
 

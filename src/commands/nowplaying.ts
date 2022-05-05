@@ -130,13 +130,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, true).setTitle("now playing")
+    const embed = new CustomEmbed(message.member).setHeader("now playing")
 
     embed.setThumbnail(track.image[3]["#text"])
 
     embed.setDescription(`[${track.name}](${track.url}) - ${track.artist["#text"]}`)
 
-    embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
+    embed.setFooter({ text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
 
     return send({ embeds: [embed] })
 }

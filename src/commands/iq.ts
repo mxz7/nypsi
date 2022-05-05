@@ -141,8 +141,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         iqMsg = "uh. woah."
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setTitle(
-        "iq calculator"
+    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setHeader(
+        "iq calculator",
+        member.user.avatarURL()
     )
 
     return send({ embeds: [embed] })

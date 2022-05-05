@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] })
 
     const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
-        .setTitle("confirmation")
+        .setHeader("confirmation")
         .setFooter("this cannot be reversed")
 
     const msg = await message.channel.send({ embeds: [embed] })

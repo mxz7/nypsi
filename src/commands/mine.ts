@@ -78,7 +78,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!pickaxe) {
-        return send({ embeds: [new ErrorEmbed("you need a pickaxe to mine")] })
+        return send({
+            embeds: [
+                new ErrorEmbed(
+                    "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/eco/minecraft)"
+                ),
+            ],
+        })
     }
 
     cooldown.set(message.member.id, new Date())
