@@ -145,7 +145,7 @@ export async function redditImage(post: any, allowed: any): Promise<string> {
     return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author
 }
 
-export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
+export async function getMember(guild: Guild, memberName: string): Promise<GuildMember | void> {
     if (!guild) return null
 
     let members: Collection<string, GuildMember>
