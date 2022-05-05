@@ -224,7 +224,7 @@ export async function getWebhooks(client: Client) {
     logger.add(
         new DiscordTransport({
             webhook: process.env.WEBHOOK_URL,
-            useCodeblock: true,
+            useCodeBlock: true,
         })
     )
 }
