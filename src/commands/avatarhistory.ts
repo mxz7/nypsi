@@ -10,7 +10,7 @@ import {
     clearAvatarHistory,
     isTracking,
 } from "../utils/users/utils"
-import { getMember, formatDate, uploadImageToImgur } from "../utils/utils"
+import { formatDate, uploadImageToImgur } from "../utils/utils"
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
     "avh",
@@ -61,12 +61,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({
                 embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")],
             })
-        }
-
-        if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
-        } else {
-            member = message.mentions.members.first()
         }
     }
 
