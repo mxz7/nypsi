@@ -110,6 +110,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!userExists(message.member)) createUser(message.member)
 
+    if (args[1].toLowerCase() == "all") {
+        args[1] = getBalance(message.member).toString()
+    } else if (args[1].toLowerCase() == "half") {
+        args[1] = (getBalance(message.member) / 2).toString()
+    }
+
     const amount = formatNumber(args[1])
 
     if (!amount) {
