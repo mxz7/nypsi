@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 t.push(`**#${ticket.id}**`)
             }
 
-            embed.addField(`your tickets [${tickets.length}]`, t.join("\n"))
+            embed.addField(`your tickets [${tickets.length}]`, t.join(" "))
         }
 
         return send({ embeds: [embed] })

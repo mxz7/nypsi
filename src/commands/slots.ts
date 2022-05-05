@@ -1,10 +1,8 @@
 import {
     getBalance,
     createUser,
-    getMultiplier,
     updateBalance,
     userExists,
-    winBoard,
     formatBet,
     getXp,
     updateXp,
@@ -19,6 +17,14 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { gamble } from "../utils/logger.js"
+
+const multipliers = {
+    "🍒": 5,
+    "🍋": 3.5,
+    "🍊": 3,
+    "🍇": 2.5,
+    "🍉": 2,
+}
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
 const reel2 = [
@@ -114,7 +120,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.length == 1 && args[0] == "info") {
-        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(winBoard())
+        let txt = ""
+
+        for (const item in multipliers) {
+            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`
+        }
+
+        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(txt)
 
         return send({ embeds: [embed] })
     }
@@ -166,13 +178,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     /**
-     * the shit below results in an approximate 33% win rate overtime, resulting in an overall loss, without counting multiplier
-     * https://i.imgur.com/4o7LQ5V.png
+     * the shit below results in an approximate 46% win rate overtime, resulting in an overall loss, without counting multiplier
      */
 
+    if (one != two && two != three && one != three) {
+        const chance = Math.floor(Math.random() * 14)
+        const chanceScore = 4
+
+        if (chance < chanceScore) {
+            one = two
+        }
+    }
+
     if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 16)
-        const chanceScore = 10
+        const chance = Math.floor(Math.random() * 13)
+        const chanceScore = 9
 
         if (chance < chanceScore) {
             one = two
@@ -180,8 +200,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 16)
-        const chanceScore = 6
+        const chance = Math.floor(Math.random() * 14)
+        const chanceScore = 5
 
         if (chance < chanceScore) {
             three = two
@@ -206,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let winnings = 0
 
     if (one == two && two == three) {
-        const multiplier = getMultiplier(one)
+        const multiplier = multipliers[one]
 
         win = true
         winnings = Math.round(multiplier * bet)
