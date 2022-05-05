@@ -31,10 +31,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member, false)
 
     if (target.user.id == message.author.id) {
-        embed.setTitle("your karma")
+        embed.setHeader("your karma", message.author.avatarURL())
         embed.setDescription(`you have **${karma.toLocaleString()}** karma 🔮`)
     } else {
-        embed.setTitle(`${target.user.username}'s karma`)
+        embed.setHeader(`${target.user.username}'s karma`, target.user.avatarURL())
         embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`)
     }
 

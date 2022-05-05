@@ -59,11 +59,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setFooter("you get increased rewards for prestiging")
 
     if (voted) {
-        embed.setTitle("vote ✅")
+        embed.setHeader("vote ✅", message.author.avatarURL())
         embed.setColor("#5efb8f")
         embed.addField("active rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
-        embed.setTitle("vote ❌")
+        embed.setHeader("vote ❌", message.author.avatarURL())
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",

@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ).toLocaleString()})`
     )
         .setFooter("not real ethereum, although it reflects current worth in USD")
-        .setTitle("ethereum | " + message.author.username)
+        .setHeader("your ethereum", message.author.avatarURL())
 
     return message.channel.send({ embeds: [embed] })
 }

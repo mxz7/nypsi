@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
-    ).setTitle("pp predictor 1337")
+    ).setHeader("pp predictor 1337", member.user.avatarURL())
 
     return send({ embeds: [embed] })
 }

@@ -110,7 +110,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("slots help")
+            .setHeader("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
@@ -126,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`
         }
 
-        const embed = new CustomEmbed(message.member).setTitle("win board").setDescription(txt)
+        const embed = new CustomEmbed(message.member).setHeader("win board").setDescription(txt)
 
         return send({ embeds: [embed] })
     }

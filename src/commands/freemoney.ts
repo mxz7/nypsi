@@ -61,7 +61,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     updateBalance(message.member, getBalance(message.member) + amount)
 
-    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setTitle("freemoney")
+    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setHeader(
+        "free money",
+        message.author.avatarURL()
+    )
 
     message.channel.send({ embeds: [embed] }).then((msg) => {
         embed.setDescription(

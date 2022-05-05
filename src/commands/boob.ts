@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setHeader("boob calculator")
+        .setHeader("boob calculator", member.user.avatarURL())
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
 
     return send({ embeds: [embed] })

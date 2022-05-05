@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (member) {
         embed.setDescription(member.user.toString())
-        embed.setTitle(member.displayHexColor)
+        embed.setHeader(member.displayHexColor)
         embed.setURL(`https://color.tekoh.net/${member.displayHexColor}`)
     }
 

@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.member,
             false,
             "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
-        ).setTitle("delete")
+        ).setHeader("purge")
 
         const m = await message.channel.send({ embeds: [embed] })
         for (let i = 0; i < amount1 / 100; i++) {

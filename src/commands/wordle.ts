@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0 || (args[0].toLowerCase() != "play" && args[0].toLowerCase() != "start")) {
         const embed = new CustomEmbed(message.member, false)
 
-        embed.setTitle("wordle help")
+        embed.setHeader("wordle help")
         embed.setDescription(
             `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n**${getPrefix(
                 message.guild
@@ -109,7 +109,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, false)
 
-    embed.setTitle(`${message.author.username}'s wordle`)
+    embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL())
     embed.setDescription(renderBoard(board))
     embed.setFooter("type your guess in chat")
 
@@ -142,7 +142,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 
     const embed = games.get(message.author.id).embed
 
-    const filter = (m) => m.author.id == message.author.id
+    const filter = (m) => m.author.id == message.author.id && !m.content.includes(" ")
     let fail = false
 
     const response: any = await message.channel

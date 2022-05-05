@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 && message.mentions.members.first() == null) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("kicksince help")
+            .setHeader("kicksince help")
             .addField("usage", `${prefix}kicksince <length> (reason)`)
             .addField(
                 "help",

@@ -14,7 +14,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         false,
         "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST"
     )
-        .setTitle("nypsi")
+        .setHeader("nypsi")
         .setFooter("made by max#0777 | tekoh.net")
 
     message.channel.send({ embeds: [embed] })

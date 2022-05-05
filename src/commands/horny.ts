@@ -132,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n**${hornyAmount}**% horny ${hornyEmoji}\n${hornyText}`
-    ).setTitle("horny calculator")
+    ).setHeader("horny calculator", member.user.avatarURL())
 
     return await send({ embeds: [embed] })
 }

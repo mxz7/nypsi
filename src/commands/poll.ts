@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("poll help")
+            .setHeader("poll help")
             .addField("usage", `${prefix}poll (choices) <title> | (text) | (hex color)`)
             .addField(
                 "help",

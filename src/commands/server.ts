@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const bots = members.filter((member) => member.user.bot)
 
     if (args.length == 1 && args[0] == "-id") {
-        const embed = new CustomEmbed(message.member).setTitle(server.name).setDescription("`" + server.id + "`")
+        const embed = new CustomEmbed(message.member).setHeader(server.name).setDescription("`" + server.id + "`")
 
         return message.channel.send({ embeds: [embed] })
     }
@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 1 && args[0] == "-m") {
         const embed = new CustomEmbed(message.member)
             .setThumbnail(server.iconURL({ format: "png", dynamic: true, size: 128 }))
-            .setTitle(server.name)
+            .setHeader(server.name)
 
             .addField(
                 "member info",
@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member)
         .setThumbnail(server.iconURL({ format: "png", dynamic: true, size: 128 }))
-        .setTitle(server.name)
+        .setHeader(server.name)
 
         .addField(
             "info",

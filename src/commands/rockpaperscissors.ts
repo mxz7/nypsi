@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 || args.length == 1) {
         const embed = new CustomEmbed(message.member)
-            .setTitle("rockpaperscissors help")
+            .setHeader("rockpaperscissors help")
             .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
             .addField(
                 "help",
@@ -214,7 +214,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             memberEmoji +
             "\n**bet** $" +
             bet.toLocaleString()
-    ).setTitle("rock paper scissors | " + message.member.user.username)
+    ).setHeader("rock paper scissors", message.author.avatarURL())
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {

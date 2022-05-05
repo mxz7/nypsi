@@ -75,7 +75,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setHeader(`${target.user.tag} | season 3`)
         .setDescription(
             "💰 $**" +
                 getBalance(target).toLocaleString() +
@@ -87,6 +86,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "**"
         )
         .setFooter(footer)
+
+    if (target.user.id == message.author.id) {
+        embed.setHeader("your balance | season 3", message.author.avatarURL())
+    } else {
+        embed.setHeader(`${target.user.username}'s balance | season 3`, target.user.avatarURL())
+    }
 
     const send = async (data) => {
         if (message.interaction) {

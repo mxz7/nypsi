@@ -118,8 +118,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE"
     }
 
-    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`).setTitle(
-        "short person calculator"
+    const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`).setHeader(
+        "short person calculator",
+        member.user.avatarURL()
     )
 
     return send({ embeds: [embed] })

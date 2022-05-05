@@ -13,7 +13,7 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categ
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!userExists(message.member)) createUser(message.member)
 
-    const embed = new CustomEmbed(message.member).setTitle("padlock | " + message.member.user.username)
+    const embed = new CustomEmbed(message.member).setHeader("padlock", message.author.avatarURL())
 
     const padlockPrice = getPadlockPrice()
     const prefix = getPrefix(message.guild)

@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false, memberList.get(1).join("\n"))
-        .setTitle(role.name + " [" + count.toLocaleString() + "]")
+        .setHeader(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`)
 
     /**

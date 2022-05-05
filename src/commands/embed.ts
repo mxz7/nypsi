@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("embed help")
+            .setHeader("embed help")
             .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
             .addField(
                 "help",

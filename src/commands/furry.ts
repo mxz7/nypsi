@@ -138,7 +138,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`
-    ).setTitle("furry detector 5000")
+    ).setHeader("furry detector 5000", member.user.avatarURL())
 
     if (furryAmount < 7) {
         embed.setFooter("+1xp")

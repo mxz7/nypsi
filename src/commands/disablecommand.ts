@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
-            .setTitle("disabled commands")
+            .setHeader("disabled commands")
             .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`)
 
         if (filter.length == 0) {
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 message.member,
                 true,
                 `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`
-            ).setTitle("chat filter")
+            ).setHeader("chat filter")
 
             return message.channel.send({ embeds: [embed] })
         }
@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.member,
             true,
             "✅ disabled `" + getPrefix(message.guild) + word + "` command"
-        ).setTitle("disabled commands")
+        ).setHeader("disabled commands")
         return message.channel.send({ embeds: [embed] })
     } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 false,
                 "❌ `" + getPrefix(message.guild) + word + "` is not disabled"
             )
-                .setTitle("disabled commands")
+                .setHeader("disabled commands")
                 .setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`)
 
             return message.channel.send({ embeds: [embed] })
@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             false,
             "✅ `" + getPrefix(message.guild) + word + "` is no longer disabled"
         )
-            .setTitle("disable commands")
+            .setHeader("disable commands")
             .setFooter(`you can use ${prefix}disablecmd reset to reset disabled commands`)
 
         return message.channel.send({ embeds: [embed] })
@@ -134,12 +134,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         updateDisabledCommands(message.guild, filter)
 
-        const embed = new CustomEmbed(message.member, false, "✅ disabled commands have been").setTitle("disabled commands")
+        const embed = new CustomEmbed(message.member, false, "✅ disabled commands have been").setHeader("disabled commands")
 
         return message.channel.send({ embeds: [embed] })
     } else {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
-            .setTitle("disabled commands")
+            .setHeader("disabled commands")
             .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`)
 
         if (filter.length == 0) {
