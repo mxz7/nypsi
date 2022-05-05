@@ -670,6 +670,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
 
     if (userIDs.length > 500) {
         userIDs = await workerSort(userIDs, balances)
+        userIDs.reverse()
     } else {
         inPlaceSort(userIDs).desc((i) => balances.get(i))
     }
