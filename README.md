@@ -41,6 +41,9 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 -   nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
 
+#### 📖 wordle
+-   you can play wordle on discord, with nypsi. no limit to how much you play per day
+
 ##### 💸 gambling / economy
 
 -   nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
@@ -75,22 +78,34 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 ### 🖼 screenshots
 
+-   `$wordle`
+
+![wordle game](images/wordle.png)
+
 -   `$mc`
 
-![mc command](https://i.imgur.com/pHFadD9.png)
+![mc command](images/minecraft.png)
+
+-   `$streetrace`
+
+![steetrace game](images/streetrace.png)
+
+-   `$blackjack`
+
+![blackjack game](images/blackjack.png)
 
 -   `$skin`
 
-![skin command](https://i.imgur.com/z8UmBXM.png)
+![skin command](images/skin.png)
 
 -   `$join`
 
-![join command](https://i.imgur.com/DjXm8lV.png)
+![join command](images/join.png)
 
 -   `$history`
 
-![history command](https://i.imgur.com/2f5bcWO.png)
+![history command](images/history.png)
 
 -   `$case`
 
-![case command](https://i.imgur.com/py6lDQg.png)
+![case command](images/case.png)
