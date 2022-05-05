@@ -314,7 +314,7 @@
         "emoji": "🎁",
         "role": "crate",
         "description": "open to receive two random items and $69,420",
-        "rarity": 2,
+        "rarity": 1,
         "aliases": ["69420"]
     },
     "calendar": {
