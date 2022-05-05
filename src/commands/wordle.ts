@@ -314,6 +314,10 @@ function guessWord(word: string, id: string): Response {
     const board = game.board
     const notInWord = game.notInWord
 
+    const copy = (" " + game.word).slice(1).split("")
+
+    // console.log(copy)
+
     for (let i = 0; i < 5; i++) {
         const letter = word[i]
         const actualLetter = game.word[i]
@@ -324,10 +328,18 @@ function guessWord(word: string, id: string): Response {
             emoji = emojis.get(`green-${letter}`)
         } else if (game.word.includes(letter)) {
             emoji = emojis.get(`yellow-${letter}`)
+            const index = copy.indexOf(letter)
+            if (index == -1) {
+                emoji = emojis.get(`grey-${letter}`)
+            } else {
+                copy.splice(index, 1)
+            }
         } else {
             if (!notInWord.includes(letter)) notInWord.push(letter)
             emoji = emojis.get(`grey-${letter}`)
         }
+
+        // console.log(copy)
 
         board[game.guesses.length][i] = emoji
     }
