@@ -16,7 +16,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { formatDate, daysAgo, daysUntil } from "../utils/utils"
 
-const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon"])
+const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon", "donate"])
 
 /**
  * @param {Message} message
