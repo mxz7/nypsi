@@ -253,8 +253,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(
         message.member,
         true,
-        "---------------\n" + one + " | " + two + " | " + three + "\n---------------\n**bet** $" + bet.toLocaleString()
-    ).setTitle("slots | " + message.member.user.username)
+        "~~---------------~~\n" +
+            one +
+            " **|** " +
+            two +
+            " **|** " +
+            three +
+            "\n~~---------------~~\n**bet** $" +
+            bet.toLocaleString()
+    ).setHeader("slots", message.author.avatarURL())
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {
