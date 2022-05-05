@@ -26,7 +26,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
+            if (message.deferred) {
+                await message.editReply(data)
+            } else {
+                await message.reply(data)
+            }
             const replyMsg = await message.fetchReply()
             if (replyMsg instanceof Message) {
                 return replyMsg
@@ -61,6 +65,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target2
 
     if (args.length == 0) {
+        if (!(message instanceof Message)) {
+            await message.deferReply()
+        }
         target1 = message.member
 
         const members = []
@@ -68,9 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         members1.forEach((m) => {
             if (!m.user.bot) {
-                if (members.indexOf(m.user.id) == -1) {
-                    members.push(m.user.id)
-                }
+                members.push(m.user.id)
             }
         })
 
