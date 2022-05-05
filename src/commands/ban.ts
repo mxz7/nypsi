@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member, false)
-            .setTitle("ban help")
+            .setHeader("ban help")
             .addField("usage", `${prefix}ban <@user(s)> (reason) [-s] [-k]`)
             .addField(
                 "help",
