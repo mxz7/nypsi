@@ -166,13 +166,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     /**
-     * the shit below results in an approximate 33% win rate overtime, resulting in an overall loss, without counting multiplier
-     * https://i.imgur.com/4o7LQ5V.png
+     * the shit below results in an approximate 46% win rate overtime, resulting in an overall loss, without counting multiplier
      */
 
+    if (one != two && two != three && one != three) {
+        const chance = Math.floor(Math.random() * 14)
+        const chanceScore = 4
+
+        if (chance < chanceScore) {
+            one = two
+        }
+    }
+
     if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 16)
-        const chanceScore = 10
+        const chance = Math.floor(Math.random() * 13)
+        const chanceScore = 9
 
         if (chance < chanceScore) {
             one = two
@@ -180,8 +188,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 16)
-        const chanceScore = 6
+        const chance = Math.floor(Math.random() * 14)
+        const chanceScore = 5
 
         if (chance < chanceScore) {
             three = two
