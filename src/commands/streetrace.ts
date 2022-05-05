@@ -264,9 +264,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     if (inventory[item] && inventory[item] > 0) {
                         if (car) {
                             if (car.speed < items[item].speed) {
+                                if (carCooldown.has(message.author.id)) {
+                                    const current = carCooldown.get(message.author.id)
+                                    if (current.includes(items[item].id)) continue
+                                }
                                 car = items[item]
                             }
                         } else {
+                            if (carCooldown.has(message.author.id)) {
+                                const current = carCooldown.get(message.author.id)
+                                if (current.includes(items[item].id)) continue
+                            }
                             car = items[item]
                         }
                     }
