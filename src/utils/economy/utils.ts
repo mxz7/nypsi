@@ -18,14 +18,6 @@ import workerSort from "../workers/sort"
 
 declare function require(name: string)
 
-const multiplier = {
-    "🍒": 10,
-    "🍋": 5,
-    "🍊": 4,
-    "🍇": 3.5,
-    "🍉": 3,
-}
-
 const db = getDatabase()
 
 const webhook = new topgg.Webhook("123")
@@ -474,14 +466,6 @@ export function getBalance(member: GuildMember | string) {
 }
 
 /**
- * @param {String} item - get the slots multiplier of an item
- * @returns {Number} multiplier of item
- */
-export function getMultiplier(item: string): number {
-    return multiplier[item]
-}
-
-/**
  *
  * @param {GuildMember} member
  * @returns {Boolean}
@@ -894,19 +878,6 @@ export function createUser(member: GuildMember | string) {
     }
 
     db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 5000, 0)
-}
-
-/**
- * @returns {String}
- */
-export function winBoard(): string {
-    let lol = ""
-
-    for (const item in multiplier) {
-        lol = lol + item + " | " + item + " | " + item + " **||** win: **" + multiplier[item] + "**x\n"
-    }
-
-    return lol
 }
 
 /**
