@@ -17,6 +17,7 @@ export default function doCollection(array: Array<string>): Promise<Array<string
 
 if (!isMainThread) {
     const db = require("better-sqlite3")("./out/data/storage.db")
+    const { encrypt } = require("../utils")
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
     )
@@ -33,6 +34,8 @@ if (!isMainThread) {
     }
 
     content = content.replace(/(\r\n|\n|\r)/gm, " ")
+
+    content = encrypt(content)
 
     let channelMembers = collection.channelMembers
 
