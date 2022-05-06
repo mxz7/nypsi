@@ -491,7 +491,9 @@ export async function runCommand(
 
         const embed = new CustomEmbed(message.member, false).setTitle("you have been locked")
 
-        embed.setDescription(`type: \`${captcha.display}\``)
+        embed.setDescription(
+            `please note that using macros / auto typers is not allowed with nypsi\n\ntype: \`${captcha.display}\` to be unlocked`
+        )
 
         beingChecked.push(message.author.id)
 
