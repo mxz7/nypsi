@@ -1,11 +1,12 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember, formatDate } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import workerSort from "../utils/workers/sort"
 import { inCooldown, addCooldown } from "../utils/guilds/utils"
 import { inPlaceSort } from "fast-sort"
 import { getKarma } from "../utils/karma/utils"
+import { getMember } from "../utils/functions/member"
+import { formatDate } from "../utils/functions/date"
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"])
 

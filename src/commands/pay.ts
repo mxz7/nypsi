@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 import {
     updateBalance,
     getBalance,

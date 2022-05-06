@@ -6,9 +6,9 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { fetchUserMentions } from "../utils/users/utils"
 import { getDatabase } from "../utils/database/database"
 import { userExists } from "../utils/economy/utils"
-import { decrypt } from "../utils/utils"
 import { getKarma, getLastCommand } from "../utils/karma/utils"
 import ms = require("ms")
+import { decrypt } from "../utils/functions/string"
 
 const cooldown = new Map()
 

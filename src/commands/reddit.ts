@@ -1,10 +1,10 @@
 import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js"
-import { redditImage } from "../utils/utils.js"
 import fetch from "node-fetch"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
+import { redditImage } from "../utils/functions/image"
 
 const cooldown = new Map()
 

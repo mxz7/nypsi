@@ -1,5 +1,4 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js"
-import { getMember } from "../utils/utils"
 import {
     getBalance,
     createUser,
@@ -16,6 +15,7 @@ import {
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
+import { getMember } from "../utils/functions/member.js"
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"])
 

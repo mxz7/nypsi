@@ -3,7 +3,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getCountdowns, getPrefix, addCountdown, deleteCountdown } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-import { formatDate, daysUntil } from "../utils/utils"
+import { daysUntil, formatDate } from "../utils/functions/date"
 
 const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
     .setAliases(["countdowns"])

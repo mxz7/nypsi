@@ -3,8 +3,8 @@ import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { getExactMember } from "../utils/utils"
 import { PunishmentType } from "../utils/models/GuildStorage"
+import { getExactMember } from "../utils/functions/member"
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 

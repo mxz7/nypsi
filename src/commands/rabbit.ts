@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-import { redditImage } from "../utils/utils.js"
+import { redditImage } from "../utils/functions/image"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium } from "../utils/premium/utils"

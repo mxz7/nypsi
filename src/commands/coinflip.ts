@@ -12,9 +12,9 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-import { getExactMember } from "../utils/utils.js"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { gamble } from "../utils/logger.js"
+import { getExactMember } from "../utils/functions/member.js"
 
 const cooldown = new Map()
 

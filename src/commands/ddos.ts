@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js"
+import { getMember } from "../utils/functions/member"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/utils"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cooldown = new Map()

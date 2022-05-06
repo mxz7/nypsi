@@ -1,6 +1,6 @@
 import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js"
+import { getColor } from "../functions/color"
 import { getEmbedColor, getTier, isPremium } from "../premium/utils"
-import { getColor } from "../utils"
 
 export class CustomEmbed extends MessageEmbed {
     /**
