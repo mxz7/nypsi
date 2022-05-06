@@ -9,7 +9,7 @@ const cooldown = new Map()
 
 const cmd = new Command("history", "view punishment history for a given user", Categories.MODERATION)
     .setAliases(["modlogs", "hist"])
-    .setPermissions(["MANAGE_MESSAGES"])
+    .setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"])
 
 cmd.slashEnabled = true
 cmd.slashData.addStringOption((option) =>
@@ -21,7 +21,11 @@ cmd.slashData.addStringOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
+    }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {

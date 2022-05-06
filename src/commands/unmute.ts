@@ -6,7 +6,10 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { PunishmentType } from "../utils/models/GuildStorage"
 import { getExactMember } from "../utils/functions/member"
 
-const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+    "MODERATE_MEMBERS",
+])
 
 cmd.slashEnabled = true
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true))
@@ -17,7 +20,9 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("u
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        return
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
     }
 
     const send = async (data) => {
