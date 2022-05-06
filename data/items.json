@@ -68,7 +68,7 @@
         "name": "diamond",
         "emoji": "<:nypsi_diamond:959443043377897502>",
         "description": "found when mining",
-        "worth": 80000,
+        "worth": 100000,
         "role": "sellable",
         "rarity": 3
     },
