@@ -25,14 +25,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
-            if (replyMsg instanceof Message) {
-                return replyMsg
-            }
+            return await message.editReply(data)
         } else {
             return await message.channel.send(data)
         }
+    }
+
+    if (!(message instanceof Message)) {
+        await message.deferReply()
     }
 
     if (cooldown.has(message.member.id)) {
