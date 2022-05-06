@@ -166,6 +166,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         tax = 0.05
     }
 
+    if (isPremium(message.member)) {
+        tax = 0
+    }
+
     updateBalance(message.member, getBalance(message.member) - amount)
 
     if (tax > 0) {
