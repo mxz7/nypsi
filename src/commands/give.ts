@@ -16,7 +16,7 @@ import {
 import { getPrefix } from "../utils/guilds/utils"
 import { payment } from "../utils/logger"
 import { isPremium, getTier } from "../utils/premium/utils"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY)
 

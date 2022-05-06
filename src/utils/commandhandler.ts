@@ -15,10 +15,12 @@ import {
 } from "discord.js"
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils"
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders"
-import { createCaptcha, formatDate, getNews, isLockedOut, MStoTime, toggleLock } from "./utils"
 import { addUse, getCommand } from "./premium/utils"
 import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils"
 import { addKarma, getKarma, updateLastCommand } from "./karma/utils"
+import { getNews } from "./functions/news"
+import { formatDate, MStoTime } from "./functions/date"
+import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha"
 
 const commands: Map<string, Command> = new Map()
 const aliases: Map<string, string> = new Map()

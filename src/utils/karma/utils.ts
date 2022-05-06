@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js"
 import { getDatabase } from "../database/database"
+import { MStoTime } from "../functions/date"
 import { logger } from "../logger"
-import { MStoTime } from "../utils"
 
 const db = getDatabase()
 

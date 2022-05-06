@@ -3,7 +3,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getPrefix } from "../utils/guilds/utils"
 import { setLastfmUsername, getLastfmUsername } from "../utils/users/utils"
-import { cleanString } from "../utils/utils"
+import { cleanString } from "../utils/functions/string"
 
 const cmd = new Command("setlastfm", "set your last.fm username", Categories.INFO).setAliases(["slfm"])
 

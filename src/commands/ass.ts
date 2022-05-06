@@ -2,7 +2,7 @@ import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { redditImage } from "../utils/utils.js"
+import { redditImage } from "../utils/functions/image"
 
 declare function require(name: string)
 

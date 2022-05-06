@@ -1,8 +1,8 @@
 import { User } from "discord.js"
 import { getPrestige, userExists } from "../utils/economy/utils"
+import { uploadImageToImgur } from "../utils/functions/image"
 import { isPremium } from "../utils/premium/utils"
 import { addNewAvatar, addNewUsername, createUsernameProfile, isTracking, usernameProfileExists } from "../utils/users/utils"
-import { uploadImageToImgur } from "../utils/utils"
 
 const queue: User[] = []
 let interval

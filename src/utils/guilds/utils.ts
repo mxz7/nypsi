@@ -1,9 +1,9 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js"
 import { getDatabase, toArray, toStorage } from "../database/database"
+import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date"
 import { logger } from "../logger"
 import { CustomEmbed } from "../models/EmbedBuilders"
 import { ChristmasProfile, Countdown, CounterProfile } from "../models/GuildStorage"
-import { daysUntil, daysUntilChristmas, MStoTime } from "../utils"
 
 declare function require(name: string)
 

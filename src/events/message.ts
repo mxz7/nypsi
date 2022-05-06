@@ -9,8 +9,8 @@ import { getTier, isPremium } from "../utils/premium/utils"
 import doCollection from "../utils/workers/mentions"
 import { cpu } from "node-os-utils"
 import { getKarma, getLastCommand } from "../utils/karma/utils"
-import { encrypt } from "../utils/utils"
 import ms = require("ms")
+import { encrypt } from "../utils/functions/string"
 
 declare function require(name: string)
 

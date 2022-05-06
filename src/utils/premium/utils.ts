@@ -1,8 +1,8 @@
 import { GuildMember } from "discord.js"
 import { getDatabase } from "../database/database"
+import { formatDate } from "../functions/date"
 import { logger } from "../logger"
 import { PremUser } from "../models/PremStorage"
-import { formatDate } from "../utils"
 
 declare function require(name: string)
 
