@@ -177,7 +177,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             speedLimit: speedLimit,
         }
 
-        const embed = new CustomEmbed(message.member).setHeader(`${message.author.tag}'s street race`)
+        const embed = new CustomEmbed(message.member).setHeader(
+            `${message.author.username}'s street race`,
+            message.author.avatarURL()
+        )
 
         embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`)
 
