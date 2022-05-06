@@ -1,4 +1,6 @@
 import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
+import { formatDate } from "../utils/functions/date"
+import { getMember } from "../utils/functions/member"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
@@ -9,7 +11,6 @@ import {
     clearUsernameHistory,
     isTracking,
 } from "../utils/users/utils"
-import { getMember, formatDate } from "../utils/utils"
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases(["un", "usernames"])
 

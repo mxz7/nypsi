@@ -2,20 +2,20 @@ import { CommandInteraction, Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import {
-    getWholesomeImage,
-    suggestWholesomeImage,
-    formatDate,
-    acceptWholesomeImage,
-    denyWholesomeImage,
-    deleteFromWholesome,
-    clearWholesomeCache,
-    getMember,
-    getAllSuggestions,
-    uploadImageToImgur,
-    isImageUrl,
-} from "../utils/utils"
 import { getPrefix } from "../utils/guilds/utils"
+import {
+    acceptWholesomeImage,
+    clearWholesomeCache,
+    deleteFromWholesome,
+    denyWholesomeImage,
+    getAllSuggestions,
+    getWholesomeImage,
+    isImageUrl,
+    suggestWholesomeImage,
+    uploadImageToImgur,
+} from "../utils/functions/image"
+import { formatDate } from "../utils/functions/date"
+import { getMember } from "../utils/functions/member"
 
 const cooldown = new Map()
 const uploadCooldown = new Map()

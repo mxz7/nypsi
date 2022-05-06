@@ -16,7 +16,7 @@ const {
 const { getPeaks } = require("../utils/guilds/utils")
 const { getKarma, getLastCommand } = require("../utils/karma/utils")
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { formatDate, daysAgo } = require("../utils/utils")
+const { formatDate, daysAgo } = require("../utils/functions/date")
 
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"])
 

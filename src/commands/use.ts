@@ -15,7 +15,7 @@ import {
 } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 
 declare function require(name: string)
 
