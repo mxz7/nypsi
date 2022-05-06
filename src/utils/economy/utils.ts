@@ -733,7 +733,7 @@ export async function bottomAmount(guild: Guild, amount: number, min = 1): Promi
 
     const query = db.prepare("SELECT id, money FROM economy").all()
 
-    const userIDs = []
+    let userIDs = []
     const balances = new Map()
 
     for (const user of query) {
@@ -743,7 +743,12 @@ export async function bottomAmount(guild: Guild, amount: number, min = 1): Promi
         }
     }
 
-    inPlaceSort(userIDs).asc((i) => balances.get(i))
+    if (userIDs.length > 500) {
+        userIDs = await workerSort(userIDs, balances)
+        userIDs.reverse()
+    } else {
+        inPlaceSort(userIDs).desc((i) => balances.get(i))
+    }
 
     const usersFinal = []
 
