@@ -12,9 +12,9 @@ import { inPlaceSort } from "fast-sort"
 import { Constructor, getAllWorkers, Worker } from "./workers"
 import { StatsProfile } from "../models/StatsProfile"
 import * as shufflearray from "shuffle-array"
-import { MStoTime } from "../utils"
 import fetch from "node-fetch"
 import workerSort from "../workers/sort"
+import { MStoTime } from "../functions/date"
 
 declare function require(name: string)
 

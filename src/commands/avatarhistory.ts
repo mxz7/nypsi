@@ -10,7 +10,8 @@ import {
     clearAvatarHistory,
     isTracking,
 } from "../utils/users/utils"
-import { formatDate, uploadImageToImgur } from "../utils/utils"
+import { uploadImageToImgur } from "../utils/functions/image"
+import { formatDate } from "../utils/functions/date"
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
     "avh",

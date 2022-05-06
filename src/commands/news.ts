@@ -1,7 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
+import { formatDate } from "../utils/functions/date"
+import { getNews, setNews } from "../utils/functions/news"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-import { getNews, formatDate, setNews } from "../utils/utils"
 
 const cmd = new Command("news", "set the news for the help command", Categories.INFO)
 

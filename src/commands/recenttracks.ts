@@ -3,7 +3,7 @@ import fetch from "node-fetch"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getLastfmUsername } from "../utils/users/utils"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command(

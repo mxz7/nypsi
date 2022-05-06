@@ -1,6 +1,6 @@
 import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const avatar = new Command("avatar", "get a person's avatar", Categories.INFO)

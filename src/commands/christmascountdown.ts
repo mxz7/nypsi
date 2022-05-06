@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
+import { daysUntilChristmas } from "../utils/functions/date"
 import {
     hasGuild,
     createGuild,
@@ -11,7 +12,6 @@ import {
 } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { daysUntilChristmas } from "../utils/utils"
 
 const cmd = new Command("christmascountdown", "create a christmas countdown", Categories.ADMIN)
     .setAliases(["christmas", "xmas"])

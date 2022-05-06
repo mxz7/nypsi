@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 
 const cache = new Map()
 const cooldown = new Map()
