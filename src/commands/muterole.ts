@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.guild
         )}**muterole reset** *reset the mute role to default*\n${getPrefix(
             message.guild
-        )}**muterole update** *update mute permissions for every channel\n${getPrefix(
+        )}**muterole update** update mute permissions for every channel\n${getPrefix(
             message.guild
         )}**muterole timeout** use timeout mode instead of a role\n\n`
 
@@ -94,7 +94,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setMuteRole(message.guild, role)
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ muterole has been updated to ${role.toString()}`)],
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
+                        message.guild
+                    )}**muted**)`
+                ),
+            ],
         })
     } else if (args[0].toLowerCase() == "reset") {
         setMuteRole(message.guild, "default")
