@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
-                "[slots has a ~33% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L166)"
+                "[slots has a ~46% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L181)"
             )
         return send({ embeds: [embed] })
     }
