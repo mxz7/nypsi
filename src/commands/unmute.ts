@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { CommandInteraction, GuildMember, Message, Permissions } from "discord.js"
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -22,14 +22,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
-            if (replyMsg instanceof Message) {
-                return replyMsg
-            }
+            return await message.editReply(data)
         } else {
             return await message.channel.send(data)
         }
+    }
+
+    if (!(message instanceof Message)) {
+        await message.deferReply()
     }
 
     if (
@@ -81,12 +81,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members = message.mentions.members
 
     let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
+    let mode = "role"
 
     if (!getMuteRole(message.guild)) {
         muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
     }
 
     if (!muteRole) {
+        if (getMuteRole(message.guild) == "timeout") mode = "timeout"
+    }
+
+    if (!muteRole && mode == "role") {
         return send({
             embeds: [
                 new ErrorEmbed(
@@ -102,27 +107,53 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let fail = false
     const failed = []
 
-    for (const member of message.mentions.members.keys()) {
-        const m = message.mentions.members.get(member)
+    if (mode == "role") {
+        for (const member of message.mentions.members.keys()) {
+            const m = message.mentions.members.get(member)
 
-        if (m.roles.cache.has(muteRole.id)) {
-            await m.roles
-                .remove(muteRole)
-                .then(() => count++)
-                .catch(() => {
-                    fail = true
-                    return send({
-                        embeds: [
-                            new ErrorEmbed(
-                                "there was an error when removing the role, please ensure i have the correct permissions"
-                            ),
-                        ],
+            if (m.roles.cache.has(muteRole.id)) {
+                await m.roles
+                    .remove(muteRole)
+                    .then(() => count++)
+                    .catch(() => {
+                        fail = true
+                        return send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "there was an error when removing the role, please ensure i have the correct permissions"
+                                ),
+                            ],
+                        })
                     })
-                })
-        } else {
-            failed.push(m.user)
+            } else {
+                failed.push(m.user)
+            }
+            if (fail) break
         }
-        if (fail) break
+    } else if (mode == "timeout") {
+        for (const member of message.mentions.members.keys()) {
+            const m: GuildMember = message.mentions.members.get(member)
+
+            if (m.isCommunicationDisabled()) {
+                await m
+                    .disableCommunicationUntil(null)
+                    .then(() => count++)
+                    .catch(() => {
+                        fail = true
+                        return send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "there was an error when unmuting the user, please ensure i have the correct permissions"
+                                ),
+                            ],
+                        })
+                    })
+            } else {
+                // @ts-expect-error weird??
+                failed.push(m.user)
+            }
+            if (fail) break
+        }
     }
 
     if (fail) return

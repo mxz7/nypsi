@@ -5,6 +5,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { PunishmentType } from "../utils/models/GuildStorage"
 import { getExactMember } from "../utils/functions/member"
+import ms = require("ms")
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
 
@@ -26,14 +27,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
-            if (replyMsg instanceof Message) {
-                return replyMsg
-            }
+            return await message.editReply(data)
         } else {
             return await message.channel.send(data)
         }
+    }
+
+    if (!(message instanceof Message)) {
+        await message.deferReply()
     }
 
     if (
@@ -42,6 +43,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
+        })
+    }
+
+    if (!message.guild.me.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+        return send({
+            embeds: [new ErrorEmbed("i need the `moderate members` permission for this command to work")],
         })
     }
 
@@ -102,6 +109,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0
+    let mode = "role"
     const failed = []
 
     let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild))
@@ -111,6 +119,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!muteRole) {
+        if (getMuteRole(message.guild) == "timeout") mode = "timeout"
+    }
+
+    if (!muteRole && mode == "role") {
         let channelError = false
         try {
             const newMuteRole = await message.guild.roles
@@ -173,55 +185,98 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
+    if (mode == "timeout" && !timedMute) {
+        unmuteDate = new Date().getTime() + ms("1 week")
+        time = ms("1 week") / 1000
+
+        timedMute = true
+    }
+
     let fail = false
 
-    for (const member of members.keys()) {
-        if (members.get(member).user.id == message.client.user.id) {
-            await send({ content: "youll never shut me up 😏" })
-            continue
-        }
-
-        const targetHighestRole = members.get(member).roles.highest
-        const memberHighestRole = message.member.roles.highest
-
-        if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-            failed.push(members.get(member).user)
-        } else if (members.get(member).roles.cache.find((r) => r.id == muteRole.id)) {
-            if (Array.from(members.keys()).length == 1) {
-                return send({ embeds: [new ErrorEmbed("that user is already muted")] })
+    if (mode == "role") {
+        for (const member of members.keys()) {
+            if (members.get(member).user.id == message.client.user.id) {
+                await message.channel.send({ content: "youll never shut me up 😏" })
+                continue
             }
 
-            failed.push(members.get(member).user)
-        } else {
-            await members
-                .get(member)
-                .roles.add(muteRole)
-                .then(() => count++)
-                .catch(() => {
-                    fail = true
-                    return send({
-                        embeds: [
-                            new ErrorEmbed(
-                                "i am unable to give users the mute role - ensure my role is above the 'muted' role"
-                            ),
-                        ],
+            const targetHighestRole = members.get(member).roles.highest
+            const memberHighestRole = message.member.roles.highest
+
+            if (
+                targetHighestRole.position >= memberHighestRole.position &&
+                message.guild.ownerId != message.member.user.id
+            ) {
+                failed.push(members.get(member).user)
+            } else if (members.get(member).roles.cache.find((r) => r.id == muteRole.id)) {
+                if (Array.from(members.keys()).length == 1) {
+                    return send({ embeds: [new ErrorEmbed("that user is already muted")] })
+                }
+
+                failed.push(members.get(member).user)
+            } else {
+                await members
+                    .get(member)
+                    .roles.add(muteRole)
+                    .then(() => count++)
+                    .catch(() => {
+                        fail = true
+                        return send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "i am unable to give users the mute role - ensure my role is above the 'muted' role"
+                                ),
+                            ],
+                        })
                     })
-                })
+            }
+            if (fail) break
         }
-        if (fail) break
+    } else if (mode == "timeout") {
+        for (const member of members.keys()) {
+            if (members.get(member).user.id == message.client.user.id) {
+                await message.channel.send({ content: "youll never shut me up 😏" })
+                continue
+            }
+
+            const targetHighestRole = members.get(member).roles.highest
+            const memberHighestRole = message.member.roles.highest
+
+            if (
+                targetHighestRole.position >= memberHighestRole.position &&
+                message.guild.ownerId != message.member.user.id
+            ) {
+                failed.push(members.get(member).user)
+            } else if (members.get(member).isCommunicationDisabled()) {
+                if (Array.from(members.keys()).length == 1) {
+                    return send({ embeds: [new ErrorEmbed("that user is already muted")] })
+                }
+
+                failed.push(members.get(member).user)
+            } else {
+                await members
+                    .get(member)
+                    .disableCommunicationUntil(unmuteDate, reason)
+                    .then(() => count++)
+                    .catch(() => {
+                        fail = true
+                        return send({
+                            embeds: [
+                                new ErrorEmbed(
+                                    "i am unable to timeout users, ensure my role is high enough and i have the permission"
+                                ),
+                            ],
+                        })
+                    })
+            }
+            if (fail) break
+        }
     }
 
     if (fail) return
 
     let mutedLength = ""
-
-    if (timedMute && time < 600) {
-        setTimeout(async () => {
-            for (const member of members.keys()) {
-                await members.get(member).roles.remove(muteRole).catch()
-            }
-        }, time * 1000)
-    }
 
     if (timedMute) {
         mutedLength = getTime(time * 1000)
@@ -293,7 +348,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (timedMute && time >= 600) {
+    if (timedMute) {
         newMute(message.guild, members1, unmuteDate)
     }
 
