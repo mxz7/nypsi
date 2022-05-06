@@ -284,7 +284,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     logger.log({
         level: "success",
-        message: `vote processed for ${memberID}`,
+        message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
     })
 
     if (!id && getDMsEnabled(memberID) && member instanceof User) {
