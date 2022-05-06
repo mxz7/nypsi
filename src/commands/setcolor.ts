@@ -69,11 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({
         embeds: [
-            new CustomEmbed(
-                message.member,
-                false,
-                `your color has been updated to **#${getEmbedColor(message.author.id)}**`
-            ),
+            new CustomEmbed(message.member, false, `your color has been updated to **${getEmbedColor(message.author.id)}**`),
         ],
     })
 }
