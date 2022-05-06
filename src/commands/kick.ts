@@ -21,14 +21,14 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
-            if (replyMsg instanceof Message) {
-                return replyMsg
-            }
+            return await message.editReply(data)
         } else {
             return await message.channel.send(data)
         }
+    }
+
+    if (!(message instanceof Message)) {
+        await message.deferReply()
     }
 
     if (!message.member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {

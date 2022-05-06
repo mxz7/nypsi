@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let role
 
-        if (current != "" && current) {
+        if (current != "" && current != "timeout" && current) {
             role = await message.guild.roles.fetch(current)
 
             if (!role) {
@@ -34,20 +34,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
+        let text = `${getPrefix(message.guild)}**muterole set <role>** *set the muterole for the server*\n${getPrefix(
+            message.guild
+        )}**muterole reset** *reset the mute role to default*\n${getPrefix(
+            message.guild
+        )}**muterole update** update mute permissions for every channel\n${getPrefix(
+            message.guild
+        )}**muterole timeout** use timeout mode instead of a role\n\n`
+
+        if (current == "timeout") {
+            text += `currently using **timeout mode**, to use a role instead, use the ${getPrefix(
+                message.guild
+            )}**muterole reset** command`
+        } else {
+            text += `current mute role: ${role ? role.toString() : "default"}`
+        }
+
         return message.channel.send({
-            embeds: [
-                new CustomEmbed(
-                    message.member,
-                    false,
-                    `${getPrefix(message.guild)}**muterole set <role>** *set the muterole for the server*\n${getPrefix(
-                        message.guild
-                    )}**muterole reset** *reset the mute role to default*\n${getPrefix(
-                        message.guild
-                    )}**muterole update** *update mute permissions for every channel*\n\ncurrent mute role: ${
-                        role ? role.toString() : "default"
-                    }`
-                ).setHeader("mute role"),
-            ],
+            embeds: [new CustomEmbed(message.member, false, text).setHeader("mute role")],
         })
     }
 
@@ -90,7 +94,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setMuteRole(message.guild, role)
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ muterole has been updated to ${role.toString()}`)],
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    false,
+                    `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
+                        message.guild
+                    )}**muted**)`
+                ),
+            ],
         })
     } else if (args[0].toLowerCase() == "reset") {
         setMuteRole(message.guild, "default")
@@ -154,6 +166,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ permissions were updated")],
+        })
+    } else if (args[0].toLowerCase() == "timeout") {
+        setMuteRole(message.guild, "timeout")
+
+        const embed = new CustomEmbed(
+            message.member,
+            false,
+            `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
+                message.guild
+            )}**muted**)`
+        )
+
+        return message.channel.send({
+            embeds: [embed],
         })
     }
 }

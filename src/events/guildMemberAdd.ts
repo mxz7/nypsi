@@ -21,6 +21,8 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     if (!profileExists(member.guild)) return
 
+    if (getMuteRole(member.guild) == "timeout") return
+
     if (isMuted(member.guild, member)) {
         let muteRole = await member.guild.roles.fetch(getMuteRole(member.guild))
 

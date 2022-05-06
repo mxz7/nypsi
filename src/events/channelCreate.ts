@@ -6,6 +6,8 @@ export default async function channelCreate(channel: GuildChannel) {
 
     if (!profileExists(channel.guild)) return
 
+    if (getMuteRole(channel.guild) == "timeout") return
+
     let muteRole = await channel.guild.roles.fetch(getMuteRole(channel.guild))
 
     if (!getMuteRole(channel.guild)) {
