@@ -9,6 +9,7 @@ const cooldown = new Map()
 
 const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
+    "MODERATE_MEMBERS",
 ])
 
 /**
@@ -16,7 +17,11 @@ const cmd = new Command("topcases", "see who has the top moderation cases", Cate
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
+    }
 
     if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
 

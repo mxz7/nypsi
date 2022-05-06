@@ -7,6 +7,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 const cmd = new Command("case", "get information about a given case", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
     "MANAGE_SERVER",
+    "MODERATE_MEMBERS",
 ])
 
 cmd.slashEnabled = true
@@ -19,7 +20,11 @@ cmd.slashData.addIntegerOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
+    }
 
     const prefix = getPrefix(message.guild)
 

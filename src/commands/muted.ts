@@ -5,12 +5,17 @@ import { createProfile, getMutedUsers, profileExists } from "../utils/moderation
 
 const cmd = new Command("muted", "view the currently muted members in the server", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
+    "MODERATE_MEMBERS",
 ])
 
 const cooldown = new Map()
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
+    }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
 
