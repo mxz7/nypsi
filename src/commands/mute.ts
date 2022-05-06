@@ -7,7 +7,10 @@ import { PunishmentType } from "../utils/models/GuildStorage"
 import { getExactMember } from "../utils/functions/member"
 import ms = require("ms")
 
-const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions([
+    "MANAGE_MESSAGES",
+    "MODERATE_MEMBERS",
+])
 
 cmd.slashEnabled = true
 cmd.slashData
@@ -20,7 +23,9 @@ cmd.slashData
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        return
+        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+            return
+        }
     }
 
     if (!profileExists(message.guild)) createProfile(message.guild)
