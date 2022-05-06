@@ -393,3 +393,9 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
         logger.error("couldnt remove mute role")
     })
 }
+
+export function getMutedUsers(guild: Guild): Array<{ user: string; unmute_time: number }> {
+    const query = db.prepare("SELECT user, unmute_time FROM moderation_mutes WHERE guild_id = ?").all(guild.id)
+
+    return query
+}
