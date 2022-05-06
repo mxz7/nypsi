@@ -17,7 +17,7 @@ import {
 import { isPremium, getPremiumProfile } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { daysAgo, daysUntil } from "../utils/utils"
+import { daysAgo, daysUntil } from "../utils/functions/date.js"
 
 const cooldown = new Map()
 

@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getDatabase } from "../utils/database/database"
-import { createCaptcha } from "../utils/utils"
+import { createCaptcha } from "../utils/functions/captcha"
 
 const cmd = new Command("execsql", "execute sql on the database", Categories.NONE).setPermissions(["bot owner"])
 

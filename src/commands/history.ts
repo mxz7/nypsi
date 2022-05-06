@@ -1,9 +1,9 @@
-import { getMember } from "../utils/utils"
 import { Message, Permissions, MessageActionRow, MessageButton, CommandInteraction } from "discord.js"
 import { getCases, profileExists, createProfile } from "../utils/moderation/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
+import { getMember } from "../utils/functions/member"
 
 const cooldown = new Map()
 

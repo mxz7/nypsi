@@ -4,8 +4,8 @@ import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { cleanString } from "../utils/utils"
 import { logger } from "../utils/logger"
+import { cleanString } from "../utils/functions/string"
 
 const cooldown = new Map()
 const cache = new Map()

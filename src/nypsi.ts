@@ -19,10 +19,10 @@ import interactionCreate from "./events/interactionCreate"
 import { getWebhooks, logger } from "./utils/logger"
 import { checkStats, createGuild, hasGuild, runChristmas, runCountdowns } from "./utils/guilds/utils"
 import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils"
-import { showTopGlobalBal } from "./utils/utils"
 import { updateCache } from "./utils/imghandler"
 import { runModerationChecks } from "./utils/moderation/utils"
 import { WebhookPayload } from "@top-gg/sdk"
+import { showTopGlobalBal } from "./utils/scheduled/topglobal"
 
 const client = new Discord.Client({
     allowedMentions: {

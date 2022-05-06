@@ -2,8 +2,8 @@ import { Client } from "discord.js"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { getRandomCommand } from "../utils/commandhandler"
+import { daysUntilChristmas } from "../utils/functions/date"
 import { logger } from "../utils/logger"
-import { daysUntilChristmas } from "../utils/utils"
 
 declare function require(name: string)
 

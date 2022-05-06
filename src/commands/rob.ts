@@ -1,4 +1,4 @@
-import { getMember } from "../utils/utils"
+import { getMember } from "../utils/functions/member"
 import {
     userExists,
     updateBalance,

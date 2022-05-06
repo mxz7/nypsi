@@ -3,7 +3,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { isPremium } from "../utils/premium/utils"
 import fetch from "node-fetch"
-import { isImageUrl } from "../utils/utils"
+import { isImageUrl } from "../utils/functions/image"
 
 const cooldown = new Map()
 

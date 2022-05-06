@@ -1,12 +1,12 @@
 import { CommandInteraction, Message, MessageEmbed } from "discord.js"
 import ms = require("ms")
 import fetch from "node-fetch"
+import { MStoTime } from "../utils/functions/date"
 import { getPrefix } from "../utils/guilds/utils"
 import { addKarma } from "../utils/karma/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getTier, isPremium } from "../utils/premium/utils"
-import { MStoTime } from "../utils/utils"
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN)
 
