@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
-                "[slots has a ~46% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L181)"
+                "[slots has a ~43% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L181)"
             )
         return send({ embeds: [embed] })
     }
@@ -178,12 +178,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     /**
-     * the shit below results in an approximate 46% win rate overtime, resulting in an overall loss, without counting multiplier
+     * the shit below results in an approximate 43% win rate overtime, resulting in an overall loss, without counting multiplier
      */
 
     if (one != two && two != three && one != three) {
-        const chance = Math.floor(Math.random() * 14)
-        const chanceScore = 4
+        const chance = Math.floor(Math.random() * 10)
+        const chanceScore = 2
 
         if (chance < chanceScore) {
             one = two
