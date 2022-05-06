@@ -194,7 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "➡") {
@@ -222,7 +222,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         )
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
+                    await edit({ embeds: [newEmbed], components: [row] })
                     return pageManager()
                 }
             } else if (reaction == "❌") {
@@ -232,7 +232,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setDescription("✅ mentions cleared")
 
-                return msg.edit({ embeds: [newEmbed], components: [] })
+                return edit({ embeds: [newEmbed], components: [] })
             }
         }
 
