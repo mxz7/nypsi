@@ -315,7 +315,7 @@ export function setMuteRole(guild: Guild, role: Role | string) {
     if (role instanceof Role) {
         query.run(role.id, guild.id)
     } else {
-        query.run("", guild.id)
+        query.run(role, guild.id)
     }
 }
 
