@@ -235,7 +235,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
-        .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
 
     let row
 
@@ -432,7 +432,7 @@ async function playGame(message, m) {
         newEmbed.setColor("#e4334f")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         games.delete(message.author.id)
         return await edit({ embeds: [newEmbed], components: [] })
     }
@@ -475,7 +475,7 @@ async function playGame(message, m) {
         addGamble(message.member, "blackjack", true)
 
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + winnings)
         games.delete(message.author.id)
         return await edit({ embeds: [newEmbed], components: [] })
@@ -487,7 +487,7 @@ async function playGame(message, m) {
         newEmbed.setColor("#E5FF00")
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-        newEmbed.addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+        newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
         updateBalance(message.member, getBalance(message.member) + bet)
         games.delete(message.author.id)
         return await edit({ embeds: [newEmbed], components: [] })
@@ -559,7 +559,7 @@ async function playGame(message, m) {
             const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             await edit({ embeds: [newEmbed1] })
 
             if (calcTotal(message.member) == 21) {
@@ -589,7 +589,7 @@ async function playGame(message, m) {
             const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             edit({ embeds: [newEmbed1] })
 
             games.set(message.member.user.id, {
@@ -643,7 +643,7 @@ async function playGame(message, m) {
             const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-                .addField(message.member.user.tag, getCards(message.member) + " **" + calcTotal(message.member) + "**")
+                .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**")
             edit({ embeds: [newEmbed1] })
 
             if (calcTotal(message.member) > 21) {
