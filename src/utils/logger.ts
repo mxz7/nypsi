@@ -75,7 +75,6 @@ const logger = winston.createLogger({
             maxSize: "5m",
             maxFiles: "90d",
             format: winston.format.simple(),
-            level: "info",
         }),
         new winston.transports.Console(),
     ],
