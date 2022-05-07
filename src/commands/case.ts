@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     case0.deleted = case0.deleted === 0 ? false : true
 
-    const target = await message.guild.members.fetch(case0.user)
+    const target = await message.guild.members.fetch(case0.user).catch(() => {})
 
     let reason = case0.command
 
