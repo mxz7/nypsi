@@ -72,6 +72,8 @@ const logger = winston.createLogger({
             maxFiles: "14d",
             format: winston.format.simple(),
             level: "warn",
+            handleExceptions: true,
+            handleRejections: true,
         }),
         new winston.transports.DailyRotateFile({
             filename: "./out/logs/out-%DATE%.log",
@@ -82,6 +84,8 @@ const logger = winston.createLogger({
         }),
         new winston.transports.Console({
             level: "debug",
+            handleExceptions: true,
+            handleRejections: true,
         }),
     ],
 })
