@@ -189,6 +189,7 @@ export class PremUser {
         }
 
         const e = await requestRemoveRole(this.id, roleID).catch((e) => {
+            logger.error(`error removing role (premium) ${this.id}`)
             logger.error(e)
         })
 
