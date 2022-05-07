@@ -243,6 +243,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     send({ embeds: [embed], components: [row] }).then((m) => {
         playGame(message, m).catch((e) => {
+            logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`)
             logger.error(e)
             return send({
                 embeds: [new ErrorEmbed("an error occured while running - join support server")],
