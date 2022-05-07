@@ -745,9 +745,8 @@ export async function bottomAmount(guild: Guild, amount: number, min = 1): Promi
 
     if (userIDs.length > 500) {
         userIDs = await workerSort(userIDs, balances)
-        userIDs.reverse()
     } else {
-        inPlaceSort(userIDs).desc((i) => balances.get(i))
+        inPlaceSort(userIDs).asc((i) => balances.get(i))
     }
 
     const usersFinal = []
