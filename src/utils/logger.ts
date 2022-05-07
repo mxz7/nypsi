@@ -61,7 +61,7 @@ const levels = {
 
 const logger = winston.createLogger({
     format: winston.format.combine(winston.format.timestamp({ format: "DD/MM HH:mm:ss" }), format),
-
+    exitOnError: false,
     levels: levels,
 
     transports: [
