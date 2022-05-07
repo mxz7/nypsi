@@ -145,6 +145,7 @@ export function getLastCommand(member: GuildMember | string): number {
 
     if (!query) {
         lastCommandCache.set(id, 0)
+        return 0
     }
 
     lastCommandCache.set(id, query.last_command)
