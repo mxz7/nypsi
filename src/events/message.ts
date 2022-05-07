@@ -209,9 +209,13 @@ async function addMention() {
         const members = mention.members
 
         if (members.size > 200) {
+            logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker..`)
+            const start = Date.now()
             await doCollection(mention).catch((e) => {
+                logger.error("error inserting mentions with worker")
                 logger.error(e)
             })
+            logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
 
             return
         }
