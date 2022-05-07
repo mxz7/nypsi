@@ -101,10 +101,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {
-            await message.editReply(data)
+            await message.editReply(data).catch(() => {})
             return await message.fetchReply()
         } else {
-            return await msg.edit(data)
+            return await msg.edit(data).catch(() => {})
         }
     }
 
