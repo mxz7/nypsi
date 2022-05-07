@@ -162,6 +162,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             fishItemsModified.push(i)
                             fishItemsModified.push(i)
                             fishItemsModified.push(i)
+                            fishItemsModified.push(i)
+                            fishItemsModified.push(i)
                         }
                         fishItemsModified.push(i)
                     }
@@ -172,11 +174,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             fishItemsModified.push(i)
                             fishItemsModified.push(i)
                             fishItemsModified.push(i)
+                            fishItemsModified.push(i)
+                            fishItemsModified.push(i)
                         }
                         fishItemsModified.push(i)
                     }
                 } else if (items[i].rarity == 2 && fishingRod != "terrible_fishing_rod") {
                     if (items[i].role == "fish") {
+                        fishItemsModified.push(i)
+                        fishItemsModified.push(i)
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
@@ -201,11 +207,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
+                        fishItemsModified.push(i)
+                        fishItemsModified.push(i)
                     }
                     fishItemsModified.push(i)
                     fishItemsModified.push(i)
                 } else if (items[i].rarity == 0) {
                     if (items[i].role == "fish") {
+                        fishItemsModified.push(i)
+                        fishItemsModified.push(i)
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
                         fishItemsModified.push(i)
