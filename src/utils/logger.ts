@@ -14,31 +14,37 @@ const webhook: Map<string, Webhook> = new Map()
 const nextLogMsg: Map<string, string> = new Map()
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
-    if (level == "error") {
-        return `[${chalk.blackBright(timestamp)}] ${chalk.red(`[error] ${message}`)}`
-    } else if (level == "warn") {
-        return `[${chalk.blackBright(timestamp)}] ${chalk.yellowBright(`[warn] ${message}`)}`
-    } else {
-        let color = chalk.white
+    let color = chalk.white
+    let prefix = `${chalk.bold.green("INFO")}`
 
-        switch (level) {
-            case "guild":
-                color = chalk.magenta
-                break
-            case "auto":
-                color = chalk.blue
-                break
-            case "cmd":
-                color = chalk.cyan
-                break
-            case "success":
-            case "img":
-                color = chalk.green
-                break
-        }
-
-        return `[${chalk.blackBright(timestamp)}] ${color(message)}`
+    switch (level) {
+        case "guild":
+            color = chalk.magenta
+            break
+        case "auto":
+            color = chalk.blue
+            break
+        case "cmd":
+            color = chalk.cyan
+            break
+        case "success":
+        case "img":
+            color = chalk.green
+            break
+        case "error":
+            color = chalk.red
+            prefix = `${chalk.bold.redBright("ERROR")}`
+            break
+        case "warn":
+            color = chalk.yellowBright
+            prefix = `${chalk.bold.yellowBright("WARN")}`
+            break
+        case "debug":
+            prefix = `${chalk.bold.gray("DEBUG")}`
+            break
     }
+
+    return `${prefix} [${chalk.blackBright(timestamp)}] ${color(message)}`
 })
 
 const levels = {
