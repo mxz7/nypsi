@@ -392,7 +392,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         for (let user of race.users.keys()) {
             user = race.users.get(user)
 
-            description += `\n\`${user.user.tag}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`
+            description += `\n\`${user.user.username}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`
         }
 
         const speedLimit = race.speedLimit
@@ -504,7 +504,7 @@ async function startRace(id) {
     for (let user of race.users.keys()) {
         user = race.users.get(user)
 
-        description += `\n\`${user.user.tag}\` ${getRacePosition(user.car.emoji, user.position)} 🏁`
+        description += `\n\`${user.user.username}\` ${getRacePosition(user.car.emoji, user.position)} 🏁`
     }
 
     embed.setDescription(description)
