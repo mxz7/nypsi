@@ -716,7 +716,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
  * @param {Number} amount of users to return with
  * @param {Number} min minimum balance
  */
-export async function bottomAmount(guild: Guild, amount: number, min = 1): Promise<Array<string>> {
+export async function bottomAmount(guild: Guild, amount: number): Promise<Array<string>> {
     let members: Collection<string, GuildMember>
 
     if (guild.memberCount == guild.members.cache.size) {
@@ -731,13 +731,13 @@ export async function bottomAmount(guild: Guild, amount: number, min = 1): Promi
         return !m.user.bot
     })
 
-    const query = db.prepare("SELECT id, money FROM economy").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
 
     let userIDs = []
     const balances = new Map()
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id) && user.money >= min) {
+        if (members.find((member) => member.user.id == user.id)) {
             userIDs.push(user.id)
             balances.set(user.id, user.money)
         }
