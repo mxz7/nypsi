@@ -53,15 +53,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     amount = parseInt(args[0])
 
-    let min = 1
-
-    if (parseInt(args[1])) min = parseInt(args[1])
-
     if (amount > 10 && !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10
 
     if (amount < 5) amount = 5
 
-    const balBottom = await bottomAmount(message.guild, amount, min)
+    const balBottom = await bottomAmount(message.guild, amount)
 
     const filtered = balBottom.filter(function (el) {
         return el != null
