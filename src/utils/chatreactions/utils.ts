@@ -1,4 +1,4 @@
-import { Collection, Guild, GuildMember, TextChannel } from "discord.js"
+import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js"
 import { inPlaceSort } from "fast-sort"
 import { getDatabase, toArray, toStorage } from "../database/database"
 import { logger } from "../logger"
@@ -69,15 +69,15 @@ setInterval(async () => {
                 continue
             }
 
-            const messages = await channel.messages.fetch({ limit: 15 }).catch(() => {})
+            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 15 }).catch(() => {})
             let stop = false
 
             if (!messages) continue
 
-            await messages.forEach((m) => {
+            messages.forEach((m) => {
                 if (m.author.id == guild.client.user.id) {
                     if (!m.embeds[0]) return
-                    if (m.embeds[0].title == "chat reaction") {
+                    if (m.embeds[0].author.name == "chat reaction") {
                         stop = true
                         return
                     }
