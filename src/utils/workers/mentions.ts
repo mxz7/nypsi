@@ -46,6 +46,7 @@ if (!isMainThread) {
 
         const member = members.get(memberID)
 
+        if (!member) return
         if (member.user.bot) return
         if (member.user.id == collection.message.author.id) return
 
