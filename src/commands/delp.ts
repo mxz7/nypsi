@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
     }
 
-    let amount = 7
+    let amount = 25
 
     if (isPremium(message.author.id)) {
         if (getTier(message.author.id) == 4) {
@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let collected: Collection<string, Message>
 
-    if (amount == 7) {
+    if (amount == 25) {
         collected = await message.channel.messages.fetch({ limit: 25 })
     } else {
         collected = await message.channel.messages.fetch({ limit: 100 })
