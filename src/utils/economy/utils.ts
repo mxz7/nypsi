@@ -1212,8 +1212,11 @@ export function toggleBan(id: string) {
     bannedCache.delete(id)
 }
 
-export function reset(): number {
+export function reset() {
     const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all()
+
+    let updated = 0
+    let deleted = 0
 
     for (const user of query) {
         const prestige = user.prestige
@@ -1233,15 +1236,19 @@ export function reset(): number {
             }
         }
 
-        db.prepare(
-            "UPDATE economy SET money = 1000, bank = 4000, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
-        ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
-
-        logger.info("updated " + user.id)
+        if (!inventory && prestige == 0 && user.money < 10000 && user.xp < 300) {
+            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
+            deleted++
+        } else {
+            db.prepare(
+                "UPDATE economy SET money = 1000, bank = 4000, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
+            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
+            updated++
+        }
     }
     db.prepare("DELETE FROM economy_stats")
 
-    return query.length
+    return { updated: updated, deleted: deleted }
 }
 
 /**
