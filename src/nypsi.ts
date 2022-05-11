@@ -101,10 +101,6 @@ client.on("shardReconnecting", (shardID) => {
     logger.info(`shard#${shardID} connecting`)
 })
 
-process.on("unhandledRejection", (e: any) => {
-    logger.error(e.stack)
-})
-
 export function checkGuild(guildID: string) {
     const g = client.guilds.cache.find((gi) => gi.id == guildID)
 
