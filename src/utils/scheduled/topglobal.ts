@@ -1,8 +1,8 @@
 import { Client } from "discord.js"
+import { topAmountGlobal } from "../economy/utils"
 import { MStoTime } from "../functions/date"
 import { logger } from "../logger"
-
-declare function require(name: string)
+import { CustomEmbed } from "../models/EmbedBuilders"
 
 export async function showTopGlobalBal(client: Client) {
     const now = new Date()
@@ -16,8 +16,6 @@ export async function showTopGlobalBal(client: Client) {
     const needed = new Date(Date.parse(d) + 10800000)
 
     const postGlobalBalTop = async () => {
-        const { topAmountGlobal } = require("./economy/utils")
-        const { CustomEmbed } = require("./models/EmbedBuilders")
         const guild = await client.guilds.fetch("747056029795221513")
 
         if (!guild) {
