@@ -51,8 +51,12 @@ export default async function messageCreate(message: Message) {
 
         for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
-                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR))
+                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+                    logger.debug(
+                        `(${message.guild.id}) (${message.author.id}) (${message.author.tag}) message deleted: ${content}`
+                    )
                     return await message.delete().catch(() => {})
+                }
             }
         }
     }
