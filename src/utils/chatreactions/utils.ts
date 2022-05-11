@@ -77,6 +77,7 @@ setInterval(async () => {
             messages.forEach((m) => {
                 if (m.author.id == guild.client.user.id) {
                     if (!m.embeds[0]) return
+                    if (!m.embeds[0].author) return
                     if (m.embeds[0].author.name == "chat reaction") {
                         stop = true
                         return
