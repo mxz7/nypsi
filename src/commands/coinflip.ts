@@ -180,12 +180,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (fail) return
 
+    if (typeof response != "string") return
+
     if (
-        response == "yes" ||
-        response == "y" ||
-        response == "accept" ||
-        response == "i accept" ||
-        response == "bring it on"
+        response.includes("yes") ||
+        response.includes("y") ||
+        response.includes("accept") ||
+        response.includes("i accept") ||
+        response.includes("bring it on")
     ) {
         if (bet > getBalance(target)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
