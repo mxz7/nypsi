@@ -150,6 +150,16 @@ export function isModLogsEnabled(guild: Guild) {
     return true
 }
 
+export function setModLogs(guild: Guild, hook: string) {
+    db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id)
+}
+
+export function getModLogsHook(guild: Guild): WebhookClient {
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+
+    return new WebhookClient({ url: query.modlogs })
+}
+
 /**
  *
  * @param {Guild} guild guild to delete case in
