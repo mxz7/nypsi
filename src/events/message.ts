@@ -11,6 +11,8 @@ import { cpu } from "node-os-utils"
 import { getKarma, getLastCommand } from "../utils/karma/utils"
 import ms = require("ms")
 import { encrypt } from "../utils/functions/string"
+import { addModLog } from "../utils/moderation/utils"
+import { PunishmentType } from "../utils/models/GuildStorage"
 
 declare function require(name: string)
 
@@ -40,7 +42,7 @@ export default async function messageCreate(message: Message) {
 
     message.content = message.content.replace(/ +(?= )/g, "") // remove any additional spaces
 
-    if (hasGuild(message.guild)) {
+    if (hasGuild(message.guild) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         const filter = getChatFilter(message.guild)
 
         let content: string | string[] = message.content.toLowerCase().normalize("NFD")
@@ -51,12 +53,11 @@ export default async function messageCreate(message: Message) {
 
         for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
-                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
-                    logger.debug(
-                        `(${message.guild.id}) (${message.author.id}) (${message.author.tag}) message deleted: ${content}`
-                    )
-                    return await message.delete().catch(() => {})
-                }
+                logger.debug(
+                    `(${message.guild.id}) (${message.author.id}) (${message.author.tag}) message deleted: ${content}`
+                )
+                addModLog(message.guild, PunishmentType.FILTER_VIOLATION, message.author.id, "nypsi", content.join(" "), -1)
+                return await message.delete().catch(() => {})
             }
         }
     }
