@@ -91,7 +91,14 @@ export function newCase(
     }
 }
 
-async function addModLog(guild: Guild, caseType: PunishmentType, userID: string, moderator: string, command: string, caseID: number) {
+async function addModLog(
+    guild: Guild,
+    caseType: PunishmentType,
+    userID: string,
+    moderator: string,
+    command: string,
+    caseID: number
+) {
     const punished = await guild.members.fetch(userID)
     let staff: GuildMember | string
 
@@ -120,7 +127,14 @@ async function addModLog(guild: Guild, caseType: PunishmentType, userID: string,
     } else {
         modLogQueue.set(guild.id, [embed])
     }
-    }
+}
+
+export function isModLogsEnabled(guild: Guild) {
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+
+    if (!query || !query.modlogs) return false
+
+    return true
 }
 
 /**
