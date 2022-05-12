@@ -96,6 +96,8 @@ export function newCase(
         ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
         db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
 
+        if (!isModLogsEnabled(guild)) return
+
         addModLog(guild, caseType, userID, moderator, command, caseCount + 1)
     }
 }
@@ -109,13 +111,6 @@ export async function addModLog(
     caseID: number
 ) {
     const punished = await guild.members.fetch(userID)
-    let staff: GuildMember | string
-
-    if (moderator == guild.me.user.id) {
-        staff = "nypsi"
-    } else {
-        staff = await guild.members.fetch(moderator)
-    }
 
     const embed = new CustomEmbed()
     embed.setColor(modLogColors.get(caseType))
@@ -123,10 +118,10 @@ export async function addModLog(
     embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
     embed.setTimestamp()
 
-    if (staff instanceof GuildMember) {
-        embed.setHeader(`${staff.user.tag} (${staff.user.id})`, staff.user.avatarURL())
+    if (moderator != "nypsi") {
+        embed.setHeader(moderator)
     } else {
-        embed.setHeader(staff, guild.me.avatarURL())
+        embed.setHeader("nypsi", guild.me.avatarURL())
     }
 
     if (caseType == PunishmentType.FILTER_VIOLATION) {
