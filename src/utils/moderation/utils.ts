@@ -306,6 +306,35 @@ export function runModerationChecks(client: Client) {
             })
             requestUnban(unban.guild_id, unban.user, client)
         }
+
+        query = db.prepare("SELECT modlogs, id FROM moderation WHERE modlogs != ''").all()
+
+        for (const modlog of query) {
+            if (!modLogQueue.has(modlog.id) || modLogQueue.get(modlog.id).length == 0) continue
+            let webhook: WebhookClient
+
+            if (modLogHookCache.has(modlog.id)) {
+                webhook = modLogHookCache.get(modlog.id)
+            } else {
+                webhook = new WebhookClient({ url: modlog.modlogs })
+                modLogHookCache.set(modlog.id, webhook)
+            }
+
+            let embeds: CustomEmbed[]
+
+            if (modLogQueue.get(modlog.id).length > 10) {
+                embeds = modLogQueue.get(modlog.id).splice(0, 10)
+            } else {
+                embeds = modLogQueue.get(modlog.id)
+            }
+
+            webhook.send({ embeds: embeds }).catch((e) => {
+                logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`)
+                logger.error(e)
+
+                db.prepare("UPDATE moderation SET modlogs = '' WHERE id = ?").run(modlog.id)
+            })
+        }
     }, 30000)
 }
 
