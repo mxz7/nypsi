@@ -100,7 +100,7 @@ export function newCase(
     }
 }
 
-async function addModLog(
+export async function addModLog(
     guild: Guild,
     caseType: PunishmentType,
     userID: string,
