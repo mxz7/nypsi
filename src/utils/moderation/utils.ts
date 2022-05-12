@@ -120,7 +120,7 @@ export async function addModLog(
     const embed = new CustomEmbed()
     embed.setColor(modLogColors.get(caseType))
     embed.setDescription(`user: <@${userID}>${punished ? ` ${punished.user.tag} (${punished.user.id})` : ""}`)
-    embed.setTitle(`${caseType} [${caseID}]`)
+    embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
     embed.setTimestamp()
 
     if (staff instanceof GuildMember) {
@@ -129,7 +129,11 @@ export async function addModLog(
         embed.setHeader(staff, guild.me.avatarURL())
     }
 
-    embed.addField("reason", command)
+    if (caseType == PunishmentType.FILTER_VIOLATION) {
+        embed.addField("message content", command)
+    } else {
+        embed.addField("reason", command)
+    }
 
     if (modLogQueue.has(guild.id)) {
         modLogQueue.get(guild.id).push(embed)
