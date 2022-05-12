@@ -114,7 +114,7 @@ export async function addModLog(
 
     const embed = new CustomEmbed()
     embed.setColor(modLogColors.get(caseType))
-    embed.setDescription(`user: <@${userID}>${punished ? ` ${punished.user.tag} (${punished.user.id})` : ""}`)
+    embed.setDescription(`user: <@${userID}>${punished ? ` (${punished.user.id})` : ""}`)
     embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
     embed.setTimestamp()
 
@@ -341,9 +341,12 @@ export function runModerationChecks(client: Client) {
             let embeds: CustomEmbed[]
 
             if (modLogQueue.get(modlog.id).length > 10) {
-                embeds = modLogQueue.get(modlog.id).splice(0, 10)
+                const current = modLogQueue.get(modlog.id)
+                embeds = current.splice(0, 10)
+                modLogQueue.set(modlog.id, current)
             } else {
                 embeds = modLogQueue.get(modlog.id)
+                modLogQueue.set(modlog.id, [])
             }
 
             webhook.send({ embeds: embeds }).catch((e) => {
