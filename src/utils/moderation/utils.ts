@@ -7,6 +7,8 @@ import { Case, PunishmentType } from "../models/GuildStorage"
 declare function require(name: string)
 
 const db = getDatabase()
+const modLogQueue: Map<string, CustomEmbed[]> = new Map()
+const modLogHookCache: Map<string, WebhookClient> = new Map()
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
