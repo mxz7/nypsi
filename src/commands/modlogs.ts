@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "disable") {
         setModLogs(message.guild, "")
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ ")] })
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ modlogs have been disabled")] })
     } else {
         let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[1]
 
