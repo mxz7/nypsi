@@ -1,7 +1,8 @@
-import { Client, Guild, GuildMember, Role } from "discord.js"
+import { Client, Guild, GuildMember, Role, WebhookClient } from "discord.js"
 import { getDatabase } from "../database/database"
 import { addCooldown, inCooldown } from "../guilds/utils"
 import { logger } from "../logger"
+import { CustomEmbed } from "../models/EmbedBuilders"
 import { Case, PunishmentType } from "../models/GuildStorage"
 
 declare function require(name: string)
@@ -85,6 +86,40 @@ export function newCase(
             "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
         db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
+
+        addModLog(guild, caseType, userID, moderator, command, caseCount + 1)
+    }
+}
+
+async function addModLog(guild: Guild, caseType: PunishmentType, userID: string, moderator: string, command: string, caseID: number) {
+    const punished = await guild.members.fetch(userID)
+    let staff: GuildMember | string
+
+    if (moderator == guild.me.user.id) {
+        staff = "nypsi"
+    } else {
+        staff = await guild.members.fetch(moderator)
+    }
+
+    const embed = new CustomEmbed()
+    embed.setColor("DARK_BUT_NOT_BLACK")
+    embed.setDescription(`user: <@${userID}>${punished ? ` ${punished.user.tag} (${punished.user.id})` : ""}`)
+    embed.setTitle(`${caseType} [${caseID}]`)
+    embed.setTimestamp()
+
+    if (staff instanceof GuildMember) {
+        embed.setHeader(`${staff.user.tag} (${staff.user.id})`, staff.user.avatarURL())
+    } else {
+        embed.setHeader(staff, guild.me.avatarURL())
+    }
+
+    embed.addField("reason", command)
+
+    if (modLogQueue.has(guild.id)) {
+        modLogQueue.get(guild.id).push(embed)
+    } else {
+        modLogQueue.set(guild.id, [embed])
+    }
     }
 }
 
