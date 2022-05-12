@@ -1,4 +1,4 @@
-import { Client, ColorResolvable, Guild, GuildMember, Role, WebhookClient } from "discord.js"
+import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js"
 import { getDatabase } from "../database/database"
 import { addCooldown, inCooldown } from "../guilds/utils"
 import { logger } from "../logger"
@@ -110,18 +110,27 @@ export async function addModLog(
     command: string,
     caseID: number
 ) {
-    const punished = await guild.members.fetch(userID)
+    let punished: GuildMember | User = await guild.members.fetch(userID)
+
+    if (!punished) {
+        punished = await guild.client.users.fetch(userID)
+    }
 
     const embed = new CustomEmbed()
     embed.setColor(modLogColors.get(caseType))
-    embed.setDescription(`user: <@${userID}>${punished ? ` (${punished.user.id})` : ""}`)
     embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
     embed.setTimestamp()
 
-    if (moderator != "nypsi") {
-        embed.setHeader(moderator)
+    if (punished) {
+        embed.addField("user", `${punished.toString()} (${punished.id})`, true)
     } else {
-        embed.setHeader("nypsi", guild.me.avatarURL())
+        embed.addField("user", userID, true)
+    }
+
+    if (moderator != "nypsi") {
+        embed.addField("moderator", moderator, true)
+    } else {
+        embed.addField("moderator", "nypsi", true)
     }
 
     if (caseType == PunishmentType.FILTER_VIOLATION) {
