@@ -1,4 +1,4 @@
-import { Client, Guild, GuildMember, Role, WebhookClient } from "discord.js"
+import { Client, ColorResolvable, Guild, GuildMember, Role, WebhookClient } from "discord.js"
 import { getDatabase } from "../database/database"
 import { addCooldown, inCooldown } from "../guilds/utils"
 import { logger } from "../logger"
@@ -10,6 +10,15 @@ declare function require(name: string)
 const db = getDatabase()
 const modLogQueue: Map<string, CustomEmbed[]> = new Map()
 const modLogHookCache: Map<string, WebhookClient> = new Map()
+const modLogColors: Map<PunishmentType, ColorResolvable> = new Map()
+
+modLogColors.set(PunishmentType.MUTE, "#ffffba")
+modLogColors.set(PunishmentType.BAN, "#ffb3ba")
+modLogColors.set(PunishmentType.UNMUTE, "#ffffba")
+modLogColors.set(PunishmentType.WARN, "#bae1ff")
+modLogColors.set(PunishmentType.KICK, "#ffdfba")
+modLogColors.set(PunishmentType.UNBAN, "#ffb3ba")
+modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9")
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
@@ -109,7 +118,7 @@ async function addModLog(
     }
 
     const embed = new CustomEmbed()
-    embed.setColor("DARK_BUT_NOT_BLACK")
+    embed.setColor(modLogColors.get(caseType))
     embed.setDescription(`user: <@${userID}>${punished ? ` ${punished.user.tag} (${punished.user.id})` : ""}`)
     embed.setTitle(`${caseType} [${caseID}]`)
     embed.setTimestamp()
