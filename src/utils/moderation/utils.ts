@@ -147,6 +147,7 @@ export async function addModLog(
 }
 
 export function isModLogsEnabled(guild: Guild) {
+    if (modLogHookCache.has(guild.id)) return true
     const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
 
     if (!query || !query.modlogs) return false
@@ -156,6 +157,7 @@ export function isModLogsEnabled(guild: Guild) {
 
 export function setModLogs(guild: Guild, hook: string) {
     db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id)
+    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id)
 }
 
 export function getModLogsHook(guild: Guild): WebhookClient | undefined {
