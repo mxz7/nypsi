@@ -161,6 +161,8 @@ export function setModLogs(guild: Guild, hook: string) {
 export function getModLogsHook(guild: Guild): WebhookClient | undefined {
     const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
 
+    if (!query.modlogs) return undefined
+
     return new WebhookClient({ url: query.modlogs })
 }
 
