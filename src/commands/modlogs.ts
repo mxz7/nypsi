@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ modlogs have been disabled")] })
     } else {
-        let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[1]
+        let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[0]
 
         if (channel.length != 18) {
             if (!message.mentions.channels.first()) {
