@@ -23,6 +23,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return
     }
 
+    if (
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS) ||
+        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
+    ) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("i need the `manage webhooks` and `manage channels` permissions for this command")],
+        })
+    }
+
     if (!profileExists(message.guild)) createProfile(message.guild)
 
     const help = async () => {
@@ -84,9 +93,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid cahnnel")] })
         }
 
-        const hook = await channel.createWebhook("nypsi", {
-            avatar: "https://i.imgur.com/4CnL3aP.png",
-        })
+        let fail = false
+
+        const hook = await channel
+            .createWebhook("nypsi", {
+                avatar: "https://i.imgur.com/4CnL3aP.png",
+            })
+            .catch(() => {
+                fail = true
+                return message.channel.send({
+                    embeds: [new ErrorEmbed("i was unable to make a webhook in that channel, please check my permissions")],
+                })
+            })
+
+        if (fail) return
 
         setModLogs(message.guild, hook.url)
 
