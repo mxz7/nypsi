@@ -13,5 +13,11 @@ export default async function guildCreate(client: Client, guild: Guild) {
 
     runCheck(guild)
 
-    addKarma(guild.ownerId, Math.floor(guild.memberCount / 10))
+    let amount = Math.floor(guild.memberCount / 10)
+
+    if (amount > 500) {
+        amount = 500
+    }
+
+    addKarma(guild.ownerId, amount)
 }
