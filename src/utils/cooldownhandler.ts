@@ -56,6 +56,8 @@ function calculateCooldownLength(seconds: number, member: GuildMember): number {
         } else {
             return Math.round(seconds * 0.5)
         }
+    } else {
+        return seconds
     }
 }
 
