@@ -6,9 +6,6 @@ import { getPrefix } from "../utils/guilds/utils"
 
 const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
 
-//DO THIS AND CRATE ALL COMMAND
-//and error logs should look same as info logs
-
 /**
  * @param {Message} message
  * @param {Array<String>} args

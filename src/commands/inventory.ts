@@ -1,15 +1,14 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { inPlaceSort } from "fast-sort"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getInventory, getItems, createUser, userExists, getMulti } from "../utils/economy/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"])
 
 cmd.slashEnabled = true
 cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription("page number"))
-
-const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -30,30 +29,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 10 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 10000)
+    await addCooldown(cmd.name, message.member, 10)
 
     let page = 0
 

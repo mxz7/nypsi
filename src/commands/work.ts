@@ -4,9 +4,7 @@ import { getBalance, updateBalance, userExists, createUser } from "../utils/econ
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { isPremium, getTier } from "../utils/premium/utils"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY)
 
@@ -15,31 +13,10 @@ const cmd = new Command("work", "work a random job and safely earn a random amou
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let cooldownLength = 1800
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 900
-        }
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -48,22 +25,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("you need money to work")] })
     }
 
-    if (getBalance(message.member) > 750000) {
+    if (getBalance(message.member) > 1000000) {
         return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] })
     }
 
-    cooldown.set(message.member.id, new Date())
+    await addCooldown(cmd.name, message.member, 1800)
 
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
-
-    let earnedMax = 14
+    let earnedMax = 20
 
     if (getBalance(message.member) <= 100000) {
-        earnedMax = 24
+        earnedMax = 35
     } else if (getBalance(message.member) >= 250000) {
-        earnedMax = 5
+        earnedMax = 10
     }
 
     const earnedPercent = Math.floor(Math.random() * earnedMax) + 1
@@ -87,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {
-            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "** (" + earnedPercent + "%)")
+            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString())
         }
 
         setTimeout(() => {

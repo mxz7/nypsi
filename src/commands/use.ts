@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js"
+import { CommandInteraction, GuildMember, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import {
@@ -14,8 +14,9 @@ import {
     openCrate,
 } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
 import { getMember } from "../utils/functions/member"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import redis from "../utils/database/redis"
 
 declare function require(name: string)
 
@@ -39,22 +40,12 @@ cmd.slashData
     )
     .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"))
 
-const cooldown = new Map()
-
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!userExists(message.member)) createUser(message.member)
-
-    let cooldownLength = 30
-
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 10
-        }
-    }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -68,23 +59,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id).init
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldown.get(message.member.id).length - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -140,18 +118,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cannot use this item")] })
     }
 
+    let cooldownLength = 30
+
     if (selected.role == "crate") {
         cooldownLength = 5
     }
 
-    cooldown.set(message.member.id, {
-        init: new Date(),
-        length: cooldownLength,
-    })
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, cooldownLength)
 
     if (selected.id.includes("gun")) {
         return send({
@@ -181,11 +154,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`
     } else {
-        const { data: robData } = require("./rob")
-        const { data: sexData } = require("./sex")
         const { isHandcuffed, addHandcuffs } = require("../utils/commandhandler")
-        const { data: bankRobData } = require("./bankrob")
-        const { data: storeRobData } = require("./storerob")
 
         switch (selected.id) {
             case "standard_watch":
@@ -261,9 +230,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
 
                 if (message.member == lockPickTarget) {
-                    if (sexData.onChastityCooldown(message.author.id)) {
+                    if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
                         addItemUse(message.member, selected.id)
-                        sexData.deleteChastityCooldown(message.author.id)
+                        await redis.del(`cd:sex-chastity:${message.author.id}`)
 
                         embed.setDescription("picking chastity cage...")
                         laterDescription = "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
@@ -311,24 +280,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 break
 
             case "mask":
-                if (
-                    !robData.onRobCooldown(message.member) &&
-                    !bankRobData.onBankRobCooldown(message.member) &&
-                    !storeRobData.onStoreRobCooldown(message.member)
-                ) {
+                const robCooldown = (await redis.exists(`cd:rob:${message.author.id}`)) == 1
+                const bankRobCooldown = (await redis.exists(`cd:bankrob:${message.author.id}`)) == 1
+                const storeRobcooldown = (await redis.exists(`cd:storerob:${message.author.id}`)) == 1
+                if (!robCooldown && !bankRobCooldown && !storeRobcooldown) {
                     return send({
                         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
                     })
                 }
 
-                if (robData.onRobCooldown(message.member)) {
-                    robData.deleteRobCooldown(message.member)
+                if (robCooldown) {
+                    await redis.del(`cd:rob:${message.author.id}`)
                     embed.setDescription("you're wearing your **mask** and can now rob someone again")
-                } else if (bankRobData.onBankRobCooldown(message.member)) {
-                    bankRobData.deleteBankRobCooldown(message.member)
+                } else if (bankRobCooldown) {
+                    await redis.del(`cd:bankrob:${message.author.id}`)
                     embed.setDescription("you're wearing your **mask** and can now rob a bank again")
-                } else if (storeRobData.onStoreRobCooldown(message.member)) {
-                    storeRobData.deleteStoreRobCooldown(message.member)
+                } else if (storeRobcooldown) {
+                    await redis.del(`cd:storerob:${message.author.id}`)
                     embed.setDescription("you're wearing your **mask** and can now rob a store again")
                 }
 
@@ -350,7 +318,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     })
                 }
 
-                let radioTarget // eslint-disable-line
+                let radioTarget: GuildMember // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
                     radioTarget = await getMember(message.guild, args[1])
@@ -366,7 +334,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid user")] })
                 }
 
-                if (robData.onRadioCooldown(radioTarget)) {
+                if ((await redis.exists(`cd:rob-radio:${radioTarget.user.id}`)) == 1) {
                     return send({
                         embeds: [new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)],
                     })
@@ -374,7 +342,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 addItemUse(message.member, selected.id)
 
-                robData.addRadioCooldown(radioTarget.id)
+                await redis.set(`cd:rob-radio:${radioTarget.user.id}`, Date.now())
+                await redis.expire(`cd:rob-radio:${radioTarget.user.id}`, 900)
 
                 inventory["radio"]--
 
@@ -395,7 +364,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     })
                 }
 
-                let chastityTarget // eslint-disable-line
+                let chastityTarget: GuildMember // eslint-disable-line
 
                 if (!message.mentions.members.first()) {
                     chastityTarget = await getMember(message.guild, args[1])
@@ -413,7 +382,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     })
                 }
 
-                if (sexData.onChastityCooldown(chastityTarget.id)) {
+                if ((await redis.exists(`cd:sex-chastity:${chastityTarget.user.id}`)) == 1) {
                     return send({
                         embeds: [new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)],
                     })
@@ -421,7 +390,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 addItemUse(message.member, selected.id)
 
-                sexData.addChastityCooldown(chastityTarget.id)
+                await redis.set(`cd:sex-chastity:${chastityTarget.user.id}`, Date.now())
+                await redis.expire(`cd:sex-chastity:${chastityTarget.user.id}`, 10800)
 
                 inventory["chastity_cage"]--
 
