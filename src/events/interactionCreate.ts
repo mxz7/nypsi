@@ -12,9 +12,12 @@ export default async function interactionCreate(interaction: Interaction) {
 
     if (interaction.channel.type == "DM") {
         const embed = new CustomEmbed()
-            .setTitle("support")
+            .setHeader("nypsi")
             .setColor("#36393f")
-            .setDescription("support server: https://discord.gg/hJTDNST")
+            .setDescription(
+                "unfortunately you can't do commands in direct messages ):\n\n" +
+                    "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
+            )
         return await interaction.reply({ embeds: [embed] })
     }
 
