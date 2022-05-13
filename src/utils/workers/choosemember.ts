@@ -59,12 +59,6 @@ if (!isMainThread) {
             target = possible.get(2)
         } else if (possible.get(3)) {
             target = possible.get(3)
-        } else if (possible.get(4)) {
-            target = possible.get(4)
-        } else if (possible.get(5)) {
-            target = possible.get(5)
-        } else if (possible.get(6)) {
-            target = possible.get(6)
         } else {
             target = null
         }
