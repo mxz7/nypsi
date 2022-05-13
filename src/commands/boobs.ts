@@ -1,13 +1,10 @@
 import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js"
-import { getResponse, onCooldown } from "../utils/cooldownhandler"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { redditImage } from "../utils/functions/image"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { isPremium } from "../utils/premium/utils"
 
 declare function require(name: string)
-
-const cooldown = new Map()
 
 const cmd = new Command("boobs", "get a random boob image", Categories.NSFW).setAliases([
     "boobies",
@@ -22,12 +19,6 @@ const cmd = new Command("boobs", "get a random boob image", Categories.NSFW).set
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let cooldownLength = 7
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member)
 
@@ -50,11 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     const boobLinks = Array.from(boobCache.keys())
 

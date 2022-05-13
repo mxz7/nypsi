@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member, false, bankList).setHeader("current bank balances")
 
         return message.channel.send({ embeds: [embed] })
-    } 
+    }
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member)

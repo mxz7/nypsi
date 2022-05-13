@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 import {
     getXp,
     getPrestigeRequirement,
@@ -20,31 +21,16 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY)
 
-const cooldown = new Map()
-
 /**
  *
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 1800 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -85,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
     ).setHeader("prestige", message.author.avatarURL())
 
-    cooldown.set(message.member.id, new Date())
+    await addCooldown(cmd.name, message.member)
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
@@ -104,13 +90,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .catch(async () => {
             embed.setDescription("❌ expired")
             await msg.edit({ embeds: [embed], components: [] })
-            cooldown.delete(message.author.id)
+            addExpiry(cmd.name, message.member, 30)
         })
 
     if (reaction == "✅") {
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, 1800000)
+        await addExpiry(cmd.name, message.member, 1800)
         currentXp = getXp(message.member)
         neededXp = getPrestigeRequirement(message.member)
         currentBal = getBankBalance(message.member)

@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js"
-import { getResponse, onCooldown } from "../utils/cooldownhandler"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
@@ -12,8 +12,6 @@ cmd.slashEnabled = true
 cmd.slashData.addStringOption((option) =>
     option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
 )
-
-const cooldown = new Map()
 
 /**
  *
@@ -116,11 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 3000)
+    await addCooldown(cmd.name, message.member, 5)
 
     let fail = false
 

@@ -11,13 +11,11 @@ import {
     userExists,
     createUser,
 } from "../utils/economy/utils"
-import { isPremium } from "../utils/premium/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY)
 
 cmd.slashEnabled = true
-
-const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -25,12 +23,6 @@ const cooldown = new Map()
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!userExists(message.member)) createUser(message.member)
-
-    let cooldownLength = 10
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 2
-    }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -44,23 +36,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     const items = getItems()
@@ -81,13 +60,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] })
     }
 
-    cooldown.set(message.member.id, new Date())
+    await addCooldown(cmd.name, message.member, 30)
 
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
-
-    const multi = await getMulti(message.member)
+    const multi = getMulti(message.member)
 
     let total = 0
     let earned = ""

@@ -13,6 +13,7 @@ import {
 } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { Item } from "../utils/models/Economy"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"])
 
@@ -50,7 +51,6 @@ cmd.slashData
 
 const races = new Map()
 const carCooldown = new Map()
-const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -85,23 +85,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         return help()
     } else if (args[0].toLowerCase() == "start") {
-        if (cooldown.has(message.member.id)) {
-            const init = cooldown.get(message.member.id)
-            const curr = new Date()
-            const diff = Math.round((curr.getTime() - init) / 1000)
-            const time = 300 - diff
+        if (await onCooldown(cmd.name, message.member)) {
+            const embed = await getResponse(cmd.name, message.member)
 
-            const minutes = Math.floor(time / 60)
-            const seconds = time - minutes * 60
-
-            let remaining: string
-
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`
-            } else {
-                remaining = `${seconds}s`
-            }
-            return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+            return message.channel.send({ embeds: [embed] })
         }
 
         if (args.length == 1) {
@@ -157,11 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, 150 * 1000)
+        await addCooldown(cmd.name, message.member, 180)
 
         const id = Math.random()
 

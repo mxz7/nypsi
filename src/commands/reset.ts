@@ -11,12 +11,11 @@ import {
     getItems,
 } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 import { addKarma } from "../utils/karma/utils.js"
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
 const cmd = new Command("reset", "reset your economy profile to gain karma", Categories.MONEY)
-
-const cooldown = new Map()
 
 /**
  *
@@ -24,23 +23,10 @@ const cooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 1800 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) createUser(message.member)
@@ -48,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let earnedKarma = 0
 
     let inventoryWorth = 0
-    const multi = await getMulti(message.member)
+    const multi = getMulti(message.member)
 
     let inventory = getInventory(message.member)
     const items = getItems()
@@ -88,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `you will lose **everything**, but you will receive ${earnedKarma.toLocaleString()} karma`
     ).setHeader("reset", message.author.avatarURL())
 
-    cooldown.set(message.member.id, new Date())
+    await addCooldown(cmd.name, message.member)
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
@@ -107,13 +93,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .catch(async () => {
             embed.setDescription("❌ expired")
             await msg.edit({ embeds: [embed], components: [] })
-            cooldown.delete(message.author.id)
+            await addExpiry(cmd.name, message.member, 30)
         })
 
     if (reaction == "✅") {
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, 1800000)
+        await addExpiry(cmd.name, message.member, 1800)
         earnedKarma = 0
         inventoryWorth = 0
 

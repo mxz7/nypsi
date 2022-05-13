@@ -19,7 +19,6 @@ import { getPrefix } from "../utils/guilds/utils"
 import { gamble, logger } from "../utils/logger.js"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
-const cooldown = new Map()
 const games = new Map()
 
 const cmd = new Command("blackjack", "play blackjack", Categories.MONEY).setAliases(["bj", "blowjob"])
@@ -193,9 +192,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (games.get(message.author.id).id == id) {
                 games.delete(message.author.id)
                 updateBalance(message.member, getBalance(message.member) + bet)
-                if (cooldown.has(message.author.id)) {
-                    cooldown.delete(message.author.id)
-                }
             }
         }
     }, 180000)

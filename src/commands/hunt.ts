@@ -2,13 +2,11 @@ import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { userExists, createUser, getInventory, getItems, setInventory, addItemUse } from "../utils/economy/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("hunt", "go to a field and hunt", Categories.MONEY)
 
 cmd.slashEnabled = true
-
-const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -16,14 +14,6 @@ const cooldown = new Map()
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!userExists(message.member)) createUser(message.member)
-
-    let cooldownLength = 1800
-
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 900
-        }
-    }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -37,23 +27,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     const inventory = getInventory(message.member)
@@ -79,11 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 1800)
 
     addItemUse(message.member, gun)
 
