@@ -4,14 +4,13 @@ import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { inPlaceSort } from "fast-sort"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command(
     "createpalette",
     "create a color palette for color.tekoh.net from role colors",
     Categories.UTILITY
 ).setAliases(["palette", "rolepalette"])
-
-const cooldown = new Map()
 
 const regex = /[^a-f0-9]/g
 
@@ -20,23 +19,10 @@ const regex = /[^a-f0-9]/g
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 15 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!isPremium(message.author.id)) {
@@ -95,11 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 15 * 1000)
+    await addCooldown(cmd.name, message.member, 15)
 
     // http://127.0.0.1:5500/#!ff0000!00ff00!0000ff&?test&?6c8ab9
 

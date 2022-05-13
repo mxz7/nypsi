@@ -1,9 +1,8 @@
 import { Collection, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton, Role } from "discord.js"
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { inCooldown, addCooldown as addGuildCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-
-const cooldown = new Map()
 
 const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY)
 
@@ -12,24 +11,10 @@ const cmd = new Command("inrole", "get the members in a role", Categories.UTILIT
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 5 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -54,6 +39,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)] })
     }
 
+    await addCooldown(cmd.name, message.member, 10)
+
     let members: Collection<string, GuildMember>
 
     if (
@@ -65,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         members = await message.guild.members.fetch()
 
-        addCooldown(message.guild, 3600)
+        addGuildCooldown(message.guild, 3600)
     }
 
     const memberList = new Map()

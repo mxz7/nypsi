@@ -1,36 +1,22 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
 import { getPrefix } from "../utils/guilds/utils"
 import { setLastfmUsername, getLastfmUsername } from "../utils/users/utils"
 import { cleanString } from "../utils/functions/string"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("setlastfm", "set your last.fm username", Categories.INFO).setAliases(["slfm"])
-
-const cooldown = new Map()
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 30 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -49,11 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const res = await setLastfmUsername(message.member, args[0])
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 30000)
+    await addCooldown(cmd.name, message.member, 30)
 
     const embed = new CustomEmbed(message.member, false)
 

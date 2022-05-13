@@ -19,12 +19,11 @@ import {
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
 import { CommandInteraction, Message } from "discord.js"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import redis from "../utils/database/redis"
 
-const cooldown = new Map()
 const playerCooldown = new Set()
-const radioCooldown = new Map()
 
 const cmd = new Command("rob", "rob other server members", Categories.MONEY).setAliases(["steal"])
 
@@ -36,14 +35,6 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("w
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 600
-
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 300
-        }
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -56,27 +47,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.user.id)) {
-        const init = cooldown.get(message.member.user.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
-    if (radioCooldown.has(message.member.user.id)) {
-        const init = radioCooldown.get(message.member.user.id)
+    if ((await redis.exists(`cd:rob-radio:${message.author.id}`)) == 1) {
+        const init = parseInt(await redis.get(`cd:rob-radio:${message.author.id}`))
         const curr = new Date()
         const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 900 - diff
@@ -152,15 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] })
     }
 
-    const date = new Date()
-
-    cooldown.set(message.member.user.id, date)
-
-    setTimeout(() => {
-        if (cooldown.has(message.author.id) && cooldown.get(message.author.id) == date) {
-            cooldown.delete(message.author.id)
-        }
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 700)
 
     const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setHeader(
         "robbery",
@@ -346,49 +316,5 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 }
 
 cmd.setRun(run)
-
-/**
- *
- * @param {GuildMember} member
- */
-function deleteRobCooldown(member) {
-    cooldown.delete(member.user.id)
-}
-
-/**
- * @returns {Boolean}
- * @param {GuildMember} member
- */
-function onRobCooldown(member) {
-    return cooldown.has(member.user.id)
-}
-
-/**
- *
- * @param {String} id
- */
-function addRadioCooldown(id) {
-    radioCooldown.set(id, new Date())
-
-    setTimeout(() => {
-        radioCooldown.delete(id)
-    }, 900000)
-}
-
-/**
- *
- * @param {GuildMember} member
- * @returns {Boolean}
- */
-function onRadioCooldown(member) {
-    return radioCooldown.has(member.user.id)
-}
-
-cmd.data = {
-    onRadioCooldown: onRadioCooldown,
-    addRadioCooldown: addRadioCooldown,
-    onRobCooldown: onRobCooldown,
-    deleteRobCooldown: deleteRobCooldown,
-}
 
 module.exports = cmd

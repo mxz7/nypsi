@@ -1,15 +1,14 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getUserCount, getUserCountGuild } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { cpu } from "node-os-utils"
 import { logger } from "../utils/logger"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
 declare function require(name: string)
-
-const cooldown = new Map()
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO)
 
@@ -18,30 +17,13 @@ const cmd = new Command("botstats", "view stats for the bot", Categories.INFO)
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 5 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
+    await addCooldown(cmd.name, message.member, 5)
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")

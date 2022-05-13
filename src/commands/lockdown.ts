@@ -1,8 +1,7 @@
 import { CommandInteraction, GuildBasedChannel, Message, Permissions, TextBasedChannel } from "discord.js"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-
-const cooldown = new Map()
 
 const cmd = new Command(
     "lockdown",
@@ -53,23 +52,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 1 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     let channel: TextBasedChannel | GuildBasedChannel = message.channel
@@ -92,10 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (channel.type != "GUILD_TEXT") return
 
-    cooldown.set(message.member.id, new Date())
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 1000)
+    await addCooldown(cmd.name, message.member, 3)
 
     let locked = false
 

@@ -1,9 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-
-const cooldown = new Map()
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 const cmd = new Command(
     "vote",
@@ -16,32 +14,7 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 5 - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
-    }
-
     if (!userExists(message.member)) createUser(message.member)
-
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
 
     let prestige = getPrestige(message.author.id)
 
@@ -49,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const amount = 15000 * (prestige + 1)
     const voted = hasVoted(message.member)
-    const multi = Math.floor((await getMulti(message.member)) * 100)
+    const multi = Math.floor(getMulti(message.member)) * 100
     let crateAmount = Math.floor(prestige / 2 + 1)
 
     if (crateAmount > 5) crateAmount = 5

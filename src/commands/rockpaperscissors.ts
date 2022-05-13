@@ -16,10 +16,8 @@ import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
 import { gamble } from "../utils/logger.js"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
 const cmd = new Command("rockpaperscissors", "play rock paper scissors", Categories.MONEY).setAliases(["rps"])
 
@@ -41,16 +39,6 @@ cmd.slashData
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 10
-
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 3
-        } else {
-            cooldownLength = 6
-        }
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -63,23 +51,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     if (!userExists(message.member)) {
@@ -151,11 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 10)
 
     updateBalance(message.member, getBalance(message.member) - bet)
 
