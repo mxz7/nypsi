@@ -41,12 +41,12 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
     let remaining: string
 
     if (minutes != 0) {
-        remaining = `${minutes}m${seconds}s`
+        remaining = `${minutes}m${Math.floor(parseFloat(seconds))}s`
     } else {
         remaining = `${seconds}s`
     }
 
-    return new ErrorEmbed(`you are on cooldown for \`${remaining}\``)
+    return new ErrorEmbed(`you are on cooldown for \`${remaining}\``).removeTitle()
 }
 
 function calculateCooldownLength(seconds: number, member: GuildMember): number {

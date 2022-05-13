@@ -162,6 +162,12 @@ export class ErrorEmbed extends MessageEmbed {
         return this
     }
 
+    removeTitle() {
+        delete this.title
+
+        return this
+    }
+
     /**
      * @returns {ErrorEmbed}
      * @param {String} text
