@@ -190,10 +190,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 target.user.tag +
                 "** has been robbed recently and is protected by a private security team\n" +
                 "you were caught and paid $" +
-                amountMoney.toLocaleString() +
-                " (" +
-                amount +
-                "%)"
+                amountMoney.toLocaleString()
         )
 
         embed3.setTitle("you were nearly robbed")
@@ -242,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             updateBalance(message.member, getBalance(message.member) + amountMoney)
 
             embed2.setColor("#5efb8f")
-            embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
+            embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**")
 
             const voted = hasVoted(message.member)
 
@@ -302,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 updateBalance(target, getBalance(target) + amountMoney)
                 updateBalance(message.member, getBalance(message.member) - amountMoney)
-                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**" + " (" + amount + "%)")
+                embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**")
                 embed3.setDescription(
                     "**" +
                         message.member.user.tag +
