@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js"
+import ms = require("ms")
 import { getDatabase } from "../database/database"
 import { MStoTime } from "../functions/date"
 import { logger } from "../logger"
@@ -170,8 +171,16 @@ function deteriorateKarma() {
     for (const user of users) {
         let karmaToRemove = 5
 
-        if (now - 604800000 > user.last_command) {
+        if (now - ms("1 week") > user.last_command) {
             karmaToRemove = 35
+        }
+
+        if (now - ms("30 days") > user.last_command) {
+            karmaToRemove = 100
+        }
+
+        if (now - ms("90 days") > user.last_command) {
+            karmaToRemove = 69420
         }
 
         if (karmaToRemove > user.karma) {
