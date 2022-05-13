@@ -11,7 +11,28 @@ export async function onCooldown(cmd: string, member: GuildMember): Promise<bool
     return res == 1 ? true : false
 }
 
-export async function addCooldown(cmd: string, member: GuildMember, seconds: number) {
+export async function addCooldown(cmd: string, member: GuildMember, seconds?: number) {
+    const key = `cd:${cmd}:${member.user.id}`
+
+    let expireDisabled = false
+
+    if (!seconds) {
+        expireDisabled = true
+        seconds = 69420
+    }
+
+    const expire = calculateCooldownLength(seconds, member)
+
+    const data: CooldownData = {
+        date: Date.now(),
+        length: expire,
+    }
+
+    await redis.set(key, JSON.stringify(data))
+    if (!expireDisabled) await redis.expire(key, expire)
+}
+
+export async function addExpiry(cmd: string, member: GuildMember, seconds: number) {
     const key = `cd:${cmd}:${member.user.id}`
 
     const expire = calculateCooldownLength(seconds, member)
