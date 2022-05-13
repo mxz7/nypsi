@@ -232,11 +232,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         winnings = Math.round(multiplier * bet)
 
         updateBalance(message.member, getBalance(message.member) + winnings)
-    } else if (one == two) {
-        win = true
-        winnings = Math.round(bet * 1.2)
-
-        updateBalance(message.member, getBalance(message.member) + winnings)
     }
 
     let multi = 0
