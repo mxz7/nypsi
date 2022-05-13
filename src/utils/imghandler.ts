@@ -69,8 +69,6 @@ const catLinks = [
     "https://www.reddit.com/r/Blep.json?limit=777",
     "https://www.reddit.com/r/Floof.json?limit=777",
     "https://www.reddit.com/r/Catloaf.json?limit=777",
-    
-    
 ]
 const dogLinks = [
     "https://www.reddit.com/r/dog.json?limit=777",
