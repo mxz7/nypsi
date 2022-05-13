@@ -1,10 +1,7 @@
 import { Collection, GuildMember } from "discord.js"
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 
-export default function chooseMember(
-    members: Collection<string, GuildMember>,
-    targetName: string
-): Promise<GuildMember | null> {
+export default function chooseMember(members: Collection<string, GuildMember>, targetName: string): Promise<string | null> {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
             workerData: [members, targetName],
@@ -64,5 +61,5 @@ if (!isMainThread) {
         }
     }
 
-    parentPort.postMessage(target)
+    parentPort.postMessage(target.user.id)
 }
