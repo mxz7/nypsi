@@ -1,12 +1,24 @@
-import { Client, Guild, GuildMember, Role } from "discord.js"
+import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js"
 import { getDatabase } from "../database/database"
 import { addCooldown, inCooldown } from "../guilds/utils"
 import { logger } from "../logger"
+import { CustomEmbed } from "../models/EmbedBuilders"
 import { Case, PunishmentType } from "../models/GuildStorage"
 
 declare function require(name: string)
 
 const db = getDatabase()
+const modLogQueue: Map<string, CustomEmbed[]> = new Map()
+const modLogHookCache: Map<string, WebhookClient> = new Map()
+const modLogColors: Map<PunishmentType, ColorResolvable> = new Map()
+
+modLogColors.set(PunishmentType.MUTE, "#ffffba")
+modLogColors.set(PunishmentType.BAN, "#ffb3ba")
+modLogColors.set(PunishmentType.UNMUTE, "#ffffba")
+modLogColors.set(PunishmentType.WARN, "#bae1ff")
+modLogColors.set(PunishmentType.KICK, "#ffdfba")
+modLogColors.set(PunishmentType.UNBAN, "#ffb3ba")
+modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9")
 
 setInterval(async () => {
     const { checkGuild } = require("../../nypsi")
@@ -83,7 +95,77 @@ export function newCase(
             "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
         db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
+
+        if (!isModLogsEnabled(guild)) return
+
+        addModLog(guild, caseType, userID, moderator, command, caseCount + 1)
     }
+}
+
+export async function addModLog(
+    guild: Guild,
+    caseType: PunishmentType,
+    userID: string,
+    moderator: string,
+    command: string,
+    caseID: number
+) {
+    let punished: GuildMember | User = await guild.members.fetch(userID)
+
+    if (!punished) {
+        punished = await guild.client.users.fetch(userID)
+    }
+
+    const embed = new CustomEmbed()
+    embed.setColor(modLogColors.get(caseType))
+    embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
+    embed.setTimestamp()
+
+    if (punished) {
+        embed.addField("user", `${punished.toString()} (${punished.id})`, true)
+    } else {
+        embed.addField("user", userID, true)
+    }
+
+    if (moderator != "nypsi") {
+        embed.addField("moderator", moderator, true)
+    } else {
+        embed.addField("moderator", "nypsi", true)
+    }
+
+    if (caseType == PunishmentType.FILTER_VIOLATION) {
+        embed.addField("message content", command)
+    } else {
+        embed.addField("reason", command)
+    }
+
+    if (modLogQueue.has(guild.id)) {
+        modLogQueue.get(guild.id).push(embed)
+    } else {
+        modLogQueue.set(guild.id, [embed])
+    }
+}
+
+export function isModLogsEnabled(guild: Guild) {
+    if (modLogHookCache.has(guild.id)) return true
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+
+    if (!query || !query.modlogs) return false
+
+    return true
+}
+
+export function setModLogs(guild: Guild, hook: string) {
+    db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id)
+    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id)
+}
+
+export function getModLogsHook(guild: Guild): WebhookClient | undefined {
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+
+    if (!query.modlogs) return undefined
+
+    return new WebhookClient({ url: query.modlogs })
 }
 
 /**
@@ -254,6 +336,38 @@ export function runModerationChecks(client: Client) {
                 message: `requesting unban in ${unban.guild_id} for ${unban.user}`,
             })
             requestUnban(unban.guild_id, unban.user, client)
+        }
+
+        query = db.prepare("SELECT modlogs, id FROM moderation WHERE modlogs != ''").all()
+
+        for (const modlog of query) {
+            if (!modLogQueue.has(modlog.id) || modLogQueue.get(modlog.id).length == 0) continue
+            let webhook: WebhookClient
+
+            if (modLogHookCache.has(modlog.id)) {
+                webhook = modLogHookCache.get(modlog.id)
+            } else {
+                webhook = new WebhookClient({ url: modlog.modlogs })
+                modLogHookCache.set(modlog.id, webhook)
+            }
+
+            let embeds: CustomEmbed[]
+
+            if (modLogQueue.get(modlog.id).length > 10) {
+                const current = modLogQueue.get(modlog.id)
+                embeds = current.splice(0, 10)
+                modLogQueue.set(modlog.id, current)
+            } else {
+                embeds = modLogQueue.get(modlog.id)
+                modLogQueue.set(modlog.id, [])
+            }
+
+            webhook.send({ embeds: embeds }).catch((e) => {
+                logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`)
+                logger.error(e)
+
+                db.prepare("UPDATE moderation SET modlogs = '' WHERE id = ?").run(modlog.id)
+            })
         }
     }, 30000)
 }
