@@ -3,9 +3,8 @@ import { getBalance, getMulti, updateBalance, userExists, createUser } from "../
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier, getLastDaily, setLastDaily } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-
-const cooldown = new Map()
+import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
 const cmd = new Command("daily", "get your daily bonus (patreon only)", Categories.MONEY)
 
@@ -14,30 +13,13 @@ const cmd = new Command("daily", "get your daily bonus (patreon only)", Categori
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 60 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 60000)
+    await addCooldown(cmd.name, message.member, 90)
 
     if (!userExists(message.member)) {
         createUser(message.member)

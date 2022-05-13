@@ -1,12 +1,12 @@
 import { CommandInteraction, Message, MessageEmbed } from "discord.js"
 import ms = require("ms")
 import fetch from "node-fetch"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { MStoTime } from "../utils/functions/date"
 import { getPrefix } from "../utils/guilds/utils"
 import { addKarma } from "../utils/karma/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-import { getTier, isPremium } from "../utils/premium/utils"
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN)
 
@@ -33,7 +33,6 @@ enum Response {
 
 const emojis: Map<string, string> = new Map()
 const games: Map<string, Game> = new Map()
-const cooldown = new Map()
 const karmaCooldown: Set<string> = new Set()
 
 let wordList: string[]
@@ -69,40 +68,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await send({ embeds: [embed] })
     }
 
-    let cooldownLength = 90
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 10
-        } else {
-            cooldownLength = 30
-        }
+        return message.channel.send({ embeds: [embed] })
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
-    }
-
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 90)
 
     const board = createBoard()
     const word = getWord()

@@ -7,13 +7,11 @@ import {
     setInventory,
     addItemUse,
 } from "../utils/economy/utils.js"
-import { CommandInteraction, GuildMember, Message } from "discord.js"
+import { CommandInteraction, Message } from "discord.js"
 import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { isPremium, getTier } from "../utils/premium/utils"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY)
 
@@ -80,38 +78,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    let cooldownLength = 600
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 300
-        }
+        return message.channel.send({ embeds: [embed] })
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
-    }
-
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 600)
 
     const banks = ["barclays", "santander", "bankofamerica", "lloyds", "hsbc", "fleeca", "mazebank"]
 
@@ -183,19 +156,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             m.edit({ embeds: [embed2] })
         }, 1500)
     })
-}
-
-function deleteBankRobCooldown(member: GuildMember): void {
-    cooldown.delete(member.user.id)
-}
-
-function onBankRobCooldown(member: GuildMember): boolean {
-    return cooldown.has(member.user.id)
-}
-
-cmd.data = {
-    deleteBankRobCooldown: deleteBankRobCooldown,
-    onBankRobCooldown: onBankRobCooldown,
 }
 
 cmd.setRun(run)

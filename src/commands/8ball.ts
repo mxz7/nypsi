@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
-import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const answers = [
     "as i see it, yes",
@@ -26,8 +26,6 @@ const answers = [
     "you may rely on it",
 ]
 
-const cooldown = new Map()
-
 const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
 
 /**
@@ -36,41 +34,17 @@ const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 7
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     const question = args.join(" ")
 

@@ -31,6 +31,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"])
 
@@ -136,19 +137,11 @@ cmd.slashData
             )
     )
 
-const cooldown = new Map()
-
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 10
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 5
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -161,23 +154,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild)
@@ -201,11 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const showStats = async () => {
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, cooldownLength * 1000)
+        await addCooldown(cmd.name, message.member, 10)
 
         const embed = new CustomEmbed(message.member, false).setHeader(`${message.author.username}'s stats`)
 
@@ -226,11 +202,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const showLeaderboard = async () => {
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, cooldownLength * 1000)
+        await addCooldown(cmd.name, message.member, 10)
 
         const embed = new CustomEmbed(message.member, false).setHeader("chat reactions leaderboard")
 

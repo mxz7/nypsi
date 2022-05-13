@@ -1,8 +1,9 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getDMsEnabled } from "../utils/economy/utils.js"
-import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import redis from "../utils/database/redis.js"
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
     "findhornymilfsinmyarea",
@@ -14,8 +15,6 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
 cmd.slashEnabled = true
 cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"))
 
-const cooldown = new Map()
-const chastityCooldown = new Map()
 const looking = new Map()
 
 const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"]
@@ -25,12 +24,6 @@ const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordg
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 30
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 10
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -43,27 +36,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
-    if (chastityCooldown.has(message.member.user.id)) {
-        const init = chastityCooldown.get(message.member.user.id)
+    if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
+        const init = parseInt(await redis.get(`cd:sex-chastity:${message.author.id}`))
         const curr = new Date()
         const diff = Math.round((curr.getTime() - init) / 1000)
         const time = 10800 - diff
@@ -86,11 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 45)
 
     const addToLooking = (description) => {
         const obj = {
@@ -226,42 +202,3 @@ setInterval(() => {
         }
     })
 }, 600000)
-
-/**
- *
- * @param {String} id
- */
-function addChastityCooldown(id) {
-    if (looking.has(id)) {
-        looking.delete(id)
-    }
-
-    chastityCooldown.set(id, new Date())
-
-    setTimeout(() => {
-        chastityCooldown.delete(id)
-    }, 10800000)
-}
-
-/**
- *
- * @param {String} id
- * @returns {Boolean}
- */
-function onChastityCooldown(id) {
-    return chastityCooldown.has(id)
-}
-
-/**
- *
- * @param {String} id
- */
-function deleteChastityCooldown(id) {
-    chastityCooldown.delete(id)
-}
-
-cmd.data = {
-    deleteChastityCooldown: deleteChastityCooldown,
-    onChastityCooldown: onChastityCooldown,
-    addChastityCooldown: addChastityCooldown,
-}

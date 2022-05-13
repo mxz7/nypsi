@@ -1,8 +1,7 @@
 import { BaseGuildTextChannel, CommandInteraction, Message, Permissions } from "discord.js"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-
-const cooldown = new Map()
 
 const cmd = new Command("purge", "bulk delete/purge messages", Categories.MODERATION)
     .setAliases(["del"])
@@ -34,27 +33,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 30 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     if (isNaN(parseInt(args[0])) || parseInt(args[0]) <= 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] })
+        return send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] })
     }
 
     let amount = parseInt(args[0])
@@ -65,11 +51,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (amount > 100) {
             amount = 100
         }
-        cooldown.set(message.member.id, new Date())
 
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, 30000)
+        await addCooldown(cmd.name, message.member, 30)
     }
 
     if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
