@@ -15,6 +15,7 @@ import * as shufflearray from "shuffle-array"
 import fetch from "node-fetch"
 import workerSort from "../workers/sort"
 import { MStoTime } from "../functions/date"
+import ms = require("ms")
 
 declare function require(name: string)
 
@@ -90,9 +91,11 @@ setInterval(() => {
         const amount = lotteryHookQueue.get(username)
 
         desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`)
-    }
 
-    lotteryHookQueue.clear()
+        lotteryHookQueue.delete(username)
+
+        if (desc.join("\n").length >= 1500) break
+    }
 
     const embed = new CustomEmbed()
 
@@ -101,7 +104,7 @@ setInterval(() => {
     embed.setTimestamp()
 
     lotteryHook.send({ embeds: [embed] })
-}, 120000)
+}, ms("30 minutes"))
 
 /**
  *
