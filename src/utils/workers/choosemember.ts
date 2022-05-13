@@ -26,40 +26,30 @@ if (!isMainThread) {
     for (const m of members.keys()) {
         const member = members.get(m)
 
+        const tag = (member.user.username + "#" + member.user.discriminator).toLowerCase()
+
         if (member.user.id == memberName) {
             target = member
             break
-        } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
+        } else if (tag == memberName.toLowerCase()) {
             target = member
             break
         } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
             if (member.user.bot) {
-                possible.set(3, member)
+                possible.set(2, member)
             } else {
                 target = member
                 break
             }
-        } else if (member.displayName.toLowerCase() == memberName.toLowerCase()) {
+        } else if (tag.includes(memberName.toLowerCase())) {
             if (member.user.bot) {
-                possible.set(4, member)
+                possible.set(3, member)
             } else {
                 possible.set(1, member)
             }
-        } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
-            if (member.user.bot) {
-                possible.set(5, member)
-            } else {
-                possible.set(2, member)
-            }
-        } else if (member.displayName.toLowerCase().includes(memberName.toLowerCase())) {
-            if (member.user.bot) {
-                possible.set(6, member)
-            } else {
-                possible.set(3, member)
-            }
         }
 
-        if (possible.size == 6) break
+        if (possible.size == 3) break
     }
 
     if (!target) {
