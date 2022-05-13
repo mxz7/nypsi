@@ -23,6 +23,7 @@ import { updateCache } from "./utils/imghandler"
 import { runModerationChecks } from "./utils/moderation/utils"
 import { WebhookPayload } from "@top-gg/sdk"
 import { showTopGlobalBal } from "./utils/scheduled/topglobal"
+import purgeUsernames from "./utils/scheduled/purgeusernames"
 
 const client = new Discord.Client({
     allowedMentions: {
@@ -253,6 +254,7 @@ setTimeout(() => {
             runCountdowns(client)
             runChristmas(client)
             showTopGlobalBal(client)
+            purgeUsernames()
             runChecks()
             updateCache()
             runModerationChecks(client)
