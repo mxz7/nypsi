@@ -1,10 +1,8 @@
 import { CommandInteraction, Message } from "discord.js"
 import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("ezpoll", "simple poll builder", Categories.UTILITY)
 
@@ -13,32 +11,10 @@ const cmd = new Command("ezpoll", "simple poll builder", Categories.UTILITY)
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 30
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
-            cooldownLength = 5
-        }
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     const prefix = getPrefix(message.guild)
@@ -61,11 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("not enough options")] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 30)
 
     let choices = ""
     let count = 1

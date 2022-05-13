@@ -9,8 +9,7 @@ import { userExists } from "../utils/economy/utils"
 import { getKarma, getLastCommand } from "../utils/karma/utils"
 import ms = require("ms")
 import { decrypt } from "../utils/functions/string"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([
     "mentions",
@@ -36,30 +35,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 15 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 15000)
+    await addCooldown(cmd.name, message.member, 20)
 
     let qualified = false
 

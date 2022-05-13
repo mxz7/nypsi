@@ -1,5 +1,4 @@
 import { CommandInteraction, Message } from "discord.js"
-import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
@@ -16,8 +15,8 @@ import {
 } from "../utils/functions/image"
 import { formatDate } from "../utils/functions/date"
 import { getMember } from "../utils/functions/member"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
-const cooldown = new Map()
 const uploadCooldown = new Map()
 
 const cmd = new Command("wholesome", "get a random wholesome picture", Categories.FUN).setAliases([
@@ -34,12 +33,6 @@ cmd.slashEnabled = true
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 7
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -52,23 +45,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
     const embed = new CustomEmbed(message.member)
@@ -164,11 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        cooldown.set(message.member.id, new Date())
-
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, cooldownLength * 1000)
+        await addCooldown(cmd.name, message.member, 15)
 
         return message.react("✅")
     } else if (args[0].toLowerCase() == "get") {
@@ -402,11 +378,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setImage(image.image)
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     const chance = Math.floor(Math.random() * 25)
 

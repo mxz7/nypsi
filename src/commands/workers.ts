@@ -15,6 +15,7 @@ import {
 import { getAllWorkers, Worker } from "../utils/economy/workers"
 import { getPrefix } from "../utils/guilds/utils"
 import { isPremium, getTier } from "../utils/premium/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
     "worker",
@@ -23,8 +24,6 @@ const cmd = new Command("workers", "view the available workers and manage your o
     "slave",
     "slaves",
 ])
-
-const cooldown = new Map()
 
 /**
  * @param {Message} message
@@ -35,36 +34,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!userExists(message.member)) createUser(message.member)
 
-    let cooldownLength = 5
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        cooldownLength = 2
+        return message.channel.send({ embeds: [embed] })
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
-    }
-
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 5)
 
     const listAllWorkers = () => {
         const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")

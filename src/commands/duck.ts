@@ -1,12 +1,10 @@
 import { CommandInteraction, Message } from "discord.js"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { redditImage } from "../utils/functions/image"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { isPremium } from "../utils/premium/utils"
 
 declare function require(name: string)
-
-const cooldown = new Map()
 
 const cmd = new Command("duck", "get a random picture of a duck", Categories.ANIMALS).setAliases(["notdick"])
 
@@ -15,29 +13,10 @@ const cmd = new Command("duck", "get a random picture of a duck", Categories.ANI
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let cooldownLength = 7
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     const { duckCache } = require("../utils/imghandler")
@@ -46,11 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     const duckLinks = Array.from(duckCache.keys())
 

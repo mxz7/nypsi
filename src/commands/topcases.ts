@@ -4,8 +4,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { getMember } from "../utils/functions/member"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getPrefix } from "../utils/guilds/utils"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
@@ -25,33 +24,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 5 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     const cases = getAllCases(message.guild)
 
     if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
 
-    cooldown.set(message.author.id, new Date())
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
+    await addCooldown(cmd.name, message.member, 15)
 
     const embed = new CustomEmbed(message.member, true).setHeader("top cases")
 

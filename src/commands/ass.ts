@@ -1,12 +1,10 @@
 import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js"
-import { isPremium } from "../utils/premium/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { redditImage } from "../utils/functions/image"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 declare function require(name: string)
-
-const cooldown = new Map()
 
 const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAliases(["peach"])
 
@@ -15,29 +13,10 @@ const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAli
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    let cooldownLength = 7
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
-
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
@@ -56,11 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     const assLinks: string[] = Array.from(assCache.keys())
 

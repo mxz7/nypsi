@@ -4,8 +4,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { getDMsEnabled } from "../utils/economy/utils.js"
 import { getPrefix } from "../utils/guilds/utils"
-
-const cooldown = new Map()
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cmd = new Command("ascii", "create ascii text", Categories.FUN)
 
@@ -22,24 +21,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = 5 - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-
-        return message.channel.send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return message.channel.send({ embeds: [embed] })
     }
 
     if (args.length == 0) {
@@ -106,11 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, 5000)
+    await addCooldown(cmd.name, message.member, 5)
 
     let font = "Standard"
     let text = ""

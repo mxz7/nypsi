@@ -3,9 +3,9 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { getMember } from "../utils/functions/member"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { isPremium, getTier } from "../utils/premium/utils"
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
 const cache = new Map()
-const cooldown = new Map()
 
 const cmd = new Command("pp", "accurate prediction of your pp size", Categories.FUN).setAliases([
     "penis",
@@ -21,13 +21,6 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("h
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let cooldownLength = 7
-    let cacheTime = 60
-
-    if (isPremium(message.author.id)) {
-        cooldownLength = 1
-    }
-
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data)
@@ -40,30 +33,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (cooldown.has(message.member.id)) {
-        const init = cooldown.get(message.member.id)
-        const curr = new Date()
-        const diff = Math.round((curr.getTime() - init) / 1000)
-        const time = cooldownLength - diff
+    if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member)
 
-        const minutes = Math.floor(time / 60)
-        const seconds = time - minutes * 60
-
-        let remaining: string
-
-        if (minutes != 0) {
-            remaining = `${minutes}m${seconds}s`
-        } else {
-            remaining = `${seconds}s`
-        }
-        return send({ embeds: [new ErrorEmbed(`still on cooldown for \`${remaining}\``)] })
+        return send({ embeds: [embed] })
     }
 
-    cooldown.set(message.member.id, new Date())
-
-    setTimeout(() => {
-        cooldown.delete(message.author.id)
-    }, cooldownLength * 1000)
+    await addCooldown(cmd.name, message.member, 7)
 
     let member
 
@@ -79,10 +55,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!member) {
             return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
-    }
-
-    if (isPremium(member.user.id)) {
-        cacheTime = 25
     }
 
     let size
@@ -111,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setTimeout(() => {
             cache.delete(member.user.id)
-        }, cacheTime * 1000)
+        }, 60 * 1000)
     }
 
     for (let i = 0; i < size; i++) {
