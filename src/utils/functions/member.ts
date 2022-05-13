@@ -16,7 +16,8 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     const possible = new Map()
 
     if (members.size > 5000) {
-        target = await chooseMember(members, memberName)
+        const id = await chooseMember(members, memberName)
+        target = members.get(id)
     } else {
         for (const m of members.keys()) {
             const member = members.get(m)
