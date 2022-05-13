@@ -24,5 +24,11 @@ export default async function guildDelete(client: Client, guild: Guild) {
         setMuteRole(guild, "")
     }
 
-    removeKarma(guild.ownerId, Math.floor(guild.memberCount / 10))
+    let amount = Math.floor(guild.memberCount / 10)
+
+    if (amount > 500) {
+        amount = 500
+    }
+
+    removeKarma(guild.ownerId, amount)
 }
