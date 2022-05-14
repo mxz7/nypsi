@@ -10,8 +10,7 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "**/*.{js,ts}": [
-      "npx eslint .",
+    "**/*.{ts,md,json}": [
       "prettier --write ."
     ]
   },
