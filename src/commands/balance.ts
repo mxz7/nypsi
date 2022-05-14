@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message.member == target) {
         if (
             getXp(target) >= getPrestigeRequirement(target) &&
-            getBankBalance(target) >= getPrestigeRequirementBal(target) &&
+            getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
             getPrestige(target) < 20
         ) {
             return send({
