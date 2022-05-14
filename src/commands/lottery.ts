@@ -37,9 +37,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const tickets = getTickets(message.member)
 
-    const prestigeBonus = Math.floor((getPrestige(message.member) > 20 ? 20 : getPrestige(message.member)) / 2.5)
+    const prestigeBonus = Math.floor((getPrestige(message.member) > 10 ? 10 : getPrestige(message.member)) / 2.5)
     const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0)
-    const karmaBonus = Math.floor(getKarma(message.member) / 100)
+    const karmaBonus = Math.floor(getKarma(message.member) / 75)
 
     let max = 5 + prestigeBonus + premiumBonus + karmaBonus
 
