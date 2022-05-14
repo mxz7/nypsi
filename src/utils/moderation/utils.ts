@@ -110,10 +110,10 @@ export async function addModLog(
     command: string,
     caseID: number
 ) {
-    let punished: GuildMember | User = await guild.members.fetch(userID)
+    let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {})
 
     if (!punished) {
-        punished = await guild.client.users.fetch(userID)
+        punished = await guild.client.users.fetch(userID).catch(() => {})
     }
 
     const embed = new CustomEmbed()
