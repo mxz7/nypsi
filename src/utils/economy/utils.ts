@@ -1010,15 +1010,11 @@ export function getPrestigeRequirement(member: GuildMember): number {
  * @returns {Number}
  * @param {Number} xp
  */
-export function getPrestigeRequirementBal(member: GuildMember): number {
-    const xp = getXp(member)
-    const karma = getKarma(member)
+export function getPrestigeRequirementBal(xp: number): number {
     const constant = 500
-    const starting = 15000
-    const bonus = xp * constant + (constant / 2) * karma
-    const max = bonus + starting
+    const bonus = xp * constant
 
-    return max
+    return bonus
 }
 
 /**
