@@ -56,11 +56,6 @@ export default async function messageCreate(message: Message) {
 
         for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
-                logger.debug(
-                    `(${message.guild.id}) (${message.author.id}) (${message.author.tag}) message deleted: ${content.join(
-                        " "
-                    )}`
-                )
                 addModLog(message.guild, PunishmentType.FILTER_VIOLATION, message.author.id, "nypsi", content.join(" "), -1)
                 return await message.delete().catch(() => {})
             }
