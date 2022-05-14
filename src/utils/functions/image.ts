@@ -329,7 +329,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
         return res
     }
 
-    logger.info("uploaded")
+    logger.info(`uploaded (${boobies.data.link})`)
     return boobies.data.link
 }
 
