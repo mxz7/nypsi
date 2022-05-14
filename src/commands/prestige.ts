@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentXp = getXp(message.member),
         neededXp = getPrestigeRequirement(message.member)
     let currentBal = getBankBalance(message.member),
-        neededBal = getPrestigeRequirementBal(neededXp)
+        neededBal = getPrestigeRequirementBal(message.member)
 
     if (currentXp < neededXp) {
         return message.channel.send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] })
@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         currentXp = getXp(message.member)
         neededXp = getPrestigeRequirement(message.member)
         currentBal = getBankBalance(message.member)
-        neededBal = getPrestigeRequirementBal(neededXp)
+        neededBal = getPrestigeRequirementBal(message.member)
 
         if (currentXp < neededXp) {
             return message.channel.send({
