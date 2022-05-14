@@ -157,7 +157,7 @@ export function getLastCommand(member: GuildMember | string): number {
 function deteriorateKarma() {
     const now = Date.now()
 
-    const threshold = now - 43200000
+    const threshold = now - ms("16 hours")
 
     /**
      * @type {Array<{id: String, karma: Number, last_command: Number}>}
