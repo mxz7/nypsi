@@ -153,4 +153,4 @@ export async function updateCache() {
     })
 }
 
-export { images }
+exports.images = images
