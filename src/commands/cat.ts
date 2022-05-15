@@ -19,7 +19,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    const { catCache } = require("../utils/imghandler")
+    const { images } = require("../utils/imghandler")
+
+    const catCache = images.get("cat")
+
+    if (!catCache) {
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
+    }
 
     if (catCache.size < 1) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })

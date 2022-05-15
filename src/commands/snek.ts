@@ -19,7 +19,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    const { snekCache } = require("../utils/imghandler")
+    const { images } = require("../utils/imghandler")
+
+    const snekCache = images.get("snek")
+
+    if (!snekCache) {
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
+    }
 
     if (snekCache.size < 1) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
