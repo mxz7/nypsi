@@ -19,7 +19,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    const { birbCache } = require("../utils/imghandler")
+    const { images } = require("../utils/imghandler")
+
+    const birbCache = images.get("birb")
+
+    if (!birbCache) {
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
+    }
 
     if (birbCache.size < 1) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
