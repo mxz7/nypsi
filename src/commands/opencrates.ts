@@ -35,15 +35,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    if (!isPremium(message.member)) {
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "to open multiple crates a time you need the BRONZE tier or higher"
-        ).setFooter(`${getPrefix(message.guild)}patreon`)
+    // if (!isPremium(message.member)) {
+    //     const embed = new CustomEmbed(
+    //         message.member,
+    //         false,
+    //         "to open multiple crates a time you need the BRONZE tier or higher"
+    //     ).setFooter(`${getPrefix(message.guild)}patreon`)
 
-        return send({ embeds: [embed] })
-    }
+    //     return send({ embeds: [embed] })
+    // }
 
     if (!getDMsEnabled(message.member)) {
         return send({
@@ -56,11 +56,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const crates = []
 
-    let max = 10
+    let max = 5
     let hitMax = false
 
-    if (getTier(message.member) >= 3) {
-        max = 20
+    if (isPremium(message.member)) {
+        if (getTier(message.member) >= 3) {
+            max = 20
+        } else {
+            max = 10
+        }
     }
 
     for (const item of Array.from(Object.keys(inventory))) {
@@ -81,9 +85,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you dont have any crates to open")] })
     }
 
-    await addCooldown(cmd.name, message.member, 120)
-
     startOpeningCrates(message.member)
+
+    await addCooldown(cmd.name, message.member, 120)
 
     const embed = new CustomEmbed(message.member, false)
 
