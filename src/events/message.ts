@@ -23,6 +23,7 @@ const addMentionToDatabase = db.prepare(
 const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
 const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
 let mentionInterval
+let workerCount = 0
 
 /**
  * @param {Message} message
@@ -215,12 +216,18 @@ async function addMention() {
         const members = mention.members
 
         if (members.size > 200) {
+            if (workerCount >= 5) {
+                mentionQueue.push(mention)
+                return
+            }
             logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker..`)
             const start = Date.now()
+            workerCount++
             await doCollection(mention).catch((e) => {
                 logger.error("error inserting mentions with worker")
                 console.error(e)
             })
+            workerCount--
             logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
 
             return
