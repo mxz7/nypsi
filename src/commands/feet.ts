@@ -6,7 +6,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 declare function require(name: string)
 
-const cmd = new Command("thighs", "get a random thighs image", Categories.NSFW)
+const cmd = new Command("feet", "get a random foot image", Categories.NSFW).setAliases(["tootsies", "toes", "feets"])
 
 /**
  * @param {Message} message
@@ -31,30 +31,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const { images } = require("../utils/imghandler")
 
-    const thighsCache = images.get("thighs")
+    const feetCache = images.get("feet")
 
-    if (!thighsCache) {
+    if (!feetCache) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
-    if (thighsCache.size <= 1) {
+    if (feetCache.size <= 2) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 
     await addCooldown(cmd.name, message.member, 7)
 
-    const thighsLinks = Array.from(thighsCache.keys())
+    const feetLinks = Array.from(feetCache.keys())
 
-    const subredditChoice: any = thighsLinks[Math.floor(Math.random() * thighsLinks.length)]
+    const subredditChoice: any = feetLinks[Math.floor(Math.random() * feetLinks.length)]
 
-    const allowed = await thighsCache.get(subredditChoice)
+    const allowed = feetCache.get(subredditChoice)
 
     const chosen = allowed[Math.floor(Math.random() * allowed.length)]
 
     const a = await redditImage(chosen, allowed)
 
     if (a == "lol") {
-        return message.channel.send({ embeds: [new ErrorEmbed("unable to find thighs image")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("unable to find feet image")] })
     }
 
     const image = a.split("|")[0]
@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
 
-    const embed = new CustomEmbed(message.member)
+    const embed = new CustomEmbed(message.member, false)
         .setTitle(title)
         .setHeader("u/" + author + " | r/" + subreddit)
         .setURL(url)
