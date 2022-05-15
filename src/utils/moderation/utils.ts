@@ -98,7 +98,7 @@ export function newCase(
 
         if (!isModLogsEnabled(guild)) return
 
-        addModLog(guild, caseType, userID, moderator, command, caseCount + 1)
+        addModLog(guild, caseType, userID, moderator, command, caseCount)
     }
 }
 
