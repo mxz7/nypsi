@@ -16,7 +16,7 @@ export default function doCollection(array: Array<string>): Promise<Array<string
 }
 
 if (!isMainThread) {
-    const db = require("better-sqlite3")("./out/data/storage.db")
+    const db = require("better-sqlite3")("./out/data/storage.db", { fileMustExist: true, timeout: 15000 })
     const { encrypt } = require("../functions/string")
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
