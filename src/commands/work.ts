@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (getBalance(message.member) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         } else {
-            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString())
+            embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**")
         }
 
         setTimeout(() => {
