@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
-                "[slots has a ~35% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L181)"
+                "[slots has a ~41% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L152)"
             )
         return send({ embeds: [embed] })
     }
@@ -149,11 +149,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     /**
-     * the shit below results in an approximate 35% win rate overtime, resulting in an overall loss, without counting multiplier
+     * the shit below results in an approximate 41% win rate overtime, resulting in an overall loss, without counting multiplier
      */
 
     if (one != two && two != three && one != three) {
-        const chance = Math.floor(Math.random() * 15)
+        const chance = Math.floor(Math.random() * 30)
         const chanceScore = 4
         const chanceScore2 = 8
 
@@ -165,8 +165,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 13)
-        const chanceScore = 8
+        const chance = Math.floor(Math.random() * 12)
+        const chanceScore = 7
 
         if (chance < chanceScore) {
             one = two
@@ -174,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 14)
+        const chance = Math.floor(Math.random() * 12)
         const chanceScore = 6
 
         if (chance < chanceScore) {
@@ -204,6 +204,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         win = true
         winnings = Math.round(multiplier * bet)
+
+        updateBalance(message.member, getBalance(message.member) + winnings)
+    } else if (one == two) {
+        win = true
+        winnings = Math.round(bet * 1.2)
 
         updateBalance(message.member, getBalance(message.member) + winnings)
     }
