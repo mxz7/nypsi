@@ -29,7 +29,7 @@ setInterval(async () => {
         const exists = await checkGuild(guild.id)
 
         if (!exists) {
-            deleteServer(guild)
+            deleteServer(guild.id)
 
             logger.log({
                 level: "guild",
