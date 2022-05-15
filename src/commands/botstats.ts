@@ -3,12 +3,9 @@ import { getUserCount, getUserCountGuild } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { cpu } from "node-os-utils"
-import { logger } from "../utils/logger"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
-import imgHandler = require("../utils/imghandler")
-const images = imgHandler.images
 
 declare function require(name: string)
 
@@ -34,46 +31,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
     const cpuUsage = await cpu.usage()
-    let imgCache = 0
-
-    try {
-        for (const cache of Array.from(images.values())) {
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-            for (const link of Array.from(cache.keys())) {
-                imgCache = imgCache + cache.get(link).length
-            }
-        }
-    } catch {
-        logger.warn("error counting image cache")
-    }
 
     let memberCount = 0
 
     const guilds = message.client.guilds.cache
-    await guilds.forEach((g) => {
+    guilds.forEach((g) => {
         memberCount = memberCount + g.memberCount
     })
 
@@ -119,8 +81,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "**snipe** " +
                 snipedMessages.toLocaleString() +
                 "\n" +
-                "**imgs** " +
-                imgCache.toLocaleString() +
                 "\n**mention queue** " +
                 mentionQueue.length.toLocaleString() +
                 "\n-- **collections** " +
