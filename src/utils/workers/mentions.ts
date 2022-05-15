@@ -57,14 +57,19 @@ if (!isMainThread) {
             if (!channelMembers.has(memberID)) return
         }
 
-        insertMention.run(
-            collection.guild.id,
-            member.user.id,
-            Math.floor(collection.message.createdTimestamp / 1000),
-            `${collection.message.author.username}#${collection.message.author.discriminator}`,
-            collection.url,
-            content
-        )
+        try {
+            insertMention.run(
+                collection.guild.id,
+                member.user.id,
+                Math.floor(collection.message.createdTimestamp / 1000),
+                `${collection.message.author.username}#${collection.message.author.discriminator}`,
+                collection.url,
+                content
+            )
+        } catch (e) {
+            if (e.code != "SQLITE_BUSY") throw e
+        }
+
         const mentions = fetchMentions.all(collection.guild.id, member.user.id)
 
         let limit = 6
