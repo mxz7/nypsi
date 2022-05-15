@@ -6,7 +6,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
 declare function require(name: string)
 
-const cmd = new Command("cat", "get a random picture of a cat", Categories.ANIMALS)
+const cmd = new Command("cat", "get a random picture of a cat", Categories.ANIMALS).setAliases(["kitty"])
 
 /**
  * @param {Message} message
