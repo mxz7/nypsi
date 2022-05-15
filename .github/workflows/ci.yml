@@ -27,6 +27,9 @@ jobs:
             - name: linting
               run: npx eslint ./src/
 
+            - name: prettier check
+              run: npx prettier --check .
+
     test:
         name: testing
 
