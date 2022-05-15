@@ -1,7 +1,7 @@
 import { logger } from "./logger"
 import fetch from "node-fetch"
 
-const images: Map<string, Map<string, object>> = new Map()
+const images: Map<string, Map<string, any>> = new Map()
 
 const bdsmLinks = [
     "https://www.reddit.com/r/bdsm.json?limit=777",
@@ -154,3 +154,5 @@ export async function updateCache() {
 }
 
 exports.images = images
+
+export { images }
