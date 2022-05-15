@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const pages: Map<number, string[]> = new Map()
 
     for (const m of muted) {
-        const user: GuildMember = await message.guild.members.fetch(m.user)
+        const user: GuildMember | void = await message.guild.members.fetch(m.user).catch(() => {})
 
         const msg = `\`${user ? user.user.tag : m.user}\` ${
             m.unmute_time >= 9999999999999
