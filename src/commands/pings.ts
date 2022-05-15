@@ -49,8 +49,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.guild.memberCount < 150000 &&
         (userExists(message.guild.ownerId) ||
             isPremium(message.guild.ownerId) ||
-            getKarma(message.guild.ownerId) >= 10 ||
-            getLastCommand(message.guild.ownerId) >= Date.now() - ms("3 days"))
+            getKarma(message.guild.ownerId) >= 50 ||
+            getLastCommand(message.guild.ownerId) >= Date.now() - ms("1 days"))
     ) {
         qualified = true
     }
