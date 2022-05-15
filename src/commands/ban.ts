@@ -4,6 +4,7 @@ import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
 import { PunishmentType } from "../utils/models/GuildStorage"
+import { getExactMember } from "../utils/functions/member"
 
 const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
     "BAN_MEMBERS",
@@ -91,9 +92,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.mentions.members.set(member.user.id, member)
         }
     } else if (message.mentions.members.first() == null) {
-        return send({
-            embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-        })
+        const member = await getExactMember(message.guild, args[0])
+
+        if (!member) {
+            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
+        }
+
+        message.mentions.members.set(member.user.id, member)
     }
 
     const members = message.mentions.members
