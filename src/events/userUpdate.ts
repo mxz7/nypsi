@@ -41,6 +41,8 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 async function doQueue() {
     const user = queue.shift()
 
+    if (!user) return
+
     const url = await uploadImageToImgur(user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
 
     if (!url) return
