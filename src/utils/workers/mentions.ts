@@ -90,5 +90,5 @@ if (!isMainThread) {
             db.close()
             parentPort.postMessage(0)
         }
-    }, 100)
+    }, 125)
 }
