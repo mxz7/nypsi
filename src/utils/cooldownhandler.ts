@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js"
 import redis from "./database/redis"
+import { getPrefix } from "./guilds/utils"
 import { ErrorEmbed } from "./models/EmbedBuilders"
 import { getTier, isPremium } from "./premium/utils"
 
@@ -67,7 +68,15 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
         remaining = `${seconds}s`
     }
 
-    return new ErrorEmbed(`you are on cooldown for \`${remaining}\``).removeTitle()
+    const embed = new ErrorEmbed(`you are on cooldown for \`${remaining}\``).removeTitle()
+
+    const random = Math.floor(Math.random() * 50)
+
+    if (random == 7 && !isPremium(member)) {
+        embed.setFooter(`premium members get 50% shorter cooldowns (${getPrefix(member.guild)}donate)`)
+    }
+
+    return embed
 }
 
 function calculateCooldownLength(seconds: number, member: GuildMember): number {
