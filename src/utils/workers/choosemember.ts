@@ -61,5 +61,9 @@ if (!isMainThread) {
         }
     }
 
-    parentPort.postMessage(target.user.id)
+    if (!target) {
+        parentPort.postMessage(null)
+    } else {
+        parentPort.postMessage(target.user.id)
+    }
 }
