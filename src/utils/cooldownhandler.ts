@@ -51,6 +51,10 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
     const key = `cd:${cmd}:${member.user.id}`
     const cd: CooldownData = JSON.parse(await redis.get(key))
 
+    if (!cd) {
+        return new ErrorEmbed("you are on cooldown for `0.1s`").removeTitle()
+    }
+
     const init = cd.date
     const length = cd.length
 
