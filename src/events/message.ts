@@ -220,9 +220,9 @@ async function addMention() {
                 mentionQueue.push(mention)
                 return
             }
-            logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker..`)
-            const start = Date.now()
             workerCount++
+            logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`)
+            const start = Date.now()
             await doCollection(mention).catch((e) => {
                 logger.error("error inserting mentions with worker")
                 console.error(e)
