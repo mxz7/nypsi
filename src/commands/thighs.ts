@@ -29,9 +29,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] })
     }
 
-    const { thighsCache } = require("../utils/imghandler")
+    const { images } = require("../utils/imghandler")
 
-    if (thighsCache.size <= 2) {
+    const thighsCache = images.get("thighs")
+
+    if (!thighsCache) {
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
+    }
+
+    if (thighsCache.size <= 1) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] })
     }
 

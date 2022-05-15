@@ -7,6 +7,8 @@ import { logger } from "../utils/logger"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import imgHandler = require("../utils/imghandler")
+const images = imgHandler.images
 
 declare function require(name: string)
 
@@ -32,46 +34,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
     const cpuUsage = await cpu.usage()
-    const {
-        bdsmCache,
-        thighsCache,
-        pornCache,
-        assCache,
-        birbCache,
-        catCache,
-        dogCache,
-        rabbitCache,
-        snekCache,
-    } = require("../utils/imghandler")
     let imgCache = 0
 
     try {
-        for (const link of Array.from(bdsmCache.keys())) {
-            imgCache = imgCache + bdsmCache.get(link).length
-        }
-        for (const link of Array.from(assCache.keys())) {
-            imgCache = imgCache + assCache.get(link).length
-        }
-        for (const link of Array.from(thighsCache.keys())) {
-            imgCache = imgCache + thighsCache.get(link).length
-        }
-        for (const link of Array.from(pornCache.keys())) {
-            imgCache = imgCache + pornCache.get(link).length
-        }
-        for (const link of Array.from(birbCache.keys())) {
-            imgCache = imgCache + birbCache.get(link).length
-        }
-        for (const link of Array.from(catCache.keys())) {
-            imgCache = imgCache + catCache.get(link).length
-        }
-        for (const link of Array.from(dogCache.keys())) {
-            imgCache = imgCache + dogCache.get(link).length
-        }
-        for (const link of Array.from(rabbitCache.keys())) {
-            imgCache = imgCache + rabbitCache.get(link).length
-        }
-        for (const link of Array.from(snekCache.keys())) {
-            imgCache = imgCache + snekCache.get(link).length
+        for (const cache of Array.from(images.values())) {
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
+            for (const link of Array.from(cache.keys())) {
+                imgCache = imgCache + cache.get(link).length
+            }
         }
     } catch {
         logger.warn("error counting image cache")
