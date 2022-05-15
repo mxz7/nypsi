@@ -18,6 +18,7 @@ const bdsmLinks = [
     "https://www.reddit.com/r/bdsm.json?limit=777",
     "https://www.reddit.com/r/bondage.json?limit=777",
     "https://www.reddit.com/r/dominated.json?limit=777",
+    "https://www.reddit.com/r/femdom.json?limit=777",
 ]
 const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777", "https://www.reddit.com/r/thickthighs.json?limit=777"]
 const boobLinks = [
