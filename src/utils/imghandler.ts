@@ -1,18 +1,7 @@
 import { logger } from "./logger"
 import fetch from "node-fetch"
 
-const pornCache = new Map()
-const bdsmCache = new Map()
-const boobCache = new Map()
-const assCache = new Map()
-const thighsCache = new Map()
-const birbCache = new Map()
-const catCache = new Map()
-const dogCache = new Map()
-const duckCache = new Map()
-const lizardCache = new Map()
-const rabbitCache = new Map()
-const snekCache = new Map()
+const images: Map<string, Map<string, object>> = new Map()
 
 const bdsmLinks = [
     "https://www.reddit.com/r/bdsm.json?limit=777",
@@ -51,6 +40,11 @@ const pornLinks = [
     "https://www.reddit.com/r/cumsluts.json?limit=777",
     "https://www.reddit.com/r/cumfetish.json?limit=777",
     "https://www.reddit.com/r/creampies.json?limit=777",
+]
+const feetLinks = [
+    "https://www.reddit.com/r/feet.json?limit=777",
+    "https://www.reddit.com/r/feetpics.json?limit=777",
+    "https://www.reddit.com/r/Feet_NSFW.json?limit=777",
 ]
 const birbLinks = [
     "https://www.reddit.com/r/birb.json?limit=777",
@@ -92,8 +86,11 @@ const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
  * @param {Map} imgs
  * @param {String} name
  */
-async function cacheUpdate(links: Array<string>, imgs: Map<string, string>, name: string) {
+async function cacheUpdate(links: Array<string>, name: string) {
     const start = new Date().getTime()
+
+    const map: Map<string, object> = new Map()
+
     let amount = 0
     for (const link of links) {
         const res = await fetch(link).then((a) => a.json())
@@ -112,12 +109,15 @@ async function cacheUpdate(links: Array<string>, imgs: Map<string, string>, name
         }
 
         if (allowed) {
-            imgs.set(link, allowed)
+            map.set(link, allowed)
             amount += allowed.length
         } else {
             logger.error(`no images @ ${link}`)
         }
     }
+
+    images.set(name, map)
+
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
     logger.log({
@@ -132,30 +132,19 @@ export async function updateCache() {
         level: "img",
         message: "img caches updating..",
     })
-    await cacheUpdate(bdsmLinks, bdsmCache, "bdsm")
-    exports.bdsmCache = bdsmCache
-    await cacheUpdate(thighsLinks, thighsCache, "thighs")
-    exports.thighsCache = thighsCache
-    await cacheUpdate(boobLinks, boobCache, "boob")
-    exports.boobCache = boobCache
-    await cacheUpdate(assLinks, assCache, "ass")
-    exports.assCache = assCache
-    await cacheUpdate(pornLinks, pornCache, "porn")
-    exports.pornCache = pornCache
-    await cacheUpdate(birbLinks, birbCache, "birb")
-    exports.birbCache = birbCache
-    await cacheUpdate(catLinks, catCache, "cat")
-    exports.catCache = catCache
-    await cacheUpdate(dogLinks, dogCache, "dog")
-    exports.dogCache = dogCache
-    await cacheUpdate(duckLinks, duckCache, "duck")
-    exports.duckCache = duckCache
-    await cacheUpdate(lizardLinks, lizardCache, "lizard")
-    exports.lizardCache = lizardCache
-    await cacheUpdate(rabbitLinks, rabbitCache, "rabbit")
-    exports.rabbitCache = rabbitCache
-    await cacheUpdate(snekLinks, snekCache, "snek")
-    exports.snekCache = snekCache
+    await cacheUpdate(bdsmLinks, "bdsm")
+    await cacheUpdate(thighsLinks, "thighs")
+    await cacheUpdate(boobLinks, "boob")
+    await cacheUpdate(assLinks, "ass")
+    await cacheUpdate(pornLinks, "porn")
+    await cacheUpdate(feetLinks, "feet")
+    await cacheUpdate(birbLinks, "birb")
+    await cacheUpdate(catLinks, "cat")
+    await cacheUpdate(dogLinks, "dog")
+    await cacheUpdate(duckLinks, "duck")
+    await cacheUpdate(lizardLinks, "lizard")
+    await cacheUpdate(rabbitLinks, "rabbit")
+    await cacheUpdate(snekLinks, "snek")
     const end = new Date().getTime()
     const total = (end - start) / 1000 + "s"
     logger.log({
@@ -163,3 +152,5 @@ export async function updateCache() {
         message: "images updated (" + total + ")",
     })
 }
+
+export { images }
