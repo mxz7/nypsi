@@ -573,10 +573,9 @@ export function updateXp(member: GuildMember, amount: number) {
  */
 export function getMaxBankBalance(member: GuildMember): number {
     const xp = getXp(member)
-    const karma = getKarma(member)
-    const constant = 500
+    const constant = 550
     const starting = 15000
-    const bonus = xp * constant + (constant / 2) * karma
+    const bonus = xp * constant
     const max = bonus + starting
 
     return max
