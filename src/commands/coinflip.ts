@@ -81,6 +81,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
+    if (!userExists(target)) createUser(target)
+
     const maxBet = calcMaxBet(message.member)
 
     const bet = formatBet(args[1], message.member)
