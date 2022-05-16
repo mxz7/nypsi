@@ -385,6 +385,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (chance == 7) embed.setFooter(`submit your own image with ${getPrefix(message.guild)}wholesome suggest (:`)
 
     if (target) {
+        if (message instanceof Message) {
+            await message.delete()
+        }
         return send({
             content: `${target.user.toString()} you've received a wholesome image (:`,
             embeds: [embed],
