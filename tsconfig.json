@@ -5,5 +5,6 @@
         "target": "ESNext",
         "module": "commonjs",
         "allowJs": true,
+        "strictFunctionTypes": true
     },
 }
