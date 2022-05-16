@@ -34,7 +34,7 @@ export class Command {
         return this
     }
 
-    public setRun(run: (message: Message, args: Array<string>) => void) {
+    public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: Array<string>) => void) {
         this.run = run
         return this
     }
