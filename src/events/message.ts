@@ -366,3 +366,5 @@ function cleanMentions() {
 }
 
 setInterval(cleanMentions, 3600 * 1000)
+
+export { workerCount }

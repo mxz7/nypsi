@@ -6,6 +6,7 @@ import { cpu } from "node-os-utils"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import { workerCount } from "../events/message.js"
 
 declare function require(name: string)
 
@@ -88,7 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "\n-- **mentions** " +
                 mentions.toLocaleString() +
                 "\n-- **deletable** " +
-                deleteQueue.length.toLocaleString(),
+                deleteQueue.length.toLocaleString() +
+                "\n-- **workers** " +
+                workerCount.toLocaleString(),
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
