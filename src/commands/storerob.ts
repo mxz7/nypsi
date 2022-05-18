@@ -143,10 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         updateBalance(message.member, getBalance(message.member) + robbedAmount)
 
-        embed2.addField(
-            "**success!!**",
-            "**you stole** $" + robbedAmount.toLocaleString() + " (" + amount + "%) from **" + shop + "**"
-        )
+        embed2.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " from **" + shop + "**")
         embed2.setColor("#5efb8f")
     }
 
