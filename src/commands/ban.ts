@@ -113,9 +113,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             args.shift()
         }
 
-        duration = getDuration(args[0].toLowerCase())
-
-        unbanDate = new Date().getTime() + duration * 1000
+        try {
+            duration = getDuration(args[0].toLowerCase())
+            unbanDate = new Date().getTime() + duration * 1000
+        } catch {
+            // eslint happy
+        }
 
         if (duration) {
             temporary = true
