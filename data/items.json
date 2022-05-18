@@ -494,6 +494,17 @@
         "aliases": ["evox", "evo"],
         "worth": 40000
     },
+    "honda_civic": {
+        "id": "honda_civic",
+        "name": "honda civic type r",
+        "emoji": "<:nypsi_civic:976564488805437512>",
+        "description": "wait for the vtec to kick in",
+        "rarity": 3,
+        "role": "car",
+        "speed": 4,
+        "aliases": ["civic", "honda"],
+        "worth": 35000
+    },
     "subaru_wrx": {
         "id": "subaru_wrx",
         "name": "subuwu",
