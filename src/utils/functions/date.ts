@@ -1,6 +1,6 @@
 import dayjs = require("dayjs")
 
-export function formatDate(date: Date | number): string {
+export function formatDate(date: Date | number | dayjs.Dayjs): string {
     return dayjs(date).format("MMM D YYYY").toLowerCase()
 }
 
