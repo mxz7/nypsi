@@ -1,8 +1,9 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
+import { MentionQueueItem } from "../users/utils"
 
 declare function require(name: string)
 
-export default function doCollection(array: Array<string>): Promise<Array<string>> {
+export default function doCollection(array: MentionQueueItem): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
             workerData: [array],
