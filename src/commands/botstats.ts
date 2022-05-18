@@ -7,6 +7,7 @@ import { cpu } from "node-os-utils"
 import { version } from "../../package.json"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
 import { workerCount } from "../events/message.js"
+import { deleteQueue, mentionQueue } from "../utils/users/utils.js"
 
 declare function require(name: string)
 
@@ -27,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
-    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
+    // const { mentionQueue, deleteQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
