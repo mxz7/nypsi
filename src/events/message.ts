@@ -312,6 +312,14 @@ async function addMention() {
         }
     } else {
         deleteMention.run(mention)
+
+        for (let i = 0; i < 49; i++) {
+            mention = deleteQueue.shift()
+
+            if (!mention) break
+
+            deleteMention.run(mention)
+        }
     }
 
     if (mentionQueue.length == 0 && deleteQueue.length == 0) {
