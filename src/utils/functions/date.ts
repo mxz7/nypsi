@@ -1,6 +1,6 @@
 import dayjs = require("dayjs")
 
-export function formatDate(date: Date | number): string {
+export function formatDate(date: Date | number | dayjs.Dayjs): string {
     return dayjs(date).format("MMM D YYYY").toLowerCase()
 }
 
@@ -40,7 +40,7 @@ export function daysUntil(date: Date | number): number {
     return days
 }
 
-export function MStoTime(ms: number) {
+export function MStoTime(ms: number, long = false) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000))
     const daysms = ms % (24 * 60 * 60 * 1000)
     const hours = Math.floor(daysms / (60 * 60 * 1000))
@@ -52,19 +52,39 @@ export function MStoTime(ms: number) {
     let output = ""
 
     if (days > 0) {
-        output = output + days + "d "
+        output = output + days
+        if (long) {
+            output += " days "
+        } else {
+            output += "d "
+        }
     }
 
     if (hours > 0) {
-        output = output + hours + "h "
+        output = output + hours
+        if (long) {
+            output += " hours "
+        } else {
+            output += "h "
+        }
     }
 
     if (minutes > 0) {
-        output = output + minutes + "m "
+        output = output + minutes
+        if (long) {
+            output += " minutes "
+        } else {
+            output += "m "
+        }
     }
 
     if (sec > 0) {
-        output = output + sec + "s"
+        output = output + sec
+        if (long) {
+            output += " seconds "
+        } else {
+            output += "s "
+        }
     }
 
     return output
