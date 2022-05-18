@@ -130,7 +130,7 @@ export async function redditImage(post: any, allowed: any): Promise<string> {
  */
 export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
-        const { getGuild } = require("../nypsi")
+        const { getGuild } = require("../../nypsi")
         const guild = await getGuild("747056029795221513")
 
         const webhooks = await guild.fetchWebhooks()
@@ -197,7 +197,7 @@ export function acceptWholesomeImage(id: number, accepter: GuildMember): boolean
 
     clearWholesomeCache()
 
-    const { requestDM } = require("../nypsi")
+    const { requestDM } = require("../../nypsi")
     const { getDMsEnabled } = require("./economy/utils")
 
     if (getDMsEnabled(query.submitter_id)) {
