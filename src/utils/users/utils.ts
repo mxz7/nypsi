@@ -1,4 +1,4 @@
-import { Collection, Guild, GuildMember, Message, User } from "discord.js"
+import { Collection, Guild, GuildMember, Message, ThreadMember, User } from "discord.js"
 import { inPlaceSort } from "fast-sort"
 import fetch from "node-fetch"
 import { getDatabase } from "../database/database"
@@ -11,7 +11,25 @@ const usernameCache = new Map()
 const avatarCache = new Map()
 const lastfmUsernameCache = new Map()
 
-const mentionQueue: Array<{ type: string; members: Collection<string, GuildMember>; message: Message; guild: string }> = []
+export interface MentionQueueItem {
+    type: string
+    members?: Collection<string, GuildMember | ThreadMember>
+    channelMembers?: any
+    message?: Message
+    guild: Guild | string
+    url?: string
+    target?: string
+    data?: MentionData
+}
+
+interface MentionData {
+    user: string
+    content: string
+    date: number
+    link: string
+}
+
+const mentionQueue: MentionQueueItem[] = []
 
 export { mentionQueue }
 

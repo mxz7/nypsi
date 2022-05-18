@@ -13,8 +13,9 @@ import ms = require("ms")
 import { encrypt } from "../utils/functions/string"
 import { addModLog } from "../utils/moderation/utils"
 import { PunishmentType } from "../utils/models/GuildStorage"
+import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils"
 
-declare function require(name: string)
+// declare function require(name: string)
 
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
@@ -62,8 +63,6 @@ export default async function messageCreate(message: Message) {
             }
         }
     }
-
-    const { mentionQueue } = require("../utils/users/utils")
 
     if (
         message.guild.memberCount < 150000 &&
@@ -190,9 +189,7 @@ let currentInterval = 150
 let lastChange = 0
 
 async function addMention() {
-    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
-
-    let mention
+    let mention: MentionQueueItem | string
 
     if (mentionQueue.length == 0) {
         if (deleteQueue.length == 0) {
@@ -212,7 +209,7 @@ async function addMention() {
         return
     }
 
-    if (mention.type == "collection") {
+    if (typeof mention != "string" && mention.type == "collection") {
         const members = mention.members
 
         if (members.size > 200) {
@@ -252,6 +249,7 @@ async function addMention() {
                     members: members.clone(),
                     message: mention.message,
                     channelMembers: channelMembers,
+                    guild: mention.guild,
                 })
             }
             const member = members.get(memberID)
@@ -285,7 +283,7 @@ async function addMention() {
             })
             count++
         }
-    } else if (mention.type == "mention") {
+    } else if (typeof mention != "string" && mention.type == "mention") {
         const guild = mention.guild
         const data = mention.data
         const target = mention.target
