@@ -54,36 +54,36 @@ export function MStoTime(ms: number, long = false) {
     if (days > 0) {
         output = output + days
         if (long) {
-            output + "days "
+            output += " days "
         } else {
-            output + "d "
+            output += "d "
         }
     }
 
     if (hours > 0) {
         output = output + hours
         if (long) {
-            output + "hours "
+            output += " hours "
         } else {
-            output + "h "
+            output += "h "
         }
     }
 
     if (minutes > 0) {
         output = output + minutes
         if (long) {
-            output + "minutes "
+            output += " minutes "
         } else {
-            output + "m "
+            output += "m "
         }
     }
 
     if (sec > 0) {
         output = output + sec
         if (long) {
-            output + "seconds "
+            output += " seconds "
         } else {
-            output + "s "
+            output += "s "
         }
     }
 
