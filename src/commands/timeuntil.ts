@@ -41,6 +41,10 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
         return send({ embeds: [new ErrorEmbed("invalid date")] })
     }
 
+    if (target.isBefore(dayjs())) {
+        return send({ embeds: [new ErrorEmbed("date must be in the future")] })
+    }
+
     await addCooldown(cmd.name, message.member, 10)
 
     args.shift()
