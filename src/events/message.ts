@@ -310,13 +310,6 @@ async function addMention() {
                 deleteQueue.push(m.url)
             }
         }
-
-        if (mentionQueue.length == 0 && deleteQueue.length == 0) {
-            clearInterval(mentionInterval)
-            mentionInterval = undefined
-            currentInterval = 100
-            return
-        }
     } else {
         deleteMention.run(mention)
     }
