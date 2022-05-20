@@ -10,6 +10,14 @@ function createTables() {
     ).run()
 
     db.prepare(
+        "CREATE TABLE IF NOT EXISTS economy_guild_members ('user_id' TEXT NOT NULL references economy(id), 'guild_id', TEXT NOT NULL references economy_guild(guild_name), 'joined_at' INTEGER NOT NULL, 'contributed_money' INTEGER NOT NULL DEFAULT 0, 'contributed_xp', INTEGER NOT NULL DEFAULT 0, 'last_known_tag' text not null, primary key (user_id, guild_id))"
+    ).run()
+
+    db.prepare(
+        "CREATE TABLE IF NOT EXISTS economy_guild ('guild_name' text not null primary key, 'created_at' integer not null, 'balance' integer not null default 0, 'xp' integer not null default 0, 'level' integer not null default 0, 'log_channel' text default '', 'motd' text default 'welcome to the guild fool (/guild motd)', 'owner' text not null)"
+    ).run()
+
+    db.prepare(
         "CREATE TABLE IF NOT EXISTS guilds ('id' TEXT PRIMARY KEY, 'peak' INTEGER DEFAULT 0, 'disabled_commands' TEXT DEFAULT '', 'snipe_filter' TEXT DEFAULT '', 'chat_filter' TEXT DEFAULT '', 'prefix' TEXT DEFAULT '$', 'countdowns' TEXT DEFAULT '{}')"
     ).run()
 
