@@ -1849,7 +1849,7 @@ export function getGuildByUser(member: GuildMember | string): EconomyGuild | nul
             return null
         }
 
-        guildName = query.guild_name
+        guildName = query.guild_id
     }
 
     const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName)
