@@ -1935,4 +1935,16 @@ export function upgradeGuild(name: string) {
         required.money,
         required.xp
     )
+
+    const guild = getGuildByName(name)
+
+    for (const m of guild.members) {
+        const inventory = getInventory(m.user_id)
+
+        if (inventory["basic_crate"]) {
+            inventory["basic_crate"] += 1
+        } else {
+            inventory["basic_crate"] = 1
+        }
+    }
 }
