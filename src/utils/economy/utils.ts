@@ -1977,4 +1977,6 @@ export function removeMember(member: string, mode: RemoveMemberMode) {
     } else {
         db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member)
     }
+
+    guildUserCache.clear()
 }
