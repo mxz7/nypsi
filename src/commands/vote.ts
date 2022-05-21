@@ -34,13 +34,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (voted) {
         embed.setHeader("vote ✅", message.author.avatarURL())
         embed.setColor("#5efb8f")
-        embed.addField("active rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
+        embed.addField("active rewards", `✓ +**3**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
         embed.setHeader("vote ❌", message.author.avatarURL())
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**5**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
+            `× +**3**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         )

@@ -299,7 +299,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     "+ **10** karma\n" +
-                    `+ **5**% multiplier, total: **${multi}**%\n` +
+                    `+ **3**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
@@ -398,7 +398,7 @@ export function getMulti(member: GuildMember | string): number {
     const voted = hasVoted(id)
 
     if (voted) {
-        multi += 5
+        multi += 3
     }
 
     const prestige = getPrestige(member)
