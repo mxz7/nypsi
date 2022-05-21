@@ -403,7 +403,7 @@ export function getMulti(member: GuildMember | string): number {
 
     const prestige = getPrestige(member)
 
-    const prestigeBonus = (prestige > 12 ? 12 : prestige) * 2
+    const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2
 
     multi += prestigeBonus
 
@@ -418,6 +418,12 @@ export function getMulti(member: GuildMember | string): number {
             case 4:
                 multi += 10
         }
+    }
+
+    const guild = getGuildByUser(id)
+
+    if (guild) {
+        multi += guild.level - 1
     }
 
     multi = Math.floor(multi)
