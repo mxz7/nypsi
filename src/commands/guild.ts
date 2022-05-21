@@ -10,6 +10,8 @@ import {
     getMaxMembersForGuild,
     getPrestige,
     isEcoBanned,
+    removeMember,
+    RemoveMemberMode,
     updateBalance,
     userExists,
 } from "../utils/economy/utils"
@@ -195,6 +197,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
 
+        await addCooldown(cmd.name, message.member, 15)
+
         invited.push(target.user.id)
 
         const embed = new CustomEmbed(message.member, false)
@@ -239,6 +243,82 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return edit({ embeds: [embed], components: [] }, msg)
+    }
+
+    if (args[0].toLowerCase() == "leave" || args[0].toLowerCase() == "exit") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (guild.owner == message.author.id) {
+            return send({ embeds: [new ErrorEmbed("you are the guild owner, you must delete the guild")] })
+        }
+
+        removeMember(message.author.id, RemoveMemberMode.ID)
+
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, false, `✅ you have left **${guild.guild_name}**`)],
+        })
+    }
+
+    if (args[0].toLowerCase() == "kick") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (guild.owner != message.author.id) {
+            return send({ embeds: [new ErrorEmbed("you are not the guild owner")] })
+        }
+
+        if (args.length == 1) {
+            return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] })
+        }
+
+        let target: string
+        let mode = RemoveMemberMode.ID
+
+        if (message.mentions?.members?.first()) {
+            let found = false
+            for (const m of guild.members) {
+                if (m.user_id == message.mentions.members.first().user.id) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                return send({
+                    embeds: [
+                        new ErrorEmbed(`\`${message.mentions.members.first().user.tag}\` is not in **${guild.guild_name}**`),
+                    ],
+                })
+            }
+
+            target = message.mentions.members.first().user.id
+        } else {
+            let found = false
+            for (const m of guild.members) {
+                if (m.user_id == args[1]) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                return send({ embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guild_name}**`)] })
+            }
+
+            target = args[1]
+            mode = RemoveMemberMode.TAG
+        }
+
+        removeMember(target, mode)
+
+        return send({
+            embeds: [
+                new CustomEmbed(message.member, false, `✅ \`${target}\` has been kicked from **${guild.guild_name}**`),
+            ],
+        })
     }
 }
 
