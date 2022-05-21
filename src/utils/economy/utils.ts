@@ -1906,3 +1906,33 @@ export function addToGuildXP(name: string, amount: number, member: GuildMember) 
         member.user.id
     )
 }
+
+export function getMaxMembersForGuild(name: string) {
+    const guild = getGuildByName(name)
+
+    return guild.level * 3
+}
+
+export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
+    const guild = getGuildByName(name)
+
+    const baseMoney = 1900000 * Math.pow(guild.level, 2)
+    const baseXP = 1425 * Math.pow(guild.level, 2)
+
+    const bonusMoney = 100000 * guild.members.length
+    const bonusXP = 75 * guild.members.length
+
+    return {
+        money: baseMoney + bonusMoney,
+        xp: baseXP + bonusXP,
+    }
+}
+
+export function upgradeGuild(name: string) {
+    const required = getRequiredForGuildUpgrade(name)
+
+    db.prepare("update economy_guild set balance = balance - ?, xp = xp - ?, level = level + 1").run(
+        required.money,
+        required.xp
+    )
+}
