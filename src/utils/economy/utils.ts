@@ -1840,7 +1840,7 @@ export function getGuildByUser(member: GuildMember | string): EconomyGuild | nul
 
         if (!guildName) return null
     } else {
-        const query = db.prepare("select guild_name from economy_guild_members where user_id = ?").get(id)
+        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id)
 
         if (!query) {
             guildUserCache.set(id, null)
