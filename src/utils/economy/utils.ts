@@ -1772,3 +1772,23 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
 
     return earned
 }
+
+interface EconomyGuild {
+    guild_name: string
+    created_at: number
+    balance: number
+    xp: number
+    level: number
+    log_channel: string | undefined
+    motd: string
+    owner: string
+}
+
+interface EconomyGuildMember {
+    user_id: string
+    guild_id: string
+    joined_at: number
+    contributed_money: number
+    contributed_xp: number
+    last_known_tag: string
+}
