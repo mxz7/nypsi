@@ -71,30 +71,10 @@ if (!isMainThread) {
             if (e.code != "SQLITE_BUSY") throw e
         }
 
-        const mentions = fetchMentions.all(collection.guild.id, member.user.id)
-
-        let limit = 6
-
-        const tier = getTier.run(member.user.id)
-
-        if (tier) {
-            limit += tier * 2
-        }
-
-        if (mentions.length > limit) {
-            mentions.splice(0, limit)
-
-            const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?")
-
-            for (const mention of mentions) {
-                deleteMention.run(mention.url)
-            }
-        }
-
         if (a.length == 0) {
             clearInterval(interval)
             db.close()
             parentPort.postMessage(0)
         }
-    }, 125)
+    }, 50)
 }
