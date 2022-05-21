@@ -4,6 +4,7 @@ import {
     addMember,
     createGuild,
     createUser,
+    deleteGuild,
     getBalance,
     getGuildByName,
     getGuildByUser,
@@ -319,6 +320,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 new CustomEmbed(message.member, false, `✅ \`${target}\` has been kicked from **${guild.guild_name}**`),
             ],
         })
+    }
+
+    if (args[0].toLowerCase() == "delete") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (guild.owner != message.author.id) {
+            return send({ embeds: [new ErrorEmbed("you are not the guild owner")] })
+        }
+
+        deleteGuild(guild.guild_name)
+
+        return send({ embeds: [new CustomEmbed(message.member, false, `✅ **${guild.guild_name}** has been deleted`)] })
     }
 }
 
