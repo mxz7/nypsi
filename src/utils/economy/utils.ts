@@ -1782,6 +1782,7 @@ interface EconomyGuild {
     log_channel: string | undefined
     motd: string
     owner: string
+    members?: EconomyGuildMember[]
 }
 
 interface EconomyGuildMember {
