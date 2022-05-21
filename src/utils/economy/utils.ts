@@ -1811,7 +1811,7 @@ export function guildExists(name: string): boolean {
 }
 
 export function getGuildByName(name: string): EconomyGuild {
-    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(name)
+    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name)
     const members: EconomyGuildMember[] = db.prepare("select * from economy_guild_members where guild_id = ?").all(name)
 
     guild.members = members
