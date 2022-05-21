@@ -1359,7 +1359,7 @@ export function addItemUse(member: GuildMember, item) {
  * @param {GuildMember} member
  * @returns
  */
-export function getInventory(member: GuildMember | string) {
+export function getInventory(member: GuildMember | string): { [key: string]: number } {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
