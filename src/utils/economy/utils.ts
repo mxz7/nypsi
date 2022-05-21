@@ -1878,6 +1878,10 @@ export function createGuild(name: string, owner: GuildMember) {
         Date.now(),
         owner.user.tag
     )
+
+    if (guildUserCache.has(owner.user.id)) {
+        guildUserCache.delete(owner.user.id)
+    }
 }
 
 export function deleteGuild(name: string) {
@@ -1964,6 +1968,10 @@ export function addMember(name: string, member: GuildMember): boolean {
         Date.now(),
         member.user.tag
     )
+
+    if (guildUserCache.has(member.user.id)) {
+        guildUserCache.delete(member.user.id)
+    }
 
     return true
 }
