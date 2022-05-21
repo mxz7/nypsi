@@ -29,6 +29,8 @@ const app = express()
 const voteCache = new Map()
 const existsCache = new Map()
 const bannedCache = new Map()
+const guildExistsCache = new Map()
+const guildUserCache = new Map()
 
 app.post(
     "/dblwebhook",
@@ -1782,7 +1784,7 @@ interface EconomyGuild {
     log_channel: string | undefined
     motd: string
     owner: string
-    members?: EconomyGuildMember[]
+    members: EconomyGuildMember[]
 }
 
 interface EconomyGuildMember {
@@ -1792,4 +1794,72 @@ interface EconomyGuildMember {
     contributed_money: number
     contributed_xp: number
     last_known_tag: string
+}
+
+export function guildExists(name: string): boolean {
+    if (guildExistsCache.has(name)) {
+        return guildExistsCache.get(name)
+    }
+
+    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name)
+
+    if (!query) {
+        return false
+    } else {
+        return true
+    }
+}
+
+export function getGuildByName(name: string): EconomyGuild {
+    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(name)
+    const members: EconomyGuildMember[] = db.prepare("select * from economy_guild_members where guild_id = ?").all(name)
+
+    guild.members = members
+
+    for (const m of members) {
+        if (!guildUserCache.has(m.user_id)) {
+            guildUserCache.set(m.user_id, m.guild_id)
+        }
+    }
+
+    return guild
+}
+
+export function getGuildByUser(member: GuildMember | string): EconomyGuild | null {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
+
+    let guildName: string
+
+    if (guildUserCache.has(id)) {
+        guildName = guildUserCache.get(id)
+
+        if (!guildName) return null
+    } else {
+        const query = db.prepare("select guild_name from economy_guild_members where user_id = ?").get(id)
+
+        if (!query) {
+            guildUserCache.set(id, null)
+            return null
+        }
+
+        guildName = query.guild_name
+    }
+
+    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName)
+    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName)
+
+    for (const m of members) {
+        if (!guildUserCache.has(m.user_id)) {
+            guildUserCache.set(m.user_id, m.guild_id)
+        }
+    }
+
+    guild.members = members
+
+    return guild
 }
