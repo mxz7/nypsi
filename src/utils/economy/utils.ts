@@ -1890,3 +1890,11 @@ export function deleteGuild(name: string) {
     db.prepare("delete from economy_guild_members where guild_id = ?").run(name)
     db.prepare("delete from economy_guild where guild_name = ?").run(name)
 }
+
+export function addToGuildBank(name: string, amount: number, member: GuildMember) {
+    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild_members set contributed_money = contributed_money + ? where user_id = ?").run(
+        amount,
+        member.user.id
+    )
+}
