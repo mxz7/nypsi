@@ -1863,3 +1863,30 @@ export function getGuildByUser(member: GuildMember | string): EconomyGuild | nul
 
     return guild
 }
+
+export function createGuild(name: string, owner: GuildMember) {
+    db.prepare("insert into economy_guild (guild_name, created_at, owner) values (?, ?, ?)").run(
+        name,
+        Date.now(),
+        owner.user.id
+    )
+    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
+        owner.user.id,
+        name,
+        Date.now(),
+        owner.user.tag
+    )
+}
+
+export function deleteGuild(name: string) {
+    const members = getGuildByName(name).members
+
+    for (const m of members) {
+        guildUserCache.delete(m.user_id)
+    }
+
+    guildExistsCache.delete(name)
+
+    db.prepare("delete from economy_guild_members where guild_id = ?").run(name)
+    db.prepare("delete from economy_guild where guild_name = ?").run(name)
+}
