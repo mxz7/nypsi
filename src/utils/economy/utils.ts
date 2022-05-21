@@ -1898,3 +1898,11 @@ export function addToGuildBank(name: string, amount: number, member: GuildMember
         member.user.id
     )
 }
+
+export function addToGuildXP(name: string, amount: number, member: GuildMember) {
+    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild_members set contributed_xp = contributed_xp + ? where user_id = ?").run(
+        amount,
+        member.user.id
+    )
+}
