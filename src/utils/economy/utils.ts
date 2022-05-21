@@ -1948,3 +1948,33 @@ export function upgradeGuild(name: string) {
         }
     }
 }
+
+export function addMember(name: string, member: GuildMember): boolean {
+    const guild = getGuildByName(name)
+
+    if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
+        return false
+    }
+
+    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
+        member.user.id,
+        guild.guild_name,
+        Date.now(),
+        member.user.tag
+    )
+
+    return true
+}
+
+export enum RemoveMemberMode {
+    ID,
+    TAG,
+}
+
+export function removeMember(member: string, mode: RemoveMemberMode) {
+    if (mode == RemoveMemberMode.ID) {
+        db.prepare("delete from economy_guild_members where user_id = ?").run(member)
+    } else {
+        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member)
+    }
+}
