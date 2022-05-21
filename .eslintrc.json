@@ -27,7 +27,7 @@
             "error",
             "never"
         ],
-        "no-unreachable": "warn",
+        "no-unreachable": "error",
         "no-case-declarations": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-function": "off",
