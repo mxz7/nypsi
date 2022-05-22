@@ -14,7 +14,7 @@ function createTables() {
     ).run()
 
     db.prepare(
-        "CREATE TABLE IF NOT EXISTS economy_guild ('guild_name' text not null primary key, 'created_at' integer not null, 'balance' integer not null default 0, 'xp' integer not null default 0, 'level' integer not null default 1, 'log_channel' text default '', 'motd' text default 'welcome to the guild fool (/guild motd)', 'owner' text not null)"
+        "CREATE TABLE IF NOT EXISTS economy_guild ('guild_name' text not null primary key, 'created_at' integer not null, 'balance' integer not null default 0, 'xp' integer not null default 0, 'level' integer not null default 1, 'motd' text default 'welcome to the guild fool (/guild motd)', 'owner' text not null)"
     ).run()
 
     db.prepare(
