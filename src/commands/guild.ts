@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`
             )
         } else {
-            embed.setTitle(guild.guild_name)
+            embed.setHeader(guild.guild_name, message.author.avatarURL())
             // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
             embed.setDescription(guild.motd)
             embed.addField(
@@ -134,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`${prefix}guild create <name>`)] })
         }
 
-        const name = cleanString(args[1])
+        const name = args.join(" ").normalize("NFD")
 
         if (name.length > 25) {
             return send({ embeds: [new ErrorEmbed("guild names must be shorter than 25 characters")] })
@@ -145,7 +145,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         for (const word of filter) {
-            if (name.includes(word)) {
+            if (cleanString(name).includes(word)) {
                 return send({ embeds: [new ErrorEmbed("invalid guild name")] })
             }
         }
