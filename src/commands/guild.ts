@@ -2,9 +2,11 @@ import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageOp
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import {
     addMember,
+    addToGuildBank,
     createGuild,
     createUser,
     deleteGuild,
+    formatNumber,
     getBalance,
     getGuildByName,
     getGuildByUser,
@@ -340,6 +342,52 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         deleteGuild(guild.guild_name)
 
         return send({ embeds: [new CustomEmbed(message.member, false, `✅ **${guild.guild_name}** has been deleted`)] })
+    }
+
+    if (args[0].toLowerCase() == "deposit" || args[0].toLowerCase() == "dep") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (args.length == 1) {
+            return send({ embeds: [new ErrorEmbed(`${prefix}guild dep <amount>`)] })
+        }
+
+        if (args[1].toLowerCase() == "all") {
+            args[1] = getBalance(message.member).toString()
+        } else if (args[1].toLowerCase() == "half") {
+            args[1] = (getBalance(message.member) / 2).toString()
+        }
+
+        const amount = formatNumber(args[1])
+
+        if (!amount) {
+            return send({ embeds: [new ErrorEmbed("invalid payment")] })
+        }
+
+        if (amount > getBalance(message.member)) {
+            return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] })
+        }
+
+        if (amount <= 0) {
+            return send({ embeds: [new ErrorEmbed("invalid payment")] })
+        }
+
+        updateBalance(message.member, getBalance(message.member) - amount)
+
+        addToGuildBank(guild.guild_name, amount, message.member)
+
+        const embed = new CustomEmbed(message.member, false).setHeader("guild deposit", message.author.avatarURL())
+
+        embed.setDescription(`$**${guild.balance.toLocaleString()}**\n - +$**${amount.toLocaleString()}**`)
+
+        const msg = await send({ embeds: [embed] })
+
+        embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**\n - +$**${amount.toLocaleString()}**`)
+
+        return setTimeout(() => {
+            edit({ embeds: [embed] }, msg)
+        }, 1500)
     }
 }
 
