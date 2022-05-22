@@ -1798,13 +1798,12 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
     return earned
 }
 
-interface EconomyGuild {
+export interface EconomyGuild {
     guild_name: string
     created_at: number
     balance: number
     xp: number
     level: number
-    log_channel: string | undefined
     motd: string
     owner: string
     members: EconomyGuildMember[]
