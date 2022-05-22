@@ -1910,6 +1910,8 @@ export function addToGuildBank(name: string, amount: number, member: GuildMember
         amount,
         member.user.id
     )
+
+    return checkUpgrade(name)
 }
 
 export function addToGuildXP(name: string, amount: number, member: GuildMember) {
@@ -1918,6 +1920,8 @@ export function addToGuildXP(name: string, amount: number, member: GuildMember) 
         amount,
         member.user.id
     )
+
+    return checkUpgrade(name)
 }
 
 export function getMaxMembersForGuild(name: string) {
@@ -1990,7 +1994,11 @@ export function updateLastKnownTag(id: string, tag: string) {
     db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id)
 }
 
-async function checkUpgrade(guild: EconomyGuild): Promise<boolean> {
+async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+    if (typeof guild == "string") {
+        guild = getGuildByName(guild)
+    }
+
     if (guild.level == 5) return
     const requirements = getRequiredForGuildUpgrade(guild.guild_name)
 
