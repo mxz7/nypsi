@@ -13,6 +13,7 @@ import {
     getGuildByUser,
     getMaxMembersForGuild,
     getPrestige,
+    getRequiredForGuildUpgrade,
     isEcoBanned,
     removeMember,
     RemoveMemberMode,
@@ -436,6 +437,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         embed.setDescription(desc)
+
+        return send({ embeds: [embed] })
+    }
+
+    if (args[0].toLowerCase() == "upgrade") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (guild.level == 5) {
+            return send({ embeds: [new CustomEmbed(message.member, false, `**${guild.guild_name}** is at max level`)] })
+        }
+
+        await addCooldown(cmd.name, message.member, 3)
+
+        const requirements = getRequiredForGuildUpgrade(guild.guild_name)
+
+        const embed = new CustomEmbed(message.member, false)
+
+        embed.setHeader(guild.guild_name, message.author.avatarURL())
+        embed.setDescription(
+            `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
+                `**money** $${guild.balance.toLocaleString()}/$${requirements.money.toLocaleString()}\n` +
+                `**xp** ${guild.xp.toLocaleString()}xp/${requirements.xp.toLocaleString()}xp\n\n` +
+                "note: the upgrade will be handled automatically when all requirements are met"
+        )
 
         return send({ embeds: [embed] })
     }
