@@ -1996,3 +1996,7 @@ export function removeMember(member: string, mode: RemoveMemberMode) {
 
     guildUserCache.clear()
 }
+
+export function updateLastKnownTag(id: string, tag: string) {
+    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id)
+}
