@@ -393,11 +393,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member, false).setHeader("guild deposit", message.author.avatarURL())
 
-        embed.setDescription(`$**${guild.balance.toLocaleString()}**\n - +$**${amount.toLocaleString()}**`)
+        embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`)
 
         const msg = await send({ embeds: [embed] })
 
-        embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**\n - +$**${amount.toLocaleString()}**`)
+        embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`)
 
         return setTimeout(() => {
             edit({ embeds: [embed] }, msg)
