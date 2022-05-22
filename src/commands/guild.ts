@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         for (const word of filter) {
-            if (cleanString(name).includes(word)) {
+            if (cleanString(name).toLowerCase().includes(word)) {
                 return send({ embeds: [new ErrorEmbed("invalid guild name")] })
             }
         }
