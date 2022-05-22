@@ -1759,7 +1759,15 @@ export function calcMinimumEarnedXp(member: GuildMember): number {
     let earned = 1
     earned += getPrestige(member)
 
-    if (earned > 7) earned = 7
+    let max = 6
+
+    const guild = getGuildByUser(member)
+
+    if (guild) {
+        max += guild.level - 1
+    }
+
+    if (earned > max) earned = max
 
     return earned
 }
@@ -2035,6 +2043,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
             } else {
                 inventory["basic_crate"] = guild.level
             }
+
+            setInventory(member.user_id, inventory)
 
             if (getDMsEnabled(member.user_id)) {
                 const { requestDM } = require("../../nypsi")
