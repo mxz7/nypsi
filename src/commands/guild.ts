@@ -17,6 +17,7 @@ import {
     isEcoBanned,
     removeMember,
     RemoveMemberMode,
+    setGuildMOTD,
     updateBalance,
     updateLastKnownTag,
     userExists,
@@ -465,6 +466,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
 
         return send({ embeds: [embed] })
+    }
+
+    if (args[0].toLowerCase() == "motd") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        if (guild.owner != message.author.id) {
+            return send({ embeds: [new ErrorEmbed("you are not the guild owner")] })
+        }
+
+        if (args.length == 1) {
+            return send({ embeds: [new ErrorEmbed(`${prefix}guild motd <new motd>`)] })
+        }
+
+        args.shift()
+
+        const motd = args.join(" ").normalize("NFD")
+
+        if (motd.length > 500) {
+            return send({ embeds: [new ErrorEmbed("guild motd cannot be longer than 500 characters")] })
+        }
+
+        for (const word of filter) {
+            if (cleanString(motd).toLowerCase().includes(word))
+                return send({ embeds: [new ErrorEmbed("invalid guild motd")] })
+        }
+
+        await addCooldown(cmd.name, message.member, 3)
+
+        setGuildMOTD(guild.guild_name, motd)
+
+        return send({ embeds: [new CustomEmbed(message.member, false, "✅ motd has been updated")] })
     }
 }
 
