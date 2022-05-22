@@ -2063,3 +2063,27 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 export function setGuildMOTD(name: string, motd: string) {
     db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name)
 }
+
+export function topGuilds(limit = 5): string[] {
+    const guilds: EconomyGuild[] = db
+        .prepare("select guild_name, balance, xp, level from economy_guild where balance > 1000")
+        .all()
+
+    inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp])
+
+    const out: string[] = []
+
+    for (const guild of guilds) {
+        let position: number | string = guilds.indexOf(guild) + 1
+
+        if (position == 1) position = "🥇"
+        if (position == 2) position = "🥈"
+        if (position == 3) position = "🥉"
+
+        out.push(`${position} **${guild.guild_name}** [${guild.level}] $${guild.balance.toLocaleString()}`)
+
+        if (out.length >= limit) break
+    }
+
+    return out
+}
