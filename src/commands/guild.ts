@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed.addField(
                 "info",
                 `**level** ${guild.level}\n` +
-                    `**created at** ${formatDate(guild.created_at)}\n` +
+                    `**created on** ${formatDate(guild.created_at)}\n` +
                     `**owner** ${guild.members[0].last_known_tag}`,
                 true
             )
