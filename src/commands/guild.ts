@@ -299,9 +299,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) return
 
         if (reaction == "yes") {
+            const targetGuild = getGuildByUser(target.user.id)
             const refreshedGuild = getGuildByName(guild.guild_name)
 
-            if (refreshedGuild.members.length >= getMaxMembersForGuild(refreshedGuild.guild_name)) {
+            if (targetGuild) {
+                embed.setDescription("❌ you are already in a guild")
+            } else if (refreshedGuild.members.length >= getMaxMembersForGuild(refreshedGuild.guild_name)) {
                 embed.setDescription("❌ this guild has too many members")
             } else {
                 addMember(guild.guild_name, target)
