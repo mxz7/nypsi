@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = getPrefix(message.guild)
 
     const showGuild = async () => {
-        await addCooldown(cmd.name, message.member, 10)
+        await addCooldown(cmd.name, message.member, 5)
         const embed = new CustomEmbed(message.member, false)
 
         if (!guild) {
@@ -255,6 +255,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you are the guild owner, you must delete the guild")] })
         }
 
+        await addCooldown(cmd.name, message.member, 20)
+
         removeMember(message.author.id, RemoveMemberMode.ID)
 
         return message.channel.send({
@@ -313,6 +315,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             mode = RemoveMemberMode.TAG
         }
 
+        await addCooldown(cmd.name, message.member, 10)
+
         removeMember(target, mode)
 
         return send({
@@ -330,6 +334,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (guild.owner != message.author.id) {
             return send({ embeds: [new ErrorEmbed("you are not the guild owner")] })
         }
+
+        await addCooldown(cmd.name, message.member, 30)
 
         deleteGuild(guild.guild_name)
 
