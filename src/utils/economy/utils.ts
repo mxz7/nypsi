@@ -2080,7 +2080,7 @@ export function topGuilds(limit = 5): string[] {
         if (position == 2) position = "🥈"
         if (position == 3) position = "🥉"
 
-        out.push(`${position} **${guild.guild_name}** [${guild.level}] $${guild.balance.toLocaleString()}`)
+        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`)
 
         if (out.length >= limit) break
     }
