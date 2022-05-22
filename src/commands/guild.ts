@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js"
+import { inPlaceSort } from "fast-sort"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import {
     addMember,
@@ -402,6 +403,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return setTimeout(() => {
             edit({ embeds: [embed] }, msg)
         }, 1500)
+    }
+
+    if (args[0].toLowerCase() == "stats") {
+        if (!guild) {
+            return send({ embeds: [new ErrorEmbed("you're not in a guild")] })
+        }
+
+        await addCooldown(cmd.name, message.member, 10)
+
+        const members = guild.members
+
+        inPlaceSort(members).desc([(i) => i.contributed_money, (i) => i.contributed_xp])
+
+        const embed = new CustomEmbed(message.member, false).setHeader(
+            `${guild.guild_name} stats`,
+            message.author.avatarURL()
+        )
+
+        let desc = ""
+
+        for (const m of members) {
+            let position: number | string = members.indexOf(m) + 1
+
+            if (position == 1) position = "🥇"
+            if (position == 2) position = "🥈"
+            if (position == 3) position = "🥉"
+
+            desc += `${position} **${
+                m.last_known_tag
+            }** $${m.contributed_money.toLocaleString()} **|** ${m.contributed_xp.toLocaleString()}xp`
+        }
+
+        embed.setDescription(desc)
+
+        return send({ embeds: [embed] })
     }
 }
 
