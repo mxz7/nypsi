@@ -16,6 +16,7 @@ import {
     removeMember,
     RemoveMemberMode,
     updateBalance,
+    updateLastKnownTag,
     userExists,
 } from "../utils/economy/utils"
 import { daysAgo, formatDate } from "../utils/functions/date"
@@ -66,6 +67,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const guild = getGuildByUser(message.member)
     const prefix = getPrefix(message.guild)
+
+    if (guild) {
+        for (const m of guild.members) {
+            if (m.user_id == message.author.id) {
+                if (m.last_known_tag != message.author.tag) {
+                    updateLastKnownTag(message.author.id, message.author.tag)
+                }
+                break
+            }
+        }
+    }
 
     const showGuild = async () => {
         await addCooldown(cmd.name, message.member, 5)
