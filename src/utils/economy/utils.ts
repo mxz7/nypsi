@@ -1777,7 +1777,15 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
 
     earned += random
 
-    if (earned > 7) earned = 7
+    let max = 6
+
+    const guild = getGuildByUser(member)
+
+    if (guild) {
+        max += guild.level - 1
+    }
+
+    if (earned > max) earned = max
 
     return earned
 }
