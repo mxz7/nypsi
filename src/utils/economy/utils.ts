@@ -2057,3 +2057,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     }
     return false
 }
+
+export function setGuildMOTD(name: string, motd: string) {
+    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name)
+}
