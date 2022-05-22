@@ -32,6 +32,53 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
 const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY).setAliases(["g", "clan"])
 
+cmd.slashEnabled = true
+
+cmd.slashData
+    .addSubcommand((create) =>
+        create
+            .setName("create")
+            .setDescription("create a guild")
+            .addStringOption((option) => option.setName("name").setDescription("name of the guild").setRequired(true))
+    )
+    .addSubcommand((invite) =>
+        invite
+            .setName("invite")
+            .setDescription("invite a member to your guild")
+            .addUserOption((option) =>
+                option.setName("member").setDescription("member to invite to the guild").setRequired(true)
+            )
+    )
+    .addSubcommand((leave) => leave.setName("leave").setDescription("leave your current guild"))
+    .addSubcommand((deleteOpt) => deleteOpt.setName("delete").setDescription("delete your current guild"))
+    .addSubcommand((kick) =>
+        kick
+            .setName("kick")
+            .setDescription("kick a member from your guild")
+            .addUserOption((option) =>
+                option.setName("member").setDescription("member to kick from the guild").setRequired(true)
+            )
+    )
+    .addSubcommand((deposit) =>
+        deposit
+            .setName("deposit")
+            .setDescription("deposit money into the guild")
+            .addIntegerOption((option) =>
+                option.setName("amount").setDescription("amount to deposit into the guild").setRequired(true)
+            )
+    )
+    .addSubcommand((stats) => stats.setName("stats").setDescription("view stats for the guild members"))
+    .addSubcommand((upgrade) =>
+        upgrade.setName("upgrade").setDescription("view the requirements for the next guild upgrade")
+    )
+    .addSubcommand((motd) =>
+        motd
+            .setName("motd")
+            .setDescription("set the motd for the guild")
+            .addStringOption((option) => option.setName("text").setDescription("text for the motd").setRequired(true))
+    )
+    .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"))
+
 const filter = ["nig", "fag", "queer"]
 
 const invited = []
