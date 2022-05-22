@@ -31,6 +31,7 @@ const existsCache = new Map()
 const bannedCache = new Map()
 const guildExistsCache = new Map()
 const guildUserCache = new Map()
+const guildRequirementsCache = new Map()
 
 app.post(
     "/dblwebhook",
@@ -1926,6 +1927,10 @@ export function getMaxMembersForGuild(name: string) {
 }
 
 export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
+    if (guildRequirementsCache.has(name)) {
+        return guildRequirementsCache.get(name)
+    }
+
     const guild = getGuildByName(name)
 
     const baseMoney = 1900000 * Math.pow(guild.level, 2)
@@ -1933,6 +1938,11 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
 
     const bonusMoney = 100000 * guild.members.length
     const bonusXP = 75 * guild.members.length
+
+    guildRequirementsCache.set(name, {
+        money: baseMoney + bonusMoney,
+        xp: baseXP + bonusXP,
+    })
 
     return {
         money: baseMoney + bonusMoney,
