@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] })
         }
 
-        if (getBalance(message.member) <= 500000) {
+        if (getBalance(message.member) < 500000) {
             return send({ embeds: [new ErrorEmbed("it costs $500,000 to create a guild. you cannot afford this")] })
         }
 
