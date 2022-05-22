@@ -7,6 +7,7 @@ import {
     createGuild,
     createUser,
     deleteGuild,
+    EconomyGuild,
     formatNumber,
     getBalance,
     getGuildByName,
@@ -69,21 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const guild = getGuildByUser(message.member)
-    const prefix = getPrefix(message.guild)
-
-    if (guild) {
-        for (const m of guild.members) {
-            if (m.user_id == message.author.id) {
-                if (m.last_known_tag != message.author.tag) {
-                    updateLastKnownTag(message.author.id, message.author.tag)
-                }
-                break
-            }
-        }
-    }
-
-    const showGuild = async () => {
+    const showGuild = async (guild: EconomyGuild) => {
         await addCooldown(cmd.name, message.member, 5)
         const embed = new CustomEmbed(message.member, false)
 
@@ -127,8 +114,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
+    const guild = getGuildByUser(message.member)
+    const prefix = getPrefix(message.guild)
+
+    if (guild) {
+        for (const m of guild.members) {
+            if (m.user_id == message.author.id) {
+                if (m.last_known_tag != message.author.tag) {
+                    updateLastKnownTag(message.author.id, message.author.tag)
+                }
+                break
+            }
+        }
+    }
+
     if (args.length == 0) {
-        return showGuild()
+        return showGuild(guild)
     }
 
     if (args[0].toLowerCase() == "create") {
@@ -513,6 +514,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return send({ embeds: [embed] })
     }
+
+    const name = args.join(" ")
+
+    if (name.length > 25) {
+        return send({ embeds: [new ErrorEmbed("invalid guild")] })
+    }
+
+    await addCooldown(cmd.name, message.member, 7)
+
+    const targetGuild = getGuildByName(name)
+
+    if (!targetGuild) {
+        return send({ embeds: [new ErrorEmbed("invalid guild")] })
+    }
+
+    return showGuild(targetGuild)
 }
 
 cmd.setRun(run)
