@@ -1950,27 +1950,6 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
     }
 }
 
-export function upgradeGuild(name: string) {
-    const required = getRequiredForGuildUpgrade(name)
-
-    db.prepare("update economy_guild set balance = balance - ?, xp = xp - ?, level = level + 1").run(
-        required.money,
-        required.xp
-    )
-
-    const guild = getGuildByName(name)
-
-    for (const m of guild.members) {
-        const inventory = getInventory(m.user_id)
-
-        if (inventory["basic_crate"]) {
-            inventory["basic_crate"] += 1
-        } else {
-            inventory["basic_crate"] = 1
-        }
-    }
-}
-
 export function addMember(name: string, member: GuildMember): boolean {
     const guild = getGuildByName(name)
 
@@ -2009,4 +1988,46 @@ export function removeMember(member: string, mode: RemoveMemberMode) {
 
 export function updateLastKnownTag(id: string, tag: string) {
     db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id)
+}
+
+async function checkUpgrade(guild: EconomyGuild): Promise<boolean> {
+    if (guild.level == 5) return
+    const requirements = getRequiredForGuildUpgrade(guild.guild_name)
+
+    if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
+        db.prepare(
+            "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
+        ).run(requirements.money, requirements.xp, guild.guild_name)
+
+        guildRequirementsCache.clear()
+
+        const embed = new CustomEmbed().setColor("#5efb8f")
+
+        embed.setHeader(guild.guild_name)
+        embed.setDescription(
+            `**${guild.guild_name}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
+                `\n +**${guild.level}** basic crates` +
+                "\n +**1**% multiplier" +
+                "\n +**1** max xp gain"
+        )
+
+        for (const member of guild.members) {
+            const inventory = getInventory(member.user_id)
+
+            if (inventory["basic_crate"]) {
+                inventory["basic_crate"] += guild.level
+            } else {
+                inventory["basic_crate"] = guild.level
+            }
+
+            if (getDMsEnabled(member.user_id)) {
+                const { requestDM } = require("../../nypsi")
+
+                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed)
+            }
+        }
+
+        return true
+    }
+    return false
 }
