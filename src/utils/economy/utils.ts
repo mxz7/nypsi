@@ -2023,6 +2023,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
             "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
         ).run(requirements.money, requirements.xp, guild.guild_name)
 
+        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`)
+
         guildRequirementsCache.clear()
 
         const embed = new CustomEmbed().setColor("#5efb8f")
