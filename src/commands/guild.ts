@@ -18,6 +18,7 @@ import {
     removeMember,
     RemoveMemberMode,
     setGuildMOTD,
+    topGuilds,
     updateBalance,
     updateLastKnownTag,
     userExists,
@@ -499,6 +500,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setGuildMOTD(guild.guild_name, motd)
 
         return send({ embeds: [new CustomEmbed(message.member, false, "✅ motd has been updated")] })
+    }
+
+    if (args[0].toLowerCase() == "top") {
+        await addCooldown(cmd.name, message.member, 15)
+
+        const top = topGuilds(parseInt(args[1]) ?? 5)
+
+        const embed = new CustomEmbed(message.member, false).setHeader("top 5 guilds", message.author.avatarURL())
+
+        embed.setDescription(top.join("\n"))
+
+        return send({ embeds: [embed] })
     }
 }
 
