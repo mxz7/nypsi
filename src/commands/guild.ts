@@ -134,6 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`${prefix}guild create <name>`)] })
         }
 
+        args.shift()
+
         const name = args.join(" ").normalize("NFD")
 
         if (name.length > 25) {
