@@ -52,6 +52,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
+    console.log(workerCount)
+
     const embed = new CustomEmbed(message.member)
         .setHeader("nypsi stats")
         .addField(
