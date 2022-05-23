@@ -6,7 +6,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 
-const cmd = new Command("timeago", "calculate how long ago a date was", Categories.INFO).setAliases(["ta", "ago"])
+const cmd = new Command("timeago", "calculate how long ago a date was", Categories.INFO).setAliases(["ago"])
 
 async function run(message: Message | (CommandInteraction & NypsiCommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
