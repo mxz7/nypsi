@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getLastfmUsername } from "../utils/users/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { logger } from "../utils/logger"
 
 const cmd = new Command("toptracks", "view your top tracks", Categories.INFO).setAliases(["tt"])
 
@@ -58,8 +59,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${username}&period=${length}&api_key=${process.env.LASTFM_TOKEN}&format=json`
     ).then((res) => res.json())
 
+    if (res.error) {
+        logger.error(`lastfm error: ${res.error} - ${username}`)
+        return message.channel.send({ embeds: [new ErrorEmbed(`lastfm error: \`${res.error}\``)] })
+    }
+
     const total: number = parseInt(res.toptracks["@attr"].total)
     const tracks: Track[] = res.toptracks.track
+
+    if (!tracks || tracks.length == 0) {
+        return message.channel.send({ embeds: [new ErrorEmbed("no track data")] })
+    }
 
     const pages: Map<number, string[]> = new Map()
 

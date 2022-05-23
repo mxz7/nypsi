@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { getLastfmUsername } from "../utils/users/utils"
 import { getPrefix } from "../utils/guilds/utils"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { logger } from "../utils/logger"
 
 const cmd = new Command("topartists", "view your top artists", Categories.INFO).setAliases(["ta"])
 
@@ -58,8 +59,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&period=${length}&api_key=${process.env.LASTFM_TOKEN}&format=json`
     ).then((res) => res.json())
 
+    if (res.error) {
+        logger.error(`lastfm error: ${res.error} - ${username}`)
+        return message.channel.send({ embeds: [new ErrorEmbed(`lastfm error: \`${res.error}\``)] })
+    }
+
     const total: number = parseInt(res.topartists["@attr"].total)
     const artists = res.topartists.artist
+
+    if (!artists || artists.length == 0) {
+        return message.channel.send({ embeds: [new ErrorEmbed("no artist data")] })
+    }
 
     const pages: Map<number, string[]> = new Map()
 
