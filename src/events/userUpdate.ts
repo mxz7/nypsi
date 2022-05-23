@@ -1,5 +1,5 @@
 import { User } from "discord.js"
-import { getPrestige, userExists } from "../utils/economy/utils"
+import { getGuildByUser, getPrestige, updateLastKnownTag, userExists } from "../utils/economy/utils"
 import { uploadImageToImgur } from "../utils/functions/image"
 import { isPremium } from "../utils/premium/utils"
 import { addNewAvatar, addNewUsername, createUsernameProfile, isTracking, usernameProfileExists } from "../utils/users/utils"
@@ -9,6 +9,10 @@ let interval
 
 export default async function userUpdate(oldUser: User, newUser: User) {
     if (oldUser.tag != newUser.tag) {
+        if (getGuildByUser(newUser.id)) {
+            updateLastKnownTag(newUser.id, newUser.tag)
+        }
+
         if (!usernameProfileExists(newUser.id)) {
             createUsernameProfile(newUser, oldUser.tag)
             addNewUsername(newUser.id, newUser.tag)

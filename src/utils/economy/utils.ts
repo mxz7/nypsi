@@ -29,6 +29,9 @@ const app = express()
 const voteCache = new Map()
 const existsCache = new Map()
 const bannedCache = new Map()
+const guildExistsCache = new Map()
+const guildUserCache = new Map()
+const guildRequirementsCache = new Map()
 
 app.post(
     "/dblwebhook",
@@ -297,7 +300,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     "+ **10** karma\n" +
-                    `+ **5**% multiplier, total: **${multi}**%\n` +
+                    `+ **3**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
@@ -396,12 +399,12 @@ export function getMulti(member: GuildMember | string): number {
     const voted = hasVoted(id)
 
     if (voted) {
-        multi += 5
+        multi += 3
     }
 
     const prestige = getPrestige(member)
 
-    const prestigeBonus = (prestige > 12 ? 12 : prestige) * 2
+    const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2
 
     multi += prestigeBonus
 
@@ -416,6 +419,12 @@ export function getMulti(member: GuildMember | string): number {
             case 4:
                 multi += 10
         }
+    }
+
+    const guild = getGuildByUser(id)
+
+    if (guild) {
+        multi += guild.level - 1
     }
 
     multi = Math.floor(multi)
@@ -1357,7 +1366,7 @@ export function addItemUse(member: GuildMember, item) {
  * @param {GuildMember} member
  * @returns
  */
-export function getInventory(member: GuildMember | string) {
+export function getInventory(member: GuildMember | string): { [key: string]: number } {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -1750,7 +1759,15 @@ export function calcMinimumEarnedXp(member: GuildMember): number {
     let earned = 1
     earned += getPrestige(member)
 
-    if (earned > 7) earned = 7
+    let max = 6
+
+    const guild = getGuildByUser(member)
+
+    if (guild) {
+        max += guild.level - 1
+    }
+
+    if (earned > max) earned = max
 
     return earned
 }
@@ -1768,7 +1785,304 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
 
     earned += random
 
-    if (earned > 7) earned = 7
+    let max = 6
+
+    const guild = getGuildByUser(member)
+
+    if (guild) {
+        max += guild.level - 1
+    }
+
+    if (earned > max) earned = max
 
     return earned
+}
+
+export interface EconomyGuild {
+    guild_name: string
+    created_at: number
+    balance: number
+    xp: number
+    level: number
+    motd: string
+    owner: string
+    members: EconomyGuildMember[]
+}
+
+interface EconomyGuildMember {
+    user_id: string
+    guild_id: string
+    joined_at: number
+    contributed_money: number
+    contributed_xp: number
+    last_known_tag: string
+}
+
+export function guildExists(name: string): boolean {
+    if (guildExistsCache.has(name)) {
+        return guildExistsCache.get(name)
+    }
+
+    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name)
+
+    if (!query) {
+        return false
+    } else {
+        return true
+    }
+}
+
+export function getGuildByName(name: string): EconomyGuild {
+    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name)
+    const members: EconomyGuildMember[] = db.prepare("select * from economy_guild_members where guild_id = ?").all(name)
+
+    if (!guild) return null
+
+    guild.members = members
+
+    for (const m of members) {
+        if (!guildUserCache.has(m.user_id)) {
+            guildUserCache.set(m.user_id, m.guild_id)
+        }
+    }
+
+    return guild
+}
+
+export function getGuildByUser(member: GuildMember | string): EconomyGuild | null {
+    let id: string
+    if (member instanceof GuildMember) {
+        id = member.user.id
+    } else {
+        id = member
+    }
+
+    let guildName: string
+
+    if (guildUserCache.has(id)) {
+        guildName = guildUserCache.get(id)
+
+        if (!guildName) return null
+    } else {
+        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id)
+
+        if (!query) {
+            guildUserCache.set(id, null)
+            return null
+        }
+
+        guildName = query.guild_id
+    }
+
+    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName)
+    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName)
+
+    for (const m of members) {
+        if (!guildUserCache.has(m.user_id)) {
+            guildUserCache.set(m.user_id, m.guild_id)
+        }
+    }
+
+    guild.members = members
+
+    return guild
+}
+
+export function createGuild(name: string, owner: GuildMember) {
+    db.prepare("insert into economy_guild (guild_name, created_at, owner) values (?, ?, ?)").run(
+        name,
+        Date.now(),
+        owner.user.id
+    )
+    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
+        owner.user.id,
+        name,
+        Date.now(),
+        owner.user.tag
+    )
+
+    if (guildUserCache.has(owner.user.id)) {
+        guildUserCache.delete(owner.user.id)
+    }
+}
+
+export function deleteGuild(name: string) {
+    const members = getGuildByName(name).members
+
+    for (const m of members) {
+        guildUserCache.delete(m.user_id)
+    }
+
+    guildExistsCache.delete(name)
+
+    db.prepare("delete from economy_guild_members where guild_id = ?").run(name)
+    db.prepare("delete from economy_guild where guild_name = ?").run(name)
+}
+
+export function addToGuildBank(name: string, amount: number, member: GuildMember) {
+    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild_members set contributed_money = contributed_money + ? where user_id = ?").run(
+        amount,
+        member.user.id
+    )
+
+    return checkUpgrade(name)
+}
+
+export function addToGuildXP(name: string, amount: number, member: GuildMember) {
+    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild_members set contributed_xp = contributed_xp + ? where user_id = ?").run(
+        amount,
+        member.user.id
+    )
+
+    return checkUpgrade(name)
+}
+
+export function getMaxMembersForGuild(name: string) {
+    const guild = getGuildByName(name)
+
+    return guild.level * 3
+}
+
+export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
+    if (guildRequirementsCache.has(name)) {
+        return guildRequirementsCache.get(name)
+    }
+
+    const guild = getGuildByName(name)
+
+    const baseMoney = 1900000 * Math.pow(guild.level, 2)
+    const baseXP = 1425 * Math.pow(guild.level, 2)
+
+    const bonusMoney = 100000 * guild.members.length
+    const bonusXP = 75 * guild.members.length
+
+    guildRequirementsCache.set(name, {
+        money: baseMoney + bonusMoney,
+        xp: baseXP + bonusXP,
+    })
+
+    return {
+        money: baseMoney + bonusMoney,
+        xp: baseXP + bonusXP,
+    }
+}
+
+export function addMember(name: string, member: GuildMember): boolean {
+    const guild = getGuildByName(name)
+
+    if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
+        return false
+    }
+
+    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
+        member.user.id,
+        guild.guild_name,
+        Date.now(),
+        member.user.tag
+    )
+
+    if (guildUserCache.has(member.user.id)) {
+        guildUserCache.delete(member.user.id)
+    }
+
+    return true
+}
+
+export enum RemoveMemberMode {
+    ID,
+    TAG,
+}
+
+export function removeMember(member: string, mode: RemoveMemberMode) {
+    if (mode == RemoveMemberMode.ID) {
+        db.prepare("delete from economy_guild_members where user_id = ?").run(member)
+    } else {
+        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member)
+    }
+
+    guildUserCache.clear()
+}
+
+export function updateLastKnownTag(id: string, tag: string) {
+    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id)
+}
+
+async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+    if (typeof guild == "string") {
+        guild = getGuildByName(guild)
+    }
+
+    if (guild.level == 5) return
+    const requirements = getRequiredForGuildUpgrade(guild.guild_name)
+
+    if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
+        db.prepare(
+            "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
+        ).run(requirements.money, requirements.xp, guild.guild_name)
+
+        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`)
+
+        guildRequirementsCache.clear()
+
+        const embed = new CustomEmbed().setColor("#5efb8f")
+
+        embed.setHeader(guild.guild_name)
+        embed.setDescription(
+            `**${guild.guild_name}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
+                `\n +**${guild.level}** basic crates` +
+                "\n +**1**% multiplier" +
+                "\n +**1** max xp gain"
+        )
+
+        for (const member of guild.members) {
+            const inventory = getInventory(member.user_id)
+
+            if (inventory["basic_crate"]) {
+                inventory["basic_crate"] += guild.level
+            } else {
+                inventory["basic_crate"] = guild.level
+            }
+
+            setInventory(member.user_id, inventory)
+
+            if (getDMsEnabled(member.user_id)) {
+                const { requestDM } = require("../../nypsi")
+
+                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed)
+            }
+        }
+
+        return true
+    }
+    return false
+}
+
+export function setGuildMOTD(name: string, motd: string) {
+    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name)
+}
+
+export function topGuilds(limit = 5): string[] {
+    const guilds: EconomyGuild[] = db
+        .prepare("select guild_name, balance, xp, level from economy_guild where balance > 1000")
+        .all()
+
+    inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp])
+
+    const out: string[] = []
+
+    for (const guild of guilds) {
+        let position: number | string = guilds.indexOf(guild) + 1
+
+        if (position == 1) position = "🥇"
+        if (position == 2) position = "🥈"
+        if (position == 3) position = "🥉"
+
+        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`)
+
+        if (out.length >= limit) break
+    }
+
+    return out
 }

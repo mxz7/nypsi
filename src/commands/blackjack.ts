@@ -11,6 +11,8 @@ import {
     getMulti,
     addGamble,
     calcEarnedXp,
+    getGuildByUser,
+    addToGuildXP,
 } from "../utils/economy/utils.js"
 import * as shuffle from "shuffle-array"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -439,6 +441,12 @@ async function playGame(message, m) {
         if (earnedXp > 0) {
             updateXp(message.member, getXp(message.member) + earnedXp)
             newEmbed.setFooter(`+${earnedXp}xp`)
+
+            const guild = getGuildByUser(message.member)
+
+            if (guild) {
+                addToGuildXP(guild.guild_name, earnedXp, message.member)
+            }
         }
 
         gamble(message.author, "blackjack", bet, true, winnings)
