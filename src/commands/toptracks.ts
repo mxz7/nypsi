@@ -7,7 +7,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 import { logger } from "../utils/logger"
 
-const cmd = new Command("toptracks", "view your top tracks", Categories.INFO).setAliases(["tt"])
+const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"])
 
 /**
  * @param {Message} message

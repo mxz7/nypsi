@@ -6,7 +6,7 @@ import { setLastfmUsername, getLastfmUsername } from "../utils/users/utils"
 import { cleanString } from "../utils/functions/string"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
-const cmd = new Command("setlastfm", "set your last.fm username", Categories.INFO).setAliases(["slfm"])
+const cmd = new Command("setlastfm", "set your last.fm username", Categories.MUSIC).setAliases(["slfm"])
 
 /**
  * @param {Message} message

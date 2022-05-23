@@ -10,7 +10,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 const cmd = new Command(
     "nowplaying",
     "view yours or another user's currently playing song using last.fm",
-    Categories.INFO
+    Categories.MUSIC
 ).setAliases(["np"])
 
 cmd.slashEnabled = true
