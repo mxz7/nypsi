@@ -24,7 +24,7 @@ as well as these upgrades, all members will receive basic crates when upgrading 
 ## how do i upgrade my guild
 
 your guild will upgraded automatically, once the requirements have been met. you can do `$guild upgrade` to look at the
-requirements to the next upgrade
+requirements for the next upgrade
 
 ## guild members
 
