@@ -21,6 +21,8 @@ import { addKarma, getKarma, updateLastCommand } from "./karma/utils"
 import { getNews } from "./functions/news"
 import { formatDate, MStoTime } from "./functions/date"
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha"
+// @ts-expect-error typescript doesnt like opening package.json
+import { version } from "../../package.json"
 
 const commands: Map<string, Command> = new Map()
 const aliases: Map<string, string> = new Map()
@@ -196,7 +198,7 @@ async function helpCmd(message: Message, args: Array<string>) {
         }
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(prefix + "help <command> | get info about a command")
+    const embed = new CustomEmbed(message.member).setFooter(`v${version}`)
 
     /**
      * FINDING WHAT THE USER REQUESTED
@@ -247,7 +249,7 @@ async function helpCmd(message: Message, args: Array<string>) {
 
             embed.setTitle(`${args[0].toLowerCase()} commands`)
             embed.setDescription(pages.get(1).join("\n"))
-            embed.setFooter(`page 1/${pages.size} | ${prefix}help <command>`)
+            embed.setFooter(`page 1/${pages.size} | v${version}`)
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd: Command
 
@@ -327,7 +329,7 @@ async function helpCmd(message: Message, args: Array<string>) {
             } else {
                 currentPage--
                 embed.setDescription(pages.get(currentPage).join("\n"))
-                embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
+                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`)
                 if (currentPage == 1) {
                     row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
@@ -348,7 +350,7 @@ async function helpCmd(message: Message, args: Array<string>) {
             } else {
                 currentPage++
                 embed.setDescription(pages.get(currentPage).join("\n"))
-                embed.setFooter(`page ${currentPage}/${lastPage} | ${prefix}help <command>`)
+                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`)
                 if (currentPage == lastPage) {
                     row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
