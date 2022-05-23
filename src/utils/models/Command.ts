@@ -49,6 +49,7 @@ export enum Categories {
     MODERATION = "moderation",
     ADMIN = "admin",
     MINECRAFT = "minecraft",
+    MUSIC = "music",
     UTILITY = "utility",
     NSFW = "nsfw",
 }
