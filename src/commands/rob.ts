@@ -15,6 +15,7 @@ import {
     getInventory,
     setInventory,
     addItemUse,
+    getGuildByUser,
 } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
@@ -124,6 +125,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!userExists(target) || getBalance(target) <= 500) {
         return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] })
+    }
+
+    const targetGuild = getGuildByUser(target)
+
+    if (targetGuild) {
+        if (targetGuild.guild_name == getGuildByUser(message.member)?.guild_name) {
+            return send({ embeds: [new ErrorEmbed("you cannot rob someone in your own guild")] })
+        }
     }
 
     if (getBalance(message.member) < 750) {
