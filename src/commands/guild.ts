@@ -266,6 +266,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid user")] })
         }
 
+        if (getGuildByUser(target)) {
+            return send({ embeds: [new ErrorEmbed("that user is already in a guild")] })
+        }
+
         await addCooldown(cmd.name, message.member, 15)
 
         invited.push(target.user.id)
