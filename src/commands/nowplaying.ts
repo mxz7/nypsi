@@ -10,7 +10,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 const cmd = new Command(
     "nowplaying",
     "view yours or another user's currently playing song using last.fm",
-    Categories.INFO
+    Categories.MUSIC
 ).setAliases(["np"])
 
 cmd.slashEnabled = true
@@ -111,13 +111,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member).setHeader("now playing")
+    const embed = new CustomEmbed(message.member).setHeader(`${username} is listening to`, message.author.avatarURL())
 
     embed.setThumbnail(track.image[3]["#text"])
-
-    embed.setDescription(`[${track.name}](${track.url}) - ${track.artist["#text"]}`)
-
-    embed.setFooter({ text: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) })
+    embed.setTitle(track.name)
+    embed.setURL(track.url)
+    embed.setDescription(`by ${track.artist["#text"]}`)
 
     return send({ embeds: [embed] })
 }
