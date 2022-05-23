@@ -1225,6 +1225,8 @@ export function toggleBan(id: string) {
 
 export function reset() {
     const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all()
+    db.prepare("delete from economy_guild_members").run()
+    db.prepare("delete from economy_guild")
 
     let updated = 0
     let deleted = 0
