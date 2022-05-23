@@ -79,7 +79,7 @@ cmd.slashData
     )
     .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"))
 
-const filter = ["nig", "fag", "queer"]
+const filter = ["nig", "fag", "queer", "delete", "inv", "create", "leave", "stats", "top"]
 
 const invited = []
 
