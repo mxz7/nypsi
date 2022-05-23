@@ -47,7 +47,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     collector.on("collect", async (i): Promise<any> => {
         if (reactions.includes(i.user.id) || i.deferred) {
-            if (!(await i.fetchReply())) {
+            const reply = await i.fetchReply().catch(() => {})
+
+            if (!reply) {
                 return await i
                     .reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
                     .catch(() => {})
