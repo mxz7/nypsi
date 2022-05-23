@@ -220,12 +220,18 @@ async function addMention() {
             workerCount++
             logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`)
             const start = Date.now()
-            await doCollection(mention).catch((e) => {
+            const res = await doCollection(mention).catch((e) => {
                 logger.error("error inserting mentions with worker")
                 console.error(e)
             })
             workerCount--
-            logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+
+            if (res == 0) {
+                logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+            } else {
+                logger.warn("worker timed out")
+                logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+            }
 
             return
         }
