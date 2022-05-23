@@ -151,13 +151,29 @@ export async function onVote(vote: WebhookPayload) {
  * @param {String} id
  * @param {Boolean} dontDmTekoh
  */
-export async function requestDM(id: string, content, dontDmTekoh: boolean): Promise<boolean> {
+export async function requestDM(
+    id: string,
+    content: string,
+    dontDmTekoh: boolean,
+    embed?: Discord.MessageEmbed
+): Promise<boolean> {
     logger.info(`DM requested with ${id}`)
     const member = await client.users.fetch(id)
 
+    let payload: any = {
+        content: content,
+    }
+
+    if (embed) {
+        payload = {
+            content: content,
+            embeds: [embed],
+        }
+    }
+
     if (member) {
         await member
-            .send({ content: content })
+            .send(payload)
             .then(() => {
                 logger.log({
                     level: "success",
@@ -169,7 +185,8 @@ export async function requestDM(id: string, content, dontDmTekoh: boolean): Prom
                 if (!dontDmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347")
 
-                    await tekoh.send({ content: `failed to send dm to ${id}\n\n${content}` })
+                    await tekoh.send({ content: `failed to send dm to ${id}` })
+                    await tekoh.send(payload)
                 }
             })
         return true
@@ -178,7 +195,8 @@ export async function requestDM(id: string, content, dontDmTekoh: boolean): Prom
         if (!dontDmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347")
 
-            await tekoh.send({ content: `failed to send dm to ${id}\n\n${content}` })
+            await tekoh.send({ content: `failed to send dm to ${id}` })
+            await tekoh.send(payload)
         }
         return false
     }
