@@ -486,7 +486,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             desc += `${position} **${
                 m.last_known_tag
-            }** $${m.contributed_money.toLocaleString()} **|** ${m.contributed_xp.toLocaleString()}xp`
+            }** $${m.contributed_money.toLocaleString()} **|** ${m.contributed_xp.toLocaleString()}xp\n`
         }
 
         embed.setDescription(desc)
