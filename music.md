@@ -1,6 +1,6 @@
 ---
 layout: default
-title: quick setup
+title: music
 nav_order: 3
 description: music explanation for nypsi
 permalink: /music
