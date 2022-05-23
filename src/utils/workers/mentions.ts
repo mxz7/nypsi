@@ -1,9 +1,10 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads"
 import { MentionQueueItem } from "../users/utils"
+import ms = require("ms")
 
 declare function require(name: string)
 
-export default function doCollection(array: MentionQueueItem): Promise<Array<string>> {
+export default function doCollection(array: MentionQueueItem): Promise<any> {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
             workerData: [array],
@@ -17,13 +18,14 @@ export default function doCollection(array: MentionQueueItem): Promise<Array<str
 }
 
 if (!isMainThread) {
+    setTimeout(() => {
+        parentPort.postMessage(1)
+    }, ms("1 hour"))
     const db = require("better-sqlite3")("./out/data/storage.db", { fileMustExist: true, timeout: 15000 })
     const { encrypt } = require("../functions/string")
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
     )
-    const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC")
-    const getTier = db.prepare("SELECT level FROM premium WHERE level > 0 AND id = ?")
     const collection = workerData[0]
 
     const members = collection.members
