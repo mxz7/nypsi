@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { calcMinimumEarnedXp, getRequiredBetForXp } from "../utils/economy/utils"
+import { calcMinimumEarnedXp, getRequiredBetForXp, getGuildByUser } from "../utils/economy/utils"
 
 const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", Categories.MONEY)
 
@@ -17,7 +17,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     
     let max = 6
 
-    const guild = getGuildByUser(member)
+    const guild = getGuildByUser(message.member)
 
     if (guild) {
         max += guild.level - 1
