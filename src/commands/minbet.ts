@@ -13,16 +13,22 @@ const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const requiredBet = getRequiredBetForXp(message.member)
 
-    let max = calcMinimumEarnedXp(message.member) + 2
+    let earned = calcMinimumEarnedXp(message.member) + 2
+    
+    let max = 6
 
-    if (max > 7) {
-        max = 7
+    const guild = getGuildByUser(member)
+
+    if (guild) {
+        max += guild.level - 1
     }
+
+    if (earned > max) earned = max
 
     const embed = new CustomEmbed(message.member, false)
 
     embed.setDescription(
-        `you must bet atleast $**${requiredBet.toLocaleString()}** to earn xp\n\nthe most xp you can earn per win is **${max}**xp`
+        `you must bet atleast $**${requiredBet.toLocaleString()}** to earn xp\n\nthe most xp you can earn per win is **${earned}**xp`
     )
 
     return message.channel.send({ embeds: [embed] })
