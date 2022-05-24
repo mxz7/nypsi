@@ -10,6 +10,8 @@ import {
     getMulti,
     addGamble,
     calcEarnedXp,
+    getGuildByUser,
+    addToGuildXP,
 } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -282,6 +284,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (earnedXp > 0) {
                 updateXp(message.member, getXp(message.member) + earnedXp)
                 embed.setFooter(`+${earnedXp}xp`)
+
+                const guild = getGuildByUser(message.member)
+
+                if (guild) {
+                    addToGuildXP(guild.guild_name, earnedXp, message.member)
+                }
             }
 
             embed.setColor("#5efb8f")

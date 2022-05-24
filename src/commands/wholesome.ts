@@ -148,8 +148,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.react("✅")
     } else if (args[0].toLowerCase() == "get") {
-        if (message.author.id != "672793821850894347") return
-
         if (args.length == 1) {
             return send({ embeds: [new ErrorEmbed("dumbass")] })
         }
@@ -162,9 +160,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setHeader(`image #${wholesome.id}`)
 
-        embed.setDescription(
-            `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
-        )
+        if (message.author.id == "672793821850894347") {
+            embed.setDescription(
+                `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
+            )
+        }
+
         embed.setImage(wholesome.image)
         embed.setFooter(`submitted on ${formatDate(wholesome.upload)}`)
     } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
@@ -385,6 +386,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (chance == 7) embed.setFooter(`submit your own image with ${getPrefix(message.guild)}wholesome suggest (:`)
 
     if (target) {
+        if (message instanceof Message) {
+            await message.delete()
+        }
         return send({
             content: `${target.user.toString()} you've received a wholesome image (:`,
             embeds: [embed],

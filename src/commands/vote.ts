@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const amount = 15000 * (prestige + 1)
     const voted = hasVoted(message.member)
-    const multi = Math.floor(getMulti(message.member)) * 100
+    const multi = Math.floor(getMulti(message.member) * 100)
     let crateAmount = Math.floor(prestige / 2 + 1)
 
     if (crateAmount > 5) crateAmount = 5
@@ -34,13 +34,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (voted) {
         embed.setHeader("vote ✅", message.author.avatarURL())
         embed.setColor("#5efb8f")
-        embed.addField("active rewards", `✓ +**5**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
+        embed.addField("active rewards", `✓ +**3**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`)
     } else {
         embed.setHeader("vote ❌", message.author.avatarURL())
         embed.setColor("#e4334f")
         embed.addField(
             "rewards",
-            `× +**5**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
+            `× +**3**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         )

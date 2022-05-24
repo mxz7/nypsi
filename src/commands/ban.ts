@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
+import { CommandInteraction, Message, Permissions, User } from "discord.js"
 import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils"
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -48,6 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!profileExists(message.guild)) createProfile(message.guild)
 
     let idOnly = false
+    let idUser: string
     let id: string
 
     const prefix = getPrefix(message.guild)
@@ -87,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!member) {
             idOnly = true
 
-            id = args[0]
+            id = args.shift()
         } else {
             message.mentions.members.set(member.user.id, member)
         }
@@ -108,14 +109,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let temporary = false
     let duration
 
-    if (args.length != members.size) {
+    if (args.length != members.size && args.length != 0) {
         for (let i = 0; i < members.size; i++) {
             args.shift()
         }
 
-        duration = getDuration(args[0].toLowerCase())
-
-        unbanDate = new Date().getTime() + duration * 1000
+        try {
+            duration = getDuration(args[0].toLowerCase())
+            unbanDate = new Date().getTime() + duration * 1000
+        } catch {
+            // eslint happy
+        }
 
         if (duration) {
             temporary = true
@@ -141,7 +145,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 days: days,
                 reason: reason,
             })
-            .then(() => {
+            .then((banned) => {
+                if (typeof banned == "string") {
+                    idUser = banned
+                } else if (banned instanceof User) {
+                    idUser = `${banned.username}#${banned.discriminator}`
+                } else {
+                    idUser = `${banned.user.tag}`
+                }
                 count++
             })
             .catch(() => {
@@ -216,11 +227,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (count == 1 && failed.length == 0) {
         if (idOnly) {
             if (temporary) {
-                embed.setDescription(`✅ \`${members.first()}\` has been banned for: **${banLength}**`)
+                embed.setDescription(`✅ \`${idUser}\` has been banned for: **${banLength}**`)
             } else if (reason.split(": ")[1] == "no reason given") {
-                embed.setDescription(`✅ \`${members.first()}\` has been banned`)
+                embed.setDescription(`✅ \`${idUser}\` has been banned`)
             } else {
-                embed.setDescription(`✅ \`${members.first()}\` has been banned for: ${reason.split(": ")[1]}`)
+                embed.setDescription(`✅ \`${idUser}\` has been banned for: ${reason.split(": ")[1]}`)
             }
         } else {
             if (temporary) {

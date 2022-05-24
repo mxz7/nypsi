@@ -34,7 +34,7 @@ export class Command {
         return this
     }
 
-    public setRun(run: (message: Message, args: Array<string>) => void) {
+    public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: Array<string>) => void) {
         this.run = run
         return this
     }
@@ -49,6 +49,7 @@ export enum Categories {
     MODERATION = "moderation",
     ADMIN = "admin",
     MINECRAFT = "minecraft",
+    MUSIC = "music",
     UTILITY = "utility",
     NSFW = "nsfw",
 }

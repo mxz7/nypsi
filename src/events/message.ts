@@ -13,8 +13,9 @@ import ms = require("ms")
 import { encrypt } from "../utils/functions/string"
 import { addModLog } from "../utils/moderation/utils"
 import { PunishmentType } from "../utils/models/GuildStorage"
+import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils"
 
-declare function require(name: string)
+// declare function require(name: string)
 
 const db = getDatabase()
 const addMentionToDatabase = db.prepare(
@@ -62,8 +63,6 @@ export default async function messageCreate(message: Message) {
             }
         }
     }
-
-    const { mentionQueue } = require("../utils/users/utils")
 
     if (
         message.guild.memberCount < 150000 &&
@@ -190,9 +189,7 @@ let currentInterval = 150
 let lastChange = 0
 
 async function addMention() {
-    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
-
-    let mention
+    let mention: MentionQueueItem | string
 
     if (mentionQueue.length == 0) {
         if (deleteQueue.length == 0) {
@@ -212,10 +209,10 @@ async function addMention() {
         return
     }
 
-    if (mention.type == "collection") {
+    if (typeof mention != "string" && mention.type == "collection") {
         const members = mention.members
 
-        if (members.size > 200) {
+        if (members.size > 300) {
             if (workerCount >= 5) {
                 mentionQueue.push(mention)
                 return
@@ -223,12 +220,18 @@ async function addMention() {
             workerCount++
             logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`)
             const start = Date.now()
-            await doCollection(mention).catch((e) => {
+            const res = await doCollection(mention).catch((e) => {
                 logger.error("error inserting mentions with worker")
                 console.error(e)
             })
             workerCount--
-            logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+
+            if (res == 0) {
+                logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+            } else {
+                logger.warn("worker timed out")
+                logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`)
+            }
 
             return
         }
@@ -252,6 +255,7 @@ async function addMention() {
                     members: members.clone(),
                     message: mention.message,
                     channelMembers: channelMembers,
+                    guild: mention.guild,
                 })
             }
             const member = members.get(memberID)
@@ -285,7 +289,7 @@ async function addMention() {
             })
             count++
         }
-    } else if (mention.type == "mention") {
+    } else if (typeof mention != "string" && mention.type == "mention") {
         const guild = mention.guild
         const data = mention.data
         const target = mention.target
@@ -312,15 +316,16 @@ async function addMention() {
                 deleteQueue.push(m.url)
             }
         }
-
-        if (mentionQueue.length == 0 && deleteQueue.length == 0) {
-            clearInterval(mentionInterval)
-            mentionInterval = undefined
-            currentInterval = 100
-            return
-        }
     } else {
         deleteMention.run(mention)
+
+        for (let i = 0; i < 49; i++) {
+            mention = deleteQueue.shift()
+
+            if (!mention) break
+
+            deleteMention.run(mention)
+        }
     }
 
     if (mentionQueue.length == 0 && deleteQueue.length == 0) {
@@ -366,3 +371,5 @@ function cleanMentions() {
 }
 
 setInterval(cleanMentions, 3600 * 1000)
+
+export { workerCount }

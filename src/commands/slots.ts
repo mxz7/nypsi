@@ -10,6 +10,8 @@ import {
     getMulti,
     addGamble,
     calcEarnedXp,
+    getGuildByUser,
+    addToGuildXP,
 } from "../utils/economy/utils.js"
 import { CommandInteraction, Message } from "discord.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
@@ -20,10 +22,10 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.j
 
 const multipliers = {
     "🍒": 5,
-    "🍋": 3.5,
-    "🍊": 3,
-    "🍇": 2.5,
-    "🍉": 2,
+    "🍋": 3,
+    "🍊": 2.5,
+    "🍇": 2,
+    "🍉": 1.5,
 }
 
 const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"]
@@ -89,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
             .addField(
                 "help",
-                "[slots has a ~41% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L152)"
+                "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#L152)"
             )
         return send({ embeds: [embed] })
     }
@@ -149,11 +151,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let three = reel3[Math.floor(Math.random() * reel3.length)]
 
     /**
-     * the shit below results in an approximate 41% win rate overtime, resulting in an overall loss, without counting multiplier
+     * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
      */
 
     if (one != two && two != three && one != three) {
-        const chance = Math.floor(Math.random() * 30)
+        const chance = Math.floor(Math.random() * 41)
         const chanceScore = 4
         const chanceScore2 = 8
 
@@ -266,6 +268,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (earnedXp > 0) {
                 updateXp(message.member, getXp(message.member) + earnedXp)
                 embed.setFooter(`+${earnedXp}xp`)
+
+                const guild = getGuildByUser(message.member)
+
+                if (guild) {
+                    addToGuildXP(guild.guild_name, earnedXp, message.member)
+                }
             }
 
             embed.setColor("#5efb8f")

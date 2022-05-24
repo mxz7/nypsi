@@ -22,7 +22,6 @@ const assLinks = [
     "https://www.reddit.com/r/buttplug.json?limit=777",
     "https://www.reddit.com/r/TheUnderbun.json?limit=777",
     "https://www.reddit.com/r/booty.json?limit=777",
-    "https://www.reddit.com/r/WhiteCheeks.json?limit=777",
     "https://www.reddit.com/r/WomenBendingOver.json?limit=777",
     "https://www.reddit.com/r/thickwhitegirls.json?limit=777",
 ]

@@ -10,7 +10,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 const cmd = new Command(
     "recenttracks",
     "view yours or another user's recently listened to songs",
-    Categories.INFO
+    Categories.MUSIC
 ).setAliases(["recentsongs", "recents"])
 
 /**

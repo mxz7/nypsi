@@ -6,6 +6,8 @@ import { cpu } from "node-os-utils"
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import { workerCount } from "../events/message.js"
+import { deleteQueue, mentionQueue } from "../utils/users/utils.js"
 
 declare function require(name: string)
 
@@ -16,6 +18,7 @@ const cmd = new Command("botstats", "view stats for the bot", Categories.INFO)
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    if (message.author.id != "672793821850894347") return
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member)
 
@@ -26,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const { commandsSize, aliasesSize } = require("../utils/commandhandler")
     const { snipe, eSnipe } = require("../nypsi.js")
-    const { mentionQueue, deleteQueue } = require("../utils/users/utils")
+    // const { mentionQueue, deleteQueue } = require("../utils/users/utils")
     const snipedMessages = snipe.size + eSnipe.size
     const uptime = getUptime(message.client.uptime)
     const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024)
@@ -88,7 +91,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "\n-- **mentions** " +
                 mentions.toLocaleString() +
                 "\n-- **deletable** " +
-                deleteQueue.length.toLocaleString(),
+                deleteQueue.length.toLocaleString() +
+                "\n-- **workers** " +
+                workerCount.toLocaleString(),
             true
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true)
