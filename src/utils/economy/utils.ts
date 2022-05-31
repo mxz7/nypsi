@@ -2077,6 +2077,7 @@ export function topGuilds(limit = 5): string[] {
     const out: string[] = []
 
     for (const guild of guilds) {
+        if (out.length >= limit) break
         let position: number | string = guilds.indexOf(guild) + 1
 
         if (position == 1) position = "🥇"
@@ -2084,8 +2085,6 @@ export function topGuilds(limit = 5): string[] {
         if (position == 3) position = "🥉"
 
         out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`)
-
-        if (out.length >= limit) break
     }
 
     return out
