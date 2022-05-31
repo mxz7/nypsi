@@ -562,7 +562,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const top = topGuilds(parseInt(args[1]) ?? 5)
 
-        const embed = new CustomEmbed(message.member, false).setHeader("top 5 guilds", message.author.avatarURL())
+        const embed = new CustomEmbed(message.member, false).setHeader(
+            `top ${args[1] ?? 5} guilds`,
+            message.author.avatarURL()
+        )
 
         embed.setDescription(top.join("\n"))
 
