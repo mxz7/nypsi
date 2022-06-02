@@ -4,87 +4,87 @@ import fetch from "node-fetch"
 const images: Map<string, Map<string, any>> = new Map()
 
 const bdsmLinks = [
-    "https://www.reddit.com/r/bdsm.json?limit=777",
-    "https://www.reddit.com/r/bondage.json?limit=777",
-    "https://www.reddit.com/r/dominated.json?limit=777",
-    "https://www.reddit.com/r/femdom.json?limit=777",
+    "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/bondage/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/dominated/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/femdom/top.json?limit=6969&t=month",
 ]
-const thighsLinks = ["https://www.reddit.com/r/legs.json?limit=777", "https://www.reddit.com/r/thickthighs.json?limit=777"]
+const thighsLinks = [
+    "https://www.reddit.com/r/legs/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/thickthighs/top.json?limit=6969&t=month",
+]
 const boobLinks = [
-    "https://www.reddit.com/r/Boobies.json?limit=777",
-    "https://www.reddit.com/r/tits.json?limit=777",
-    "https://www.reddit.com/r/TinyTits.json?limit=777",
+    "https://www.reddit.com/r/Boobies/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/tits/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/TinyTits/top.json?limit=6969&t=month",
 ]
 const assLinks = [
-    "https://www.reddit.com/r/ass.json?limit=777",
-    "https://www.reddit.com/r/facedownassup.json?limit=777",
-    "https://www.reddit.com/r/assinthong.json?limit=777",
-    "https://www.reddit.com/r/buttplug.json?limit=777",
-    "https://www.reddit.com/r/TheUnderbun.json?limit=777",
-    "https://www.reddit.com/r/booty.json?limit=777",
-    "https://www.reddit.com/r/WomenBendingOver.json?limit=777",
-    "https://www.reddit.com/r/thickwhitegirls.json?limit=777",
+    "https://www.reddit.com/r/ass/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/facedownassup/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/assinthong/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/buttplug/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/TheUnderbun/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/booty/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/WomenBendingOver/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/thickwhitegirls/top.json?limit=6969&t=month",
 ]
 const pornLinks = [
-    "https://www.reddit.com/r/collegesluts.json?limit=777",
-    "https://www.reddit.com/r/realgirls.json?limit=777",
-    "https://www.reddit.com/r/legalteens.json?limit=777",
-    "https://www.reddit.com/r/amateur.json?limit=777",
-    "https://www.reddit.com/r/gonewild.json?limit=777",
-    "https://www.reddit.com/r/gonewild18.json?limit=777",
-    "https://www.reddit.com/r/collegeamateurs.json?limit=777",
-    "https://www.reddit.com/r/irlgirls.json?limit=777",
-    "https://www.reddit.com/r/camwhores.json?limit=777",
-    "https://www.reddit.com/r/camsluts.json?limit=777",
-    "https://www.reddit.com/r/cumsluts.json?limit=777",
-    "https://www.reddit.com/r/cumfetish.json?limit=777",
-    "https://www.reddit.com/r/creampies.json?limit=777",
+    "https://www.reddit.com/r/collegesluts/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/realgirls/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/legalteens/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/amateur/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/gonewild/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/gonewild18/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/collegeamateurs/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/irlgirls/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/camwhores/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/camsluts/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/cumsluts/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/cumfetish/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/creampies/top.json?limit=6969&t=month",
 ]
 const feetLinks = [
-    "https://www.reddit.com/r/feet.json?limit=777",
-    "https://www.reddit.com/r/feetpics.json?limit=777",
-    "https://www.reddit.com/r/Feet_NSFW.json?limit=777",
+    "https://www.reddit.com/r/feet/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/feetpics/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/Feet_NSFW/top.json?limit=6969&t=month",
 ]
 const birbLinks = [
-    "https://www.reddit.com/r/birb.json?limit=777",
-    "https://www.reddit.com/r/budgies.json?limit=777",
-    "https://www.reddit.com/r/parrots.json?limit=777",
+    "https://www.reddit.com/r/birb/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/budgies/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/parrots/top.json?limit=6969&t=month",
 ]
 const catLinks = [
-    "https://www.reddit.com/r/cat.json?limit=777",
-    "https://www.reddit.com/r/catsyawning.json?limit=777",
-    "https://www.reddit.com/r/Kitten.json?limit=777",
-    "https://www.reddit.com/r/kitty.json?limit=777",
-    "https://www.reddit.com/r/catpics.json?limit=777",
-    "https://www.reddit.com/r/CatsInSinks.json?limit=777",
-    "https://www.reddit.com/r/CatsInBusinessAttire.json?limit=777",
-    "https://www.reddit.com/r/MildlyStartledCats.json?limit=777",
-    "https://www.reddit.com/r/tuckedinkitties.json?limit=777",
-    "https://www.reddit.com/r/Blep.json?limit=777",
-    "https://www.reddit.com/r/Floof.json?limit=777",
-    "https://www.reddit.com/r/Catloaf.json?limit=777",
+    "https://www.reddit.com/r/cat/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/catsyawning/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/Kitten/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/kitty/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/catpics/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/CatsInSinks/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/CatsInBusinessAttire/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/MildlyStartledCats/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/tuckedinkitties/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/Blep/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/Floof/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/Catloaf/top.json?limit=6969&t=month",
 ]
 const dogLinks = [
-    "https://www.reddit.com/r/dog.json?limit=777",
-    "https://www.reddit.com/r/corgi.json?limit=777",
-    "https://www.reddit.com/r/dogpictures.json?limit=777",
-    "https://www.reddit.com/r/goldenretrievers.json?limit=777",
-    "https://www.reddit.com/r/shiba.json?limit=777",
+    "https://www.reddit.com/r/dog/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/corgi/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/dogpictures/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/goldenretrievers/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/shiba/top.json?limit=6969&t=month",
 ]
-const duckLinks = ["https://www.reddit.com/r/duck.json?limit=777", "https://www.reddit.com/r/BACKYARDDUCKS.json?limit=777"]
+const duckLinks = [
+    "https://www.reddit.com/r/duck/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/BACKYARDDUCKS/top.json?limit=6969&t=month",
+]
 const lizardLinks = [
-    "https://www.reddit.com/r/Lizards.json?limit=777",
-    "https://www.reddit.com/r/BeardedDragons.json?limit=777",
+    "https://www.reddit.com/r/Lizards/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/BeardedDragons/top.json?limit=6969&t=month",
 ]
-const rabbitLinks = ["https://www.reddit.com/r/rabbits.json?limit=777"]
-const snekLinks = ["https://www.reddit.com/r/snek.json?limit=777"]
+const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"]
+const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"]
 
-/**
- *
- * @param {Array<String>} links
- * @param {Map} imgs
- * @param {String} name
- */
 async function cacheUpdate(links: Array<string>, name: string) {
     const start = new Date().getTime()
 
