@@ -47,7 +47,7 @@
     "winston-discord-webhook": "^1.1.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.0.0",
+    "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.0",
     "@types/better-sqlite3": "^7.5.0",
     "@types/crypto-js": "^4.1.1",
