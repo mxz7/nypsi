@@ -4,7 +4,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
 import { userExists, createUser, getItems, getMulti } from "../utils/economy/utils"
 import { getPrefix } from "../utils/guilds/utils"
 
-const cmd = new Command("worth", "check the worth of items", Categories.MONEY)
+const cmd = new Command("worth", "check the worth of items", Categories.MONEY).setAliases(["price"])
 
 /**
  * @param {Message} message
