@@ -14,7 +14,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const requiredBet = getRequiredBetForXp(message.member)
 
     let earned = calcMinimumEarnedXp(message.member) + 2
-    
+
     let max = 6
 
     const guild = getGuildByUser(message.member)
