@@ -212,7 +212,7 @@ async function addMention() {
     if (typeof mention != "string" && mention.type == "collection") {
         const members = mention.members
 
-        if (members.size > 300) {
+        if (members.size > 1000) {
             if (workerCount >= 5) {
                 mentionQueue.push(mention)
                 return
