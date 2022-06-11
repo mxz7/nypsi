@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     url = "https://reddit.com" + url
 
-    const subreddit = subredditChoice.split("r/")[1].split(".json")[0]
+    const subreddit = subredditChoice.split("/")[4]
 
     const embed = new CustomEmbed(message.member)
         .setTitle(title)
