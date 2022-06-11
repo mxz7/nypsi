@@ -7,7 +7,7 @@ import { updateXp, getXp, userExists, createUser, getInventory, setInventory } f
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
 
-const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO)
+const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"])
 
 declare function require(name: string)
 
