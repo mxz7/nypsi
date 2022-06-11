@@ -31,6 +31,7 @@ let workerCount = 0
  */
 export default async function messageCreate(message: Message) {
     if (message.author.bot) return
+    if (!message.member) return
 
     if (message.channel.type == "DM") {
         logger.info("message in DM from " + message.author.tag + ": " + message.content)
