@@ -149,11 +149,13 @@ async function showUser(message, user) {
             "user",
             `**tag** ${user.tag}
             **created** ${formatDate(user.createdAt)}${
-                getLastCommand(user.id) ? `\n**last command** ${daysAgo(getLastCommand(user.id))} days ago` : ""
+                (await getLastCommand(user.id))
+                    ? `\n**last command** ${daysAgo(await getLastCommand(user.id))} days ago`
+                    : ""
             }`,
             true
         )
-        .setFooter(`${getKarma(user.id)} karma`)
+        .setFooter(`${await getKarma(user.id)} karma`)
 
     if (userExists(user.id)) {
         const voted = hasVoted(user.id)

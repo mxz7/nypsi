@@ -69,8 +69,8 @@ export default async function messageCreate(message: Message) {
         message.guild.memberCount < 150000 &&
         (userExists(message.guild.ownerId) ||
             isPremium(message.guild.ownerId) ||
-            getKarma(message.guild.ownerId) >= 50 ||
-            getLastCommand(message.guild.ownerId) >= Date.now() - ms("1 days"))
+            (await getKarma(message.guild.ownerId)) >= 50 ||
+            (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
     ) {
         if (message.mentions.everyone) {
             if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
