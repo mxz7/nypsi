@@ -268,7 +268,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     const prestigeBonus = Math.floor((getPrestige(memberID) > 20 ? 20 : getPrestige(memberID)) / 2.5)
     const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0)
-    const karmaBonus = Math.floor(getKarma(memberID) / 100)
+    const karmaBonus = Math.floor((await getKarma(memberID)) / 100)
 
     const max = 5 + prestigeBonus + premiumBonus + karmaBonus
 
