@@ -16,7 +16,7 @@ export interface MentionQueueItem {
     members?: Collection<string, GuildMember | ThreadMember>
     channelMembers?: any
     message?: Message
-    guild: Guild | string
+    guildId: string
     url?: string
     target?: string
     data?: MentionData
