@@ -130,7 +130,7 @@ export function closeKarmaShop() {
  * @param {GuildMember} member
  * @returns {number}
  */
-export function getLastCommand(member: GuildMember | string): number {
+export async function getLastCommand(member: GuildMember | string): Promise<number> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -138,16 +138,13 @@ export function getLastCommand(member: GuildMember | string): number {
         id = member
     }
 
-    if (lastCommandCache.has(id)) return lastCommandCache.get(id)
+    if (await redis.hexists("cache:karma:lastcmd", id)) return parseInt(await redis.hget("cache:karma:lastcmd", id))
 
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
 
     if (!query) {
-        lastCommandCache.set(id, 0)
         return 0
     }
-
-    lastCommandCache.set(id, query.last_command)
 
     return query.last_command
 }
