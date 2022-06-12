@@ -89,7 +89,7 @@ export default async function messageCreate(message: Message) {
                 members: members.clone(),
                 message: message,
                 channelMembers: message.channel.members,
-                guild: message.guild,
+                guildId: message.guild.id,
                 url: message.url,
             })
 
@@ -115,7 +115,7 @@ export default async function messageCreate(message: Message) {
                         members: r.members.clone(),
                         message: message,
                         channelMembers: members,
-                        guild: message.guild,
+                        guildId: message.guild.id,
                         url: message.url,
                     })
                 })
@@ -144,7 +144,7 @@ export default async function messageCreate(message: Message) {
                             date: message.createdTimestamp,
                             link: message.url,
                         },
-                        guild: message.guild.id,
+                        guildId: message.guild.id,
                         target: message.mentions.members.first().user.id,
                     })
                 } else {
@@ -153,7 +153,7 @@ export default async function messageCreate(message: Message) {
                         members: message.mentions.members.clone(),
                         message: message,
                         channelMembers: message.channel.members,
-                        guild: message.guild,
+                        guildId: message.guild.id,
                         url: message.url,
                     })
                 }
@@ -256,7 +256,7 @@ async function addMention() {
                     members: members.clone(),
                     message: mention.message,
                     channelMembers: channelMembers,
-                    guild: mention.guild,
+                    guildId: mention.guildId,
                 })
             }
             const member = members.get(memberID)
@@ -285,13 +285,13 @@ async function addMention() {
             mentionQueue.push({
                 type: "mention",
                 data: data,
-                guild: guild,
+                guildId: guild,
                 target: member.user.id,
             })
             count++
         }
     } else if (typeof mention != "string" && mention.type == "mention") {
-        const guild = mention.guild
+        const guild = mention.guildId
         const data = mention.data
         const target = mention.target
 
