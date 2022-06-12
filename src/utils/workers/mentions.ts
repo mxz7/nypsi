@@ -62,7 +62,7 @@ if (!isMainThread) {
 
         try {
             insertMention.run(
-                collection.guild.id,
+                collection.guildId,
                 member.user.id,
                 Math.floor(collection.message.createdTimestamp / 1000),
                 `${collection.message.author.username}#${collection.message.author.discriminator}`,
