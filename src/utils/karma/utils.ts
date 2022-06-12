@@ -64,7 +64,7 @@ export async function addKarma(member: GuildMember | string, amount: number) {
  * @param {GuildMember} member
  * @param {Number} amount
  */
-export function removeKarma(member: GuildMember | string, amount: number) {
+export async function removeKarma(member: GuildMember | string, amount: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -72,7 +72,7 @@ export function removeKarma(member: GuildMember | string, amount: number) {
         id = member
     }
 
-    if (karmaCache.has(id)) karmaCache.delete(id)
+    if (await redis.hexists("cache:karma:amount", id)) redis.hdel("cache:karma:amount", id)
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
