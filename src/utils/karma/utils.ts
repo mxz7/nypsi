@@ -149,7 +149,7 @@ export async function getLastCommand(member: GuildMember | string): Promise<numb
     return query.last_command
 }
 
-function deteriorateKarma() {
+async function deteriorateKarma() {
     const now = Date.now()
 
     const threshold = now - ms("16 hours")
@@ -184,8 +184,6 @@ function deteriorateKarma() {
 
         total += karmaToRemove
 
-        if (karmaCache.has(user.id)) karmaCache.delete(user.id)
-
         db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id)
     }
 
@@ -193,6 +191,8 @@ function deteriorateKarma() {
         level: "auto",
         message: `${total} total karma deteriorated`,
     })
+
+    await redis.del("cache:karma:amount")
 }
 
 // prettier-ignore
