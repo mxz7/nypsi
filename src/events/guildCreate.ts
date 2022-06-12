@@ -19,5 +19,5 @@ export default async function guildCreate(client: Client, guild: Guild) {
         amount = 500
     }
 
-    addKarma(guild.ownerId, amount)
+    await addKarma(guild.ownerId, amount)
 }

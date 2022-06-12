@@ -613,7 +613,7 @@ export async function runCommand(
             }
         }
         commands.get(aliases.get(cmd)).run(message, args)
-        updateLastCommand(message.member)
+        await updateLastCommand(message.member)
     } else {
         if (commands.get(cmd).category == "money") {
             if (isEcoBanned(message.author.id)) {
@@ -915,18 +915,18 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
         return
     }
 
-    const updateKarma = () => {
+    const updateKarma = async () => {
         for (const user of commandUses.keys()) {
             let modifier = 2
 
-            if (getKarma(user) > 200) modifier = 3
-            if (getKarma(user) > 400) modifier = 4
-            if (getKarma(user) > 500) modifier = 5
+            if ((await getKarma(user)) > 200) modifier = 3
+            if ((await getKarma(user)) > 400) modifier = 4
+            if ((await getKarma(user)) > 500) modifier = 5
 
             const amount = Math.floor(commandUses.get(user) / modifier)
 
             if (amount > 0) {
-                addKarma(user, amount)
+                await addKarma(user, amount)
             }
         }
 

@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         embed.setHeader("karma shop", message.author.avatarURL())
-        embed.setFooter(`you have ${getKarma(message.member).toLocaleString()} karma ${displayItemsLeft()}`)
+        embed.setFooter(`you have ${(await getKarma(message.member)).toLocaleString()} karma ${displayItemsLeft()}`)
 
         for (let item of pages[page]) {
             item = items[item]
@@ -163,8 +163,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
-                                message.member
+                            `page ${currentPage + 1}/${pages.length} | you have ${(
+                                await getKarma(message.member)
                             ).toLocaleString()} karma ${displayItemsLeft()}`
                         )
                         if (currentPage == 0) {
@@ -197,8 +197,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             )
                         }
                         newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${getKarma(
-                                message.member
+                            `page ${currentPage + 1}/${pages.length} | you have ${(
+                                await getKarma(message.member)
                             ).toLocaleString()} karma ${displayItemsLeft()}`
                         )
                         if (currentPage + 1 == lastPage) {
@@ -258,7 +258,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("there is none of this item left in the shop")] })
         }
 
-        if (getKarma(message.member) < selected.cost) {
+        if ((await getKarma(message.member)) < selected.cost) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] })
         }
 
@@ -344,7 +344,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             amount.set(message.author.id, 1)
         }
 
-        removeKarma(message.member, selected.cost)
+        await removeKarma(message.member, selected.cost)
 
         if (!selected.unlimited) {
             items[selected.id].items_left -= 1

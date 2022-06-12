@@ -42,7 +42,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
                 renewUser(newMember.user.id)
             } else {
                 addMember(newMember.user.id, tier)
-                addKarma(newMember.user.id, 50)
+                await addKarma(newMember.user.id, 50)
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
             // 747066190530347089 boost role
