@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 })
             }
 
-            removeKarma(args[1], parseInt(args[2]))
+            await removeKarma(args[1], parseInt(args[2]))
         }
         target = message.mentions.members.first()
 
@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const karma = getKarma(target)
+    const karma = await getKarma(target)
 
     const embed = new CustomEmbed(message.member, false)
 

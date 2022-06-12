@@ -1,13 +1,11 @@
 import { GuildMember } from "discord.js"
 import ms = require("ms")
 import { getDatabase } from "../database/database"
+import redis from "../database/redis"
 import { MStoTime } from "../functions/date"
 import { logger } from "../logger"
 
 const db = getDatabase()
-
-const karmaCache: Map<string, number> = new Map()
-const lastCommandCache: Map<string, number> = new Map()
 
 let karmaShop = false
 
@@ -16,7 +14,7 @@ let karmaShop = false
  * @param {GuildMember} member
  * @returns {Number}
  */
-export function getKarma(member: GuildMember | string): number {
+export async function getKarma(member: GuildMember | string): Promise<number> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -24,7 +22,7 @@ export function getKarma(member: GuildMember | string): number {
         id = member
     }
 
-    if (karmaCache.has(id)) return karmaCache.get(id)
+    if (await redis.hexists("cache:karma:amount", id)) return parseInt(await redis.hget("cache:karma:amount", id))
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -32,7 +30,7 @@ export function getKarma(member: GuildMember | string): number {
         db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now())
         return 1
     } else {
-        karmaCache.set(id, query.karma)
+        await redis.hsetnx("cache:karma:amount", id, query.karma)
         return query.karma
     }
 }
@@ -42,7 +40,7 @@ export function getKarma(member: GuildMember | string): number {
  * @param {GuildMember} member
  * @param {Number} amount
  */
-export function addKarma(member: GuildMember | string, amount: number) {
+export async function addKarma(member: GuildMember | string, amount: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -50,7 +48,7 @@ export function addKarma(member: GuildMember | string, amount: number) {
         id = member
     }
 
-    if (karmaCache.has(id)) karmaCache.delete(id)
+    if (await redis.hexists("cache:karma:amount", id)) redis.hdel("cache:karma:amount", id)
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -66,7 +64,7 @@ export function addKarma(member: GuildMember | string, amount: number) {
  * @param {GuildMember} member
  * @param {Number} amount
  */
-export function removeKarma(member: GuildMember | string, amount: number) {
+export async function removeKarma(member: GuildMember | string, amount: number) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -74,7 +72,7 @@ export function removeKarma(member: GuildMember | string, amount: number) {
         id = member
     }
 
-    if (karmaCache.has(id)) karmaCache.delete(id)
+    if (await redis.hexists("cache:karma:amount", id)) redis.hdel("cache:karma:amount", id)
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -92,7 +90,7 @@ export function removeKarma(member: GuildMember | string, amount: number) {
  *
  * @param {GuildMember} member
  */
-export function updateLastCommand(member: GuildMember | string) {
+export async function updateLastCommand(member: GuildMember | string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -100,7 +98,7 @@ export function updateLastCommand(member: GuildMember | string) {
         id = member
     }
 
-    if (lastCommandCache.has(id)) lastCommandCache.delete(id)
+    await redis.hset("cache:karma:lastcmd", id, Date.now())
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
@@ -132,7 +130,7 @@ export function closeKarmaShop() {
  * @param {GuildMember} member
  * @returns {number}
  */
-export function getLastCommand(member: GuildMember | string): number {
+export async function getLastCommand(member: GuildMember | string): Promise<number> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -140,21 +138,18 @@ export function getLastCommand(member: GuildMember | string): number {
         id = member
     }
 
-    if (lastCommandCache.has(id)) return lastCommandCache.get(id)
+    if (await redis.hexists("cache:karma:lastcmd", id)) return parseInt(await redis.hget("cache:karma:lastcmd", id))
 
     const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id)
 
     if (!query) {
-        lastCommandCache.set(id, 0)
         return 0
     }
-
-    lastCommandCache.set(id, query.last_command)
 
     return query.last_command
 }
 
-function deteriorateKarma() {
+async function deteriorateKarma() {
     const now = Date.now()
 
     const threshold = now - ms("16 hours")
@@ -189,8 +184,6 @@ function deteriorateKarma() {
 
         total += karmaToRemove
 
-        if (karmaCache.has(user.id)) karmaCache.delete(user.id)
-
         db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id)
     }
 
@@ -198,6 +191,8 @@ function deteriorateKarma() {
         level: "auto",
         message: `${total} total karma deteriorated`,
     })
+
+    await redis.del("cache:karma:amount")
 }
 
 // prettier-ignore

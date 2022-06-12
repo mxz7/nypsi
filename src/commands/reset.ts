@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         earnedKarma = Math.floor(earnedKarma * 2.2)
 
-        addKarma(message.member, earnedKarma)
+        await addKarma(message.member, earnedKarma)
 
         deleteUser(message.member)
 
