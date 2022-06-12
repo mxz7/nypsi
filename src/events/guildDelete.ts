@@ -30,5 +30,5 @@ export default async function guildDelete(client: Client, guild: Guild) {
         amount = 500
     }
 
-    removeKarma(guild.ownerId, amount)
+    await removeKarma(guild.ownerId, amount)
 }

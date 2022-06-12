@@ -238,7 +238,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
             karmaCooldown.delete(message.author.id)
         }, ms("15m"))
 
-        addKarma(message.author.id, 5)
+        await addKarma(message.author.id, 5)
     }
 }
 
