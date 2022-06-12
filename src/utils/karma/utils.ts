@@ -90,7 +90,7 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
  *
  * @param {GuildMember} member
  */
-export function updateLastCommand(member: GuildMember | string) {
+export async function updateLastCommand(member: GuildMember | string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -98,7 +98,7 @@ export function updateLastCommand(member: GuildMember | string) {
         id = member
     }
 
-    if (lastCommandCache.has(id)) lastCommandCache.delete(id)
+    await redis.hset("cache:karma:lastcmd", id, Date.now())
 
     const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id)
 
