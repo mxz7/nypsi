@@ -287,7 +287,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
     })
 
-    if (!id && getDMsEnabled(memberID) && member instanceof User) {
+    if (!id && (await getDMsEnabled(memberID)) && member instanceof User) {
         const embed = new CustomEmbed()
             .setColor("#5efb8f")
             .setDescription(
@@ -998,7 +998,7 @@ export function getPrestigeRequirementBal(xp: number): number {
  * @returns {Boolean}
  * @param {GuildMember} member
  */
-export function getDMsEnabled(member: GuildMember | string): boolean {
+export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -1519,7 +1519,7 @@ async function doLottery(client: Client) {
 
     await lotteryHook.send({ embeds: [embed] })
 
-    if (getDMsEnabled(user.id)) {
+    if (await getDMsEnabled(user.id)) {
         embed.setTitle("you have won the lottery!")
         embed.setDescription(
             `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
@@ -2020,7 +2020,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
             setInventory(member.user_id, inventory)
 
-            if (getDMsEnabled(member.user_id)) {
+            if (await getDMsEnabled(member.user_id)) {
                 const { requestDM } = require("../../nypsi")
 
                 await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed)

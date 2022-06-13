@@ -311,7 +311,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setTimeout(async () => {
             await edit({ embeds: [embed2] }, m)
 
-            if (getDMsEnabled(target)) {
+            if (await getDMsEnabled(target)) {
                 if (robberySuccess) {
                     addRob(message.member, true)
                     target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {})

@@ -272,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "your money is no longer protected by a padlock"
                 )
 
-                if (getDMsEnabled(lockPickTarget)) {
+                if (await getDMsEnabled(lockPickTarget)) {
                     await lockPickTarget.send({ embeds: [targetEmbed] })
                 }
                 embed.setDescription(`picking **${lockPickTarget.user.tag}**'s padlock...`)

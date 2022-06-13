@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(message.member))) createUser(message.member)
 
-    const current = getDMsEnabled(message.member)
+    const current = await getDMsEnabled(message.member)
 
     let newValue
     let embed
