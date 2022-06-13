@@ -21,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (prestige > 15) prestige = 15
 
     const amount = 15000 * (prestige + 1)
-    const voted = hasVoted(message.member)
+    const voted = await hasVoted(message.member)
     const multi = Math.floor(getMulti(message.member) * 100)
     let crateAmount = Math.floor(prestige / 2 + 1)
 

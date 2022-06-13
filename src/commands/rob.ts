@@ -220,7 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed2.setColor("#5efb8f")
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**")
 
-            const voted = hasVoted(message.member)
+            const voted = await hasVoted(message.member)
 
             if (voted) {
                 updateXp(message.member, getXp(message.member) + 1)

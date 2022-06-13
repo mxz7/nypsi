@@ -365,7 +365,7 @@ export function getMulti(member: GuildMember | string): number {
 
     let multi = 0
 
-    const voted = hasVoted(id)
+    const voted = await hasVoted(id)
 
     if (voted) {
         multi += 3
@@ -1034,7 +1034,7 @@ export function setDMsEnabled(member: GuildMember, value: boolean) {
  */
 export function calcMaxBet(member: GuildMember): number {
     const base = 100000
-    const voted = hasVoted(member)
+    const voted = await hasVoted(member)
     const bonus = 50000
 
     let total = base
