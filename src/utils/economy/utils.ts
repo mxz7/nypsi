@@ -869,7 +869,7 @@ export function createUser(member: GuildMember | string) {
  * @returns {Number} formatted bet
  * @param {String} number to format
  */
-export function formatBet(bet: string | number, member: GuildMember): number | void {
+export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
     const maxBet = await calcMaxBet(member)
 
     if (bet.toString().toLowerCase() == "all") {

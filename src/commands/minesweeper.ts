@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member)
 
-    const bet = formatBet(args[0], message.member)
+    const bet = await formatBet(args[0], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })

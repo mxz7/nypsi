@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        const bet = formatBet(args[1], message.member)
+        const bet = await formatBet(args[1], message.member)
 
         if (!bet) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
