@@ -35,7 +35,7 @@ cmd.slashData.addIntegerOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -89,9 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    const maxBet = calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member)
 
-    const bet = formatBet(args[0], message.member)
+    const bet = await formatBet(args[0], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })

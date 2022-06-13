@@ -16,6 +16,7 @@ import fetch from "node-fetch"
 import workerSort from "../workers/sort"
 import { MStoTime } from "../functions/date"
 import ms = require("ms")
+import redis from "../database/redis"
 
 declare function require(name: string)
 
@@ -26,8 +27,6 @@ const topggStats = new topgg.Api(process.env.TOPGG_TOKEN)
 
 const app = express()
 
-const voteCache = new Map()
-const existsCache = new Map()
 const bannedCache = new Map()
 const guildExistsCache = new Map()
 const guildUserCache = new Map()
@@ -215,7 +214,7 @@ setInterval(updateCryptoWorth, 1500000)
 export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const { user } = vote
 
-    if (!userExists(user)) {
+    if (!(await userExists(user))) {
         logger.warn(`${user} doesnt exist`)
         return
     }
@@ -232,13 +231,8 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
 
-    voteCache.set(user, true)
-
-    setTimeout(() => {
-        if (voteCache.has(user)) {
-            voteCache.delete(user)
-        }
-    }, 10800)
+    redis.set(`cache:vote:${user}`, "true")
+    redis.expire(`cache:vote:${user}`, ms("6 hours"))
 
     let member: User | string = await client.users.fetch(user)
 
@@ -258,7 +252,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     if (prestige > 15) prestige = 15
 
     const amount = 15000 * (prestige + 1)
-    const multi = Math.floor(getMulti(memberID) * 100)
+    const multi = Math.floor((await getMulti(memberID)) * 100)
     const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
@@ -293,7 +287,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
     })
 
-    if (!id && getDMsEnabled(memberID) && member instanceof User) {
+    if (!id && (await getDMsEnabled(memberID)) && member instanceof User) {
         const embed = new CustomEmbed()
             .setColor("#5efb8f")
             .setDescription(
@@ -330,24 +324,7 @@ export function getPadlockPrice(): number {
     return padlockPrice
 }
 
-/**
- * @returns {Number}
- */
-export function getVoteCacheSize(): number {
-    return voteCache.size
-}
-
-/**
- *
- * @param {GuildMember} member
- */
-export function removeFromVoteCache(member: GuildMember) {
-    if (voteCache.has(member.user.id)) {
-        voteCache.delete(member.user.id)
-    }
-}
-
-export function hasVoted(member: GuildMember | string) {
+export async function hasVoted(member: GuildMember | string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -355,9 +332,7 @@ export function hasVoted(member: GuildMember | string) {
         id = member
     }
 
-    if (voteCache.has(id)) {
-        return voteCache.get(id)
-    }
+    if (await redis.exists(`cache:vote:${id}`)) return (await redis.get(`cache:vote:${id}`)) === "true" ? true : false
 
     const now = new Date().getTime()
 
@@ -366,18 +341,12 @@ export function hasVoted(member: GuildMember | string) {
     const lastVote = query.last_vote
 
     if (now - lastVote < 43200000) {
-        voteCache.set(id, true)
-
-        setTimeout(() => {
-            voteCache.delete(id)
-        }, 10800000)
+        redis.set(`cache:vote:${id}`, "true")
+        redis.expire(`cache:vote:${id}`, ms("30 minutes"))
         return true
     } else {
-        voteCache.set(id, false)
-
-        setTimeout(() => {
-            voteCache.delete(id)
-        }, 10800000)
+        redis.set(`cache:vote:${id}`, "false")
+        redis.expire(`cache:vote:${id}`, ms("6 hours"))
         return false
     }
 }
@@ -386,7 +355,7 @@ export function hasVoted(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Number}
  */
-export function getMulti(member: GuildMember | string): number {
+export async function getMulti(member: GuildMember | string): Promise<number> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -396,7 +365,7 @@ export function getMulti(member: GuildMember | string): number {
 
     let multi = 0
 
-    const voted = hasVoted(id)
+    const voted = await hasVoted(id)
 
     if (voted) {
         multi += 3
@@ -482,7 +451,7 @@ export function getBalance(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Boolean}
  */
-export function userExists(member: GuildMember | string): boolean {
+export async function userExists(member: GuildMember | string): Promise<boolean> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -490,17 +459,19 @@ export function userExists(member: GuildMember | string): boolean {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        return existsCache.get(id)
+    if (await redis.exists(`cache:economy:exists:${id}`)) {
+        return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false
     }
 
     const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
 
     if (query) {
-        existsCache.set(id, true)
+        await redis.set(`cache:economy:exists:${id}`, "true")
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
         return true
     } else {
-        existsCache.set(id, false)
+        await redis.set(`cache:economy:exists:${id}`, "false")
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
         return false
     }
 }
@@ -889,9 +860,7 @@ export function createUser(member: GuildMember | string) {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        existsCache.delete(id)
-    }
+    redis.del(`cache:economy:exists:${id}`)
 
     db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000)
 }
@@ -900,8 +869,8 @@ export function createUser(member: GuildMember | string) {
  * @returns {Number} formatted bet
  * @param {String} number to format
  */
-export function formatBet(bet: string | number, member: GuildMember): number | void {
-    const maxBet = calcMaxBet(member)
+export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
+    const maxBet = await calcMaxBet(member)
 
     if (bet.toString().toLowerCase() == "all") {
         bet = getBalance(member)
@@ -1029,7 +998,7 @@ export function getPrestigeRequirementBal(xp: number): number {
  * @returns {Boolean}
  * @param {GuildMember} member
  */
-export function getDMsEnabled(member: GuildMember | string): boolean {
+export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -1037,7 +1006,7 @@ export function getDMsEnabled(member: GuildMember | string): boolean {
         id = member
     }
 
-    if (!userExists(id)) createUser(id)
+    if (!(await userExists(id))) createUser(id)
 
     const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id)
 
@@ -1063,9 +1032,9 @@ export function setDMsEnabled(member: GuildMember, value: boolean) {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function calcMaxBet(member: GuildMember): number {
+export async function calcMaxBet(member: GuildMember): Promise<number> {
     const base = 100000
-    const voted = hasVoted(member)
+    const voted = await hasVoted(member)
     const bonus = 50000
 
     let total = base
@@ -1443,9 +1412,7 @@ export function deleteUser(member: GuildMember | string) {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        existsCache.delete(id)
-    }
+    redis.del(`cache:economy:exists:${id}`)
 
     db.prepare("DELETE FROM economy WHERE id = ?").run(id)
 }
@@ -1550,7 +1517,7 @@ async function doLottery(client: Client) {
 
     await lotteryHook.send({ embeds: [embed] })
 
-    if (getDMsEnabled(user.id)) {
+    if (await getDMsEnabled(user.id)) {
         embed.setTitle("you have won the lottery!")
         embed.setDescription(
             `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
@@ -2051,7 +2018,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
             setInventory(member.user_id, inventory)
 
-            if (getDMsEnabled(member.user_id)) {
+            if (await getDMsEnabled(member.user_id)) {
                 const { requestDM } = require("../../nypsi")
 
                 await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed)

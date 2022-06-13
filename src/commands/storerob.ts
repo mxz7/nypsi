@@ -19,7 +19,7 @@ const cmd = new Command("storerob", "attempt to rob a store for a reward", Categ
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (getBalance(message.member) < 1000) {
         return await message.channel.send({

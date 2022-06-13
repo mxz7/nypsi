@@ -81,9 +81,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid user")] })
     }
 
-    if (!userExists(target)) createUser(target)
+    if (!(await userExists(target))) createUser(target)
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (args[1].toLowerCase() == "all") {
         args[1] = getBalance(message.member).toString()
