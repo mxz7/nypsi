@@ -166,7 +166,7 @@ async function showUser(message, user) {
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}
             **prestige** ${getPrestige(user.id)}
-            **bonus** ${Math.floor(getMulti(user.id) * 100)}%`,
+            **bonus** ${Math.floor((await getMulti(user.id)) * 100)}%`,
             true
         )
     }

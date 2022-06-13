@@ -252,7 +252,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     if (prestige > 15) prestige = 15
 
     const amount = 15000 * (prestige + 1)
-    const multi = Math.floor(getMulti(memberID) * 100)
+    const multi = Math.floor((await getMulti(memberID)) * 100)
     const inventory = getInventory(memberID)
 
     updateBalance(memberID, getBalance(memberID) + amount)
@@ -355,7 +355,7 @@ export async function hasVoted(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Number}
  */
-export function getMulti(member: GuildMember | string): number {
+export async function getMulti(member: GuildMember | string): Promise<number> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id

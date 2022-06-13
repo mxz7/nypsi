@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30)
 
-    const multi = getMulti(message.member)
+    const multi = await getMulti(message.member)
 
     let total = 0
     let earned = ""

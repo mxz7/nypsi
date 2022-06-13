@@ -218,7 +218,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let multi = 0
 
     if (win) {
-        multi = getMulti(message.member)
+        multi = await getMulti(message.member)
 
         if (multi > 0) {
             updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi))

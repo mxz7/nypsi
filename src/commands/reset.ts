@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let earnedKarma = 0
 
     let inventoryWorth = 0
-    const multi = getMulti(message.member)
+    const multi = await getMulti(message.member)
 
     let inventory = getInventory(message.member)
     const items = getItems()
