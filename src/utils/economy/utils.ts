@@ -16,6 +16,7 @@ import fetch from "node-fetch"
 import workerSort from "../workers/sort"
 import { MStoTime } from "../functions/date"
 import ms = require("ms")
+import redis from "../database/redis"
 
 declare function require(name: string)
 
@@ -26,8 +27,6 @@ const topggStats = new topgg.Api(process.env.TOPGG_TOKEN)
 
 const app = express()
 
-const voteCache = new Map()
-const existsCache = new Map()
 const bannedCache = new Map()
 const guildExistsCache = new Map()
 const guildUserCache = new Map()
@@ -232,13 +231,8 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
 
-    voteCache.set(user, true)
-
-    setTimeout(() => {
-        if (voteCache.has(user)) {
-            voteCache.delete(user)
-        }
-    }, 10800)
+    redis.set(`cache:vote:${user}`, "true")
+    redis.expire(`cache:vote:${user}`, ms("6 hours"))
 
     let member: User | string = await client.users.fetch(user)
 
