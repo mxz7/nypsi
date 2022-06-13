@@ -451,7 +451,7 @@ export function getBalance(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Boolean}
  */
-export function userExists(member: GuildMember | string): boolean {
+export async function userExists(member: GuildMember | string): Promise<boolean> {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -459,17 +459,19 @@ export function userExists(member: GuildMember | string): boolean {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        return existsCache.get(id)
+    if (await redis.exists(`cache:economy:exists:${id}`)) {
+        return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false
     }
 
     const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
 
     if (query) {
-        existsCache.set(id, true)
+        await redis.set(`cache:economy:exists:${id}`, "true")
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
         return true
     } else {
-        existsCache.set(id, false)
+        await redis.set(`cache:economy:exists:${id}`, "false")
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
         return false
     }
 }
