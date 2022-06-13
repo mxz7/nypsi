@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     //     return send({ embeds: [embed] })
     // }
 
-    if (!getDMsEnabled(message.member)) {
+    if (!(await getDMsEnabled(message.member))) {
         return send({
             embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
         })

@@ -57,7 +57,7 @@ const carCooldown = new Map()
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
         }
 
-        const bet = formatBet(args[1], message.member)
+        const bet = await formatBet(args[1], message.member)
 
         if (!bet) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] })
@@ -226,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] })
         }
 
-        const maxBet = calcMaxBet(message.member)
+        const maxBet = await calcMaxBet(message.member)
 
         if (race.bet > maxBet) {
             return send({
