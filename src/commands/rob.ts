@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (message.guild.id == "747056029795221513") {
         return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] })
@@ -123,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cant rob yourself")] })
     }
 
-    if (!userExists(target) || getBalance(target) <= 500) {
+    if (!(await userExists(target)) || getBalance(target) <= 500) {
         return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] })
     }
 

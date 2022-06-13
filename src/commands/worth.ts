@@ -11,7 +11,7 @@ const cmd = new Command("worth", "check the worth of items", Categories.MONEY).s
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (args.length == 0) {
         return message.channel.send({

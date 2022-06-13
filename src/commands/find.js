@@ -157,7 +157,7 @@ async function showUser(message, user) {
         )
         .setFooter(`${await getKarma(user.id)} karma`)
 
-    if (userExists(user.id)) {
+    if (await userExists(user.id)) {
         const voted = await hasVoted(user.id)
         embed.addField(
             "economy",

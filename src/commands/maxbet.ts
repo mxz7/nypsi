@@ -10,7 +10,7 @@ const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     const maxBet = calcMaxBet(message.member)
 

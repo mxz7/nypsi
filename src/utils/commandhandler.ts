@@ -670,7 +670,7 @@ export async function runCommand(
 
     if (getCmdCategory(cmdName) == "money") {
         if (!message.member) return
-        if (!userExists(message.member)) return
+        if (!(await userExists(message.member))) return
 
         setTimeout(() => {
             try {

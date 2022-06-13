@@ -214,7 +214,7 @@ setInterval(updateCryptoWorth, 1500000)
 export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const { user } = vote
 
-    if (!userExists(user)) {
+    if (!(await userExists(user))) {
         logger.warn(`${user} doesnt exist`)
         return
     }
@@ -1008,7 +1008,7 @@ export function getDMsEnabled(member: GuildMember | string): boolean {
         id = member
     }
 
-    if (!userExists(id)) createUser(id)
+    if (!(await userExists(id))) createUser(id)
 
     const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id)
 

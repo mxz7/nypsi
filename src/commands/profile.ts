@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10)
 
-    if (!userExists(message.member)) {
+    if (!(await userExists(message.member))) {
         createUser(message.member)
     }
 
