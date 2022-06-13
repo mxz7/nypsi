@@ -19,7 +19,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (getBalance(message.member) <= 0) {
         return message.channel.send({ embeds: [new ErrorEmbed("you need money to work")] })

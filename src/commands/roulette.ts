@@ -94,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] })
     }
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
         return send({
@@ -153,9 +153,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         args[0] = "b"
     }
 
-    const maxBet = calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member)
 
-    const bet = formatBet(args[1], message.member)
+    const bet = await formatBet(args[1], message.member)
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] })
@@ -237,7 +237,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let multi = 0
 
     if (win) {
-        multi = getMulti(message.member)
+        multi = await getMulti(message.member)
 
         if (multi > 0) {
             updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi))

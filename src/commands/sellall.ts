@@ -22,7 +22,7 @@ cmd.slashEnabled = true
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30)
 
-    const multi = getMulti(message.member)
+    const multi = await getMulti(message.member)
 
     let total = 0
     let earned = ""

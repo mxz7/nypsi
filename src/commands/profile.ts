@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10)
 
-    if (!userExists(message.member)) {
+    if (!(await userExists(message.member))) {
         createUser(message.member)
     }
 
@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prestige = getPrestige(message.member).toLocaleString()
     const maxBet = await calcMaxBet(message.member)
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%"
-    const voted = hasVoted(message.member)
+    const voted = await hasVoted(message.member)
     const inventory = getInventory(message.member)
     let inventoryItems
 

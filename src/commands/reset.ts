@@ -29,12 +29,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] })
     }
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     let earnedKarma = 0
 
     let inventoryWorth = 0
-    const multi = getMulti(message.member)
+    const multi = await getMulti(message.member)
 
     let inventory = getInventory(message.member)
     const items = getItems()
