@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-import { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } from "../utils/economy/utils.js"
+import { hasVoted, userExists, createUser, getPrestige, getMulti } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -45,7 +45,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }`
         )
         embed.setFooter("you get increased rewards for prestiging")
-        removeFromVoteCache(message.member)
     }
 
     message.channel.send({ embeds: [embed] })
