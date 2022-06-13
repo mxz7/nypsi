@@ -324,24 +324,7 @@ export function getPadlockPrice(): number {
     return padlockPrice
 }
 
-/**
- * @returns {Number}
- */
-export function getVoteCacheSize(): number {
-    return voteCache.size
-}
-
-/**
- *
- * @param {GuildMember} member
- */
-export function removeFromVoteCache(member: GuildMember) {
-    if (voteCache.has(member.user.id)) {
-        voteCache.delete(member.user.id)
-    }
-}
-
-export function hasVoted(member: GuildMember | string) {
+export async function hasVoted(member: GuildMember | string) {
     let id: string
     if (member instanceof GuildMember) {
         id = member.user.id
@@ -349,9 +332,7 @@ export function hasVoted(member: GuildMember | string) {
         id = member
     }
 
-    if (voteCache.has(id)) {
-        return voteCache.get(id)
-    }
+    if (await redis.exists(`cache:vote:${id}`)) return (await redis.get(`cache:vote:${id}`)) === "true" ? true : false
 
     const now = new Date().getTime()
 
@@ -360,18 +341,12 @@ export function hasVoted(member: GuildMember | string) {
     const lastVote = query.last_vote
 
     if (now - lastVote < 43200000) {
-        voteCache.set(id, true)
-
-        setTimeout(() => {
-            voteCache.delete(id)
-        }, 10800000)
+        redis.set(`cache:vote:${id}`, "true")
+        redis.expire(`cache:vote:${id}`, ms("30 minutes"))
         return true
     } else {
-        voteCache.set(id, false)
-
-        setTimeout(() => {
-            voteCache.delete(id)
-        }, 10800000)
+        redis.set(`cache:vote:${id}`, "false")
+        redis.expire(`cache:vote:${id}`, ms("6 hours"))
         return false
     }
 }
