@@ -860,9 +860,7 @@ export function createUser(member: GuildMember | string) {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        existsCache.delete(id)
-    }
+    redis.del(`cache:economy:exists:${id}`)
 
     db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000)
 }
