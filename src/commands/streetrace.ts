@@ -226,7 +226,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] })
         }
 
-        const maxBet = calcMaxBet(message.member)
+        const maxBet = await calcMaxBet(message.member)
 
         if (race.bet > maxBet) {
             return send({

@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
     }
 
-    const maxBet = calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member)
 
     const bet = formatBet(args[0], message.member)
 

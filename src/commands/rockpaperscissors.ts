@@ -94,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (choice == "paper") memberEmoji = "📰"
     if (choice == "scissors") memberEmoji = "✂"
 
-    const maxBet = calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member)
 
     const bet = formatBet(args[1], message.member)
 

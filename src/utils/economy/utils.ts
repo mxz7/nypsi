@@ -870,7 +870,7 @@ export function createUser(member: GuildMember | string) {
  * @param {String} number to format
  */
 export function formatBet(bet: string | number, member: GuildMember): number | void {
-    const maxBet = calcMaxBet(member)
+    const maxBet = await calcMaxBet(member)
 
     if (bet.toString().toLowerCase() == "all") {
         bet = getBalance(member)
@@ -1032,7 +1032,7 @@ export function setDMsEnabled(member: GuildMember, value: boolean) {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function calcMaxBet(member: GuildMember): number {
+export async function calcMaxBet(member: GuildMember): Promise<number> {
     const base = 100000
     const voted = await hasVoted(member)
     const bonus = 50000
