@@ -1412,9 +1412,7 @@ export function deleteUser(member: GuildMember | string) {
         id = member
     }
 
-    if (existsCache.has(id)) {
-        existsCache.delete(id)
-    }
+    redis.del(`cache:economy:exists:${id}`)
 
     db.prepare("DELETE FROM economy WHERE id = ?").run(id)
 }
