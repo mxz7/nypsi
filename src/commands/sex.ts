@@ -186,7 +186,7 @@ setInterval(() => {
 
     looking.forEach(async (obj) => {
         if (now - obj.date >= expire) {
-            if (getDMsEnabled(obj.user.id)) {
+            if (await getDMsEnabled(obj.user.id)) {
                 await obj.user
                     .send({
                         embeds: [

@@ -21,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 90)
 
-    if (!userExists(message.member)) {
+    if (!(await userExists(message.member))) {
         createUser(message.member)
     }
 
@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             setLastWeekly(message.author.id, now)
 
             let amount = 150000
-            const multi = getMulti(message.member)
+            const multi = await getMulti(message.member)
 
             let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
 

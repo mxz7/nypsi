@@ -32,7 +32,7 @@ const cmd = new Command("workers", "view the available workers and manage your o
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const workers = getAllWorkers()
 
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member)

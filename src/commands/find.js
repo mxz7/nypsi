@@ -157,8 +157,8 @@ async function showUser(message, user) {
         )
         .setFooter(`${await getKarma(user.id)} karma`)
 
-    if (userExists(user.id)) {
-        const voted = hasVoted(user.id)
+    if (await userExists(user.id)) {
+        const voted = await hasVoted(user.id)
         embed.addField(
             "economy",
             `💰 $**${getBalance(user.id).toLocaleString()}**
@@ -166,7 +166,7 @@ async function showUser(message, user) {
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}
             **prestige** ${getPrestige(user.id)}
-            **bonus** ${Math.floor(getMulti(user.id) * 100)}%`,
+            **bonus** ${Math.floor((await getMulti(user.id)) * 100)}%`,
             true
         )
     }

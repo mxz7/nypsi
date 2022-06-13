@@ -45,7 +45,7 @@ cmd.slashData
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -272,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "your money is no longer protected by a padlock"
                 )
 
-                if (getDMsEnabled(lockPickTarget)) {
+                if (await getDMsEnabled(lockPickTarget)) {
                     await lockPickTarget.send({ embeds: [targetEmbed] })
                 }
                 embed.setDescription(`picking **${lockPickTarget.user.tag}**'s padlock...`)

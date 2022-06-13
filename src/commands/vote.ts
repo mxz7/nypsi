@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js"
-import { hasVoted, userExists, createUser, removeFromVoteCache, getPrestige, getMulti } from "../utils/economy/utils.js"
+import { hasVoted, userExists, createUser, getPrestige, getMulti } from "../utils/economy/utils.js"
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
 
@@ -14,15 +14,15 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!userExists(message.member)) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member)
 
     let prestige = getPrestige(message.author.id)
 
     if (prestige > 15) prestige = 15
 
     const amount = 15000 * (prestige + 1)
-    const voted = hasVoted(message.member)
-    const multi = Math.floor(getMulti(message.member) * 100)
+    const voted = await hasVoted(message.member)
+    const multi = Math.floor((await getMulti(message.member)) * 100)
     let crateAmount = Math.floor(prestige / 2 + 1)
 
     if (crateAmount > 5) crateAmount = 5
@@ -45,7 +45,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }`
         )
         embed.setFooter("you get increased rewards for prestiging")
-        removeFromVoteCache(message.member)
     }
 
     message.channel.send({ embeds: [embed] })

@@ -15,7 +15,7 @@ const cmd = new Command("ascii", "create ascii text", Categories.FUN)
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const prefix = getPrefix(message.guild)
 
-    if (!getDMsEnabled(message.member)) {
+    if (!(await getDMsEnabled(message.member))) {
         return message.channel.send({
             embeds: [new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)],
         })

@@ -180,7 +180,7 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
  * @param {Number} id
  * @param {GuildMember} accepter
  */
-export function acceptWholesomeImage(id: number, accepter: GuildMember): boolean {
+export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
     const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id)
 
     if (!query) return false
@@ -200,7 +200,7 @@ export function acceptWholesomeImage(id: number, accepter: GuildMember): boolean
     const { requestDM } = require("../../nypsi")
     const { getDMsEnabled } = require("../economy/utils")
 
-    if (getDMsEnabled(query.submitter_id)) {
+    if (await getDMsEnabled(query.submitter_id)) {
         requestDM(query.submitter_id, `your wholesome image (${query.image}) has been accepted`, true)
     }
 

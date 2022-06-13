@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (let m of members.keys()) {
         m = members.get(m)
 
-        if (!userExists(m)) continue
+        if (!(await userExists(m))) continue
 
         const inventory = getInventory(m)
 
