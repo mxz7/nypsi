@@ -72,6 +72,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "stats") {
         const stats = getWordleStats(message.member)
 
+        if (!stats) {
+            return send({ embeds: [new ErrorEmbed("you have no wordle stats")] })
+        }
+
         const embed = new CustomEmbed(message.member, false).setHeader(
             `${message.author.username}'s wordle stats`,
             message.author.avatarURL()
