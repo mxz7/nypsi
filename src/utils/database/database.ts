@@ -1,6 +1,6 @@
 import * as Database from "better-sqlite3"
-import { databaseLog, logger } from "../logger"
-const db = new Database("./out/data/storage.db", { verbose: databaseLog })
+import { logger } from "../logger"
+const db = new Database("./out/data/storage.db")
 
 db.pragma("journal_mode = WAL")
 
