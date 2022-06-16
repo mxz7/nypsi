@@ -1,7 +1,7 @@
 import { Collection, Guild, GuildMember, Message, ThreadMember, User } from "discord.js"
 import { inPlaceSort } from "fast-sort"
 import fetch from "node-fetch"
-import { getDatabase } from "../database/database"
+import { getDatabase, toArray, toStorage } from "../database/database"
 import { cleanString } from "../functions/string"
 
 const db = getDatabase()
@@ -338,4 +338,58 @@ export function fetchUserMentions(
         .all(guild.id, id, amount)
 
     return mentions
+}
+
+interface WordleStats {
+    user: string
+    win1: number
+    win2: number
+    win3: number
+    win4: number
+    win5: number
+    win6: number
+    lose: number
+    history: number[]
+}
+
+export function getWordleStats(member: GuildMember): WordleStats | null {
+    const query = db.prepare("select * from wordle_stats where user = ?").get(member.user.id)
+
+    if (query) {
+        query.history = toArray(query.history)
+
+        return query
+    } else {
+        return null
+    }
+}
+
+export function addWordleGame(member: GuildMember, win: boolean, attempts?: number, seconds?: number) {
+    const profile = getWordleStats(member)
+
+    if (!win) {
+        if (profile) {
+            db.prepare("update wordle_stats set lose = lose + 1 where user = ?").run(member.user.id)
+        } else {
+            db.prepare("insert into wordle_stats (user, lose) values (?, 1)").run(member.user.id)
+        }
+    } else {
+        const column = `win${attempts + 1}`
+        if (profile) {
+            profile.history.push(seconds)
+
+            if (profile.history.length > 100) profile.history.shift()
+
+            const history = toStorage(profile.history)
+
+            db.prepare(`update wordle_stats set ${column} = ${column} + 1, history = ? where user = ?`).run(
+                history,
+                member.user.id
+            )
+        } else {
+            const history = toStorage([seconds])
+
+            db.prepare(`insert into wordle_stats (user, ${column}, history) values (?, 1, ?)`).run(member.user.id, history)
+        }
+    }
 }

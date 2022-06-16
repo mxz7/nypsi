@@ -7,6 +7,7 @@ import { getPrefix } from "../utils/guilds/utils"
 import { addKarma } from "../utils/karma/utils"
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command"
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+import { addWordleGame, getWordleStats } from "../utils/users/utils"
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN)
 
@@ -54,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you are already playing wordle")] })
     }
 
-    if (args.length == 0 || (args[0].toLowerCase() != "play" && args[0].toLowerCase() != "start")) {
+    if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
 
         embed.setHeader("wordle help")
@@ -66,6 +67,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter("type 'stop' to cancel the game when you're playing")
 
         return await send({ embeds: [embed] })
+    }
+
+    if (args[0].toLowerCase() == "stats") {
+        const stats = getWordleStats(message.member)
+
+        const embed = new CustomEmbed(message.member, false).setHeader(
+            `${message.author.username}'s wordle stats`,
+            message.author.avatarURL()
+        )
+
+        let desc = ""
+
+        if (stats.win1) desc += `:green_square: **${stats.win1.toLocaleString()}**\n`
+        if (stats.win2) desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`
+        if (stats.win3)
+            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win3.toLocaleString()}**\n`
+        if (stats.win4)
+            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win4.toLocaleString()}**\n`
+        if (stats.win5)
+            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win5.toLocaleString()}**\n`
+        if (stats.win6)
+            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win6.toLocaleString()}**\n`
+        if (stats.lose) desc += `:red_square: **${stats.lose.toLocaleString()}**\n`
+
+        embed.setDescription(desc)
+
+        if (stats.history.length > 2) {
+            const average = stats.history.reduce((a, b) => Number(a) + Number(b)) / stats.history.length
+
+            embed.setFooter(`average length of winning game: ${MStoTime(average)}`)
+        }
+
+        return send({ embeds: [embed] })
     }
 
     if (await onCooldown(cmd.name, message.member)) {
@@ -96,6 +130,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed: embed,
         start: Date.now(),
     })
+
+    console.log(word)
 
     return play(message)
 }
@@ -211,6 +247,8 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 
     edit({ embeds: [embed] })
     games.delete(message.author.id)
+
+    addWordleGame(message.member, false)
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
@@ -222,6 +260,13 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
             return await m.edit(data)
         }
     }
+
+    addWordleGame(
+        message.member,
+        true,
+        games.get(message.author.id).guesses.length,
+        Date.now() - games.get(message.author.id).start
+    )
 
     const embed = games.get(message.author.id).embed
     embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations")
@@ -262,6 +307,8 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
 
     edit({ embeds: [embed] })
     games.delete(message.author.id)
+
+    addWordleGame(message.member, false)
 }
 
 function createBoard(): string[][] {
