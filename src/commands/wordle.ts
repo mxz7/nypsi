@@ -135,8 +135,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         start: Date.now(),
     })
 
-    console.log(word)
-
     return play(message)
 }
 
