@@ -136,6 +136,7 @@ export function doBackup() {
  * @param {String} seperator optional seperator
  */
 export function toArray(string: string, seperator?: string): Array<string> {
+    if (!string) return []
     const d = string.split(seperator || "#@|@#")
 
     for (const thing of d) {
