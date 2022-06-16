@@ -374,7 +374,7 @@ export function addWordleGame(member: GuildMember, win: boolean, attempts?: numb
             db.prepare("insert into wordle_stats (user, lose) values (?, 1)").run(member.user.id)
         }
     } else {
-        const column = `win${attempts}`
+        const column = `win${attempts + 1}`
         if (profile) {
             profile.history.push(seconds)
 
