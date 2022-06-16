@@ -94,6 +94,10 @@ function createTables() {
     db.prepare(
         "CREATE TABLE IF NOT EXISTS premium_commands ('owner' TEXT NOT NULL PRIMARY KEY, 'trigger' TEXT NOT NULL, 'content' TEXT NOT NULL, 'uses' INTEGER NOT NULL DEFAULT 0)"
     ).run()
+
+    db.prepare(
+        "create table if not exists wordle_stats ('user' text not null primary key, 'win1' integer default 0, 'win2' integer default 0, 'win3' integer default 0, 'win4' integer default 0, 'win5' integer default 0, 'win6' integer default 0, 'lose' integer default 0, 'history' text)"
+    ).run()
 }
 
 createTables()
@@ -132,6 +136,7 @@ export function doBackup() {
  * @param {String} seperator optional seperator
  */
 export function toArray(string: string, seperator?: string): Array<string> {
+    if (!string) return []
     const d = string.split(seperator || "#@|@#")
 
     for (const thing of d) {
@@ -149,7 +154,7 @@ export function toArray(string: string, seperator?: string): Array<string> {
  * @param {String} seperator
  * @returns
  */
-export function toStorage(array: Array<string>, seperator?: string): string {
+export function toStorage(array: Array<any>, seperator?: string): string {
     return array.join(seperator || "#@|@#")
 }
 
