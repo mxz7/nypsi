@@ -380,16 +380,14 @@ export function addWordleGame(member: GuildMember, win: boolean, attempts?: numb
 
             const history = toStorage(profile.history)
 
-            db.prepare("update wordle_stats set ? = ? + 1, history = ? where user = ?").run(
-                column,
-                column,
+            db.prepare(`update wordle_stats set ${column} = ${column} + 1, history = ? where user = ?`).run(
                 history,
                 member.user.id
             )
         } else {
             const history = toStorage([seconds])
 
-            db.prepare("insert into wordle_stats (user, ?, history) values (?, 1, ?)").run(column, member.user.id, history)
+            db.prepare(`insert into wordle_stats (user, ${column}, history) values (?, 1, ?)`).run(member.user.id, history)
         }
     }
 }
