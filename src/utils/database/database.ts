@@ -96,7 +96,7 @@ function createTables() {
     ).run()
 
     db.prepare(
-        "create table if not exists wordle_stats ('user' text not null primary key, 'win1, integer default 0, 'win2' integer default 0, 'win3' integer default 0, 'win4' integer default 0, 'win5' integer default 0, 'win6' integer default 0, 'lose' integer default 0, 'history' text)"
+        "create table if not exists wordle_stats ('user' text not null primary key, 'win1' integer default 0, 'win2' integer default 0, 'win3' integer default 0, 'win4' integer default 0, 'win5' integer default 0, 'win6' integer default 0, 'lose' integer default 0, 'history' text)"
     ).run()
 }
 
