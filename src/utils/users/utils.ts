@@ -378,6 +378,8 @@ export function addWordleGame(member: GuildMember, win: boolean, attempts?: numb
         if (profile) {
             profile.history.push(seconds)
 
+            if (profile.history.length > 100) profile.history.shift()
+
             const history = toStorage(profile.history)
 
             db.prepare(`update wordle_stats set ${column} = ${column} + 1, history = ? where user = ?`).run(
