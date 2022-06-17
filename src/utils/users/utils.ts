@@ -352,7 +352,7 @@ interface WordleStats {
     history: number[]
 }
 
-export function getWordleStats(member: GuildMember): WordleStats | null {
+export function getWordleStats(member: GuildMember): WordleStats | void {
     const query = db.prepare("select * from wordle_stats where user = ?").get(member.user.id)
 
     if (query) {
