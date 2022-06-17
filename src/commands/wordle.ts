@@ -347,13 +347,14 @@ function guessWord(word: string, id: string): Response {
         let emoji: string
 
         if (letter == actualLetter) {
+            copy.splice(i, 1)
             emoji = emojis.get(`green-${letter}`)
         } else if (game.word.includes(letter)) {
-            emoji = emojis.get(`yellow-${letter}`)
             const index = copy.indexOf(letter)
             if (index == -1) {
                 emoji = emojis.get(`grey-${letter}`)
             } else {
+                emoji = emojis.get(`yellow-${letter}`)
                 copy.splice(index, 1)
             }
         } else {
