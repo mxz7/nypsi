@@ -9,7 +9,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
 import { addWordleGame, getWordleStats } from "../utils/users/utils"
 
-const cmd = new Command("wordle", "play wordle on discord", Categories.FUN)
+const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"])
 
 cmd.slashEnabled = true
 cmd.slashData
