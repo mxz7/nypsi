@@ -10,7 +10,7 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders"
 export default async function interactionCreate(interaction: Interaction) {
     if (!interaction.isCommand()) return
 
-    if (interaction.channel.type == "DM") {
+    if (interaction.channel?.type == "DM") {
         const embed = new CustomEmbed()
             .setHeader("nypsi")
             .setColor("#36393f")
