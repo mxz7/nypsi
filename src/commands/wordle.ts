@@ -14,6 +14,7 @@ const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setA
 cmd.slashEnabled = true
 cmd.slashData
     .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
+    .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
     .addSubcommand((option) => option.setName("help").setDescription("view the help menu for wordle"))
 
 interface Game {
