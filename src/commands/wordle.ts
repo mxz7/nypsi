@@ -141,13 +141,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
 async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const m = games.get(message.author.id).message
-    if (m.deleted) return
+    if (m.deleted) {
+        games.delete(message.author.id)
+        return
+    }
     const edit = async (data) => {
         if (!(message instanceof Message)) {
-            await message.editReply(data)
+            await message.editReply(data).catch(() => {
+                games.delete(message.author.id)
+                return
+            })
             return await message.fetchReply()
         } else {
-            return await m.edit(data)
+            return await m.edit(data).catch(() => {
+                games.delete(message.author.id)
+                return
+            })
         }
     }
 
