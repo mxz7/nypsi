@@ -260,6 +260,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
     edit({ embeds: [embed] });
     games.delete(message.author.id);
 
+    if (!message.member) return;
     addWordleGame(message.member, false);
 }
 
@@ -320,6 +321,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
     edit({ embeds: [embed] });
     games.delete(message.author.id);
 
+    if (!message.member) return;
     addWordleGame(message.member, false);
 }
 
