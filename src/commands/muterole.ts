@@ -1,10 +1,10 @@
-import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getPrefix } from "../utils/guilds/utils"
-import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils/moderation/utils"
+import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getPrefix } from "../utils/guilds/utils";
+import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils/moderation/utils";
 
-const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"])
+const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"]);
 
 /**
  * @param {Message} message
@@ -13,24 +13,24 @@ const cmd = new Command("muterole", "set the muterole for the server", Categorie
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
-        return
+        return;
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild)
+    if (!profileExists(message.guild)) createProfile(message.guild);
 
     const help = async () => {
-        const current = getMuteRole(message.guild)
+        const current = getMuteRole(message.guild);
 
-        let role
+        let role;
 
         if (current != "" && current != "timeout" && current) {
-            role = await message.guild.roles.fetch(current)
+            role = await message.guild.roles.fetch(current);
 
             if (!role) {
-                setMuteRole(message.guild, "")
-                role = undefined
+                setMuteRole(message.guild, "");
+                role = undefined;
             }
         }
 
@@ -40,23 +40,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.guild
         )}**muterole update** update mute permissions for every channel\n${getPrefix(
             message.guild
-        )}**muterole timeout** use timeout mode instead of a role\n\n`
+        )}**muterole timeout** use timeout mode instead of a role\n\n`;
 
         if (current == "timeout") {
             text += `currently using **timeout mode**, to use a role instead, use the ${getPrefix(
                 message.guild
-            )}**muterole reset** command`
+            )}**muterole reset** command`;
         } else {
-            text += `current mute role: ${role ? role.toString() : "default"}`
+            text += `current mute role: ${role ? role.toString() : "default"}`;
         }
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, text).setHeader("mute role")],
-        })
-    }
+        });
+    };
 
     if (args.length == 0) {
-        return help()
+        return help();
     }
 
     if (args[0].toLowerCase() == "set") {
@@ -69,29 +69,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         )}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
                     ),
                 ],
-            })
+            });
         }
 
-        const roles = message.guild.roles.cache
+        const roles = message.guild.roles.cache;
 
-        let role
+        let role;
 
         if (message.mentions.roles.first()) {
-            role = message.mentions.roles.first()
+            role = message.mentions.roles.first();
         } else if (args[1].length == 18 && parseInt(args[1])) {
-            role = roles.find((r) => r.id == args[1])
+            role = roles.find((r) => r.id == args[1]);
         } else {
-            args.shift()
-            role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()))
+            args.shift();
+            role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()));
         }
 
         if (!role) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)],
-            })
+            });
         }
 
-        setMuteRole(message.guild, role)
+        setMuteRole(message.guild, role);
 
         return message.channel.send({
             embeds: [
@@ -103,20 +103,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     )}**muted**)`
                 ),
             ],
-        })
+        });
     } else if (args[0].toLowerCase() == "reset") {
-        setMuteRole(message.guild, "default")
+        setMuteRole(message.guild, "default");
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ muterole has been reset")],
-        })
+        });
     } else if (args[0].toLowerCase() == "update") {
-        let channelError = false
+        let channelError = false;
         try {
-            let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
+            let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild));
 
             if (getMuteRole(message.guild) == "") {
-                muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+                muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
             }
 
             if (!muteRole) {
@@ -125,16 +125,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         name: "muted",
                     })
                     .catch(() => {
-                        channelError = true
-                    })
+                        channelError = true;
+                    });
 
                 if (newMuteRole instanceof Role) {
-                    muteRole = newMuteRole
+                    muteRole = newMuteRole;
                 }
             }
 
             await message.guild.channels.cache.forEach(async (channel) => {
-                if (channel instanceof ThreadChannel) return
+                if (channel instanceof ThreadChannel) return;
                 await channel.permissionOverwrites
                     .edit(muteRole, {
                         SEND_MESSAGES: false,
@@ -142,9 +142,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         ADD_REACTIONS: false,
                     })
                     .catch(() => {
-                        channelError = true
-                    })
-            })
+                        channelError = true;
+                    });
+            });
         } catch (e) {
             return message.channel.send({
                 embeds: [
@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
                     ),
                 ],
-            })
+            });
         }
         if (channelError) {
             return message.channel.send({
@@ -161,14 +161,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
                     ),
                 ],
-            })
+            });
         }
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ permissions were updated")],
-        })
+        });
     } else if (args[0].toLowerCase() == "timeout") {
-        setMuteRole(message.guild, "timeout")
+        setMuteRole(message.guild, "timeout");
 
         const embed = new CustomEmbed(
             message.member,
@@ -176,14 +176,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
                 message.guild
             )}**muted**)`
-        )
+        );
 
         return message.channel.send({
             embeds: [embed],
-        })
+        });
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

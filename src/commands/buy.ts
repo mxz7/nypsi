@@ -1,6 +1,6 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import {
     getItems,
     getBalance,
@@ -11,23 +11,23 @@ import {
     setInventory,
     userExists,
     createUser,
-} from "../utils/economy/utils"
-import { getPrefix } from "../utils/guilds/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+} from "../utils/economy/utils";
+import { getPrefix } from "../utils/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("buy", "buy items from the shop", Categories.MONEY)
+const cmd = new Command("buy", "buy items from the shop", Categories.MONEY);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
     if (args.length == 0) {
@@ -39,34 +39,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `buy items from ${getPrefix(message.guild)}shop by using the item id or item name without spaces`
                 ),
             ],
-        })
+        });
     }
 
-    const items = getItems()
-    const inventory = getInventory(message.member)
+    const items = getItems();
+    const inventory = getInventory(message.member);
 
-    const searchTag = args[0].toLowerCase()
+    const searchTag = args[0].toLowerCase();
 
-    let selectedName: string
+    let selectedName: string;
 
     for (const itemName of Array.from(Object.keys(items))) {
-        const aliases = items[itemName].aliases ? items[itemName].aliases : []
+        const aliases = items[itemName].aliases ? items[itemName].aliases : [];
         if (searchTag == itemName) {
-            selectedName = itemName
-            break
+            selectedName = itemName;
+            break;
         } else if (searchTag == itemName.split("_").join("")) {
-            selectedName = itemName
-            break
+            selectedName = itemName;
+            break;
         } else if (aliases.indexOf(searchTag) != -1) {
-            selectedName = itemName
-            break
+            selectedName = itemName;
+            break;
         }
     }
 
-    const selected = items[selectedName]
+    const selected = items[selectedName];
 
     if (!selected) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] })
+        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
     if (
@@ -78,57 +78,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         selected.role == "sellable" ||
         selected.role == "ore"
     ) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
     }
 
-    let amount = 1
+    let amount = 1;
 
     if (args.length != 1) {
-        amount = parseInt(args[1])
+        amount = parseInt(args[1]);
     }
 
     if (!amount) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (amount < 1) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > 50) amount = 50
+    if (amount > 50) amount = 50;
 
     if (getBalance(message.member) < selected.worth * amount) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
     if (selected.id == "bitcoin") {
-        const owned = inventory["bitcoin"] || 0
-        const max = getMaxBitcoin(message.member)
+        const owned = inventory["bitcoin"] || 0;
+        const max = getMaxBitcoin(message.member);
 
         if (owned + amount > max) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] });
         }
     } else if (selected.id == "ethereum") {
-        const owned = inventory["ethereum"] || 0
-        const max = getMaxEthereum(message.member)
+        const owned = inventory["ethereum"] || 0;
+        const max = getMaxEthereum(message.member);
 
         if (owned + amount > max) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much ethereum yet")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much ethereum yet")] });
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) - selected.worth * amount)
-    inventory[selected.id] + amount
+    updateBalance(message.member, getBalance(message.member) - selected.worth * amount);
+    inventory[selected.id] + amount;
 
     if (inventory[selected.id]) {
-        inventory[selected.id] += amount
+        inventory[selected.id] += amount;
     } else {
-        inventory[selected.id] = amount
+        inventory[selected.id] = amount;
     }
 
-    setInventory(message.member, inventory)
+    setInventory(message.member, inventory);
 
     return message.channel.send({
         embeds: [
@@ -140,9 +140,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ).toLocaleString()}`
             ),
         ],
-    })
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

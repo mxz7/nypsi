@@ -1,6 +1,6 @@
-import { getZeroWidth } from "../chatreactions/utils"
+import { getZeroWidth } from "../chatreactions/utils";
 
-const locked: Array<string> = []
+const locked: Array<string> = [];
 
 /**
  *
@@ -9,9 +9,9 @@ const locked: Array<string> = []
  */
 export function isLockedOut(string: string): boolean {
     if (locked.indexOf(string) == -1) {
-        return false
+        return false;
     } else {
-        return true
+        return true;
     }
 }
 
@@ -21,9 +21,9 @@ export function isLockedOut(string: string): boolean {
  */
 export function toggleLock(string: string) {
     if (isLockedOut(string)) {
-        locked.splice(locked.indexOf(string), 1)
+        locked.splice(locked.indexOf(string), 1);
     } else {
-        locked.push(string)
+        locked.push(string);
     }
 }
 
@@ -31,34 +31,34 @@ export function toggleLock(string: string) {
  * @returns {captcha}
  */
 export function createCaptcha(): captcha {
-    return new captcha(Math.random().toString(36).substr(2, 7))
+    return new captcha(Math.random().toString(36).substr(2, 7));
 }
 
 class captcha {
-    public answer: string
-    public display: string
+    public answer: string;
+    public display: string;
     /**
      *
      * @param {String} d random letters
      * @returns {captcha}
      */
     constructor(d: string) {
-        this.answer = d
+        this.answer = d;
 
-        const zeroWidthCount = d.length / 2
+        const zeroWidthCount = d.length / 2;
 
-        const zeroWidthChar = getZeroWidth()
+        const zeroWidthChar = getZeroWidth();
 
-        let displayWord = d
+        let displayWord = d;
 
         for (let i = 0; i < zeroWidthCount; i++) {
-            const pos = Math.floor(Math.random() * d.length + 1)
+            const pos = Math.floor(Math.random() * d.length + 1);
 
-            displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos)
+            displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos);
         }
 
-        this.display = displayWord
+        this.display = displayWord;
 
-        return this
+        return this;
     }
 }

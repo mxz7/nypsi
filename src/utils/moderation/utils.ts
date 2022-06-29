@@ -1,50 +1,50 @@
-import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js"
-import { getDatabase } from "../database/database"
-import { addCooldown, inCooldown } from "../guilds/utils"
-import { logger } from "../logger"
-import { CustomEmbed } from "../models/EmbedBuilders"
-import { Case, PunishmentType } from "../models/GuildStorage"
+import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
+import { getDatabase } from "../database/database";
+import { addCooldown, inCooldown } from "../guilds/utils";
+import { logger } from "../logger";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { Case, PunishmentType } from "../models/GuildStorage";
 
-declare function require(name: string)
+declare function require(name: string);
 
-const db = getDatabase()
-const modLogQueue: Map<string, CustomEmbed[]> = new Map()
-const modLogHookCache: Map<string, WebhookClient> = new Map()
-const modLogColors: Map<PunishmentType, ColorResolvable> = new Map()
+const db = getDatabase();
+const modLogQueue: Map<string, CustomEmbed[]> = new Map();
+const modLogHookCache: Map<string, WebhookClient> = new Map();
+const modLogColors: Map<PunishmentType, ColorResolvable> = new Map();
 
-modLogColors.set(PunishmentType.MUTE, "#ffffba")
-modLogColors.set(PunishmentType.BAN, "#ffb3ba")
-modLogColors.set(PunishmentType.UNMUTE, "#ffffba")
-modLogColors.set(PunishmentType.WARN, "#bae1ff")
-modLogColors.set(PunishmentType.KICK, "#ffdfba")
-modLogColors.set(PunishmentType.UNBAN, "#ffb3ba")
-modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9")
+modLogColors.set(PunishmentType.MUTE, "#ffffba");
+modLogColors.set(PunishmentType.BAN, "#ffb3ba");
+modLogColors.set(PunishmentType.UNMUTE, "#ffffba");
+modLogColors.set(PunishmentType.WARN, "#bae1ff");
+modLogColors.set(PunishmentType.KICK, "#ffdfba");
+modLogColors.set(PunishmentType.UNBAN, "#ffb3ba");
+modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9");
 
 setInterval(async () => {
-    const { checkGuild } = require("../../nypsi")
+    const { checkGuild } = require("../../nypsi");
 
-    const query = db.prepare("SELECT id FROM moderation").all()
+    const query = db.prepare("SELECT id FROM moderation").all();
 
     for (const guild of query) {
-        const exists = await checkGuild(guild.id)
+        const exists = await checkGuild(guild.id);
 
         if (!exists) {
-            deleteServer(guild.id)
+            deleteServer(guild.id);
 
             logger.log({
                 level: "guild",
                 message: `deleted guild '${guild.id}' from moderation data`,
-            })
+            });
         }
     }
-}, 24 * 60 * 60 * 1000)
+}, 24 * 60 * 60 * 1000);
 
 /**
  *
  * @param {Guild} guild guild to create profile for
  */
 export function createProfile(guild: Guild) {
-    db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id)
+    db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id);
 }
 
 /**
@@ -52,12 +52,12 @@ export function createProfile(guild: Guild) {
  * @param {Guild} guild check if profile exists for this guild
  */
 export function profileExists(guild: Guild): boolean {
-    const query = db.prepare("SELECT id FROM moderation WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT id FROM moderation WHERE id = ?").get(guild.id);
 
     if (!query) {
-        return false
+        return false;
     } else {
-        return true
+        return true;
     }
 }
 
@@ -66,9 +66,9 @@ export function profileExists(guild: Guild): boolean {
  * @param {Guild} guild guild to get case count of
  */
 export function getCaseCount(guild: Guild): number {
-    const query = db.prepare("SELECT case_count FROM moderation WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT case_count FROM moderation WHERE id = ?").get(guild.id);
 
-    return query.case_count
+    return query.case_count;
 }
 
 /**
@@ -87,18 +87,18 @@ export function newCase(
     command: string
 ) {
     if (!(userIDs instanceof Array)) {
-        userIDs = [userIDs]
+        userIDs = [userIDs];
     }
     for (const userID of userIDs) {
-        const caseCount = getCaseCount(guild)
+        const caseCount = getCaseCount(guild);
         db.prepare(
             "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id)
-        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id)
+        ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id);
+        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id);
 
-        if (!isModLogsEnabled(guild)) return
+        if (!isModLogsEnabled(guild)) return;
 
-        addModLog(guild, caseType, userID, moderator, command, caseCount)
+        addModLog(guild, caseType, userID, moderator, command, caseCount);
     }
 }
 
@@ -110,62 +110,62 @@ export async function addModLog(
     command: string,
     caseID: number
 ) {
-    let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {})
+    let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
     if (!punished) {
-        punished = await guild.client.users.fetch(userID).catch(() => {})
+        punished = await guild.client.users.fetch(userID).catch(() => {});
     }
 
-    const embed = new CustomEmbed()
-    embed.setColor(modLogColors.get(caseType))
-    embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`)
-    embed.setTimestamp()
+    const embed = new CustomEmbed();
+    embed.setColor(modLogColors.get(caseType));
+    embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`);
+    embed.setTimestamp();
 
     if (punished) {
-        embed.addField("user", `${punished.toString()} (${punished.id})`, true)
+        embed.addField("user", `${punished.toString()} (${punished.id})`, true);
     } else {
-        embed.addField("user", userID, true)
+        embed.addField("user", userID, true);
     }
 
     if (moderator != "nypsi") {
-        embed.addField("moderator", moderator, true)
+        embed.addField("moderator", moderator, true);
     } else {
-        embed.addField("moderator", "nypsi", true)
+        embed.addField("moderator", "nypsi", true);
     }
 
     if (caseType == PunishmentType.FILTER_VIOLATION) {
-        embed.addField("message content", command)
+        embed.addField("message content", command);
     } else {
-        embed.addField("reason", command)
+        embed.addField("reason", command);
     }
 
     if (modLogQueue.has(guild.id)) {
-        modLogQueue.get(guild.id).push(embed)
+        modLogQueue.get(guild.id).push(embed);
     } else {
-        modLogQueue.set(guild.id, [embed])
+        modLogQueue.set(guild.id, [embed]);
     }
 }
 
 export function isModLogsEnabled(guild: Guild) {
-    if (modLogHookCache.has(guild.id)) return true
-    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+    if (modLogHookCache.has(guild.id)) return true;
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id);
 
-    if (!query || !query.modlogs) return false
+    if (!query || !query.modlogs) return false;
 
-    return true
+    return true;
 }
 
 export function setModLogs(guild: Guild, hook: string) {
-    db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id)
-    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id)
+    db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id);
+    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id);
 }
 
 export function getModLogsHook(guild: Guild): WebhookClient | undefined {
-    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id);
 
-    if (!query.modlogs) return undefined
+    if (!query.modlogs) return undefined;
 
-    return new WebhookClient({ url: query.modlogs })
+    return new WebhookClient({ url: query.modlogs });
 }
 
 /**
@@ -174,7 +174,10 @@ export function getModLogsHook(guild: Guild): WebhookClient | undefined {
  * @param {String} caseID case to delete
  */
 export function deleteCase(guild: Guild, caseID: string) {
-    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(guild.id, caseID.toString())
+    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(
+        guild.id,
+        caseID.toString()
+    );
 }
 
 /**
@@ -182,17 +185,17 @@ export function deleteCase(guild: Guild, caseID: string) {
  * @param {Guild} guild guild to delete data for
  */
 export function deleteServer(guild: Guild | string) {
-    let id: string
+    let id: string;
     if (guild instanceof Guild) {
-        id = guild.id
+        id = guild.id;
     } else {
-        id = guild
+        id = guild;
     }
 
-    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(id)
-    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(id)
-    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(id)
-    db.prepare("DELETE FROM moderation WHERE id = ?").run(id)
+    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(id);
+    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(id);
+    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(id);
+    db.prepare("DELETE FROM moderation WHERE id = ?").run(id);
 }
 
 /**
@@ -201,13 +204,13 @@ export function deleteServer(guild: Guild | string) {
  * @param {String} userID user to get cases of
  */
 export function getCases(guild: Guild, userID: string): Array<Case> {
-    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?").all(guild.id, userID)
+    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?").all(guild.id, userID);
 
     for (const d of query) {
-        d.case_id = parseInt(d.case_id)
+        d.case_id = parseInt(d.case_id);
     }
 
-    return query.reverse()
+    return query.reverse();
 }
 
 /**
@@ -215,9 +218,9 @@ export function getCases(guild: Guild, userID: string): Array<Case> {
  * @param {Guild} guild guild to get cases of
  */
 export function getAllCases(guild: Guild): Case[] {
-    const query = db.prepare("SELECT user, moderator, type, deleted FROM moderation_cases WHERE guild_id = ?").all(guild.id)
+    const query = db.prepare("SELECT user, moderator, type, deleted FROM moderation_cases WHERE guild_id = ?").all(guild.id);
 
-    return query.reverse()
+    return query.reverse();
 }
 
 /**
@@ -226,23 +229,23 @@ export function getAllCases(guild: Guild): Case[] {
  * @param {Number} caseID case to fetch
  */
 export function getCase(guild: Guild, caseID: number): Case {
-    if (caseID > getCaseCount(guild)) return undefined
+    if (caseID > getCaseCount(guild)) return undefined;
 
     let query = db
         .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
-        .get(guild.id, caseID.toString())
+        .get(guild.id, caseID.toString());
 
     if (!query) {
         query = db
             .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
-            .get(guild.id, caseID.toString() + ".0")
+            .get(guild.id, caseID.toString() + ".0");
     }
 
-    if (!query) return undefined
+    if (!query) return undefined;
 
-    query.case_id = parseInt(query.case_id)
+    query.case_id = parseInt(query.case_id);
 
-    return query
+    return query;
 }
 
 /**
@@ -253,10 +256,14 @@ export function getCase(guild: Guild, caseID: number): Case {
  */
 export function newMute(guild: Guild, userIDs: Array<string>, date: number) {
     if (!(userIDs instanceof Array)) {
-        userIDs = [userIDs]
+        userIDs = [userIDs];
     }
     for (const userID of userIDs) {
-        db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
+        db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(
+            userID,
+            date,
+            guild.id
+        );
     }
 }
 
@@ -268,11 +275,11 @@ export function newMute(guild: Guild, userIDs: Array<string>, date: number) {
  */
 export function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
     if (!(userIDs instanceof Array)) {
-        userIDs = [userIDs]
+        userIDs = [userIDs];
     }
 
     for (const userID of userIDs) {
-        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id)
+        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id);
     }
 }
 
@@ -284,12 +291,12 @@ export function newBan(guild: Guild, userIDs: Array<string> | string, date: Date
 export function isMuted(guild: Guild, member: GuildMember): boolean {
     const query = db
         .prepare("SELECT user FROM moderation_mutes WHERE guild_id = ? AND user = ?")
-        .get(guild.id, member.user.id)
+        .get(guild.id, member.user.id);
 
     if (query) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -301,12 +308,12 @@ export function isMuted(guild: Guild, member: GuildMember): boolean {
 export function isBanned(guild: Guild, member: GuildMember): boolean {
     const query = db
         .prepare("SELECT user FROM moderation_bans WHERE guild_id = ? AND user = ?")
-        .get(guild.id, member.user.id)
+        .get(guild.id, member.user.id);
 
     if (query) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -316,60 +323,60 @@ export function isBanned(guild: Guild, member: GuildMember): boolean {
  */
 export function runModerationChecks(client: Client) {
     setInterval(() => {
-        const date = new Date().getTime()
+        const date = new Date().getTime();
 
-        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?").all(date)
+        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?").all(date);
 
         for (const unmute of query) {
             logger.log({
                 level: "auto",
                 message: `requesting unmute in ${unmute.guild_id} for ${unmute.user}`,
-            })
-            requestUnmute(unmute.guild_id, unmute.user, client)
+            });
+            requestUnmute(unmute.guild_id, unmute.user, client);
         }
 
-        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date)
+        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date);
 
         for (const unban of query) {
             logger.log({
                 level: "auto",
                 message: `requesting unban in ${unban.guild_id} for ${unban.user}`,
-            })
-            requestUnban(unban.guild_id, unban.user, client)
+            });
+            requestUnban(unban.guild_id, unban.user, client);
         }
 
-        query = db.prepare("SELECT modlogs, id FROM moderation WHERE modlogs != ''").all()
+        query = db.prepare("SELECT modlogs, id FROM moderation WHERE modlogs != ''").all();
 
         for (const modlog of query) {
-            if (!modLogQueue.has(modlog.id) || modLogQueue.get(modlog.id).length == 0) continue
-            let webhook: WebhookClient
+            if (!modLogQueue.has(modlog.id) || modLogQueue.get(modlog.id).length == 0) continue;
+            let webhook: WebhookClient;
 
             if (modLogHookCache.has(modlog.id)) {
-                webhook = modLogHookCache.get(modlog.id)
+                webhook = modLogHookCache.get(modlog.id);
             } else {
-                webhook = new WebhookClient({ url: modlog.modlogs })
-                modLogHookCache.set(modlog.id, webhook)
+                webhook = new WebhookClient({ url: modlog.modlogs });
+                modLogHookCache.set(modlog.id, webhook);
             }
 
-            let embeds: CustomEmbed[]
+            let embeds: CustomEmbed[];
 
             if (modLogQueue.get(modlog.id).length > 10) {
-                const current = modLogQueue.get(modlog.id)
-                embeds = current.splice(0, 10)
-                modLogQueue.set(modlog.id, current)
+                const current = modLogQueue.get(modlog.id);
+                embeds = current.splice(0, 10);
+                modLogQueue.set(modlog.id, current);
             } else {
-                embeds = modLogQueue.get(modlog.id)
-                modLogQueue.set(modlog.id, [])
+                embeds = modLogQueue.get(modlog.id);
+                modLogQueue.set(modlog.id, []);
             }
 
             webhook.send({ embeds: embeds }).catch((e) => {
-                logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`)
-                logger.error(e)
+                logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`);
+                logger.error(e);
 
-                db.prepare("UPDATE moderation SET modlogs = '' WHERE id = ?").run(modlog.id)
-            })
+                db.prepare("UPDATE moderation SET modlogs = '' WHERE id = ?").run(modlog.id);
+            });
         }
-    }, 30000)
+    }, 30000);
 }
 
 /**
@@ -379,29 +386,29 @@ export function runModerationChecks(client: Client) {
  * @param {String} reason
  */
 export function setReason(guild: Guild, caseID: number, reason: string) {
-    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(reason, caseID, guild.id)
+    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(reason, caseID, guild.id);
 }
 
 export function deleteMute(guild: Guild, member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.id
+        id = member.id;
     } else {
-        id = member
+        id = member;
     }
 
-    db.prepare("DELETE FROM moderation_mutes WHERE user = ? AND guild_id = ?").run(id, guild.id)
+    db.prepare("DELETE FROM moderation_mutes WHERE user = ? AND guild_id = ?").run(id, guild.id);
 }
 
 export function deleteBan(guild: Guild, member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.id
+        id = member.id;
     } else {
-        id = member
+        id = member;
     }
 
-    db.prepare("DELETE FROM moderation_bans WHERE user = ? AND guild_id = ?").run(id, guild.id)
+    db.prepare("DELETE FROM moderation_bans WHERE user = ? AND guild_id = ?").run(id, guild.id);
 }
 /**
  *
@@ -409,12 +416,12 @@ export function deleteBan(guild: Guild, member: GuildMember | string) {
  * @returns {String}
  */
 export function getMuteRole(guild: Guild): string {
-    const query = db.prepare("SELECT mute_role FROM moderation WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT mute_role FROM moderation WHERE id = ?").get(guild.id);
 
     if (query.mute_role == "") {
-        return undefined
+        return undefined;
     } else {
-        return query.mute_role
+        return query.mute_role;
     }
 }
 
@@ -424,92 +431,92 @@ export function getMuteRole(guild: Guild): string {
  * @param {Role} role
  */
 export function setMuteRole(guild: Guild, role: Role | string) {
-    const query = db.prepare("UPDATE moderation SET mute_role = ? WHERE id = ?")
+    const query = db.prepare("UPDATE moderation SET mute_role = ? WHERE id = ?");
 
     if (role instanceof Role) {
-        query.run(role.id, guild.id)
+        query.run(role.id, guild.id);
     } else {
-        query.run(role, guild.id)
+        query.run(role, guild.id);
     }
 }
 
 function requestUnban(guild: string | Guild, member: string, client: Client) {
-    guild = client.guilds.cache.find((g) => g.id == guild)
+    guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn("unable to find guild")
-        return
+        logger.warn("unable to find guild");
+        return;
     }
 
-    deleteBan(guild, member)
+    deleteBan(guild, member);
 
-    guild.members.unban(member, "ban expired")
+    guild.members.unban(member, "ban expired");
 
     logger.log({
         level: "success",
         message: "ban removed",
-    })
+    });
 }
 
 async function requestUnmute(guild: Guild | string, member: string, client: Client) {
-    guild = client.guilds.cache.find((g) => g.id == guild)
+    guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn(`unable to find guild ${guild}`)
-        return
+        logger.warn(`unable to find guild ${guild}`);
+        return;
     }
 
-    let members
+    let members;
 
     if (inCooldown(guild)) {
-        members = guild.members.cache
+        members = guild.members.cache;
     } else {
-        members = await guild.members.fetch()
+        members = await guild.members.fetch();
 
-        addCooldown(guild, 3600)
+        addCooldown(guild, 3600);
     }
 
-    let newMember = await members.find((m) => m.id == member)
+    let newMember = await members.find((m) => m.id == member);
 
     if (!newMember) {
         newMember = await guild.members.fetch(member).catch(() => {
-            newMember = undefined
-        })
+            newMember = undefined;
+        });
         if (!newMember) {
-            logger.warn("unable to find member, deleting mute..")
-            return deleteMute(guild, member)
+            logger.warn("unable to find member, deleting mute..");
+            return deleteMute(guild, member);
         }
     }
 
-    await guild.roles.fetch()
+    await guild.roles.fetch();
 
-    const muteRoleID = getMuteRole(guild)
+    const muteRoleID = getMuteRole(guild);
 
-    let muteRole = guild.roles.cache.find((r) => r.id == muteRoleID)
+    let muteRole = guild.roles.cache.find((r) => r.id == muteRoleID);
 
     if (!muteRoleID || muteRoleID == "") {
-        muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+        muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        logger.warn("unable to find mute role, deleting mute..")
-        return deleteMute(guild, newMember)
+        logger.warn("unable to find mute role, deleting mute..");
+        return deleteMute(guild, newMember);
     }
 
-    deleteMute(guild, member)
+    deleteMute(guild, member);
 
     logger.log({
         level: "success",
         message: "mute deleted",
-    })
+    });
 
     return await newMember.roles.remove(muteRole).catch(() => {
-        logger.error("couldnt remove mute role")
-    })
+        logger.error("couldnt remove mute role");
+    });
 }
 
 export function getMutedUsers(guild: Guild): Array<{ user: string; unmute_time: number }> {
-    const query = db.prepare("SELECT user, unmute_time FROM moderation_mutes WHERE guild_id = ?").all(guild.id)
+    const query = db.prepare("SELECT user, unmute_time FROM moderation_mutes WHERE guild_id = ?").all(guild.id);
 
-    return query
+    return query;
 }

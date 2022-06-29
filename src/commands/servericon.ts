@@ -1,8 +1,8 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("servericon", "get the server icon", Categories.INFO)
+const cmd = new Command("servericon", "get the server icon", Categories.INFO);
 
 /**
  * @param {Message} message
@@ -18,9 +18,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 })
             ),
         ],
-    })
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,22 +1,22 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("roll", "roll a dice", Categories.UTILITY)
+const cmd = new Command("roll", "roll a dice", Categories.UTILITY);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let range = 6
+    let range = 6;
 
     if (args.length != 0) {
         if (parseInt(args[0])) {
             if (parseInt(args[0]) < 2 || parseInt(args[0]) > 1000000000) {
-                return message.channel.send({ embeds: [new ErrorEmbed("invalid range")] })
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid range")] });
             } else {
-                range = parseInt(args[0])
+                range = parseInt(args[0]);
             }
         }
     }
@@ -29,9 +29,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
             ),
         ],
-    })
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

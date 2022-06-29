@@ -1,6 +1,6 @@
-const { Message, Guild, User } = require("discord.js")
-const { Command, Categories, NypsiCommandInteraction } = require("../utils/models/Command")
-const { CustomEmbed } = require("../utils/models/EmbedBuilders.js")
+const { Message, Guild, User } = require("discord.js");
+const { Command, Categories, NypsiCommandInteraction } = require("../utils/models/Command");
+const { CustomEmbed } = require("../utils/models/EmbedBuilders.js");
 const {
     topAmount,
     userExists,
@@ -13,71 +13,71 @@ const {
     getMulti,
     topAmountGlobal,
     isEcoBanned,
-} = require("../utils/economy/utils")
-const { getPeaks } = require("../utils/guilds/utils")
-const { getKarma, getLastCommand } = require("../utils/karma/utils")
-const { isPremium, getPremiumProfile } = require("../utils/premium/utils")
-const { formatDate, daysAgo } = require("../utils/functions/date")
+} = require("../utils/economy/utils");
+const { getPeaks } = require("../utils/guilds/utils");
+const { getKarma, getLastCommand } = require("../utils/karma/utils");
+const { isPremium, getPremiumProfile } = require("../utils/premium/utils");
+const { formatDate, daysAgo } = require("../utils/functions/date");
 
-const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"])
+const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message, args) {
-    if (message.member.user.id != "672793821850894347") return
+    if (message.member.user.id != "672793821850894347") return;
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member, false);
 
         embed.setDescription(
             "$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top"
-        )
+        );
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "gid") {
-        if (args.length == 1) return message.react("❌")
+        if (args.length == 1) return message.react("❌");
 
-        const guild = await message.client.guilds.fetch(args[1])
+        const guild = await message.client.guilds.fetch(args[1]);
 
-        if (!guild) return message.react("❌")
+        if (!guild) return message.react("❌");
 
-        return showGuild(message, guild)
+        return showGuild(message, guild);
     } else if (args[0].toLowerCase() == "gname") {
-        if (args.length == 1) return message.react("❌")
+        if (args.length == 1) return message.react("❌");
 
-        args.shift()
+        args.shift();
 
-        const guild = message.client.guilds.cache.find((g) => g.name.includes(args.join(" ")))
+        const guild = message.client.guilds.cache.find((g) => g.name.includes(args.join(" ")));
 
-        if (!guild) return message.react("❌")
+        if (!guild) return message.react("❌");
 
-        return showGuild(message, guild)
+        return showGuild(message, guild);
     } else if (args[0].toLowerCase() == "id") {
-        if (args.length == 1) return message.react("❌")
+        if (args.length == 1) return message.react("❌");
 
-        const user = await message.client.users.fetch(args[1])
+        const user = await message.client.users.fetch(args[1]);
 
-        if (!user) return message.react("❌")
+        if (!user) return message.react("❌");
 
-        return showUser(message, user)
+        return showUser(message, user);
     } else if (args[0].toLowerCase() == "tag") {
-        if (args.length == 1) return message.react("❌")
+        if (args.length == 1) return message.react("❌");
 
-        args.shift()
+        args.shift();
 
-        const user = message.client.users.cache.find((u) => u.tag.includes(args.join(" ")))
+        const user = message.client.users.cache.find((u) => u.tag.includes(args.join(" ")));
 
-        if (!user) return message.react("❌")
+        if (!user) return message.react("❌");
 
-        return showUser(message, user)
+        return showUser(message, user);
     } else if (args[0].toLowerCase() == "top") {
-        const balTop = await topAmountGlobal(10, message.client, false)
+        const balTop = await topAmountGlobal(10, message.client, false);
 
-        const embed = new CustomEmbed(message.member, false, balTop.join("\n")).setTitle("top " + balTop.length)
+        const embed = new CustomEmbed(message.member, false, balTop.join("\n")).setTitle("top " + balTop.length);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 }
 
@@ -87,20 +87,20 @@ async function run(message, args) {
  * @param {Guild} guild
  */
 async function showGuild(message, guild) {
-    let balTop = await topAmount(guild, 5)
+    let balTop = await topAmount(guild, 5);
 
     const filtered = balTop.filter(function (el) {
-        return el != null
-    })
+        return el != null;
+    });
 
-    balTop = filtered.join("\n")
+    balTop = filtered.join("\n");
 
-    const owner = await guild.members.fetch(guild.ownerId)
+    const owner = await guild.members.fetch(guild.ownerId);
 
     const invites = await guild.invites
         .fetch()
         .then((invites) => Array.from(invites.keys()))
-        .catch(() => {})
+        .catch(() => {});
 
     const embed = new CustomEmbed(message.member, false)
         .setDescription(`\`${guild.id}\``)
@@ -116,17 +116,17 @@ async function showGuild(message, guild) {
             `**members** ${guild.memberCount.toLocaleString()}
     **peak** ${getPeaks(guild).toLocaleString()}`,
             true
-        )
+        );
 
     if (invites && invites.length > 0) {
-        embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)])
+        embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)]);
     }
 
     if (balTop.length > 0) {
-        embed.addField("top bal", balTop)
+        embed.addField("top bal", balTop);
     }
 
-    return message.channel.send({ embeds: [embed] })
+    return message.channel.send({ embeds: [embed] });
 }
 
 /**
@@ -135,13 +135,13 @@ async function showGuild(message, guild) {
  * @param {User} user
  */
 async function showUser(message, user) {
-    const guilds = []
+    const guilds = [];
 
     message.client.guilds.cache.forEach((g) => {
         if (g.members.cache.find((u) => u.id == user.id)) {
-            guilds.push(`\`${g.id}\``)
+            guilds.push(`\`${g.id}\``);
         }
-    })
+    });
 
     const embed = new CustomEmbed(message.member, false)
         .setTitle(user.tag)
@@ -160,10 +160,10 @@ async function showUser(message, user) {
             }`,
             true
         )
-        .setFooter(`${await getKarma(user.id)} karma`)
+        .setFooter(`${await getKarma(user.id)} karma`);
 
     if (await userExists(user.id)) {
-        const voted = await hasVoted(user.id)
+        const voted = await hasVoted(user.id);
         embed.addField(
             "economy",
             `💰 $**${getBalance(user.id).toLocaleString()}**
@@ -173,16 +173,16 @@ async function showUser(message, user) {
             **prestige** ${getPrestige(user.id)}
             **bonus** ${Math.floor((await getMulti(user.id)) * 100)}%`,
             true
-        )
+        );
     }
 
     if (guilds.length > 0) {
-        embed.addField("guilds", guilds.join(" "))
+        embed.addField("guilds", guilds.join(" "));
     }
 
-    return message.channel.send({ embeds: [embed] })
+    return message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

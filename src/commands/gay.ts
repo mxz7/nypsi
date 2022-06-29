@@ -1,15 +1,15 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/functions/member"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getMember } from "../utils/functions/member";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cache = new Map()
+const cache = new Map();
 
-const cmd = new Command("gay", "very accurate gay level calculator", Categories.FUN).setAliases(["howgay", "lgbtdetector"])
+const cmd = new Command("gay", "very accurate gay level calculator", Categories.FUN).setAliases(["howgay", "lgbtdetector"]);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are u gay"))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are u gay"));
 
 /**
  * @param {Message} message
@@ -18,80 +18,80 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("a
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    let member
+    let member;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
+            member = await getMember(message.guild, args[0]);
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
     }
 
-    let gayAmount
+    let gayAmount;
 
     if (cache.has(member.user.id)) {
-        gayAmount = cache.get(member.user.id)
+        gayAmount = cache.get(member.user.id);
     } else {
-        gayAmount = Math.ceil(Math.random() * 101) - 1
+        gayAmount = Math.ceil(Math.random() * 101) - 1;
 
-        cache.set(member.user.id, gayAmount)
+        cache.set(member.user.id, gayAmount);
 
         setTimeout(() => {
-            cache.delete(member.user.id)
-        }, 60 * 1000)
+            cache.delete(member.user.id);
+        }, 60 * 1000);
     }
 
-    let gayText = ""
-    let gayEmoji = ""
+    let gayText = "";
+    let gayEmoji = "";
 
     if (gayAmount >= 70) {
-        gayEmoji = ":rainbow_flag:"
-        gayText = "dam hmu 😏"
+        gayEmoji = ":rainbow_flag:";
+        gayText = "dam hmu 😏";
     } else if (gayAmount >= 45) {
-        gayEmoji = "🌈"
-        gayText = "good enough 😉"
+        gayEmoji = "🌈";
+        gayText = "good enough 😉";
     } else if (gayAmount >= 20) {
-        gayEmoji = "👫"
-        gayText = "kinda straight 😐"
+        gayEmoji = "👫";
+        gayText = "kinda straight 😐";
     } else {
-        gayEmoji = "📏"
-        gayText = "thought we coulda had smth 🙄"
+        gayEmoji = "📏";
+        gayText = "thought we coulda had smth 🙄";
     }
 
     const embed = new CustomEmbed(
         message.member,
         false,
         `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
-    ).setHeader("gay calculator", member.user.avatarURL())
+    ).setHeader("gay calculator", member.user.avatarURL());
 
-    return await send({ embeds: [embed] })
+    return await send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

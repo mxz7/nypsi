@@ -1,16 +1,16 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, Permissions } from "discord.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { BaseGuildTextChannel, CommandInteraction, Message, Permissions } from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("purge", "bulk delete/purge messages", Categories.MODERATION)
     .setAliases(["del"])
-    .setPermissions(["MANAGE_MESSAGES"])
+    .setPermissions(["MANAGE_MESSAGES"]);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) =>
     option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
-)
+);
 
 /**
  * @param {Message} message
@@ -18,174 +18,174 @@ cmd.slashData.addIntegerOption((option) =>
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        return
+        return;
     }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     if (isNaN(parseInt(args[0])) || parseInt(args[0]) <= 0) {
-        return send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] })
+        return send({ embeds: [new ErrorEmbed("$del <amount> (@user)")] });
     }
 
-    let amount = parseInt(args[0])
+    let amount = parseInt(args[0]);
 
-    if (amount < 60) amount++
+    if (amount < 60) amount++;
 
     if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
         if (amount > 100) {
-            amount = 100
+            amount = 100;
         }
 
-        await addCooldown(cmd.name, message.member, 30)
+        await addCooldown(cmd.name, message.member, 30);
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return
+    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
 
     if (message instanceof Message && message.mentions.members.first()) {
-        await message.delete()
-        const target = message.mentions.members.first()
+        await message.delete();
+        const target = message.mentions.members.first();
 
-        const collected = await message.channel.messages.fetch({ limit: 100 })
+        const collected = await message.channel.messages.fetch({ limit: 100 });
 
         const collecteda = collected.filter((msg) => {
-            if (!msg.author) return
-            return msg.author.id == target.user.id
-        })
+            if (!msg.author) return;
+            return msg.author.id == target.user.id;
+        });
 
         if (collecteda.size == 0) {
-            return
+            return;
         }
 
-        let count = 0
+        let count = 0;
 
         for (const m of collecteda.keys()) {
-            const msg = collecteda.get(m)
+            const msg = collecteda.get(m);
             if (count >= amount) {
-                collecteda.delete(msg.id)
+                collecteda.delete(msg.id);
             } else {
-                count++
+                count++;
             }
         }
 
-        return await message.channel.bulkDelete(collecteda)
+        return await message.channel.bulkDelete(collecteda);
     }
 
     if (!(message instanceof Message)) {
-        await message.deferReply()
+        await message.deferReply();
     }
 
     if (amount <= 100) {
-        await message.channel.bulkDelete(amount, true).catch()
+        await message.channel.bulkDelete(amount, true).catch();
     } else {
-        amount = amount - 1
+        amount = amount - 1;
 
-        const amount1 = amount
-        let fail = false
-        let counter = 0
+        const amount1 = amount;
+        let fail = false;
+        let counter = 0;
 
         if (amount > 10000) {
-            amount = 10000
+            amount = 10000;
         }
 
         const embed = new CustomEmbed(
             message.member,
             false,
             "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
-        ).setHeader("purge")
+        ).setHeader("purge");
 
-        const m = await message.channel.send({ embeds: [embed] })
+        const m = await message.channel.send({ embeds: [embed] });
         for (let i = 0; i < amount1 / 100; i++) {
             if (m.deleted) {
-                embed.setDescription("✅ operation cancelled")
-                return await message.channel.send({ embeds: [embed] })
+                embed.setDescription("✅ operation cancelled");
+                return await message.channel.send({ embeds: [embed] });
             }
 
-            if (amount < 10) return await m.delete().catch()
+            if (amount < 10) return await m.delete().catch();
 
             if (amount <= 100) {
-                let messages = await message.channel.messages.fetch({ limit: amount, before: m.id })
+                let messages = await message.channel.messages.fetch({ limit: amount, before: m.id });
 
                 messages = messages.filter((m) => {
-                    return timeSince(new Date(m.createdTimestamp)) < 14
-                })
+                    return timeSince(new Date(m.createdTimestamp)) < 14;
+                });
 
-                await message.channel.bulkDelete(messages).catch()
-                return await m.delete().catch()
+                await message.channel.bulkDelete(messages).catch();
+                return await m.delete().catch();
             }
 
-            let messages = await message.channel.messages.fetch({ limit: 100, before: m.id })
+            let messages = await message.channel.messages.fetch({ limit: 100, before: m.id });
 
             messages = messages.filter((m) => {
-                return timeSince(new Date(m.createdTimestamp)) < 14
-            })
+                return timeSince(new Date(m.createdTimestamp)) < 14;
+            });
 
             if (messages.size < 100) {
-                amount = messages.size
-                counter = 0
+                amount = messages.size;
+                counter = 0;
                 embed.setDescription(
                     "deleting `" +
                         amount +
                         " / " +
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
-                )
-                await m.edit({ embeds: [embed] })
+                );
+                await m.edit({ embeds: [embed] });
             }
 
             await message.channel.bulkDelete(messages).catch(() => {
-                fail = true
-            })
+                fail = true;
+            });
 
             if (fail) {
-                return
+                return;
             }
 
-            amount = amount - 100
-            counter++
+            amount = amount - 100;
+            counter++;
 
             if (counter >= 2) {
-                counter = 0
+                counter = 0;
                 embed.setDescription(
                     "deleting `" +
                         amount +
                         " / " +
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
-                )
-                await m.edit({ embeds: [embed] }).catch(() => {})
+                );
+                await m.edit({ embeds: [embed] }).catch(() => {});
             }
         }
         if (!(message instanceof Message)) {
-            message.editReply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")] }).catch(() => {})
+            message.editReply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")] }).catch(() => {});
         }
-        return m.delete().catch()
+        return m.delete().catch();
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;
 
 function timeSince(date) {
-    const ms = Math.floor(new Date().getTime() - date)
+    const ms = Math.floor(new Date().getTime() - date);
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
 
-    return days
+    return days;
 }

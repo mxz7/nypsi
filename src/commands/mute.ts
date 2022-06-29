@@ -1,21 +1,21 @@
-import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js"
-import { profileExists, createProfile, newCase, newMute, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils"
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { PunishmentType } from "../utils/models/GuildStorage"
-import { getExactMember } from "../utils/functions/member"
-import ms = require("ms")
+import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js";
+import { profileExists, createProfile, newCase, newMute, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { getExactMember } from "../utils/functions/member";
+import ms = require("ms");
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
     "MODERATE_MEMBERS",
-])
+]);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 cmd.slashData
     .addUserOption((option) => option.setName("user").setDescription("user to mute").setRequired(true))
-    .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"));
 
 /**
  * @param {Message} message
@@ -24,22 +24,22 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
-            return
+            return;
         }
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild)
+    if (!profileExists(message.guild)) createProfile(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data)
+            return await message.editReply(data);
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (!(message instanceof Message)) {
-        await message.deferReply()
+        await message.deferReply();
     }
 
     if (
@@ -48,16 +48,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
-        })
+        });
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
         return send({
             embeds: [new ErrorEmbed("i need the `moderate members` permission for this command to work")],
-        })
+        });
     }
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
@@ -70,80 +70,80 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField(
                 "time format examples",
                 "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
-            )
-        return send({ embeds: [embed] })
+            );
+        return send({ embeds: [embed] });
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
-        let members
+        let members;
 
         if (inCooldown(message.guild)) {
-            members = message.guild.members.cache
+            members = message.guild.members.cache;
         } else {
-            members = await message.guild.members.fetch()
-            addCooldown(message.guild, 3600)
+            members = await message.guild.members.fetch();
+            addCooldown(message.guild, 3600);
         }
 
-        const member = members.find((m) => m.id == args[0])
+        const member = members.find((m) => m.id == args[0]);
 
         if (!member) {
             return send({
                 embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-            })
+            });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     } else if (message.mentions.members.first() == null) {
-        const member = await getExactMember(message.guild, args[0])
+        const member = await getExactMember(message.guild, args[0]);
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
+            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     }
 
-    const members = message.mentions.members
-    let reason: string | string[] = ""
+    const members = message.mentions.members;
+    let reason: string | string[] = "";
 
     if (args.length != members.size) {
         for (let i = 0; i < members.size; i++) {
-            args.shift()
+            args.shift();
         }
-        reason = args.join(" ")
+        reason = args.join(" ");
     }
 
-    let count = 0
-    let mode = "role"
-    const failed = []
+    let count = 0;
+    let mode = "role";
+    const failed = [];
 
-    let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild))
+    let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild));
 
     if (!getMuteRole(message.guild)) {
-        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        if (getMuteRole(message.guild) == "timeout") mode = "timeout"
+        if (getMuteRole(message.guild) == "timeout") mode = "timeout";
     }
 
     if (!muteRole && mode == "role") {
-        let channelError = false
+        let channelError = false;
         try {
             const newMuteRole = await message.guild.roles
                 .create({
                     name: "muted",
                 })
                 .catch(() => {
-                    channelError = true
-                })
+                    channelError = true;
+                });
 
             if (newMuteRole instanceof Role) {
-                muteRole = newMuteRole
+                muteRole = newMuteRole;
             }
 
             message.guild.channels.cache.forEach(async (channel) => {
-                if (channel instanceof ThreadChannel) return
+                if (channel instanceof ThreadChannel) return;
                 await channel.permissionOverwrites
                     .edit(muteRole, {
                         SEND_MESSAGES: false,
@@ -151,9 +151,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         ADD_REACTIONS: false,
                     })
                     .catch(() => {
-                        channelError = true
-                    })
-            })
+                        channelError = true;
+                    });
+            });
         } catch (e) {
             return send({
                 embeds: [
@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
                     ),
                 ],
-            })
+            });
         }
         if (channelError) {
             return send({
@@ -170,312 +170,312 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
                     ),
                 ],
-            })
+            });
         }
     }
 
-    let timedMute = false
-    let unmuteDate
-    let time = 0
+    let timedMute = false;
+    let unmuteDate;
+    let time = 0;
 
     if (reason != "") {
-        time = getDuration(reason.split(" ")[0].toLowerCase())
-        unmuteDate = new Date().getTime() + time * 1000
+        time = getDuration(reason.split(" ")[0].toLowerCase());
+        unmuteDate = new Date().getTime() + time * 1000;
 
         if (time) {
-            timedMute = true
-            reason = reason.split(" ")
-            reason.shift()
-            reason = reason.join(" ")
+            timedMute = true;
+            reason = reason.split(" ");
+            reason.shift();
+            reason = reason.join(" ");
         }
     }
 
     if (mode == "timeout" && !timedMute) {
-        unmuteDate = new Date().getTime() + ms("1 week")
-        time = ms("1 week") / 1000
+        unmuteDate = new Date().getTime() + ms("1 week");
+        time = ms("1 week") / 1000;
 
-        timedMute = true
+        timedMute = true;
     }
 
-    let fail = false
+    let fail = false;
 
     if (mode == "role") {
         for (const member of members.keys()) {
             if (members.get(member).user.id == message.client.user.id) {
-                await message.channel.send({ content: "youll never shut me up 😏" })
-                continue
+                await message.channel.send({ content: "youll never shut me up 😏" });
+                continue;
             }
 
-            const targetHighestRole = members.get(member).roles.highest
-            const memberHighestRole = message.member.roles.highest
+            const targetHighestRole = members.get(member).roles.highest;
+            const memberHighestRole = message.member.roles.highest;
 
             if (
                 targetHighestRole.position >= memberHighestRole.position &&
                 message.guild.ownerId != message.member.user.id
             ) {
-                failed.push(members.get(member).user)
+                failed.push(members.get(member).user);
             } else if (members.get(member).roles.cache.find((r) => r.id == muteRole.id)) {
                 if (Array.from(members.keys()).length == 1) {
-                    return send({ embeds: [new ErrorEmbed("that user is already muted")] })
+                    return send({ embeds: [new ErrorEmbed("that user is already muted")] });
                 }
 
-                failed.push(members.get(member).user)
+                failed.push(members.get(member).user);
             } else {
                 await members
                     .get(member)
                     .roles.add(muteRole)
                     .then(() => count++)
                     .catch(() => {
-                        fail = true
+                        fail = true;
                         return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "i am unable to give users the mute role - ensure my role is above the 'muted' role"
                                 ),
                             ],
-                        })
-                    })
+                        });
+                    });
             }
-            if (fail) break
+            if (fail) break;
         }
     } else if (mode == "timeout") {
         for (const member of members.keys()) {
             if (members.get(member).user.id == message.client.user.id) {
-                await message.channel.send({ content: "youll never shut me up 😏" })
-                continue
+                await message.channel.send({ content: "youll never shut me up 😏" });
+                continue;
             }
 
-            const targetHighestRole = members.get(member).roles.highest
-            const memberHighestRole = message.member.roles.highest
+            const targetHighestRole = members.get(member).roles.highest;
+            const memberHighestRole = message.member.roles.highest;
 
             if (
                 targetHighestRole.position >= memberHighestRole.position &&
                 message.guild.ownerId != message.member.user.id
             ) {
-                failed.push(members.get(member).user)
+                failed.push(members.get(member).user);
             } else if (members.get(member).isCommunicationDisabled()) {
                 if (Array.from(members.keys()).length == 1) {
-                    return send({ embeds: [new ErrorEmbed("that user is already muted")] })
+                    return send({ embeds: [new ErrorEmbed("that user is already muted")] });
                 }
 
-                failed.push(members.get(member).user)
+                failed.push(members.get(member).user);
             } else {
                 await members
                     .get(member)
                     .disableCommunicationUntil(unmuteDate, reason)
                     .then(() => count++)
                     .catch(() => {
-                        fail = true
+                        fail = true;
                         return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "i am unable to timeout users, ensure my role is high enough and i have the permission"
                                 ),
                             ],
-                        })
-                    })
+                        });
+                    });
             }
-            if (fail) break
+            if (fail) break;
         }
     }
 
-    if (fail) return
+    if (fail) return;
 
-    let mutedLength = ""
+    let mutedLength = "";
 
     if (timedMute) {
-        mutedLength = getTime(time * 1000)
+        mutedLength = getTime(time * 1000);
     }
 
     if (count == 0) {
-        return send({ embeds: [new ErrorEmbed("i was unable to mute any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to mute any users")] });
     }
 
-    const embed = new CustomEmbed(message.member, false, `✅ **${count}** member(s) muted`)
+    const embed = new CustomEmbed(message.member, false, `✅ **${count}** member(s) muted`);
 
     if (timedMute) {
         if (count == 1 && failed.length == 0) {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**")
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**");
         } else {
-            embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**")
+            embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**");
         }
     } else {
         if (count == 1 && failed.length == 0) {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been muted")
+            embed.setDescription("✅ `" + members.first().user.tag + "` has been muted");
         } else {
-            embed.setDescription("✅ **" + count + "** members muted")
+            embed.setDescription("✅ **" + count + "** members muted");
         }
     }
 
     if (failed.length != 0) {
-        const failedTags = []
+        const failedTags = [];
         for (const fail1 of failed) {
-            failedTags.push(fail1.tag)
+            failedTags.push(fail1.tag);
         }
 
-        embed.addField("error", "unable to mute: " + failedTags.join(", "))
+        embed.addField("error", "unable to mute: " + failedTags.join(", "));
     }
 
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
-            await message.delete()
-            await message.member.send({ embeds: [embed] }).catch()
+            await message.delete();
+            await message.member.send({ embeds: [embed] }).catch();
         } else {
-            await message.reply({ embeds: [embed], ephemeral: true })
+            await message.reply({ embeds: [embed], ephemeral: true });
         }
     } else {
-        await send({ embeds: [embed] })
+        await send({ embeds: [embed] });
     }
 
-    let storeReason = reason
+    let storeReason = reason;
 
     if (!timedMute) {
-        storeReason = "[perm] " + reason
+        storeReason = "[perm] " + reason;
     } else {
-        storeReason = `[${mutedLength}] ${reason}`
+        storeReason = `[${mutedLength}] ${reason}`;
     }
 
-    const members1 = Array.from(members.keys())
+    const members1 = Array.from(members.keys());
 
     if (failed.length != 0) {
         for (const fail1 of failed) {
             if (members1.includes(fail1.id)) {
-                members1.splice(members1.indexOf(fail1.id), 1)
+                members1.splice(members1.indexOf(fail1.id), 1);
             }
         }
     }
 
-    newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason)
+    newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
 
     for (const m of members1) {
         if (isMuted(message.guild, members.get(m))) {
-            deleteMute(message.guild, members.get(m))
+            deleteMute(message.guild, members.get(m));
         }
     }
 
     if (timedMute) {
-        newMute(message.guild, members1, unmuteDate)
+        newMute(message.guild, members1, unmuteDate);
     }
 
     if (!timedMute) {
-        newMute(message.guild, members1, 9999999999999)
+        newMute(message.guild, members1, 9999999999999);
     }
 
-    if (args.join(" ").includes("-s")) return
+    if (args.join(" ").includes("-s")) return;
     for (const m of members1) {
-        const mem = members.get(m)
+        const mem = members.get(m);
         if (!timedMute) {
             const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
-                .addField("length", "`permanent`", true)
+                .addField("length", "`permanent`", true);
 
             if (reason != "") {
-                embed.addField("reason", `\`${reason}\``, true)
+                embed.addField("reason", `\`${reason}\``, true);
             }
 
-            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
         } else {
             const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
                 .addField("length", `\`${mutedLength}\``, true)
                 .setFooter("unmuted at:")
-                .setTimestamp(unmuteDate)
+                .setTimestamp(unmuteDate);
 
             if (reason != "") {
-                embed.addField("reason", `\`${reason}\``, true)
+                embed.addField("reason", `\`${reason}\``, true);
             }
 
-            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {})
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
         }
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;
 
 function getDuration(duration) {
-    duration.toLowerCase()
+    duration.toLowerCase();
 
     if (duration.includes("d")) {
-        if (!parseInt(duration.split("d")[0])) return undefined
+        if (!parseInt(duration.split("d")[0])) return undefined;
 
-        const num = duration.split("d")[0]
+        const num = duration.split("d")[0];
 
-        return num * 86400
+        return num * 86400;
     } else if (duration.includes("h")) {
-        if (!parseInt(duration.split("h")[0])) return undefined
+        if (!parseInt(duration.split("h")[0])) return undefined;
 
-        const num = duration.split("h")[0]
+        const num = duration.split("h")[0];
 
-        return num * 3600
+        return num * 3600;
     } else if (duration.includes("m")) {
-        if (!parseInt(duration.split("m")[0])) return undefined
+        if (!parseInt(duration.split("m")[0])) return undefined;
 
-        const num = duration.split("m")[0]
+        const num = duration.split("m")[0];
 
-        return num * 60
+        return num * 60;
     } else if (duration.includes("s")) {
-        if (!parseInt(duration.split("s")[0])) return undefined
+        if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = duration.split("s")[0]
+        const num = duration.split("s")[0];
 
-        return num
+        return num;
     }
 }
 
 function getTime(ms) {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor(daysms / (60 * 60 * 1000))
-    const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor(hoursms / (60 * 1000))
-    const minutesms = ms % (60 * 1000)
-    const sec = Math.floor(minutesms / 1000)
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+    const daysms = ms % (24 * 60 * 60 * 1000);
+    const hours = Math.floor(daysms / (60 * 60 * 1000));
+    const hoursms = ms % (60 * 60 * 1000);
+    const minutes = Math.floor(hoursms / (60 * 1000));
+    const minutesms = ms % (60 * 1000);
+    const sec = Math.floor(minutesms / 1000);
 
-    let output = ""
+    let output = "";
 
     if (days > 0) {
-        let a = " days"
+        let a = " days";
 
         if (days == 1) {
-            a = " day"
+            a = " day";
         }
 
-        output = days + a
+        output = days + a;
     }
 
     if (hours > 0) {
-        let a = " hours"
+        let a = " hours";
 
         if (hours == 1) {
-            a = " hour"
+            a = " hour";
         }
 
         if (output == "") {
-            output = hours + a
+            output = hours + a;
         } else {
-            output = `${output} ${hours}${a}`
+            output = `${output} ${hours}${a}`;
         }
     }
 
     if (minutes > 0) {
-        let a = " mins"
+        let a = " mins";
 
         if (minutes == 1) {
-            a = " min"
+            a = " min";
         }
 
         if (output == "") {
-            output = minutes + a
+            output = minutes + a;
         } else {
-            output = `${output} ${minutes}${a}`
+            output = `${output} ${minutes}${a}`;
         }
     }
 
     if (sec > 0) {
-        output = output + sec + "s"
+        output = output + sec + "s";
     }
 
-    return output
+    return output;
 }

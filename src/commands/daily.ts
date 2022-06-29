@@ -1,12 +1,12 @@
-import { CommandInteraction, Message } from "discord.js"
-import { getBalance, getMulti, updateBalance, userExists, createUser } from "../utils/economy/utils.js"
-import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier, getLastDaily, setLastDaily } from "../utils/premium/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import { CommandInteraction, Message } from "discord.js";
+import { getBalance, getMulti, updateBalance, userExists, createUser } from "../utils/economy/utils.js";
+import { getPrefix } from "../utils/guilds/utils";
+import { isPremium, getTier, getLastDaily, setLastDaily } from "../utils/premium/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const cmd = new Command("daily", "get your daily bonus (patreon only)", Categories.MONEY)
+const cmd = new Command("daily", "get your daily bonus (patreon only)", Categories.MONEY);
 
 /**
  * @param {Message} message
@@ -14,15 +14,15 @@ const cmd = new Command("daily", "get your daily bonus (patreon only)", Categori
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 90)
+    await addCooldown(cmd.name, message.member, 90);
 
     if (!(await userExists(message.member))) {
-        createUser(message.member)
+        createUser(message.member);
     }
 
     const notValidForYou = () => {
@@ -30,102 +30,102 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.member,
             false,
             `${getPrefix(message.guild)}daily is for BRONZE tier and higher`
-        ).setFooter(`${getPrefix(message.guild)}patreon`)
+        ).setFooter(`${getPrefix(message.guild)}patreon`);
 
-        return message.channel.send({ embeds: [embed] })
-    }
+        return message.channel.send({ embeds: [embed] });
+    };
 
     if (!isPremium(message.author.id)) {
-        return notValidForYou()
+        return notValidForYou();
     } else {
         if (getTier(message.author.id) < 1) {
-            return notValidForYou()
+            return notValidForYou();
         }
 
-        const now = new Date().getTime()
-        const lastDaily = getLastDaily(message.author.id)
-        const diff = now - lastDaily
+        const now = new Date().getTime();
+        const lastDaily = getLastDaily(message.author.id);
+        const diff = now - lastDaily;
 
         if (diff >= 86400000) {
-            setLastDaily(message.author.id, now)
+            setLastDaily(message.author.id, now);
 
-            let amount = 75000
-            const multi = await getMulti(message.member)
+            let amount = 75000;
+            const multi = await getMulti(message.member);
 
-            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`
+            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
 
             if (multi > 0) {
-                amount = amount + Math.round(amount * multi)
+                amount = amount + Math.round(amount * multi);
                 description = `$${getBalance(
                     message.member
                 ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
                     multi * 100
-                ).toLocaleString()}**% bonus)`
+                ).toLocaleString()}**% bonus)`;
             }
 
-            updateBalance(message.member, getBalance(message.member) + amount)
+            updateBalance(message.member, getBalance(message.member) + amount);
 
-            const embed = new CustomEmbed(message.member, false, description)
+            const embed = new CustomEmbed(message.member, false, description);
 
             return message.channel.send({ embeds: [embed] }).then((msg) => {
                 setTimeout(() => {
-                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`)
-                    msg.edit({ embeds: [embed] })
-                }, 2000)
-            })
+                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`);
+                    msg.edit({ embeds: [embed] });
+                }, 2000);
+            });
         } else {
-            const timeRemaining = Math.abs(86400000 - diff)
-            const dd = timeUntil(new Date().getTime() + timeRemaining)
+            const timeRemaining = Math.abs(86400000 - diff);
+            const dd = timeUntil(new Date().getTime() + timeRemaining);
 
             const embed = new CustomEmbed(
                 message.member,
                 false,
                 "you have already used your daily reward! come back in **" + dd + "**"
-            )
+            );
 
-            return message.channel.send({ embeds: [embed] })
+            return message.channel.send({ embeds: [embed] });
         }
     }
 }
 
 function timeUntil(date) {
-    const ms = Math.floor(date - new Date().getTime())
+    const ms = Math.floor(date - new Date().getTime());
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000))
-    const daysms = ms % (24 * 60 * 60 * 1000)
-    const hours = Math.floor(daysms / (60 * 60 * 1000))
-    const hoursms = ms % (60 * 60 * 1000)
-    const minutes = Math.floor(hoursms / (60 * 1000))
-    const minutesms = ms % (60 * 1000)
-    const sec = Math.floor(minutesms / 1000)
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+    const daysms = ms % (24 * 60 * 60 * 1000);
+    const hours = Math.floor(daysms / (60 * 60 * 1000));
+    const hoursms = ms % (60 * 60 * 1000);
+    const minutes = Math.floor(hoursms / (60 * 1000));
+    const minutesms = ms % (60 * 1000);
+    const sec = Math.floor(minutesms / 1000);
 
-    let output = ""
+    let output = "";
 
     if (days > 0) {
-        output = output + days + "d "
+        output = output + days + "d ";
     }
 
     if (hours > 0) {
-        output = output + hours + "h "
+        output = output + hours + "h ";
     }
 
     if (minutes > 0) {
-        output = output + minutes + "m "
+        output = output + minutes + "m ";
     }
 
     if (sec > 0) {
-        output = output + sec + "s"
+        output = output + sec + "s";
     } else if (output != "") {
-        output = output.substr(0, output.length - 1)
+        output = output.substr(0, output.length - 1);
     }
 
     if (output == "") {
-        output = "0s"
+        output = "0s";
     }
 
-    return output
+    return output;
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

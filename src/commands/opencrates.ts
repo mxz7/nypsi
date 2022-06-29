@@ -1,15 +1,15 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { startOpeningCrates, stopOpeningCrates } from "../utils/commandhandler"
-import { getInventory, getItems, openCrate, getDMsEnabled } from "../utils/economy/utils"
-import { getPrefix } from "../utils/guilds/utils"
-import { isPremium, getTier } from "../utils/premium/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { startOpeningCrates, stopOpeningCrates } from "../utils/commandhandler";
+import { getInventory, getItems, openCrate, getDMsEnabled } from "../utils/economy/utils";
+import { getPrefix } from "../utils/guilds/utils";
+import { isPremium, getTier } from "../utils/premium/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY)
+const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 
 /**
  *
@@ -19,20 +19,20 @@ cmd.slashEnabled = true
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     // if (!isPremium(message.member)) {
@@ -48,103 +48,103 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await getDMsEnabled(message.member))) {
         return send({
             embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
-        })
+        });
     }
 
-    const inventory = getInventory(message.member)
-    const items = getItems()
+    const inventory = getInventory(message.member);
+    const items = getItems();
 
-    const crates = []
+    const crates = [];
 
-    let max = 5
-    let hitMax = false
+    let max = 5;
+    let hitMax = false;
 
     if (isPremium(message.member)) {
         if (getTier(message.member) >= 3) {
-            max = 20
+            max = 20;
         } else {
-            max = 10
+            max = 10;
         }
     }
 
     for (const item of Array.from(Object.keys(inventory))) {
         if (items[item].role == "crate") {
-            let amount = 0
+            let amount = 0;
             while (amount < inventory[item]) {
-                amount++
-                crates.push(item)
+                amount++;
+                crates.push(item);
                 if (crates.length >= max) {
-                    hitMax = true
-                    break
+                    hitMax = true;
+                    break;
                 }
             }
         }
     }
 
     if (crates.length == 0) {
-        return send({ embeds: [new ErrorEmbed("you dont have any crates to open")] })
+        return send({ embeds: [new ErrorEmbed("you dont have any crates to open")] });
     }
 
-    startOpeningCrates(message.member)
+    startOpeningCrates(message.member);
 
-    await addCooldown(cmd.name, message.member, 120)
+    await addCooldown(cmd.name, message.member, 120);
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member, false);
 
-    embed.setTitle("opening crates")
+    embed.setTitle("opening crates");
 
-    let desc = `opening ${crates.length} crates${hitMax ? " (limited)" : ""}`
+    let desc = `opening ${crates.length} crates${hitMax ? " (limited)" : ""}`;
 
-    embed.setDescription(desc)
+    embed.setDescription(desc);
 
-    desc += "\n\nyou found:\n"
+    desc += "\n\nyou found:\n";
 
-    let fail = false
+    let fail = false;
 
     const msg = await message.member.send({ embeds: [embed] }).catch(() => {
-        fail = true
-    })
+        fail = true;
+    });
 
     if (fail || !(msg instanceof Message)) {
-        const reply = new ErrorEmbed("failed to dm you, please check your privacy settings")
+        const reply = new ErrorEmbed("failed to dm you, please check your privacy settings");
         if (message.interaction) {
-            return send({ embeds: [reply], ephemeral: true })
+            return send({ embeds: [reply], ephemeral: true });
         } else {
-            return send({ embeds: [reply] })
+            return send({ embeds: [reply] });
         }
     } else {
-        const reply = new CustomEmbed(message.member, false, "✅ check your dms")
+        const reply = new CustomEmbed(message.member, false, "✅ check your dms");
         if (message.interaction) {
-            await send({ embeds: [reply], ephemeral: true })
+            await send({ embeds: [reply], ephemeral: true });
         } else {
-            await send({ embeds: [reply] })
+            await send({ embeds: [reply] });
         }
     }
 
     const interval = setInterval(() => {
-        let finished = false
-        const crate = crates.shift()
+        let finished = false;
+        const crate = crates.shift();
 
-        const found = openCrate(message.member, items[crate])
+        const found = openCrate(message.member, items[crate]);
 
-        desc += ` - ${found.join("\n - ")}\n`
+        desc += ` - ${found.join("\n - ")}\n`;
 
         if (crates.length == 0) {
-            desc += "\n\nfinished (:"
-            finished = true
+            desc += "\n\nfinished (:";
+            finished = true;
         }
 
-        embed.setDescription(desc)
+        embed.setDescription(desc);
 
-        msg.edit({ embeds: [embed] })
+        msg.edit({ embeds: [embed] });
 
         if (finished) {
-            clearInterval(interval)
-            stopOpeningCrates(message.member)
+            clearInterval(interval);
+            stopOpeningCrates(message.member);
         }
-    }, 1500)
+    }, 1500);
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;
