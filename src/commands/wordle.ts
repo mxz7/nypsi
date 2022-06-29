@@ -347,8 +347,6 @@ function guessWord(word: string, id: string): Response {
 
     const copy = (" " + game.word).slice(1).split("");
 
-    // console.log(copy)
-
     for (let i = 0; i < 5; i++) {
         const letter = word[i];
         const actualLetter = game.word[i];
@@ -356,7 +354,7 @@ function guessWord(word: string, id: string): Response {
         let emoji: string;
 
         if (letter == actualLetter) {
-            copy.splice(i, 1);
+            copy[i] = "";
             emoji = emojis.get(`green-${letter}`);
         } else if (game.word.includes(letter)) {
             const index = copy.indexOf(letter);
@@ -364,7 +362,7 @@ function guessWord(word: string, id: string): Response {
                 emoji = emojis.get(`grey-${letter}`);
             } else {
                 emoji = emojis.get(`yellow-${letter}`);
-                copy.splice(index, 1);
+                copy[i] = "";
             }
         } else {
             if (!notInWord.includes(letter)) notInWord.push(letter);
