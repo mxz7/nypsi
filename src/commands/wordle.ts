@@ -364,14 +364,12 @@ function guessWord(word: string, id: string): Response {
                 emoji = emojis.get(`grey-${letter}`);
             } else {
                 emoji = emojis.get(`yellow-${letter}`);
-                copy[i] = "";
+                copy[index] = "";
             }
         } else {
             if (!notInWord.includes(letter)) notInWord.push(letter);
             emoji = emojis.get(`grey-${letter}`);
         }
-
-        // console.log(copy)
 
         board[game.guesses.length][i] = emoji;
     }
