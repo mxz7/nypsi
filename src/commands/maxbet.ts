@@ -1,24 +1,24 @@
-import { CommandInteraction, Message } from "discord.js"
-import { calcMaxBet, userExists, createUser } from "../utils/economy/utils.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { CommandInteraction, Message } from "discord.js";
+import { calcMaxBet, userExists, createUser } from "../utils/economy/utils.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY)
+const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member);
 
     return message.channel.send({
         embeds: [new CustomEmbed(message.member, false, `your maximum bet is $**${maxBet.toLocaleString()}**`)],
-    })
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,9 +1,9 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("f", "pay your respects", Categories.FUN)
+const cmd = new Command("f", "pay your respects", Categories.FUN);
 
 /**
  *
@@ -12,60 +12,60 @@ const cmd = new Command("f", "pay your respects", Categories.FUN)
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
     if (args.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you need to pay respects to something")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("you need to pay respects to something")] });
     }
 
-    await addCooldown(cmd.name, message.member, 30)
+    await addCooldown(cmd.name, message.member, 30);
 
-    let content = args.join(" ")
+    let content = args.join(" ");
 
     if (content.split("\n").length > 2) {
-        content = content.split("\n").join(".")
+        content = content.split("\n").join(".");
     }
 
     if (content.length > 50) {
-        content = content.substr(0, 50)
+        content = content.substr(0, 50);
     }
 
-    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`)
+    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`);
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
-    )
+    );
 
-    await message.channel.send({ embeds: [embed], components: [row] })
+    await message.channel.send({ embeds: [embed], components: [row] });
 
-    const reactions = []
+    const reactions = [];
 
-    const collector = message.channel.createMessageComponentCollector({ time: 60000 })
+    const collector = message.channel.createMessageComponentCollector({ time: 60000 });
 
     collector.on("collect", async (i): Promise<any> => {
         if (reactions.includes(i.user.id) || i.deferred) {
-            const reply = await i.fetchReply().catch(() => {})
+            const reply = await i.fetchReply().catch(() => {});
 
             if (!reply) {
                 return await i
                     .reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
-                    .catch(() => {})
+                    .catch(() => {});
             }
         }
 
-        await i.deferUpdate().catch(() => {})
+        await i.deferUpdate().catch(() => {});
 
-        reactions.push(i.user.id)
+        reactions.push(i.user.id);
 
         return await message.channel.send({
             embeds: [
                 new CustomEmbed(message.member, false, `${i.user.toString()} has paid respects to **${args.join(" ")}**`),
             ],
-        })
-    })
+        });
+    });
 
     collector.on("end", async () => {
         await message.channel.send({
@@ -78,10 +78,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     } paid their respects to **${content}**`
                 ),
             ],
-        })
-    })
+        });
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

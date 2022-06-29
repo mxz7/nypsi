@@ -1,15 +1,15 @@
-import { CommandInteraction, Message } from "discord.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
-import { getMember } from "../utils/functions/member"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cache = new Map()
+const cache = new Map();
 
-const cmd = new Command("height", "accurate prediction of your height", Categories.FUN)
+const cmd = new Command("height", "accurate prediction of your height", Categories.FUN);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i bet ur short"))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i bet ur short"));
 
 /**
  * @param {Message} message
@@ -18,84 +18,84 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    let member
+    let member;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
+            member = await getMember(message.guild, args[0]);
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
     }
 
-    let size
-    let feet
-    let inches
-    let sizeMsg
+    let size;
+    let feet;
+    let inches;
+    let sizeMsg;
 
     if (cache.has(member.user.id)) {
-        size = cache.get(member.user.id)
-        feet = size.split("'")[0]
-        inches = size.split("'")[1]
+        size = cache.get(member.user.id);
+        feet = size.split("'")[0];
+        inches = size.split("'")[1];
     } else {
-        feet = Math.floor(Math.random() * 6) + 4
-        inches = Math.floor(Math.random() * 12)
+        feet = Math.floor(Math.random() * 6) + 4;
+        inches = Math.floor(Math.random() * 12);
 
-        if (feet > 6) feet = 5
+        if (feet > 6) feet = 5;
 
-        size = `${feet}'${inches}`
+        size = `${feet}'${inches}`;
 
-        cache.set(member.user.id, size)
+        cache.set(member.user.id, size);
 
         setTimeout(() => {
-            cache.delete(member.user.id)
-        }, 60 * 1000)
+            cache.delete(member.user.id);
+        }, 60 * 1000);
     }
 
     if (feet == 6) {
-        sizeMsg = "yo ur tall 😳"
+        sizeMsg = "yo ur tall 😳";
     } else if (feet == 5) {
         if (inches <= 6) {
-            sizeMsg = "kinda short.. 🤨"
+            sizeMsg = "kinda short.. 🤨";
         } else {
-            sizeMsg = "average 🙄"
+            sizeMsg = "average 🙄";
         }
     } else {
-        sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE"
+        sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE";
     }
 
     const embed = new CustomEmbed(message.member, false, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`).setHeader(
         "short person calculator",
         member.user.avatarURL()
-    )
+    );
 
-    return send({ embeds: [embed] })
+    return send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

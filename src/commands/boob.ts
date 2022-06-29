@@ -1,15 +1,15 @@
-import { CommandInteraction, Message } from "discord.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
-import { getMember } from "../utils/functions/member"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cache = new Map()
+const cache = new Map();
 
-const cmd = new Command("boob", "accurate prediction of your boob size", Categories.FUN).setAliases(["howbigaremyboobies"])
+const cmd = new Command("boob", "accurate prediction of your boob size", Categories.FUN).setAliases(["howbigaremyboobies"]);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big are your boobies"))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big are your boobies"));
 
 /**
  * @param {Message} message
@@ -18,82 +18,82 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("h
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    let member
+    let member;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
+            member = await getMember(message.guild, args[0]);
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
     }
 
-    const letters = ["AA", "A", "B", "C", "D", "DD"]
+    const letters = ["AA", "A", "B", "C", "D", "DD"];
 
-    let sizeMsg = ""
-    let sizeEmoji = ""
+    let sizeMsg = "";
+    let sizeEmoji = "";
 
     if (cache.has(member.user.id)) {
-        sizeMsg = cache.get(member.user.id).msg
-        sizeEmoji = cache.get(member.user.id).emoji
+        sizeMsg = cache.get(member.user.id).msg;
+        sizeEmoji = cache.get(member.user.id).emoji;
     } else {
-        const size = Math.floor(Math.random() * 9) * 2 + 30
+        const size = Math.floor(Math.random() * 9) * 2 + 30;
 
-        const index = Math.floor(Math.random() * letters.length)
+        const index = Math.floor(Math.random() * letters.length);
 
-        const letter = letters[index]
+        const letter = letters[index];
 
         if (index > 4) {
-            sizeEmoji = "🍈"
+            sizeEmoji = "🍈";
         } else if (index > 2) {
-            sizeEmoji = "🍒"
+            sizeEmoji = "🍒";
         } else {
-            sizeEmoji = "🥞"
+            sizeEmoji = "🥞";
         }
 
-        sizeMsg = `${size}${letter}`
+        sizeMsg = `${size}${letter}`;
 
         cache.set(member.user.id, {
             msg: sizeMsg,
             emoji: sizeEmoji,
-        })
+        });
 
         setTimeout(() => {
-            cache.delete(member.user.id)
-        }, 60 * 1000)
+            cache.delete(member.user.id);
+        }, 60 * 1000);
     }
 
     const embed = new CustomEmbed(message.member, false)
         .setHeader("boob calculator", member.user.avatarURL())
-        .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`)
+        .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`);
 
-    return send({ embeds: [embed] })
+    return send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

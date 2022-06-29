@@ -12,13 +12,13 @@ import {
     calcEarnedXp,
     getGuildByUser,
     addToGuildXP,
-} from "../utils/economy/utils.js"
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { getPrefix } from "../utils/guilds/utils"
-import { gamble } from "../utils/logger.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+} from "../utils/economy/utils.js";
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { getPrefix } from "../utils/guilds/utils";
+import { gamble } from "../utils/logger.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
 const values = [
     "b",
@@ -58,11 +58,11 @@ const values = [
     "r",
     "b",
     "r",
-]
+];
 
-const cmd = new Command("roulette", "play roulette", Categories.MONEY).setAliases(["r"])
+const cmd = new Command("roulette", "play roulette", Categories.MONEY).setAliases(["r"]);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 cmd.slashData
     .addStringOption((option) =>
         option
@@ -73,7 +73,7 @@ cmd.slashData
             .addChoice("⚫ black", "black")
             .addChoice("🟢 green", "green")
     )
-    .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true))
+    .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
 /**
  * @param {Message} message
@@ -82,19 +82,19 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (message.interaction) {
-            return await message.reply(data)
+            return await message.reply(data);
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
         return send({
@@ -117,10 +117,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         " win **17**x"
                 ),
             ],
-        })
+        });
     }
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
@@ -130,9 +130,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "help",
                 "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
                     "red and black give a **1.5x** win and green gives a **17**x win"
-            )
+            );
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
@@ -142,23 +142,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
                 ),
             ],
-        })
+        });
     }
 
     if (args[0] == "red") {
-        args[0] = "r"
+        args[0] = "r";
     } else if (args[0] == "green") {
-        args[0] = "g"
+        args[0] = "g";
     } else if (args[0] == "black") {
-        args[0] = "b"
+        args[0] = "b";
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[1], message.member)
+    const bet = await formatBet(args[1], message.member);
 
     if (!bet) {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
     }
 
     if (bet <= 0) {
@@ -168,7 +168,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
                 ),
             ],
-        })
+        });
     }
 
     if (!bet) {
@@ -178,11 +178,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
                 ),
             ],
-        })
+        });
     }
 
     if (bet > getBalance(message.member)) {
-        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
     if (bet > maxBet) {
@@ -192,56 +192,56 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
                 ),
             ],
-        })
+        });
     }
 
-    await addCooldown(cmd.name, message.member, 10)
+    await addCooldown(cmd.name, message.member, 10);
 
-    let colorBet = args[0].toLowerCase()
+    let colorBet = args[0].toLowerCase();
 
-    updateBalance(message.member, getBalance(message.member) - bet)
+    updateBalance(message.member, getBalance(message.member) - bet);
 
-    let roll = values[Math.floor(Math.random() * values.length)]
+    let roll = values[Math.floor(Math.random() * values.length)];
 
-    let win = false
-    let winnings = 0
+    let win = false;
+    let winnings = 0;
 
     if (colorBet == roll) {
-        win = true
+        win = true;
         if (roll == "g") {
-            winnings = Math.round(bet * 17)
+            winnings = Math.round(bet * 17);
         } else {
-            winnings = Math.round(bet * 1.5)
+            winnings = Math.round(bet * 1.5);
         }
-        updateBalance(message.member, getBalance(message.member) + winnings)
+        updateBalance(message.member, getBalance(message.member) + winnings);
     }
 
     if (colorBet == "b") {
-        colorBet = "⚫"
+        colorBet = "⚫";
     }
     if (colorBet == "r") {
-        colorBet = "🔴"
+        colorBet = "🔴";
     }
     if (colorBet == "g") {
-        colorBet = "🟢"
+        colorBet = "🟢";
     }
 
     if (roll == "b") {
-        roll = "⚫"
+        roll = "⚫";
     } else if (roll == "r") {
-        roll = "🔴"
+        roll = "🔴";
     } else if (roll == "g") {
-        roll = "🟢"
+        roll = "🟢";
     }
 
-    let multi = 0
+    let multi = 0;
 
     if (win) {
-        multi = await getMulti(message.member)
+        multi = await getMulti(message.member);
 
         if (multi > 0) {
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi))
-            winnings = winnings + Math.round(winnings * multi)
+            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi));
+            winnings = winnings + Math.round(winnings * multi);
         }
     }
 
@@ -249,20 +249,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         true,
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
-    ).setHeader("roulette", message.author.avatarURL())
+    ).setHeader("roulette", message.author.avatarURL());
 
     const edit = async (data, msg) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data)
+            return await message.editReply(data);
         } else {
-            return await msg.edit(data)
+            return await msg.edit(data);
         }
-    }
+    };
 
     send({ embeds: [embed] }).then((m) => {
         embed.setDescription(
             "**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
-        )
+        );
 
         if (win) {
             if (multi > 0) {
@@ -274,38 +274,38 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "+**" +
                         Math.floor(multi * 100).toString() +
                         "**% bonus"
-                )
+                );
             } else {
-                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString())
+                embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
             }
 
-            const earnedXp = calcEarnedXp(message.member, bet)
+            const earnedXp = calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp)
-                embed.setFooter(`+${earnedXp}xp`)
+                updateXp(message.member, getXp(message.member) + earnedXp);
+                embed.setFooter(`+${earnedXp}xp`);
 
-                const guild = getGuildByUser(message.member)
+                const guild = getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guild_name, earnedXp, message.member)
+                    addToGuildXP(guild.guild_name, earnedXp, message.member);
                 }
             }
 
-            embed.setColor("#5efb8f")
+            embed.setColor("#5efb8f");
         } else {
-            embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString())
-            embed.setColor("#e4334f")
+            embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString());
+            embed.setColor("#e4334f");
         }
 
         setTimeout(() => {
-            edit({ embeds: [embed] }, m)
-        }, 2000)
-    })
-    gamble(message.author, "roulette", bet, win, winnings)
-    addGamble(message.member, "roulette", win)
+            edit({ embeds: [embed] }, m);
+        }, 2000);
+    });
+    gamble(message.author, "roulette", bet, win, winnings);
+    addGamble(message.member, "roulette", win);
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

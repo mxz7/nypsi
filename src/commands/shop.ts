@@ -1,11 +1,11 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-import { inPlaceSort } from "fast-sort"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getItems } from "../utils/economy/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { inPlaceSort } from "fast-sort";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getItems } from "../utils/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"])
+const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"]);
 
 /**
  * @param {Message} message
@@ -13,37 +13,37 @@ const cmd = new Command("shop", "view current items that are available to buy/se
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 10)
+    await addCooldown(cmd.name, message.member, 10);
 
-    let page = 0
+    let page = 0;
 
     if (args.length == 1) {
         if (!parseInt(args[0])) {
-            page = 1
+            page = 1;
         } else {
-            page = parseInt(args[0]) - 1
+            page = parseInt(args[0]) - 1;
             if (page < 0) {
-                page = 0
+                page = 0;
             }
         }
     }
 
-    const items = getItems()
+    const items = getItems();
 
-    const itemIDs = Array.from(Object.keys(items))
+    const itemIDs = Array.from(Object.keys(items));
 
-    inPlaceSort(itemIDs).asc()
+    inPlaceSort(itemIDs).asc();
 
-    const pages = []
+    const pages = [];
 
-    let pageOfItems = []
+    let pageOfItems = [];
     for (const item of itemIDs) {
-        if (!items[item].worth) continue
+        if (!items[item].worth) continue;
         if (
             items[item].role == "prey" ||
             items[item].role == "fish" ||
@@ -52,136 +52,136 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             items[item].role == "sellable" ||
             items[item].role == "ore"
         )
-            continue
+            continue;
         if (pageOfItems.length == 6) {
-            pages.push(pageOfItems)
-            pageOfItems = [item]
+            pages.push(pageOfItems);
+            pageOfItems = [item];
         } else {
-            pageOfItems.push(item)
+            pageOfItems.push(item);
         }
     }
 
     if (pageOfItems.length != 0) {
-        pages.push(pageOfItems)
+        pages.push(pageOfItems);
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`)
+    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`);
 
-    embed.setHeader("shop", message.author.avatarURL())
+    embed.setHeader("shop", message.author.avatarURL());
 
     if (!pages[page]) {
-        page = 0
+        page = 0;
     }
 
     for (let item of pages[page]) {
-        item = items[item]
+        item = items[item];
         embed.addField(
             item.id,
             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
             true
-        )
+        );
     }
 
     let row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
         new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
-    )
+    );
 
     /**
      * @type {Message}
      */
-    let msg
+    let msg;
 
     if (pages.length == 1) {
-        return await message.channel.send({ embeds: [embed] })
+        return await message.channel.send({ embeds: [embed] });
     } else {
-        msg = await message.channel.send({ embeds: [embed], components: [row] })
+        msg = await message.channel.send({ embeds: [embed], components: [row] });
     }
 
     if (pages.length > 1) {
-        let currentPage = page
+        let currentPage = page;
 
-        const lastPage = pages.length
+        const lastPage = pages.length;
 
-        const filter = (i) => i.user.id == message.author.id
+        const filter = (i) => i.user.id == message.author.id;
 
         const pageManager = async () => {
             const reaction = await msg
                 .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
                 .then(async (collected) => {
-                    await collected.deferUpdate()
-                    return collected.customId
+                    await collected.deferUpdate();
+                    return collected.customId;
                 })
                 .catch(async () => {
-                    await msg.edit({ components: [] })
-                })
+                    await msg.edit({ components: [] });
+                });
 
-            const newEmbed = new CustomEmbed(message.member).setHeader("shop", message.author.avatarURL())
+            const newEmbed = new CustomEmbed(message.member).setHeader("shop", message.author.avatarURL());
 
-            if (!reaction) return
+            if (!reaction) return;
 
             if (reaction == "⬅") {
                 if (currentPage <= 0) {
-                    return pageManager()
+                    return pageManager();
                 } else {
-                    currentPage--
+                    currentPage--;
                     for (let item of pages[currentPage]) {
-                        item = items[item]
+                        item = items[item];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
                             true
-                        )
+                        );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`);
                     if (currentPage == 0) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
-                        )
+                        );
                     } else {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
-                        )
+                        );
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
-                    return pageManager()
+                    await msg.edit({ embeds: [newEmbed], components: [row] });
+                    return pageManager();
                 }
             } else if (reaction == "➡") {
                 if (currentPage + 1 >= lastPage) {
-                    return pageManager()
+                    return pageManager();
                 } else {
-                    currentPage++
+                    currentPage++;
                     for (let item of pages[currentPage]) {
-                        item = items[item]
+                        item = items[item];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
                             true
-                        )
+                        );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`)
+                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`);
                     if (currentPage + 1 == lastPage) {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
-                        )
+                        );
                     } else {
                         row = new MessageActionRow().addComponents(
                             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
                             new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
-                        )
+                        );
                     }
-                    await msg.edit({ embeds: [newEmbed], components: [row] })
-                    return pageManager()
+                    await msg.edit({ embeds: [newEmbed], components: [row] });
+                    return pageManager();
                 }
             }
-        }
-        return pageManager()
+        };
+        return pageManager();
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

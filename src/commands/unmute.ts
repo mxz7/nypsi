@@ -1,18 +1,18 @@
-import { CommandInteraction, GuildMember, Message, Permissions } from "discord.js"
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
-import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { PunishmentType } from "../utils/models/GuildStorage"
-import { getExactMember } from "../utils/functions/member"
+import { CommandInteraction, GuildMember, Message, Permissions } from "discord.js";
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
+import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { getExactMember } from "../utils/functions/member";
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
     "MODERATE_MEMBERS",
-])
+]);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true));
 
 /**
  * @param {Message} message
@@ -21,20 +21,20 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("u
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
-            return
+            return;
         }
     }
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data)
+            return await message.editReply(data);
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (!(message instanceof Message)) {
-        await message.deferReply()
+        await message.deferReply();
     }
 
     if (
@@ -43,57 +43,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
-        })
+        });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild)
+    if (!profileExists(message.guild)) createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
-        return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] })
+        return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
-        let members
+        let members;
 
         if (inCooldown(message.guild)) {
-            members = message.guild.members.cache
+            members = message.guild.members.cache;
         } else {
-            members = await message.guild.members.fetch()
-            addCooldown(message.guild, 3600)
+            members = await message.guild.members.fetch();
+            addCooldown(message.guild, 3600);
         }
 
-        const member = members.find((m) => m.id == args[0])
+        const member = members.find((m) => m.id == args[0]);
 
         if (!member) {
             return send({
                 embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-            })
+            });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     } else if (message.mentions.members.first() == null) {
-        const member = await getExactMember(message.guild, args[0])
+        const member = await getExactMember(message.guild, args[0]);
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
+            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     }
 
-    const members = message.mentions.members
+    const members = message.mentions.members;
 
-    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild))
-    let mode = "role"
+    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild));
+    let mode = "role";
 
     if (!getMuteRole(message.guild)) {
-        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted")
+        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        if (getMuteRole(message.guild) == "timeout") mode = "timeout"
+        if (getMuteRole(message.guild) == "timeout") mode = "timeout";
     }
 
     if (!muteRole && mode == "role") {
@@ -105,113 +105,113 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     )}muterole, or create a role called "muted"`
                 ),
             ],
-        })
+        });
     }
 
-    let count = 0
-    let fail = false
-    const failed = []
+    let count = 0;
+    let fail = false;
+    const failed = [];
 
     if (mode == "role") {
         for (const member of message.mentions.members.keys()) {
-            const m = message.mentions.members.get(member)
+            const m = message.mentions.members.get(member);
 
             if (m.roles.cache.has(muteRole.id)) {
                 await m.roles
                     .remove(muteRole)
                     .then(() => count++)
                     .catch(() => {
-                        fail = true
+                        fail = true;
                         return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "there was an error when removing the role, please ensure i have the correct permissions"
                                 ),
                             ],
-                        })
-                    })
+                        });
+                    });
             } else {
-                failed.push(m.user)
+                failed.push(m.user);
             }
-            if (fail) break
+            if (fail) break;
         }
     } else if (mode == "timeout") {
         for (const member of message.mentions.members.keys()) {
-            const m: GuildMember = message.mentions.members.get(member)
+            const m: GuildMember = message.mentions.members.get(member);
 
             if (m.isCommunicationDisabled()) {
                 await m
                     .disableCommunicationUntil(null)
                     .then(() => count++)
                     .catch(() => {
-                        fail = true
+                        fail = true;
                         return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "there was an error when unmuting the user, please ensure i have the correct permissions"
                                 ),
                             ],
-                        })
-                    })
+                        });
+                    });
             } else {
                 // @ts-expect-error weird??
-                failed.push(m.user)
+                failed.push(m.user);
             }
-            if (fail) break
+            if (fail) break;
         }
     }
 
-    if (fail) return
+    if (fail) return;
 
-    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted")
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** member(s) unmuted");
 
     if (count == 1) {
-        embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted")
+        embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted");
     }
 
     if (count == 0) {
-        return send({ embeds: [new ErrorEmbed("i was unable to unmute any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to unmute any users")] });
     }
 
     if (failed.length != 0) {
-        const failedTags = []
+        const failedTags = [];
         for (const fail1 of failed) {
-            failedTags.push(fail1.tag)
+            failedTags.push(fail1.tag);
         }
 
-        embed.addField("error", "unable to unmute: " + failedTags.join(", "))
+        embed.addField("error", "unable to unmute: " + failedTags.join(", "));
     }
 
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
-            await message.delete()
-            await message.member.send({ embeds: [embed] }).catch()
+            await message.delete();
+            await message.member.send({ embeds: [embed] }).catch();
         } else {
-            await message.reply({ embeds: [embed], ephemeral: true })
+            await message.reply({ embeds: [embed], ephemeral: true });
         }
     } else {
-        await send({ embeds: [embed] })
+        await send({ embeds: [embed] });
     }
 
-    const members1 = Array.from(members.keys())
+    const members1 = Array.from(members.keys());
 
     if (failed.length != 0) {
         for (const fail1 of failed) {
             if (members1.includes(fail1.id)) {
-                members1.splice(members1.indexOf(fail1.id), 1)
+                members1.splice(members1.indexOf(fail1.id), 1);
             }
         }
     }
 
     for (const m of members1) {
         if (isMuted(message.guild, members.get(m))) {
-            deleteMute(message.guild, members.get(m))
+            deleteMute(message.guild, members.get(m));
         }
     }
 
-    newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content)
+    newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content);
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

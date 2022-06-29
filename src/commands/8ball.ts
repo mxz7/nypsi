@@ -1,7 +1,7 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const answers = [
     "as i see it, yes",
@@ -24,9 +24,9 @@ const answers = [
     "yes.",
     "yes - definitely",
     "you may rely on it",
-]
+];
 
-const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
+const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN);
 
 /**
  *
@@ -35,28 +35,28 @@ const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN)
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
     if (args.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    const question = args.join(" ")
+    const question = args.join(" ");
 
     const embed = new CustomEmbed(
         message.member,
         false,
         `**${question}** - ${message.member.user.toString()}\n\n🎱 ${answers[Math.floor(Math.random() * answers.length)]}`
-    )
+    );
 
-    message.channel.send({ embeds: [embed] })
+    message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

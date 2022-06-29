@@ -1,51 +1,51 @@
-import * as chalk from "chalk"
-import { Client, User, Webhook } from "discord.js"
-import * as winston from "winston"
-import "winston-daily-rotate-file"
-import * as DiscordTransport from "winston-discord-webhook"
+import * as chalk from "chalk";
+import { Client, User, Webhook } from "discord.js";
+import * as winston from "winston";
+import "winston-daily-rotate-file";
+import * as DiscordTransport from "winston-discord-webhook";
 
 /**
  * @type {Map<String, Webhook>}
  */
-const webhook: Map<string, Webhook> = new Map()
+const webhook: Map<string, Webhook> = new Map();
 /**
  * @type {Map<String, String>}
  */
-const nextLogMsg: Map<string, string> = new Map()
+const nextLogMsg: Map<string, string> = new Map();
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
-    let color = chalk.white
-    let prefix = `${chalk.bold.green("INFO")}`
+    let color = chalk.white;
+    let prefix = `${chalk.bold.green("INFO")}`;
 
     switch (level) {
         case "guild":
-            color = chalk.magenta
-            break
+            color = chalk.magenta;
+            break;
         case "auto":
-            color = chalk.blue
-            break
+            color = chalk.blue;
+            break;
         case "cmd":
-            color = chalk.cyan
-            break
+            color = chalk.cyan;
+            break;
         case "success":
         case "img":
-            color = chalk.green
-            break
+            color = chalk.green;
+            break;
         case "error":
-            color = chalk.red
-            prefix = `${chalk.bold.redBright("ERROR")}`
-            break
+            color = chalk.red;
+            prefix = `${chalk.bold.redBright("ERROR")}`;
+            break;
         case "warn":
-            color = chalk.yellowBright
-            prefix = `${chalk.bold.yellowBright("WARN")}`
-            break
+            color = chalk.yellowBright;
+            prefix = `${chalk.bold.yellowBright("WARN")}`;
+            break;
         case "debug":
-            prefix = `${chalk.bold.gray("DEBUG")}`
-            break
+            prefix = `${chalk.bold.gray("DEBUG")}`;
+            break;
     }
 
-    return `${prefix} [${chalk.blackBright(timestamp)}] ${color(message)}`
-})
+    return `${prefix} [${chalk.blackBright(timestamp)}] ${color(message)}`;
+});
 
 const levels = {
     error: 0,
@@ -57,7 +57,7 @@ const levels = {
     img: 2,
     success: 2,
     debug: 3,
-}
+};
 
 const logger = winston.createLogger({
     format: winston.format.combine(winston.format.timestamp({ format: "DD/MM HH:mm:ss" }), format),
@@ -88,42 +88,42 @@ const logger = winston.createLogger({
             handleRejections: true,
         }),
     ],
-})
+});
 
-export { logger }
+export { logger };
 
 /**
  *
  * @param {String} content
  */
 export function databaseLog(content: string) {
-    const day = new Date().getDate()
-    const month = new Date().getMonth() + 1
+    const day = new Date().getDate();
+    const month = new Date().getMonth() + 1;
 
-    content = `\`\`\`[${day}/${month} ${getTimestamp()}] ${content}\`\`\``
+    content = `\`\`\`[${day}/${month} ${getTimestamp()}] ${content}\`\`\``;
 
     if (!nextLogMsg.get("sql")) {
-        nextLogMsg.set("sql", content)
+        nextLogMsg.set("sql", content);
     } else {
-        let current = nextLogMsg.get("sql")
+        let current = nextLogMsg.get("sql");
 
         if (current.length >= 1500) {
-            let lastLine = current.substr(current.lastIndexOf("\n"), 50)
+            let lastLine = current.substr(current.lastIndexOf("\n"), 50);
 
-            const amount = parseInt(lastLine.split(" ")[0].substring(1, lastLine.length))
+            const amount = parseInt(lastLine.split(" ")[0].substring(1, lastLine.length));
 
             if (!amount) {
-                lastLine = "+1 more"
+                lastLine = "+1 more";
             } else {
-                lastLine = `+${amount + 1} more`
+                lastLine = `+${amount + 1} more`;
             }
 
-            current = current.substr(0, 1500) + "\n\n" + lastLine
+            current = current.substr(0, 1500) + "\n\n" + lastLine;
         } else {
-            current = current + content
+            current = current + content;
         }
 
-        nextLogMsg.set("sql", current)
+        nextLogMsg.set("sql", current);
     }
 }
 
@@ -135,13 +135,16 @@ export function databaseLog(content: string) {
  */
 export function payment(from: User, to: User, amount: number) {
     if (!nextLogMsg.get("pay")) {
-        nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`)
+        nextLogMsg.set(
+            "pay",
+            `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
+        );
     } else {
         nextLogMsg.set(
             "pay",
             nextLogMsg.get("pay") +
                 `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
-        )
+        );
     }
 }
 
@@ -160,7 +163,7 @@ export function gamble(user: User, game: string, amount: number, win: boolean, w
             `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
                 win ? ` ($**${winAmount.toLocaleString()}**)` : ""
             } - $**${amount.toLocaleString()}**\n`
-        )
+        );
     } else {
         nextLogMsg.set(
             "gamble",
@@ -168,7 +171,7 @@ export function gamble(user: User, game: string, amount: number, win: boolean, w
                 `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
                     win ? ` ($**${winAmount.toLocaleString()}**)` : ""
                 } - $**${amount.toLocaleString()}**\n`
-        )
+        );
     }
 }
 
@@ -176,26 +179,26 @@ export function gamble(user: User, game: string, amount: number, win: boolean, w
  * @returns {String}
  */
 export function getTimestamp(): string {
-    const date = new Date()
-    let hours = date.getHours().toString()
-    let minutes = date.getMinutes().toString()
-    let seconds = date.getSeconds().toString()
+    const date = new Date();
+    let hours = date.getHours().toString();
+    let minutes = date.getMinutes().toString();
+    let seconds = date.getSeconds().toString();
 
     if (hours.length == 1) {
-        hours = "0" + hours
+        hours = "0" + hours;
     }
 
     if (minutes.length == 1) {
-        minutes = "0" + minutes
+        minutes = "0" + minutes;
     }
 
     if (seconds.length == 1) {
-        seconds = "0" + seconds
+        seconds = "0" + seconds;
     }
 
-    const timestamp = hours + ":" + minutes + ":" + seconds
+    const timestamp = hours + ":" + minutes + ":" + seconds;
 
-    return timestamp
+    return timestamp;
 }
 
 /**
@@ -203,51 +206,51 @@ export function getTimestamp(): string {
  * @param {Client} client
  */
 export async function getWebhooks(client: Client) {
-    if (client.user.id != "678711738845102087") return
+    if (client.user.id != "678711738845102087") return;
 
-    const guild = await client.guilds.fetch("747056029795221513")
+    const guild = await client.guilds.fetch("747056029795221513");
 
     if (!guild) {
-        return logger.error("UNABLE TO GET GUILD FOR LOGS")
+        return logger.error("UNABLE TO GET GUILD FOR LOGS");
     }
 
-    const webhooks = await guild.fetchWebhooks()
+    const webhooks = await guild.fetchWebhooks();
 
-    const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266")
+    const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266");
 
-    webhook.set("pay", paymentLogs)
-    logger.info(`payment logs webhook running ${paymentLogs.id}`)
+    webhook.set("pay", paymentLogs);
+    logger.info(`payment logs webhook running ${paymentLogs.id}`);
 
-    const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333")
+    const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333");
 
-    webhook.set("gamble", gambleLogs)
-    logger.info(`gamble logs webhook running ${gambleLogs.id}`)
+    webhook.set("gamble", gambleLogs);
+    logger.info(`gamble logs webhook running ${gambleLogs.id}`);
 
-    const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176")
+    const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176");
 
-    webhook.set("sql", sqlLogs)
-    logger.info(`sql logs webhook running ${sqlLogs.id}`)
+    webhook.set("sql", sqlLogs);
+    logger.info(`sql logs webhook running ${sqlLogs.id}`);
 
-    runLogs()
+    runLogs();
 
     logger.add(
         new DiscordTransport({
             webhook: process.env.WEBHOOK_URL,
             useCodeblock: true,
         })
-    )
+    );
 }
 
 function runLogs() {
-    if (process.env.GITHUB_ACTION) return
+    if (process.env.GITHUB_ACTION) return;
     setInterval(() => {
         webhook.forEach((v, k) => {
-            const msg = nextLogMsg.get(k)
+            const msg = nextLogMsg.get(k);
 
             if (msg != "" && msg) {
-                v.send({ content: msg })
-                nextLogMsg.set(k, "")
+                v.send({ content: msg });
+                nextLogMsg.set(k, "");
             }
-        })
-    }, 2500)
+        });
+    }, 2500);
 }

@@ -1,20 +1,20 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/functions/member"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { isPremium, getTier } from "../utils/premium/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getMember } from "../utils/functions/member";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { isPremium, getTier } from "../utils/premium/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cache = new Map()
+const cache = new Map();
 
 const cmd = new Command("pp", "accurate prediction of your pp size", Categories.FUN).setAliases([
     "penis",
     "12inchmonster",
     "1inchwarrior",
-])
+]);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big is your willy"))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big is your willy"));
 
 /**
  * @param {Message} message
@@ -23,84 +23,84 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("h
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    let member
+    let member;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
+            member = await getMember(message.guild, args[0]);
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
     }
 
-    let size
-    let sizeMsg = "8"
+    let size;
+    let sizeMsg = "8";
 
     if (cache.has(member.user.id)) {
-        size = cache.get(member.user.id)
+        size = cache.get(member.user.id);
     } else {
-        size = Math.floor(Math.random() * 15)
+        size = Math.floor(Math.random() * 15);
 
-        let chance = 45
+        let chance = 45;
 
         if (isPremium(member.user.id)) {
             if (getTier(member.user.id) >= 3) {
-                chance = 10
+                chance = 10;
             }
         }
 
-        const bigInch = Math.floor(Math.random() * chance)
+        const bigInch = Math.floor(Math.random() * chance);
 
         if (bigInch == 7) {
-            size = Math.floor(Math.random() * 55) + 15
+            size = Math.floor(Math.random() * 55) + 15;
         }
 
-        cache.set(member.user.id, size)
+        cache.set(member.user.id, size);
 
         setTimeout(() => {
-            cache.delete(member.user.id)
-        }, 60 * 1000)
+            cache.delete(member.user.id);
+        }, 60 * 1000);
     }
 
     for (let i = 0; i < size; i++) {
-        sizeMsg = sizeMsg + "="
+        sizeMsg = sizeMsg + "=";
     }
 
-    sizeMsg = sizeMsg + "D"
+    sizeMsg = sizeMsg + "D";
 
     const embed = new CustomEmbed(
         message.member,
         false,
         `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
-    ).setHeader("pp predictor 1337", member.user.avatarURL())
+    ).setHeader("pp predictor 1337", member.user.avatarURL());
 
-    return send({ embeds: [embed] })
+    return send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

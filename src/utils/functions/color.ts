@@ -1,9 +1,9 @@
-import { GuildMember } from "discord.js"
+import { GuildMember } from "discord.js";
 
 export function getColor(member: GuildMember) {
     if (member.displayHexColor == "#ffffff") {
-        return "#111111"
+        return "#111111";
     } else {
-        return member.displayHexColor
+        return member.displayHexColor;
     }
 }
