@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
 import {
     userExists,
     createUser,
@@ -13,47 +13,47 @@ import {
     calcEarnedXp,
     getGuildByUser,
     addToGuildXP,
-} from "../utils/economy/utils.js"
-import * as shuffle from "shuffle-array"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { getPrefix } from "../utils/guilds/utils"
-import { gamble, logger } from "../utils/logger.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+} from "../utils/economy/utils.js";
+import * as shuffle from "shuffle-array";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { getPrefix } from "../utils/guilds/utils";
+import { gamble, logger } from "../utils/logger.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const games = new Map()
+const games = new Map();
 
-const cmd = new Command("yablon", "play yablon", Categories.MONEY).setAliases(["yb"])
+const cmd = new Command("yablon", "play yablon", Categories.MONEY).setAliases(["yb"]);
 
-cmd.slashEnabled = true
-cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true))
+cmd.slashEnabled = true;
+cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true));
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
@@ -67,9 +67,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField(
                 "help",
                 "**J**ack | value of 11\n**Q**ueen | value of 12\n" + "**K**ing | value of 13\n**A**ce | value of 14\n"
-            )
+            );
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     if (args[0] == "info") {
@@ -80,25 +80,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
                 "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/yablon.js#L123)"
-        ).setHeader("yablon help")
+        ).setHeader("yablon help");
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    const maxBet = await calcMaxBet(message.member)
+    const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[0], message.member)
+    const bet = await formatBet(args[0], message.member);
 
     if (!bet) {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] })
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
     }
 
     if (bet <= 0) {
-        return send({ embeds: [new ErrorEmbed(`${prefix}yablon <bet>`)] })
+        return send({ embeds: [new ErrorEmbed(`${prefix}yablon <bet>`)] });
     }
 
     if (bet > getBalance(message.member)) {
-        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] })
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
     if (bet > maxBet) {
@@ -108,18 +108,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
                 ),
             ],
-        })
+        });
     }
 
     if (games.has(message.member.user.id)) {
-        return send({ embeds: [new ErrorEmbed("you are already playing yablon")] })
+        return send({ embeds: [new ErrorEmbed("you are already playing yablon")] });
     }
 
-    await addCooldown(cmd.name, message.member, 30)
+    await addCooldown(cmd.name, message.member, 30);
 
-    updateBalance(message.member, getBalance(message.member) - bet)
+    updateBalance(message.member, getBalance(message.member) - bet);
 
-    const id = Math.random()
+    const id = Math.random();
 
     const newDeck = [
         "A♠",
@@ -174,9 +174,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "J♦",
         "Q♦",
         "K♦",
-    ]
+    ];
 
-    const voteMulti = await getMulti(message.member)
+    const voteMulti = await getMulti(message.member);
 
     games.set(message.member.user.id, {
         bet: bet,
@@ -187,20 +187,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         nextCard: "",
         id: id,
         voted: voteMulti,
-    })
+    });
 
     setTimeout(() => {
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
-                games.delete(message.author.id)
-                updateBalance(message.member, getBalance(message.member) + bet)
+                games.delete(message.author.id);
+                updateBalance(message.member, getBalance(message.member) + bet);
             }
         }
-    }, 180000)
+    }, 180000);
 
-    newCard(message.member)
-    newCard(message.member)
-    newNextCard(message.member)
+    newCard(message.member);
+    newCard(message.member);
+    newNextCard(message.member);
 
     while (
         getValue(games.get(message.member.user.id).cards[0]) == getValue(games.get(message.member.user.id).cards[1]) ||
@@ -217,7 +217,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 nextCard: "",
                 id: games.get(message.member.user.id).id,
                 voted: games.get(message.member.user.id).voted,
-            })
+            });
         } else {
             games.set(message.member.user.id, {
                 bet: games.get(message.member.user.id).bet,
@@ -227,51 +227,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 nextCard: "",
                 id: games.get(message.member.user.id).id,
                 voted: games.get(message.member.user.id).voted,
-            })
+            });
         }
-        newCard(message.member)
-        newCard(message.member)
-        newNextCard(message.member)
+        newCard(message.member);
+        newCard(message.member);
+        newNextCard(message.member);
     }
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
         new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
-    )
+    );
 
     const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
         .setHeader("yablon", message.author.avatarURL())
-        .addField("cards", getCards(message.member))
+        .addField("cards", getCards(message.member));
 
     send({ embeds: [embed], components: [row] }).then((m) => {
         playGame(message, m).catch((e) => {
-            logger.error(`error occured playing yablon - ${message.author.tag} (${message.author.id})`)
-            logger.error(e)
+            logger.error(`error occured playing yablon - ${message.author.tag} (${message.author.id})`);
+            logger.error(e);
             return message.channel.send({
                 embeds: [new ErrorEmbed("an error occured while running - join support server")],
-            })
-        })
-    })
+            });
+        });
+    });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;
 
 function newCard(member) {
-    const bet = games.get(member.user.id).bet
-    const win = games.get(member.user.id).win
-    const deck = games.get(member.user.id).deck
-    const cards = games.get(member.user.id).cards
-    const nextCard = games.get(member.user.id).nextCard
-    const id = games.get(member.user.id).id
-    const voted = games.get(member.user.id).voted
+    const bet = games.get(member.user.id).bet;
+    const win = games.get(member.user.id).win;
+    const deck = games.get(member.user.id).deck;
+    const cards = games.get(member.user.id).cards;
+    const nextCard = games.get(member.user.id).nextCard;
+    const id = games.get(member.user.id).id;
+    const voted = games.get(member.user.id).voted;
 
-    const choice = deck[0]
+    const choice = deck[0];
 
-    deck.shift()
+    deck.shift();
 
-    cards.push(choice)
+    cards.push(choice);
 
     games.set(member.user.id, {
         bet: bet,
@@ -281,15 +281,15 @@ function newCard(member) {
         nextCard: nextCard,
         id: id,
         voted: voted,
-    })
+    });
 }
 
 function newNextCard(member) {
-    const deck = games.get(member.user.id).deck
+    const deck = games.get(member.user.id).deck;
 
-    const choice = deck[0]
+    const choice = deck[0];
 
-    deck.shift()
+    deck.shift();
 
     games.set(member.user.id, {
         bet: games.get(member.user.id).bet,
@@ -299,60 +299,60 @@ function newNextCard(member) {
         nextCard: choice,
         id: games.get(member.user.id).id,
         voted: games.get(member.user.id).voted,
-    })
+    });
 }
 
 function getValue(card) {
-    card = card.toLowerCase()
+    card = card.toLowerCase();
 
-    if (card.includes("a")) return 14
-    if (card.includes("k")) return 13
-    if (card.includes("q")) return 12
-    if (card.includes("j")) return 11
+    if (card.includes("a")) return 14;
+    if (card.includes("k")) return 13;
+    if (card.includes("q")) return 12;
+    if (card.includes("j")) return 11;
     // if (!parseInt(card.split()[0])) return "ERROR"
-    return parseInt(card.split()[0])
+    return parseInt(card.split()[0]);
 }
 
 function invalidCardDistance(member) {
-    const value1 = getValue(games.get(member.user.id).cards[0])
-    const value2 = getValue(games.get(member.user.id).cards[1])
+    const value1 = getValue(games.get(member.user.id).cards[0]);
+    const value2 = getValue(games.get(member.user.id).cards[1]);
 
-    const minNeeded = 6
-    const maxAllowed = 7
+    const minNeeded = 6;
+    const maxAllowed = 7;
 
-    if (value1 > value2) return !(value1 - value2 >= minNeeded) || !(value1 - value2 <= maxAllowed)
-    return !(value2 - value1 >= minNeeded) || !(value2 - value1 <= maxAllowed)
+    if (value1 > value2) return !(value1 - value2 >= minNeeded) || !(value1 - value2 <= maxAllowed);
+    return !(value2 - value1 >= minNeeded) || !(value2 - value1 <= maxAllowed);
 }
 
 function equalCards(member) {
-    const value1 = getValue(games.get(member.user.id).cards[0])
-    const value2 = getValue(games.get(member.user.id).cards[1])
-    const value3 = getValue(games.get(member.user.id).nextCard)
-    if (value3 == value1 || value3 == value2) return true
-    return false
+    const value1 = getValue(games.get(member.user.id).cards[0]);
+    const value2 = getValue(games.get(member.user.id).cards[1]);
+    const value3 = getValue(games.get(member.user.id).nextCard);
+    if (value3 == value1 || value3 == value2) return true;
+    return false;
 }
 
 function nextCardInBetween(member) {
-    const value1 = getValue(games.get(member.user.id).cards[0])
-    const value2 = getValue(games.get(member.user.id).cards[1])
-    const value3 = getValue(games.get(member.user.id).nextCard)
-    let high
-    let low
+    const value1 = getValue(games.get(member.user.id).cards[0]);
+    const value2 = getValue(games.get(member.user.id).cards[1]);
+    const value3 = getValue(games.get(member.user.id).nextCard);
+    let high;
+    let low;
     if (value1 > value2) {
-        high = value1
-        low = value2
+        high = value1;
+        low = value2;
     } else {
-        high = value2
-        low = value1
+        high = value2;
+        low = value1;
     }
-    if (low < value3 && value3 < high) return true
-    return false
+    if (low < value3 && value3 < high) return true;
+    return false;
 }
 
 function getCards(member) {
-    const cards = games.get(member.user.id).cards
+    const cards = games.get(member.user.id).cards;
 
-    return "| " + cards.join(" | ") + " |"
+    return "| " + cards.join(" | ") + " |";
 }
 
 /**
@@ -362,50 +362,50 @@ function getCards(member) {
  * @returns
  */
 async function playGame(message, m) {
-    if (!games.has(message.author.id)) return
+    if (!games.has(message.author.id)) return;
 
-    const bet = games.get(message.member.user.id).bet
-    const nextCard = games.get(message.member.user.id).nextCard
+    const bet = games.get(message.member.user.id).bet;
+    const nextCard = games.get(message.member.user.id).nextCard;
 
-    const newEmbed = new CustomEmbed(message.member, true).setHeader("yablon", message.author.avatarURL())
+    const newEmbed = new CustomEmbed(message.member, true).setHeader("yablon", message.author.avatarURL());
 
     const edit = async (data) => {
         if (message.interaction) {
-            await message.editReply(data)
-            return await message.fetchReply()
+            await message.editReply(data);
+            return await message.fetchReply();
         } else {
-            return await m.edit(data)
+            return await m.edit(data);
         }
-    }
+    };
 
     const lose = async () => {
-        gamble(message.author, "yablon", bet, false, 0)
-        addGamble(message.member, "yablon", false)
-        newEmbed.setColor("#e4334f")
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**")
-        newEmbed.addField("cards", getCards(message.member))
-        newEmbed.addField("drawn card", "| " + nextCard + " |")
-        games.delete(message.author.id)
-        return await edit({ embeds: [newEmbed], components: [] })
-    }
+        gamble(message.author, "yablon", bet, false, 0);
+        addGamble(message.member, "yablon", false);
+        newEmbed.setColor("#e4334f");
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
+        newEmbed.addField("cards", getCards(message.member));
+        newEmbed.addField("drawn card", "| " + nextCard + " |");
+        games.delete(message.author.id);
+        return await edit({ embeds: [newEmbed], components: [] });
+    };
 
     const win = async () => {
-        let winnings = Math.round(bet * 1.5)
+        let winnings = Math.round(bet * 1.5);
 
-        newEmbed.setColor("#5efb8f")
+        newEmbed.setColor("#5efb8f");
         if (games.get(message.member.user.id).voted > 0) {
-            winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted)
+            winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
 
-            const earnedXp = calcEarnedXp(message.member, bet)
+            const earnedXp = calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp)
-                newEmbed.setFooter(`+${earnedXp}xp`)
+                updateXp(message.member, getXp(message.member) + earnedXp);
+                newEmbed.setFooter(`+${earnedXp}xp`);
 
-                const guild = getGuildByUser(message.member)
+                const guild = getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guild_name, earnedXp, message.member)
+                    addToGuildXP(guild.guild_name, earnedXp, message.member);
                 }
             }
 
@@ -418,7 +418,7 @@ async function playGame(message, m) {
                     "+**" +
                     Math.floor(games.get(message.member.user.id).voted * 100).toString() +
                     "**% bonus"
-            )
+            );
         } else {
             newEmbed.setDescription(
                 "**bet** $" +
@@ -426,57 +426,57 @@ async function playGame(message, m) {
                     Math.round(bet).toLocaleString() +
                     "\n\n**winner!!**\n**you win** $" +
                     winnings.toLocaleString()
-            )
+            );
         }
-        gamble(message.author, "yablon", bet, true, winnings)
-        addGamble(message.member, "yablon", true)
-        newEmbed.addField("cards", getCards(message.member))
-        newEmbed.addField("drawn card", "| " + nextCard + " |")
-        updateBalance(message.member, getBalance(message.member) + winnings)
-        games.delete(message.author.id)
-        return edit({ embeds: [newEmbed], components: [] })
-    }
+        gamble(message.author, "yablon", bet, true, winnings);
+        addGamble(message.member, "yablon", true);
+        newEmbed.addField("cards", getCards(message.member));
+        newEmbed.addField("drawn card", "| " + nextCard + " |");
+        updateBalance(message.member, getBalance(message.member) + winnings);
+        games.delete(message.author.id);
+        return edit({ embeds: [newEmbed], components: [] });
+    };
 
     const draw = async () => {
-        gamble(message.author, "yablon", bet, true, bet)
-        addGamble(message.member, "yablon", true)
-        newEmbed.setColor("#E5FF00")
-        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString())
-        newEmbed.addField("cards", getCards(message.member))
-        newEmbed.addField("drawn card", "| " + nextCard + " |")
-        updateBalance(message.member, getBalance(message.member) + bet)
-        games.delete(message.author.id)
-        return await edit({ embeds: [newEmbed], components: [] })
-    }
+        gamble(message.author, "yablon", bet, true, bet);
+        addGamble(message.member, "yablon", true);
+        newEmbed.setColor("#E5FF00");
+        newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
+        newEmbed.addField("cards", getCards(message.member));
+        newEmbed.addField("drawn card", "| " + nextCard + " |");
+        updateBalance(message.member, getBalance(message.member) + bet);
+        games.delete(message.author.id);
+        return await edit({ embeds: [newEmbed], components: [] });
+    };
 
-    const filter = (i) => i.user.id == message.author.id
+    const filter = (i) => i.user.id == message.author.id;
 
-    let fail = false
+    let fail = false;
 
     const reaction = await m
         .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
         .then(async (collected) => {
-            await collected.deferUpdate()
-            return collected.customId
+            await collected.deferUpdate();
+            return collected.customId;
         })
         .catch(() => {
-            fail = true
-            games.delete(message.author.id)
-            return message.channel.send({ content: message.author.toString() + " yablon game expired" })
-        })
+            fail = true;
+            games.delete(message.author.id);
+            return message.channel.send({ content: message.author.toString() + " yablon game expired" });
+        });
 
-    if (fail) return
+    if (fail) return;
 
     if (reaction == "1️⃣") {
-        if (equalCards(message.member)) return draw()
-        if (nextCardInBetween(message.member)) return win()
-        return lose()
+        if (equalCards(message.member)) return draw();
+        if (nextCardInBetween(message.member)) return win();
+        return lose();
     } else if (reaction == "2️⃣") {
-        if (equalCards(message.member)) return draw()
-        if (nextCardInBetween(message.member)) return lose()
-        return win()
+        if (equalCards(message.member)) return draw();
+        if (nextCardInBetween(message.member)) return lose();
+        return win();
     } else {
-        games.delete(message.author.id)
-        return m.reactions.removeAll()
+        games.delete(message.author.id);
+        return m.reactions.removeAll();
     }
 }

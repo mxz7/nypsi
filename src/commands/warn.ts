@@ -1,39 +1,39 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
-import { newCase, profileExists, createProfile } from "../utils/moderation/utils"
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { PunishmentType } from "../utils/models/GuildStorage"
-import { getExactMember } from "../utils/functions/member"
+import { CommandInteraction, Message, Permissions } from "discord.js";
+import { newCase, profileExists, createProfile } from "../utils/moderation/utils";
+import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { getExactMember } from "../utils/functions/member";
 
-const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"])
+const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"]);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 cmd.slashData
     .addUserOption((option) => option.setName("user").setDescription("user to warn").setRequired(true))
-    .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"))
+    .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"));
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
-    if (!profileExists(message.guild)) createProfile(message.guild)
+    if (!profileExists(message.guild)) createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data)
+            return await message.editReply(data);
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (!(message instanceof Message)) {
-        await message.deferReply()
+        await message.deferReply();
     }
 
     if (args.length == 0 || !args[0]) {
@@ -48,133 +48,133 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n\n" +
                     "if the bot was unable to DM a user on warn, the warning will still be logged"
             )
-            .addField("examples", `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`)
+            .addField("examples", `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     if (args[0].length == 18 && message.mentions.members.first() == null) {
-        let members
+        let members;
 
         if (inCooldown(message.guild)) {
-            members = message.guild.members.cache
+            members = message.guild.members.cache;
         } else {
-            members = await message.guild.members.fetch()
-            addCooldown(message.guild, 3600)
+            members = await message.guild.members.fetch();
+            addCooldown(message.guild, 3600);
         }
 
-        const member = members.find((m) => m.id == args[0])
+        const member = members.find((m) => m.id == args[0]);
 
         if (!member) {
             return send({
                 embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-            })
+            });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     } else if (message.mentions.members.first() == null) {
-        const member = await getExactMember(message.guild, args[0])
+        const member = await getExactMember(message.guild, args[0]);
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] })
+            return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
         }
 
-        message.mentions.members.set(member.user.id, member)
+        message.mentions.members.set(member.user.id, member);
     }
 
-    const members = message.mentions.members
-    let reason
+    const members = message.mentions.members;
+    let reason;
 
     if (args.length != members.size) {
         for (let i = 0; i < members.size; i++) {
-            args.shift()
+            args.shift();
         }
-        reason = args.join(" ")
+        reason = args.join(" ");
     } else {
-        return send({ embeds: [new ErrorEmbed("you must include a warn reason")] })
+        return send({ embeds: [new ErrorEmbed("you must include a warn reason")] });
     }
 
-    let count = 0
-    const failed = []
-    const error = []
+    let count = 0;
+    const failed = [];
+    const error = [];
 
     for (const member of members.keys()) {
-        const targetHighestRole = members.get(member).roles.highest
-        const memberHighestRole = message.member.roles.highest
+        const targetHighestRole = members.get(member).roles.highest;
+        const memberHighestRole = message.member.roles.highest;
 
         if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-            failed.push(members.get(member).user)
+            failed.push(members.get(member).user);
         } else {
             const embed = new CustomEmbed(members.get(member))
                 .setTitle(`warned in ${message.guild.name}`)
-                .addField("reason", `\`${reason}\``)
+                .addField("reason", `\`${reason}\``);
 
             await members
                 .get(member)
                 .send({ content: `you have been warned in ${message.guild.name}`, embeds: [embed] })
                 .catch(() => {
-                    error.push(members.get(member).user)
-                })
-            count++
+                    error.push(members.get(member).user);
+                });
+            count++;
         }
 
         if (members.get(member).user.id == message.client.user.id) {
-            await send({ content: "wow... 😢" })
+            await send({ content: "wow... 😢" });
         }
     }
 
     if (count == 0) {
-        return send({ embeds: [new ErrorEmbed("i was unable to warn any users")] })
+        return send({ embeds: [new ErrorEmbed("i was unable to warn any users")] });
     }
 
-    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason)
+    const embed = new CustomEmbed(message.member, false, "✅ **" + count + "** members warned for: " + reason);
 
     if (count == 1 && failed.length == 0) {
-        embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason)
+        embed.setDescription("✅ `" + members.first().user.tag + "` has been warned for: " + reason);
     }
 
     if (failed.length != 0) {
-        const failedTags = []
+        const failedTags = [];
         for (const fail of failed) {
-            failedTags.push(fail.tag)
+            failedTags.push(fail.tag);
         }
 
-        embed.addField("error", "unable to warn: " + failedTags.join(", "))
+        embed.addField("error", "unable to warn: " + failedTags.join(", "));
     }
 
     if (error.length != 0) {
-        const errorTags = []
+        const errorTags = [];
         for (const err of error) {
-            errorTags.push(err.tag)
+            errorTags.push(err.tag);
         }
 
-        embed.addField("warning", "unable to DM: " + errorTags.join(", "))
+        embed.addField("warning", "unable to DM: " + errorTags.join(", "));
     }
 
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
-            await message.delete()
-            await message.member.send({ embeds: [embed] }).catch()
+            await message.delete();
+            await message.member.send({ embeds: [embed] }).catch();
         } else {
-            await message.reply({ embeds: [embed], ephemeral: true })
+            await message.reply({ embeds: [embed], ephemeral: true });
         }
     } else {
-        await send({ embeds: [embed] })
+        await send({ embeds: [embed] });
     }
 
-    const members1 = Array.from(members.keys())
+    const members1 = Array.from(members.keys());
 
     if (failed.length != 0) {
         for (const fail of failed) {
             if (members1.includes(fail.id)) {
-                members1.splice(members1.indexOf(fail.id), 1)
+                members1.splice(members1.indexOf(fail.id), 1);
             }
         }
     }
 
-    newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason)
+    newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason);
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

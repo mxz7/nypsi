@@ -1,28 +1,28 @@
-import { Client } from "discord.js"
+import { Client } from "discord.js";
 // @ts-expect-error typescript doesnt like opening package.json
-import { version } from "../../package.json"
-import { getRandomCommand } from "../utils/commandhandler"
-import { daysUntilChristmas } from "../utils/functions/date"
-import { logger } from "../utils/logger"
+import { version } from "../../package.json";
+import { getRandomCommand } from "../utils/commandhandler";
+import { daysUntilChristmas } from "../utils/functions/date";
+import { logger } from "../utils/logger";
 
-declare function require(name: string)
+declare function require(name: string);
 
 /**
  * @param {Client} client
  * @param {Number} startUp
  */
 export default function ready(client: Client, startUp: number) {
-    const games = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"]
+    const games = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"];
 
     setTimeout(() => {
-        const a = getRandomCommand()
+        const a = getRandomCommand();
 
-        let game = games[Math.floor(Math.random() * games.length)]
+        let game = games[Math.floor(Math.random() * games.length)];
 
         if (game == "x0x") {
-            game = `$${a.name} - ${a.description}`
+            game = `$${a.name} - ${a.description}`;
         } else if (game == "xmas") {
-            game = `${daysUntilChristmas()} days until christmas`
+            game = `${daysUntilChristmas()} days until christmas`;
         }
 
         client.user.setPresence({
@@ -32,18 +32,18 @@ export default function ready(client: Client, startUp: number) {
                     name: game,
                 },
             ],
-        })
-    }, 5000)
+        });
+    }, 5000);
 
     setInterval(() => {
-        const a = getRandomCommand()
+        const a = getRandomCommand();
 
-        let game = games[Math.floor(Math.random() * games.length)]
+        let game = games[Math.floor(Math.random() * games.length)];
 
         if (game == "x0x") {
-            game = `$${a.name} - ${a.description}`
+            game = `$${a.name} - ${a.description}`;
         } else if (game == "xmas") {
-            game = `${daysUntilChristmas()} days until christmas`
+            game = `${daysUntilChristmas()} days until christmas`;
         }
 
         client.user.setPresence({
@@ -53,26 +53,26 @@ export default function ready(client: Client, startUp: number) {
                     name: game,
                 },
             ],
-        })
-    }, 30 * 60 * 1000)
+        });
+    }, 30 * 60 * 1000);
 
-    const { commandsSize } = require("../utils/commandhandler")
+    const { commandsSize } = require("../utils/commandhandler");
 
-    let memberCount = 0
+    let memberCount = 0;
 
     client.guilds.cache.forEach((g) => {
-        memberCount = memberCount + g.memberCount
-    })
+        memberCount = memberCount + g.memberCount;
+    });
 
-    logger.info("server count: " + client.guilds.cache.size.toLocaleString())
-    logger.info("user count: " + memberCount.toLocaleString())
-    logger.info("commands count: " + commandsSize)
-    logger.info(`version: ${version}`)
+    logger.info("server count: " + client.guilds.cache.size.toLocaleString());
+    logger.info("user count: " + memberCount.toLocaleString());
+    logger.info("commands count: " + commandsSize);
+    logger.info(`version: ${version}`);
 
-    logger.info("logged in as " + client.user.tag)
+    logger.info("logged in as " + client.user.tag);
 
-    const now = Date.now()
-    const timeTaken = (now - startUp) / 1000
+    const now = Date.now();
+    const timeTaken = (now - startUp) / 1000;
 
-    logger.info(`time taken: ${timeTaken}s\n`)
+    logger.info(`time taken: ${timeTaken}s\n`);
 }

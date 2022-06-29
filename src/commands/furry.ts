@@ -1,16 +1,19 @@
-import { CommandInteraction, Message } from "discord.js"
-import { updateXp, getXp, userExists, createUser } from "../utils/economy/utils.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getMember } from "../utils/functions/member.js"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import { CommandInteraction, Message } from "discord.js";
+import { updateXp, getXp, userExists, createUser } from "../utils/economy/utils.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getMember } from "../utils/functions/member.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const cache = new Map()
+const cache = new Map();
 
-const cmd = new Command("furry", "measure how much of a furry you are", Categories.FUN).setAliases(["howfurry", "stfufurry"])
+const cmd = new Command("furry", "measure how much of a furry you are", Categories.FUN).setAliases([
+    "howfurry",
+    "stfufurry",
+]);
 
-cmd.slashEnabled = true
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"))
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"));
 
 /**
  * @param {Message} message
@@ -19,89 +22,89 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 7)
+    await addCooldown(cmd.name, message.member, 7);
 
-    let member
+    let member;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0])
+            member = await getMember(message.guild, args[0]);
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
 
         if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] })
+            return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
     }
 
-    if (!(await userExists(member))) createUser(member)
+    if (!(await userExists(member))) createUser(member);
 
-    let furryAmount
+    let furryAmount;
 
     if (cache.has(member.user.id)) {
-        furryAmount = cache.get(member.user.id)
+        furryAmount = cache.get(member.user.id);
     } else {
-        furryAmount = Math.ceil(Math.random() * 101) - 1
+        furryAmount = Math.ceil(Math.random() * 101) - 1;
 
-        cache.set(member.user.id, furryAmount)
+        cache.set(member.user.id, furryAmount);
 
         setTimeout(() => {
             if (cache.has(member.user.id)) {
-                cache.delete(member.user.id)
+                cache.delete(member.user.id);
             }
-        }, 60 * 1000)
+        }, 60 * 1000);
     }
 
-    let furryText = ""
-    let furryEmoji = ""
+    let furryText = "";
+    let furryEmoji = "";
 
     if (furryAmount >= 85) {
-        furryEmoji = "🐶🍆💦🧎‍♂️😋"
-        furryText = "fucking cumfurry bet u work at a doggy daycare"
+        furryEmoji = "🐶🍆💦🧎‍♂️😋";
+        furryText = "fucking cumfurry bet u work at a doggy daycare";
     } else if (furryAmount >= 70) {
-        furryEmoji = "🐱🍆💦💦"
-        furryText = "you've got a furry suit collection and go to cosplay conventions"
+        furryEmoji = "🐱🍆💦💦";
+        furryText = "you've got a furry suit collection and go to cosplay conventions";
     } else if (furryAmount >= 50) {
-        furryEmoji = "👉🐈💦"
-        furryText = "stop looking at the cat"
+        furryEmoji = "👉🐈💦";
+        furryText = "stop looking at the cat";
     } else if (furryAmount >= 30) {
-        furryEmoji = "💻🐕🐩"
-        furryText = "i've seen your search history..."
+        furryEmoji = "💻🐕🐩";
+        furryText = "i've seen your search history...";
     } else if (furryAmount >= 25) {
-        furryEmoji = "😾"
-        furryText = "STOP DONT DO IT DONT BUY THE FURRY SUIT"
+        furryEmoji = "😾";
+        furryText = "STOP DONT DO IT DONT BUY THE FURRY SUIT";
     } else if (furryAmount >= 15) {
-        furryEmoji = "🐈🐕"
-        furryText = "you be thinking about the wrong things"
+        furryEmoji = "🐈🐕";
+        furryText = "you be thinking about the wrong things";
     } else if (furryAmount >= 7) {
-        furryEmoji = "👍⁉"
-        furryText = "you're normal. i hope."
+        furryEmoji = "👍⁉";
+        furryText = "you're normal. i hope.";
     } else {
-        furryEmoji = "👍"
-        furryText = "you're normal, thank you. have 1 xp"
+        furryEmoji = "👍";
+        furryText = "you're normal, thank you. have 1 xp";
 
         if (cache.has(member.user.id)) {
-            cache.delete(member.user.id)
-            updateXp(member, getXp(member) + 1)
+            cache.delete(member.user.id);
+            updateXp(member, getXp(member) + 1);
         }
     }
 
@@ -109,15 +112,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         false,
         `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`
-    ).setHeader("furry detector 5000", member.user.avatarURL())
+    ).setHeader("furry detector 5000", member.user.avatarURL());
 
     if (furryAmount < 7) {
-        embed.setFooter("+1xp")
+        embed.setFooter("+1xp");
     }
 
-    return await send({ embeds: [embed] })
+    return await send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

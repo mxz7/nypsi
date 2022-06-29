@@ -1,5 +1,5 @@
-import Redis from "ioredis"
+import Redis from "ioredis";
 
-const redis = new Redis({ showFriendlyErrorStack: true })
+const redis = new Redis({ showFriendlyErrorStack: true });
 
-export default redis
+export default redis;

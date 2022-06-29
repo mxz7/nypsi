@@ -10,7 +10,7 @@ import {
     DMChannel,
     ThreadChannel,
     PartialDMChannel,
-} from "discord.js"
+} from "discord.js";
 import {
     createReactionProfile,
     hasReactionProfile,
@@ -26,16 +26,16 @@ import {
     getBlacklisted,
     setBlacklisted,
     deleteStats,
-} from "../utils/chatreactions/utils"
-import { getPrefix } from "../utils/guilds/utils"
-import { isPremium } from "../utils/premium/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+} from "../utils/chatreactions/utils";
+import { getPrefix } from "../utils/guilds/utils";
+import { isPremium } from "../utils/premium/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"])
+const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"]);
 
-cmd.slashEnabled = true
+cmd.slashEnabled = true;
 cmd.slashData
     .addSubcommand((option) => option.setName("start").setDescription("start a chat reaction in the current channel"))
     .addSubcommand((option) => option.setName("stats").setDescription("view your chat reaction stats"))
@@ -135,7 +135,7 @@ cmd.slashData
                             .setRequired(true)
                     )
             )
-    )
+    );
 
 /**
  * @param {Message} message
@@ -144,29 +144,29 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
-    if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild)
-    if (!hasReactionStatsProfile(message.guild, message.member)) createReactionStatsProfile(message.guild, message.member)
+    if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild);
+    if (!hasReactionStatsProfile(message.guild, message.member)) createReactionStatsProfile(message.guild, message.member);
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     const helpCmd = () => {
-        const embed = new CustomEmbed(message.member, true).setHeader("chat reactions")
+        const embed = new CustomEmbed(message.member, true).setHeader("chat reactions");
 
         embed.setDescription(
             `${prefix}**cr start** *start a random chat reaction*\n` +
@@ -175,82 +175,82 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**cr blacklist** *add/remove people to the blacklist*\n` +
                 `${prefix}**cr stats** *view your chat reaction stats*\n` +
                 `${prefix}**cr lb** *view the server leaderboard*`
-        )
+        );
 
-        return send({ embeds: [embed] })
-    }
+        return send({ embeds: [embed] });
+    };
 
     const showStats = async () => {
-        await addCooldown(cmd.name, message.member, 10)
+        await addCooldown(cmd.name, message.member, 10);
 
-        const embed = new CustomEmbed(message.member, false).setHeader(`${message.author.username}'s stats`)
+        const embed = new CustomEmbed(message.member, false).setHeader(`${message.author.username}'s stats`);
 
-        const stats = getReactionStats(message.guild, message.member)
+        const stats = getReactionStats(message.guild, message.member);
 
         embed.addField(
             "your stats",
             `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`
-        )
+        );
 
-        const blacklisted = getBlacklisted(message.guild)
+        const blacklisted = getBlacklisted(message.guild);
 
         if (blacklisted.indexOf(message.author.id) != -1) {
-            embed.setFooter("you are blacklisted from chat reactions in this server")
+            embed.setFooter("you are blacklisted from chat reactions in this server");
         }
 
-        return send({ embeds: [embed] })
-    }
+        return send({ embeds: [embed] });
+    };
 
     const showLeaderboard = async () => {
-        await addCooldown(cmd.name, message.member, 10)
+        await addCooldown(cmd.name, message.member, 10);
 
-        const embed = new CustomEmbed(message.member, false).setHeader("chat reactions leaderboard")
+        const embed = new CustomEmbed(message.member, false).setHeader("chat reactions leaderboard");
 
-        let amount = 3
+        let amount = 3;
 
         if (parseInt(args[1])) {
-            amount = parseInt(args[1])
+            amount = parseInt(args[1]);
 
             if (amount > 10) {
-                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10
+                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10;
             }
         }
 
-        const leaderboards = await getServerLeaderboard(message.guild, amount)
+        const leaderboards = await getServerLeaderboard(message.guild, amount);
 
         if (leaderboards.get("wins")) {
-            embed.addField("first place", leaderboards.get("wins"), true)
+            embed.addField("first place", leaderboards.get("wins"), true);
         }
 
         if (leaderboards.get("second")) {
-            embed.addField("second place", leaderboards.get("second"), true)
+            embed.addField("second place", leaderboards.get("second"), true);
         }
 
         if (leaderboards.get("third")) {
-            embed.addField("third place", leaderboards.get("third"), true)
+            embed.addField("third place", leaderboards.get("third"), true);
         }
 
         if (leaderboards.get("overall")) {
-            embed.addField("overall", leaderboards.get("overall"))
+            embed.addField("overall", leaderboards.get("overall"));
         }
 
-        return send({ embeds: [embed] })
-    }
+        return send({ embeds: [embed] });
+    };
 
     if (args.length == 0) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return showStats()
-        return helpCmd()
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return showStats();
+        return helpCmd();
     } else if (args[0].toLowerCase() == "start") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
         if (!(message.channel instanceof TextChannel)) {
-            return send({ embeds: [new ErrorEmbed("this is an invalid channel")] })
+            return send({ embeds: [new ErrorEmbed("this is an invalid channel")] });
         }
-        const a = await startReaction(message.guild, message.channel)
+        const a = await startReaction(message.guild, message.channel);
 
         if (a == "xoxo69") {
             return send({
                 embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
-            })
+            });
         }
     } else if (args[0].toLowerCase() == "stats") {
         if (args.length == 2 && args[1].toLowerCase() == "reset") {
@@ -258,47 +258,47 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (message.author.id != message.guild.ownerId) {
                     return send({
                         embeds: [new ErrorEmbed("you need the to be the server owner for this command")],
-                    })
+                    });
                 }
-                deleteStats(message.guild)
+                deleteStats(message.guild);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, "✅ stats have been deleted")],
-                })
+                });
             }
         }
-        return showStats()
+        return showStats();
     } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
-        return showLeaderboard()
+        return showLeaderboard();
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
-            })
+            });
         }
 
         if (args.length == 1 || args[1].toLowerCase() == "list") {
-            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions")
+            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions");
 
-            const blacklisted = getBlacklisted(message.guild)
+            const blacklisted = getBlacklisted(message.guild);
 
             if (blacklisted.length == 0) {
-                embed.setDescription("❌ no blacklisted users")
+                embed.setDescription("❌ no blacklisted users");
             } else {
-                embed.setDescription(`\`${blacklisted.join("`\n`")}\``)
+                embed.setDescription(`\`${blacklisted.join("`\n`")}\``);
             }
 
-            embed.setFooter(`use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users`)
+            embed.setFooter(`use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users`);
 
-            return send({ embeds: [embed] })
+            return send({ embeds: [embed] });
         } else {
             if (args[1].toLowerCase() == "add" || args[1] == "+") {
                 if (args.length == 2) {
-                    return send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)] })
+                    return send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist add/+ @user`)] });
                 }
 
-                let user: string | GuildMember = args[2]
+                let user: string | GuildMember = args[2];
 
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
@@ -308,39 +308,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
                                 ),
                             ],
-                        })
+                        });
                     } else {
-                        user = message.mentions.members.first()
+                        user = message.mentions.members.first();
                     }
                 } else {
-                    user = await message.guild.members.fetch(user)
+                    user = await message.guild.members.fetch(user);
                 }
 
                 if (!user) {
-                    return send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] });
                 }
 
-                const blacklisted = getBlacklisted(message.guild)
+                const blacklisted = getBlacklisted(message.guild);
 
                 if (blacklisted.length >= 75) {
                     return send({
                         embeds: [new ErrorEmbed("you have reached the maximum amount of blacklisted users (75)")],
-                    })
+                    });
                 }
 
-                blacklisted.push(user.id)
+                blacklisted.push(user.id);
 
-                setBlacklisted(message.guild, blacklisted)
+                setBlacklisted(message.guild, blacklisted);
 
-                const embed = new CustomEmbed(message.member, false, `✅ ${user.toString()} has been blacklisted`)
+                const embed = new CustomEmbed(message.member, false, `✅ ${user.toString()} has been blacklisted`);
 
-                return send({ embeds: [embed] })
+                return send({ embeds: [embed] });
             } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
                 if (args.length == 2) {
-                    return send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist del/- @user`)] })
+                    return send({ embeds: [new ErrorEmbed(`${prefix}cr blacklist del/- @user`)] });
                 }
 
-                let user = args[2]
+                let user = args[2];
 
                 if (user.length != 18) {
                     if (!message.mentions.members.first()) {
@@ -350,58 +350,58 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
                                 ),
                             ],
-                        })
+                        });
                     } else {
-                        user = message.mentions.members.first().id
+                        user = message.mentions.members.first().id;
                     }
                 }
 
                 if (!user) {
-                    return send({ embeds: [new ErrorEmbed("invalid user")] })
+                    return send({ embeds: [new ErrorEmbed("invalid user")] });
                 }
 
-                const blacklisted = getBlacklisted(message.guild)
+                const blacklisted = getBlacklisted(message.guild);
 
                 if (blacklisted.indexOf(user) == -1) {
-                    return send({ embeds: [new ErrorEmbed("this user is not blacklisted")] })
+                    return send({ embeds: [new ErrorEmbed("this user is not blacklisted")] });
                 }
 
-                blacklisted.splice(blacklisted.indexOf(user), 1)
+                blacklisted.splice(blacklisted.indexOf(user), 1);
 
-                setBlacklisted(message.guild, blacklisted)
+                setBlacklisted(message.guild, blacklisted);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, "✅ user has been unblacklisted")],
-                })
+                });
             } else if (args[1].toLowerCase() == "reset" || args[1].toLowerCase() == "empty") {
-                setBlacklisted(message.guild, [])
+                setBlacklisted(message.guild, []);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, "✅ blacklist was emptied")],
-                })
+                });
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
-            })
+            });
         }
 
         if (args.length == 1 || args[1].toLowerCase() == "view") {
-            const embed = new CustomEmbed(message.member, false)
+            const embed = new CustomEmbed(message.member, false);
 
-            embed.setHeader("chat reactions")
+            embed.setHeader("chat reactions");
 
-            const settings = getReactionSettings(message.guild)
+            const settings = getReactionSettings(message.guild);
 
-            let channels
+            let channels;
 
             if (settings.randomChannels.length == 0) {
-                channels = "none"
+                channels = "none";
             } else {
-                channels = settings.randomChannels.join("` `")
+                channels = settings.randomChannels.join("` `");
             }
 
             embed.setDescription(
@@ -410,16 +410,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `**time between events** \`${settings.timeBetweenEvents}s\`\n` +
                     `**max offset** \`${settings.randomModifier}s\`\n` +
                     `**max game length** \`${settings.timeout}s\``
-            )
+            );
 
-            embed.setFooter(`use ${prefix}cr settings help to change this settings`)
+            embed.setFooter(`use ${prefix}cr settings help to change this settings`);
 
-            return send({ embeds: [embed] })
+            return send({ embeds: [embed] });
         } else if (args.length == 2) {
             if (args[1].toLowerCase() == "help") {
-                const embed = new CustomEmbed(message.member, false)
+                const embed = new CustomEmbed(message.member, false);
 
-                embed.setHeader("chat reactions")
+                embed.setHeader("chat reactions");
 
                 embed.setDescription(
                     `${prefix}**cr settings enable** *enable automatic starting*\n` +
@@ -428,41 +428,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         `${prefix}**cr settings cooldown <seconds>** *set the time between automatic chat reactions*\n` +
                         `${prefix}**cr settings offset <seconds>** *set a maximum offset to be used with the cooldown*\n` +
                         `${prefix}**cr settings length <seconds>** *set a maximum game length*`
-                )
+                );
 
-                return send({ embeds: [embed] })
+                return send({ embeds: [embed] });
             } else if (args[1].toLowerCase() == "enable") {
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
                 if (settings.randomStart) {
-                    return send({ embeds: [new ErrorEmbed("already enabled")] })
+                    return send({ embeds: [new ErrorEmbed("already enabled")] });
                 }
 
-                settings.randomStart = true
+                settings.randomStart = true;
 
                 if (settings.randomChannels.length == 0) {
-                    settings.randomChannels.push(message.channel.id)
+                    settings.randomChannels.push(message.channel.id);
                 }
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been enabled")],
-                })
+                });
             } else if (args[1].toLowerCase() == "disable") {
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
                 if (!settings.randomStart) {
-                    return send({ embeds: [new ErrorEmbed("already disabled")] })
+                    return send({ embeds: [new ErrorEmbed("already disabled")] });
                 }
 
-                settings.randomStart = false
+                settings.randomStart = false;
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been disabled")],
-                })
+                });
             } else if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
                 return send({
                     embeds: [
@@ -470,21 +470,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
                         ),
                     ],
-                })
+                });
             } else if (args[1].toLowerCase() == "cooldown") {
                 return send({
                     embeds: [new ErrorEmbed(`${prefix}cr settings cooldown <number>`)],
-                })
+                });
             } else if (args[1].toLowerCase() == "offset") {
-                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings offset <number>`)] })
+                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings offset <number>`)] });
             } else if (args[1].toLowerCase() == "length") {
-                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings length <number>`)] })
+                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings length <number>`)] });
             } else {
-                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] })
+                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] });
             }
         } else if (args.length == 3) {
             if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
-                let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[2]
+                let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[2];
 
                 if (channel.length != 18) {
                     if (!message.mentions.channels.first()) {
@@ -494,322 +494,322 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel"
                                 ),
                             ],
-                        })
+                        });
                     } else {
-                        channel = message.mentions.channels.first()
+                        channel = message.mentions.channels.first();
                     }
                 } else {
-                    channel = message.guild.channels.cache.find((ch) => ch.id == channel)
+                    channel = message.guild.channels.cache.find((ch) => ch.id == channel);
                 }
 
                 if (!channel) {
-                    return send({ embeds: [new ErrorEmbed("invalid channel")] })
+                    return send({ embeds: [new ErrorEmbed("invalid channel")] });
                 }
 
                 if (channel.type != "GUILD_TEXT") {
-                    return send({ embeds: [new ErrorEmbed("invalid cahnnel")] })
+                    return send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
                 }
 
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
-                let added = false
-                let max = 1
+                let added = false;
+                let max = 1;
 
                 if (isPremium(message.author.id)) {
-                    max = 5
+                    max = 5;
                 }
 
                 if (settings.randomChannels.indexOf(channel.id) != -1) {
-                    settings.randomChannels.splice(settings.randomChannels.indexOf(channel.id), 1)
+                    settings.randomChannels.splice(settings.randomChannels.indexOf(channel.id), 1);
                 } else {
                     if (settings.randomChannels.length >= max) {
                         const embed = new ErrorEmbed(
                             `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/nypsi) to have more`
-                        )
+                        );
 
                         if (max > 1) {
-                            embed.setDescription(`you have reached the maximum amount of random channels (${max})`)
+                            embed.setDescription(`you have reached the maximum amount of random channels (${max})`);
                         }
 
-                        return send({ embeds: [embed] })
+                        return send({ embeds: [embed] });
                     }
-                    settings.randomChannels.push(channel.id)
-                    added = true
+                    settings.randomChannels.push(channel.id);
+                    added = true;
                 }
 
                 if (settings.randomChannels.length == 0) {
-                    settings.randomStart = false
+                    settings.randomStart = false;
                 }
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
-                const embed = new CustomEmbed(message.member, false)
+                const embed = new CustomEmbed(message.member, false);
 
                 if (added) {
-                    embed.setDescription(`${channel.name} has been added as a random channel`)
+                    embed.setDescription(`${channel.name} has been added as a random channel`);
                 } else {
-                    embed.setDescription(`${channel.name} has been removed`)
+                    embed.setDescription(`${channel.name} has been removed`);
                 }
 
-                return send({ embeds: [embed] })
+                return send({ embeds: [embed] });
             } else if (args[1].toLowerCase() == "cooldown") {
-                const length = parseInt(args[2])
+                const length = parseInt(args[2]);
 
                 if (!length) {
                     return send({
                         embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
-                    })
+                    });
                 }
 
                 if (length > 900) {
-                    return send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] })
+                    return send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] });
                 }
 
                 if (length < 120) {
                     return send({
                         embeds: [new ErrorEmbed("cannot be shorter than 120 seconds")],
-                    })
+                    });
                 }
 
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
-                settings.timeBetweenEvents = length
+                settings.timeBetweenEvents = length;
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, `✅ event cooldown set to \`${length}s\``)],
-                })
+                });
             } else if (args[1].toLowerCase() == "offset") {
-                let length = parseInt(args[2])
+                let length = parseInt(args[2]);
 
                 if (!length) {
                     return send({
                         embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
-                    })
+                    });
                 }
 
                 if (length > 900) {
-                    return send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] })
+                    return send({ embeds: [new ErrorEmbed("cannot be longer than 900 seconds")] });
                 }
 
                 if (length < 0) {
-                    length = 0
+                    length = 0;
                 }
 
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
-                settings.randomModifier = length
+                settings.randomModifier = length;
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, `✅ cooldown max offset set to \`${length}s\``)],
-                })
+                });
             } else if (args[1].toLowerCase() == "length") {
-                const length = parseInt(args[2])
+                const length = parseInt(args[2]);
 
                 if (!length) {
                     return send({
                         embeds: [new ErrorEmbed("invalid time, it must be a whole number")],
-                    })
+                    });
                 }
 
                 if (length > 120) {
-                    return send({ embeds: [new ErrorEmbed("cannot be longer than 120 seconds")] })
+                    return send({ embeds: [new ErrorEmbed("cannot be longer than 120 seconds")] });
                 }
 
                 if (length < 30) {
-                    return send({ embeds: [new ErrorEmbed("cannot be shorter than 30 seconds")] })
+                    return send({ embeds: [new ErrorEmbed("cannot be shorter than 30 seconds")] });
                 }
 
-                const settings = getReactionSettings(message.guild)
+                const settings = getReactionSettings(message.guild);
 
-                settings.timeout = length
+                settings.timeout = length;
 
-                updateReactionSettings(message.guild, settings)
+                updateReactionSettings(message.guild, settings);
 
                 return send({
                     embeds: [new CustomEmbed(message.member, false, `✅ max length set to \`${length}s\``)],
-                })
+                });
             } else {
-                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] })
+                return send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] });
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return
+        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
-            })
+            });
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions")
+            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions");
 
             embed.setDescription(
                 `${prefix}**cr words list** *view the current wordlist*\n` +
                     `${prefix}**cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
                     `${prefix}**cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
                     `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)*`
-            )
+            );
 
-            return send({ embeds: [embed] })
+            return send({ embeds: [embed] });
         } else if (args[1].toLowerCase() == "add" || args[1] == "+") {
             if (args.length == 2) {
                 return send({
                     embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)],
-                })
+                });
             }
 
-            const words = getWordList(message.guild)
+            const words = getWordList(message.guild);
 
-            const phrase = args.slice(2, args.length).join(" ")
+            const phrase = args.slice(2, args.length).join(" ");
 
             if (phrase == "" || phrase == " ") {
-                return send({ embeds: [new ErrorEmbed("invalid phrase")] })
+                return send({ embeds: [new ErrorEmbed("invalid phrase")] });
             }
 
             if (words.indexOf(phrase) != -1) {
                 return send({
                     embeds: [new ErrorEmbed(`\`${phrase}\` already exists in the word list`)],
-                })
+                });
             }
 
-            let maxSize = 100
+            let maxSize = 100;
 
             if (isPremium(message.author.id)) {
-                maxSize = 200
+                maxSize = 200;
             }
 
             if (words.length >= maxSize) {
-                const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`)
+                const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`);
 
                 if (maxSize == 100) {
-                    error.setFooter("become a patreon ($patreon) to double this limit")
+                    error.setFooter("become a patreon ($patreon) to double this limit");
                 }
 
-                return send({ embeds: [error] })
+                return send({ embeds: [error] });
             }
 
             if (phrase.length >= 150) {
                 return send({
                     embeds: [new ErrorEmbed("phrase is too long (150 characters max)")],
-                })
+                });
             }
 
-            words.push(phrase)
+            words.push(phrase);
 
-            updateWords(message.guild, words)
+            updateWords(message.guild, words);
 
             return send({
                 embeds: [new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`)],
-            })
+            });
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
             if (args.length == 2) {
                 return send({
                     embeds: [new ErrorEmbed(`${prefix}cr words add/+ <word or sentence>`)],
-                })
+                });
             }
 
-            const words = getWordList(message.guild)
+            const words = getWordList(message.guild);
 
-            const phrase = args.slice(2, args.length).join(" ")
+            const phrase = args.slice(2, args.length).join(" ");
 
             if (words.indexOf(phrase) == -1) {
                 return send({
                     embeds: [new ErrorEmbed(`\`${phrase}\` doesn't exist in the word list`)],
-                })
+                });
             }
 
-            words.splice(words.indexOf(phrase), 1)
+            words.splice(words.indexOf(phrase), 1);
 
-            updateWords(message.guild, words)
+            updateWords(message.guild, words);
 
             return send({
                 embeds: [new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist`)],
-            })
+            });
         } else if (args[1].toLowerCase() == "reset") {
-            updateWords(message.guild, [])
+            updateWords(message.guild, []);
 
             return send({
                 embeds: [new CustomEmbed(message.member, false, "✅ wordlist has been reset")],
-            })
+            });
         } else if (args[1].toLowerCase() == "list") {
-            const words = getWordList(message.guild)
+            const words = getWordList(message.guild);
 
-            const embed = new CustomEmbed(message.member, false)
+            const embed = new CustomEmbed(message.member, false);
 
             if (words.length == 0) {
                 embed.setDescription(
                     "using [default word list](https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/b2dd03eb27da1daef362f0343a203617237c8ac8/chat-reactions.txt)"
-                )
-                embed.setHeader("chat reactions")
+                );
+                embed.setHeader("chat reactions");
             } else {
                 /**
                  * @type {Map<Number, Array<String>>}
                  */
-                const pages = new Map()
+                const pages = new Map();
 
                 for (const word of words) {
                     if (pages.size == 0) {
-                        pages.set(1, [`\`${word}\``])
+                        pages.set(1, [`\`${word}\``]);
                     } else if (pages.get(pages.size).length >= 10) {
-                        pages.set(pages.size + 1, [`\`${word}\``])
+                        pages.set(pages.size + 1, [`\`${word}\``]);
                     } else {
-                        const d = pages.get(pages.size)
+                        const d = pages.get(pages.size);
 
-                        d.push(`\`${word}\``)
+                        d.push(`\`${word}\``);
 
-                        pages.set(pages.size, d)
+                        pages.set(pages.size, d);
                     }
                 }
 
-                embed.setHeader(`word list [${words.length}]`)
-                embed.setDescription(`${pages.get(1).join("\n")}`)
-                embed.setFooter(`page 1/${pages.size}`)
+                embed.setHeader(`word list [${words.length}]`);
+                embed.setDescription(`${pages.get(1).join("\n")}`);
+                embed.setFooter(`page 1/${pages.size}`);
 
                 if (pages.size > 1) {
                     let row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
                         new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
-                    )
-                    const msg = await send({ embeds: [embed], components: [row] })
+                    );
+                    const msg = await send({ embeds: [embed], components: [row] });
 
-                    let currentPage = 1
-                    const lastPage = pages.size
+                    let currentPage = 1;
+                    const lastPage = pages.size;
 
-                    const filter = (i) => i.user.id == message.author.id
+                    const filter = (i) => i.user.id == message.author.id;
 
                     const edit = async (data, msg) => {
                         if (!(message instanceof Message)) {
-                            await message.editReply(data)
-                            return await message.fetchReply()
+                            await message.editReply(data);
+                            return await message.fetchReply();
                         } else {
-                            return await msg.edit(data)
+                            return await msg.edit(data);
                         }
-                    }
+                    };
 
                     const pageManager = async () => {
                         const reaction = await msg
                             .awaitMessageComponent({ filter, time: 30000 })
                             .then(async (collected) => {
-                                await collected.deferUpdate()
-                                return collected.customId
+                                await collected.deferUpdate();
+                                return collected.customId;
                             })
                             .catch(async () => {
-                                await edit({ components: [] }, msg)
-                            })
+                                await edit({ components: [] }, msg);
+                            });
 
-                        if (!reaction) return
+                        if (!reaction) return;
 
                         if (reaction == "⬅") {
                             if (currentPage <= 1) {
-                                return pageManager()
+                                return pageManager();
                             } else {
-                                currentPage--
-                                embed.setDescription(pages.get(currentPage).join("\n"))
-                                embed.setFooter("page " + currentPage + "/" + lastPage)
+                                currentPage--;
+                                embed.setDescription(pages.get(currentPage).join("\n"));
+                                embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == 1) {
                                     row = new MessageActionRow().addComponents(
@@ -823,7 +823,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setLabel("next")
                                             .setStyle("PRIMARY")
                                             .setDisabled(false)
-                                    )
+                                    );
                                 } else {
                                     row = new MessageActionRow().addComponents(
                                         new MessageButton()
@@ -836,19 +836,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setLabel("next")
                                             .setStyle("PRIMARY")
                                             .setDisabled(false)
-                                    )
+                                    );
                                 }
 
-                                await edit({ embeds: [embed], components: [row] }, msg)
-                                return pageManager()
+                                await edit({ embeds: [embed], components: [row] }, msg);
+                                return pageManager();
                             }
                         } else if (reaction == "➡") {
                             if (currentPage >= lastPage) {
-                                return pageManager()
+                                return pageManager();
                             } else {
-                                currentPage++
-                                embed.setDescription(pages.get(currentPage).join("\n"))
-                                embed.setFooter("page " + currentPage + "/" + lastPage)
+                                currentPage++;
+                                embed.setDescription(pages.get(currentPage).join("\n"));
+                                embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == lastPage) {
                                     row = new MessageActionRow().addComponents(
@@ -862,7 +862,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setLabel("next")
                                             .setStyle("PRIMARY")
                                             .setDisabled(true)
-                                    )
+                                    );
                                 } else {
                                     row = new MessageActionRow().addComponents(
                                         new MessageButton()
@@ -875,23 +875,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setLabel("next")
                                             .setStyle("PRIMARY")
                                             .setDisabled(false)
-                                    )
+                                    );
                                 }
 
-                                await edit({ embeds: [embed], components: [row] }, msg)
-                                return pageManager()
+                                await edit({ embeds: [embed], components: [row] }, msg);
+                                return pageManager();
                             }
                         }
-                    }
-                    return pageManager()
+                    };
+                    return pageManager();
                 }
             }
 
-            return send({ embeds: [embed] })
+            return send({ embeds: [embed] });
         }
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

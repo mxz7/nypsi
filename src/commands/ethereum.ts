@@ -1,11 +1,11 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils";
 
 const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", Categories.MONEY).setAliases(
     ["eth"]
-)
+);
 
 /**
  *
@@ -13,14 +13,14 @@ const cmd = new Command("ethereum", "view the current ethereum value (reflects r
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member)
-    const ethereum = getItems()["ethereum"]
-    const inventory = getInventory(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
+    const ethereum = getItems()["ethereum"];
+    const inventory = getInventory(message.member);
 
-    let ethereumAmount = 0
+    let ethereumAmount = 0;
 
     if (inventory["ethereum"]) {
-        ethereumAmount = inventory["ethereum"]
+        ethereumAmount = inventory["ethereum"];
     }
 
     const embed = new CustomEmbed(
@@ -31,11 +31,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ).toLocaleString()})`
     )
         .setFooter("not real ethereum, although it reflects current worth in USD")
-        .setHeader("your ethereum", message.author.avatarURL())
+        .setHeader("your ethereum", message.author.avatarURL());
 
-    return message.channel.send({ embeds: [embed] })
+    return message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

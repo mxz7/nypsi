@@ -1,104 +1,104 @@
-import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/functions/member"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getMember } from "../utils/functions/member";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const avatar = new Command("avatar", "get a person's avatar", Categories.INFO)
+const avatar = new Command("avatar", "get a person's avatar", Categories.INFO);
 
-avatar.setAliases(["av", "pfp", "picture"])
+avatar.setAliases(["av", "pfp", "picture"]);
 
-avatar.slashEnabled = true
+avatar.slashEnabled = true;
 
 avatar.slashData.addUserOption((option) =>
     option.setName("user").setDescription("view avatar of this user").setRequired(false)
-)
+);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    let member: GuildMember
+    let member: GuildMember;
 
     if (args.length == 0) {
-        member = message.member
+        member = message.member;
     } else {
         if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args.join(" "))
+            member = await getMember(message.guild, args.join(" "));
         } else {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         }
     }
 
     if (!member) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] })
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 })
+    const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 });
 
-    let serverAvatar = member.displayAvatarURL({ dynamic: true, size: 256 })
+    let serverAvatar = member.displayAvatarURL({ dynamic: true, size: 256 });
 
     if (avatar == serverAvatar) {
-        serverAvatar = undefined
+        serverAvatar = undefined;
     }
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("x").setLabel("show server avatar").setStyle("PRIMARY")
-    )
+    );
 
-    const embed = new CustomEmbed(member, false).setHeader(member.user.tag).setImage(avatar)
+    const embed = new CustomEmbed(member, false).setHeader(member.user.tag).setImage(avatar);
 
-    let msg
+    let msg;
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data)
-            const replyMsg = await message.fetchReply()
+            await message.reply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await message.channel.send(data)
+            return await message.channel.send(data);
         }
-    }
+    };
 
     if (serverAvatar) {
-        msg = await send({ embeds: [embed], components: [row] })
+        msg = await send({ embeds: [embed], components: [row] });
     } else {
-        return send({ embeds: [embed] })
+        return send({ embeds: [embed] });
     }
 
     const edit = async (data) => {
         if (!(message instanceof Message)) {
-            await msg.editReply(data)
-            const replyMsg = await message.fetchReply()
+            await msg.editReply(data);
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
-                return replyMsg
+                return replyMsg;
             }
         } else {
-            return await msg.edit(data)
+            return await msg.edit(data);
         }
-    }
+    };
 
-    const filter = (i) => i.user.id == message.author.id
+    const filter = (i) => i.user.id == message.author.id;
 
     const reaction = await msg
         .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
         .then(async (collected) => {
-            await collected.deferUpdate()
-            return collected.customId
+            await collected.deferUpdate();
+            return collected.customId;
         })
         .catch(async () => {
-            await edit({ components: [] })
-        })
+            await edit({ components: [] });
+        });
 
     if (reaction == "x") {
-        embed.setImage(serverAvatar)
+        embed.setImage(serverAvatar);
 
-        await edit({ embeds: [embed], components: [] })
+        await edit({ embeds: [embed], components: [] });
     }
 }
 
-avatar.setRun(run)
+avatar.setRun(run);
 
-module.exports = avatar
+module.exports = avatar;

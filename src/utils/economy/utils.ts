@@ -1,210 +1,210 @@
-import { getDatabase } from "../database/database"
-import * as express from "express"
-import * as topgg from "@top-gg/sdk"
-import { logger } from "../logger"
-import { EconomyProfile, Item, LotteryTicket } from "../models/Economy"
-import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js"
-import { CustomEmbed } from "../models/EmbedBuilders"
-import * as fs from "fs"
-import { addKarma, getKarma } from "../karma/utils"
-import { getTier, isPremium } from "../premium/utils"
-import { inPlaceSort } from "fast-sort"
-import { Constructor, getAllWorkers, Worker } from "./workers"
-import { StatsProfile } from "../models/StatsProfile"
-import * as shufflearray from "shuffle-array"
-import fetch from "node-fetch"
-import workerSort from "../workers/sort"
-import { MStoTime } from "../functions/date"
-import ms = require("ms")
-import redis from "../database/redis"
+import { getDatabase } from "../database/database";
+import * as express from "express";
+import * as topgg from "@top-gg/sdk";
+import { logger } from "../logger";
+import { EconomyProfile, Item, LotteryTicket } from "../models/Economy";
+import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import * as fs from "fs";
+import { addKarma, getKarma } from "../karma/utils";
+import { getTier, isPremium } from "../premium/utils";
+import { inPlaceSort } from "fast-sort";
+import { Constructor, getAllWorkers, Worker } from "./workers";
+import { StatsProfile } from "../models/StatsProfile";
+import * as shufflearray from "shuffle-array";
+import fetch from "node-fetch";
+import workerSort from "../workers/sort";
+import { MStoTime } from "../functions/date";
+import ms = require("ms");
+import redis from "../database/redis";
 
-declare function require(name: string)
+declare function require(name: string);
 
-const db = getDatabase()
+const db = getDatabase();
 
-const webhook = new topgg.Webhook("123")
-const topggStats = new topgg.Api(process.env.TOPGG_TOKEN)
+const webhook = new topgg.Webhook("123");
+const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
 
-const app = express()
+const app = express();
 
-const bannedCache = new Map()
-const guildExistsCache = new Map()
-const guildUserCache = new Map()
-const guildRequirementsCache = new Map()
+const bannedCache = new Map();
+const guildExistsCache = new Map();
+const guildUserCache = new Map();
+const guildRequirementsCache = new Map();
 
 app.post(
     "/dblwebhook",
     webhook.listener((vote) => {
-        logger.info(`received vote: ${vote.user}`)
-        const { onVote } = require("../../nypsi")
-        onVote(vote)
+        logger.info(`received vote: ${vote.user}`);
+        const { onVote } = require("../../nypsi");
+        onVote(vote);
     })
-)
+);
 
-app.listen(5000)
+app.listen(5000);
 
 setInterval(() => {
-    const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all()
+    const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all();
 
     for (const user of query) {
-        const workers = JSON.parse(user.workers)
+        const workers = JSON.parse(user.workers);
 
         for (const w of Object.keys(workers)) {
-            const worker: any = workers[w]
+            const worker: any = workers[w];
 
             if (worker.stored < worker.maxStorage) {
                 if (worker.stored + worker.perInterval > worker.maxStorage) {
-                    worker.stored = worker.maxStorage
+                    worker.stored = worker.maxStorage;
                 } else {
-                    worker.stored += worker.perInterval
+                    worker.stored += worker.perInterval;
                 }
             }
         }
 
         if (workers != JSON.parse(user.workers)) {
-            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), user.id)
+            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), user.id);
         }
     }
-}, 5 * 60 * 1000)
+}, 5 * 60 * 1000);
 
-let items: { [key: string]: Item }
+let items: { [key: string]: Item };
 
-const lotteryTicketPrice = 15000
+const lotteryTicketPrice = 15000;
 /**
  * higher ticket price = more favourable to rich people cus poor people cant buy tickets resulting in less tickets overall
  * the goal is to have more tickets overall for a more random outcome
  */
-export { lotteryTicketPrice }
+export { lotteryTicketPrice };
 
-let lotteryHook: WebhookClient
+let lotteryHook: WebhookClient;
 
 if (!process.env.GITHUB_ACTION) {
-    lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK })
+    lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 }
 
-const lotteryHookQueue = new Map()
+const lotteryHookQueue = new Map();
 
 setInterval(() => {
-    if (lotteryHookQueue.size == 0) return
+    if (lotteryHookQueue.size == 0) return;
 
-    const desc = []
+    const desc = [];
 
     for (const username of lotteryHookQueue.keys()) {
-        const amount = lotteryHookQueue.get(username)
+        const amount = lotteryHookQueue.get(username);
 
-        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`)
+        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`);
 
-        lotteryHookQueue.delete(username)
+        lotteryHookQueue.delete(username);
 
-        if (desc.join("\n").length >= 1500) break
+        if (desc.join("\n").length >= 1500) break;
     }
 
-    const embed = new CustomEmbed()
+    const embed = new CustomEmbed();
 
-    embed.setColor("#111111")
-    embed.setDescription(desc.join("\n"))
-    embed.setTimestamp()
+    embed.setColor("#111111");
+    embed.setDescription(desc.join("\n"));
+    embed.setTimestamp();
 
-    lotteryHook.send({ embeds: [embed] })
-}, ms("30 minutes"))
+    lotteryHook.send({ embeds: [embed] });
+}, ms("30 minutes"));
 
 /**
  *
  * @returns {String}
  */
 export function loadItems(): string {
-    let txt = ""
+    let txt = "";
 
-    const b: any = fs.readFileSync("./data/items.json")
+    const b: any = fs.readFileSync("./data/items.json");
 
-    items = JSON.parse(b)
+    items = JSON.parse(b);
 
-    logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`)
+    logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
 
-    txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`
+    txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`;
 
-    let deleted = 0
+    let deleted = 0;
 
-    const query = db.prepare("SELECT id, inventory FROM economy").all()
+    const query = db.prepare("SELECT id, inventory FROM economy").all();
 
     for (const user of query) {
-        let inventory = JSON.parse(user.inventory)
+        let inventory = JSON.parse(user.inventory);
 
         if (!inventory) {
-            inventory = {}
-            db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(user.id)
+            inventory = {};
+            db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(user.id);
         }
 
-        const inventory1 = JSON.parse(user.inventory)
+        const inventory1 = JSON.parse(user.inventory);
 
         for (const item of Array.from(Object.keys(inventory))) {
             if (!Array.from(Object.keys(items)).includes(item)) {
-                delete inventory[item]
-                deleted++
+                delete inventory[item];
+                deleted++;
             } else if (!inventory[item]) {
-                delete inventory[item]
-                deleted++
+                delete inventory[item];
+                deleted++;
             } else if (inventory[item] == 0) {
-                delete inventory[item]
-                deleted++
+                delete inventory[item];
+                deleted++;
             }
         }
 
         if (inventory != inventory1) {
-            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id)
+            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id);
         }
     }
 
     if (deleted != 0) {
-        logger.info(`${deleted} items deleted from inventories`)
-        txt += `\n${deleted.toLocaleString()} items deleted from inventories`
+        logger.info(`${deleted} items deleted from inventories`);
+        txt += `\n${deleted.toLocaleString()} items deleted from inventories`;
     }
 
     setTimeout(() => {
-        updateCryptoWorth()
-    }, 50)
+        updateCryptoWorth();
+    }, 50);
 
-    return txt
+    return txt;
 }
 
-loadItems()
+loadItems();
 
 function randomOffset() {
-    return Math.floor(Math.random() * 50000)
+    return Math.floor(Math.random() * 50000);
 }
 
-let padlockPrice = 25000 + randomOffset()
-items["padlock"].worth = padlockPrice
-logger.info("padlock price updated: $" + padlockPrice.toLocaleString())
+let padlockPrice = 25000 + randomOffset();
+items["padlock"].worth = padlockPrice;
+logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
 
 setInterval(() => {
-    padlockPrice = 25000 + randomOffset()
-    items["padlock"].worth = padlockPrice
-    logger.info("padlock price updated: $" + padlockPrice.toLocaleString())
-}, 3600000)
+    padlockPrice = 25000 + randomOffset();
+    items["padlock"].worth = padlockPrice;
+    logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
+}, 3600000);
 
 async function updateCryptoWorth() {
-    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json())
+    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json());
 
-    const btcworth = Math.floor(res.bpi.USD.rate_float)
+    const btcworth = Math.floor(res.bpi.USD.rate_float);
 
-    items["bitcoin"].worth = btcworth
-    logger.info("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString())
+    items["bitcoin"].worth = btcworth;
+    logger.info("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString());
 
-    res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json())
+    res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json());
 
-    const ethWorth = Math.floor(res.data.rates.USD)
+    const ethWorth = Math.floor(res.data.rates.USD);
 
     if (!ethWorth) {
-        logger.error("INVALID ETH WORTH")
-        return logger.error(res)
+        logger.error("INVALID ETH WORTH");
+        return logger.error(res);
     }
 
-    items["ethereum"].worth = ethWorth
-    logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString())
+    items["ethereum"].worth = ethWorth;
+    logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString());
 }
 
-setInterval(updateCryptoWorth, 1500000)
+setInterval(updateCryptoWorth, 1500000);
 
 /**
  *
@@ -212,80 +212,80 @@ setInterval(updateCryptoWorth, 1500000)
  * @param {JSON} vote
  */
 export async function doVote(client: Client, vote: topgg.WebhookPayload) {
-    const { user } = vote
+    const { user } = vote;
 
     if (!(await userExists(user))) {
-        logger.warn(`${user} doesnt exist`)
-        return
+        logger.warn(`${user} doesnt exist`);
+        return;
     }
 
-    const now = new Date().getTime()
+    const now = new Date().getTime();
 
-    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(user)
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(user);
 
-    const lastVote = query.lastVote
+    const lastVote = query.lastVote;
 
     if (now - lastVote < 43200000) {
-        return logger.error(`${user} already voted`)
+        return logger.error(`${user} already voted`);
     }
 
-    db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user)
+    db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user);
 
-    redis.set(`cache:vote:${user}`, "true")
-    redis.expire(`cache:vote:${user}`, ms("6 hours"))
+    redis.set(`cache:vote:${user}`, "true");
+    redis.expire(`cache:vote:${user}`, ms("6 hours"));
 
-    let member: User | string = await client.users.fetch(user)
+    let member: User | string = await client.users.fetch(user);
 
-    let id = false
-    let memberID: string
+    let id = false;
+    let memberID: string;
 
     if (!member) {
-        member = user
-        memberID = user
-        id = true
+        member = user;
+        memberID = user;
+        id = true;
     } else {
-        memberID = member.id
+        memberID = member.id;
     }
 
-    let prestige = getPrestige(memberID)
+    let prestige = getPrestige(memberID);
 
-    if (prestige > 15) prestige = 15
+    if (prestige > 15) prestige = 15;
 
-    const amount = 15000 * (prestige + 1)
-    const multi = Math.floor((await getMulti(memberID)) * 100)
-    const inventory = getInventory(memberID)
+    const amount = 15000 * (prestige + 1);
+    const multi = Math.floor((await getMulti(memberID)) * 100);
+    const inventory = getInventory(memberID);
 
-    updateBalance(memberID, getBalance(memberID) + amount)
-    addKarma(memberID, 10)
+    updateBalance(memberID, getBalance(memberID) + amount);
+    addKarma(memberID, 10);
 
-    const tickets = getTickets(memberID)
+    const tickets = getTickets(memberID);
 
-    const prestigeBonus = Math.floor((getPrestige(memberID) > 20 ? 20 : getPrestige(memberID)) / 2.5)
-    const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0)
-    const karmaBonus = Math.floor((await getKarma(memberID)) / 100)
+    const prestigeBonus = Math.floor((getPrestige(memberID) > 20 ? 20 : getPrestige(memberID)) / 2.5);
+    const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0);
+    const karmaBonus = Math.floor((await getKarma(memberID)) / 100);
 
-    const max = 5 + prestigeBonus + premiumBonus + karmaBonus
+    const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
 
     if (tickets.length < max) {
-        addTicket(memberID)
+        addTicket(memberID);
     }
 
-    let crateAmount = Math.floor(prestige / 2 + 1)
+    let crateAmount = Math.floor(prestige / 2 + 1);
 
-    if (crateAmount > 5) crateAmount = 5
+    if (crateAmount > 5) crateAmount = 5;
 
     if (inventory["vote_crate"]) {
-        inventory["vote_crate"] += crateAmount
+        inventory["vote_crate"] += crateAmount;
     } else {
-        inventory["vote_crate"] = crateAmount
+        inventory["vote_crate"] = crateAmount;
     }
 
-    setInventory(memberID, inventory)
+    setInventory(memberID, inventory);
 
     logger.log({
         level: "success",
         message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
-    })
+    });
 
     if (!id && (await getDMsEnabled(memberID)) && member instanceof User) {
         const embed = new CustomEmbed()
@@ -297,7 +297,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
                     `+ **3**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
-            )
+            );
 
         await member
             .send({ content: "thank you for voting!", embeds: [embed] })
@@ -306,14 +306,14 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
                     logger.log({
                         level: "success",
                         message: `sent vote confirmation to ${member.tag}`,
-                    })
+                    });
                 }
             })
             .catch(() => {
                 if (member instanceof User) {
-                    logger.warn(`failed to send vote confirmation to ${member.tag}`)
+                    logger.warn(`failed to send vote confirmation to ${member.tag}`);
                 }
-            })
+            });
     }
 }
 
@@ -321,33 +321,33 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
  * @returns {Number}
  */
 export function getPadlockPrice(): number {
-    return padlockPrice
+    return padlockPrice;
 }
 
 export async function hasVoted(member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    if (await redis.exists(`cache:vote:${id}`)) return (await redis.get(`cache:vote:${id}`)) === "true" ? true : false
+    if (await redis.exists(`cache:vote:${id}`)) return (await redis.get(`cache:vote:${id}`)) === "true" ? true : false;
 
-    const now = new Date().getTime()
+    const now = new Date().getTime();
 
-    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(id);
 
-    const lastVote = query.last_vote
+    const lastVote = query.last_vote;
 
     if (now - lastVote < 43200000) {
-        redis.set(`cache:vote:${id}`, "true")
-        redis.expire(`cache:vote:${id}`, ms("30 minutes"))
-        return true
+        redis.set(`cache:vote:${id}`, "true");
+        redis.expire(`cache:vote:${id}`, ms("30 minutes"));
+        return true;
     } else {
-        redis.set(`cache:vote:${id}`, "false")
-        redis.expire(`cache:vote:${id}`, ms("6 hours"))
-        return false
+        redis.set(`cache:vote:${id}`, "false");
+        redis.expire(`cache:vote:${id}`, ms("6 hours"));
+        return false;
     }
 }
 
@@ -356,77 +356,77 @@ export async function hasVoted(member: GuildMember | string) {
  * @returns {Number}
  */
 export async function getMulti(member: GuildMember | string): Promise<number> {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    let multi = 0
+    let multi = 0;
 
-    const voted = await hasVoted(id)
+    const voted = await hasVoted(id);
 
     if (voted) {
-        multi += 3
+        multi += 3;
     }
 
-    const prestige = getPrestige(member)
+    const prestige = getPrestige(member);
 
-    const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2
+    const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2;
 
-    multi += prestigeBonus
+    multi += prestigeBonus;
 
     if (isPremium(id)) {
         switch (getTier(id)) {
             case 2:
-                multi += 4
-                break
+                multi += 4;
+                break;
             case 3:
-                multi += 6
-                break
+                multi += 6;
+                break;
             case 4:
-                multi += 10
+                multi += 10;
         }
     }
 
-    const guild = getGuildByUser(id)
+    const guild = getGuildByUser(id);
 
     if (guild) {
-        multi += guild.level - 1
+        multi += guild.level - 1;
     }
 
-    multi = Math.floor(multi)
+    multi = Math.floor(multi);
 
-    multi = multi / 100
+    multi = multi / 100;
 
-    return parseFloat(multi.toFixed(2))
+    return parseFloat(multi.toFixed(2));
 }
 
 /**
  * @returns {Number}
  */
 export function getUserCount(): number {
-    const query = db.prepare("SELECT id FROM economy").all()
+    const query = db.prepare("SELECT id FROM economy").all();
 
-    return query.length
+    return query.length;
 }
 
 /**
  * @param {Guild} guild - guild object to get economy user count of
  */
 export function getUserCountGuild(guild: Guild) {
-    let count = 0
+    let count = 0;
 
-    const query = db.prepare("SELECT id FROM economy").all()
+    const query = db.prepare("SELECT id FROM economy").all();
 
     for (const user of query) {
         if (guild.members.cache.find((member) => member.user.id == user.id)) {
-            count++
+            count++;
         }
     }
 
-    return count
+    return count;
 }
 
 /**
@@ -434,16 +434,16 @@ export function getUserCountGuild(guild: Guild) {
  * @param {GuildMember} member - get balance
  */
 export function getBalance(member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT money FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT money FROM economy WHERE id = ?").get(id);
 
-    return parseInt(query.money)
+    return parseInt(query.money);
 }
 
 /**
@@ -452,27 +452,27 @@ export function getBalance(member: GuildMember | string) {
  * @returns {Boolean}
  */
 export async function userExists(member: GuildMember | string): Promise<boolean> {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
     if (await redis.exists(`cache:economy:exists:${id}`)) {
-        return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false
+        return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false;
     }
 
-    const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id);
 
     if (query) {
-        await redis.set(`cache:economy:exists:${id}`, "true")
-        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
-        return true
+        await redis.set(`cache:economy:exists:${id}`, "true");
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"));
+        return true;
     } else {
-        await redis.set(`cache:economy:exists:${id}`, "false")
-        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"))
-        return false
+        await redis.set(`cache:economy:exists:${id}`, "false");
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"));
+        return false;
     }
 }
 
@@ -481,16 +481,16 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
  * @param {Number} amount to update balance to
  */
 export function updateBalance(member: GuildMember | string, amount: number) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const amount1 = amount
+    const amount1 = amount;
 
-    db.prepare("UPDATE economy SET money = ? WHERE id = ?").run(amount1, id)
+    db.prepare("UPDATE economy SET money = ? WHERE id = ?").run(amount1, id);
 }
 
 /**
@@ -498,16 +498,16 @@ export function updateBalance(member: GuildMember | string, amount: number) {
  * @param {GuildMember} member to get bank balance of
  */
 export function getBankBalance(member: GuildMember): number {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT bank FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT bank FROM economy WHERE id = ?").get(id);
 
-    return parseInt(query.bank)
+    return parseInt(query.bank);
 }
 
 /**
@@ -516,7 +516,7 @@ export function getBankBalance(member: GuildMember): number {
  * @param {Number} amount to update balance to
  */
 export function updateBankBalance(member: GuildMember, amount: number) {
-    db.prepare("UPDATE economy SET bank = ? WHERE id = ?").run(amount, member.user.id)
+    db.prepare("UPDATE economy SET bank = ? WHERE id = ?").run(amount, member.user.id);
 }
 
 /**
@@ -524,16 +524,16 @@ export function updateBankBalance(member: GuildMember, amount: number) {
  * @param {GuildMember} member to get xp of
  */
 export function getXp(member: GuildMember): number {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT xp FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT xp FROM economy WHERE id = ?").get(id);
 
-    return parseInt(query.xp)
+    return parseInt(query.xp);
 }
 
 /**
@@ -542,9 +542,9 @@ export function getXp(member: GuildMember): number {
  * @param {Number} amount to update xp to
  */
 export function updateXp(member: GuildMember, amount: number) {
-    if (amount >= 69420) return
+    if (amount >= 69420) return;
 
-    db.prepare("UPDATE economy SET xp = ? WHERE id = ?").run(amount, member.user.id)
+    db.prepare("UPDATE economy SET xp = ? WHERE id = ?").run(amount, member.user.id);
 }
 
 /**
@@ -552,13 +552,13 @@ export function updateXp(member: GuildMember, amount: number) {
  * @param {GuildMember} member to get max balance of
  */
 export function getMaxBankBalance(member: GuildMember): number {
-    const xp = getXp(member)
-    const constant = 550
-    const starting = 15000
-    const bonus = xp * constant
-    const max = bonus + starting
+    const xp = getXp(member);
+    const constant = 550;
+    const starting = 15000;
+    const bonus = xp * constant;
+    const max = bonus + starting;
 
-    return max
+    return max;
 }
 
 /**
@@ -568,54 +568,54 @@ export function getMaxBankBalance(member: GuildMember): number {
  * @param {Boolean} anon
  */
 export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<Array<string>> {
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
 
-    const userIDs = []
-    const balances = new Map()
+    const userIDs = [];
+    const balances = new Map();
 
     for (const user of query) {
-        userIDs.push(user.id)
-        balances.set(user.id, user.money)
+        userIDs.push(user.id);
+        balances.set(user.id, user.money);
     }
 
-    inPlaceSort(userIDs).desc((i) => balances.get(i))
+    inPlaceSort(userIDs).desc((i) => balances.get(i));
 
-    const usersFinal = []
+    const usersFinal = [];
 
-    let count = 0
+    let count = 0;
 
     for (const user of userIDs) {
-        if (count >= amount) break
-        if (usersFinal.join().length >= 1500) break
+        if (count >= amount) break;
+        if (usersFinal.join().length >= 1500) break;
 
         if (balances.get(user) != 0) {
-            let pos: number | string = count + 1
+            let pos: number | string = count + 1;
 
             if (pos == 1) {
-                pos = "🥇"
+                pos = "🥇";
             } else if (pos == 2) {
-                pos = "🥈"
+                pos = "🥈";
             } else if (pos == 3) {
-                pos = "🥉"
+                pos = "🥉";
             }
 
-            const member = await client.users.fetch(user)
+            const member = await client.users.fetch(user);
 
-            let username = user
+            let username = user;
 
             if (member) {
                 if (anon) {
-                    username = member.username
+                    username = member.username;
                 } else {
-                    username = member.tag
+                    username = member.tag;
                 }
             }
 
-            usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString()
-            count++
+            usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
+            count++;
         }
     }
-    return usersFinal
+    return usersFinal;
 }
 
 /**
@@ -624,72 +624,72 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
  * @param {Number} amount of users to return with
  */
 export async function topAmount(guild: Guild, amount: number): Promise<Array<string>> {
-    let members: Collection<string, GuildMember>
+    let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
-        members = guild.members.cache
+        members = guild.members.cache;
     } else {
-        members = await guild.members.fetch()
+        members = await guild.members.fetch();
     }
 
-    if (!members) members = guild.members.cache
+    if (!members) members = guild.members.cache;
 
     members = members.filter((m) => {
-        return !m.user.bot
-    })
+        return !m.user.bot;
+    });
 
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
 
-    let userIDs = []
-    const balances = new Map()
+    let userIDs = [];
+    const balances = new Map();
 
     for (const user of query) {
         if (members.has(user.id)) {
-            userIDs.push(user.id)
-            balances.set(user.id, user.money)
+            userIDs.push(user.id);
+            balances.set(user.id, user.money);
         }
     }
 
     if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, balances)
-        userIDs.reverse()
+        userIDs = await workerSort(userIDs, balances);
+        userIDs.reverse();
     } else {
-        inPlaceSort(userIDs).desc((i) => balances.get(i))
+        inPlaceSort(userIDs).desc((i) => balances.get(i));
     }
 
-    const usersFinal = []
+    const usersFinal = [];
 
-    let count = 0
+    let count = 0;
 
     const getMemberID = (guild, id) => {
         const target = guild.members.cache.find((member) => {
-            return member.user.id == id
-        })
+            return member.user.id == id;
+        });
 
-        return target
-    }
+        return target;
+    };
 
     for (const user of userIDs) {
-        if (count >= amount) break
-        if (usersFinal.join().length >= 1500) break
+        if (count >= amount) break;
+        if (usersFinal.join().length >= 1500) break;
 
         if (balances.get(user) != 0) {
-            let pos: number | string = count + 1
+            let pos: number | string = count + 1;
 
             if (pos == 1) {
-                pos = "🥇"
+                pos = "🥇";
             } else if (pos == 2) {
-                pos = "🥈"
+                pos = "🥈";
             } else if (pos == 3) {
-                pos = "🥉"
+                pos = "🥉";
             }
 
             usersFinal[count] =
-                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString()
-            count++
+                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString();
+            count++;
         }
     }
-    return usersFinal
+    return usersFinal;
 }
 
 /**
@@ -699,72 +699,72 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
  * @param {Number} min minimum balance
  */
 export async function bottomAmount(guild: Guild, amount: number): Promise<Array<string>> {
-    let members: Collection<string, GuildMember>
+    let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
-        members = guild.members.cache
+        members = guild.members.cache;
     } else {
-        members = await guild.members.fetch()
+        members = await guild.members.fetch();
     }
 
-    if (!members) members = guild.members.cache
+    if (!members) members = guild.members.cache;
 
     members = members.filter((m) => {
-        return !m.user.bot
-    })
+        return !m.user.bot;
+    });
 
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all()
+    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
 
-    let userIDs = []
-    const balances = new Map()
+    let userIDs = [];
+    const balances = new Map();
 
     for (const user of query) {
         if (members.find((member) => member.user.id == user.id)) {
-            userIDs.push(user.id)
-            balances.set(user.id, user.money)
+            userIDs.push(user.id);
+            balances.set(user.id, user.money);
         }
     }
 
     if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, balances)
+        userIDs = await workerSort(userIDs, balances);
     } else {
-        inPlaceSort(userIDs).asc((i) => balances.get(i))
+        inPlaceSort(userIDs).asc((i) => balances.get(i));
     }
 
-    const usersFinal = []
+    const usersFinal = [];
 
-    let count = 0
+    let count = 0;
 
     const getMemberID = (guild, id) => {
         const target = guild.members.cache.find((member) => {
-            return member.user.id == id
-        })
+            return member.user.id == id;
+        });
 
-        return target
-    }
+        return target;
+    };
 
     for (const user of userIDs) {
-        if (count >= amount) break
-        if (usersFinal.join().length >= 1500) break
+        if (count >= amount) break;
+        if (usersFinal.join().length >= 1500) break;
 
         if (balances.get(user) != 0) {
-            let pos: number | string = count + 1
+            let pos: number | string = count + 1;
 
             if (pos == 1) {
-                pos = "🥇"
+                pos = "🥇";
             } else if (pos == 2) {
-                pos = "🥈"
+                pos = "🥈";
             } else if (pos == 3) {
-                pos = "🥉"
+                pos = "🥉";
             }
 
             usersFinal[count] =
-                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString()
-            count++
+                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString();
+            count++;
         }
     }
 
-    return usersFinal
+    return usersFinal;
 }
 
 /**
@@ -773,67 +773,67 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<Array<
  * @param {Number} amount of users to return with
  */
 export async function topAmountPrestige(guild: Guild, amount: number): Promise<Array<string>> {
-    let members: Collection<string, GuildMember>
+    let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
-        members = guild.members.cache
+        members = guild.members.cache;
     } else {
-        members = await guild.members.fetch()
+        members = await guild.members.fetch();
     }
 
-    if (!members) members = guild.members.cache
+    if (!members) members = guild.members.cache;
 
     members = members.filter((m) => {
-        return !m.user.bot
-    })
+        return !m.user.bot;
+    });
 
-    const query = db.prepare("SELECT id, prestige FROM economy WHERE prestige > 0").all()
+    const query = db.prepare("SELECT id, prestige FROM economy WHERE prestige > 0").all();
 
-    let userIDs = []
-    const prestiges = new Map()
+    let userIDs = [];
+    const prestiges = new Map();
 
     for (const user of query) {
         if (members.find((member) => member.user.id == user.id)) {
-            userIDs.push(user.id)
-            prestiges.set(user.id, user.prestige)
+            userIDs.push(user.id);
+            prestiges.set(user.id, user.prestige);
         }
     }
 
     if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, prestiges)
+        userIDs = await workerSort(userIDs, prestiges);
     } else {
-        inPlaceSort(userIDs).desc((i) => prestiges.get(i))
+        inPlaceSort(userIDs).desc((i) => prestiges.get(i));
     }
 
-    const usersFinal = []
+    const usersFinal = [];
 
-    let count = 0
+    let count = 0;
 
     const getMemberID = (guild, id) => {
         const target = guild.members.cache.find((member) => {
-            return member.user.id == id
-        })
+            return member.user.id == id;
+        });
 
-        return target
-    }
+        return target;
+    };
 
     for (const user of userIDs) {
-        if (count >= amount) break
-        if (usersFinal.join().length >= 1500) break
+        if (count >= amount) break;
+        if (usersFinal.join().length >= 1500) break;
 
         if (prestiges.get(user) != 0) {
-            let pos: string | number = count + 1
+            let pos: string | number = count + 1;
 
             if (pos == 1) {
-                pos = "🥇"
+                pos = "🥇";
             } else if (pos == 2) {
-                pos = "🥈"
+                pos = "🥈";
             } else if (pos == 3) {
-                pos = "🥉"
+                pos = "🥉";
             }
 
-            const thing = ["th", "st", "nd", "rd"]
-            const v = prestiges.get(user) % 100
+            const thing = ["th", "st", "nd", "rd"];
+            const v = prestiges.get(user) % 100;
             usersFinal[count] =
                 pos +
                 " **" +
@@ -841,11 +841,11 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<A
                 "** " +
                 prestiges.get(user) +
                 (thing[(v - 20) % 10] || thing[v] || thing[0]) +
-                " prestige"
-            count++
+                " prestige";
+            count++;
         }
     }
-    return usersFinal
+    return usersFinal;
 }
 
 /**
@@ -853,16 +853,16 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<A
  * @param {GuildMember} member to create profile for
  */
 export function createUser(member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`)
+    redis.del(`cache:economy:exists:${id}`);
 
-    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000)
+    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000);
 }
 
 /**
@@ -870,41 +870,41 @@ export function createUser(member: GuildMember | string) {
  * @param {String} number to format
  */
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
-    const maxBet = await calcMaxBet(member)
+    const maxBet = await calcMaxBet(member);
 
     if (bet.toString().toLowerCase() == "all") {
-        bet = getBalance(member)
+        bet = getBalance(member);
         if (bet > maxBet) {
-            bet = maxBet
+            bet = maxBet;
         }
     } else if (bet.toString().toLowerCase() == "max") {
-        bet = maxBet
+        bet = maxBet;
     } else if (bet.toString().toLowerCase() == "half") {
-        bet = Math.floor(getBalance(member) / 2)
+        bet = Math.floor(getBalance(member) / 2);
     }
 
-    const formatted = formatNumber(bet.toString())
+    const formatted = formatNumber(bet.toString());
 
     if (formatted) {
-        bet = formatted
+        bet = formatted;
     } else {
-        return null
+        return null;
     }
 
-    if (bet <= 0) return null
+    if (bet <= 0) return null;
 
-    return bet
+    return bet;
 }
 
 export function formatNumber(number: string): number | void {
-    number = number.toString().toLowerCase().replace("t", "000000000000")
-    number = number.replace("b", "000000000")
-    number = number.replace("m", "000000")
-    number = number.replace("k", "000")
+    number = number.toString().toLowerCase().replace("t", "000000000000");
+    number = number.replace("b", "000000000");
+    number = number.replace("m", "000000");
+    number = number.replace("k", "000");
 
-    if (isNaN(parseInt(number))) return null
+    if (isNaN(parseInt(number))) return null;
 
-    return Math.floor(parseInt(number))
+    return Math.floor(parseInt(number));
 }
 
 /**
@@ -912,9 +912,9 @@ export function formatNumber(number: string): number | void {
  * @param {GuildMember} member to check
  */
 export function hasPadlock(member: GuildMember): boolean {
-    const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id)
+    const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id);
 
-    return query.padlock == 1 ? true : false
+    return query.padlock == 1 ? true : false;
 }
 
 /**
@@ -923,9 +923,9 @@ export function hasPadlock(member: GuildMember): boolean {
  * @param {Boolean} setting padlock to true or false
  */
 export function setPadlock(member: GuildMember, setting: boolean | number) {
-    setting = setting ? 1 : 0
+    setting = setting ? 1 : 0;
 
-    db.prepare("UPDATE economy SET padlock = ? WHERE id = ?").run(setting, member.user.id)
+    db.prepare("UPDATE economy SET padlock = ? WHERE id = ?").run(setting, member.user.id);
 }
 
 /**
@@ -937,7 +937,7 @@ export function updateStats(guildCount: number, shardCount: number) {
     topggStats.postStats({
         serverCount: guildCount,
         shardCount: shardCount,
-    })
+    });
 
     // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
     //     method: "POST",
@@ -951,16 +951,16 @@ export function updateStats(guildCount: number, shardCount: number) {
  * @param {GuildMember} member
  */
 export function getPrestige(member: GuildMember | string): number {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT prestige FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT prestige FROM economy WHERE id = ?").get(id);
 
-    return query.prestige
+    return query.prestige;
 }
 
 /**
@@ -969,7 +969,7 @@ export function getPrestige(member: GuildMember | string): number {
  * @param {Number} amount
  */
 export function setPrestige(member: GuildMember, amount: number) {
-    db.prepare("UPDATE economy SET prestige = ? WHERE id = ?").run(amount, member.user.id)
+    db.prepare("UPDATE economy SET prestige = ? WHERE id = ?").run(amount, member.user.id);
 }
 
 /**
@@ -977,10 +977,10 @@ export function setPrestige(member: GuildMember, amount: number) {
  * @param {GuildMember} member
  */
 export function getPrestigeRequirement(member: GuildMember): number {
-    const constant = 250
-    const extra = getPrestige(member) * constant
+    const constant = 250;
+    const extra = getPrestige(member) * constant;
 
-    return 500 + extra
+    return 500 + extra;
 }
 
 /**
@@ -988,10 +988,10 @@ export function getPrestigeRequirement(member: GuildMember): number {
  * @param {Number} xp
  */
 export function getPrestigeRequirementBal(xp: number): number {
-    const constant = 500
-    const bonus = xp * constant
+    const constant = 500;
+    const bonus = xp * constant;
 
-    return bonus
+    return bonus;
 }
 
 /**
@@ -999,21 +999,21 @@ export function getPrestigeRequirementBal(xp: number): number {
  * @param {GuildMember} member
  */
 export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    if (!(await userExists(id))) createUser(id)
+    if (!(await userExists(id))) createUser(id);
 
-    const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id);
 
     if (query.dms == 1) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -1023,9 +1023,9 @@ export async function getDMsEnabled(member: GuildMember | string): Promise<boole
  * @param {Boolean} value
  */
 export function setDMsEnabled(member: GuildMember, value: boolean) {
-    const setting = value ? 1 : 0
+    const setting = value ? 1 : 0;
 
-    db.prepare("UPDATE economy SET dms = ? WHERE id = ?").run(setting, member.user.id)
+    db.prepare("UPDATE economy SET dms = ? WHERE id = ?").run(setting, member.user.id);
 }
 
 /**
@@ -1033,19 +1033,19 @@ export function setDMsEnabled(member: GuildMember, value: boolean) {
  * @param {GuildMember} member
  */
 export async function calcMaxBet(member: GuildMember): Promise<number> {
-    const base = 100000
-    const voted = await hasVoted(member)
-    const bonus = 50000
+    const base = 100000;
+    const voted = await hasVoted(member);
+    const bonus = 50000;
 
-    let total = base
+    let total = base;
 
     if (voted) {
-        total += 50000
+        total += 50000;
     }
 
-    const prestige = getPrestige(member)
+    const prestige = getPrestige(member);
 
-    return total + bonus * (prestige > 15 ? 15 : prestige)
+    return total + bonus * (prestige > 15 ? 15 : prestige);
 }
 
 /**
@@ -1054,16 +1054,16 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
  * @param {String} member
  */
 export function getWorkers(member: GuildMember | string): any {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(id);
 
-    return JSON.parse(query.workers)
+    return JSON.parse(query.workers);
 }
 
 /**
@@ -1073,16 +1073,16 @@ export function getWorkers(member: GuildMember | string): any {
  * @returns {Worker}
  */
 export function getWorker(member: GuildMember, id: string): Worker {
-    let memberID: string
+    let memberID: string;
     if (member instanceof GuildMember) {
-        memberID = member.user.id
+        memberID = member.user.id;
     } else {
-        memberID = member
+        memberID = member;
     }
 
-    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID)
+    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID);
 
-    return JSON.parse(query.workers)[id]
+    return JSON.parse(query.workers)[id];
 }
 
 /**
@@ -1092,47 +1092,47 @@ export function getWorker(member: GuildMember, id: string): Worker {
  * @returns
  */
 export function addWorker(member: GuildMember, id: number) {
-    let memberID: string
+    let memberID: string;
     if (member instanceof GuildMember) {
-        memberID = member.user.id
+        memberID = member.user.id;
     } else {
-        memberID = member
+        memberID = member;
     }
 
-    const workers = getAllWorkers()
+    const workers = getAllWorkers();
 
-    let worker: Constructor<Worker> | Worker = workers.get(id)
+    let worker: Constructor<Worker> | Worker = workers.get(id);
 
-    if (!worker) return
+    if (!worker) return;
 
-    worker = new worker()
+    worker = new worker();
 
-    const memberWorkers = getWorkers(member)
+    const memberWorkers = getWorkers(member);
 
-    memberWorkers[id] = worker
+    memberWorkers[id] = worker;
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID)
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID);
 }
 
 export function emptyWorkersStored(member: GuildMember | string) {
-    let memberID: string
+    let memberID: string;
     if (member instanceof GuildMember) {
-        memberID = member.user.id
+        memberID = member.user.id;
     } else {
-        memberID = member
+        memberID = member;
     }
 
-    const workers = getWorkers(memberID)
+    const workers = getWorkers(memberID);
 
     for (const w of Object.keys(workers)) {
-        const worker: Worker = workers[w]
+        const worker: Worker = workers[w];
 
-        worker.stored = 0
+        worker.stored = 0;
 
-        workers[worker.id] = worker
+        workers[worker.id] = worker;
     }
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID)
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID);
 }
 
 /**
@@ -1141,96 +1141,96 @@ export function emptyWorkersStored(member: GuildMember | string) {
  * @param {String} id
  */
 export function upgradeWorker(member: GuildMember | string, id: string) {
-    let memberID: string
+    let memberID: string;
     if (member instanceof GuildMember) {
-        memberID = member.user.id
+        memberID = member.user.id;
     } else {
-        memberID = member
+        memberID = member;
     }
 
-    const workers = getWorkers(memberID)
+    const workers = getWorkers(memberID);
 
-    let worker = workers[id]
+    let worker = workers[id];
 
-    worker = Worker.fromJSON(worker)
+    worker = Worker.fromJSON(worker);
 
-    worker.upgrade()
+    worker.upgrade();
 
-    workers[id] = worker
+    workers[id] = worker;
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID)
+    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID);
 }
 
 export function isEcoBanned(id: string) {
     if (bannedCache.has(id)) {
-        return bannedCache.get(id)
+        return bannedCache.get(id);
     } else {
-        const query = db.prepare("SELECT banned FROM economy WHERE id = ?").get(id)
+        const query = db.prepare("SELECT banned FROM economy WHERE id = ?").get(id);
 
         if (!query) {
-            bannedCache.set(id, false)
-            return false
+            bannedCache.set(id, false);
+            return false;
         }
 
         if (query.banned) {
-            bannedCache.set(id, true)
-            return true
+            bannedCache.set(id, true);
+            return true;
         } else {
-            bannedCache.set(id, false)
-            return false
+            bannedCache.set(id, false);
+            return false;
         }
     }
 }
 
 export function toggleBan(id: string) {
     if (isEcoBanned(id)) {
-        db.prepare("UPDATE economy SET banned = 0 WHERE id = ?").run(id)
+        db.prepare("UPDATE economy SET banned = 0 WHERE id = ?").run(id);
     } else {
-        db.prepare("UPDATE economy SET banned = 1 WHERE id = ?").run(id)
+        db.prepare("UPDATE economy SET banned = 1 WHERE id = ?").run(id);
     }
 
-    bannedCache.delete(id)
+    bannedCache.delete(id);
 }
 
 export function reset() {
-    const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all()
-    db.prepare("delete from economy_guild_members").run()
-    db.prepare("delete from economy_guild")
+    const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all();
+    db.prepare("delete from economy_guild_members").run();
+    db.prepare("delete from economy_guild");
 
-    let updated = 0
-    let deleted = 0
+    let updated = 0;
+    let deleted = 0;
 
     for (const user of query) {
-        const prestige = user.prestige
-        const lastVote = user.last_vote
-        let inventory = JSON.parse(user.inventory)
-        const dms = user.dms
+        const prestige = user.prestige;
+        const lastVote = user.last_vote;
+        let inventory = JSON.parse(user.inventory);
+        const dms = user.dms;
 
-        if (!inventory) inventory = {}
+        if (!inventory) inventory = {};
 
         if (Array.from(Object.keys(inventory)).length == 0) {
-            inventory = undefined
+            inventory = undefined;
         } else {
             for (const item of Array.from(Object.keys(inventory))) {
                 if (items[item].role != "collectable") {
-                    delete inventory[item]
+                    delete inventory[item];
                 }
             }
         }
 
         if (!inventory && prestige == 0 && user.money < 10000 && user.xp < 300) {
-            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id)
-            deleted++
+            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id);
+            deleted++;
         } else {
             db.prepare(
                 "UPDATE economy SET money = 1000, bank = 4000, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
-            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id)
-            updated++
+            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id);
+            updated++;
         }
     }
-    db.prepare("DELETE FROM economy_stats")
+    db.prepare("DELETE FROM economy_stats");
 
-    return { updated: updated, deleted: deleted }
+    return { updated: updated, deleted: deleted };
 }
 
 /**
@@ -1238,16 +1238,16 @@ export function reset() {
  * @param {GuildMember} member
  */
 export function getStats(member: GuildMember): StatsProfile {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").all(id)
+    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").all(id);
 
-    return new StatsProfile(query)
+    return new StatsProfile(query);
 }
 
 /**
@@ -1257,26 +1257,26 @@ export function getStats(member: GuildMember): StatsProfile {
  * @param {Boolean} win
  */
 export function addGamble(member: GuildMember, game: string, win: boolean) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game)
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game);
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game)
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game);
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game)
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game);
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
+            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1)
+            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
         }
     }
 }
@@ -1287,26 +1287,26 @@ export function addGamble(member: GuildMember, game: string, win: boolean) {
  * @param {Boolean} win
  */
 export function addRob(member: GuildMember, win: boolean) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = 'rob'").get(id)
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = 'rob'").get(id);
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = 'rob'").run(id)
+            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = 'rob'").run(id);
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = 'rob'").run(id)
+            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = 'rob'").run(id);
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, "rob", 1)
+            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, "rob", 1);
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, "rob", 1)
+            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, "rob", 1);
         }
     }
 }
@@ -1316,19 +1316,19 @@ export function addRob(member: GuildMember, win: boolean) {
  * @param {GuildMember} member
  */
 export function addItemUse(member: GuildMember, item) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item)
+    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item);
 
     if (query) {
-        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item)
+        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item);
     } else {
-        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item)
+        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item);
     }
 }
 
@@ -1338,21 +1338,21 @@ export function addItemUse(member: GuildMember, item) {
  * @returns
  */
 export function getInventory(member: GuildMember | string): { [key: string]: number } {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id)
+    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id);
 
     if (!query.inventory) {
-        db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(id)
-        return {}
+        db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(id);
+        return {};
     }
 
-    return JSON.parse(query.inventory)
+    return JSON.parse(query.inventory);
 }
 
 /**
@@ -1361,17 +1361,17 @@ export function getInventory(member: GuildMember | string): { [key: string]: num
  * @param {Object} inventory
  */
 export function setInventory(member: GuildMember | string, inventory: object) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
-    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id)
+    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id);
 }
 
 export function getItems(): { [key: string]: Item } {
-    return items
+    return items;
 }
 
 /**
@@ -1379,17 +1379,17 @@ export function getItems(): { [key: string]: Item } {
  * @param {GuildMember} member
  */
 export function getMaxBitcoin(member: GuildMember): number {
-    const base = 10
+    const base = 10;
 
-    const prestige = getPrestige(member)
+    const prestige = getPrestige(member);
 
-    const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige)
+    const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige);
 
-    let xpBonus = 1 * Math.floor(getXp(member) / 100)
+    let xpBonus = 1 * Math.floor(getXp(member) / 100);
 
-    if (xpBonus > 5) xpBonus = 5
+    if (xpBonus > 5) xpBonus = 5;
 
-    return base + prestigeBonus + xpBonus
+    return base + prestigeBonus + xpBonus;
 }
 
 /**
@@ -1397,7 +1397,7 @@ export function getMaxBitcoin(member: GuildMember): number {
  * @param {GuildMember} member
  */
 export function getMaxEthereum(member: GuildMember): number {
-    return getMaxBitcoin(member) * 10
+    return getMaxBitcoin(member) * 10;
 }
 
 /**
@@ -1405,16 +1405,16 @@ export function getMaxEthereum(member: GuildMember): number {
  * @param {GuildMember} member
  */
 export function deleteUser(member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`)
+    redis.del(`cache:economy:exists:${id}`);
 
-    db.prepare("DELETE FROM economy WHERE id = ?").run(id)
+    db.prepare("DELETE FROM economy WHERE id = ?").run(id);
 }
 
 /**
@@ -1423,16 +1423,16 @@ export function deleteUser(member: GuildMember | string) {
  * @returns {Array<{ user_id: string, id: number }>}
  */
 export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    const query: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets WHERE user_id = ?").all(id)
+    const query: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets WHERE user_id = ?").all(id);
 
-    return query
+    return query;
 }
 
 /**
@@ -1440,21 +1440,21 @@ export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
  * @param {GuildMember} member
  */
 export function addTicket(member: GuildMember | string) {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id)
+    db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id);
 
-    if (!(member instanceof GuildMember)) return
+    if (!(member instanceof GuildMember)) return;
 
     if (lotteryHookQueue.has(member.user.username)) {
-        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1)
+        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1);
     } else {
-        lotteryHookQueue.set(member.user.username, 1)
+        lotteryHookQueue.set(member.user.username, 1);
     }
 }
 
@@ -1463,66 +1463,66 @@ export function addTicket(member: GuildMember | string) {
  * @param {Client} client
  */
 async function doLottery(client: Client) {
-    logger.info("performing lottery..")
-    const tickets: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets").all()
+    logger.info("performing lottery..");
+    const tickets: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets").all();
 
     if (tickets.length < 10) {
-        logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`)
+        logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
 
-        const embed = new CustomEmbed()
+        const embed = new CustomEmbed();
 
-        embed.setTitle("lottery cancelled")
+        embed.setTitle("lottery cancelled");
         embed.setDescription(
             `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
-        )
-        embed.setColor("#111111")
+        );
+        embed.setColor("#111111");
 
-        return lotteryHook.send({ embeds: [embed] })
+        return lotteryHook.send({ embeds: [embed] });
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9)
+    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
 
     /**
      * @type {Array<{ user_id: string, id: number }>}
      */
-    const shuffledTickets: Array<{ user_id: string; id: number }> = shufflearray(tickets)
+    const shuffledTickets: Array<{ user_id: string; id: number }> = shufflearray(tickets);
 
-    let chosen: LotteryTicket
-    let user: User
+    let chosen: LotteryTicket;
+    let user: User;
 
     while (!user) {
-        chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)]
+        chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
 
-        logger.info(`winner: ${chosen.user_id} with ticket #${chosen.id}`)
+        logger.info(`winner: ${chosen.user_id} with ticket #${chosen.id}`);
 
-        user = await client.users.fetch(chosen.user_id)
+        user = await client.users.fetch(chosen.user_id);
     }
 
     logger.log({
         level: "success",
         message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
-    })
+    });
 
-    updateBalance(user.id, getBalance(user.id) + total)
+    updateBalance(user.id, getBalance(user.id) + total);
 
-    const embed = new CustomEmbed()
+    const embed = new CustomEmbed();
 
-    embed.setTitle("lottery winner")
+    embed.setTitle("lottery winner");
     embed.setDescription(
         `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
             `they have won a total of $**${total.toLocaleString()}**`
-    )
-    embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`)
-    embed.setColor("#111111")
+    );
+    embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`);
+    embed.setColor("#111111");
 
-    await lotteryHook.send({ embeds: [embed] })
+    await lotteryHook.send({ embeds: [embed] });
 
     if (await getDMsEnabled(user.id)) {
-        embed.setTitle("you have won the lottery!")
+        embed.setTitle("you have won the lottery!");
         embed.setDescription(
             `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
-        )
-        embed.setColor("#111111")
+        );
+        embed.setColor("#111111");
 
         await user
             .send({ embeds: [embed] })
@@ -1530,16 +1530,16 @@ async function doLottery(client: Client) {
                 logger.log({
                     level: "success",
                     message: "sent notification to winner",
-                })
+                });
             })
             .catch(() => {
-                logger.warn("failed to send notification to winner")
-            })
+                logger.warn("failed to send notification to winner");
+            });
     }
 
-    const { changes } = db.prepare("DELETE FROM lottery_tickets").run()
+    const { changes } = db.prepare("DELETE FROM lottery_tickets").run();
 
-    logger.info(`${changes.toLocaleString()} tickets deleted from database`)
+    logger.info(`${changes.toLocaleString()} tickets deleted from database`);
 }
 
 /**
@@ -1547,24 +1547,24 @@ async function doLottery(client: Client) {
  * @param {Client} client
  */
 export function runLotteryInterval(client: Client) {
-    const now = new Date()
-    const saturday = new Date()
-    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1)
-    saturday.setHours(0, 0, 0, 0)
+    const now = new Date();
+    const saturday = new Date();
+    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1);
+    saturday.setHours(0, 0, 0, 0);
 
-    const needed = saturday.getTime() - now.getTime()
+    const needed = saturday.getTime() - now.getTime();
 
     setTimeout(() => {
-        doLottery(client)
+        doLottery(client);
         setInterval(() => {
-            doLottery(client)
-        }, 86400 * 1000 * 7)
-    }, needed)
+            doLottery(client);
+        }, 86400 * 1000 * 7);
+    }, needed);
 
     logger.log({
         level: "auto",
         message: `lottery will run in ${MStoTime(needed)}`,
-    })
+    });
 }
 
 /**
@@ -1574,8 +1574,8 @@ export function runLotteryInterval(client: Client) {
  * @returns {string}
  */
 export function openCrate(member: GuildMember, item: Item): string[] {
-    const inventory = getInventory(member)
-    const items = getItems()
+    const inventory = getInventory(member);
+    const items = getItems();
 
     const crateItems = [
         "money:10000",
@@ -1588,275 +1588,275 @@ export function openCrate(member: GuildMember, item: Item): string[] {
         "xp:15",
         "xp:25",
         "xp:50",
-    ]
+    ];
 
     for (const i of Array.from(Object.keys(items))) {
-        crateItems.push(i)
+        crateItems.push(i);
     }
 
-    inventory[item.id] -= 1
+    inventory[item.id] -= 1;
 
     if (inventory[item.id] == 0) {
-        delete inventory[item.id]
+        delete inventory[item.id];
     }
 
-    setInventory(member, inventory)
+    setInventory(member, inventory);
 
-    let times = 2
-    const names = []
+    let times = 2;
+    const names = [];
 
     if (item.id.includes("vote")) {
-        times = 1
+        times = 1;
     } else if (item.id.includes("69420")) {
-        updateBalance(member, getBalance(member) + 69420)
-        names.push("$69,420")
+        updateBalance(member, getBalance(member) + 69420);
+        names.push("$69,420");
     }
 
     for (let i = 0; i < times; i++) {
-        const crateItemsModified = []
+        const crateItemsModified = [];
 
         for (const i of crateItems) {
             if (items[i]) {
                 if (items[i].rarity == 4) {
-                    const chance = Math.floor(Math.random() * 15)
+                    const chance = Math.floor(Math.random() * 15);
                     if (chance == 4) {
-                        crateItemsModified.push(i)
+                        crateItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 3) {
-                    const chance = Math.floor(Math.random() * 3)
+                    const chance = Math.floor(Math.random() * 3);
                     if (chance == 2) {
-                        crateItemsModified.push(i)
+                        crateItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 2) {
-                    crateItemsModified.push(i)
+                    crateItemsModified.push(i);
                 } else if (items[i].rarity == 1) {
-                    crateItemsModified.push(i)
-                    crateItemsModified.push(i)
+                    crateItemsModified.push(i);
+                    crateItemsModified.push(i);
                 } else if (items[i].rarity == 0) {
-                    crateItemsModified.push(i)
-                    crateItemsModified.push(i)
-                    crateItemsModified.push(i)
+                    crateItemsModified.push(i);
+                    crateItemsModified.push(i);
+                    crateItemsModified.push(i);
                 }
             } else {
-                crateItemsModified.push(i)
-                crateItemsModified.push(i)
+                crateItemsModified.push(i);
+                crateItemsModified.push(i);
             }
         }
 
-        const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)]
+        const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)];
 
         if (chosen == "bitcoin") {
-            const owned = inventory["bitcoin"] || 0
-            const max = getMaxBitcoin(member)
+            const owned = inventory["bitcoin"] || 0;
+            const max = getMaxBitcoin(member);
 
             if (owned + 1 > max) {
-                i--
-                continue
+                i--;
+                continue;
             } else {
                 if (inventory[chosen]) {
-                    inventory[chosen] += 1
+                    inventory[chosen] += 1;
                 } else {
-                    inventory[chosen] = 1
+                    inventory[chosen] = 1;
                 }
-                names.push(`${items[chosen].emoji} ${items[chosen].name}`)
+                names.push(`${items[chosen].emoji} ${items[chosen].name}`);
             }
         } else if (chosen == "ethereum") {
-            const owned = inventory["ethereum"] || 0
-            const max = getMaxEthereum(member)
+            const owned = inventory["ethereum"] || 0;
+            const max = getMaxEthereum(member);
 
             if (owned + 1 > max) {
-                i--
-                continue
+                i--;
+                continue;
             } else {
                 if (inventory[chosen]) {
-                    inventory[chosen] += 1
+                    inventory[chosen] += 1;
                 } else {
-                    inventory[chosen] = 1
+                    inventory[chosen] = 1;
                 }
-                names.push(`${items[chosen].emoji} ${items[chosen].name}`)
+                names.push(`${items[chosen].emoji} ${items[chosen].name}`);
             }
         } else if (chosen.includes("money:") || chosen.includes("xp:")) {
             if (chosen.includes("money:")) {
-                const amount = parseInt(chosen.substr(6))
+                const amount = parseInt(chosen.substr(6));
 
-                updateBalance(member, getBalance(member) + amount)
-                names.push("$" + amount.toLocaleString())
+                updateBalance(member, getBalance(member) + amount);
+                names.push("$" + amount.toLocaleString());
             } else if (chosen.includes("xp:")) {
-                const amount = parseInt(chosen.substr(3))
+                const amount = parseInt(chosen.substr(3));
 
-                updateXp(member, getXp(member) + amount)
-                names.push(amount + "xp")
+                updateXp(member, getXp(member) + amount);
+                names.push(amount + "xp");
             }
         } else {
-            let amount = 1
+            let amount = 1;
 
             if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun" || chosen == "wooden_pickaxe") {
-                amount = 5
+                amount = 5;
             } else if (chosen == "fishing_rod" || chosen == "gun" || chosen == "iron_pickaxe") {
-                amount = 10
+                amount = 10;
             } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamond_pickaxe") {
-                amount = 10
+                amount = 10;
             }
 
             if (inventory[chosen]) {
-                inventory[chosen] += amount
+                inventory[chosen] += amount;
             } else {
-                inventory[chosen] = amount
+                inventory[chosen] = amount;
             }
-            names.push(`${items[chosen].emoji} ${items[chosen].name}`)
+            names.push(`${items[chosen].emoji} ${items[chosen].name}`);
         }
     }
 
-    setInventory(member, inventory)
+    setInventory(member, inventory);
 
-    return names
+    return names;
 }
 
 export function getRequiredBetForXp(member: GuildMember): number {
-    let requiredBet = 1000
+    let requiredBet = 1000;
 
-    const prestige = getPrestige(member)
+    const prestige = getPrestige(member);
 
-    if (prestige > 2) requiredBet = 10000
+    if (prestige > 2) requiredBet = 10000;
 
-    requiredBet += prestige * 1000
+    requiredBet += prestige * 1000;
 
-    return requiredBet
+    return requiredBet;
 }
 
 export function calcMinimumEarnedXp(member: GuildMember): number {
-    let earned = 1
-    earned += getPrestige(member)
+    let earned = 1;
+    earned += getPrestige(member);
 
-    let max = 6
+    let max = 6;
 
-    const guild = getGuildByUser(member)
+    const guild = getGuildByUser(member);
 
     if (guild) {
-        max += guild.level - 1
+        max += guild.level - 1;
     }
 
-    if (earned > max) earned = max
+    if (earned > max) earned = max;
 
-    return earned
+    return earned;
 }
 
 export function calcEarnedXp(member: GuildMember, bet: number): number {
-    const requiredBet = getRequiredBetForXp(member)
+    const requiredBet = getRequiredBetForXp(member);
 
     if (bet < requiredBet) {
-        return 0
+        return 0;
     }
 
-    let earned = calcMinimumEarnedXp(member)
+    let earned = calcMinimumEarnedXp(member);
 
-    const random = Math.floor(Math.random() * 3)
+    const random = Math.floor(Math.random() * 3);
 
-    earned += random
+    earned += random;
 
-    let max = 6
+    let max = 6;
 
-    const guild = getGuildByUser(member)
+    const guild = getGuildByUser(member);
 
     if (guild) {
-        max += guild.level - 1
+        max += guild.level - 1;
     }
 
-    if (earned > max) earned = max
+    if (earned > max) earned = max;
 
-    return earned
+    return earned;
 }
 
 export interface EconomyGuild {
-    guild_name: string
-    created_at: number
-    balance: number
-    xp: number
-    level: number
-    motd: string
-    owner: string
-    members: EconomyGuildMember[]
+    guild_name: string;
+    created_at: number;
+    balance: number;
+    xp: number;
+    level: number;
+    motd: string;
+    owner: string;
+    members: EconomyGuildMember[];
 }
 
 interface EconomyGuildMember {
-    user_id: string
-    guild_id: string
-    joined_at: number
-    contributed_money: number
-    contributed_xp: number
-    last_known_tag: string
+    user_id: string;
+    guild_id: string;
+    joined_at: number;
+    contributed_money: number;
+    contributed_xp: number;
+    last_known_tag: string;
 }
 
 export function guildExists(name: string): boolean {
     if (guildExistsCache.has(name)) {
-        return guildExistsCache.get(name)
+        return guildExistsCache.get(name);
     }
 
-    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name)
+    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name);
 
     if (!query) {
-        return false
+        return false;
     } else {
-        return true
+        return true;
     }
 }
 
 export function getGuildByName(name: string): EconomyGuild {
-    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name)
+    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name);
     const members: EconomyGuildMember[] = db
         .prepare("select * from economy_guild_members where guild_id = ? collate nocase")
-        .all(name)
+        .all(name);
 
-    if (!guild) return null
+    if (!guild) return null;
 
-    guild.members = members
+    guild.members = members;
 
     for (const m of members) {
         if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id)
+            guildUserCache.set(m.user_id, m.guild_id);
         }
     }
 
-    return guild
+    return guild;
 }
 
 export function getGuildByUser(member: GuildMember | string): EconomyGuild | null {
-    let id: string
+    let id: string;
     if (member instanceof GuildMember) {
-        id = member.user.id
+        id = member.user.id;
     } else {
-        id = member
+        id = member;
     }
 
-    let guildName: string
+    let guildName: string;
 
     if (guildUserCache.has(id)) {
-        guildName = guildUserCache.get(id)
+        guildName = guildUserCache.get(id);
 
-        if (!guildName) return null
+        if (!guildName) return null;
     } else {
-        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id)
+        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id);
 
         if (!query) {
-            guildUserCache.set(id, null)
-            return null
+            guildUserCache.set(id, null);
+            return null;
         }
 
-        guildName = query.guild_id
+        guildName = query.guild_id;
     }
 
-    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName)
-    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName)
+    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName);
+    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName);
 
     for (const m of members) {
         if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id)
+            guildUserCache.set(m.user_id, m.guild_id);
         }
     }
 
-    guild.members = members
+    guild.members = members;
 
-    return guild
+    return guild;
 }
 
 export function createGuild(name: string, owner: GuildMember) {
@@ -1864,87 +1864,87 @@ export function createGuild(name: string, owner: GuildMember) {
         name,
         Date.now(),
         owner.user.id
-    )
+    );
     db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
         owner.user.id,
         name,
         Date.now(),
         owner.user.tag
-    )
+    );
 
     if (guildUserCache.has(owner.user.id)) {
-        guildUserCache.delete(owner.user.id)
+        guildUserCache.delete(owner.user.id);
     }
 }
 
 export function deleteGuild(name: string) {
-    const members = getGuildByName(name).members
+    const members = getGuildByName(name).members;
 
     for (const m of members) {
-        guildUserCache.delete(m.user_id)
+        guildUserCache.delete(m.user_id);
     }
 
-    guildExistsCache.delete(name)
+    guildExistsCache.delete(name);
 
-    db.prepare("delete from economy_guild_members where guild_id = ?").run(name)
-    db.prepare("delete from economy_guild where guild_name = ?").run(name)
+    db.prepare("delete from economy_guild_members where guild_id = ?").run(name);
+    db.prepare("delete from economy_guild where guild_name = ?").run(name);
 }
 
 export function addToGuildBank(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name);
     db.prepare("update economy_guild_members set contributed_money = contributed_money + ? where user_id = ?").run(
         amount,
         member.user.id
-    )
+    );
 
-    return checkUpgrade(name)
+    return checkUpgrade(name);
 }
 
 export function addToGuildXP(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name)
+    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name);
     db.prepare("update economy_guild_members set contributed_xp = contributed_xp + ? where user_id = ?").run(
         amount,
         member.user.id
-    )
+    );
 
-    return checkUpgrade(name)
+    return checkUpgrade(name);
 }
 
 export function getMaxMembersForGuild(name: string) {
-    const guild = getGuildByName(name)
+    const guild = getGuildByName(name);
 
-    return guild.level * 3
+    return guild.level * 3;
 }
 
 export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
     if (guildRequirementsCache.has(name)) {
-        return guildRequirementsCache.get(name)
+        return guildRequirementsCache.get(name);
     }
 
-    const guild = getGuildByName(name)
+    const guild = getGuildByName(name);
 
-    const baseMoney = 1900000 * Math.pow(guild.level, 2)
-    const baseXP = 1425 * Math.pow(guild.level, 2)
+    const baseMoney = 1900000 * Math.pow(guild.level, 2);
+    const baseXP = 1425 * Math.pow(guild.level, 2);
 
-    const bonusMoney = 100000 * guild.members.length
-    const bonusXP = 75 * guild.members.length
+    const bonusMoney = 100000 * guild.members.length;
+    const bonusXP = 75 * guild.members.length;
 
     guildRequirementsCache.set(name, {
         money: baseMoney + bonusMoney,
         xp: baseXP + bonusXP,
-    })
+    });
 
     return {
         money: baseMoney + bonusMoney,
         xp: baseXP + bonusXP,
-    }
+    };
 }
 
 export function addMember(name: string, member: GuildMember): boolean {
-    const guild = getGuildByName(name)
+    const guild = getGuildByName(name);
 
     if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
-        return false
+        return false;
     }
 
     db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
@@ -1952,13 +1952,13 @@ export function addMember(name: string, member: GuildMember): boolean {
         guild.guild_name,
         Date.now(),
         member.user.tag
-    )
+    );
 
     if (guildUserCache.has(member.user.id)) {
-        guildUserCache.delete(member.user.id)
+        guildUserCache.delete(member.user.id);
     }
 
-    return true
+    return true;
 }
 
 export enum RemoveMemberMode {
@@ -1968,91 +1968,91 @@ export enum RemoveMemberMode {
 
 export function removeMember(member: string, mode: RemoveMemberMode) {
     if (mode == RemoveMemberMode.ID) {
-        db.prepare("delete from economy_guild_members where user_id = ?").run(member)
+        db.prepare("delete from economy_guild_members where user_id = ?").run(member);
     } else {
-        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member)
+        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member);
     }
 
-    guildUserCache.clear()
+    guildUserCache.clear();
 }
 
 export function updateLastKnownTag(id: string, tag: string) {
-    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id)
+    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id);
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (typeof guild == "string") {
-        guild = getGuildByName(guild)
+        guild = getGuildByName(guild);
     }
 
-    if (guild.level == 5) return
-    const requirements = getRequiredForGuildUpgrade(guild.guild_name)
+    if (guild.level == 5) return;
+    const requirements = getRequiredForGuildUpgrade(guild.guild_name);
 
     if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
         db.prepare(
             "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
-        ).run(requirements.money, requirements.xp, guild.guild_name)
+        ).run(requirements.money, requirements.xp, guild.guild_name);
 
-        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`)
+        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`);
 
-        guildRequirementsCache.clear()
+        guildRequirementsCache.clear();
 
-        const embed = new CustomEmbed().setColor("#5efb8f")
+        const embed = new CustomEmbed().setColor("#5efb8f");
 
-        embed.setHeader(guild.guild_name)
+        embed.setHeader(guild.guild_name);
         embed.setDescription(
             `**${guild.guild_name}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
                 `\n +**${guild.level}** basic crates` +
                 "\n +**1**% multiplier" +
                 "\n +**1** max xp gain"
-        )
+        );
 
         for (const member of guild.members) {
-            const inventory = getInventory(member.user_id)
+            const inventory = getInventory(member.user_id);
 
             if (inventory["basic_crate"]) {
-                inventory["basic_crate"] += guild.level
+                inventory["basic_crate"] += guild.level;
             } else {
-                inventory["basic_crate"] = guild.level
+                inventory["basic_crate"] = guild.level;
             }
 
-            setInventory(member.user_id, inventory)
+            setInventory(member.user_id, inventory);
 
             if (await getDMsEnabled(member.user_id)) {
-                const { requestDM } = require("../../nypsi")
+                const { requestDM } = require("../../nypsi");
 
-                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed)
+                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed);
             }
         }
 
-        return true
+        return true;
     }
-    return false
+    return false;
 }
 
 export function setGuildMOTD(name: string, motd: string) {
-    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name)
+    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name);
 }
 
 export function topGuilds(limit = 5): string[] {
     const guilds: EconomyGuild[] = db
         .prepare("select guild_name, balance, xp, level from economy_guild where balance > 1000")
-        .all()
+        .all();
 
-    inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp])
+    inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp]);
 
-    const out: string[] = []
+    const out: string[] = [];
 
     for (const guild of guilds) {
-        if (out.length >= limit) break
-        let position: number | string = guilds.indexOf(guild) + 1
+        if (out.length >= limit) break;
+        let position: number | string = guilds.indexOf(guild) + 1;
 
-        if (position == 1) position = "🥇"
-        if (position == 2) position = "🥈"
-        if (position == 3) position = "🥉"
+        if (position == 1) position = "🥇";
+        if (position == 2) position = "🥈";
+        if (position == 3) position = "🥉";
 
-        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`)
+        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`);
     }
 
-    return out
+    return out;
 }
