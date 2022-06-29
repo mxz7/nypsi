@@ -1,41 +1,41 @@
-import { CommandInteraction, Message } from "discord.js"
-import { formatDate } from "../utils/functions/date"
-import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/guilds/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { formatDate } from "../utils/functions/date";
+import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/guilds/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("server", "view information about the server", Categories.INFO).setAliases([
     "serverinfo",
     "membercount",
-])
+]);
 
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const server = message.guild
+    const server = message.guild;
 
-    runCheck(server)
+    runCheck(server);
 
-    const created = formatDate(server.createdAt).toLowerCase()
+    const created = formatDate(server.createdAt).toLowerCase();
 
-    let members
+    let members;
 
     if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size) {
-        members = server.members.cache
+        members = server.members.cache;
     } else {
-        members = await server.members.fetch()
-        addCooldown(server, 3600)
+        members = await server.members.fetch();
+        addCooldown(server, 3600);
     }
 
-    const users = members.filter((member) => !member.user.bot)
-    const bots = members.filter((member) => member.user.bot)
+    const users = members.filter((member) => !member.user.bot);
+    const bots = members.filter((member) => member.user.bot);
 
     if (args.length == 1 && args[0] == "-id") {
-        const embed = new CustomEmbed(message.member).setHeader(server.name).setDescription("`" + server.id + "`")
+        const embed = new CustomEmbed(message.member).setHeader(server.name).setDescription("`" + server.id + "`");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
     if (args.length == 1 && args[0] == "-m") {
@@ -49,9 +49,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `**humans** ${users.size.toLocaleString()}\n` +
                     `**bots** ${bots.size.toLocaleString()}\n` +
                     `**member peak** ${getPeaks(message.guild).toLocaleString()}`
-            )
+            );
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
     const embed = new CustomEmbed(message.member)
@@ -83,15 +83,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `**humans** ${users.size.toLocaleString()}\n` +
                 `**bots** ${bots.size.toLocaleString()}\n` +
                 `**member peak** ${getPeaks(message.guild).toLocaleString()}`
-        )
+        );
 
     if (server.memberCount >= 25000) {
-        embed.setFooter("humans and bots may be inaccurate due to server size")
+        embed.setFooter("humans and bots may be inaccurate due to server size");
     }
 
-    message.channel.send({ embeds: [embed] })
+    message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

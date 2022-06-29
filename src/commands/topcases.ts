@@ -1,15 +1,15 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
-import { profileExists, getAllCases } from "../utils/moderation/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { getMember } from "../utils/functions/member"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { getPrefix } from "../utils/guilds/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+import { CommandInteraction, Message, Permissions } from "discord.js";
+import { profileExists, getAllCases } from "../utils/moderation/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getMember } from "../utils/functions/member";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { getPrefix } from "../utils/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
     "MODERATE_MEMBERS",
-])
+]);
 
 /**
  * @param {Message} message
@@ -18,190 +18,190 @@ const cmd = new Command("topcases", "see who has the top moderation cases", Cate
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
-            return
+            return;
         }
     }
 
-    if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
+    if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    const cases = getAllCases(message.guild)
+    const cases = getAllCases(message.guild);
 
-    if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] })
+    if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 
-    await addCooldown(cmd.name, message.member, 15)
+    await addCooldown(cmd.name, message.member, 15);
 
-    const embed = new CustomEmbed(message.member, true).setHeader("top cases")
+    const embed = new CustomEmbed(message.member, true).setHeader("top cases");
 
-    const prefix = getPrefix(message.guild)
+    const prefix = getPrefix(message.guild);
 
     if (args.length == 0) {
-        const topStaff = new Map()
-        const topMembers = new Map()
+        const topStaff = new Map();
+        const topMembers = new Map();
 
-        let deletedCaseCount = 0
+        let deletedCaseCount = 0;
 
         for (const case0 of cases) {
             if (case0.deleted) {
-                deletedCaseCount++
-                continue
+                deletedCaseCount++;
+                continue;
             }
 
             if (topStaff.has(case0.moderator)) {
-                topStaff.set(case0.moderator, topStaff.get(case0.moderator) + 1)
+                topStaff.set(case0.moderator, topStaff.get(case0.moderator) + 1);
             } else {
-                topStaff.set(case0.moderator, 1)
+                topStaff.set(case0.moderator, 1);
             }
 
             if (topMembers.has(case0.user)) {
-                topMembers.set(case0.user, topMembers.get(case0.user) + 1)
+                topMembers.set(case0.user, topMembers.get(case0.user) + 1);
             } else {
-                topMembers.set(case0.user, 1)
+                topMembers.set(case0.user, 1);
             }
         }
 
-        const staff = []
-        const members = []
+        const staff = [];
+        const members = [];
 
         for (const s of topStaff.keys()) {
-            staff.push(s)
+            staff.push(s);
         }
 
         for (const m of topMembers.keys()) {
-            members.push(m)
+            members.push(m);
         }
 
         staff.sort(function (a, b) {
-            return topStaff.get(b) - topStaff.get(a)
-        })
+            return topStaff.get(b) - topStaff.get(a);
+        });
 
         members.sort(function (a, b) {
-            return topMembers.get(b) - topMembers.get(a)
-        })
+            return topMembers.get(b) - topMembers.get(a);
+        });
 
-        const staffText = []
-        const memberText = []
+        const staffText = [];
+        const memberText = [];
 
-        let count = 0
+        let count = 0;
 
         for (const s of staff) {
-            if (count >= 5) break
+            if (count >= 5) break;
 
-            staffText[count] = count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given"
+            staffText[count] = count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given";
 
-            count++
+            count++;
         }
 
-        count = 0
+        count = 0;
 
         for (const m of members) {
-            if (count >= 5) break
+            if (count >= 5) break;
 
-            let username: any = message.guild.members.cache.find((mem) => mem.id == m)
+            let username: any = message.guild.members.cache.find((mem) => mem.id == m);
 
             if (!username) {
-                username = m
+                username = m;
             } else {
-                username = username.user.tag
+                username = username.user.tag;
             }
 
             memberText[count] =
-                count + 1 + " `" + username + "` **" + topMembers.get(m).toLocaleString() + "** punishments taken"
+                count + 1 + " `" + username + "` **" + topMembers.get(m).toLocaleString() + "** punishments taken";
 
-            count++
+            count++;
         }
 
-        embed.addField("top staff", staffText.join("\n"), true)
-        embed.addField("top members", memberText.join("\n"), true)
+        embed.addField("top staff", staffText.join("\n"), true);
+        embed.addField("top members", memberText.join("\n"), true);
 
         if (deletedCaseCount) {
             embed.setFooter(
                 `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`
-            )
+            );
         } else {
-            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`)
+            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`);
         }
     } else {
-        let member
+        let member;
 
         if (message.mentions.members.first()) {
-            member = message.mentions.members.first()
+            member = message.mentions.members.first();
         } else {
-            const members = message.guild.members.cache
+            const members = message.guild.members.cache;
 
             if (args[0].length == 18) {
-                member = members.find((m) => m.user.id == args[0])
+                member = members.find((m) => m.user.id == args[0]);
 
                 if (!member) {
-                    member = args[0]
+                    member = args[0];
                 }
             } else {
-                member = await getMember(message.guild, args.join(" "))
+                member = await getMember(message.guild, args.join(" "));
 
                 if (!member) {
                     return message.channel.send({
                         embeds: [new ErrorEmbed("can't find `" + args.join(" ") + "`")],
-                    })
+                    });
                 }
             }
         }
 
-        let deletedCasesModerator = 0
-        let deletedCases = 0
+        let deletedCasesModerator = 0;
+        let deletedCases = 0;
 
-        let punished = 0
-        let punishments = 0
+        let punished = 0;
+        let punishments = 0;
 
-        let mutes = 0
-        let bans = 0
-        let kicks = 0
-        let warns = 0
-        let unbans = 0
-        let unmutes = 0
+        let mutes = 0;
+        let bans = 0;
+        let kicks = 0;
+        let warns = 0;
+        let unbans = 0;
+        let unmutes = 0;
 
         for (const case0 of cases) {
             if (case0.moderator == member.user.tag) {
                 if (case0.deleted) {
-                    deletedCasesModerator++
+                    deletedCasesModerator++;
                 } else {
-                    punished++
+                    punished++;
 
                     switch (case0.type) {
                         case "mute":
-                            mutes++
-                            break
+                            mutes++;
+                            break;
                         case "ban":
-                            bans++
-                            break
+                            bans++;
+                            break;
                         case "kick":
-                            kicks++
-                            break
+                            kicks++;
+                            break;
                         case "warn":
-                            warns++
-                            break
+                            warns++;
+                            break;
                         case "unban":
-                            unbans++
-                            break
+                            unbans++;
+                            break;
                         case "unmute":
-                            unmutes++
-                            break
+                            unmutes++;
+                            break;
                     }
                 }
             } else if (case0.user == member.user.id) {
                 if (case0.deleted) {
-                    deletedCases++
+                    deletedCases++;
                 } else {
-                    punishments++
+                    punishments++;
                 }
             }
         }
 
-        embed.setDescription(member.user.toString())
+        embed.setDescription(member.user.toString());
 
         if (punished > 5) {
             embed.addField(
@@ -224,18 +224,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     unmutes.toLocaleString() +
                     "`",
                 true
-            )
+            );
         }
         embed.addField(
             "member stats",
             "punishments `" + punishments.toLocaleString() + "`\ndeleted `" + deletedCases.toLocaleString() + "`",
             true
-        )
+        );
     }
 
-    return await message.channel.send({ embeds: [embed] })
+    return await message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,7 +1,7 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 
-const cmd = new Command("support", "join the nypsi support server", Categories.INFO).setAliases(["discord"])
+const cmd = new Command("support", "join the nypsi support server", Categories.INFO).setAliases(["discord"]);
 
 /**
  *
@@ -9,9 +9,9 @@ const cmd = new Command("support", "join the nypsi support server", Categories.I
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    return message.channel.send({ content: "discord.gg/hJTDNST" })
+    return message.channel.send({ content: "discord.gg/hJTDNST" });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

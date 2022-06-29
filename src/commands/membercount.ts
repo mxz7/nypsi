@@ -1,12 +1,12 @@
-import { CommandInteraction, Message, Permissions } from "discord.js"
-import { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } from "../utils/guilds/utils"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js"
-import { logger } from "../utils/logger"
+import { CommandInteraction, Message, Permissions } from "discord.js";
+import { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } from "../utils/guilds/utils";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("membercount", "create an updating member count channel for your server", Categories.ADMIN)
     .setAliases(["counter"])
-    .setPermissions(["MANAGE_SERVER"])
+    .setPermissions(["MANAGE_SERVER"]);
 
 /**
  * @param {Message} message
@@ -15,21 +15,21 @@ const cmd = new Command("membercount", "create an updating member count channel 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
-        return
+        return;
     }
 
     if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")],
-        })
+        });
     }
 
-    if (!hasGuild(message.guild)) createGuild(message.guild)
+    if (!hasGuild(message.guild)) createGuild(message.guild);
 
-    const profile = getStatsProfile(message.guild)
-    const prefix = getPrefix(message.guild)
+    const profile = getStatsProfile(message.guild);
+    const prefix = getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(
@@ -40,9 +40,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
             .setHeader("member count")
-            .setFooter(`use ${prefix}counter help to view additional commands`)
+            .setFooter(`use ${prefix}counter help to view additional commands`);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "help") {
         const embed = new CustomEmbed(
             message.member,
@@ -54,28 +54,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter channel** *set a channel as the channel to be used*`
         )
             .setHeader("member count")
-            .setFooter("channel will be updated every 10 minutes")
+            .setFooter("channel will be updated every 10 minutes");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "enable") {
         if (profile.enabled) {
-            return message.channel.send({ embeds: [new ErrorEmbed("already enabled")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("already enabled")] });
         }
 
-        const role = message.guild.roles.cache.find((r) => r.name == "@everyone")
+        const role = message.guild.roles.cache.find((r) => r.name == "@everyone");
 
-        let memberCount = await message.guild.members.fetch()
+        let memberCount = await message.guild.members.fetch();
 
         if (profile.filter_bots) {
-            memberCount = memberCount.filter((m) => !m.user.bot)
+            memberCount = memberCount.filter((m) => !m.user.bot);
         }
 
-        let format = ""
+        let format = "";
 
-        format = profile.format.split("%count%").join(memberCount.size.toLocaleString())
-        format = format.split("%peak%").join(getPeaks(message.guild).toLocaleString())
+        format = profile.format.split("%count%").join(memberCount.size.toLocaleString());
+        format = format.split("%peak%").join(getPeaks(message.guild).toLocaleString());
 
-        let fail = false
+        let fail = false;
 
         const channel = await message.guild.channels
             .create(format, {
@@ -88,35 +88,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ],
             })
             .catch(() => {
-                fail = true
-                return message.channel.send({ embeds: [new ErrorEmbed("error creating channel")] })
-            })
+                fail = true;
+                return message.channel.send({ embeds: [new ErrorEmbed("error creating channel")] });
+            });
 
-        if (fail) return
+        if (fail) return;
 
-        profile.enabled = true
-        profile.channel = channel.id
+        profile.enabled = true;
+        profile.channel = channel.id;
 
-        setStatsProfile(message.guild, profile)
+        setStatsProfile(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ channel successfully created")
             .setHeader("member count")
-            .setFooter("channel will be updated every 10 minutes")
+            .setFooter("channel will be updated every 10 minutes");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
-            return message.channel.send({ embeds: [new ErrorEmbed("already disabled")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("already disabled")] });
         }
 
-        profile.enabled = false
-        profile.channel = "none"
+        profile.enabled = false;
+        profile.channel = "none";
 
-        setStatsProfile(message.guild, profile)
+        setStatsProfile(message.guild, profile);
 
-        const embed = new CustomEmbed(message.member, false, "✅ counter successfully disabled").setHeader("member count")
+        const embed = new CustomEmbed(message.member, false, "✅ counter successfully disabled").setHeader("member count");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -126,34 +126,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             )
                 .setHeader("member count")
                 .addField("current format", "`" + profile.format + "`")
-                .addField("help", `to change this format, do ${prefix}**counter format <new format>**`)
+                .addField("help", `to change this format, do ${prefix}**counter format <new format>**`);
 
-            return message.channel.send({ embeds: [embed] })
+            return message.channel.send({ embeds: [embed] });
         }
 
-        args.shift()
+        args.shift();
 
-        const newFormat = args.join(" ")
+        const newFormat = args.join(" ");
 
         if (!newFormat.includes("%count%") && !newFormat.includes("%peak%")) {
             return message.channel.send({
                 embeds: [new ErrorEmbed("format must include `%count%` or `%peak%` or both")],
-            })
+            });
         }
 
         if (newFormat.length > 30) {
-            return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 30 characers")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 30 characers")] });
         }
 
-        profile.format = newFormat
+        profile.format = newFormat;
 
-        setStatsProfile(message.guild, profile)
+        setStatsProfile(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ format updated - will update channel on next interval")
             .setHeader("member count")
-            .addField("new format", "`" + newFormat + "`")
+            .addField("new format", "`" + newFormat + "`");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "filterbots") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -163,28 +163,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             )
                 .setHeader("member count")
                 .addField("current value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
-                .addField("help", `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`)
+                .addField("help", `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`);
 
-            return message.channel.send({ embeds: [embed] })
+            return message.channel.send({ embeds: [embed] });
         }
 
         if (args[1].toLowerCase() != "true" && args[1].toLowerCase() != "false") {
-            return message.channel.send({ embeds: [new ErrorEmbed("value must either be true or false")] })
+            return message.channel.send({ embeds: [new ErrorEmbed("value must either be true or false")] });
         }
 
         if (args[1].toLowerCase() == "true") {
-            profile.filter_bots = 1
+            profile.filter_bots = 1;
         } else {
-            profile.filter_bots = 0
+            profile.filter_bots = 0;
         }
 
-        setStatsProfile(message.guild, profile)
+        setStatsProfile(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ value updated - will update channel on next interval")
             .setHeader("member count")
-            .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
+            .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "channel") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
@@ -194,53 +194,53 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             )
                 .setHeader("member count")
                 .addField("current value", "`" + profile.channel + "`")
-                .addField("help", `to change this value, do ${prefix}**counter channel <channel id>**`)
+                .addField("help", `to change this value, do ${prefix}**counter channel <channel id>**`);
 
-            return message.channel.send({ embeds: [embed] })
+            return message.channel.send({ embeds: [embed] });
         }
 
-        let channel
+        let channel;
 
         if (args[1].length != 18) {
             if (message.mentions.channels.first()) {
-                channel = message.mentions.channels.first()
+                channel = message.mentions.channels.first();
             } else {
-                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
             }
         } else {
-            const c = message.guild.channels.cache.find((c) => c.id == args[1])
+            const c = message.guild.channels.cache.find((c) => c.id == args[1]);
 
             if (!c) {
-                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] })
+                return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
             } else {
-                channel = c
+                channel = c;
             }
         }
 
         if (profile.channel == channel.id) {
             return message.channel.send({
                 embeds: [new ErrorEmbed("channel must be different to current channel")],
-            })
+            });
         }
 
-        profile.channel = channel.id
+        profile.channel = channel.id;
 
-        setStatsProfile(message.guild, profile)
+        setStatsProfile(message.guild, profile);
 
-        let memberCount = await message.guild.members.fetch()
+        let memberCount = await message.guild.members.fetch();
 
         if (profile.filter_bots) {
-            memberCount = memberCount.filter((m) => !m.user.bot)
+            memberCount = memberCount.filter((m) => !m.user.bot);
         }
 
-        let format = ""
+        let format = "";
 
-        format = profile.format.split("%count%").join(memberCount.size.toLocaleString())
-        format = format.split("%peak%").join(getPeaks(message.guild).toString())
+        format = profile.format.split("%count%").join(memberCount.size.toLocaleString());
+        format = format.split("%peak%").join(getPeaks(message.guild).toString());
 
-        const old = channel.name
+        const old = channel.name;
 
-        let fail = false
+        let fail = false;
 
         await channel
             .edit({ name: format })
@@ -248,25 +248,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 logger.log({
                     level: "auto",
                     message: "counter updated for '" + message.guild.name + "' ~ '" + old + "' -> '" + format + "'",
-                })
+                });
             })
             .catch(() => {
-                logger.error("error updating counter in " + message.guild.name)
-                fail = true
-            })
+                logger.error("error updating counter in " + message.guild.name);
+                fail = true;
+            });
 
         if (fail) {
-            profile.enabled = false
-            profile.channel = "none"
-            setStatsProfile(message.guild, profile)
-            return message.channel.send({ embeds: [new ErrorEmbed("error updating channel")] })
+            profile.enabled = false;
+            profile.channel = "none";
+            setStatsProfile(message.guild, profile);
+            return message.channel.send({ embeds: [new ErrorEmbed("error updating channel")] });
         }
 
         const embed = new CustomEmbed(message.member, false, "✅ channel updated")
             .setHeader("member count")
-            .addField("new value", "`" + profile.channel + "`")
+            .addField("new value", "`" + profile.channel + "`");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     } else {
         const embed = new CustomEmbed(
             message.member,
@@ -277,12 +277,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter filterbots** *view/change the setting to filter bots*`
         )
             .setHeader("member count")
-            .setFooter("member count will be updated every 10 minutes")
+            .setFooter("member count will be updated every 10 minutes");
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

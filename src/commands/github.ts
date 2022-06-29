@@ -1,8 +1,8 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("github", "view code for the bot on github", Categories.INFO).setAliases(["git"])
+const cmd = new Command("github", "view code for the bot on github", Categories.INFO).setAliases(["git"]);
 
 /**
  * @param {Message} message
@@ -19,11 +19,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "what does this mean?",
             "if you know how to code, you could fix bugs, add features, create your own commands.. the list goes on."
-        )
+        );
 
-    return message.channel.send({ embeds: [embed] })
+    return message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,14 +1,14 @@
-import { Collection, CommandInteraction, CommandInteractionOption, GuildMember, Interaction } from "discord.js"
-import { runCommand } from "../utils/commandhandler"
-import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
+import { Collection, CommandInteraction, CommandInteractionOption, GuildMember, Interaction } from "discord.js";
+import { runCommand } from "../utils/commandhandler";
+import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 /**
  *
  * @param {Interaction} interaction
  */
 export default async function interactionCreate(interaction: Interaction) {
-    if (!interaction.isCommand()) return
+    if (!interaction.isCommand()) return;
 
     if (interaction.channel?.type == "DM") {
         const embed = new CustomEmbed()
@@ -17,13 +17,13 @@ export default async function interactionCreate(interaction: Interaction) {
             .setDescription(
                 "unfortunately you can't do commands in direct messages ):\n\n" +
                     "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
-            )
-        return await interaction.reply({ embeds: [embed] })
+            );
+        return await interaction.reply({ embeds: [embed] });
     }
 
-    const message: CommandInteraction & NypsiCommandInteraction = createNypsiInteraction(interaction)
+    const message: CommandInteraction & NypsiCommandInteraction = createNypsiInteraction(interaction);
 
-    const args = [""]
+    const args = [""];
 
     /**
      *
@@ -32,50 +32,50 @@ export default async function interactionCreate(interaction: Interaction) {
     const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
             case "USER":
-                const user = arg.user
-                args.push(`<@${user.id}>`)
-                const guildMember = await interaction.guild.members.fetch(user.id)
+                const user = arg.user;
+                args.push(`<@${user.id}>`);
+                const guildMember = await interaction.guild.members.fetch(user.id);
 
                 if (guildMember) {
-                    const collection: Collection<string, GuildMember> = new Collection()
-                    collection.set(user.id, guildMember)
+                    const collection: Collection<string, GuildMember> = new Collection();
+                    collection.set(user.id, guildMember);
                     message.mentions = {
                         members: collection,
-                    }
+                    };
                 }
-                break
+                break;
             case "STRING":
                 for (const str of arg.value.toString().split(" ")) {
-                    args.push(str)
+                    args.push(str);
                 }
-                break
+                break;
             case "INTEGER":
-                args.push(arg.value.toString())
-                break
+                args.push(arg.value.toString());
+                break;
             case "CHANNEL":
                 // @ts-expect-error will always error bc typescript doesnt know type has been validated
-                args.push(arg.value)
-                break
+                args.push(arg.value);
+                break;
             case "SUB_COMMAND_GROUP":
-                args.push(arg.name)
+                args.push(arg.name);
                 for (const arg1 of arg.options) {
-                    await parseArgument(arg1)
+                    await parseArgument(arg1);
                 }
-                break
+                break;
             case "SUB_COMMAND":
-                args.push(arg.name)
+                args.push(arg.name);
                 for (const arg1 of arg.options) {
-                    await parseArgument(arg1)
+                    await parseArgument(arg1);
                 }
-                break
+                break;
         }
-    }
+    };
 
     for (const arg of interaction.options.data) {
-        await parseArgument(arg)
+        await parseArgument(arg);
     }
 
-    message.content = `[/]${interaction.commandName} ${args.join(" ")}`
+    message.content = `[/]${interaction.commandName} ${args.join(" ")}`;
 
-    return runCommand(interaction.commandName, message, args)
+    return runCommand(interaction.commandName, message, args);
 }

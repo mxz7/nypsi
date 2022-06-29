@@ -1,17 +1,17 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders"
-import { getPrefix } from "../utils/guilds/utils"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getPrefix } from "../utils/guilds/utils";
 import {
     isTracking,
     disableTracking,
     enableTracking,
     usernameProfileExists,
     createUsernameProfile,
-} from "../utils/users/utils"
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler"
+} from "../utils/users/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO)
+const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO);
 
 /**
  * @param {Message} message
@@ -19,32 +19,32 @@ const cmd = new Command("toggletracking", "toggle tracking your username and ava
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member, message.author.tag)
+    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member, message.author.tag);
 
-    await addCooldown(cmd.name, message.member, 90)
+    await addCooldown(cmd.name, message.member, 90);
 
     if (isTracking(message.author.id)) {
-        disableTracking(message.author.id)
+        disableTracking(message.author.id);
         return message.channel.send({
             embeds: [
                 new CustomEmbed(message.member, false, "✅ username and avatar tracking has been disabled").setFooter(
                     `use ${getPrefix(message.guild)}(un/avh) -clear to clear your history`
                 ),
             ],
-        })
+        });
     } else {
-        enableTracking(message.author.id)
+        enableTracking(message.author.id);
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ username and avatar tracking has been enabled")],
-        })
+        });
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,129 +1,129 @@
-import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js"
-import { inPlaceSort } from "fast-sort"
-import { getDatabase, toArray, toStorage } from "../database/database"
-import { logger } from "../logger"
-import fetch from "node-fetch"
+import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { inPlaceSort } from "fast-sort";
+import { getDatabase, toArray, toStorage } from "../database/database";
+import { logger } from "../logger";
+import fetch from "node-fetch";
 
-declare function require(name: string)
+declare function require(name: string);
 
-const db = getDatabase()
+const db = getDatabase();
 
-const currentChannels = new Set()
-const existsCache = new Set()
-const enabledCache = new Map()
-const lastGame = new Map()
+const currentChannels = new Set();
+const existsCache = new Set();
+const enabledCache = new Map();
+const lastGame = new Map();
 
 setInterval(async () => {
-    const { checkGuild } = require("../../nypsi")
+    const { checkGuild } = require("../../nypsi");
 
-    const query = db.prepare("SELECT id FROM chat_reaction").all()
+    const query = db.prepare("SELECT id FROM chat_reaction").all();
 
     for (const guild of query) {
-        const exists = await checkGuild(guild.id)
+        const exists = await checkGuild(guild.id);
 
         if (!exists) {
-            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id)
+            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id);
+            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id);
 
             logger.log({
                 level: "guild",
                 message: `deleted guild '${guild.id}' from chat reaction data`,
-            })
+            });
         }
     }
-}, 24 * 60 * 60 * 1000)
+}, 24 * 60 * 60 * 1000);
 
 setInterval(async () => {
-    let count = 0
+    let count = 0;
 
     const query = db
         .prepare("SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1")
-        .all()
+        .all();
 
     for (const guildData of query) {
-        const { getGuild } = require("../../nypsi")
-        const guild = await getGuild(guildData.id)
+        const { getGuild } = require("../../nypsi");
+        const guild = await getGuild(guildData.id);
 
         if (!guild) {
-            continue
+            continue;
         }
 
-        const channels = toArray(guildData.random_channels)
+        const channels = toArray(guildData.random_channels);
 
-        if (channels.length == 0) continue
+        if (channels.length == 0) continue;
 
-        const now = new Date().getTime()
+        const now = new Date().getTime();
 
         for (const ch of channels) {
             if (lastGame.has(ch)) {
                 if (now >= lastGame.get(ch)) {
-                    lastGame.delete(ch)
+                    lastGame.delete(ch);
                 } else {
-                    continue
+                    continue;
                 }
             }
 
-            const channel = await guild.channels.cache.find((cha) => cha.id == ch)
+            const channel = await guild.channels.cache.find((cha) => cha.id == ch);
 
             if (!channel) {
-                continue
+                continue;
             }
 
-            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 15 }).catch(() => {})
-            let stop = false
+            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 15 }).catch(() => {});
+            let stop = false;
 
-            if (!messages) continue
+            if (!messages) continue;
 
             messages.forEach((m) => {
                 if (m.author.id == guild.client.user.id) {
-                    if (!m.embeds[0]) return
-                    if (!m.embeds[0].author) return
+                    if (!m.embeds[0]) return;
+                    if (!m.embeds[0].author) return;
                     if (m.embeds[0].author.name == "chat reaction") {
-                        stop = true
-                        return
+                        stop = true;
+                        return;
                     }
                 }
-            })
+            });
 
             if (stop) {
-                continue
+                continue;
             }
 
-            const a = await startReaction(guild, channel)
+            const a = await startReaction(guild, channel);
 
             if (a != "xoxo69") {
-                count++
+                count++;
             } else {
-                continue
+                continue;
             }
 
-            const base = guildData.between_events
-            let final
+            const base = guildData.between_events;
+            let final;
 
             if (guildData.random_modifier == 0) {
-                final = base
+                final = base;
             } else {
-                const o = ["+", "-"]
-                let operator = o[Math.floor(Math.random() * o.length)]
+                const o = ["+", "-"];
+                let operator = o[Math.floor(Math.random() * o.length)];
 
                 if (base - guildData.random_modifier < 120) {
-                    operator = "+"
+                    operator = "+";
                 }
 
-                const amount = Math.floor(Math.random() * guildData.random_modifier)
+                const amount = Math.floor(Math.random() * guildData.random_modifier);
 
                 if (operator == "+") {
-                    final = base + amount
+                    final = base + amount;
                 } else {
-                    final = base - amount
+                    final = base - amount;
                 }
             }
 
-            const nextGame = new Date().getTime() + final * 1000
+            const nextGame = new Date().getTime() + final * 1000;
 
-            lastGame.set(channel.id, nextGame)
+            lastGame.set(channel.id, nextGame);
 
-            continue
+            continue;
         }
     }
 
@@ -131,15 +131,15 @@ setInterval(async () => {
         logger.log({
             level: "auto",
             message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
-        })
+        });
     }
-}, 60000)
+}, 60000);
 
 /**
  * @param {Guild} guild
  */
 export function createReactionProfile(guild: Guild) {
-    db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id)
+    db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id);
 }
 
 /**
@@ -147,16 +147,16 @@ export function createReactionProfile(guild: Guild) {
  */
 export function hasReactionProfile(guild: Guild) {
     if (existsCache.has(guild.id)) {
-        return true
+        return true;
     }
 
-    const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id);
 
     if (query) {
-        existsCache.add(guild.id)
-        return true
+        existsCache.add(guild.id);
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -165,16 +165,16 @@ export function hasReactionProfile(guild: Guild) {
  * @returns {Array<String>}
  */
 export async function getWords(guild: Guild): Promise<Array<string>> {
-    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id);
 
-    const wordList = toArray(query.word_list)
+    const wordList = toArray(query.word_list);
 
     if (wordList.length == 0) {
-        const a = await getDefaultWords()
+        const a = await getDefaultWords();
 
-        return a
+        return a;
     } else {
-        return wordList
+        return wordList;
     }
 }
 
@@ -183,9 +183,9 @@ export async function getWords(guild: Guild): Promise<Array<string>> {
  * @param {Array<String>} newWordList
  */
 export function updateWords(guild: Guild, newWordList: Array<string>) {
-    const list = toStorage(newWordList)
+    const list = toStorage(newWordList);
 
-    db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id)
+    db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id);
 }
 
 /**
@@ -193,9 +193,9 @@ export function updateWords(guild: Guild, newWordList: Array<string>) {
  * @returns {Array<String>}
  */
 export function getWordList(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id);
 
-    return toArray(query.word_list)
+    return toArray(query.word_list);
 }
 
 /**
@@ -204,9 +204,9 @@ export function getWordList(guild: Guild): Array<string> {
  */
 export function isUsingDefaultWords(guild: Guild): boolean {
     if (getWordList(guild).length == 0) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -215,17 +215,17 @@ export function isUsingDefaultWords(guild: Guild): boolean {
  * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
 export function getReactionSettings(guild: Guild): {
-    randomStart: boolean
-    randomChannels: Array<string>
-    timeBetweenEvents: number
-    randomModifier: number
-    timeout: number
+    randomStart: boolean;
+    randomChannels: Array<string>;
+    timeBetweenEvents: number;
+    randomModifier: number;
+    timeout: number;
 } {
     const query = db
         .prepare(
             "SELECT random_start, random_channels, between_events, random_modifier, timeout FROM chat_reaction WHERE id = ?"
         )
-        .get(guild.id)
+        .get(guild.id);
 
     return {
         randomStart: query.random_start == 1 ? true : false,
@@ -233,7 +233,7 @@ export function getReactionSettings(guild: Guild): {
         timeBetweenEvents: query.between_events,
         randomModifier: query.random_modifier,
         timeout: query.timeout,
-    }
+    };
 }
 
 /**
@@ -243,11 +243,11 @@ export function getReactionSettings(guild: Guild): {
 export function updateReactionSettings(
     guild: Guild,
     settings: {
-        randomStart: boolean
-        randomChannels: Array<string>
-        timeBetweenEvents: number
-        randomModifier: number
-        timeout: number
+        randomStart: boolean;
+        randomChannels: Array<string>;
+        timeBetweenEvents: number;
+        randomModifier: number;
+        timeout: number;
     }
 ) {
     db.prepare(
@@ -259,9 +259,9 @@ export function updateReactionSettings(
         settings.randomModifier,
         settings.timeout,
         guild.id
-    )
+    );
 
-    if (enabledCache.has(guild.id)) enabledCache.delete(guild.id)
+    if (enabledCache.has(guild.id)) enabledCache.delete(guild.id);
 }
 
 /**
@@ -275,13 +275,13 @@ export function getReactionStats(
 ): { wins: number; secondPlace: number; thirdPlace: number } {
     const query = db
         .prepare("SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
-        .get(guild.id, member.user.id)
+        .get(guild.id, member.user.id);
 
     return {
         wins: query.wins,
         secondPlace: query.second,
         thirdPlace: query.third,
-    }
+    };
 }
 
 /**
@@ -289,111 +289,111 @@ export function getReactionStats(
  * @param {TextChannel} channel
  */
 export async function startReaction(guild: Guild, channel: TextChannel) {
-    if (currentChannels.has(channel.id)) return "xoxo69"
+    if (currentChannels.has(channel.id)) return "xoxo69";
 
-    currentChannels.add(channel.id)
+    currentChannels.add(channel.id);
 
-    const words = await getWords(guild)
+    const words = await getWords(guild);
 
-    const chosenWord = words[Math.floor(Math.random() * words.length)]
-    let displayWord = chosenWord
+    const chosenWord = words[Math.floor(Math.random() * words.length)];
+    let displayWord = chosenWord;
 
-    const zeroWidthCount = chosenWord.length / 2
+    const zeroWidthCount = chosenWord.length / 2;
 
-    const zeroWidthChar = getZeroWidth()
+    const zeroWidthChar = getZeroWidth();
 
     for (let i = 0; i < zeroWidthCount; i++) {
-        const pos = Math.floor(Math.random() * chosenWord.length + 1)
+        const pos = Math.floor(Math.random() * chosenWord.length + 1);
 
-        displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos)
+        displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos);
     }
 
-    const { CustomEmbed } = require("../models/EmbedBuilders")
+    const { CustomEmbed } = require("../models/EmbedBuilders");
 
-    const embed = new CustomEmbed().setColor("#5efb8f")
+    const embed = new CustomEmbed().setColor("#5efb8f");
 
-    embed.setHeader("chat reaction")
-    embed.setDescription(`type: \`${displayWord}\``)
+    embed.setHeader("chat reaction");
+    embed.setDescription(`type: \`${displayWord}\``);
 
-    const msg = await channel.send({ embeds: [embed] })
+    const msg = await channel.send({ embeds: [embed] });
 
-    const start = new Date().getTime()
+    const start = new Date().getTime();
 
-    const winners = new Map()
-    const winnersIDs = []
+    const winners = new Map();
+    const winnersIDs = [];
 
-    let waiting = false
+    let waiting = false;
 
     const filter = (m) =>
         m.content.toLowerCase() == chosenWord.toLowerCase() &&
         winnersIDs.indexOf(m.author.id) == -1 &&
         !m.member.user.bot &&
-        getBlacklisted(guild).indexOf(m.author.id) == -1
+        getBlacklisted(guild).indexOf(m.author.id) == -1;
 
-    const timeout = getReactionSettings(guild).timeout
+    const timeout = getReactionSettings(guild).timeout;
 
     const collector = channel.createMessageCollector({
         filter,
         max: 3,
         time: timeout * 1000,
-    })
+    });
 
     collector.on("collect", async (message): Promise<void> => {
         if (msg.deleted) {
-            currentChannels.delete(channel.id)
-            collector.stop()
-            return
+            currentChannels.delete(channel.id);
+            collector.stop();
+            return;
         }
 
-        let time: number | string = new Date().getTime()
+        let time: number | string = new Date().getTime();
 
-        time = ((time - start) / 1000).toFixed(2)
+        time = ((time - start) / 1000).toFixed(2);
 
-        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member)
+        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member);
 
         if (winners.size == 0) {
-            embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``)
+            embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``);
 
-            addWin(guild, message.member)
+            addWin(guild, message.member);
 
             setTimeout(() => {
                 if (winners.size != 3) {
-                    return collector.stop()
+                    return collector.stop();
                 }
-            }, 10000)
+            }, 10000);
         } else {
             if (winners.size == 1) {
-                waiting = true
+                waiting = true;
 
                 setTimeout(async () => {
-                    waiting = false
+                    waiting = false;
 
                     if (winners.size == 1) {
-                        return
+                        return;
                     } else {
-                        const field = await embed.fields.find((f) => f.name == "winners")
+                        const field = await embed.fields.find((f) => f.name == "winners");
 
-                        field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``
+                        field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``;
 
-                        add2ndPlace(guild, winners.get(2).member)
+                        add2ndPlace(guild, winners.get(2).member);
 
                         if (winners.get(3)) {
-                            field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``
-                            add3rdPlace(guild, winners.get(3).member)
+                            field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``;
+                            add3rdPlace(guild, winners.get(3).member);
                         }
 
                         return await msg.edit({ embeds: [embed] }).catch(() => {
-                            collector.stop()
-                        })
+                            collector.stop();
+                        });
                     }
-                }, 250)
+                }, 250);
             } else {
                 if (!waiting) {
-                    const field = await embed.fields.find((f) => f.name == "winners")
+                    const field = await embed.fields.find((f) => f.name == "winners");
 
-                    field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``
+                    field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``;
 
-                    add3rdPlace(guild, message.member)
+                    add3rdPlace(guild, message.member);
                 }
             }
         }
@@ -402,29 +402,29 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
             mention: message.author.toString(),
             time: time,
             member: message.member,
-        })
-        winnersIDs.push(message.author.id)
+        });
+        winnersIDs.push(message.author.id);
         if (!waiting) {
             await msg.edit({ embeds: [embed] }).catch(() => {
-                collector.stop()
-            })
-            return
+                collector.stop();
+            });
+            return;
         }
-    })
+    });
 
     collector.on("end", () => {
-        currentChannels.delete(channel.id)
+        currentChannels.delete(channel.id);
         setTimeout(async () => {
             if (winners.size == 0) {
-                embed.setDescription(embed.description + "\n\nnobody won ):")
+                embed.setDescription(embed.description + "\n\nnobody won ):");
             } else if (winners.size == 1) {
-                embed.setFooter("ended with 1 winner")
+                embed.setFooter("ended with 1 winner");
             } else {
-                embed.setFooter(`ended with ${winners.size} winners`)
+                embed.setFooter(`ended with ${winners.size} winners`);
             }
-            await msg.edit({ embeds: [embed] }).catch(() => {})
-        }, 500)
-    })
+            await msg.edit({ embeds: [embed] }).catch(() => {});
+        }, 500);
+    });
 }
 
 /**
@@ -436,12 +436,12 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 export function hasReactionStatsProfile(guild: Guild, member: GuildMember): boolean {
     const query = db
         .prepare("SELECT user_id FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
-        .get(guild.id, member.user.id)
+        .get(guild.id, member.user.id);
 
     if (query) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 
@@ -451,7 +451,7 @@ export function hasReactionStatsProfile(guild: Guild, member: GuildMember): bool
  * @param {GuildMember} member
  */
 export function createReactionStatsProfile(guild: Guild, member: GuildMember) {
-    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id)
+    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id);
 }
 
 /**
@@ -470,7 +470,7 @@ export function updateStats(
         newStats.thirdPlace,
         guild.id,
         member.user.id
-    )
+    );
 }
 
 /**
@@ -482,7 +482,7 @@ export function addWin(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
-    )
+    );
 }
 
 /**
@@ -494,7 +494,7 @@ export function add2ndPlace(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
-    )
+    );
 }
 
 /**
@@ -506,7 +506,7 @@ export function add3rdPlace(guild: Guild, member: GuildMember) {
     db.prepare("UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?").run(
         guild.id,
         member.user.id
-    )
+    );
 }
 
 /**
@@ -515,150 +515,152 @@ export function add3rdPlace(guild: Guild, member: GuildMember) {
  * @returns {Map}
  */
 export async function getServerLeaderboard(guild: Guild, amount: number): Promise<Map<string, string>> {
-    const { inCooldown, addCooldown } = require("../guilds/utils")
+    const { inCooldown, addCooldown } = require("../guilds/utils");
 
-    let members: Collection<string, GuildMember>
+    let members: Collection<string, GuildMember>;
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
-        members = guild.members.cache
+        members = guild.members.cache;
     } else {
-        members = await guild.members.fetch()
+        members = await guild.members.fetch();
 
-        addCooldown(guild, 3600)
+        addCooldown(guild, 3600);
     }
 
-    if (!members) members = guild.members.cache
+    if (!members) members = guild.members.cache;
 
     members = members.filter((m) => {
-        return !m.user.bot
-    })
+        return !m.user.bot;
+    });
 
-    const usersWins = []
-    const winsStats = new Map()
-    const usersSecond = []
-    const secondStats = new Map()
-    const usersThird = []
-    const thirdStats = new Map()
-    const overallWins = []
-    const overallStats = new Map()
+    const usersWins = [];
+    const winsStats = new Map();
+    const usersSecond = [];
+    const secondStats = new Map();
+    const usersThird = [];
+    const thirdStats = new Map();
+    const overallWins = [];
+    const overallStats = new Map();
 
-    const query = db.prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?").all(guild.id)
+    const query = db
+        .prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?")
+        .all(guild.id);
 
     for (const user of query) {
-        let overall = false
+        let overall = false;
 
         if (members.find((member) => member.user.id == user.user_id) && user.wins != 0) {
-            usersWins.push(user.user_id)
-            winsStats.set(user.user_id, user.wins)
-            overall = true
+            usersWins.push(user.user_id);
+            winsStats.set(user.user_id, user.wins);
+            overall = true;
         }
         if (members.find((member) => member.user.id == user.user_id) && user.second != 0) {
-            usersSecond.push(user.user_id)
-            secondStats.set(user.user_id, user.second)
-            overall = true
+            usersSecond.push(user.user_id);
+            secondStats.set(user.user_id, user.second);
+            overall = true;
         }
         if (members.find((member) => member.user.id == user.user_id) && user.third != 0) {
-            usersThird.push(user.user_id)
-            thirdStats.set(user.user_id, user.third)
-            overall = true
+            usersThird.push(user.user_id);
+            thirdStats.set(user.user_id, user.third);
+            overall = true;
         }
 
         if (overall) {
-            overallWins.push(user.user_id)
-            overallStats.set(user.user_id, user.wins + user.second + user.third)
+            overallWins.push(user.user_id);
+            overallStats.set(user.user_id, user.wins + user.second + user.third);
         }
     }
 
     const getMember = (id) => {
-        const target = members.find((member) => member.user.id == id)
+        const target = members.find((member) => member.user.id == id);
 
-        return target
-    }
+        return target;
+    };
 
-    inPlaceSort(usersWins).desc((i) => winsStats.get(i))
-    inPlaceSort(usersSecond).desc((i) => secondStats.get(i))
-    inPlaceSort(usersThird).desc((i) => thirdStats.get(i))
-    inPlaceSort(overallWins).desc((i) => overallStats.get(i))
+    inPlaceSort(usersWins).desc((i) => winsStats.get(i));
+    inPlaceSort(usersSecond).desc((i) => secondStats.get(i));
+    inPlaceSort(usersThird).desc((i) => thirdStats.get(i));
+    inPlaceSort(overallWins).desc((i) => overallStats.get(i));
 
-    usersWins.splice(amount, usersWins.length - amount)
-    usersSecond.splice(amount, usersSecond.length - amount)
-    usersThird.splice(amount, usersThird.length - amount)
-    overallWins.splice(amount, overallWins.length - amount)
+    usersWins.splice(amount, usersWins.length - amount);
+    usersSecond.splice(amount, usersSecond.length - amount);
+    usersThird.splice(amount, usersThird.length - amount);
+    overallWins.splice(amount, overallWins.length - amount);
 
-    let winsMsg = ""
-    let secondMsg = ""
-    let thirdMsg = ""
-    let overallMsg = ""
+    let winsMsg = "";
+    let secondMsg = "";
+    let thirdMsg = "";
+    let overallMsg = "";
 
-    let count = 1
+    let count = 1;
 
     for (const user of usersWins) {
-        let pos: string | number = count
+        let pos: string | number = count;
 
         if (count == 1) {
-            pos = "🥇"
+            pos = "🥇";
         } else if (count == 2) {
-            pos = "🥈"
+            pos = "🥈";
         } else if (count == 3) {
-            pos = "🥉"
+            pos = "🥉";
         }
 
-        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats.get(user).toLocaleString()}\n`
-        count++
+        winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats.get(user).toLocaleString()}\n`;
+        count++;
     }
 
-    count = 1
+    count = 1;
 
     for (const user of usersSecond) {
-        let pos: string | number = count
+        let pos: string | number = count;
 
         if (count == 1) {
-            pos = "🥇"
+            pos = "🥇";
         } else if (count == 2) {
-            pos = "🥈"
+            pos = "🥈";
         } else if (count == 3) {
-            pos = "🥉"
+            pos = "🥉";
         }
 
-        secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats.get(user).toLocaleString()}\n`
-        count++
+        secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats.get(user).toLocaleString()}\n`;
+        count++;
     }
 
-    count = 1
+    count = 1;
 
     for (const user of usersThird) {
-        let pos: string | number = count
+        let pos: string | number = count;
 
         if (count == 1) {
-            pos = "🥇"
+            pos = "🥇";
         } else if (count == 2) {
-            pos = "🥈"
+            pos = "🥈";
         } else if (count == 3) {
-            pos = "🥉"
+            pos = "🥉";
         }
 
-        thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats.get(user).toLocaleString()}\n`
-        count++
+        thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats.get(user).toLocaleString()}\n`;
+        count++;
     }
 
-    count = 1
+    count = 1;
 
     for (const user of overallWins) {
-        let pos: string | number = count
+        let pos: string | number = count;
 
         if (count == 1) {
-            pos = "🥇"
+            pos = "🥇";
         } else if (count == 2) {
-            pos = "🥈"
+            pos = "🥈";
         } else if (count == 3) {
-            pos = "🥉"
+            pos = "🥉";
         }
 
-        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats.get(user).toLocaleString()}\n`
-        count++
+        overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats.get(user).toLocaleString()}\n`;
+        count++;
     }
 
-    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg)
+    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg);
 }
 
 /**
@@ -667,17 +669,17 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
  */
 export function hasRandomReactionsEnabled(guild: Guild): boolean {
     if (enabledCache.has(guild.id)) {
-        return enabledCache.get(guild.id)
+        return enabledCache.get(guild.id);
     }
 
-    const query = db.prepare("SELECT random_start FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT random_start FROM chat_reaction WHERE id = ?").get(guild.id);
 
     if (query.random_start == 1) {
-        enabledCache.set(guild.id, true)
-        return true
+        enabledCache.set(guild.id, true);
+        return true;
     } else {
-        enabledCache.set(guild.id, false)
-        return false
+        enabledCache.set(guild.id, false);
+        return false;
     }
 }
 
@@ -686,9 +688,9 @@ export function hasRandomReactionsEnabled(guild: Guild): boolean {
  * @returns {Array<String>}
  */
 export function getRandomChannels(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id);
 
-    return toArray(query.random_channels)
+    return toArray(query.random_channels);
 }
 
 /**
@@ -696,9 +698,9 @@ export function getRandomChannels(guild: Guild): Array<string> {
  * @returns {Array<String>}
  */
 export function getBlacklisted(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id)
+    const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id);
 
-    return toArray(query.blacklisted)
+    return toArray(query.blacklisted);
 }
 
 /**
@@ -706,7 +708,7 @@ export function getBlacklisted(guild: Guild): Array<string> {
  * @param {Array<String>} blacklisted
  */
 export function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
-    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id)
+    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id);
 }
 
 /**
@@ -714,7 +716,7 @@ export function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
  * @param {Guild} guild
  */
 export function deleteStats(guild: Guild) {
-    db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id)
+    db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id);
 }
 
 /**
@@ -723,14 +725,14 @@ export function deleteStats(guild: Guild) {
 async function getDefaultWords(): Promise<Array<string>> {
     const res = await fetch(
         "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"
-    )
-    const body = await res.text()
+    );
+    const body = await res.text();
 
-    const words = body.split("\n")
+    const words = body.split("\n");
 
-    return words
+    return words;
 }
 
 export function getZeroWidth() {
-    return "​"
+    return "​";
 }

@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js"
-import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js"
+import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
     getXp,
     getPrestigeRequirement,
@@ -15,11 +15,11 @@ import {
     calcMaxBet,
     getInventory,
     setInventory,
-} from "../utils/economy/utils.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders"
+} from "../utils/economy/utils.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY)
+const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
 
 /**
  *
@@ -28,12 +28,12 @@ const cmd = new Command("prestige", "prestige to gain extra benefits", Categorie
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member)
+        const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] })
+        return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member)
+    if (!(await userExists(message.member))) createUser(message.member);
 
     // if (getPrestige(message.member) >= 20) {
     //     return message.channel.send({
@@ -44,12 +44,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     // }
 
     let currentXp = getXp(message.member),
-        neededXp = getPrestigeRequirement(message.member)
+        neededXp = getPrestigeRequirement(message.member);
     let currentBal = getBankBalance(message.member),
-        neededBal = getPrestigeRequirementBal(neededXp)
+        neededBal = getPrestigeRequirementBal(neededXp);
 
     if (currentXp < neededXp) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] })
+        return message.channel.send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] });
     }
 
     if (currentBal < neededBal) {
@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
                 ).setHeader("prestige", message.author.avatarURL()),
             ],
-        })
+        });
     }
 
     const embed = new CustomEmbed(
@@ -69,41 +69,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         true,
         "are you sure you want to prestige?\n\n" +
             `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
-    ).setHeader("prestige", message.author.avatarURL())
+    ).setHeader("prestige", message.author.avatarURL());
 
-    await addCooldown(cmd.name, message.member)
+    await addCooldown(cmd.name, message.member);
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
-    )
+    );
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] })
+    const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id
+    const filter = (i) => i.user.id == message.author.id;
 
     const reaction = await msg
         .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
-            await collected.deferUpdate()
-            return collected.customId
+            await collected.deferUpdate();
+            return collected.customId;
         })
         .catch(async () => {
-            embed.setDescription("❌ expired")
-            await msg.edit({ embeds: [embed], components: [] })
-            addExpiry(cmd.name, message.member, 30)
-        })
+            embed.setDescription("❌ expired");
+            await msg.edit({ embeds: [embed], components: [] });
+            addExpiry(cmd.name, message.member, 30);
+        });
 
     if (reaction == "✅") {
-        await addExpiry(cmd.name, message.member, 1800)
-        currentXp = getXp(message.member)
-        neededXp = getPrestigeRequirement(message.member)
-        currentBal = getBankBalance(message.member)
-        neededBal = getPrestigeRequirementBal(neededXp)
+        await addExpiry(cmd.name, message.member, 1800);
+        currentXp = getXp(message.member);
+        neededXp = getPrestigeRequirement(message.member);
+        currentBal = getBankBalance(message.member);
+        neededBal = getPrestigeRequirementBal(neededXp);
 
         if (currentXp < neededXp) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)],
-            })
+            });
         }
 
         if (currentBal < neededBal) {
@@ -115,37 +115,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
                     ).setHeader("prestige", message.author.avatarURL()),
                 ],
-            })
+            });
         }
 
-        updateBankBalance(message.member, currentBal - neededBal)
-        updateXp(message.member, currentXp - neededXp)
-        setPrestige(message.member, getPrestige(message.member) + 1)
+        updateBankBalance(message.member, currentBal - neededBal);
+        updateXp(message.member, currentXp - neededXp);
+        setPrestige(message.member, getPrestige(message.member) + 1);
 
-        const multi = await getMulti(message.member)
-        const maxBet = await calcMaxBet(message.member)
+        const multi = await getMulti(message.member);
+        const maxBet = await calcMaxBet(message.member);
 
-        const inventory = getInventory(message.member)
+        const inventory = getInventory(message.member);
 
-        let amount = 1
+        let amount = 1;
 
         if (getPrestige(message.member) > 5) {
-            amount = 2
+            amount = 2;
         } else if (getPrestige(message.member) > 10) {
-            amount = 3
+            amount = 3;
         }
 
         if (inventory["basic_crate"]) {
-            inventory["basic_crate"] += amount
+            inventory["basic_crate"] += amount;
         } else {
-            inventory["basic_crate"] = amount
+            inventory["basic_crate"] = amount;
         }
 
-        setInventory(message.member, inventory)
+        setInventory(message.member, inventory);
 
-        let crateAmount = Math.floor(getPrestige(message.member) / 2 + 1)
+        let crateAmount = Math.floor(getPrestige(message.member) / 2 + 1);
 
-        if (crateAmount > 5) crateAmount = 5
+        if (crateAmount > 5) crateAmount = 5;
 
         embed.setDescription(
             `you are now prestige **${getPrestige(message.member)}**\n\n` +
@@ -155,12 +155,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
-        )
+        );
 
-        await msg.edit({ embeds: [embed], components: [] })
+        await msg.edit({ embeds: [embed], components: [] });
     }
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,8 +1,8 @@
-import { CommandInteraction, Message } from "discord.js"
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command"
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js"
+import { CommandInteraction, Message } from "discord.js";
+import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("invite", "generate an invite link for the bot", Categories.INFO).setAliases(["bot"])
+const cmd = new Command("invite", "generate an invite link for the bot", Categories.INFO).setAliases(["bot"]);
 
 /**
  * @param {Message} message
@@ -15,11 +15,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST"
     )
         .setHeader("nypsi")
-        .setFooter("made by max#0777 | tekoh.net")
+        .setFooter("made by max#0777 | tekoh.net");
 
-    message.channel.send({ embeds: [embed] })
+    message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run)
+cmd.setRun(run);
 
-module.exports = cmd
+module.exports = cmd;

@@ -1,6 +1,6 @@
-import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js"
-import { getColor } from "../functions/color"
-import { getEmbedColor, getTier, isPremium } from "../premium/utils"
+import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js";
+import { getColor } from "../functions/color";
+import { getEmbedColor, getTier, isPremium } from "../premium/utils";
 
 export class CustomEmbed extends MessageEmbed {
     /**
@@ -10,38 +10,38 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} text
      */
     constructor(member?: GuildMember, footer?: boolean, text?: string) {
-        super()
+        super();
 
         if (member) {
             if (isPremium(member.user.id)) {
                 if (getTier(member.user.id) >= 1) {
-                    const color = getEmbedColor(member.user.id)
+                    const color = getEmbedColor(member.user.id);
                     if (color != "default") {
-                        super.setColor(color)
+                        super.setColor(color);
                     } else {
-                        super.setColor(getColor(member))
+                        super.setColor(getColor(member));
                     }
                 } else {
-                    super.setColor(getColor(member))
+                    super.setColor(getColor(member));
                 }
             } else {
-                super.setColor(getColor(member))
+                super.setColor(getColor(member));
             }
         }
 
         if (text) {
             if (text.length > 2000) {
-                text = text.substring(0, 2000)
+                text = text.substring(0, 2000);
             }
 
-            super.setDescription(text)
+            super.setDescription(text);
         }
 
         if (footer) {
-            super.setFooter({ text: "nypsi.xyz" })
+            super.setFooter({ text: "nypsi.xyz" });
         }
 
-        return this
+        return this;
     }
 
     /**
@@ -50,11 +50,11 @@ export class CustomEmbed extends MessageEmbed {
      */
     setDescription(text: string) {
         if (text.length > 2000) {
-            text = text.substr(0, 2000)
+            text = text.substr(0, 2000);
         }
-        super.setDescription(text)
+        super.setDescription(text);
 
-        return this
+        return this;
     }
 
     /**
@@ -65,12 +65,12 @@ export class CustomEmbed extends MessageEmbed {
      */
     addField(title: string, text: string, inline?: boolean) {
         if (text.length > 1000) {
-            text = text.substr(0, 1000)
+            text = text.substr(0, 1000);
         }
 
-        super.addField(title, text, inline)
+        super.addField(title, text, inline);
 
-        return this
+        return this;
     }
 
     /**
@@ -78,9 +78,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {string} text
      */
     setTitle(text: string) {
-        super.setTitle(text)
+        super.setTitle(text);
 
-        return this
+        return this;
     }
 
     /**
@@ -88,9 +88,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} url
      */
     setImage(url: string) {
-        super.setImage(url)
+        super.setImage(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -98,9 +98,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} url
      */
     setThumbnail(url: string) {
-        super.setThumbnail(url)
+        super.setThumbnail(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -108,9 +108,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} url
      */
     setURL(url: string) {
-        super.setURL(url)
+        super.setURL(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -118,9 +118,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text: string, image?: string) {
-        super.setAuthor({ name: text, iconURL: image })
+        super.setAuthor({ name: text, iconURL: image });
 
-        return this
+        return this;
     }
 
     /**
@@ -128,9 +128,9 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} color
      */
     setColor(color: `#${string}` | ColorResolvable) {
-        super.setColor(color)
+        super.setColor(color);
 
-        return this
+        return this;
     }
 
     /**
@@ -139,12 +139,12 @@ export class CustomEmbed extends MessageEmbed {
      */
     setTimestamp(date?: Date | number) {
         if (date) {
-            super.setTimestamp(date)
+            super.setTimestamp(date);
         } else {
-            super.setTimestamp()
+            super.setTimestamp();
         }
 
-        return this
+        return this;
     }
 }
 
@@ -154,18 +154,18 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      */
     constructor(text: string) {
-        super()
-        super.setColor("#e31937")
-        super.setTitle("`❌`")
-        super.setDescription(text)
+        super();
+        super.setColor("#e31937");
+        super.setTitle("`❌`");
+        super.setDescription(text);
 
-        return this
+        return this;
     }
 
     removeTitle() {
-        delete this.title
+        delete this.title;
 
-        return this
+        return this;
     }
 
     /**
@@ -174,11 +174,11 @@ export class ErrorEmbed extends MessageEmbed {
      */
     setDescription(text: string) {
         if (text.length > 2000) {
-            text = text.substring(0, 2000)
+            text = text.substring(0, 2000);
         }
-        super.setDescription(text)
+        super.setDescription(text);
 
-        return this
+        return this;
     }
 
     /**
@@ -189,12 +189,12 @@ export class ErrorEmbed extends MessageEmbed {
      */
     addField(title: string, text: string, inline?: boolean) {
         if (text.length > 1000) {
-            text = text.substring(0, 1000)
+            text = text.substring(0, 1000);
         }
 
-        super.addField(title, text, inline)
+        super.addField(title, text, inline);
 
-        return this
+        return this;
     }
 
     /**
@@ -202,9 +202,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {string} text
      */
     setTitle(text: string) {
-        super.setTitle(text)
+        super.setTitle(text);
 
-        return this
+        return this;
     }
 
     /**
@@ -212,9 +212,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} url
      */
     setImage(url: string) {
-        super.setImage(url)
+        super.setImage(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -222,9 +222,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} url
      */
     setThumbnail(url: string) {
-        super.setThumbnail(url)
+        super.setThumbnail(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -232,9 +232,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} url
      */
     setURL(url: string) {
-        super.setURL(url)
+        super.setURL(url);
 
-        return this
+        return this;
     }
 
     /**
@@ -242,9 +242,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      */
     setHeader(text: string): ErrorEmbed {
-        super.setAuthor({ name: text })
+        super.setAuthor({ name: text });
 
-        return this
+        return this;
     }
 
     /**
@@ -252,9 +252,9 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} color
      */
     setColor(color: `#${string}` | ColorResolvable) {
-        super.setColor(color)
+        super.setColor(color);
 
-        return this
+        return this;
     }
 
     /**
@@ -263,11 +263,11 @@ export class ErrorEmbed extends MessageEmbed {
      */
     setTimestamp(date: Date | number) {
         if (date) {
-            super.setTimestamp(date)
+            super.setTimestamp(date);
         } else {
-            super.setTimestamp()
+            super.setTimestamp();
         }
 
-        return this
+        return this;
     }
 }
