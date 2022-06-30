@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (args[0].toLowerCase() != "start" && args[0].toLowerCase() == "play") {
+    if (args[0].toLowerCase() != "start" && args[0].toLowerCase() != "play") {
         return send({ embeds: [new ErrorEmbed(`${getPrefix(message.guild)}wordle play`)] });
     }
 
