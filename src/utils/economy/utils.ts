@@ -232,7 +232,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user);
 
     redis.set(`cache:vote:${user}`, "true");
-    redis.expire(`cache:vote:${user}`, ms("6 hours"));
+    redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
 
     let member: User | string = await client.users.fetch(user);
 
@@ -332,7 +332,15 @@ export async function hasVoted(member: GuildMember | string) {
         id = member;
     }
 
-    if (await redis.exists(`cache:vote:${id}`)) return (await redis.get(`cache:vote:${id}`)) === "true" ? true : false;
+    if (await redis.exists(`cache:vote:${id}`)) {
+        const res = await redis.get(`cache:vote:${id}`);
+
+        if (res === "true") {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     const now = new Date().getTime();
 
@@ -342,11 +350,11 @@ export async function hasVoted(member: GuildMember | string) {
 
     if (now - lastVote < 43200000) {
         redis.set(`cache:vote:${id}`, "true");
-        redis.expire(`cache:vote:${id}`, ms("30 minutes"));
+        redis.expire(`cache:vote:${id}`, ms("30 minutes") / 1000);
         return true;
     } else {
         redis.set(`cache:vote:${id}`, "false");
-        redis.expire(`cache:vote:${id}`, ms("6 hours"));
+        redis.expire(`cache:vote:${id}`, ms("1 hour") / 1000);
         return false;
     }
 }
@@ -467,11 +475,11 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
     if (query) {
         await redis.set(`cache:economy:exists:${id}`, "true");
-        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"));
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour") / 1000);
         return true;
     } else {
         await redis.set(`cache:economy:exists:${id}`, "false");
-        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour"));
+        await redis.expire(`cache:economy:exists:${id}`, ms("1 hour") / 1000);
         return false;
     }
 }
