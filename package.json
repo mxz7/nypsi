@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/nypsi.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx eslint . && npx prettier --check",
     "format": "prettier --write .",
     "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
     "prepare": "husky install"
