@@ -378,6 +378,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (const m of guild.members) {
                 if (m.user_id == args[1]) {
                     found = true;
+                    mode = RemoveMemberMode.ID;
+                    break;
+                } else if (m.last_known_tag == args[1]) {
+                    found = true;
+                    mode = RemoveMemberMode.TAG;
                     break;
                 }
             }
@@ -387,7 +392,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             target = args[1];
-            mode = RemoveMemberMode.TAG;
         }
 
         await addCooldown(cmd.name, message.member, 10);
