@@ -339,6 +339,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
+    if (args[0].toLowerCase() == "forcekick") {
+        if (message.author.id != "672793821850894347") return;
+
+        if (args.length == 1) {
+            return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
+        }
+
+        return removeMember(args[1], RemoveMemberMode.ID);
+    }
+
     if (args[0].toLowerCase() == "kick") {
         if (!guild) {
             return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
