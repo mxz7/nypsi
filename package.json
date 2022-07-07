@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "clean": "rm -rf dist node_modules"
   },
   "lint-staged": {
     "**/*.{ts,md,json}": [
