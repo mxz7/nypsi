@@ -12,7 +12,8 @@ declare function require(name: string);
  */
 export default function ready(client: Client, startUp: number) {
     setTimeout(() => {
-        const presence = getCustomPresence() || randomPresence();
+        if (getCustomPresence()) return;
+        const presence = randomPresence();
 
         client.user.setPresence({
             status: "dnd",
@@ -25,7 +26,8 @@ export default function ready(client: Client, startUp: number) {
     }, 15000);
 
     setInterval(() => {
-        const presence = getCustomPresence() || randomPresence();
+        if (getCustomPresence()) return;
+        const presence = randomPresence();
 
         client.user.setPresence({
             status: "dnd",
