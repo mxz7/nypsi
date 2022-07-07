@@ -7,6 +7,23 @@ on:
         branches: [main]
 
 jobs:
+    prettier:
+        name: prettier
+
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout repository
+              uses: actions/checkout@v3
+              
+            - name: setup node
+              uses: actions/setup-node@v3
+
+            - name: install packages
+              run: npm install
+
+            - name: prettier check
+              run: npx prettier --check .
+
     lint:
         name: linting
 
@@ -26,9 +43,6 @@ jobs:
             
             - name: linting
               run: npx eslint ./src/
-
-            - name: prettier check
-              run: npx prettier --check .
 
     test:
         name: testing
@@ -50,6 +64,12 @@ jobs:
 
             - name: install packages
               run: npm install
+
+            - name: install redis-server
+              run: apt install redis-server
+
+            - name: run redis-server
+              run: service redis-server start
 
             - name: setup
               run: ./setup.sh
