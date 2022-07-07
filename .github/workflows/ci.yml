@@ -66,9 +66,9 @@ jobs:
               run: npm install
 
             - name: setup redis
-            uses: shogo82148/actions-setup-redis@v1
-            with:
-              auto-start: "true"
+              uses: shogo82148/actions-setup-redis@v1
+              with:
+                auto-start: "true"
 
             - name: setup
               run: ./setup.sh
