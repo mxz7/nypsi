@@ -7,7 +7,8 @@
     "test": "npx eslint . && npx prettier --check",
     "format": "prettier --write .",
     "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "clean": "rm -rf dist node_modules"
   },
   "lint-staged": {
     "**/*.{ts,md,json}": [
@@ -26,7 +27,7 @@
     "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.3",
-    "discord-api-types": "^0.35.0",
+    "discord-api-types": "^0.36.1",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
@@ -42,7 +43,7 @@
     "table": "6.8",
     "urban-dictionary": "^3.0.2",
     "utf-8-validate": "^5.0.9",
-    "winston": "^3.8.0",
+    "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.6.1",
     "winston-discord-webhook": "^1.1.4"
   },
@@ -54,9 +55,9 @@
     "@types/ms": "^0.7.31",
     "@types/node-os-utils": "^1.2.0",
     "@types/shuffle-array": "^1.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.30.0",
-    "@typescript-eslint/parser": "^5.30.0",
-    "eslint": "^8.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
+    "eslint": "^8.19.0",
     "eslint-plugin-jsdoc": "^39.3.3",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",

@@ -42,13 +42,13 @@ let wordList: string[];
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
-            const replyMsg = await message.fetchReply();
+            await message.reply(data).catch();
+            const replyMsg = await message.fetchReply().catch();
             if (replyMsg instanceof Message) {
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data).catch();
         }
     };
 
