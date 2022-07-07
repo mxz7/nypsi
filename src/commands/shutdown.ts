@@ -4,6 +4,7 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { startRestart } from "../utils/commandhandler";
 import { vacuum } from "../utils/database/database";
 import { logger } from "../utils/logger";
+import { setCustomPresence } from "../utils/functions/presence";
 
 const cmd = new Command("shutdown", "shutdown bot", Categories.NONE).setPermissions(["bot owner"]);
 
@@ -26,6 +27,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     } else {
         startRestart();
+
+        setCustomPresence("rebooting..");
+
+        message.client.user.setPresence({
+            activities: [
+                {
+                    name: "rebooting..",
+                },
+            ],
+        });
 
         logger.info("nypsi shutting down soon...");
 

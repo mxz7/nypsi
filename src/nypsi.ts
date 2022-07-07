@@ -266,6 +266,16 @@ export async function getGuild(guildID: string): Promise<Discord.Guild | void> {
 setTimeout(() => {
     logger.info("logging in...");
     client.login(process.env.BOT_TOKEN).then(() => {
+        client.user.setPresence({
+            status: "dnd",
+            activities: [
+                {
+                    name: "loading..",
+                    type: "PLAYING",
+                },
+            ],
+        });
+
         setTimeout(() => {
             runLotteryInterval(client);
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
