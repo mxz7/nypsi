@@ -65,11 +65,10 @@ jobs:
             - name: install packages
               run: npm install
 
-            - name: install redis-server
-              run: apt install redis-server
-
-            - name: run redis-server
-              run: service redis-server start
+            - name: setup redis
+            uses: shogo82148/actions-setup-redis@v1
+            with:
+              auto-start: "true"
 
             - name: setup
               run: ./setup.sh
