@@ -29,7 +29,7 @@ export function randomPresence(): string {
         const randomCommand = getRandomCommand();
 
         game = `$${randomCommand.name} - ${randomCommand.description}`;
-    } else if (chosen === "christmas") {
+    } else if (chosen === "xmas") {
         game = `${daysUntilChristmas()} days until christmas`;
     } else {
         game = chosen;
