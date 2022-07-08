@@ -2,6 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import fetch from "node-fetch";
 
 const answers = [
     "as i see it, yes",
@@ -48,10 +49,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const question = args.join(" ");
 
+    const res = (
+        await fetch(`https://8ball.delegator.com/magic/JSON/${encodeURIComponent(question)}`)
+            .then((res) => res.json())
+            .catch()
+    ).magic;
+
+    let response: string;
+
+    if (!res || !res.answer) {
+        response = answers[Math.floor(Math.random() * answers.length)];
+    } else {
+        response = res.answer.toLowerCase();
+    }
+
     const embed = new CustomEmbed(
         message.member,
         false,
-        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${answers[Math.floor(Math.random() * answers.length)]}`
+        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`
     );
 
     message.channel.send({ embeds: [embed] });
