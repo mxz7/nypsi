@@ -26,7 +26,7 @@ const answers = [
     "you may rely on it",
 ];
 
-const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN);
+const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN).setAliases(["8"]);
 
 /**
  *
