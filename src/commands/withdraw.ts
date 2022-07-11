@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const m = await send({ embeds: [embed] });
 
-    updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
+    await updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
     await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
     const embed1 = new CustomEmbed(message.member, true)

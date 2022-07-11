@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        updateBankBalance(message.member, currentBal - neededBal);
+        await updateBankBalance(message.member, currentBal - neededBal);
         updateXp(message.member, currentXp - neededXp);
         setPrestige(message.member, getPrestige(message.member) + 1);
 

@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const m = await send({ embeds: [embed] });
 
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
-    updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
+    await updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
 
     const embed1 = new CustomEmbed(message.member, false)
         .setHeader("bank deposit", message.author.avatarURL())
