@@ -3,6 +3,7 @@ backup/
 logs/
 dist/
 out/
+migrations/
 
 *.json
 *.env
