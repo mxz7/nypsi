@@ -12,19 +12,6 @@ export interface Item {
     ingot?: string;
 }
 
-export interface EconomyProfile {
-    id?: string;
-    money?: number;
-    bank?: number;
-    xp?: number;
-    prestige?: number;
-    padlock?: number;
-    dms?: number;
-    last_vote?: number;
-    inventory?: any;
-    workers?: any;
-}
-
 export interface LotteryTicket {
     user_id: string;
     id: number;

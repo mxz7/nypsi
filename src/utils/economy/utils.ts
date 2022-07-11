@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as topgg from "@top-gg/sdk";
 import { logger } from "../logger";
-import { EconomyProfile, Item, LotteryTicket } from "../models/Economy";
+import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import * as fs from "fs";
