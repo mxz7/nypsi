@@ -12,11 +12,12 @@ datasource db {
 model User {
   id           String  @id
   lastKnownTag String
+  karma        Int     @default(0)
   commandCount Int     @default(0)
+  lastCommand  Int     @default(0)
   tracking     Boolean @default(true)
 
   Economy            Economy?
-  Karma              Karma?
   Lastfm             Lastfm?
   Premium            Premium?
   Username           Username[]
@@ -71,14 +72,6 @@ enum PremiumLevel {
   SILVER
   GOLD
   PLATINUM
-}
-
-model Karma {
-  karma       Int @default(1)
-  lastCommand Int @default(0)
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @id @unique
 }
 
 model Lastfm {
