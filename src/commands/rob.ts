@@ -185,7 +185,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "**"
         );
     } else if (await hasPadlock(target)) {
-        setPadlock(target, false);
+        await setPadlock(target, false);
 
         const amount = Math.floor(Math.random() * 35) + 5;
         const amountMoney = Math.round((await getBalance(target)) * (amount / 100));

@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                setPadlock(message.member, true);
+                await setPadlock(message.member, true);
                 inventory["padlock"]--;
 
                 if (inventory["padlock"] <= 0) {
@@ -247,7 +247,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                setPadlock(lockPickTarget, false);
+                await setPadlock(lockPickTarget, false);
 
                 inventory["lock_pick"]--;
 
