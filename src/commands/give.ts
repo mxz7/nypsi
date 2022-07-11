@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.id == "bitcoin") {
         const owned = targetInventory["bitcoin"] || 0;
-        const max = getMaxBitcoin(target);
+        const max = await getMaxBitcoin(target);
 
         if (owned + amount > max) {
             return message.channel.send({
@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     } else if (selected.id == "ethereum") {
         const owned = targetInventory["ethereum"] || 0;
-        const max = getMaxEthereum(target);
+        const max = await getMaxEthereum(target);
 
         if (owned + amount > max) {
             return message.channel.send({
@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const targetPrestige = getPrestige(target);
 
     if (targetPrestige < 2) {
-        const targetXp = getXp(target);
+        const targetXp = await getXp(target);
 
         let payLimit = 150000;
 

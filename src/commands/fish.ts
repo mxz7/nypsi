@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (chosen == "bitcoin") {
             const owned = inventory["bitcoin"] || 0;
-            const max = getMaxBitcoin(message.member);
+            const max = await getMaxBitcoin(message.member);
 
             if (owned + 1 > max) {
                 i--;
@@ -239,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         } else if (chosen == "ethereum") {
             const owned = inventory["ethereum"] || 0;
-            const max = getMaxEthereum(message.member);
+            const max = await getMaxEthereum(message.member);
 
             if (owned + 1 > max) {
                 i--;
@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else if (chosen.includes("xp:")) {
                 const amount = parseInt(chosen.substr(3));
 
-                updateXp(message.member, getXp(message.member) + amount);
+                updateXp(message.member, (await getXp(message.member)) + amount);
                 foundItems.push(amount + "xp");
             }
         } else {

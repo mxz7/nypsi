@@ -672,11 +672,11 @@ export async function runCommand(
         if (!message.member) return;
         if (!(await userExists(message.member))) return;
 
-        setTimeout(() => {
+        setTimeout(async () => {
             try {
                 if (!xpCooldown.has(message.author.id)) {
                     try {
-                        updateXp(message.member, getXp(message.member) + 1);
+                        updateXp(message.member, (await getXp(message.member)) + 1);
 
                         xpCooldown.add(message.author.id);
 

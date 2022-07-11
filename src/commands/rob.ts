@@ -223,7 +223,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const voted = await hasVoted(message.member);
 
             if (voted) {
-                updateXp(message.member, getXp(message.member) + 1);
+                updateXp(message.member, (await getXp(message.member)) + 1);
                 embed2.setFooter("+1xp");
             }
 

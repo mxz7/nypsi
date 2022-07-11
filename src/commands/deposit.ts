@@ -61,8 +61,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "all") {
         args[0] = (await getBalance(message.member)).toString();
         const amount = parseInt(args[0]);
-        if (amount > getMaxBankBalance(message.member) - (await getBankBalance(message.member))) {
-            args[0] = (getMaxBankBalance(message.member) - (await getBankBalance(message.member))).toString();
+        if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
+            args[0] = ((await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))).toString();
         }
     }
 
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
     }
 
-    if (amount > getMaxBankBalance(message.member) - (await getBankBalance(message.member))) {
+    if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("your bank is not big enough for this payment")] });
     }
 
@@ -95,9 +95,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                (await getBankBalance(message.member).toLocaleString()) +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
@@ -112,9 +112,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                (await getBankBalance(message.member).toLocaleString()) +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");

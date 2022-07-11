@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "$**" +
                 (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         )
         .addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "$**" +
                 (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         );
 

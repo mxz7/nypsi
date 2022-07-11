@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id);
-            updateXp(member, getXp(member) + 1);
+            updateXp(member, (await getXp(member)) + 1);
         }
     }
 

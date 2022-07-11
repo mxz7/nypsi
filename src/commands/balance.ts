@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(target))) createUser(target);
 
-    let footer = `xp: ${getXp(target).toLocaleString()}`;
+    let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
 
     if (getPrestige(target) > 0) {
         footer += ` | prestige: ${getPrestige(target)}`;
@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "💳 $**" +
                 (await getBankBalance(target).toLocaleString()) +
                 "** / $**" +
-                getMaxBankBalance(target).toLocaleString() +
+                (await getMaxBankBalance(target)).toLocaleString() +
                 "**"
         )
         .setFooter(footer);
@@ -103,8 +103,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.member == target) {
         if (
-            getXp(target) >= getPrestigeRequirement(target) &&
-            (await getBankBalance(target)) >= getPrestigeRequirementBal(getXp(target)) &&
+            (await getXp(target)) >= getPrestigeRequirement(target) &&
+            (await getBankBalance(target)) >= getPrestigeRequirementBal(await getXp(target)) &&
             getPrestige(target) < 20
         ) {
             return send({

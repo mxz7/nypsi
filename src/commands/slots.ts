@@ -247,7 +247,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    send({ embeds: [embed] }).then((m) => {
+    send({ embeds: [embed] }).then(async (m) => {
         if (win) {
             if (multi > 0) {
                 embed.addField(
@@ -266,7 +266,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const earnedXp = calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp);
+                updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 embed.setFooter(`+${earnedXp}xp`);
 
                 const guild = getGuildByUser(message.member);

@@ -317,10 +317,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "100xp":
-                updateXp(message.member, getXp(message.member) + 100);
+                updateXp(message.member, (await getXp(message.member)) + 100);
                 break;
             case "1000xp":
-                updateXp(message.member, getXp(message.member) + 1000);
+                updateXp(message.member, (await getXp(message.member)) + 1000);
                 break;
             case "basic_crate":
                 const inventory = getInventory(message.member); // eslint-disable-line
