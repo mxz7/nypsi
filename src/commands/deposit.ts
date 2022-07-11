@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member).toString();
+        args[0] = (await getBalance(message.member)).toString();
         const amount = parseInt(args[0]);
         if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
             args[0] = (getMaxBankBalance(message.member) - getBankBalance(message.member)).toString();
@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > getBalance(message.member)) {
+    if (amount > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
     }
 
@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const m = await send({ embeds: [embed] });
 
-    updateBalance(message.member, getBalance(message.member) - amount);
+    updateBalance(message.member, (await getBalance(message.member)) - amount);
     updateBankBalance(message.member, getBankBalance(message.member) + amount);
 
     const embed1 = new CustomEmbed(message.member, false)

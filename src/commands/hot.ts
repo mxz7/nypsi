@@ -79,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id);
-            updateBalance(member, getBalance(member) + 1069);
+            updateBalance(member, (await getBalance(member)) + 1069);
         }
     } else if (hotAmount >= 80) {
         hotEmoji = "💍😍";

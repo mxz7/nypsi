@@ -166,7 +166,7 @@ async function showUser(message, user) {
         const voted = await hasVoted(user.id);
         embed.addField(
             "economy",
-            `💰 $**${getBalance(user.id).toLocaleString()}**
+            `💰 $**${await getBalance(user.id).toLocaleString()}**
             💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id).toLocaleString()}**
             **xp** ${getXp(user.id).toLocaleString()}
             **voted** ${voted}

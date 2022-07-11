@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member, false)
         .setDescription(
             "💰 $**" +
-                getBalance(target).toLocaleString() +
+                (await getBalance(target)).toLocaleString() +
                 "**\n" +
                 "💳 $**" +
                 getBankBalance(target).toLocaleString() +

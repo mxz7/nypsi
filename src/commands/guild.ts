@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
         }
 
-        if (getBalance(message.member) < 500000) {
+        if ((await getBalance(message.member)) < 500000) {
             return send({ embeds: [new ErrorEmbed("it costs $500,000 to create a guild. you cannot afford this")] });
         }
 
@@ -218,7 +218,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 3);
 
-        updateBalance(message.member, getBalance(message.member) - 500000);
+        updateBalance(message.member, (await getBalance(message.member)) - 500000);
 
         createGuild(name, message.member);
 
@@ -441,9 +441,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args[1].toLowerCase() == "all") {
-            args[1] = getBalance(message.member).toString();
+            args[1] = (await getBalance(message.member)).toString();
         } else if (args[1].toLowerCase() == "half") {
-            args[1] = (getBalance(message.member) / 2).toString();
+            args[1] = ((await getBalance(message.member)) / 2).toString();
         }
 
         const amount = formatNumber(args[1]);
@@ -452,7 +452,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid payment")] });
         }
 
-        if (amount > getBalance(message.member)) {
+        if (amount > (await getBalance(message.member))) {
             return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
         }
 
@@ -460,7 +460,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid payment")] });
         }
 
-        updateBalance(message.member, getBalance(message.member) - amount);
+        updateBalance(message.member, (await getBalance(message.member)) - amount);
 
         addToGuildBank(guild.guild_name, amount, message.member);
 

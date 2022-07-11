@@ -153,7 +153,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            if (getBalance(message.member) < worker.cost) {
+            if ((await getBalance(message.member)) < worker.cost) {
                 return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this worker")] });
             }
 
@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
             }
 
-            updateBalance(message.member, getBalance(message.member) - worker.cost);
+            updateBalance(message.member, (await getBalance(message.member)) - worker.cost);
 
             addWorker(message.member, worker.id);
 
@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             emptyWorkersStored(message.member);
-            updateBalance(message.member, getBalance(message.member) + amountEarned);
+            updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
             const embed = new CustomEmbed(
                 message.member,
@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] });
             }
 
-            if (getBalance(message.member) < worker.getUpgradeCost()) {
+            if ((await getBalance(message.member)) < worker.getUpgradeCost()) {
                 return message.channel.send({
                     embeds: [
                         new ErrorEmbed(
@@ -269,7 +269,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            updateBalance(message.member, getBalance(message.member) - worker.getUpgradeCost());
+            updateBalance(message.member, (await getBalance(message.member)) - worker.getUpgradeCost());
 
             upgradeWorker(message.member, worker.id);
 

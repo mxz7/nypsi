@@ -123,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cant rob yourself")] });
     }
 
-    if (!(await userExists(target)) || getBalance(target) <= 500) {
+    if (!(await userExists(target)) || (await getBalance(target)) <= 500) {
         return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
     }
 
@@ -135,7 +135,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (getBalance(message.member) < 750) {
+    if ((await getBalance(message.member)) < 750) {
         return send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] });
     }
 
@@ -157,10 +157,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (playerCooldown.has(target.user.id)) {
         const amount = Math.floor(Math.random() * 9) + 1;
-        const amountMoney = Math.round(getBalance(message.member) * (amount / 100));
+        const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-        updateBalance(target, getBalance(target) + amountMoney);
-        updateBalance(message.member, getBalance(message.member) - amountMoney);
+        updateBalance(target, (await getBalance(target)) + amountMoney);
+        updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
 
         embed2.setColor("#e4334f");
         embed2.addField(
@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setPadlock(target, false);
 
         const amount = Math.floor(Math.random() * 35) + 5;
-        const amountMoney = Math.round(getBalance(target) * (amount / 100));
+        const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
         embed2.setColor("#e4334f");
         embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken");
@@ -212,10 +212,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             robberySuccess = true;
 
             const amount = Math.floor(Math.random() * 35) + 5;
-            const amountMoney = Math.round(getBalance(target) * (amount / 100));
+            const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
-            updateBalance(target, getBalance(target) - amountMoney);
-            updateBalance(message.member, getBalance(message.member) + amountMoney);
+            updateBalance(target, (await getBalance(target)) - amountMoney);
+            updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
 
             embed2.setColor("#5efb8f");
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
@@ -249,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }, length * 1000);
         } else {
             const amount = Math.floor(Math.random() * 20) + 5;
-            const amountMoney = Math.round(getBalance(message.member) * (amount / 100));
+            const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
             const inventory = getInventory(message.member);
 
@@ -276,8 +276,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "they were caught by the police, but a lawyer protected their money"
                 );
             } else {
-                updateBalance(target, getBalance(target) + amountMoney);
-                updateBalance(message.member, getBalance(message.member) - amountMoney);
+                updateBalance(target, (await getBalance(target)) + amountMoney);
+                updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
                 embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
                 embed3.setDescription(
                     "**" +

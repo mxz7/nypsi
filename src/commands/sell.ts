@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         sellWorth = 1000 * amount;
     }
 
-    updateBalance(message.member, getBalance(message.member) + sellWorth);
+    updateBalance(message.member, (await getBalance(message.member)) + sellWorth);
 
     const embed = new CustomEmbed(message.member, false);
 

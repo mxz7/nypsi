@@ -52,24 +52,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let amount = 75000;
             const multi = await getMulti(message.member);
 
-            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
+            let description = `$${(await getBalance(message.member)).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi);
-                description = `$${getBalance(
+                description = `$${await getBalance(
                     message.member
                 ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
                     multi * 100
                 ).toLocaleString()}**% bonus)`;
             }
 
-            updateBalance(message.member, getBalance(message.member) + amount);
+            updateBalance(message.member, (await getBalance(message.member)) + amount);
 
             const embed = new CustomEmbed(message.member, false, description);
 
             return message.channel.send({ embeds: [embed] }).then((msg) => {
-                setTimeout(() => {
-                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`);
+                setTimeout(async () => {
+                    embed.setDescription(`new balance: $**${(await getBalance(message.member)).toLocaleString()}**`);
                     msg.edit({ embeds: [embed] });
                 }, 2000);
             });

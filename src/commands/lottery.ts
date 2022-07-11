@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] });
         }
 
-        if (getBalance(message.member) < lotteryTicketPrice * amount) {
+        if ((await getBalance(message.member)) < lotteryTicketPrice * amount) {
             return send({
                 embeds: [new ErrorEmbed("you cannot afford this")],
             });
@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 10);
 
-        updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice * amount);
+        updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
         for (let i = 0; i < amount; i++) {
             addTicket(message.member);

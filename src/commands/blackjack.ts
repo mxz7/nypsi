@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`${prefix}blackjack <bet>`)] });
     }
 
-    if (bet > getBalance(message.member)) {
+    if (bet > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30);
 
-    updateBalance(message.member, getBalance(message.member) - bet);
+    updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const id = Math.random();
 
@@ -189,11 +189,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         voted: multi,
     });
 
-    setTimeout(() => {
+    setTimeout(async () => {
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
                 games.delete(message.author.id);
-                updateBalance(message.member, getBalance(message.member) + bet);
+                updateBalance(message.member, (await getBalance(message.member)) + bet);
             }
         }
     }, 180000);
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let row;
 
-    if (getBalance(message.member) >= bet) {
+    if ((await getBalance(message.member)) >= bet) {
         row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
             new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY"),
@@ -454,7 +454,7 @@ async function playGame(message, m) {
 
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
         newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        updateBalance(message.member, getBalance(message.member) + winnings);
+        updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
         return await edit({ embeds: [newEmbed], components: [] });
     };
@@ -466,7 +466,7 @@ async function playGame(message, m) {
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
         newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        updateBalance(message.member, getBalance(message.member) + bet);
+        updateBalance(message.member, (await getBalance(message.member)) + bet);
         games.delete(message.author.id);
         return await edit({ embeds: [newEmbed], components: [] });
     };
@@ -601,7 +601,7 @@ async function playGame(message, m) {
                 }
             }, 1500);
         } else if (reaction == "3️⃣") {
-            updateBalance(message.member, getBalance(message.member) - bet);
+            updateBalance(message.member, (await getBalance(message.member)) - bet);
 
             bet = bet * 2;
 

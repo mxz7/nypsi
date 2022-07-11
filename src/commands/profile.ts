@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member, true);
 
     //ECONOMY
-    const balance = getBalance(message.member).toLocaleString();
+    const balance = (await getBalance(message.member)).toLocaleString();
     const bankBalance = getBankBalance(message.member).toLocaleString();
     const maxBankBalance = getMaxBankBalance(message.member).toLocaleString();
     const xp = getXp(message.member).toLocaleString();

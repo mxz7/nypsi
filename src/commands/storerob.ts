@@ -21,7 +21,7 @@ const cmd = new Command("storerob", "attempt to rob a store for a reward", Categ
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!(await userExists(message.member))) createUser(message.member);
 
-    if (getBalance(message.member) < 1000) {
+    if ((await getBalance(message.member)) < 1000) {
         return await message.channel.send({
             embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a store")],
         });
@@ -29,38 +29,38 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const shopWorth = new Map();
 
-    if (getBalance(message.member) > 100000000) {
-        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.0005));
-        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.005));
-        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.002));
-        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.001));
-        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.005));
-        shopWorth.set("target", Math.round(getBalance(message.member) * 0.002));
-        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.001));
-    } else if (getBalance(message.member) > 10000000) {
-        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.005));
-        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.05));
-        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.02));
-        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.01));
-        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.05));
-        shopWorth.set("target", Math.round(getBalance(message.member) * 0.02));
-        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.01));
-    } else if (getBalance(message.member) > 500000) {
-        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.05));
-        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.5));
-        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.2));
-        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.1));
-        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.5));
-        shopWorth.set("target", Math.round(getBalance(message.member) * 0.2));
-        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.1));
+    if ((await getBalance(message.member)) > 100000000) {
+        shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.0005));
+        shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.005));
+        shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.002));
+        shopWorth.set("morrisons", Math.round((await getBalance(message.member)) * 0.001));
+        shopWorth.set("walmart", Math.round((await getBalance(message.member)) * 0.005));
+        shopWorth.set("target", Math.round((await getBalance(message.member)) * 0.002));
+        shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.001));
+    } else if ((await getBalance(message.member)) > 10000000) {
+        shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.005));
+        shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.05));
+        shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.02));
+        shopWorth.set("morrisons", Math.round((await getBalance(message.member)) * 0.01));
+        shopWorth.set("walmart", Math.round((await getBalance(message.member)) * 0.05));
+        shopWorth.set("target", Math.round((await getBalance(message.member)) * 0.02));
+        shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.01));
+    } else if ((await getBalance(message.member)) > 500000) {
+        shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.05));
+        shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.5));
+        shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.2));
+        shopWorth.set("morrisons", Math.round((await getBalance(message.member)) * 0.1));
+        shopWorth.set("walmart", Math.round((await getBalance(message.member)) * 0.5));
+        shopWorth.set("target", Math.round((await getBalance(message.member)) * 0.2));
+        shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.1));
     } else {
-        shopWorth.set("primark", Math.round(getBalance(message.member) * 0.1));
-        shopWorth.set("asda", Math.round(getBalance(message.member) * 0.7));
-        shopWorth.set("tesco", Math.round(getBalance(message.member) * 0.4));
-        shopWorth.set("morrisons", Math.round(getBalance(message.member) * 0.3));
-        shopWorth.set("walmart", Math.round(getBalance(message.member) * 0.7));
-        shopWorth.set("target", Math.round(getBalance(message.member) * 0.3));
-        shopWorth.set("7eleven", Math.round(getBalance(message.member) * 0.3));
+        shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.1));
+        shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.7));
+        shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.4));
+        shopWorth.set("morrisons", Math.round((await getBalance(message.member)) * 0.3));
+        shopWorth.set("walmart", Math.round((await getBalance(message.member)) * 0.7));
+        shopWorth.set("target", Math.round((await getBalance(message.member)) * 0.3));
+        shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.3));
     }
 
     if (args[0] == "status") {
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (caught <= 5) {
         percentLost = Math.floor(Math.random() * 50) + 10;
-        amountLost = Math.round((percentLost / 100) * getBalance(message.member));
+        amountLost = Math.round((percentLost / 100) * (await getBalance(message.member)));
 
         const inventory = getInventory(message.member);
 
@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             setInventory(message.member, inventory);
 
-            updateBalance(message.member, getBalance(message.member) - Math.floor(amountLost * 0.25));
+            updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
 
             embed2.addField(
                 "**you were caught**",
@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
             embed2.setColor("#e4334f");
         } else {
-            updateBalance(message.member, getBalance(message.member) - amountLost);
+            updateBalance(message.member, (await getBalance(message.member)) - amountLost);
 
             embed2.addField(
                 "**you were caught**",
@@ -141,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         robbedAmount = Math.round((amount / 100) * shopWorth.get(shop));
 
-        updateBalance(message.member, getBalance(message.member) + robbedAmount);
+        updateBalance(message.member, (await getBalance(message.member)) + robbedAmount);
 
         embed2.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " from **" + shop + "**");
         embed2.setColor("#5efb8f");

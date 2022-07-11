@@ -178,7 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         races.set(message.channel.id, game);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!races.has(message.channel.id)) return;
             if (races.get(message.channel.id).id != id) return;
             if (races.get(message.channel.id).users.size < 2) {
@@ -189,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 for (let user of races.get(message.channel.id).users.keys()) {
                     user = races.get(message.channel.id).users.get(user);
 
-                    updateBalance(user.user.id, getBalance(user.user.id) + bet);
+                    updateBalance(user.user.id, (await getBalance(user.user.id)) + bet);
                 }
                 races.delete(message.channel.id);
             } else {
@@ -222,7 +222,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const race = races.get(message.channel.id);
 
-        if (race.bet > getBalance(message.member)) {
+        if (race.bet > (await getBalance(message.member))) {
             return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] });
         }
 
@@ -360,7 +360,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        updateBalance(message.member, getBalance(message.member) - race.bet);
+        updateBalance(message.member, (await getBalance(message.member)) - race.bet);
 
         race.users.set(message.author.id, {
             user: message.author,
@@ -502,7 +502,7 @@ async function startRace(id) {
     if (winner) {
         const winnings = race.bet * race.users.size;
 
-        updateBalance(winner.id, getBalance(winner.id) + race.bet * race.users.size);
+        updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
 
         description +=
             `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${

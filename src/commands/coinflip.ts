@@ -99,11 +99,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] });
     }
 
-    if (bet > getBalance(message.member)) {
+    if (bet > (await getBalance(message.member))) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
-    if (bet > getBalance(target)) {
+    if (bet > (await getBalance(target))) {
         return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
     }
 
@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     waiting.push(message.author.id);
 
-    updateBalance(message.member, getBalance(message.member) - bet);
+    updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const requestEmbed = new CustomEmbed(
         message.member,
@@ -148,10 +148,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .then((collected) => {
             return collected.first().content.toLowerCase();
         })
-        .catch(() => {
+        .catch(async () => {
             fail = true;
             waiting.splice(waiting.indexOf(message.author.id), 1);
-            updateBalance(message.member, getBalance(message.member) + bet);
+            updateBalance(message.member, (await getBalance(message.member)) + bet);
             return message.channel.send({ content: message.author.toString() + " coinflip request expired" });
         });
 
@@ -166,13 +166,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         response.includes("i accept") ||
         response.includes("bring it on")
     ) {
-        if (bet > getBalance(target)) {
+        if (bet > (await getBalance(target))) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
         }
 
         await addCooldown(cmd.name, message.member, 10);
 
-        updateBalance(target, getBalance(target) - bet);
+        updateBalance(target, (await getBalance(target)) - bet);
 
         // its big to make sure that theres little to no deviation in chance cus of rounding
         const lols = [
@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         addGamble(winner, "coinflip", true);
         addGamble(loser, "coinflip", false);
 
-        updateBalance(winner, getBalance(winner) + bet * 2);
+        updateBalance(winner, (await getBalance(winner)) + bet * 2);
 
         waiting.splice(waiting.indexOf(message.author.id), 1);
 
@@ -249,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }, 2000);
         });
     } else {
-        updateBalance(message.member, getBalance(message.member) + bet);
+        updateBalance(message.member, (await getBalance(message.member)) + bet);
         waiting.splice(waiting.indexOf(message.author.id), 1);
         return message.channel.send({ embeds: [new CustomEmbed(target, false, "✅ coinflip request denied")] });
     }

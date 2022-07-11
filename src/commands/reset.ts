@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     earnedKarma += getPrestige(message.member) * 30;
     earnedKarma += getXp(message.member) / 100;
-    earnedKarma += getBalance(message.member) / 100000 / 2;
+    earnedKarma += (await getBalance(message.member)) / 100000 / 2;
     earnedKarma += inventoryWorth / 100000 / 2;
 
     earnedKarma = Math.floor(earnedKarma * 2.2);
@@ -126,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         earnedKarma += getPrestige(message.member) * 30;
         earnedKarma += getXp(message.member) / 100;
-        earnedKarma += getBalance(message.member) / 100000 / 2;
+        earnedKarma += (await getBalance(message.member)) / 100000 / 2;
         earnedKarma += inventoryWorth / 100000 / 2;
 
         earnedKarma = Math.floor(earnedKarma * 2.2);

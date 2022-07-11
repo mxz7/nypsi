@@ -20,7 +20,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(message.member))) createUser(message.member);
 
-    if (getBalance(message.member) > 500000) {
+    if ((await getBalance(message.member)) > 500000) {
         return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });
     }
 
@@ -40,16 +40,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) + amount);
+    updateBalance(message.member, (await getBalance(message.member)) + amount);
 
     const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setHeader(
         "free money",
         message.author.avatarURL()
     );
 
-    message.channel.send({ embeds: [embed] }).then((msg) => {
+    message.channel.send({ embeds: [embed] }).then(async (msg) => {
         embed.setDescription(
-            `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(message.member).toLocaleString()}**`
+            `+$**${amount.toLocaleString()}**\nnew balance: $**${(await getBalance(message.member)).toLocaleString()}**`
         );
         setTimeout(() => {
             msg.edit({ embeds: [embed] });

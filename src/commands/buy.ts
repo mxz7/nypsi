@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount > 50) amount = 50;
 
-    if (getBalance(message.member) < selected.worth * amount) {
+    if ((await getBalance(message.member)) < selected.worth * amount) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) - selected.worth * amount);
+    updateBalance(message.member, (await getBalance(message.member)) - selected.worth * amount);
     inventory[selected.id] + amount;
 
     if (inventory[selected.id]) {
