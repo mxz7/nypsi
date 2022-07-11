@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    updateBalance(message.member, (await getBalance(message.member)) - selected.worth * amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - selected.worth * amount);
     inventory[selected.id] + amount;
 
     if (inventory[selected.id]) {

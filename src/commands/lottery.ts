@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 10);
 
-        updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
+        await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
         for (let i = 0; i < amount; i++) {
             addTicket(message.member);

@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ).toLocaleString()}**% bonus)`;
             }
 
-            updateBalance(message.member, (await getBalance(message.member)) + amount);
+            await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
             const embed = new CustomEmbed(message.member, false, description);
 

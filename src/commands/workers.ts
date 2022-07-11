@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
             }
 
-            updateBalance(message.member, (await getBalance(message.member)) - worker.cost);
+            await updateBalance(message.member, (await getBalance(message.member)) - worker.cost);
 
             addWorker(message.member, worker.id);
 
@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             emptyWorkersStored(message.member);
-            updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
+            await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
             const embed = new CustomEmbed(
                 message.member,
@@ -269,7 +269,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            updateBalance(message.member, (await getBalance(message.member)) - worker.getUpgradeCost());
+            await updateBalance(message.member, (await getBalance(message.member)) - worker.getUpgradeCost());
 
             upgradeWorker(message.member, worker.id);
 

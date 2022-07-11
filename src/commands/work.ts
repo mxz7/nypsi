@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const work = workMessages[Math.floor(Math.random() * workMessages.length)];
 
-    updateBalance(message.member, (await getBalance(message.member)) + earned);
+    await updateBalance(message.member, (await getBalance(message.member)) + earned);
 
     const embed = new CustomEmbed(message.member, true, work).setHeader("work", message.author.avatarURL());
 

@@ -144,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10);
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     let one = reel1[Math.floor(Math.random() * reel1.length)];
     const two = reel2[Math.floor(Math.random() * reel2.length)];
@@ -207,12 +207,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         win = true;
         winnings = Math.round(multiplier * bet);
 
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     } else if (one == two) {
         win = true;
         winnings = Math.round(bet * 1.2);
 
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     }
 
     let multi = 0;
@@ -221,7 +221,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         multi = await getMulti(message.member);
 
         if (multi > 0) {
-            updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
+            await updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
             winnings = winnings + Math.round(winnings * multi);
         }
     }

@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             setInventory(message.member, inventory);
 
-            updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
+            await updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
 
             embed2.addField(
                 "**you were caught**",
@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
             embed2.setColor("#e4334f");
         } else {
-            updateBalance(message.member, (await getBalance(message.member)) - amountLost);
+            await updateBalance(message.member, (await getBalance(message.member)) - amountLost);
 
             embed2.addField(
                 "**you were caught**",
@@ -141,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         robbedAmount = Math.round((amount / 100) * shopWorth.get(shop));
 
-        updateBalance(message.member, (await getBalance(message.member)) + robbedAmount);
+        await updateBalance(message.member, (await getBalance(message.member)) + robbedAmount);
 
         embed2.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " from **" + shop + "**");
         embed2.setColor("#5efb8f");

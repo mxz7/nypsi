@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     setInventory(message.member, inventory);
 
-    updateBalance(message.member, (await getBalance(message.member)) + total);
+    await updateBalance(message.member, (await getBalance(message.member)) + total);
 
     const embed = new CustomEmbed(message.member, false);
 

@@ -159,8 +159,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const amount = Math.floor(Math.random() * 9) + 1;
         const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-        updateBalance(target, (await getBalance(target)) + amountMoney);
-        updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
+        await updateBalance(target, (await getBalance(target)) + amountMoney);
+        await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
 
         embed2.setColor("#e4334f");
         embed2.addField(
@@ -214,8 +214,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const amount = Math.floor(Math.random() * 35) + 5;
             const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
-            updateBalance(target, (await getBalance(target)) - amountMoney);
-            updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
+            await updateBalance(target, (await getBalance(target)) - amountMoney);
+            await updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
 
             embed2.setColor("#5efb8f");
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
@@ -276,8 +276,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "they were caught by the police, but a lawyer protected their money"
                 );
             } else {
-                updateBalance(target, (await getBalance(target)) + amountMoney);
-                updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
+                await updateBalance(target, (await getBalance(target)) + amountMoney);
+                await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
                 embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
                 embed3.setDescription(
                     "**" +

@@ -189,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 for (let user of races.get(message.channel.id).users.keys()) {
                     user = races.get(message.channel.id).users.get(user);
 
-                    updateBalance(user.user.id, (await getBalance(user.user.id)) + bet);
+                    await updateBalance(user.user.id, (await getBalance(user.user.id)) + bet);
                 }
                 races.delete(message.channel.id);
             } else {
@@ -360,7 +360,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        updateBalance(message.member, (await getBalance(message.member)) - race.bet);
+        await updateBalance(message.member, (await getBalance(message.member)) - race.bet);
 
         race.users.set(message.author.id, {
             user: message.author,
@@ -502,7 +502,7 @@ async function startRace(id) {
     if (winner) {
         const winnings = race.bet * race.users.size;
 
-        updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
+        await updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
 
         description +=
             `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${

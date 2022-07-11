@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     waiting.push(message.author.id);
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const requestEmbed = new CustomEmbed(
         message.member,
@@ -151,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .catch(async () => {
             fail = true;
             waiting.splice(waiting.indexOf(message.author.id), 1);
-            updateBalance(message.member, (await getBalance(message.member)) + bet);
+            await updateBalance(message.member, (await getBalance(message.member)) + bet);
             return message.channel.send({ content: message.author.toString() + " coinflip request expired" });
         });
 
@@ -172,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 10);
 
-        updateBalance(target, (await getBalance(target)) - bet);
+        await updateBalance(target, (await getBalance(target)) - bet);
 
         // its big to make sure that theres little to no deviation in chance cus of rounding
         const lols = [
@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         addGamble(winner, "coinflip", true);
         addGamble(loser, "coinflip", false);
 
-        updateBalance(winner, (await getBalance(winner)) + bet * 2);
+        await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 
         waiting.splice(waiting.indexOf(message.author.id), 1);
 
@@ -249,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }, 2000);
         });
     } else {
-        updateBalance(message.member, (await getBalance(message.member)) + bet);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
         waiting.splice(waiting.indexOf(message.author.id), 1);
         return message.channel.send({ embeds: [new CustomEmbed(target, false, "✅ coinflip request denied")] });
     }

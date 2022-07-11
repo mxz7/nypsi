@@ -119,12 +119,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
                 games.delete(message.author.id);
-                updateBalance(message.member, (await getBalance(message.member)) + bet);
+                await updateBalance(message.member, (await getBalance(message.member)) + bet);
             }
         }
     }, 180000);
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const id = Math.random();
 
@@ -437,7 +437,7 @@ async function playGame(message, msg) {
         addGamble(message.member, "minesweeper", true);
 
         embed.addField("your grid", table);
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
         return await edit({ embeds: [embed] });
     };
@@ -458,7 +458,7 @@ async function playGame(message, msg) {
                 bet.toLocaleString()
         );
         embed.addField("your grid", table);
-        updateBalance(message.member, (await getBalance(message.member)) + bet);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
         games.delete(message.author.id);
         return await edit({ embeds: [embed] });
     };

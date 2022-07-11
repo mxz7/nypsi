@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const amount = parseInt(args[1]);
 
-        updateBalance(target, amount);
+        await updateBalance(target, amount);
 
         if (!(message instanceof Message)) return;
         return message.react("✅");

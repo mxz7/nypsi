@@ -199,7 +199,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let colorBet = args[0].toLowerCase();
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     let roll = values[Math.floor(Math.random() * values.length)];
 
@@ -213,7 +213,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             winnings = Math.round(bet * 1.5);
         }
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     }
 
     if (colorBet == "b") {
@@ -240,7 +240,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         multi = await getMulti(message.member);
 
         if (multi > 0) {
-            updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
+            await updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
             winnings = winnings + Math.round(winnings * multi);
         }
     }

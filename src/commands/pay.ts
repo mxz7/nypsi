@@ -143,12 +143,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         tax = 0;
     }
 
-    updateBalance(message.member, (await getBalance(message.member)) - amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
     if (tax > 0) {
-        updateBalance(target, (await getBalance(target)) + (amount - Math.round(amount * tax)));
+        await updateBalance(target, (await getBalance(target)) + (amount - Math.round(amount * tax)));
     } else {
-        updateBalance(target, (await getBalance(target)) + amount);
+        await updateBalance(target, (await getBalance(target)) + amount);
     }
 
     const embed = new CustomEmbed(message.member)

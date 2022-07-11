@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10);
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const values = ["rock", "paper", "scissors"];
 
@@ -154,17 +154,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         win = true;
 
         winnings = Math.round(bet * 1.5);
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     } else if (choice == "paper" && winning == "rock") {
         win = true;
 
         winnings = Math.round(bet * 1.5);
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     } else if (choice == "scissors" && winning == "paper") {
         win = true;
 
         winnings = Math.round(bet * 1.5);
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     }
 
     let multi = 0;
@@ -173,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         multi = await getMulti(message.member);
 
         if (multi > 0) {
-            updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
+            await updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
             winnings = winnings + Math.round(winnings * multi);
         }
     }

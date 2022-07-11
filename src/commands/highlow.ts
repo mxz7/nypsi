@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30);
 
-    updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const id = Math.random();
 
@@ -194,7 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
                 games.delete(message.author.id);
-                updateBalance(message.member, (await getBalance(message.member)) + bet);
+                await updateBalance(message.member, (await getBalance(message.member)) + bet);
             }
         }
     }, 180000);
@@ -360,7 +360,7 @@ async function playGame(message, m) {
         addGamble(message.member, "highlow", true);
 
         newEmbed.addField("card", "| " + card + " |");
-        updateBalance(message.member, (await getBalance(message.member)) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
         return edit({ embeds: [newEmbed], components: [] });
     };
@@ -381,7 +381,7 @@ async function playGame(message, m) {
                 bet.toLocaleString()
         );
         newEmbed.addField("card", "| " + card + " |");
-        updateBalance(message.member, (await getBalance(message.member)) + bet);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
         games.delete(message.author.id);
         return await edit({ embeds: [newEmbed], components: [] });
     };

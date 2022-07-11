@@ -218,7 +218,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 3);
 
-        updateBalance(message.member, (await getBalance(message.member)) - 500000);
+        await updateBalance(message.member, (await getBalance(message.member)) - 500000);
 
         createGuild(name, message.member);
 
@@ -460,7 +460,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid payment")] });
         }
 
-        updateBalance(message.member, (await getBalance(message.member)) - amount);
+        await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
         addToGuildBank(guild.guild_name, amount, message.member);
 
