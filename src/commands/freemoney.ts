@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if ((await getBalance(message.member)) > 500000) {
         return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });

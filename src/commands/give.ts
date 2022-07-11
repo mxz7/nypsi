@@ -62,9 +62,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (!(await userExists(target))) createUser(target);
+    if (!(await userExists(target))) await createUser(target);
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const items = getItems();
     const inventory = getInventory(message.member);

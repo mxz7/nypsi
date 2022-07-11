@@ -14,7 +14,7 @@ const cmd = new Command(
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     let prestige = getPrestige(message.author.id);
 

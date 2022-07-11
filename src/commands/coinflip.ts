@@ -26,7 +26,7 @@ const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
     if (await onCooldown(cmd.name, message.member)) {
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (!(await userExists(target))) createUser(target);
+    if (!(await userExists(target))) await createUser(target);
 
     const maxBet = await calcMaxBet(message.member);
 

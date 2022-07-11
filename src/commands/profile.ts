@@ -36,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 10);
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
     const embed = new CustomEmbed(message.member, true);

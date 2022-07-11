@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (message.guild.id == "747056029795221513") {
         return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] });

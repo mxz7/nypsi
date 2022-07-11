@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 90);
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
     const notValidForYou = () => {

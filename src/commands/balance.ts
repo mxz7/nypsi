@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!target) {
             target = args[0];
-            if (!(await userExists(target))) createUser(target);
+            if (!(await userExists(target))) await createUser(target);
         }
 
         if (args[1] == "reset") {
@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(await userExists(target))) createUser(target);
+    if (!(await userExists(target))) await createUser(target);
 
     let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
 

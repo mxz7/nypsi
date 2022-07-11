@@ -23,7 +23,7 @@ const amount = new Map();
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
     if (message.author.id == "672793821850894347") {
         if (args[0] && args[0].toLowerCase() == "open") {
             return openKarmaShop();

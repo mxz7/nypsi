@@ -11,7 +11,7 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categ
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader("padlock", message.author.avatarURL());
 

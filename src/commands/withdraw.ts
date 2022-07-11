@@ -24,7 +24,7 @@ cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescripti
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {

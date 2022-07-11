@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (message instanceof CommandInteraction) {
         await message.deferReply();

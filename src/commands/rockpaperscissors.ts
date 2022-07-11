@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
     const prefix = getPrefix(message.guild);

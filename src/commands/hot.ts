@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(await userExists(member))) createUser(member);
+    if (!(await userExists(member))) await createUser(member);
 
     let hotAmount;
 
