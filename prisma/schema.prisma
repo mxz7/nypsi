@@ -1,0 +1,296 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// user specific tables (economy etc.)
+
+model User {
+  id           String  @id
+  lastKnownTag String
+  commandCount Int     @default(0)
+  tracking     Boolean @default(true)
+
+  Economy            Economy?
+  Karma              Karma?
+  Lastfm             Lastfm?
+  Premium            Premium?
+  Username           Username[]
+  WordleStats        WordleStats?
+  EconomyGuildMember EconomyGuildMember?
+  EconomyGuild       EconomyGuild?
+}
+
+model Economy {
+  money     Int     @default(500)
+  bank      Int     @default(9500)
+  xp        Int     @default(0)
+  prestige  Int     @default(0)
+  padlock   Boolean @default(false)
+  dms       Boolean @default(true)
+  lastVote  Int     @default(0)
+  inventory Json    @default("{}")
+  workers   Json    @default("{}")
+  banned    Boolean @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @id
+
+  EconomyStats EconomyStats[]
+}
+
+model EconomyStats {
+  type   String
+  win    Int     @default(0)
+  lose   Int     @default(0)
+  gamble Boolean
+
+  economy       Economy @relation(fields: [economyUserId], references: [userId])
+  economyUserId String  @id
+}
+
+model Premium {
+  level       PremiumLevel
+  embed_color String       @default("default")
+  last_daily  Int          @default(0)
+  last_weekly Int          @default(0)
+  status      Int          @default(1)
+  start_date  Int
+  expire_date Int
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @id
+}
+
+enum PremiumLevel {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+model Karma {
+  karma        Int @default(1)
+  last_command Int @default(0)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @id @unique
+}
+
+model Lastfm {
+  username String @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @id @unique
+}
+
+model Username {
+  id    String @id @default(uuid())
+  type  String @default("username")
+  value String
+  date  Int
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model WordleStats {
+  win1    Int   @default(0)
+  win2    Int   @default(0)
+  win3    Int   @default(0)
+  win4    Int   @default(0)
+  win5    Int   @default(0)
+  win6    Int   @default(0)
+  lose    Int   @default(0)
+  history Int[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @id
+}
+
+// guild specific tables
+
+model Guild {
+  id                String   @id
+  peak              Int      @default(0)
+  disabled_commands String[]
+  snipe_filter      String[]
+  chat_filter       String[]
+  prefix            String   @default("$")
+
+  GuildChristmas GuildChristmas?
+  GuildCounter   GuildCounter?
+  GuildCountdown GuildCountdown[]
+
+  ChatReaction ChatReaction?
+
+  Moderation Moderation?
+}
+
+model GuildChristmas {
+  format  String @default("`%days%` days until christmas")
+  channel String
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String @id @unique
+}
+
+model GuildCounter {
+  format     String  @default("members: %count% (%peak%)")
+  filterBots Boolean @default(false)
+  channel    String
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String @id @unique
+}
+
+model GuildCountdown {
+  date        Int
+  format      String
+  finalFormat String
+  channel     String
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String
+
+  @@id([guildId, date])
+}
+
+model Moderation {
+  case_count Int     @default(0)
+  mute_role  String?
+  modlogs    String?
+
+  guild          Guild            @relation(fields: [guildId], references: [id])
+  guildId        String           @unique
+  ModerationBan  ModerationBan[]
+  ModerationMute ModerationMute[]
+  ModerationCase ModerationCase[]
+}
+
+model ModerationBan {
+  userId  String
+  guildId String
+  expire  Int
+
+  moderation Moderation @relation(fields: [guildId], references: [guildId])
+
+  @@id([userId, guildId])
+}
+
+model ModerationMute {
+  userId  String
+  guildId String
+  expire  Int
+
+  moderation Moderation @relation(fields: [guildId], references: [guildId])
+
+  @@id([userId, guildId])
+}
+
+model ModerationCase {
+  caseId    String
+  guildId   String
+  type      String
+  user      String
+  moderator String
+  command   String
+  time      Int
+  deleted   Boolean @default(false)
+
+  moderation Moderation @relation(fields: [guildId], references: [guildId])
+
+  @@id([caseId, guildId])
+}
+
+model ChatReaction {
+  word_list       String[]
+  random_start    Boolean  @default(false)
+  random_channels String[]
+  between_events  Int      @default(600)
+  random_modifier Int      @default(300)
+  timeout         Int      @default(60)
+  blacklisted     String[]
+
+  guild             Guild               @relation(fields: [guildId], references: [id])
+  guildId           String              @unique
+  ChatReactionStats ChatReactionStats[]
+}
+
+model ChatReactionStats {
+  userId Int
+  wins   Int @default(0)
+  second Int @default(0)
+  third  Int @default(0)
+
+  chatReaction        ChatReaction @relation(fields: [chatReactionGuildId], references: [guildId])
+  chatReactionGuildId String
+
+  @@id([chatReactionGuildId, userId])
+}
+
+// economy 'guild' feature tables
+
+model EconomyGuild {
+  guildName String @id
+  createdAt Int
+  balance   Int    @default(0)
+  xp        Int    @default(0)
+  level     Int    @default(1)
+  motd      String @default("welcome to the guild fool (/guild motd)")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @unique
+
+  EconomyGuildMember EconomyGuildMember[]
+}
+
+model EconomyGuildMember {
+  userId           String @unique
+  guildName        String
+  joinedAt         Int
+  contributedMoney Int    @default(0)
+  contributedXp    Int    @default(0)
+
+  user  User         @relation(fields: [userId], references: [id])
+  guild EconomyGuild @relation(fields: [guildName], references: [guildName])
+
+  @@id([userId, guildName])
+}
+
+// wholesome tables
+
+model WholesomeImage {
+  id          Int    @id @default(autoincrement())
+  image       String @unique()
+  submitter   String
+  submitterId String
+  uploadDate  Int
+  accepterId  String
+}
+
+model WholesomeSuggestion {
+  id          Int    @id @default(autoincrement())
+  image       String @unique()
+  submitter   String
+  submitterId String
+  uploadDate  Int
+}
+
+// tables with no relation for easiness
+
+model lottery_tickets {
+  id     Int    @id @default(autoincrement())
+  userId String
+}
+
+model premium_commands {
+  owner   String @id
+  trigger String @unique
+  content String
+  uses    Int    @default(0)
+}
