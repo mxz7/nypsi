@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    // if (getPrestige(message.member) >= 20) {
+    // if (await getPrestige(message.member) >= 20) {
     //     return message.channel.send({
     //         embeds: [
     //             new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png"),
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     // }
 
     let currentXp = await getXp(message.member),
-        neededXp = getPrestigeRequirement(message.member);
+        neededXp = await getPrestigeRequirement(message.member);
     let currentBal = await getBankBalance(message.member),
         neededBal = getPrestigeRequirementBal(neededXp);
 
@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (reaction == "✅") {
         await addExpiry(cmd.name, message.member, 1800);
         currentXp = await getXp(message.member);
-        neededXp = getPrestigeRequirement(message.member);
+        neededXp = await getPrestigeRequirement(message.member);
         currentBal = await getBankBalance(message.member);
         neededBal = getPrestigeRequirementBal(neededXp);
 
@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateBankBalance(message.member, currentBal - neededBal);
         await updateXp(message.member, currentXp - neededXp);
-        setPrestige(message.member, getPrestige(message.member) + 1);
+        await setPrestige(message.member, (await getPrestige(message.member)) + 1);
 
         const multi = await getMulti(message.member);
         const maxBet = await calcMaxBet(message.member);
@@ -129,9 +129,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let amount = 1;
 
-        if (getPrestige(message.member) > 5) {
+        if ((await getPrestige(message.member)) > 5) {
             amount = 2;
-        } else if (getPrestige(message.member) > 10) {
+        } else if ((await getPrestige(message.member)) > 10) {
             amount = 3;
         }
 
@@ -143,15 +143,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setInventory(message.member, inventory);
 
-        let crateAmount = Math.floor(getPrestige(message.member) / 2 + 1);
+        let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
         if (crateAmount > 5) crateAmount = 5;
 
         embed.setDescription(
-            `you are now prestige **${getPrestige(message.member)}**\n\n` +
+            `you are now prestige **${await getPrestige(message.member)}**\n\n` +
                 `new vote rewards: $**${(
                     15000 *
-                    (getPrestige(message.member) + 1)
+                    ((await getPrestige(message.member)) + 1)
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`

@@ -30,7 +30,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
     if (oldUser.displayAvatarURL({ dynamic: true, size: 256 }) != newUser.displayAvatarURL({ dynamic: true, size: 256 })) {
         if (!(await userExists(newUser.id))) return;
-        if (!isPremium(newUser.id) && getPrestige(newUser.id) < 2) return;
+        if (!isPremium(newUser.id) && (await getPrestige(newUser.id)) < 2) return;
 
         if (!usernameProfileExists(newUser.id)) {
             const url = await uploadImageToImgur(newUser.displayAvatarURL({ format: "png", dynamic: true, size: 256 }));

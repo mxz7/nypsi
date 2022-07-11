@@ -279,7 +279,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
             }
 
-            const earnedXp = calcEarnedXp(message.member, bet);
+            const earnedXp = await calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);

@@ -436,7 +436,7 @@ async function playGame(message, m) {
             );
         }
 
-        const earnedXp = calcEarnedXp(message.member, bet);
+        const earnedXp = await calcEarnedXp(message.member, bet);
 
         if (earnedXp > 0) {
             await updateXp(message.member, (await getXp(message.member)) + earnedXp);

@@ -16,7 +16,7 @@ const cmd = new Command(
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    let prestige = getPrestige(message.author.id);
+    let prestige = await getPrestige(message.author.id);
 
     if (prestige > 15) prestige = 15;
 

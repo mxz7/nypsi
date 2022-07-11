@@ -141,13 +141,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            if (worker.prestige > getPrestige(message.member)) {
+            if (worker.prestige > (await getPrestige(message.member))) {
                 return message.channel.send({
                     embeds: [
                         new ErrorEmbed(
                             `you need to be prestige **${
                                 worker.prestige
-                            }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
+                            }** to buy this worker, you are prestige **${await getPrestige(message.member)}**`
                         ),
                     ],
                 });

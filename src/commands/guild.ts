@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "create") {
-        if (getPrestige(message.member) < 1) {
+        if ((await getPrestige(message.member)) < 1) {
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
         }
 

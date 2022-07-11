@@ -149,7 +149,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const targetPrestige = getPrestige(target);
+    const targetPrestige = await getPrestige(target);
 
     if (targetPrestige < 2) {
         const targetXp = await getXp(target);

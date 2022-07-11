@@ -70,8 +70,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
 
-    if (getPrestige(target) > 0) {
-        footer += ` | prestige: ${getPrestige(target)}`;
+    if ((await getPrestige(target)) > 0) {
+        footer += ` | prestige: ${await getPrestige(target)}`;
     }
 
     const embed = new CustomEmbed(message.member, false)
@@ -103,9 +103,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.member == target) {
         if (
-            (await getXp(target)) >= getPrestigeRequirement(target) &&
+            (await getXp(target)) >= (await getPrestigeRequirement(target)) &&
             (await getBankBalance(target)) >= getPrestigeRequirementBal(await getXp(target)) &&
-            getPrestige(target) < 20
+            (await getPrestige(target)) < 20
         ) {
             return send({
                 content: `you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`,

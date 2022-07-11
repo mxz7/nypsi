@@ -396,7 +396,7 @@ async function playGame(message, m) {
         if (games.get(message.member.user.id).voted > 0) {
             winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
 
-            const earnedXp = calcEarnedXp(message.member, bet);
+            const earnedXp = await calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);

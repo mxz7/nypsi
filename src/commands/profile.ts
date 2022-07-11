@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const bankBalance = (await getBankBalance(message.member)).toLocaleString();
     const maxBankBalance = (await getMaxBankBalance(message.member)).toLocaleString();
     const xp = (await getXp(message.member)).toLocaleString();
-    const prestige = getPrestige(message.member).toLocaleString();
+    const prestige = await getPrestige(message.member).toLocaleString();
     const maxBet = await calcMaxBet(message.member);
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%";
     const voted = await hasVoted(message.member);

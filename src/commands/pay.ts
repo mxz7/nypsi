@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid payment")] });
     }
 
-    const targetPrestige = getPrestige(target);
+    const targetPrestige = await getPrestige(target);
 
     if (targetPrestige < 2) {
         const targetXp = await getXp(target);
