@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 amountMoney.toLocaleString() +
                 "**"
         );
-    } else if (hasPadlock(target)) {
+    } else if (await hasPadlock(target)) {
         setPadlock(target, false);
 
         const amount = Math.floor(Math.random() * 35) + 5;

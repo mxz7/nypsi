@@ -23,7 +23,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`)],
         });
     } else {
-        if (hasPadlock(message.member)) {
+        if (await hasPadlock(message.member)) {
             embed.setColor("#5efb8f");
             embed.setDescription("**protected** 🔒\nyou currently have a padlock");
             return await message.channel.send({ embeds: [embed] }).catch();

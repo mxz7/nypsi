@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.addField(
         "💰 economy",
         `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(
+    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${await hasPadlock(
             message.member
         )}
     **workers** ${Object.keys(getWorkers(message.member)).length}

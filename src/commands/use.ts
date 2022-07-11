@@ -182,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 break;
 
             case "padlock":
-                if (hasPadlock(message.member)) {
+                if (await hasPadlock(message.member)) {
                     return send({
                         embeds: [new ErrorEmbed("you already have a padlock on your balance")],
                     });
@@ -241,7 +241,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid user")] });
                 }
 
-                if (!hasPadlock(lockPickTarget)) {
+                if (!(await hasPadlock(lockPickTarget))) {
                     return send({
                         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
                     });
