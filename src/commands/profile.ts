@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${await hasPadlock(
             message.member
         )}
-    **workers** ${Object.keys(getWorkers(message.member)).length}
+    **workers** ${Object.keys(await getWorkers(message.member)).length}
     **inventory** ${inventoryItems.toLocaleString()} items`,
         true
     );

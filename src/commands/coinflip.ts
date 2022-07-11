@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (isEcoBanned(target.user.id)) {
+    if (await isEcoBanned(target.user.id)) {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 

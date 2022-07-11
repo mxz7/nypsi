@@ -258,7 +258,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("this user has already been invited to a guild")] });
         }
 
-        if (isEcoBanned(target.user.id)) {
+        if (await isEcoBanned(target.user.id)) {
             return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
 

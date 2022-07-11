@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed = new CustomEmbed(message.member, false, "✅ you will now receive dms from nypsi");
     }
 
-    setDMsEnabled(message.member, newValue);
+    await setDMsEnabled(message.member, newValue);
 
     return await message.channel.send({ embeds: [embed] });
 }

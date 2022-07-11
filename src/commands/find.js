@@ -147,7 +147,7 @@ async function showUser(message, user) {
         .setTitle(user.tag)
         .setDescription(
             `\`${user.id}\`${isPremium(user.id) ? ` (${getPremiumProfile(user.id).getLevelString()}) ` : ""} ${
-                isEcoBanned(user.id) ? "[banned]" : ""
+                (await isEcoBanned(user.id)) ? "[banned]" : ""
             }`
         )
         .addField(

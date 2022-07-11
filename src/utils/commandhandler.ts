@@ -564,7 +564,7 @@ export async function runCommand(
     logCommand(message, args);
     if (alias) {
         if (commands.get(aliases.get(cmd)).category == "money") {
-            if (isEcoBanned(message.author.id)) {
+            if (await sEcoBanned(message.author.id)) {
                 return;
             }
         }
