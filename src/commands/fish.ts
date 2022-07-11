@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else if (chosen.includes("xp:")) {
                 const amount = parseInt(chosen.substr(3));
 
-                updateXp(message.member, (await getXp(message.member)) + amount);
+                await updateXp(message.member, (await getXp(message.member)) + amount);
                 foundItems.push(amount + "xp");
             }
         } else {

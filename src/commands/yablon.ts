@@ -399,7 +399,7 @@ async function playGame(message, m) {
             const earnedXp = calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, (await getXp(message.member)) + earnedXp);
+                await updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 newEmbed.setFooter(`+${earnedXp}xp`);
 
                 const guild = getGuildByUser(message.member);

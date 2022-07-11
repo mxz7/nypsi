@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         await updateBankBalance(message.member, currentBal - neededBal);
-        updateXp(message.member, currentXp - neededXp);
+        await updateXp(message.member, currentXp - neededXp);
         setPrestige(message.member, getPrestige(message.member) + 1);
 
         const multi = await getMulti(message.member);

@@ -148,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "crate") {
         addItemUse(message.member, selected.id);
-        const itemsFound = openCrate(message.member, selected);
+        const itemsFound = await openCrate(message.member, selected);
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`);
 

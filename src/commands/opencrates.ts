@@ -121,11 +121,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
         let finished = false;
         const crate = crates.shift();
 
-        const found = openCrate(message.member, items[crate]);
+        const found = await openCrate(message.member, items[crate]);
 
         desc += ` - ${found.join("\n - ")}\n`;
 

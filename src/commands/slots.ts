@@ -266,7 +266,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const earnedXp = calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, (await getXp(message.member)) + earnedXp);
+                await updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 embed.setFooter(`+${earnedXp}xp`);
 
                 const guild = getGuildByUser(message.member);

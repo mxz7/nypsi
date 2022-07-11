@@ -676,7 +676,7 @@ export async function runCommand(
             try {
                 if (!xpCooldown.has(message.author.id)) {
                     try {
-                        updateXp(message.member, (await getXp(message.member)) + 1);
+                        await updateXp(message.member, (await getXp(message.member)) + 1);
 
                         xpCooldown.add(message.author.id);
 
