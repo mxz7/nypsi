@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 600);
 
-    addItemUse(message.member, "furnace");
+    await addItemUse(message.member, "furnace");
 
     const smelted = new Map();
 

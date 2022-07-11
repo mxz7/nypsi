@@ -380,7 +380,7 @@ async function playGame(message, m) {
 
     const lose = async () => {
         gamble(message.author, "yablon", bet, false, 0);
-        addGamble(message.member, "yablon", false);
+        await addGamble(message.member, "yablon", false);
         newEmbed.setColor("#e4334f");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
         newEmbed.addField("cards", getCards(message.member));
@@ -429,7 +429,7 @@ async function playGame(message, m) {
             );
         }
         gamble(message.author, "yablon", bet, true, winnings);
-        addGamble(message.member, "yablon", true);
+        await addGamble(message.member, "yablon", true);
         newEmbed.addField("cards", getCards(message.member));
         newEmbed.addField("drawn card", "| " + nextCard + " |");
         await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -439,7 +439,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "yablon", bet, true, bet);
-        addGamble(message.member, "yablon", true);
+        await addGamble(message.member, "yablon", true);
         newEmbed.setColor("#E5FF00");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
         newEmbed.addField("cards", getCards(message.member));

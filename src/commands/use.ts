@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let laterDescription;
 
     if (selected.role == "crate") {
-        addItemUse(message.member, selected.id);
+        await addItemUse(message.member, selected.id);
         const itemsFound = await openCrate(message.member, selected);
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`);
@@ -158,25 +158,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (selected.id) {
             case "standard_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "golden_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your *golden* 😏 watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "diamond_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your 💎 *diamond* 💎 watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "calendar":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look at your calendar to check the date..");
                 laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`;
                 break;
@@ -197,7 +197,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 setInventory(message.member, inventory);
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 embed.setDescription("✅ your padlock has been applied");
                 break;
@@ -231,7 +231,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 if (message.member == lockPickTarget) {
                     if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
-                        addItemUse(message.member, selected.id);
+                        await addItemUse(message.member, selected.id);
                         await redis.del(`cd:sex-chastity:${message.author.id}`);
 
                         embed.setDescription("picking chastity cage...");
@@ -255,7 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["lock_pick"];
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 setInventory(message.member, inventory);
 
@@ -306,7 +306,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["mask"];
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 setInventory(message.member, inventory);
                 break;
@@ -340,7 +340,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 await redis.set(`cd:rob-radio:${radioTarget.user.id}`, Date.now());
                 await redis.expire(`cd:rob-radio:${radioTarget.user.id}`, 900);
@@ -388,7 +388,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 await redis.set(`cd:sex-chastity:${chastityTarget.user.id}`, Date.now());
                 await redis.expire(`cd:sex-chastity:${chastityTarget.user.id}`, 10800);
@@ -434,7 +434,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 addHandcuffs(handcuffsTarget.id);
 

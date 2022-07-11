@@ -221,8 +221,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         gamble(winner.user, "coinflip", bet, true, bet * 2);
         gamble(loser.user, "coinflip", bet, false);
-        addGamble(winner, "coinflip", true);
-        addGamble(loser, "coinflip", false);
+        await addGamble(winner, "coinflip", true);
+        await addGamble(loser, "coinflip", false);
 
         await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 

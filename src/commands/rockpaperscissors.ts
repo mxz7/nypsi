@@ -252,7 +252,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     gamble(message.author, "rock paper scissors", bet, win, winnings);
-    addGamble(message.member, "rps", win);
+    await addGamble(message.member, "rps", win);
 }
 
 cmd.setRun(run);

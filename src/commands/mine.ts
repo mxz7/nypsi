@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 1800);
 
-    addItemUse(message.member, pickaxe);
+    await addItemUse(message.member, pickaxe);
 
     const mineItems = Array.from(Object.keys(items));
 

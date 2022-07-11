@@ -303,7 +303,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 2000);
     });
     gamble(message.author, "roulette", bet, win, winnings);
-    addGamble(message.member, "roulette", win);
+    await addGamble(message.member, "roulette", win);
 }
 
 cmd.setRun(run);

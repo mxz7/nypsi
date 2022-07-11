@@ -400,7 +400,7 @@ async function playGame(message, m) {
 
     const lose = async () => {
         gamble(message.author, "blackjack", bet, false, 0);
-        addGamble(message.member, "blackjack", false);
+        await addGamble(message.member, "blackjack", false);
         newEmbed.setColor("#e4334f");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
@@ -450,7 +450,7 @@ async function playGame(message, m) {
         }
 
         gamble(message.author, "blackjack", bet, true, winnings);
-        addGamble(message.member, "blackjack", true);
+        await addGamble(message.member, "blackjack", true);
 
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
         newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -461,7 +461,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "blackjack", bet, true, bet);
-        addGamble(message.member, "blackjack", true);
+        await addGamble(message.member, "blackjack", true);
         newEmbed.setColor("#E5FF00");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");

@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         fishItems.push(i);
     }
 
-    addItemUse(message.member, fishingRod);
+    await addItemUse(message.member, fishingRod);
 
     inventory[fishingRod]--;
 

@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const inventory = getInventory(message.member);
 
         if (inventory["lawyer"] && inventory["lawyer"] > 0) {
-            addItemUse(message.member, "lawyer");
+            await addItemUse(message.member, "lawyer");
             inventory["lawyer"]--;
 
             if (inventory["lawyer"] == 0) {

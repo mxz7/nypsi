@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 1800);
 
-    addItemUse(message.member, gun);
+    await addItemUse(message.member, gun);
 
     const huntItems = Array.from(Object.keys(items));
 

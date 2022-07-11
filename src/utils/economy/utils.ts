@@ -1077,7 +1077,7 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     });
 
     await redis.set(`cache:economy:prestige:${id}`, query.prestige);
-    await redis.expire(`cache:economy:prestige:${id}`, ms("1 hour" / 1000));
+    await redis.expire(`cache:economy:prestige:${id}`, ms("1 hour") / 1000);
 
     return query.prestige;
 }
@@ -1436,7 +1436,7 @@ export async function getStats(member: GuildMember): Promise<StatsProfile> {
  * @param {String} game
  * @param {Boolean} win
  */
-export function addGamble(member: GuildMember, game: string, win: boolean) {
+export async function addGamble(member: GuildMember, game: string, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1444,19 +1444,54 @@ export function addGamble(member: GuildMember, game: string, win: boolean) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id }, { type: game }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: game }],
+                },
+                data: {
+                    win: { increment: 1 },
+                },
+            });
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: game }],
+                },
+                data: {
+                    lose: { increment: 1 },
+                },
+            });
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: game,
+                    win: 1,
+                    gamble: true,
+                },
+            });
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: game,
+                    lose: 1,
+                    gamble: true,
+                },
+            });
         }
     }
 }
@@ -1466,7 +1501,7 @@ export function addGamble(member: GuildMember, game: string, win: boolean) {
  * @param {GuildMember} member
  * @param {Boolean} win
  */
-export function addRob(member: GuildMember, win: boolean) {
+export async function addRob(member: GuildMember, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1474,19 +1509,54 @@ export function addRob(member: GuildMember, win: boolean) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = 'rob'").get(id);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id }, { type: "rob" }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = 'rob'").run(id);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: "rob" }],
+                },
+                data: {
+                    win: { increment: 1 },
+                },
+            });
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = 'rob'").run(id);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: "rob" }],
+                },
+                data: {
+                    lose: { increment: 1 },
+                },
+            });
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, "rob", 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: "rob",
+                    win: 1,
+                    gamble: true,
+                },
+            });
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, "rob", 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: "rob",
+                    lose: 1,
+                    gamble: true,
+                },
+            });
         }
     }
 }
@@ -1495,7 +1565,7 @@ export function addRob(member: GuildMember, win: boolean) {
  *
  * @param {GuildMember} member
  */
-export function addItemUse(member: GuildMember, item) {
+export async function addItemUse(member: GuildMember, item: string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1503,12 +1573,33 @@ export function addItemUse(member: GuildMember, item) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id, type: item }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
-        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item);
+        await prisma.economyStats.updateMany({
+            where: {
+                AND: [{ economyUserId: id }, { type: item }],
+            },
+            data: {
+                win: { increment: 1 },
+            },
+        });
     } else {
-        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item);
+        await prisma.economyStats.create({
+            data: {
+                economyUserId: id,
+                type: item,
+                win: 1,
+                gamble: false,
+            },
+        });
     }
 }
 

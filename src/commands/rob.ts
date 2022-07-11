@@ -254,7 +254,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const inventory = getInventory(message.member);
 
             if (inventory["lawyer"] && inventory["lawyer"] > 0) {
-                addItemUse(message.member, "lawyer");
+                await addItemUse(message.member, "lawyer");
                 inventory["lawyer"]--;
 
                 if (inventory["lawyer"] == 0) {
@@ -313,11 +313,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (await getDMsEnabled(target)) {
                 if (robberySuccess) {
-                    addRob(message.member, true);
-                    target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
+                    await addRob(message.member, true);
+                    await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
                 } else {
-                    addRob(message.member, false);
-                    target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
+                    await addRob(message.member, false);
+                    await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
                 }
             }
         }, 1500);

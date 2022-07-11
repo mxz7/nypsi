@@ -366,7 +366,7 @@ async function playGame(message, msg) {
 
     const lose = async () => {
         gamble(message.author, "minesweeper", bet, false, 0);
-        addGamble(message.member, "minesweeper", false);
+        await addGamble(message.member, "minesweeper", false);
         embed.setColor("#e4334f");
         embed.setDescription(
             "**bet** $" +
@@ -434,7 +434,7 @@ async function playGame(message, msg) {
         }
 
         gamble(message.author, "minesweeper", bet, true, winnings);
-        addGamble(message.member, "minesweeper", true);
+        await addGamble(message.member, "minesweeper", true);
 
         embed.addField("your grid", table);
         await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -444,7 +444,7 @@ async function playGame(message, msg) {
 
     const draw = async () => {
         gamble(message.author, "minesweeper", bet, true, bet);
-        addGamble(message.member, "minesweeper", true);
+        await addGamble(message.member, "minesweeper", true);
         embed.setColor("#e5ff00");
         embed.setDescription(
             "**bet** $" +

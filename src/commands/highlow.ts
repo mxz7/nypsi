@@ -288,7 +288,7 @@ async function playGame(message, m) {
 
     const lose = async () => {
         gamble(message.author, "highlow", bet, false, 0);
-        addGamble(message.member, "highlow", false);
+        await addGamble(message.member, "highlow", false);
         newEmbed.setColor("#e4334f");
         newEmbed.setDescription(
             "**bet** $" +
@@ -357,7 +357,7 @@ async function playGame(message, m) {
         }
 
         gamble(message.author, "highlow", bet, true, winnings);
-        addGamble(message.member, "highlow", true);
+        await addGamble(message.member, "highlow", true);
 
         newEmbed.addField("card", "| " + card + " |");
         await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -367,7 +367,7 @@ async function playGame(message, m) {
 
     const draw = async () => {
         gamble(message.author, "highlow", bet, true, bet);
-        addGamble(message.member, "highlow", true);
+        await addGamble(message.member, "highlow", true);
         newEmbed.setColor("#E5FF00");
         newEmbed.setDescription(
             "**bet** $" +
