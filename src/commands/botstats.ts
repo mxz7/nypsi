@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
         .addField(
             "economy",
-            `**users** ${getUserCount().toLocaleString()}
+            `**users** ${(await getUserCount()).toLocaleString()}
          -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`,
             true
         )
