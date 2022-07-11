@@ -54,13 +54,13 @@ model EconomyStats {
 }
 
 model Premium {
-  level       PremiumLevel
-  embed_color String       @default("default")
-  last_daily  Int          @default(0)
-  last_weekly Int          @default(0)
-  status      Int          @default(1)
-  start_date  Int
-  expire_date Int
+  level      PremiumLevel
+  embedColor String       @default("default")
+  lastDaily  Int          @default(0)
+  lastWeekly Int          @default(0)
+  status     Int          @default(1)
+  startDate  Int
+  expireDate Int
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
@@ -74,8 +74,8 @@ enum PremiumLevel {
 }
 
 model Karma {
-  karma        Int @default(1)
-  last_command Int @default(0)
+  karma       Int @default(1)
+  lastCommand Int @default(0)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id @unique
@@ -115,12 +115,12 @@ model WordleStats {
 // guild specific tables
 
 model Guild {
-  id                String   @id
-  peak              Int      @default(0)
-  disabled_commands String[]
-  snipe_filter      String[]
-  chat_filter       String[]
-  prefix            String   @default("$")
+  id               String   @id
+  peak             Int      @default(0)
+  disabledCommands String[]
+  snipeFilter      String[]
+  chatFilter       String[]
+  prefix           String   @default("$")
 
   GuildChristmas GuildChristmas?
   GuildCounter   GuildCounter?
@@ -161,9 +161,9 @@ model GuildCountdown {
 }
 
 model Moderation {
-  case_count Int     @default(0)
-  mute_role  String?
-  modlogs    String?
+  caseCount Int     @default(0)
+  muteRole  String?
+  modlogs   String?
 
   guild          Guild            @relation(fields: [guildId], references: [id])
   guildId        String           @unique
@@ -208,13 +208,13 @@ model ModerationCase {
 }
 
 model ChatReaction {
-  word_list       String[]
-  random_start    Boolean  @default(false)
-  random_channels String[]
-  between_events  Int      @default(600)
-  random_modifier Int      @default(300)
-  timeout         Int      @default(60)
-  blacklisted     String[]
+  wordList       String[]
+  randomStart    Boolean  @default(false)
+  randomChannels String[]
+  betweenEvents  Int      @default(600)
+  randomModifier Int      @default(300)
+  timeout        Int      @default(60)
+  blacklisted    String[]
 
   guild             Guild               @relation(fields: [guildId], references: [id])
   guildId           String              @unique
@@ -283,12 +283,12 @@ model WholesomeSuggestion {
 
 // tables with no relation for easiness
 
-model lottery_tickets {
+model LotteryTicket {
   id     Int    @id @default(autoincrement())
   userId String
 }
 
-model premium_commands {
+model PremiumCommand {
   owner   String @id
   trigger String @unique
   content String
