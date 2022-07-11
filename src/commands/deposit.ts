@@ -61,13 +61,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "all") {
         args[0] = (await getBalance(message.member)).toString();
         const amount = parseInt(args[0]);
-        if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
-            args[0] = (getMaxBankBalance(message.member) - getBankBalance(message.member)).toString();
+        if (amount > getMaxBankBalance(message.member) - (await getBankBalance(message.member))) {
+            args[0] = (getMaxBankBalance(message.member) - (await getBankBalance(message.member))).toString();
         }
     }
 
     if (args[0] == "half") {
-        args[0] = (getBankBalance(message.member) / 2).toString();
+        args[0] = ((await getBankBalance(message.member)) / 2).toString();
     }
 
     const amount = formatNumber(args[0]);
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
     }
 
-    if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
+    if (amount > getMaxBankBalance(message.member) - (await getBankBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("your bank is not big enough for this payment")] });
     }
 
@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member).toLocaleString()) +
                 "** / $**" +
                 getMaxBankBalance(message.member).toLocaleString() +
                 "**"
@@ -105,14 +105,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const m = await send({ embeds: [embed] });
 
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
-    updateBankBalance(message.member, getBankBalance(message.member) + amount);
+    updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
 
     const embed1 = new CustomEmbed(message.member, false)
         .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member).toLocaleString()) +
                 "** / $**" +
                 getMaxBankBalance(message.member).toLocaleString() +
                 "**"

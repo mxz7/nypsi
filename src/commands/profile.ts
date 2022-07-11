@@ -43,7 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     //ECONOMY
     const balance = (await getBalance(message.member)).toLocaleString();
-    const bankBalance = getBankBalance(message.member).toLocaleString();
+    const bankBalance = (await getBankBalance(message.member)).toLocaleString();
     const maxBankBalance = getMaxBankBalance(message.member).toLocaleString();
     const xp = getXp(message.member).toLocaleString();
     const prestige = getPrestige(message.member).toLocaleString();

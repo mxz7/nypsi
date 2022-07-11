@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let currentXp = getXp(message.member),
         neededXp = getPrestigeRequirement(message.member);
-    let currentBal = getBankBalance(message.member),
+    let currentBal = await getBankBalance(message.member),
         neededBal = getPrestigeRequirementBal(neededXp);
 
     if (currentXp < neededXp) {
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await addExpiry(cmd.name, message.member, 1800);
         currentXp = getXp(message.member);
         neededXp = getPrestigeRequirement(message.member);
-        currentBal = getBankBalance(message.member);
+        currentBal = await getBankBalance(message.member);
         neededBal = getPrestigeRequirementBal(neededXp);
 
         if (currentXp < neededXp) {

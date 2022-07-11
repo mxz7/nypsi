@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 (await getBalance(target)).toLocaleString() +
                 "**\n" +
                 "💳 $**" +
-                getBankBalance(target).toLocaleString() +
+                (await getBankBalance(target).toLocaleString()) +
                 "** / $**" +
                 getMaxBankBalance(target).toLocaleString() +
                 "**"
@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message.member == target) {
         if (
             getXp(target) >= getPrestigeRequirement(target) &&
-            getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
+            (await getBankBalance(target)) >= getPrestigeRequirementBal(getXp(target)) &&
             getPrestige(target) < 20
         ) {
             return send({

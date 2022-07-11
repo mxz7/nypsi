@@ -54,21 +54,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (getBankBalance(message.member) == 0) {
+    if ((await getBankBalance(message.member)) == 0) {
         return send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] });
     }
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBankBalance(message.member).toString();
+        args[0] = (await getBankBalance(message.member)).toString();
     }
 
     if (args[0] == "half") {
-        args[0] = (getBankBalance(message.member) / 2).toString();
+        args[0] = ((await getBankBalance(message.member)) / 2).toString();
     }
 
     const amount = formatNumber(args[0]);
 
-    if (amount > getBankBalance(message.member)) {
+    if (amount > (await getBankBalance(message.member))) {
         return send({
             embeds: [new ErrorEmbed("you dont have enough money in your bank account")],
         });
@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
                 getMaxBankBalance(message.member).toLocaleString() +
                 "**"
@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const m = await send({ embeds: [embed] });
 
-    updateBankBalance(message.member, getBankBalance(message.member) - amount);
+    updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
     await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
     const embed1 = new CustomEmbed(message.member, true)
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
                 getMaxBankBalance(message.member).toLocaleString() +
                 "**"
