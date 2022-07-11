@@ -36,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let inventoryWorth = 0;
     const multi = await getMulti(message.member);
 
-    let inventory = getInventory(message.member);
+    let inventory = await getInventory(message.member);
     const items = getItems();
 
     let itemIDs = Array.from(Object.keys(inventory));
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         earnedKarma = 0;
         inventoryWorth = 0;
 
-        inventory = getInventory(message.member);
+        inventory = await getInventory(message.member);
 
         itemIDs = Array.from(Object.keys(inventory));
 
@@ -133,7 +133,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addKarma(message.member, earnedKarma);
 
-        deleteUser(message.member);
+        await deleteUser(message.member);
 
         embed.setDescription(
             `your economy profile has been reset.\n\nyou have been given **${earnedKarma.toLocaleString()}** karma`

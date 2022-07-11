@@ -13,6 +13,6 @@ export interface Item {
 }
 
 export interface LotteryTicket {
-    user_id: string;
+    userId: string;
     id: number;
 }

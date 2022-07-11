@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const searchTag = args[0].toLowerCase();
 
@@ -195,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["padlock"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 await addItemUse(message.member, selected.id);
 
@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await addItemUse(message.member, selected.id);
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms"); // eslint-disable-line
 
@@ -308,7 +308,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await addItemUse(message.member, selected.id);
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
                 break;
 
             case "radio":
@@ -351,7 +351,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["radio"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("putting report out on police scanner...");
                 laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`;
@@ -399,7 +399,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["chastity_cage"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("locking chastity cage...");
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
@@ -444,7 +444,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["handcuffs"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`);
                 laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`;

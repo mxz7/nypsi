@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const multi = await getMulti(message.member);
         const maxBet = await calcMaxBet(message.member);
 
-        const inventory = getInventory(message.member);
+        const inventory = await getInventory(message.member);
 
         let amount = 1;
 
@@ -141,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             inventory["basic_crate"] = amount;
         }
 
-        setInventory(message.member, inventory);
+        await setInventory(message.member, inventory);
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 

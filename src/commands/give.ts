@@ -67,8 +67,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await userExists(message.member))) await createUser(message.member);
 
     const items = getItems();
-    const inventory = getInventory(message.member);
-    const targetInventory = getInventory(target);
+    const inventory = await getInventory(message.member);
+    const targetInventory = await getInventory(target);
 
     let searchTag;
 
@@ -185,8 +185,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         targetInventory[selected.id] = amount;
     }
 
-    setInventory(message.member, inventory);
-    setInventory(target, targetInventory);
+    await setInventory(message.member, inventory);
+    await setInventory(target, targetInventory);
 
     payment(message.author, target.user, selected.worth * amount);
 

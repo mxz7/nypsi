@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     let fishingRod;
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         delete inventory[fishingRod];
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     let times = 1;
 
@@ -283,7 +283,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
         }
     }
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     const embed = new CustomEmbed(message.member, false, `you go to the pond and cast your **${items[fishingRod].name}**`);
 

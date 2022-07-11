@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems();
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const selected = new Map();
 
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         earned += `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`;
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     await updateBalance(message.member, (await getBalance(message.member)) + total);
 

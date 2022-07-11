@@ -35,7 +35,7 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const tickets = getTickets(message.member);
+    const tickets = await getTickets(message.member);
 
     const prestigeBonus = Math.floor(
         ((await getPrestige(message.member)) > 10 ? 10 : await getPrestige(message.member)) / 2.5
@@ -129,7 +129,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
         for (let i = 0; i < amount; i++) {
-            addTicket(message.member);
+            await addTicket(message.member);
         }
 
         const embed = new CustomEmbed(

@@ -239,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         const items = getItems();
-        const inventory = getInventory(message.member);
+        const inventory = await getInventory(message.member);
 
         let car: Item;
         let cycle = false;

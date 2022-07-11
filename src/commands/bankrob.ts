@@ -111,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         percentLost = Math.floor(Math.random() * 50) + 10;
         amountLost = Math.round((percentLost / 100) * (await getBalance(message.member)));
 
-        const inventory = getInventory(message.member);
+        const inventory = await getInventory(message.member);
 
         if (inventory["lawyer"] && inventory["lawyer"] > 0) {
             await addItemUse(message.member, "lawyer");
@@ -121,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 delete inventory["lawyer"];
             }
 
-            setInventory(message.member, inventory);
+            await setInventory(message.member, inventory);
 
             await updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
 

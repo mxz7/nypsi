@@ -251,7 +251,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const amount = Math.floor(Math.random() * 20) + 5;
             const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-            const inventory = getInventory(message.member);
+            const inventory = await getInventory(message.member);
 
             if (inventory["lawyer"] && inventory["lawyer"] > 0) {
                 await addItemUse(message.member, "lawyer");
@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["lawyer"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed2.addField(
                     "fail!!",

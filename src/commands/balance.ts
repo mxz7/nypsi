@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args[1] == "reset") {
-            deleteUser(target);
+            await deleteUser(target);
             if (!(message instanceof Message)) return;
             return message.react("✅");
         }

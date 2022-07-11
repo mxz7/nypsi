@@ -323,7 +323,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateXp(message.member, (await getXp(message.member)) + 1000);
                 break;
             case "basic_crate":
-                const inventory = getInventory(message.member); // eslint-disable-line
+                const inventory = await getInventory(message.member); // eslint-disable-line
 
                 if (inventory["basic_crate"]) {
                     inventory["basic_crate"]++;
@@ -331,7 +331,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     inventory["basic_crate"] = 1;
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
         }
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {

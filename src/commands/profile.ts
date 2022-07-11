@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const maxBet = await calcMaxBet(message.member);
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%";
     const voted = await hasVoted(message.member);
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     let inventoryItems;
 
     try {

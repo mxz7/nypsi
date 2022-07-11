@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     const crates = [];

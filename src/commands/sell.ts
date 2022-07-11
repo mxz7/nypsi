@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const searchTag = args[0].toLowerCase();
 
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         delete inventory[selected.id];
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     let sellWorth = Math.floor(selected.worth * 0.5 * amount);
 

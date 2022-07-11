@@ -243,12 +243,12 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     const amount = 15000 * (prestige + 1);
     const multi = Math.floor((await getMulti(memberID)) * 100);
-    const inventory = getInventory(memberID);
+    const inventory = await getInventory(memberID);
 
     await updateBalance(memberID, (await getBalance(memberID)) + amount);
     addKarma(memberID, 10);
 
-    const tickets = getTickets(memberID);
+    const tickets = await getTickets(memberID);
 
     const prestigeBonus = Math.floor(((await getPrestige(memberID)) > 20 ? 20 : await getPrestige(memberID)) / 2.5);
     const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0);
@@ -257,7 +257,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
 
     if (tickets.length < max) {
-        addTicket(memberID);
+        awaitaddTicket(memberID);
     }
 
     let crateAmount = Math.floor(prestige / 2 + 1);
@@ -270,7 +270,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         inventory["vote_crate"] = crateAmount;
     }
 
-    setInventory(memberID, inventory);
+    await setInventory(memberID, inventory);
 
     logger.log({
         level: "success",
@@ -1603,12 +1603,14 @@ export async function addItemUse(member: GuildMember, item: string) {
     }
 }
 
+type Inventory = { [key: string]: number };
+
 /**
  *
  * @param {GuildMember} member
  * @returns
  */
-export function getInventory(member: GuildMember | string): { [key: string]: number } {
+export async function getInventory(member: GuildMember | string): Promise<Inventory> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1616,14 +1618,20 @@ export function getInventory(member: GuildMember | string): { [key: string]: num
         id = member;
     }
 
-    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            inventory: true,
+        },
+    });
 
     if (!query.inventory) {
-        db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(id);
         return {};
     }
 
-    return JSON.parse(query.inventory);
+    return query.inventory as Inventory;
 }
 
 /**
@@ -1631,14 +1639,22 @@ export function getInventory(member: GuildMember | string): { [key: string]: num
  * @param {GuildMember} member
  * @param {Object} inventory
  */
-export function setInventory(member: GuildMember | string, inventory: object) {
+export async function setInventory(member: GuildMember | string, inventory: object) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
     } else {
         id = member;
     }
-    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id);
+
+    await prisma.economy.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            inventory: inventory,
+        },
+    });
 }
 
 export function getItems(): { [key: string]: Item } {
@@ -1675,7 +1691,7 @@ export async function getMaxEthereum(member: GuildMember): Promise<number> {
  *
  * @param {GuildMember} member
  */
-export function deleteUser(member: GuildMember | string) {
+export async function deleteUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1685,7 +1701,11 @@ export function deleteUser(member: GuildMember | string) {
 
     redis.del(`cache:economy:exists:${id}`);
 
-    db.prepare("DELETE FROM economy WHERE id = ?").run(id);
+    await prisma.economy.delete({
+        where: {
+            userId: id,
+        },
+    });
 }
 
 /**
@@ -1693,7 +1713,7 @@ export function deleteUser(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Array<{ user_id: string, id: number }>}
  */
-export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
+export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1701,7 +1721,11 @@ export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
         id = member;
     }
 
-    const query: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets WHERE user_id = ?").all(id);
+    const query = await prisma.lotteryTicket.findMany({
+        where: {
+            userId: id,
+        },
+    });
 
     return query;
 }
@@ -1710,7 +1734,7 @@ export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
  *
  * @param {GuildMember} member
  */
-export function addTicket(member: GuildMember | string) {
+export async function addTicket(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1718,7 +1742,11 @@ export function addTicket(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id);
+    await prisma.lotteryTicket.create({
+        data: {
+            userId: id,
+        },
+    });
 
     if (!(member instanceof GuildMember)) return;
 
@@ -1735,9 +1763,9 @@ export function addTicket(member: GuildMember | string) {
  */
 async function doLottery(client: Client) {
     logger.info("performing lottery..");
-    const tickets: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets").all();
+    const tickets = await prisma.lotteryTicket.findMany();
 
-    if (tickets.length < 10) {
+    if (tickets.length < 100) {
         logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
 
         const embed = new CustomEmbed();
@@ -1753,10 +1781,7 @@ async function doLottery(client: Client) {
 
     const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
 
-    /**
-     * @type {Array<{ user_id: string, id: number }>}
-     */
-    const shuffledTickets: Array<{ user_id: string; id: number }> = shufflearray(tickets);
+    const shuffledTickets = shufflearray(tickets);
 
     let chosen: LotteryTicket;
     let user: User;
@@ -1764,9 +1789,9 @@ async function doLottery(client: Client) {
     while (!user) {
         chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
 
-        logger.info(`winner: ${chosen.user_id} with ticket #${chosen.id}`);
+        logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
 
-        user = await client.users.fetch(chosen.user_id);
+        user = await client.users.fetch(chosen.userId);
     }
 
     logger.log({
@@ -1808,9 +1833,9 @@ async function doLottery(client: Client) {
             });
     }
 
-    const { changes } = db.prepare("DELETE FROM lottery_tickets").run();
+    const { count } = await prisma.lotteryTicket.deleteMany();
 
-    logger.info(`${changes.toLocaleString()} tickets deleted from database`);
+    logger.info(`${count.toLocaleString()} tickets deleted from database`);
 }
 
 /**
@@ -1845,7 +1870,7 @@ export function runLotteryInterval(client: Client) {
  * @returns {string}
  */
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
-    const inventory = getInventory(member);
+    const inventory = await getInventory(member);
     const items = getItems();
 
     const crateItems = [
@@ -1871,7 +1896,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         delete inventory[item.id];
     }
 
-    setInventory(member, inventory);
+    await setInventory(member, inventory);
 
     let times = 2;
     const names = [];
@@ -1978,7 +2003,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         }
     }
 
-    setInventory(member, inventory);
+    await setInventory(member, inventory);
 
     return names;
 }
@@ -2279,7 +2304,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
         );
 
         for (const member of guild.members) {
-            const inventory = getInventory(member.user_id);
+            const inventory = await getInventory(member.user_id);
 
             if (inventory["basic_crate"]) {
                 inventory["basic_crate"] += guild.level;
@@ -2287,7 +2312,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
                 inventory["basic_crate"] = guild.level;
             }
 
-            setInventory(member.user_id, inventory);
+            await setInventory(member.user_id, inventory);
 
             if (await getDMsEnabled(member.user_id)) {
                 const { requestDM } = require("../../nypsi");

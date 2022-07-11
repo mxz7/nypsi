@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     let gun;
@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         delete inventory[gun];
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     let times = 1;
 
@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
     }
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     const embed = new CustomEmbed(
         message.member,
