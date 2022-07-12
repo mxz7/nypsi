@@ -258,7 +258,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
 
     if (tickets.length < max) {
-        awaitaddTicket(memberID);
+        await addTicket(memberID);
     }
 
     let crateAmount = Math.floor(prestige / 2 + 1);
@@ -2072,27 +2072,8 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
     return earned;
 }
 
-export interface EconomyGuild {
-    guildName: string;
-    createdAt: number;
-    balance: number;
-    xp: number;
-    level: number;
-    motd: string;
-    ownerId: string;
-    members?: EconomyGuildMember[];
-}
-
-interface EconomyGuildMember {
-    userId: string;
-    guildName: string;
-    joinedAt: number;
-    contributedMoney: number;
-    contributedXp: number;
-}
-
-export async function getGuildByName(name: string): Promise<EconomyGuild> {
-    const guild: EconomyGuild = await prisma.economyGuild
+export async function getGuildByName(name: string) {
+    const guild = await prisma.economyGuild
         .findMany({
             where: {
                 guildName: {
@@ -2101,7 +2082,15 @@ export async function getGuildByName(name: string): Promise<EconomyGuild> {
                 },
             },
             include: {
-                members: true,
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                lastKnownTag: true,
+                            },
+                        },
+                    },
+                },
             },
         })
         .then((r) => r[0]);
@@ -2109,7 +2098,7 @@ export async function getGuildByName(name: string): Promise<EconomyGuild> {
     return guild;
 }
 
-export async function getGuildByUser(member: GuildMember | string): Promise<EconomyGuild> {
+export async function getGuildByUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -2131,7 +2120,15 @@ export async function getGuildByUser(member: GuildMember | string): Promise<Econ
             select: {
                 guild: {
                     include: {
-                        members: true,
+                        members: {
+                            include: {
+                                user: {
+                                    select: {
+                                        lastKnownTag: true,
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -2148,64 +2145,94 @@ export async function getGuildByUser(member: GuildMember | string): Promise<Econ
     return await getGuildByName(guildName);
 }
 
-export function createGuild(name: string, owner: GuildMember) {
-    db.prepare("insert into economy_guild (guild_name, created_at, owner) values (?, ?, ?)").run(
-        name,
-        Date.now(),
-        owner.user.id
-    );
-    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
-        owner.user.id,
-        name,
-        Date.now(),
-        owner.user.tag
-    );
+export async function createGuild(name: string, owner: GuildMember) {
+    await prisma.economyGuild.create({
+        data: {
+            guildName: name,
+            createdAt: Date.now(),
+            ownerId: owner.user.id,
+        },
+    });
+    await prisma.economyGuildMember.create({
+        data: {
+            userId: owner.user.id,
+            guildName: name,
+            joinedAt: Date.now(),
+        },
+    });
 
     if (guildUserCache.has(owner.user.id)) {
         guildUserCache.delete(owner.user.id);
     }
 }
 
-export function deleteGuild(name: string) {
-    const members = await getGuildByName(name).members;
-
-    for (const m of members) {
-        guildUserCache.delete(m.user_id);
-    }
+export async function deleteGuild(name: string) {
+    guildUserCache.clear();
 
     guildExistsCache.delete(name);
 
-    db.prepare("delete from economy_guild_members where guild_id = ?").run(name);
-    db.prepare("delete from economy_guild where guild_name = ?").run(name);
+    await prisma.economyGuild.delete({
+        where: {
+            guildName: name,
+        },
+    });
+
+    await prisma.economyGuildMember.deleteMany({
+        where: {
+            guildName: name,
+        },
+    });
 }
 
-export function addToGuildBank(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name);
-    db.prepare("update economy_guild_members set contributed_money = contributed_money + ? where user_id = ?").run(
-        amount,
-        member.user.id
-    );
+export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            balance: { increment: amount },
+        },
+    });
+    await prisma.economyGuildMember.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            contributedMoney: { increment: amount },
+        },
+    });
 
     return checkUpgrade(name);
 }
 
-export function addToGuildXP(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name);
-    db.prepare("update economy_guild_members set contributed_xp = contributed_xp + ? where user_id = ?").run(
-        amount,
-        member.user.id
-    );
+export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            xp: { increment: amount },
+        },
+    });
+    await prisma.economyGuildMember.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            contributedXp: { increment: amount },
+        },
+    });
 
     return checkUpgrade(name);
 }
 
-export function getMaxMembersForGuild(name: string) {
+export async function getMaxMembersForGuild(name: string) {
     const guild = await getGuildByName(name);
 
     return guild.level * 3;
 }
 
-export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
+export async function getRequiredForGuildUpgrade(name: string): Promise<{ money: number; xp: number }> {
     if (guildRequirementsCache.has(name)) {
         return guildRequirementsCache.get(name);
     }
@@ -2229,19 +2256,20 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
     };
 }
 
-export function addMember(name: string, member: GuildMember): boolean {
+export async function addMember(name: string, member: GuildMember) {
     const guild = await getGuildByName(name);
 
-    if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
+    if (guild.members.length + 1 > (await getMaxMembersForGuild(guild.guildName))) {
         return false;
     }
 
-    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
-        member.user.id,
-        guild.guild_name,
-        Date.now(),
-        member.user.tag
-    );
+    await prisma.economyGuildMember.create({
+        data: {
+            userId: member.user.id,
+            guildName: guild.guildName,
+            joinedAt: Date.now(),
+        },
+    });
 
     if (guildUserCache.has(member.user.id)) {
         guildUserCache.delete(member.user.id);
@@ -2255,14 +2283,58 @@ export enum RemoveMemberMode {
     TAG,
 }
 
-export function removeMember(member: string, mode: RemoveMemberMode) {
-    if (mode == RemoveMemberMode.ID) {
-        db.prepare("delete from economy_guild_members where user_id = ?").run(member);
-    } else {
-        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member);
-    }
-
+export async function removeMember(member: string, mode: RemoveMemberMode) {
     guildUserCache.clear();
+
+    if (mode == RemoveMemberMode.ID) {
+        await prisma.economyGuildMember.delete({
+            where: {
+                userId: member,
+            },
+        });
+        return true;
+    } else {
+        const user = await prisma.user.findFirst({
+            where: {
+                lastKnownTag: member,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (!user || !user.id) {
+            return false;
+        }
+
+        const x = await prisma.economyGuildMember.delete({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        if (x) return true;
+        return false;
+    }
+}
+
+interface EconomyGuild {
+    guildName: string;
+    createdAt: number;
+    balance: number;
+    xp: number;
+    level: number;
+    motd: string;
+    ownerId: string;
+    members?: EconomyGuildMember[];
+}
+
+interface EconomyGuildMember {
+    userId: string;
+    guildName: string;
+    joinedAt: number;
+    contributedMoney: number;
+    contributedXp: number;
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
@@ -2271,29 +2343,36 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     }
 
     if (guild.level == 5) return;
-    const requirements = getRequiredForGuildUpgrade(guild.guild_name);
+    const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
     if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
-        db.prepare(
-            "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
-        ).run(requirements.money, requirements.xp, guild.guild_name);
+        await prisma.economyGuild.update({
+            where: {
+                guildName: guild.guildName,
+            },
+            data: {
+                level: { increment: 1 },
+                balance: { decrement: requirements.money },
+                xp: { decrement: requirements.xp },
+            },
+        });
 
-        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`);
+        logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
         guildRequirementsCache.clear();
 
         const embed = new CustomEmbed().setColor("#5efb8f");
 
-        embed.setHeader(guild.guild_name);
+        embed.setHeader(guild.guildName);
         embed.setDescription(
-            `**${guild.guild_name}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
+            `**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
                 `\n +**${guild.level}** basic crates` +
                 "\n +**1**% multiplier" +
                 "\n +**1** max xp gain"
         );
 
         for (const member of guild.members) {
-            const inventory = await getInventory(member.user_id);
+            const inventory = await getInventory(member.userId);
 
             if (inventory["basic_crate"]) {
                 inventory["basic_crate"] += guild.level;
@@ -2301,12 +2380,12 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
                 inventory["basic_crate"] = guild.level;
             }
 
-            await setInventory(member.user_id, inventory);
+            await setInventory(member.userId, inventory);
 
-            if (await getDMsEnabled(member.user_id)) {
+            if (await getDMsEnabled(member.userId)) {
                 const { requestDM } = require("../../nypsi");
 
-                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed);
+                await requestDM(member.userId, `${guild.guildName} has been upgraded!`, false, embed);
             }
         }
 
@@ -2315,14 +2394,29 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     return false;
 }
 
-export function setGuildMOTD(name: string, motd: string) {
-    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name);
+export async function setGuildMOTD(name: string, motd: string) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            motd: motd,
+        },
+    });
 }
 
-export function topGuilds(limit = 5): string[] {
-    const guilds: EconomyGuild[] = db
-        .prepare("select guild_name, balance, xp, level from economy_guild where balance > 1000")
-        .all();
+export async function topGuilds(limit = 5) {
+    const guilds = await prisma.economyGuild.findMany({
+        where: {
+            balance: { gt: 1000 },
+        },
+        select: {
+            guildName: true,
+            balance: true,
+            xp: true,
+            level: true,
+        },
+    });
 
     inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp]);
 
@@ -2336,7 +2430,7 @@ export function topGuilds(limit = 5): string[] {
         if (position == 2) position = "🥈";
         if (position == 3) position = "🥉";
 
-        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`);
+        out.push(`${position} **${guild.guildName}**[${guild.level}] $${guild.balance.toLocaleString()}`);
     }
 
     return out;

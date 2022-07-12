@@ -352,7 +352,7 @@ async function playGame(message, m) {
             const guild = await getGuildByUser(message.member);
 
             if (guild) {
-                addToGuildXP(guild.guildName, earnedXp, message.member);
+                await addToGuildXP(guild.guildName, earnedXp, message.member);
             }
         }
 

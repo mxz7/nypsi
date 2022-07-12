@@ -288,7 +288,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const guild = await getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guildName, earnedXp, message.member);
+                    await addToGuildXP(guild.guildName, earnedXp, message.member);
                 }
             }
 
