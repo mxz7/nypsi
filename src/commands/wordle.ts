@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "stats") {
-        const stats = getWordleStats(message.member);
+        const stats = await getWordleStats(message.member);
 
         if (!stats) {
             return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
