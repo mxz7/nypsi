@@ -3,7 +3,6 @@ backup/
 logs/
 dist/
 out/
-migrations/
 
 *.json
 *.env
@@ -11,6 +10,7 @@ migrations/
 *.db-shm
 *.db-wal
 *.DS_STORE
+*.sql
 
 !lists.json
 !items.json
@@ -23,3 +23,4 @@ migrations/
 !.prettierignore
 !tsconfig.json
 !.commitlintrc.json
+!migration_lock.toml
