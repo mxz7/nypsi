@@ -239,7 +239,7 @@ model EconomyGuild {
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @unique
 
-  EconomyGuildMember EconomyGuildMember[]
+  members EconomyGuildMember[]
 }
 
 model EconomyGuildMember {
