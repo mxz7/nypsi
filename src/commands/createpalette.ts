@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!isPremium(message.author.id)) {
+    if (!(await isPremium(message.author.id))) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must be a patreon for this command")] });
     }
 

@@ -48,9 +48,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let limit = 15;
 
-    if (isPremium(message.author.id)) {
+    if (await isPremium(message.author.id)) {
         limit = 20;
-        if (getTier(message.author.id) == 4) {
+        if ((await getTier(message.author.id)) == 4) {
             limit = 50;
         }
     }
@@ -266,7 +266,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (selected.id) {
             case "bronze":
-                if (isPremium(message.member) && getTier(message.member) >= 1) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 1) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -283,7 +283,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "silver":
-                if (isPremium(message.member) && getTier(message.member) >= 2) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 2) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -300,7 +300,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "gold":
-                if (isPremium(message.member) && getTier(message.member) >= 3) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 3) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -335,7 +335,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
-            setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15));
+            await setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15));
         }
 
         if (amount.has(message.author.id)) {

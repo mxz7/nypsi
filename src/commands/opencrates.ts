@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    // if (!isPremium(message.member)) {
+    // if (!await isPremium(message.member)) {
     //     const embed = new CustomEmbed(
     //         message.member,
     //         false,
@@ -59,8 +59,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let max = 5;
     let hitMax = false;
 
-    if (isPremium(message.member)) {
-        if (getTier(message.member) >= 3) {
+    if (await isPremium(message.member)) {
+        if ((await getTier(message.member)) >= 3) {
             max = 20;
         } else {
             max = 10;

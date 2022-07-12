@@ -35,19 +35,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     };
 
-    if (!isPremium(message.author.id)) {
+    if (!(await isPremium(message.author.id))) {
         return notValidForYou();
     } else {
-        if (getTier(message.author.id) < 1) {
+        if ((await getTier(message.author.id)) < 1) {
             return notValidForYou();
         }
 
         const now = new Date().getTime();
-        const lastDaily = getLastDaily(message.author.id);
+        const lastDaily = await getLastDaily(message.author.id);
         const diff = now - lastDaily;
 
         if (diff >= 86400000) {
-            setLastDaily(message.author.id, now);
+            await setLastDaily(message.author.id, now);
 
             let amount = 75000;
             const multi = await getMulti(message.member);

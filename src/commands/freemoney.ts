@@ -28,14 +28,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let amount = 1000;
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 1) {
+    if (await isPremium(message.author.id)) {
+        if ((await getTier(message.author.id)) == 1) {
             amount = 2500;
-        } else if (getTier(message.author.id) == 2) {
+        } else if ((await getTier(message.author.id)) == 2) {
             amount = 5000;
-        } else if (getTier(message.author.id) == 3) {
+        } else if ((await getTier(message.author.id)) == 3) {
             amount = 7500;
-        } else if (getTier(message.author.id) == 4) {
+        } else if ((await getTier(message.author.id)) == 4) {
             amount = 10000;
         }
     }

@@ -68,7 +68,7 @@ export default async function messageCreate(message: Message) {
     if (
         message.guild.memberCount < 150000 &&
         ((await userExists(message.guild.ownerId)) ||
-            isPremium(message.guild.ownerId) ||
+            (await isPremium(message.guild.ownerId)) ||
             (await getKarma(message.guild.ownerId)) >= 50 ||
             (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
     ) {
@@ -303,8 +303,8 @@ async function addMention() {
 
         let limit = 6;
 
-        if (isPremium(target)) {
-            const tier = getTier(target);
+        if (await isPremium(target)) {
+            const tier = await getTier(target);
 
             limit += tier * 2;
         }

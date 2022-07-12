@@ -6,7 +6,6 @@ import {
     setTier,
     setEmbedColor,
     setStatus,
-    setReason,
     addMember,
     renewUser,
     expireUser,
@@ -23,13 +22,13 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO).
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const defaultMessage = () => {
-        if (isPremium(message.member)) {
+    const defaultMessage = async () => {
+        if (await isPremium(message.member)) {
             const embed = new CustomEmbed(message.member, false);
 
             embed.setHeader("premium status", message.author.avatarURL());
 
-            const profile = getPremiumProfile(message.member);
+            const profile = await getPremiumProfile(message.member);
 
             const timeStarted = formatDate(profile.startDate);
             const timeAgo = daysAgo(profile.startDate);
@@ -42,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             description += `\n\n**color** #${embedColor} - ${getPrefix(message.guild)}setcolor`;
 
             if (profile.level > 2) {
-                const cmd = getUserCommand(message.author.id);
+                const cmd = await getUserCommand(message.author.id);
                 description += `\n**custom command** ${cmd ? cmd.content : "none"}`;
             }
 
@@ -86,12 +85,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!user) return message.channel.send({ embeds: [new ErrorEmbed("user doesnt exist")] });
 
-        if (isPremium(user.id)) {
+        if (await isPremium(user.id)) {
             const embed = new CustomEmbed(message.member, false);
 
             embed.setHeader("premium status", message.author.avatarURL());
 
-            const profile = getPremiumProfile(user.id);
+            const profile = await getPremiumProfile(user.id);
 
             const timeStarted = formatDate(profile.startDate);
             const timeAgo = daysAgo(profile.startDate);
@@ -101,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`;
 
             if (profile.level > 2) {
-                const cmd = getUserCommand(user.id);
+                const cmd = await getUserCommand(user.id);
                 description += `\n**custom command** ${cmd ? cmd.content : "none"}`;
             }
 
@@ -122,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        if (!isPremium(args[2])) {
+        if (!(await isPremium(args[2]))) {
             return message.channel.send({
                 embeds: [
                     new ErrorEmbed(
@@ -134,22 +133,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (args[1].toLowerCase()) {
             case "level":
-                setTier(args[2], parseInt(args[3]));
+                await setTier(args[2], parseInt(args[3]));
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, false, `✅ tier changed to ${args[3]}`)],
                 });
             case "embed":
-                setEmbedColor(args[2], args[3]);
+                await setEmbedColor(args[2], args[3]);
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, false, `✅ embed color changed to ${args[3]}`)],
                 });
             case "status":
-                setStatus(args[2], parseInt(args[3]));
-                return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`)],
-                });
-            case "reason":
-                setReason(args[2], args.join(" "));
+                await setStatus(args[2], parseInt(args[3]));
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`)],
                 });
@@ -163,7 +157,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        addMember(args[1], parseInt(args[2]));
+        await addMember(args[1], parseInt(args[2]));
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ created profile at tier " + args[2])],
@@ -177,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        renewUser(args[1]);
+        await renewUser(args[1]);
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ membership renewed")] });
     } else if (args[0].toLowerCase() == "expire") {

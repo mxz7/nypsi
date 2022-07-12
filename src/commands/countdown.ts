@@ -49,8 +49,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let max = 1;
 
-        if (isPremium(message.author.id)) {
-            max += getTier(message.author.id);
+        if (await isPremium(message.author.id)) {
+            max += await getTier(message.author.id);
         }
 
         if (Object.keys(countdowns).length >= max) {

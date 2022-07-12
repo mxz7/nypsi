@@ -76,8 +76,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     //PATREON
     let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate;
 
-    if (isPremium(message.author.id)) {
-        const profile = getPremiumProfile(message.author.id);
+    if (await isPremium(message.author.id)) {
+        const profile = await getPremiumProfile(message.author.id);
 
         tier = profile.level;
         tierString = profile.getLevelString();

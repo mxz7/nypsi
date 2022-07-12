@@ -515,7 +515,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let added = false;
                 let max = 1;
 
-                if (isPremium(message.author.id)) {
+                if (await isPremium(message.author.id)) {
                     max = 5;
                 }
 
@@ -678,7 +678,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             let maxSize = 100;
 
-            if (isPremium(message.author.id)) {
+            if (await isPremium(message.author.id)) {
                 maxSize = 200;
             }
 

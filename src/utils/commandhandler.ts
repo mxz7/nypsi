@@ -273,8 +273,9 @@ async function helpCmd(message: Message, args: Array<string>) {
 
             embed.setTitle(`${cmd.name} command`);
             embed.setDescription(desc);
-        } else if (getCommand(args[0].toLowerCase())) {
-            const member = message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner);
+        } else if (await getCommand(args[0].toLowerCase())) {
+            const owner = (await getCommand(args[0].toLowerCase())).owner;
+            const member = message.guild.members.cache.find((m) => m.id == owner);
             embed.setTitle("custom command");
             embed.setDescription(
                 `this is a custom command${
@@ -430,7 +431,7 @@ export async function runCommand(
     if (!commandExists(cmd) && message instanceof Message) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return;
-            const customCommand = getCommand(cmd);
+            const customCommand = await getCommand(cmd);
 
             if (!customCommand) {
                 return;

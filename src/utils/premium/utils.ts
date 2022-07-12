@@ -1,24 +1,28 @@
 import { GuildMember } from "discord.js";
-import { getDatabase } from "../database/database";
+import prisma from "../database/database";
+import redis from "../database/redis";
 import { formatDate } from "../functions/date";
 import { logger } from "../logger";
 import { PremUser } from "../models/PremStorage";
 
 declare function require(name: string);
 
-const db = getDatabase();
-
-const isPremiumCache = new Map();
-const tierCache = new Map();
 const colorCache = new Map();
 
 setInterval(async () => {
     const now = new Date().getTime();
 
-    const query = db.prepare("SELECT id FROM premium WHERE expire_date <= ?").all(now);
+    const query = await prisma.premium.findMany({
+        where: {
+            expireDate: { lte: now },
+        },
+        select: {
+            userId: true,
+        },
+    });
 
     for (const user of query) {
-        expireUser(user.id);
+        expireUser(user.userId);
     }
 }, 600000);
 
@@ -26,7 +30,7 @@ setInterval(async () => {
  * @returns {Boolean}
  * @param {GuildMember} member
  */
-export function isPremium(member: GuildMember | string): boolean {
+export async function isPremium(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -34,22 +38,44 @@ export function isPremium(member: GuildMember | string): boolean {
         id = member;
     }
 
-    if (isPremiumCache.has(id)) {
-        return isPremiumCache.get(id);
+    if (await redis.exists(`cache:premium:level:${id}`)) {
+        const level = parseInt(await redis.get(`cache:premium:level:${id}`));
+
+        if (level == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
-    const query = db.prepare("SELECT id FROM premium WHERE id = ?").get(id);
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            userId: true,
+            level: true,
+        },
+    });
 
     if (query) {
-        if (getTier(id) == 0) {
-            isPremiumCache.set(id, false);
+        if (query.level == 0) {
+            await prisma.premium.delete({
+                where: {
+                    userId: id,
+                },
+            });
+            await redis.set(`cache:premium:level:${id}`, 0);
+            await redis.expire(`cache:premium:level:${id}`, 300);
             return false;
         }
 
-        isPremiumCache.set(id, true);
+        await redis.set(`cache:premium:level:${id}`, query.level);
+        await redis.expire(`cache:premium:level:${id}`, 300);
         return true;
     } else {
-        isPremiumCache.set(id, false);
+        await redis.set(`cache:premium:level:${id}`, 0);
+        await redis.expire(`cache:premium:level:${id}`, 300);
         return false;
     }
 }
@@ -58,7 +84,7 @@ export function isPremium(member: GuildMember | string): boolean {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function getTier(member: GuildMember | string): number {
+export async function getTier(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -66,13 +92,19 @@ export function getTier(member: GuildMember | string): number {
         id = member;
     }
 
-    if (tierCache.has(id)) {
-        return tierCache.get(id);
-    }
+    if (await redis.exists(`cache:premium:level:${id}`)) return parseInt(await redis.get(`cache:premium:level:${id}`));
 
-    const query = db.prepare("SELECT level FROM premium WHERE id = ?").get(id);
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            level: true,
+        },
+    });
 
-    tierCache.set(id, query.level);
+    await redis.set(`cache:premium:level:${id}`, query.level || 0);
+    await redis.expire(`cache:premium:level:${id}`, 300);
 
     return query.level;
 }
@@ -81,7 +113,7 @@ export function getTier(member: GuildMember | string): number {
  * @param {GuildMember} member
  * @param {Number} level
  */
-export function addMember(member: GuildMember | string, level: number) {
+export async function addMember(member: GuildMember | string, level: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -92,9 +124,16 @@ export function addMember(member: GuildMember | string, level: number) {
     const start = new Date().getTime();
     const expire = new Date().setDate(new Date().getDate() + 35);
 
-    db.prepare("INSERT INTO premium (id, level, start_date, expire_date) VALUES (?, ?, ?, ?)").run(id, level, start, expire);
+    await prisma.premium.create({
+        data: {
+            userId: id,
+            level: level,
+            startDate: start,
+            expireDate: expire,
+        },
+    });
 
-    const profile = getPremiumProfile(id);
+    const profile = await getPremiumProfile(id);
 
     logger.info(`premium level ${level} given to ${id}`);
 
@@ -106,20 +145,14 @@ export function addMember(member: GuildMember | string, level: number) {
         )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`
     );
 
-    if (isPremiumCache.has(id)) {
-        isPremiumCache.delete(id);
-    }
-
-    if (tierCache.has(id)) {
-        tierCache.delete(id);
-    }
+    await redis.del(`cache:premium:level:${id}`);
 }
 
 /**
  * @returns {PremUser}
  * @param {GuildMember} member
  */
-export function getPremiumProfile(member: GuildMember | string): PremUser {
+export async function getPremiumProfile(member: GuildMember | string): Promise<PremUser> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -127,7 +160,11 @@ export function getPremiumProfile(member: GuildMember | string): PremUser {
         id = member;
     }
 
-    const query = db.prepare("SELECT * FROM premium WHERE id = ?").get(id);
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: id,
+        },
+    });
 
     return createPremUser(query);
 }
@@ -136,7 +173,7 @@ export function getPremiumProfile(member: GuildMember | string): PremUser {
  * @param {GuildMember} member
  * @param {Number} level
  */
-export function setTier(member: GuildMember | string, level: number) {
+export async function setTier(member: GuildMember | string, level: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -144,27 +181,28 @@ export function setTier(member: GuildMember | string, level: number) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET level = ? WHERE id = ?").run(level, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            level: level,
+        },
+    });
 
     logger.info(`premium level updated to ${level} for ${id}`);
 
     const { requestDM } = require("../../nypsi");
     requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`);
 
-    if (isPremiumCache.has(id)) {
-        isPremiumCache.delete(id);
-    }
-
-    if (tierCache.has(id)) {
-        tierCache.delete(id);
-    }
+    await redis.del(`cache:premium:level:${id}`);
 }
 
 /**
  * @param {GuildMember} member
  * @param {String} color
  */
-export function setEmbedColor(member: GuildMember | string, color: string) {
+export async function setEmbedColor(member: GuildMember | string, color: string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -172,7 +210,14 @@ export function setEmbedColor(member: GuildMember | string, color: string) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET embed_color = ? WHERE id = ?").run(color, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            embedColor: color,
+        },
+    });
 
     if (colorCache.has(id)) {
         colorCache.delete(id);
@@ -183,23 +228,30 @@ export function setEmbedColor(member: GuildMember | string, color: string) {
  * @returns {String}
  * @param {String} member id
  */
-export function getEmbedColor(member: string): `#${string}` | "default" {
+export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
     if (colorCache.has(member)) {
         return colorCache.get(member);
     }
 
-    const query = db.prepare("SELECT embed_color FROM premium WHERE id = ?").get(member);
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: member,
+        },
+        select: {
+            embedColor: true,
+        },
+    });
 
-    colorCache.set(member, query.embed_color);
+    colorCache.set(member, query.embedColor);
 
-    return query.embed_color;
+    return query.embedColor as `#${string}` | "default";
 }
 
 /**
  * @param {GuildMember} member
  * @param {Date} date
  */
-export function setLastDaily(member: GuildMember | string, date: number) {
+export async function setLastDaily(member: GuildMember | string, date: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -207,14 +259,21 @@ export function setLastDaily(member: GuildMember | string, date: number) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET last_daily = ? WHERE id = ?").run(date, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            lastDaily: date,
+        },
+    });
 }
 
 /**
  * @param {GuildMember} member
  * @param {Date} date
  */
-export function setLastWeekly(member: GuildMember | string, date: number) {
+export async function setLastWeekly(member: GuildMember | string, date: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -222,14 +281,21 @@ export function setLastWeekly(member: GuildMember | string, date: number) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET last_weekly = ? WHERE id = ?").run(date, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            lastWeekly: date,
+        },
+    });
 }
 
 /**
  * @param {GuildMember} member
  * @param {Number} status
  */
-export function setStatus(member: GuildMember | string, status: number) {
+export async function setStatus(member: GuildMember | string, status: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -237,59 +303,37 @@ export function setStatus(member: GuildMember | string, status: number) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET status = ? WHERE id = ?").run(status, id);
-}
-
-/**
- * @param {GuildMember} member
- * @param {String} reason
- */
-export function setReason(member: GuildMember | string, reason: string) {
-    let id: string;
-    if (member instanceof GuildMember) {
-        id = member.user.id;
-    } else {
-        id = member;
-    }
-
-    db.prepare("UPDATE premium SET revoke_reason = ? WHERE id = ?").run(reason, id);
-}
-
-/**
- * @param {GuildMember} member
- * @param {Date} date
- */
-export function setStartDate(member: GuildMember, date: Date) {
-    let id: string;
-    if (member instanceof GuildMember) {
-        id = member.user.id;
-    } else {
-        id = member;
-    }
-
-    db.prepare("UPDATE premium SET start_date = ? WHERE id = ?").run(date, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            status: status,
+        },
+    });
 }
 
 /**
  * @param {String} member id
  */
-export function renewUser(member: string) {
-    const profile = getPremiumProfile(member);
+export async function renewUser(member: string) {
+    const profile = await getPremiumProfile(member);
 
     profile.renew();
 
-    db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(profile.expireDate, member);
+    await prisma.premium.update({
+        where: {
+            userId: member,
+        },
+        data: {
+            expireDate: profile.expireDate,
+        },
+    });
 
     const { requestDM } = require("../../nypsi");
     requestDM(member, `your membership has been renewed until **${formatDate(profile.expireDate)}**`);
 
-    if (isPremiumCache.has(member)) {
-        isPremiumCache.delete(member);
-    }
-
-    if (tierCache.has(member)) {
-        tierCache.delete(member);
-    }
+    await redis.del(`cache:premium:level:${member}`);
 
     if (colorCache.has(member)) {
         colorCache.delete(member);
@@ -300,7 +344,7 @@ export function renewUser(member: string) {
  * @param {String} member id
  */
 export async function expireUser(member: string) {
-    const profile = getPremiumProfile(member);
+    const profile = await getPremiumProfile(member);
 
     const expire = await profile.expire();
 
@@ -308,15 +352,19 @@ export async function expireUser(member: string) {
         return renewUser(member);
     }
 
-    db.prepare("DELETE FROM premium WHERE id = ?").run(member);
+    await prisma.premium.delete({
+        where: {
+            userId: member,
+        },
+    });
 
-    if (isPremiumCache.has(member)) {
-        isPremiumCache.delete(member);
-    }
+    await prisma.premiumCommand.delete({
+        where: {
+            owner: member,
+        },
+    });
 
-    if (tierCache.has(member)) {
-        tierCache.delete(member);
-    }
+    await redis.del(`cache:premium:level:${member}`);
 
     if (colorCache.has(member)) {
         colorCache.delete(member);
@@ -324,58 +372,69 @@ export async function expireUser(member: string) {
 }
 
 /**
+ * @returns {Date}
  * @param {String} member id
- * @param {String} reason
  */
-export function revokeUser(member: string, reason: string) {
-    db.prepare("UPDATE premium SET level = 0, status = 2, revoke_reason = ? WHERE id = ?").run(reason, member);
+export async function getLastDaily(member: string) {
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: member,
+        },
+        select: {
+            lastDaily: true,
+        },
+    });
 
-    const { requestDM } = require("../../nypsi");
-    requestDM(member, "your membership has been revoked");
+    return query.lastDaily;
 }
 
 /**
  * @returns {Date}
  * @param {String} member id
  */
-export function getLastDaily(member: string): number {
-    const query = db.prepare("SELECT last_daily FROM premium WHERE id = ?").get(member);
+export async function getLastWeekly(member: string) {
+    const query = await prisma.premium.findUnique({
+        where: {
+            userId: member,
+        },
+        select: {
+            lastWeekly: true,
+        },
+    });
 
-    return query.last_daily;
+    return query.lastWeekly;
 }
 
-/**
- * @returns {Date}
- * @param {String} member id
- */
-export function getLastWeekly(member: string): number {
-    const query = db.prepare("SELECT last_weekly FROM premium WHERE id = ?").get(member);
+type PremiumCommand = {
+    owner: string;
+    trigger: string;
+    content: string;
+    uses: number;
+};
 
-    return query.last_weekly;
-}
-
-/**
- * @returns {{ trigger: String, content: String, owner: String, uses: Number } || null}
- * @param {String} name
- */
-export function getCommand(name: string): { trigger: string; content: string; owner: string; uses: number } {
-    const query = db.prepare("SELECT * FROM premium_commands WHERE trigger = ?").get(name);
+export async function getCommand(name: string): Promise<PremiumCommand> {
+    const query = await prisma.premiumCommand.findUnique({
+        where: {
+            trigger: name,
+        },
+    });
 
     if (query) {
-        if (!isPremium(query.owner)) return null;
+        if (!(await isPremium(query.owner))) {
+            return undefined;
+        }
         return query;
     } else {
-        return null;
+        return undefined;
     }
 }
 
-/**
- *
- * @param {String} id
- * @returns {{ trigger: String, content: String, owner: String, uses: Number }}
- */
-export function getUserCommand(id: string): { trigger: string; content: string; owner: string; uses: number } {
-    return db.prepare("SELECT * FROM premium_commands WHERE owner = ?").get(id);
+export async function getUserCommand(id: string) {
+    return await prisma.premiumCommand.findUnique({
+        where: {
+            owner: id,
+        },
+    });
 }
 
 /**
@@ -385,26 +444,47 @@ export function getUserCommand(id: string): { trigger: string; content: string; 
  * @param {String} content
  * @param {Number} uses
  */
-export function setCommand(id: string, trigger: string, content: string) {
-    const query = db.prepare("SELECT owner FROM premium_commands WHERE owner = ?").get(id);
+export async function setCommand(id: string, trigger: string, content: string) {
+    const query = await prisma.premiumCommand.findUnique({
+        where: {
+            owner: id,
+        },
+        select: {
+            owner: true,
+        },
+    });
 
     if (query) {
-        db.prepare("UPDATE premium_commands SET trigger = ?, content = ?, uses = 0 WHERE owner = ?").run(
-            trigger,
-            content,
-            id
-        );
+        await prisma.premiumCommand.update({
+            where: {
+                owner: id,
+            },
+            data: {
+                trigger: trigger,
+                content: content,
+                uses: 0,
+            },
+        });
     } else {
-        db.prepare("INSERT INTO premium_commands (trigger, content, owner, uses) VALUES (?, ?, ?, 0)").run(
-            trigger,
-            content,
-            id
-        );
+        await prisma.premiumCommand.create({
+            data: {
+                trigger: trigger,
+                content: content,
+                owner: id,
+            },
+        });
     }
 }
 
-export function addUse(id: string) {
-    db.prepare("UPDATE premium_commands SET uses = uses + 1 WHERE owner = ?").run(id);
+export async function addUse(id: string) {
+    await prisma.premiumCommand.update({
+        where: {
+            owner: id,
+        },
+        data: {
+            uses: { increment: 1 },
+        },
+    });
 }
 
 /**
@@ -412,7 +492,7 @@ export function addUse(id: string) {
  * @param {GuildMember} member
  * @param {number} date
  */
-export function setExpireDate(member: GuildMember | string, date: number) {
+export async function setExpireDate(member: GuildMember | string, date: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -420,7 +500,14 @@ export function setExpireDate(member: GuildMember | string, date: number) {
         id = member;
     }
 
-    db.prepare("UPDATE premium SET expire_date = ? WHERE id = ?").run(date, id);
+    await prisma.premium.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            expireDate: date,
+        },
+    });
 
     const { requestDM } = require("../../nypsi");
     requestDM(id, `your membership will now expire on **${formatDate(date)}**`);
@@ -430,12 +517,11 @@ export function createPremUser(query: any) {
     return PremUser.fromData({
         id: query.id,
         level: query.level,
-        embedColor: query.embed_color,
-        lastDaily: query.last_daily,
-        lastWeekly: query.last_weekly,
+        embedColor: query.embedColor,
+        lastDaily: query.lastDaily,
+        lastWeekly: query.lastWeekly,
         status: query.status,
-        revokeReason: query.revoke_reason,
-        startDate: query.start_date,
-        expireDate: query.expire_date,
+        startDate: query.startDate,
+        expireDate: query.expireDate,
     });
 }

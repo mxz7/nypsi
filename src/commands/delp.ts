@@ -18,8 +18,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let amount = 25;
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 4) {
+    if (await isPremium(message.author.id)) {
+        if ((await getTier(message.author.id)) == 4) {
             amount = 100;
         } else {
             amount = 50;

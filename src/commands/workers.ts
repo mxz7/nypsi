@@ -298,7 +298,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             args[0].toLowerCase() == "patreon" ||
             args[0].toLowerCase() == "premium"
         ) {
-            if (!isPremium(message.author.id)) {
+            if (!(await isPremium(message.author.id))) {
                 return message.channel.send({
                     embeds: [
                         new ErrorEmbed("you must have a premium membership for this").setFooter(
@@ -312,7 +312,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const personalWorkers = await getWorkers(message.member);
 
-            if (getTier(message.author.id) >= 2) {
+            if ((await getTier(message.author.id)) >= 2) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];
@@ -330,7 +330,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
             }
 
-            if (getTier(message.author.id) >= 3) {
+            if ((await getTier(message.author.id)) >= 3) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];
@@ -348,7 +348,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
             }
 
-            if (getTier(message.author.id) >= 4) {
+            if ((await getTier(message.author.id)) >= 4) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];

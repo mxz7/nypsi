@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prestigeBonus = Math.floor(
         ((await getPrestige(message.member)) > 10 ? 10 : await getPrestige(message.member)) / 2.5
     );
-    const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0);
+    const premiumBonus = Math.floor((await isPremium(message.member)) ? await getTier(message.member) : 0);
     const karmaBonus = Math.floor((await getKarma(message.member)) / 75);
 
     let max = 5 + prestigeBonus + premiumBonus + karmaBonus;

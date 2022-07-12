@@ -252,7 +252,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const tickets = await getTickets(memberID);
 
     const prestigeBonus = Math.floor(((await getPrestige(memberID)) > 20 ? 20 : await getPrestige(memberID)) / 2.5);
-    const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0);
+    const premiumBonus = Math.floor((await isPremium(memberID)) ? await getTier(memberID) : 0);
     const karmaBonus = Math.floor((await getKarma(memberID)) / 100);
 
     const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
@@ -383,8 +383,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
     multi += prestigeBonus;
 
-    if (isPremium(id)) {
-        switch (getTier(id)) {
+    if (await isPremium(id)) {
+        switch (await getTier(id)) {
             case 2:
                 multi += 4;
                 break;

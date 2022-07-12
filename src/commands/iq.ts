@@ -61,8 +61,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         let chanceAmount = 25;
 
-        if (isPremium(member.user.id)) {
-            if (getTier(member.user.id) >= 3) {
+        if (await isPremium(member.user.id)) {
+            if ((await getTier(member.user.id)) >= 3) {
                 chanceAmount = 10;
             }
         }

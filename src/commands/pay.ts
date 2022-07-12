@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         tax = 0.05;
     }
 
-    if (isPremium(message.member)) {
+    if (await isPremium(message.member)) {
         tax = 0;
     }
 
