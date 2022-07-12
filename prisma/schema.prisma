@@ -54,23 +54,16 @@ model EconomyStats {
 }
 
 model Premium {
-  level      PremiumLevel
-  embedColor String       @default("default")
-  lastDaily  Int          @default(0)
-  lastWeekly Int          @default(0)
-  status     Int          @default(1)
+  level      Int
+  embedColor String @default("default")
+  lastDaily  Int    @default(0)
+  lastWeekly Int    @default(0)
+  status     Int    @default(1)
   startDate  Int
   expireDate Int
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
-}
-
-enum PremiumLevel {
-  BRONZE
-  SILVER
-  GOLD
-  PLATINUM
 }
 
 model Username {
