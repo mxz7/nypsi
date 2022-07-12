@@ -402,10 +402,10 @@ async function playGame(message, m) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 newEmbed.setFooter(`+${earnedXp}xp`);
 
-                const guild = getGuildByUser(message.member);
+                const guild = await getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guild_name, earnedXp, message.member);
+                    addToGuildXP(guild.guildName, earnedXp, message.member);
                 }
             }
 

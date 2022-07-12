@@ -395,7 +395,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
         }
     }
 
-    const guild = getGuildByUser(id);
+    const guild = await getGuildByUser(id);
 
     if (guild) {
         multi += guild.level - 1;
@@ -2026,7 +2026,7 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
 
     let max = 6;
 
-    const guild = getGuildByUser(member);
+    const guild = await getGuildByUser(member);
 
     if (guild) {
         max += guild.level - 1;
@@ -2052,7 +2052,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     let max = 6;
 
-    const guild = getGuildByUser(member);
+    const guild = await getGuildByUser(member);
 
     if (guild) {
         max += guild.level - 1;
@@ -2064,59 +2064,43 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 }
 
 export interface EconomyGuild {
-    guild_name: string;
-    created_at: number;
+    guildName: string;
+    createdAt: number;
     balance: number;
     xp: number;
     level: number;
     motd: string;
-    owner: string;
-    members: EconomyGuildMember[];
+    ownerId: string;
+    members?: EconomyGuildMember[];
 }
 
 interface EconomyGuildMember {
-    user_id: string;
-    guild_id: string;
-    joined_at: number;
-    contributed_money: number;
-    contributed_xp: number;
-    last_known_tag: string;
+    userId: string;
+    guildName: string;
+    joinedAt: number;
+    contributedMoney: number;
+    contributedXp: number;
 }
 
-export function guildExists(name: string): boolean {
-    if (guildExistsCache.has(name)) {
-        return guildExistsCache.get(name);
-    }
-
-    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name);
-
-    if (!query) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-export function getGuildByName(name: string): EconomyGuild {
-    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name);
-    const members: EconomyGuildMember[] = db
-        .prepare("select * from economy_guild_members where guild_id = ? collate nocase")
-        .all(name);
-
-    if (!guild) return null;
-
-    guild.members = members;
-
-    for (const m of members) {
-        if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id);
-        }
-    }
+export async function getGuildByName(name: string): Promise<EconomyGuild> {
+    const guild: EconomyGuild = await prisma.economyGuild
+        .findMany({
+            where: {
+                guildName: {
+                    mode: "insensitive",
+                    equals: name,
+                },
+            },
+            include: {
+                members: true,
+            },
+        })
+        .then((r) => r[0]);
 
     return guild;
 }
 
-export function getGuildByUser(member: GuildMember | string): EconomyGuild | null {
+export async function getGuildByUser(member: GuildMember | string): Promise<EconomyGuild> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -2129,30 +2113,30 @@ export function getGuildByUser(member: GuildMember | string): EconomyGuild | nul
     if (guildUserCache.has(id)) {
         guildName = guildUserCache.get(id);
 
-        if (!guildName) return null;
+        if (!guildName) return undefined;
     } else {
-        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id);
+        const query = await prisma.economyGuildMember.findUnique({
+            where: {
+                userId: id,
+            },
+            select: {
+                guild: {
+                    include: {
+                        members: true,
+                    },
+                },
+            },
+        });
 
-        if (!query) {
-            guildUserCache.set(id, null);
-            return null;
+        if (!query || !query.guild) {
+            guildUserCache.set(id, undefined);
+            return undefined;
         }
 
-        guildName = query.guild_id;
+        return query.guild;
     }
 
-    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName);
-    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName);
-
-    for (const m of members) {
-        if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id);
-        }
-    }
-
-    guild.members = members;
-
-    return guild;
+    return await getGuildByName(guildName);
 }
 
 export function createGuild(name: string, owner: GuildMember) {
@@ -2174,7 +2158,7 @@ export function createGuild(name: string, owner: GuildMember) {
 }
 
 export function deleteGuild(name: string) {
-    const members = getGuildByName(name).members;
+    const members = await getGuildByName(name).members;
 
     for (const m of members) {
         guildUserCache.delete(m.user_id);
@@ -2207,7 +2191,7 @@ export function addToGuildXP(name: string, amount: number, member: GuildMember) 
 }
 
 export function getMaxMembersForGuild(name: string) {
-    const guild = getGuildByName(name);
+    const guild = await getGuildByName(name);
 
     return guild.level * 3;
 }
@@ -2217,7 +2201,7 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
         return guildRequirementsCache.get(name);
     }
 
-    const guild = getGuildByName(name);
+    const guild = await getGuildByName(name);
 
     const baseMoney = 1900000 * Math.pow(guild.level, 2);
     const baseXP = 1425 * Math.pow(guild.level, 2);
@@ -2237,7 +2221,7 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
 }
 
 export function addMember(name: string, member: GuildMember): boolean {
-    const guild = getGuildByName(name);
+    const guild = await getGuildByName(name);
 
     if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
         return false;
@@ -2278,7 +2262,7 @@ export function updateLastKnownTag(id: string, tag: string) {
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (typeof guild == "string") {
-        guild = getGuildByName(guild);
+        guild = await getGuildByName(guild);
     }
 
     if (guild.level == 5) return;

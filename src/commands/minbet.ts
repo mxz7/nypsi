@@ -17,7 +17,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let max = 6;
 
-    const guild = getGuildByUser(message.member);
+    const guild = await getGuildByUser(message.member);
 
     if (guild) {
         max += guild.level - 1;

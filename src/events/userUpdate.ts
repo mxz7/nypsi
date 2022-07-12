@@ -15,7 +15,7 @@ let interval;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
     if (oldUser.tag != newUser.tag) {
-        if (getGuildByUser(newUser.id)) {
+        if (await getGuildByUser(newUser.id)) {
             updateLastKnownTag(newUser.id, newUser.tag);
         }
 

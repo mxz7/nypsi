@@ -161,12 +161,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     };
 
-    const guild = getGuildByUser(message.member);
+    const guild = await getGuildByUser(message.member);
     const prefix = getPrefix(message.guild);
 
     if (guild) {
         for (const m of guild.members) {
-            if (m.user_id == message.author.id) {
+            if (m.userId == message.author.id) {
                 if (m.last_known_tag != message.author.tag) {
                     updateLastKnownTag(message.author.id, message.author.tag);
                 }
@@ -266,7 +266,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
 
-        if (getGuildByUser(target)) {
+        if (await getGuildByUser(target)) {
             return send({ embeds: [new ErrorEmbed("that user is already in a guild")] });
         }
 
@@ -303,8 +303,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) return;
 
         if (reaction == "yes") {
-            const targetGuild = getGuildByUser(target.user.id);
-            const refreshedGuild = getGuildByName(guild.guild_name);
+            const targetGuild = await getGuildByUser(target.user.id);
+            const refreshedGuild = await getGuildByName(guild.guild_name);
 
             if (targetGuild) {
                 embed.setDescription("❌ you are already in a guild");
@@ -594,7 +594,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 7);
 
-    const targetGuild = getGuildByName(name);
+    const targetGuild = await getGuildByName(name);
 
     if (!targetGuild) {
         return send({ embeds: [new ErrorEmbed("invalid guild")] });

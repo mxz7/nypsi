@@ -127,10 +127,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
     }
 
-    const targetGuild = getGuildByUser(target);
+    const targetGuild = await getGuildByUser(target);
 
     if (targetGuild) {
-        if (targetGuild.guild_name == getGuildByUser(message.member)?.guild_name) {
+        if (targetGuild.guildName == (await getGuildByUser(message.member))?.guildName) {
             return send({ embeds: [new ErrorEmbed("you cannot rob someone in your own guild")] });
         }
     }
