@@ -106,6 +106,19 @@ export async function updateLastKnowntag(member: GuildMember | string, tag: stri
     });
 }
 
+export async function getLastKnownTag(id: string) {
+    const query = await prisma.user.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            lastKnownTag: true,
+        },
+    });
+
+    return query.lastKnownTag;
+}
+
 export async function isTracking(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
