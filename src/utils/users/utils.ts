@@ -1,14 +1,12 @@
 import { Collection, Guild, GuildMember, Message, ThreadMember, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import ms = require("ms");
 import fetch from "node-fetch";
-import { getDatabase, toArray, toStorage } from "../database/database";
+import prisma from "../database/database";
+import redis from "../database/redis";
 import { cleanString } from "../functions/string";
 
-const db = getDatabase();
-const existsCache = new Set();
 const optCache = new Map();
-const usernameCache = new Map();
-const avatarCache = new Map();
 const lastfmUsernameCache = new Map();
 
 export interface MentionQueueItem {
@@ -37,20 +35,7 @@ const deleteQueue: Array<string> = [];
 
 export { deleteQueue };
 
-/**
- *
- * @param {GuildMember} member
- */
-export function createUsernameProfile(member: GuildMember | User, tag: string, url?: string) {
-    const id = member.id;
-
-    db.prepare("INSERT INTO usernames_optout (id) VALUES (?)").run(id);
-    db.prepare("INSERT INTO usernames (id, value, date) VALUES (?, ?, ?)").run(id, tag, Date.now());
-    if (url)
-        db.prepare("INSERT INTO usernames (id, value, type, date) VALUES (?, ?, ?, ?)").run(id, url, "avatar", Date.now());
-}
-
-export function usernameProfileExists(member: GuildMember | string): boolean {
+export async function hasProfile(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -58,19 +43,68 @@ export function usernameProfileExists(member: GuildMember | string): boolean {
         id = member;
     }
 
-    if (existsCache.has(id)) return true;
+    if (await redis.exists(`cache:user:exists:${id}`)) {
+        return (await redis.get(`cache:user:exists:${id}`)) === "true" ? true : false;
+    }
 
-    const query = db.prepare("SELECT id FROM usernames_optout WHERE id = ?").get(id);
+    const query = await prisma.user.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            id: true,
+        },
+    });
 
     if (query) {
-        existsCache.add(id);
+        await redis.set(`cache:user:exists:${id}`, "true");
+        await redis.expire(`cache:user:exists:${id}`, ms("1 hour") / 1000);
         return true;
     } else {
+        await redis.set(`cache:user:exists:${id}`, "false");
+        await redis.expire(`cache:user:exists:${id}`, ms("1 hour") / 1000);
         return false;
     }
 }
 
-export function isTracking(member: GuildMember | string): boolean {
+export async function createProfile(member: User | string) {
+    let id: string;
+    let username = "";
+    if (member instanceof User) {
+        username = `${member.username}#${member.discriminator}`;
+        id = member.id;
+    } else {
+        id = member;
+    }
+
+    await redis.del(`cache:user:exists:${id}`);
+    await prisma.user.create({
+        data: {
+            id: id,
+            lastKnownTag: username,
+        },
+    });
+}
+
+export async function updateLastKnowntag(member: GuildMember | string, tag: string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            lastKnownTag: tag,
+        },
+    });
+}
+
+export async function isTracking(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -82,9 +116,16 @@ export function isTracking(member: GuildMember | string): boolean {
         return optCache.get(id);
     }
 
-    const query = db.prepare("SELECT tracking FROM usernames_optout WHERE id = ?").get(id);
+    const query = await prisma.user.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            tracking: true,
+        },
+    });
 
-    if (query.tracking == 1) {
+    if (query.tracking) {
         optCache.set(id, true);
         return true;
     } else {
@@ -93,7 +134,7 @@ export function isTracking(member: GuildMember | string): boolean {
     }
 }
 
-export function disableTracking(member: GuildMember | string) {
+export async function disableTracking(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -101,14 +142,21 @@ export function disableTracking(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("UPDATE usernames_optout SET tracking = 0 WHERE id = ?").run(id);
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            tracking: false,
+        },
+    });
 
     if (optCache.has(id)) {
         optCache.delete(id);
     }
 }
 
-export function enableTracking(member: GuildMember | string) {
+export async function enableTracking(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -116,7 +164,14 @@ export function enableTracking(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("UPDATE usernames_optout SET tracking = 1 WHERE id = ?").run(id);
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            tracking: true,
+        },
+    });
 
     if (optCache.has(id)) {
         optCache.delete(id);
@@ -128,7 +183,7 @@ export function enableTracking(member: GuildMember | string) {
  * @param {GuildMember} member
  * @param {String} username
  */
-export function addNewUsername(member: GuildMember | string, username: string) {
+export async function addNewUsername(member: GuildMember | string, username: string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -136,23 +191,16 @@ export function addNewUsername(member: GuildMember | string, username: string) {
         id = member;
     }
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(
-        id,
-        "username",
-        username,
-        Date.now()
-    );
-
-    if (usernameCache.has(id)) {
-        usernameCache.delete(id);
-    }
+    await prisma.username.create({
+        data: {
+            userId: id,
+            value: username,
+            date: Date.now(),
+        },
+    });
 }
 
-/**
- * @returns {Array<{ value: String, date: Number }>}
- * @param {GuildMember} member
- */
-export function fetchUsernameHistory(member: GuildMember | string): Array<{ value: string; date: number }> {
+export async function fetchUsernameHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -160,15 +208,17 @@ export function fetchUsernameHistory(member: GuildMember | string): Array<{ valu
         id = member;
     }
 
-    if (usernameCache.has(id)) {
-        return usernameCache.get(id);
-    }
-
-    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'username'").all(id);
+    const query = await prisma.username.findMany({
+        where: {
+            AND: [{ userId: id }, { type: "username" }],
+        },
+        select: {
+            value: true,
+            date: true,
+        },
+    });
 
     inPlaceSort(query).desc((u) => u.date);
-
-    usernameCache.set(id, query);
 
     return query;
 }
@@ -177,7 +227,7 @@ export function fetchUsernameHistory(member: GuildMember | string): Array<{ valu
  *
  * @param {GuildMember} member
  */
-export function clearUsernameHistory(member: GuildMember | string) {
+export async function clearUsernameHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -185,11 +235,11 @@ export function clearUsernameHistory(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'username'").run(id);
-
-    if (usernameCache.has(id)) {
-        usernameCache.delete(id);
-    }
+    await prisma.username.deleteMany({
+        where: {
+            AND: [{ userId: id }, { type: "username" }],
+        },
+    });
 }
 
 /**
@@ -197,7 +247,7 @@ export function clearUsernameHistory(member: GuildMember | string) {
  * @param {GuildMember} member
  * @param {String} url
  */
-export function addNewAvatar(member: GuildMember | string, url: string) {
+export async function addNewAvatar(member: GuildMember | string, url: string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -205,18 +255,17 @@ export function addNewAvatar(member: GuildMember | string, url: string) {
         id = member;
     }
 
-    db.prepare("INSERT INTO usernames (id, type, value, date) VALUES (?, ?, ?, ?)").run(id, "avatar", url, Date.now());
-
-    if (avatarCache.has(id)) {
-        avatarCache.delete(id);
-    }
+    await prisma.username.create({
+        data: {
+            userId: id,
+            type: "avatar",
+            value: url,
+            date: Date.now(),
+        },
+    });
 }
 
-/**
- * @returns {Array<{ value: String, date: Number }>}
- * @param {GuildMember} member
- */
-export function fetchAvatarHistory(member: GuildMember | string): Array<{ value: string; date: number }> {
+export async function fetchAvatarHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -224,15 +273,17 @@ export function fetchAvatarHistory(member: GuildMember | string): Array<{ value:
         id = member;
     }
 
-    if (avatarCache.has(id)) {
-        return avatarCache.get(id);
-    }
-
-    const query = db.prepare("SELECT value, date FROM usernames WHERE id = ? AND type = 'avatar'").all(id);
+    const query = await prisma.username.findMany({
+        where: {
+            AND: [{ userId: id }, { type: "avatar" }],
+        },
+        select: {
+            value: true,
+            date: true,
+        },
+    });
 
     inPlaceSort(query).desc((u) => u.date);
-
-    avatarCache.set(id, query);
 
     return query;
 }
@@ -241,7 +292,7 @@ export function fetchAvatarHistory(member: GuildMember | string): Array<{ value:
  *
  * @param {GuildMember} member
  */
-export function clearAvatarHistory(member: GuildMember | string) {
+export async function clearAvatarHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -249,11 +300,11 @@ export function clearAvatarHistory(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("DELETE FROM usernames WHERE id = ? AND type = 'avatar'").run(id);
-
-    if (avatarCache.has(id)) {
-        avatarCache.delete(id);
-    }
+    await prisma.username.deleteMany({
+        where: {
+            AND: [{ userId: id }, { type: "avatar" }],
+        },
+    });
 }
 
 /**

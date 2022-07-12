@@ -28,8 +28,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 90);
 
-    if (isTracking(message.author.id)) {
-        disableTracking(message.author.id);
+    if (await isTracking(message.author.id)) {
+        await disableTracking(message.author.id);
         return message.channel.send({
             embeds: [
                 new CustomEmbed(message.member, false, "✅ username and avatar tracking has been disabled").setFooter(
@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ],
         });
     } else {
-        enableTracking(message.author.id);
+        await enableTracking(message.author.id);
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ username and avatar tracking has been enabled")],
         });

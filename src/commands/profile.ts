@@ -19,6 +19,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil } from "../utils/functions/date.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { updateLastKnowntag } from "../utils/users/utils.js";
 
 const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO);
 
@@ -40,6 +41,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, true);
+
+    await updateLastKnowntag(message.member, message.member.user.tag);
 
     //ECONOMY
     const balance = (await getBalance(message.member)).toLocaleString();

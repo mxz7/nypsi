@@ -17,6 +17,7 @@ import { MStoTime } from "../functions/date";
 import ms = require("ms");
 import redis from "../database/redis";
 import prisma from "../database/database";
+import { createProfile, hasProfile } from "../users/utils";
 
 declare function require(name: string);
 
@@ -950,6 +951,14 @@ export async function createUser(member: GuildMember | string) {
     }
 
     redis.del(`cache:economy:exists:${id}`);
+
+    if (!(await hasProfile(id))) {
+        if (member instanceof GuildMember) {
+            await createProfile(member.user);
+        } else {
+            await createProfile(id);
+        }
+    }
 
     await prisma.economy.create({
         data: {
@@ -2254,10 +2263,6 @@ export function removeMember(member: string, mode: RemoveMemberMode) {
     }
 
     guildUserCache.clear();
-}
-
-export function updateLastKnownTag(id: string, tag: string) {
-    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id);
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {

@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         member = message.member;
     } else {
         if (args[0].toLowerCase() == "-clear") {
-            clearUsernameHistory(message.member);
+            await clearUsernameHistory(message.member);
             return message.channel.send({
                 embeds: [new CustomEmbed(message.member, false, "✅ your username history has been cleared")],
             });
@@ -55,9 +55,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag);
 
-    const isUserTracking = isTracking(member);
+    const isUserTracking = await isTracking(member);
 
-    const history = fetchUsernameHistory(member);
+    const history = await fetchUsernameHistory(member);
 
     if (history.length == 0) {
         return message.channel.send({

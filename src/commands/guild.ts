@@ -21,7 +21,6 @@ import {
     setGuildMOTD,
     topGuilds,
     updateBalance,
-    updateLastKnownTag,
     userExists,
 } from "../utils/economy/utils";
 import { daysAgo, formatDate } from "../utils/functions/date";
@@ -163,17 +162,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const guild = await getGuildByUser(message.member);
     const prefix = getPrefix(message.guild);
-
-    if (guild) {
-        for (const m of guild.members) {
-            if (m.userId == message.author.id) {
-                if (m.last_known_tag != message.author.tag) {
-                    updateLastKnownTag(message.author.id, message.author.tag);
-                }
-                break;
-            }
-        }
-    }
 
     if (args.length == 0) {
         return showGuild(guild);

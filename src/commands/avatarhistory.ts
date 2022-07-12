@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         member = message.member;
     } else {
         if (args[0].toLowerCase() == "-clear") {
-            clearAvatarHistory(message.member);
+            await clearAvatarHistory(message.member);
             return message.channel.send({
                 embeds: [new CustomEmbed(message.member, false, "✅ your avatar history has been cleared")],
             });
@@ -52,13 +52,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag);
 
-    let history = fetchAvatarHistory(member);
+    let history = await fetchAvatarHistory(member);
 
     if (history.length == 0) {
         const url = await uploadImageToImgur(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }));
         if (url) {
-            addNewAvatar(member, url);
-            history = fetchAvatarHistory(member);
+            await addNewAvatar(member, url);
+            history = await fetchAvatarHistory(member);
         } else {
             return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
         }
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter(`${formatDate(history[index].date)} | ${index + 1}/${history.length}`);
     }
 
-    if (!isTracking(member)) {
+    if (!(await isTracking(member))) {
         embed.setDescription("`[tracking disabled]`");
     }
 
@@ -121,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const newEmbed = new CustomEmbed(message.member, false);
 
-        if (!isTracking(member)) {
+        if (!(await isTracking(member))) {
             newEmbed.setDescription("`[tracking disabled]`");
         }
 
