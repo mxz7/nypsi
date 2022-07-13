@@ -124,7 +124,7 @@ model GuildCounter {
   enabled    Boolean @default(false)
   format     String  @default("members: %count% (%peak%)")
   filterBots Boolean @default(false)
-  channel    String
+  channel    String  @default("")
 
   guild   Guild  @relation(fields: [guildId], references: [id])
   guildId String @id @unique
