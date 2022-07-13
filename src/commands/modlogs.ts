@@ -36,10 +36,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const help = async () => {
-        const current = getModLogsHook(message.guild);
+        const current = await getModLogsHook(message.guild);
 
         const embed = new CustomEmbed(message.member, false);
 
@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         return help();
     } else if (args[0].toLowerCase() == "disable") {
-        setModLogs(message.guild, "");
+        await setModLogs(message.guild, "");
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ modlogs have been disabled")] });
     } else {
@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (fail) return;
 
-        setModLogs(message.guild, hook.url);
+        await setModLogs(message.guild, hook.url);
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, `✅ modlogs set to ${channel.toString()}`)],

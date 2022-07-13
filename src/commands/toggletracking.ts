@@ -24,8 +24,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member, message.author.tag);
-
     await addCooldown(cmd.name, message.member, 90);
 
     if (await isTracking(message.author.id)) {

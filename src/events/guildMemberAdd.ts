@@ -19,18 +19,18 @@ export default async function guildMemberAdd(member: GuildMember) {
         }, 120000);
     }
 
-    if (!profileExists(member.guild)) return;
+    if (!(await profileExists(member.guild))) return;
 
-    if (getMuteRole(member.guild) == "timeout") return;
+    if ((await getMuteRole(member.guild)) == "timeout") return;
 
-    if (isMuted(member.guild, member)) {
-        let muteRole = await member.guild.roles.fetch(getMuteRole(member.guild));
+    if (await isMuted(member.guild, member)) {
+        let muteRole = await member.guild.roles.fetch(await getMuteRole(member.guild));
 
-        if (!getMuteRole(member.guild)) {
+        if (!(await getMuteRole(member.guild))) {
             muteRole = await member.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
         }
 
-        if (!muteRole) return deleteMute(member.guild, member);
+        if (!muteRole) return await deleteMute(member.guild, member);
 
         member.roles.add(muteRole);
     }

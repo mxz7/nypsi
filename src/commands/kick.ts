@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const prefix = await getPrefix(message.guild);
 
@@ -187,7 +187,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
+    await newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
 
     if (args.join(" ").includes("-s")) return;
     for (const member of members1) {

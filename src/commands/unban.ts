@@ -43,7 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const prefix = await getPrefix(message.guild);
 
@@ -72,9 +72,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (arg.length == 18) {
             await message.guild.members
                 .unban(arg, message.member.user.tag)
-                .then((user) => {
+                .then(async (user) => {
                     members.push(user);
-                    deleteBan(message.guild, arg);
+                    await deleteBan(message.guild, arg);
                 })
                 .catch(() => {
                     failed.push(arg);
@@ -89,9 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     const id = findingMember.id;
                     await message.guild.members
                         .unban(id, message.member.user.tag)
-                        .then((user) => {
+                        .then(async (user) => {
                             members.push(user);
-                            deleteBan(message.guild, user.id);
+                            await deleteBan(message.guild, user.id);
                         })
                         .catch(() => {
                             failed.push(arg);
@@ -136,7 +136,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         members1.push(m.id);
     }
 
-    newCase(message.guild, PunishmentType.UNBAN, members1, message.member.user.tag, message.content);
+    await newCase(message.guild, PunishmentType.UNBAN, members1, message.member.user.tag, message.content);
 }
 
 cmd.setRun(run);

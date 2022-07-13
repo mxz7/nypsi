@@ -22,7 +22,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!profileExists(message.guild)) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
+    if (!(await profileExists(message.guild)))
+        return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -30,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    const cases = getAllCases(message.guild);
+    const cases = await getAllCases(message.guild);
 
     if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 

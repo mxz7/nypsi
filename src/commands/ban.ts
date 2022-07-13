@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     let idOnly = false;
     let idUser: string;
@@ -265,9 +265,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (idOnly) {
-        newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1]);
+        await newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1]);
         if (temporary) {
-            newBan(message.guild, id, unbanDate);
+            await newBan(message.guild, id, unbanDate);
         }
     } else {
         const members1 = Array.from(members.keys());
@@ -280,10 +280,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1]);
+        await newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1]);
 
         if (temporary) {
-            newBan(message.guild, members1, unbanDate);
+            await newBan(message.guild, members1, unbanDate);
         }
 
         if (args.join(" ").includes("-s")) return;

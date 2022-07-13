@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const reason = args.join(" ");
 
-    const case0 = getCase(message.guild, parseInt(caseID));
+    const case0 = await getCase(message.guild, parseInt(caseID));
 
     if (!case0) {
         return message.channel.send({
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    setReason(message.guild, parseInt(caseID), reason);
+    await setReason(message.guild, parseInt(caseID), reason);
 
     const embed = new CustomEmbed(message.member).setDescription("✅ case updated");
 

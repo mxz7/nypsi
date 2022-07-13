@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -117,14 +117,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let mode = "role";
     const failed = [];
 
-    let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild));
+    let muteRole: Role = await message.guild.roles.fetch(await getMuteRole(message.guild));
 
-    if (!getMuteRole(message.guild)) {
+    if (!(await getMuteRole(message.guild))) {
         muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        if (getMuteRole(message.guild) == "timeout") mode = "timeout";
+        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
     }
 
     if (!muteRole && mode == "role") {
@@ -345,20 +345,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
+    await newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
 
     for (const m of members1) {
-        if (isMuted(message.guild, members.get(m))) {
-            deleteMute(message.guild, members.get(m));
+        if (await isMuted(message.guild, members.get(m))) {
+            await deleteMute(message.guild, members.get(m));
         }
     }
 
     if (timedMute) {
-        newMute(message.guild, members1, unmuteDate);
+        await newMute(message.guild, members1, unmuteDate);
     }
 
     if (!timedMute) {
-        newMute(message.guild, members1, 9999999999999);
+        await newMute(message.guild, members1, 9999999999999);
     }
 
     if (args.join(" ").includes("-s")) return;

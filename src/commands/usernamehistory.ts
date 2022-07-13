@@ -4,13 +4,7 @@ import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import {
-    usernameProfileExists,
-    createUsernameProfile,
-    fetchUsernameHistory,
-    clearUsernameHistory,
-    isTracking,
-} from "../utils/users/utils";
+import { fetchUsernameHistory, clearUsernameHistory, isTracking } from "../utils/users/utils";
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
     "un",
@@ -52,8 +46,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 5);
-
-    if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag);
 
     const isUserTracking = await isTracking(member);
 

@@ -54,17 +54,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const case0 = getCase(message.guild, parseInt(args[0]));
+    const case0 = await getCase(message.guild, parseInt(args[0]));
 
     if (!case0) {
         return send({
             embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
         });
     }
-
-    case0.deleted = case0.deleted === 0 ? false : true;
 
     const target = await message.guild.members.fetch(case0.user).catch(() => {});
 
@@ -75,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member, false)
-        .setHeader("case " + case0.case_id)
+        .setHeader("case " + case0.caseId)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
         .addField("date/time", `<t:${Math.floor(case0.time / 1000)}>`, true)
@@ -121,12 +119,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
 
     if (reaction == "❌") {
-        deleteCase(message.guild, case0.case_id.toString());
+        await deleteCase(message.guild, case0.caseId.toString());
 
         const newEmbed = new CustomEmbed(
             message.member,
             false,
-            "✅ case `" + case0.case_id + "` successfully deleted by " + message.member.toString()
+            "✅ case `" + case0.caseId + "` successfully deleted by " + message.member.toString()
         );
 
         await edit({ embeds: [newEmbed], components: [] }, msg);

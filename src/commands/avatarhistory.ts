@@ -50,8 +50,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    if (!usernameProfileExists(member)) createUsernameProfile(member, member.user.tag);
-
     let history = await fetchAvatarHistory(member);
 
     if (history.length == 0) {

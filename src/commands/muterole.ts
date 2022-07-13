@@ -20,10 +20,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const help = async () => {
-        const current = getMuteRole(message.guild);
+        const current = await getMuteRole(message.guild);
 
         let role;
 
@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             role = await message.guild.roles.fetch(current);
 
             if (!role) {
-                setMuteRole(message.guild, "");
+                await setMuteRole(message.guild, "");
                 role = undefined;
             }
         }
@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        setMuteRole(message.guild, role);
+        await setMuteRole(message.guild, role);
 
         return message.channel.send({
             embeds: [
@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ],
         });
     } else if (args[0].toLowerCase() == "reset") {
-        setMuteRole(message.guild, "default");
+        await setMuteRole(message.guild, "default");
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ muterole has been reset")],
@@ -103,9 +103,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "update") {
         let channelError = false;
         try {
-            let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild));
+            let muteRole = await message.guild.roles.fetch(await getMuteRole(message.guild));
 
-            if (getMuteRole(message.guild) == "") {
+            if ((await getMuteRole(message.guild)) == "") {
                 muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
             }
 
@@ -158,7 +158,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [new CustomEmbed(message.member, false, "✅ permissions were updated")],
         });
     } else if (args[0].toLowerCase() == "timeout") {
-        setMuteRole(message.guild, "timeout");
+        await setMuteRole(message.guild, "timeout");
 
         const embed = new CustomEmbed(
             message.member,

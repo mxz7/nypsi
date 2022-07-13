@@ -16,9 +16,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const muted = getMutedUsers(message.guild);
+    const muted = await getMutedUsers(message.guild);
 
     if (!muted || muted.length == 0) {
         return message.channel.send({
@@ -37,12 +37,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const pages: Map<number, string[]> = new Map();
 
     for (const m of muted) {
-        const user: GuildMember | void = await message.guild.members.fetch(m.user).catch(() => {});
+        const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
 
-        const msg = `\`${user ? user.user.tag : m.user}\` ${
-            m.unmute_time >= 9999999999999
-                ? "is permanently muted"
-                : `will be unmuted <t:${Math.floor(m.unmute_time / 1000)}:R>`
+        const msg = `\`${user ? user.user.tag : m.userId}\` ${
+            m.expire >= 9999999999999 ? "is permanently muted" : `will be unmuted <t:${Math.floor(m.expire / 1000)}:R>`
         }`;
 
         if (pages.size == 0) {
