@@ -1,6 +1,5 @@
 import { Collection, GuildMember, Message, Permissions, ThreadMember, ThreadMemberManager } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
-import { getDatabase } from "../utils/database/database";
 import { userExists } from "../utils/economy/utils";
 import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
 import { logger } from "../utils/logger";
@@ -14,10 +13,11 @@ import { encrypt } from "../utils/functions/string";
 import { addModLog } from "../utils/moderation/utils";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils";
+import Database = require("better-sqlite3");
 
 // declare function require(name: string)
 
-const db = getDatabase();
+const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 );
