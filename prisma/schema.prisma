@@ -110,7 +110,8 @@ model Guild {
 }
 
 model GuildChristmas {
-  format  String @default("`%days%` days until christmas")
+  enabled Boolean @default(false)
+  format  String  @default("`%days%` days until christmas")
   channel String
 
   guild   Guild  @relation(fields: [guildId], references: [id])
@@ -118,6 +119,7 @@ model GuildChristmas {
 }
 
 model GuildCounter {
+  enabled    Boolean @default(false)
   format     String  @default("members: %count% (%peak%)")
   filterBots Boolean @default(false)
   channel    String
