@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target;
 
     if (args.length == 0 || !(message instanceof Message)) {
-        const image = getWholesomeImage();
+        const image = await getWholesomeImage();
 
         embed.setHeader(`<3 | #${image.id}`);
         embed.setImage(image.image);
@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("dumbass")] });
         }
 
-        const wholesome = getWholesomeImage(parseInt(args[1]));
+        const wholesome = await getWholesomeImage(parseInt(args[1]));
 
         if (!wholesome) {
             return message.react("❌");
@@ -162,12 +162,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (message.author.id == "672793821850894347") {
             embed.setDescription(
-                `**suggested by** ${wholesome.submitter} (${wholesome.submitter_id})\n**accepted by** \`${wholesome.accepter}\`\n**url** ${wholesome.image}`
+                `**suggested by** ${wholesome.submitter} (${wholesome.submitterId})\n**accepted by** \`${wholesome.accepterId}\`\n**url** ${wholesome.image}`
             );
         }
 
         embed.setImage(wholesome.image);
-        embed.setFooter(`submitted on ${formatDate(wholesome.upload)}`);
+        embed.setFooter(`submitted on ${formatDate(wholesome.uploadDate)}`);
     } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
         if (message.guild.id != "747056029795221513") return;
 
@@ -253,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!allow) return;
 
-        const queue = getAllSuggestions();
+        const queue = await getAllSuggestions();
 
         const pages = new Map();
 
@@ -278,7 +278,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.addField(
                 image.id.toString(),
-                `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image}`
+                `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image}`
             );
         }
 
@@ -373,7 +373,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("couldnt find that member ):")] });
         }
 
-        const image = getWholesomeImage();
+        const image = await getWholesomeImage();
 
         embed.setHeader(`<3 | #${image.id}`);
         embed.setImage(image.image);
