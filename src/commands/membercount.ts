@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js";
-import { getPeaks, getPrefix, getGuildCounter, setGuildCounter } from "../utils/guilds/utils";
+import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { logger } from "../utils/logger";
@@ -26,7 +26,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const profile = await getGuildCounter(message.guild);
+    let profile = await getGuildCounter(message.guild);
+    if (!profile) {
+        await createGuildCounter(message.guild);
+        profile = await getGuildCounter(message.guild);
+    }
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {

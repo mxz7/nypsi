@@ -286,6 +286,14 @@ export async function getGuildCounter(guild: Guild) {
     return query;
 }
 
+export async function createGuildCounter(guild: Guild) {
+    await prisma.guildCounter.create({
+        data: {
+            guildId: guild.id,
+        },
+    });
+}
+
 /**
  *
  * @param {Guild} guild
