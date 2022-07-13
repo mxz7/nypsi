@@ -16,7 +16,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member).setHeader("padlock", message.author.avatarURL());
 
     const padlockPrice = getPadlockPrice();
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 1) {
         return message.channel.send({

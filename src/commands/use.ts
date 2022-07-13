@@ -65,13 +65,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
                     false,
-                    `${getPrefix(message.guild)}use <item>\n\nuse items to open crates or to simply use the item's function`
+                    `${prefix}use <item>\n\nuse items to open crates or to simply use the item's function`
                 ).setHeader("use", message.author.avatarURL()),
             ],
         });
@@ -110,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "car") {
         return send({
-            embeds: [new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`)],
+            embeds: [new ErrorEmbed(`cars are used for street races (${prefix}sr)`)],
         });
     }
 
@@ -128,18 +130,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.id.includes("gun")) {
         return send({
-            embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`)],
+            embeds: [new ErrorEmbed(`this item is used with ${prefix}hunt`)],
         });
     } else if (selected.id.includes("fishing")) {
         return send({
-            embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`)],
+            embeds: [new ErrorEmbed(`this item is used with ${prefix}fish`)],
         });
     } else if (selected.id.includes("coin")) {
         return send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] });
     } else if (selected.id.includes("pickaxe")) {
-        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)] });
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}mine`)] });
     } else if (selected.id.includes("furnace")) {
-        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] });
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}smelt`)] });
     }
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
@@ -213,7 +215,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use lockpick <member>`)],
                     });
                 }
 
@@ -314,7 +316,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "radio":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use radio <member>`)],
                     });
                 }
 
@@ -360,7 +362,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "chastity_cage":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use chastity <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use chastity <member>`)],
                     });
                 }
 
@@ -408,7 +410,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "handcuffs":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use handcuffs <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use handcuffs <member>`)],
                     });
                 }
 

@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)

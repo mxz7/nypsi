@@ -25,12 +25,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await createUser(message.member);
     }
 
+    const prefix = await getPrefix(message.guild);
+
     const notValidForYou = () => {
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            `${getPrefix(message.guild)}weekly is for SILVER tier and higher`
-        ).setFooter(`${getPrefix(message.guild)}patreon`);
+        const embed = new CustomEmbed(message.member, false, `${prefix}weekly is for SILVER tier and higher`).setFooter(
+            `${prefix}patreon`
+        );
 
         return message.channel.send({ embeds: [embed] });
     };

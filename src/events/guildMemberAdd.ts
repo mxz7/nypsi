@@ -8,13 +8,13 @@ const queue = new Set();
  * @param {GuildMember} member
  */
 export default async function guildMemberAdd(member: GuildMember) {
-    if (!hasGuild(member.guild)) createGuild(member.guild);
+    if (!(await hasGuild(member.guild))) await createGuild(member.guild);
 
     if (!queue.has(member.guild.id)) {
         queue.add(member.guild.id);
 
-        setTimeout(() => {
-            runCheck(member.guild);
+        setTimeout(async () => {
+            await runCheck(member.guild);
             queue.delete(member.guild.id);
         }, 120000);
     }

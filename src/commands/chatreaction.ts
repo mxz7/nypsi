@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!hasReactionProfile(message.guild)) createReactionProfile(message.guild);
     if (!hasReactionStatsProfile(message.guild, message.member)) createReactionStatsProfile(message.guild, message.member);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const helpCmd = () => {
         const embed = new CustomEmbed(message.member, true).setHeader("chat reactions");

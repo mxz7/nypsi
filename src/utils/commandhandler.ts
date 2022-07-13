@@ -167,7 +167,7 @@ async function helpCmd(message: Message, args: Array<string>) {
 
     const helpCategories = new Map();
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     for (const cmd of commands.keys()) {
         const category = getCmdCategory(cmd);
@@ -280,9 +280,7 @@ async function helpCmd(message: Message, args: Array<string>) {
             embed.setDescription(
                 `this is a custom command${
                     member ? ` owned by ${member.toString()}` : ""
-                }\n\nto disable custom commands in your server you can do:\n${getPrefix(
-                    message.guild
-                )}disablecmd + customcommand`
+                }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`
             );
         } else {
             return message.channel.send({ embeds: [new ErrorEmbed("unknown command")] });
@@ -384,7 +382,7 @@ export async function runCommand(
     message: Message | (NypsiCommandInteraction & CommandInteraction),
     args: Array<string>
 ) {
-    if (!hasGuild(message.guild)) createGuild(message.guild);
+    if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
     if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
 
@@ -447,13 +445,13 @@ export async function runCommand(
                 cooldown.delete(message.author.id);
             }, 1500);
 
-            if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
+            if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
                 return message.channel.send({
                     embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
                 });
             }
 
-            const filter = getChatFilter(message.guild);
+            const filter = await getChatFilter(message.guild);
 
             let contentToCheck: string | string[] = content.toLowerCase().normalize("NFD");
 
@@ -609,7 +607,7 @@ export async function runCommand(
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member);
 
-        if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
+        if ((await getDisabledCommands(message.guild)).indexOf(aliases.get(cmd)) != -1) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {
@@ -655,7 +653,7 @@ export async function runCommand(
 
         updatePopularCommands(commands.get(cmd).name, message.member);
 
-        if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
+        if ((await getDisabledCommands(message.guild)).indexOf(cmd) != -1) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {

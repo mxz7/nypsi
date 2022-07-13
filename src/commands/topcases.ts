@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, true).setHeader("top cases");
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const topStaff = new Map();

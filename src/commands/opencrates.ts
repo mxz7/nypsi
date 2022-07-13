@@ -35,19 +35,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    // if (!await isPremium(message.member)) {
-    //     const embed = new CustomEmbed(
-    //         message.member,
-    //         false,
-    //         "to open multiple crates a time you need the BRONZE tier or higher"
-    //     ).setFooter(`${getPrefix(message.guild)}patreon`)
-
-    //     return send({ embeds: [embed] })
-    // }
-
     if (!(await getDMsEnabled(message.member))) {
         return send({
-            embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
+            embeds: [new ErrorEmbed(`you must have dms enabled. ${await getPrefix(message.guild)}dms`)],
         });
     }
 

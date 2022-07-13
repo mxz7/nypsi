@@ -114,7 +114,7 @@ async function showGuild(message, guild) {
         .addField(
             "member info",
             `**members** ${guild.memberCount.toLocaleString()}
-    **peak** ${getPeaks(guild).toLocaleString()}`,
+    **peak** ${(await getPeaks(guild)).toLocaleString()}`,
             true
         );
 

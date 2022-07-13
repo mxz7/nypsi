@@ -113,12 +113,6 @@ export function checkGuild(guildID: string) {
 }
 
 function runChecks() {
-    setInterval(() => {
-        client.guilds.cache.forEach((guild) => {
-            if (!hasGuild(guild)) return createGuild(guild);
-        });
-    }, 3600000);
-
     checkStats();
 
     if (client.user.id != "678711738845102087") return;

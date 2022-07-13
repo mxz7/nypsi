@@ -55,11 +55,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         qualified = true;
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (!qualified) {
         const embed = new ErrorEmbed(
-            `this server does not qualify to track mentions (${getPrefix(
-                message.guild
-            )}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`
+            `this server does not qualify to track mentions (${prefix}pings)\n\njoin the support server for help (${prefix}support)`
         );
 
         return send({ embeds: [embed] });

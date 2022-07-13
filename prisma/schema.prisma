@@ -129,6 +129,7 @@ model GuildCounter {
 }
 
 model GuildCountdown {
+  id          String
   date        Int
   format      String
   finalFormat String
@@ -137,7 +138,7 @@ model GuildCountdown {
   guild   Guild  @relation(fields: [guildId], references: [id])
   guildId String
 
-  @@id([guildId, date])
+  @@id([guildId, id])
 }
 
 model Moderation {

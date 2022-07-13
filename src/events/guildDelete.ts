@@ -18,8 +18,8 @@ export default async function guildDelete(client: Client, guild: Guild) {
         message: `removed from ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
     });
 
-    setPrefix(guild, "$");
-    updateDisabledCommands(guild, []);
+    await setPrefix(guild, "$");
+    await updateDisabledCommands(guild, []);
     if (profileExists(guild)) {
         setMuteRole(guild, "");
     }

@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             (await getPrestige(target)) < 20
         ) {
             return send({
-                content: `you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`,
+                content: `you are eligible to prestige, use ${await getPrefix(message.guild)}prestige for more info`,
                 embeds: [embed],
             });
         }

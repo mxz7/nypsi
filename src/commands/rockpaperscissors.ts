@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await createUser(message.member);
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || args.length == 1) {
         const embed = new CustomEmbed(message.member)

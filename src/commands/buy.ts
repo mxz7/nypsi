@@ -36,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 new CustomEmbed(
                     message.member,
                     false,
-                    `buy items from ${getPrefix(message.guild)}shop by using the item id or item name without spaces`
+                    `buy items from ${await getPrefix(message.guild)}shop by using the item id or item name without spaces`
                 ),
             ],
         });

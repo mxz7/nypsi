@@ -22,16 +22,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
-        const countdowns = getCountdowns(message.guild);
+        const countdowns = await getCountdowns(message.guild);
 
         const embed = new CustomEmbed(message.member, false).setHeader("countdown");
 
-        if (Object.keys(countdowns).length == 0) {
-            embed.setDescription(`use ${getPrefix(message.guild)}**countdown create** to create a countdown`);
+        if (countdowns.length == 0) {
+            embed.setDescription(`use ${prefix}**countdown create** to create a countdown`);
         } else {
-            for (const c in countdowns) {
-                const countdown = countdowns[c];
+            for (const countdown of countdowns) {
                 const date = formatDate(new Date(countdown.date).getTime());
 
                 embed.addField(
@@ -41,11 +42,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        embed.setFooter(`use ${getPrefix(message.guild)}countdown help for more commands`);
+        embed.setFooter(`use ${prefix}countdown help for more commands`);
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "create" || args[0].toLowerCase() == "new") {
-        const countdowns = getCountdowns(message.guild);
+        const countdowns = await getCountdowns(message.guild);
 
         let max = 1;
 
@@ -53,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             max += await getTier(message.author.id);
         }
 
-        if (Object.keys(countdowns).length >= max) {
+        if (countdowns.length >= max) {
             let error = `you have reached the maximum amount of countdowns for this server (${max})`;
 
             if (max == 1) {
@@ -201,25 +202,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (fail) return;
 
-        addCountdown(message.guild, date, format, finalFormat, channel.id);
+        await addCountdown(message.guild, date, format, finalFormat, channel.id);
 
         embed.setDescription("✅ countdown added");
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-" || args[0].toLowerCase() == "delete") {
-        if (args.length == 1) {
+        if (args.length == 1 || isNaN(parseInt(args[1]))) {
             return message.channel.send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}countdown delete <countdown id>`)],
+                embeds: [new ErrorEmbed(`${prefix}countdown delete <countdown id>`)],
             });
         }
 
-        const countdowns = getCountdowns(message.guild);
+        const countdowns = await getCountdowns(message.guild);
 
-        if (Object.keys(countdowns).indexOf(args[1].toString()) == -1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid countdown use the countdown id")] });
+        if (!countdowns[parseInt(args[1]) - 1]) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid countdown - use the countdown id")] });
         }
 
-        deleteCountdown(message.guild, args[1].toString());
+        await deleteCountdown(message.guild, args[1].toString());
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ countdown deleted")] });
     } else {
@@ -227,11 +228,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setHeader("countdown");
         embed.setDescription(
-            `${getPrefix(message.guild)}**countdown create** *create a countdown*\n${getPrefix(
-                message.guild
-            )}**countdown del <id>** *delete a countdown*\n${getPrefix(
-                message.guild
-            )}**countdown** *list all active countdowns*`
+            `${prefix}**countdown create** *create a countdown*\n${prefix}**countdown del <id>** *delete a countdown*\n${prefix}**countdown** *list all active countdowns*`
         );
 
         return message.channel.send({ embeds: [embed] });

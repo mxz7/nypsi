@@ -51,6 +51,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     const embed = new CustomEmbed(message.member);
 
     let target;
@@ -85,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (args.length == 1 && !message.attachments.first()) {
             return send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}wholesome suggest <imgur url>`)],
+                embeds: [new ErrorEmbed(`${prefix}wholesome suggest <imgur url>`)],
             });
         }
 
@@ -136,9 +138,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({
                 embeds: [
                     new ErrorEmbed(
-                        `error: maybe that image already exists? if this persists join the ${getPrefix(
-                            message.guild
-                        )}support server`
+                        `error: maybe that image already exists? if this persists join the ${prefix}support server`
                     ),
                 ],
             });
@@ -383,7 +383,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const chance = Math.floor(Math.random() * 25);
 
-    if (chance == 7) embed.setFooter(`submit your own image with ${getPrefix(message.guild)}wholesome suggest (:`);
+    if (chance == 7) embed.setFooter(`submit your own image with ${prefix}wholesome suggest (:`);
 
     if (target) {
         if (message instanceof Message) {

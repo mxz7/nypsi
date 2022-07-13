@@ -71,12 +71,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
+    const prefix = await getPrefix(message.guild);
+
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setHeader("street race");
 
         embed.setDescription(
-            `${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
-                `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
+            `${prefix}**sr start <entry fee>** *start a street race*\n` +
+                `${prefix}**sr join** *join a street race in the current channel*`
         );
 
         return send({ embeds: [embed] });
@@ -93,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (args.length == 1) {
             return send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
+                embeds: [new ErrorEmbed(`${prefix}sr start <entry fee> (speed limit)`)],
             });
         }
 
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (bet <= 0) {
             return send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
+                embeds: [new ErrorEmbed(`${prefix}sr start <entry fee> (speed limit)`)],
             });
         }
 
@@ -165,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.author.avatarURL()
         );
 
-        embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`);
+        embed.setFooter(`use ${prefix}sr join to join`);
 
         embed.setDescription(
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
@@ -305,9 +307,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({
                 embeds: [
                     new ErrorEmbed(
-                        `your ${car.name} is too fast for this race, select another with ${getPrefix(
-                            message.guild
-                        )}**sr join <car>**`
+                        `your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`
                     ),
                 ],
             });
@@ -319,11 +319,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (current.includes(car.id)) {
                 return send({
                     embeds: [
-                        new ErrorEmbed(
-                            `your ${car.name} is on cooldown, select another with ${getPrefix(
-                                message.guild
-                            )}**sr join <car>**`
-                        ),
+                        new ErrorEmbed(`your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`),
                     ],
                 });
             } else {

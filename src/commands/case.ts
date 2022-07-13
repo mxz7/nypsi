@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {

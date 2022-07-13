@@ -31,10 +31,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL());
 
-        embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`);
+        embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
 
         return message.channel.send({ embeds: [embed] });
@@ -77,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } catch {
         const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL());
 
-        embed.addField("usage", `${getPrefix(message.guild)}give <member> <item> (amount)`);
+        embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
 
         return message.channel.send({ embeds: [embed] });

@@ -15,7 +15,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`${getPrefix(message.guild)}worth <item> (amount)\n\ncalculates the worth of an item`)],
+            embeds: [
+                new ErrorEmbed(`${await getPrefix(message.guild)}worth <item> (amount)\n\ncalculates the worth of an item`),
+            ],
         });
     }
 

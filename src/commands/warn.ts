@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!profileExists(message.guild)) createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {

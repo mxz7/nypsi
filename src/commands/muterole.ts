@@ -18,6 +18,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (!profileExists(message.guild)) createProfile(message.guild);
 
     const help = async () => {
@@ -34,18 +36,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        let text = `${getPrefix(message.guild)}**muterole set <role>** *set the muterole for the server*\n${getPrefix(
-            message.guild
-        )}**muterole reset** *reset the mute role to default*\n${getPrefix(
-            message.guild
-        )}**muterole update** update mute permissions for every channel\n${getPrefix(
-            message.guild
-        )}**muterole timeout** use timeout mode instead of a role\n\n`;
+        let text = `${prefix}**muterole set <role>** *set the muterole for the server*\n${prefix}**muterole reset** *reset the mute role to default*\n${prefix}**muterole update** update mute permissions for every channel\n${prefix}**muterole timeout** use timeout mode instead of a role\n\n`;
 
         if (current == "timeout") {
-            text += `currently using **timeout mode**, to use a role instead, use the ${getPrefix(
-                message.guild
-            )}**muterole reset** command`;
+            text += `currently using **timeout mode**, to use a role instead, use the ${prefix}**muterole reset** command`;
         } else {
             text += `current mute role: ${role ? role.toString() : "default"}`;
         }
@@ -64,9 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({
                 embeds: [
                     new ErrorEmbed(
-                        `${getPrefix(
-                            message.guild
-                        )}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
+                        `${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
                     ),
                 ],
             });
@@ -98,9 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 new CustomEmbed(
                     message.member,
                     false,
-                    `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
-                        message.guild
-                    )}**muted**)`
+                    `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
                 ),
             ],
         });
@@ -173,9 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(
             message.member,
             false,
-            `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${getPrefix(
-                message.guild
-            )}**muted**)`
+            `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
         );
 
         return message.channel.send({

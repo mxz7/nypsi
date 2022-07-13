@@ -35,6 +35,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         const embed = new CustomEmbed(
             message.member,
@@ -45,13 +47,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader("create palette");
         embed.addField(
             "usage",
-            `${getPrefix(
-                message.guild
-            )}palette <name> <background color>\nuse _ (underscores) for spaces in name, you can use ${getPrefix(
-                message.guild
-            )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+            `${prefix}palette <name> <background color>\nuse _ (underscores) for spaces in name, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
         );
-        embed.addField("example", `${getPrefix(message.guild)}palette my_palette #ff0000`);
+        embed.addField("example", `${prefix}palette my_palette #ff0000`);
         return message.channel.send({ embeds: [embed] });
     }
 
@@ -104,9 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({
                 embeds: [
                     new ErrorEmbed(
-                        `invalid color, you can use ${getPrefix(
-                            message.guild
-                        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+                        `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
                     ),
                 ],
             });
@@ -116,9 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({
                 embeds: [
                     new ErrorEmbed(
-                        `invalid color, you can use ${getPrefix(
-                            message.guild
-                        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+                        `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
                     ),
                 ],
             });

@@ -15,7 +15,7 @@ const cmd = new Command("reason", "set a reason for a case/punishment", Categori
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length <= 1) {
         const embed = new CustomEmbed(message.member)

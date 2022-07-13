@@ -160,7 +160,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     const guild = await getGuildByUser(message.member);
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         return showGuild(guild);

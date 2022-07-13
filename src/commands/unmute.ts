@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!profileExists(message.guild)) createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
@@ -100,9 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
             embeds: [
                 new ErrorEmbed(
-                    `no mute role could be found, set one with ${getPrefix(
-                        message.guild
-                    )}muterole, or create a role called "muted"`
+                    `no mute role could be found, set one with ${prefix}muterole, or create a role called "muted"`
                 ),
             ],
         });

@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed.setDescription("you don't have a custom command");
         }
 
-        embed.setFooter(`use ${getPrefix(message.guild)}mycmd <content> to set the content of your custom command`);
+        embed.setFooter(`use ${await getPrefix(message.guild)}mycmd <content> to set the content of your custom command`);
 
         return message.channel.send({ embeds: [embed] });
     } else {

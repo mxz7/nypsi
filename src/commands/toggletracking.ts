@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({
             embeds: [
                 new CustomEmbed(message.member, false, "✅ username and avatar tracking has been disabled").setFooter(
-                    `use ${getPrefix(message.guild)}(un/avh) -clear to clear your history`
+                    `use ${await getPrefix(message.guild)}(un/avh) -clear to clear your history`
                 ),
             ],
         });

@@ -14,26 +14,6 @@ const enabledCache = new Map();
 const lastGame = new Map();
 
 setInterval(async () => {
-    const { checkGuild } = require("../../nypsi");
-
-    const query = db.prepare("SELECT id FROM chat_reaction").all();
-
-    for (const guild of query) {
-        const exists = await checkGuild(guild.id);
-
-        if (!exists) {
-            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id);
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id);
-
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from chat reaction data`,
-            });
-        }
-    }
-}, 24 * 60 * 60 * 1000);
-
-setInterval(async () => {
     let count = 0;
 
     const query = db

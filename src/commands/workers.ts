@@ -42,10 +42,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 5);
 
+    const prefix = await getPrefix(message.guild);
+
     const listAllWorkers = () => {
         const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")
             .setHeader("workers", message.author.avatarURL())
-            .setFooter(`${getPrefix(message.guild)}workers help`);
+            .setFooter(`${prefix}workers help`);
 
         for (const w of Array.from(workers.keys())) {
             const Worker = workers.get(w);
@@ -73,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
             .setHeader("your workers", message.author.avatarURL())
-            .setFooter(`${getPrefix(message.guild)}workers help`);
+            .setFooter(`${prefix}workers help`);
 
         for (const w of Object.keys(personalWorkers)) {
             const worker = Worker.fromJSON(personalWorkers[w]);
@@ -104,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers buy <id or name>`)],
                 });
             }
 
@@ -208,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers upgrade <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <id or name>`)],
                 });
             }
 
@@ -300,11 +302,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ) {
             if (!(await isPremium(message.author.id))) {
                 return message.channel.send({
-                    embeds: [
-                        new ErrorEmbed("you must have a premium membership for this").setFooter(
-                            `${getPrefix(message.guild)}patreon`
-                        ),
-                    ],
+                    embeds: [new ErrorEmbed("you must have a premium membership for this").setFooter(`${prefix}patreon`)],
                 });
             }
 
@@ -375,10 +373,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const embed = new CustomEmbed(message.member, false).setHeader("workers", message.author.avatarURL());
 
             embed.setDescription(
-                `${getPrefix(message.guild)}**workers list** *list all available workers*\n` +
-                    `${getPrefix(message.guild)}**workers buy** *buy a worker*\n` +
-                    `${getPrefix(message.guild)}**workers claim** *claim money from your workers*\n` +
-                    `${getPrefix(message.guild)}**workers upgrade** *upgrade a worker*`
+                `${prefix}**workers list** *list all available workers*\n` +
+                    `${prefix}**workers buy** *buy a worker*\n` +
+                    `${prefix}**workers claim** *claim money from your workers*\n` +
+                    `${prefix}**workers upgrade** *upgrade a worker*`
             );
 
             return message.channel.send({ embeds: [embed] });

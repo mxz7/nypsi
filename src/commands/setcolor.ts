@@ -29,15 +29,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false);
 
-        embed.setDescription(`**color** #${await getEmbedColor(message.author.id)}\n\nuse \`${getPrefix(
-            message.guild
-        )}setcolor <hex color code>\` to change this
-        you can use ${getPrefix(
-            message.guild
-        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`);
+        embed.setDescription(`**color** #${await getEmbedColor(
+            message.author.id
+        )}\n\nuse \`${prefix}setcolor <hex color code>\` to change this
+        you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`);
 
         return message.channel.send({ embeds: [embed] });
     }

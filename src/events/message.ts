@@ -48,8 +48,8 @@ export default async function messageCreate(message: Message) {
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
-    if (hasGuild(message.guild) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        const filter = getChatFilter(message.guild);
+    if ((await hasGuild(message.guild)) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        const filter = await getChatFilter(message.guild);
 
         let content: string | string[] = message.content.toLowerCase().normalize("NFD");
 
@@ -165,7 +165,7 @@ export default async function messageCreate(message: Message) {
         }
     }
 
-    let prefix = getPrefix(message.guild);
+    let prefix = await getPrefix(message.guild);
 
     if (message.client.user.id == "685193083570094101") prefix = "£";
 

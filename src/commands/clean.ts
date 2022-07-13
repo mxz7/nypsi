@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const collected = await message.channel.messages.fetch({ limit: 50 });
 

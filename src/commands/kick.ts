@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!profileExists(message.guild)) createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)

@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader("lottery", message.author.avatarURL());
         embed.setDescription(
             "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
-                `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(
+                `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
                     message.guild
                 )}**lotto buy**\nyou can have a maximum of **${max}** tickets`
         );
