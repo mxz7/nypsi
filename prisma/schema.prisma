@@ -50,7 +50,9 @@ model EconomyStats {
   gamble Boolean
 
   economy       Economy @relation(fields: [economyUserId], references: [userId])
-  economyUserId String  @id
+  economyUserId String
+
+  @@id([type, economyUserId])
 }
 
 model Premium {
