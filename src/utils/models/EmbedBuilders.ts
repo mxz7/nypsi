@@ -15,9 +15,8 @@ export class CustomEmbed extends MessageEmbed {
     constructor(member?: GuildMember, footer?: boolean, text?: string) {
         super();
 
-        checkPremium(member.user.id);
-
         if (member) {
+            checkPremium(member.user.id);
             const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
 
             if (color && color != "none") {

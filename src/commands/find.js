@@ -146,9 +146,9 @@ async function showUser(message, user) {
     const embed = new CustomEmbed(message.member, false)
         .setTitle(user.tag)
         .setDescription(
-            `\`${user.id}\`${(await isPremium(user.id)) ? ` (${await getPremiumProfile(user.id).getLevelString()}) ` : ""} ${
-                (await isEcoBanned(user.id)) ? "[banned]" : ""
-            }`
+            `\`${user.id}\`${
+                (await isPremium(user.id)) ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) ` : ""
+            } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`
         )
         .addField(
             "user",
