@@ -17,7 +17,7 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, createGuild, hasGuild, runChristmas, runCountdowns } from "./utils/guilds/utils";
+import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
 import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
