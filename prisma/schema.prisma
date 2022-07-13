@@ -112,7 +112,7 @@ model Guild {
 model GuildChristmas {
   enabled Boolean @default(false)
   format  String  @default("`%days%` days until christmas")
-  channel String
+  channel String  @default("")
 
   guild   Guild  @relation(fields: [guildId], references: [id])
   guildId String @id @unique
