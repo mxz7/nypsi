@@ -562,7 +562,6 @@ export async function runCommand(
             }
         }
     }
-
     logCommand(message, args);
     if (alias) {
         if (commands.get(aliases.get(cmd)).category == "money") {
@@ -618,7 +617,7 @@ export async function runCommand(
         await updateLastCommand(message.member);
     } else {
         if (commands.get(cmd).category == "money") {
-            if (isEcoBanned(message.author.id)) {
+            if (await isEcoBanned(message.author.id)) {
                 return;
             }
         }

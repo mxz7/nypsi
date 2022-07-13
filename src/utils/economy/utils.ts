@@ -950,7 +950,7 @@ export async function createUser(member: GuildMember | string) {
         id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`);
+    await redis.del(`cache:economy:exists:${id}`);
 
     if (!(await hasProfile(id))) {
         if (member instanceof GuildMember) {

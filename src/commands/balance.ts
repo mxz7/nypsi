@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 (await getBalance(target)).toLocaleString() +
                 "**\n" +
                 "💳 $**" +
-                (await getBankBalance(target).toLocaleString()) +
+                (await getBankBalance(target)).toLocaleString() +
                 "** / $**" +
                 (await getMaxBankBalance(target)).toLocaleString() +
                 "**"
