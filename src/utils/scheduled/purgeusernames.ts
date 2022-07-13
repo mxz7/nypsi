@@ -1,9 +1,7 @@
 import dayjs = require("dayjs");
-import { getDatabase } from "../database/database";
+import prisma from "../database/database";
 import { MStoTime } from "../functions/date";
 import { logger } from "../logger";
-
-const db = getDatabase();
 
 export default function purgeUsernames() {
     const now = new Date();
@@ -16,12 +14,16 @@ export default function purgeUsernames() {
 
     const needed = new Date(Date.parse(d) + 10800000);
 
-    const purge = () => {
+    const purge = async () => {
         const old = dayjs().subtract(180, "days").toDate().getTime();
 
-        const d = db.prepare("DELETE FROM usernames WHERE type = 'username' AND date < ?").run(old);
+        const d = await prisma.username.deleteMany({
+            where: {
+                AND: [{ type: "username" }, { date: { lt: old } }],
+            },
+        });
 
-        logger.log("auto", `${d.changes.toLocaleString()} old usernames deleted from database`);
+        logger.log("auto", `${d.count.toLocaleString()} old usernames deleted from database`);
     };
 
     setTimeout(async () => {
