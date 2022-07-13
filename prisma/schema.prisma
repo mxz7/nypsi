@@ -203,10 +203,10 @@ model ChatReaction {
 }
 
 model ChatReactionStats {
-  userId Int
-  wins   Int @default(0)
-  second Int @default(0)
-  third  Int @default(0)
+  userId String
+  wins   Int    @default(0)
+  second Int    @default(0)
+  third  Int    @default(0)
 
   chatReaction        ChatReaction @relation(fields: [chatReactionGuildId], references: [guildId])
   chatReactionGuildId String
