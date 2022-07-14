@@ -199,8 +199,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let colorBet = args[0].toLowerCase();
 
-    await updateBalance(message.member, (await getBalance(message.member)) - bet);
-
     let roll = values[Math.floor(Math.random() * values.length)];
 
     let win = false;
@@ -213,7 +211,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             winnings = Math.round(bet * 1.5);
         }
-        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     }
 
     if (colorBet == "b") {
@@ -239,10 +236,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (win) {
         multi = await getMulti(message.member);
 
+        winnings -= bet;
+
         if (multi > 0) {
-            await updateBalance(message.member, (await getBalance(message.member)) + Math.round(winnings * multi));
+            await updateBalance(
+                message.member,
+                (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+            );
             winnings = winnings + Math.round(winnings * multi);
+        } else {
+            await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         }
+    } else {
+        await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
 
     const embed = new CustomEmbed(
