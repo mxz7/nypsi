@@ -6,6 +6,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
@@ -175,12 +176,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let timedMute = false;
-    let unmuteDate;
+    let unmuteDate: Date;
     let time = 0;
 
     if (reason != "") {
         time = getDuration(reason.split(" ")[0].toLowerCase());
-        unmuteDate = new Date().getTime() + time * 1000;
+        unmuteDate = new Date(Date.now() + time * 1000);
 
         if (time) {
             timedMute = true;
@@ -191,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (mode == "timeout" && !timedMute) {
-        unmuteDate = new Date().getTime() + ms("1 week");
+        unmuteDate = dayjs().add(1, "week").toDate();
         time = ms("1 week") / 1000;
 
         timedMute = true;

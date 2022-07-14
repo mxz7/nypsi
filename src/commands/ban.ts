@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members = message.mentions.members;
     let reason = message.member.user.tag + ": ";
     let days = 1;
-    let unbanDate;
+    let unbanDate: Date;
     let temporary = false;
     let duration;
 
@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         try {
             duration = getDuration(args[0].toLowerCase());
-            unbanDate = new Date().getTime() + duration * 1000;
+            unbanDate = new Date(Date.now() + duration * 1000);
         } catch {
             // eslint happy
         }
