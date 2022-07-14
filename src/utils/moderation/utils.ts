@@ -95,7 +95,7 @@ export async function newCase(
                 user: userID,
                 moderator: moderator,
                 command: command,
-                time: Date.now(),
+                time: new Date(),
             },
         });
         await prisma.moderation.update({
@@ -310,7 +310,7 @@ export async function getCase(guild: Guild, caseID: number) {
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export async function newMute(guild: Guild, userIDs: Array<string>, date: number) {
+export async function newMute(guild: Guild, userIDs: Array<string>, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }
@@ -331,7 +331,7 @@ export async function newMute(guild: Guild, userIDs: Array<string>, date: number
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export async function newBan(guild: Guild, userIDs: Array<string> | string, date: number) {
+export async function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }
@@ -397,7 +397,7 @@ export async function isBanned(guild: Guild, member: GuildMember) {
  */
 export function runModerationChecks(client: Client) {
     setInterval(async () => {
-        const date = new Date().getTime();
+        const date = new Date();
 
         const query1 = await prisma.moderationMute.findMany({
             where: {

@@ -6,6 +6,7 @@ import { isPremium, getTier, setExpireDate } from "../utils/premium/utils";
 import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -335,7 +336,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
-            await setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15));
+            await setExpireDate(message.member, dayjs().add(15, "days").toDate());
         }
 
         if (amount.has(message.author.id)) {

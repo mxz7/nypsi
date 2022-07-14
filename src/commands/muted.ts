@@ -40,7 +40,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
 
         const msg = `\`${user ? user.user.tag : m.userId}\` ${
-            m.expire >= 9999999999999 ? "is permanently muted" : `will be unmuted <t:${Math.floor(m.expire / 1000)}:R>`
+            m.expire.getTime() >= 3130000000000
+                ? "is permanently muted"
+                : `will be unmuted <t:${Math.floor(m.expire.getTime() / 1000)}:R>`
         }`;
 
         if (pages.size == 0) {

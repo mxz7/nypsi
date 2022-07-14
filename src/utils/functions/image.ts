@@ -162,7 +162,7 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
             image: image,
             submitter: submitter.user.tag,
             submitterId: submitter.user.id,
-            uploadDate: Date.now(),
+            uploadDate: new Date(),
         },
     });
 

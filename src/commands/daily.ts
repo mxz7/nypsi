@@ -42,9 +42,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return notValidForYou();
         }
 
-        const now = new Date().getTime();
+        const now = new Date();
         const lastDaily = await getLastDaily(message.author.id);
-        const diff = now - lastDaily;
+        const diff = now.getTime() - lastDaily.getTime();
 
         if (diff >= 86400000) {
             await setLastDaily(message.author.id, now);

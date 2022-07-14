@@ -10,7 +10,7 @@ declare function require(name: string);
 const colorCache = new Map();
 
 setInterval(async () => {
-    const now = new Date().getTime();
+    const now = new Date();
 
     const query = await prisma.premium.findMany({
         where: {
@@ -121,8 +121,10 @@ export async function addMember(member: GuildMember | string, level: number) {
         id = member;
     }
 
-    const start = new Date().getTime();
-    const expire = new Date().setDate(new Date().getDate() + 35);
+    const start = new Date();
+    const expire = new Date();
+
+    expire.setDate(new Date().getDate() + 35);
 
     await prisma.premium.create({
         data: {
@@ -130,6 +132,8 @@ export async function addMember(member: GuildMember | string, level: number) {
             level: level,
             startDate: start,
             expireDate: expire,
+            lastDaily: new Date(0),
+            lastWeekly: new Date(0),
         },
     });
 
@@ -251,7 +255,7 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
  * @param {GuildMember} member
  * @param {Date} date
  */
-export async function setLastDaily(member: GuildMember | string, date: number) {
+export async function setLastDaily(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -273,7 +277,7 @@ export async function setLastDaily(member: GuildMember | string, date: number) {
  * @param {GuildMember} member
  * @param {Date} date
  */
-export async function setLastWeekly(member: GuildMember | string, date: number) {
+export async function setLastWeekly(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -492,7 +496,7 @@ export async function addUse(id: string) {
  * @param {GuildMember} member
  * @param {number} date
  */
-export async function setExpireDate(member: GuildMember | string, date: number) {
+export async function setExpireDate(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;

@@ -6,12 +6,12 @@ export class PremUser {
     public id: string;
     public level: number;
     public embedColor: string;
-    public lastDaily: number;
-    public lastWeekly: number;
+    public lastDaily: Date;
+    public lastWeekly: Date;
     public status: number;
     public revokeReason: string;
-    public startDate: number;
-    public expireDate: number;
+    public startDate: Date;
+    public expireDate: Date;
     /**
      * @returns {PremUser}
      * @param {String} id user id
@@ -21,12 +21,12 @@ export class PremUser {
         this.id = id;
         this.level = level;
         this.embedColor = "default"; // for custom embed color on all messages
-        this.lastDaily = 0;
-        this.lastWeekly = 0;
+        this.lastDaily = new Date(0);
+        this.lastWeekly = new Date(0);
         this.status = status.ACTIVE;
         this.revokeReason = "none";
-        this.startDate = new Date().getTime();
-        this.expireDate = new Date().setDate(new Date().getDate() + 35);
+        this.startDate = new Date();
+        this.expireDate = new Date(new Date().setDate(new Date().getDate() + 35));
 
         return this;
     }
@@ -55,9 +55,9 @@ export class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setLastDaily(date: Date | number): PremUser {
+    setLastDaily(date: Date): PremUser {
         if (date instanceof Date) {
-            this.lastDaily = date.getTime();
+            this.lastDaily = date;
         } else {
             this.lastDaily = date;
         }
@@ -69,9 +69,9 @@ export class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setLastWeekly(date: Date | number): PremUser {
+    setLastWeekly(date: Date): PremUser {
         if (date instanceof Date) {
-            this.lastWeekly = date.getTime();
+            this.lastWeekly = date;
         } else {
             this.lastWeekly = date;
         }
@@ -103,9 +103,9 @@ export class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setStartDate(date: Date | number): PremUser {
+    setStartDate(date: Date): PremUser {
         if (date instanceof Date) {
-            this.startDate = date.getTime();
+            this.startDate = date;
         } else {
             this.startDate = date;
         }
@@ -117,9 +117,9 @@ export class PremUser {
      * @returns {PremUser}
      * @param {Date} date
      */
-    setExpireDate(date: Date | number): PremUser {
+    setExpireDate(date: Date): PremUser {
         if (date instanceof Date) {
-            this.expireDate = date.getTime();
+            this.expireDate = date;
         } else {
             this.expireDate = date;
         }
@@ -161,7 +161,7 @@ export class PremUser {
     }
 
     renew() {
-        this.expireDate = new Date().setDate(new Date().getDate() + 35);
+        this.expireDate = new Date(new Date().setDate(new Date().getDate() + 35));
     }
 
     /**

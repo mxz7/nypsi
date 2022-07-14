@@ -26,16 +26,16 @@ model User {
 }
 
 model Economy {
-  money     Int     @default(500)
-  bank      Int     @default(9500)
-  xp        Int     @default(0)
-  prestige  Int     @default(0)
-  padlock   Boolean @default(false)
-  dms       Boolean @default(true)
-  lastVote  Int     @default(0)
-  inventory Json    @default("{}")
-  workers   Json    @default("{}")
-  banned    Boolean @default(false)
+  money     Int      @default(500)
+  bank      Int      @default(9500)
+  xp        Int      @default(0)
+  prestige  Int      @default(0)
+  padlock   Boolean  @default(false)
+  dms       Boolean  @default(true)
+  lastVote  DateTime
+  inventory Json     @default("{}")
+  workers   Json     @default("{}")
+  banned    Boolean  @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
@@ -57,22 +57,22 @@ model EconomyStats {
 
 model Premium {
   level      Int
-  embedColor String @default("default")
-  lastDaily  Int    @default(0)
-  lastWeekly Int    @default(0)
-  status     Int    @default(1)
-  startDate  Int
-  expireDate Int
+  embedColor String   @default("default")
+  lastDaily  DateTime
+  lastWeekly DateTime
+  status     Int      @default(1)
+  startDate  DateTime
+  expireDate DateTime
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
 }
 
 model Username {
-  id    String @id @default(uuid())
-  type  String @default("username")
+  id    String   @id @default(uuid())
+  type  String   @default("username")
   value String
-  date  Int
+  date  DateTime
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -132,7 +132,7 @@ model GuildCounter {
 
 model GuildCountdown {
   id          String
-  date        Int
+  date        DateTime
   format      String
   finalFormat String
   channel     String
@@ -158,7 +158,7 @@ model Moderation {
 model ModerationBan {
   userId  String
   guildId String
-  expire  Int
+  expire  DateTime
 
   moderation Moderation @relation(fields: [guildId], references: [guildId])
 
@@ -168,7 +168,7 @@ model ModerationBan {
 model ModerationMute {
   userId  String
   guildId String
-  expire  Int
+  expire  DateTime
 
   moderation Moderation @relation(fields: [guildId], references: [guildId])
 
@@ -182,8 +182,8 @@ model ModerationCase {
   user      String
   moderator String
   command   String
-  time      Int
-  deleted   Boolean @default(false)
+  time      DateTime
+  deleted   Boolean  @default(false)
 
   moderation Moderation @relation(fields: [guildId], references: [guildId])
 
@@ -219,12 +219,12 @@ model ChatReactionStats {
 // economy 'guild' feature tables
 
 model EconomyGuild {
-  guildName String @id
-  createdAt Int
-  balance   Int    @default(0)
-  xp        Int    @default(0)
-  level     Int    @default(1)
-  motd      String @default("welcome to the guild fool (/guild motd)")
+  guildName String   @id
+  createdAt DateTime
+  balance   Int      @default(0)
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  motd      String   @default("welcome to the guild fool (/guild motd)")
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @unique
@@ -233,11 +233,11 @@ model EconomyGuild {
 }
 
 model EconomyGuildMember {
-  userId           String @unique
+  userId           String   @unique
   guildName        String
-  joinedAt         Int
-  contributedMoney Int    @default(0)
-  contributedXp    Int    @default(0)
+  joinedAt         DateTime
+  contributedMoney Int      @default(0)
+  contributedXp    Int      @default(0)
 
   user  User         @relation(fields: [userId], references: [id])
   guild EconomyGuild @relation(fields: [guildName], references: [guildName])
@@ -248,20 +248,20 @@ model EconomyGuildMember {
 // wholesome tables
 
 model WholesomeImage {
-  id          Int    @id @default(autoincrement())
-  image       String @unique()
+  id          Int      @id @default(autoincrement())
+  image       String   @unique()
   submitter   String
   submitterId String
-  uploadDate  Int
+  uploadDate  DateTime
   accepterId  String
 }
 
 model WholesomeSuggestion {
-  id          Int    @id @default(autoincrement())
-  image       String @unique()
+  id          Int      @id @default(autoincrement())
+  image       String   @unique()
   submitter   String
   submitterId String
-  uploadDate  Int
+  uploadDate  DateTime
 }
 
 // tables with no relation for easiness

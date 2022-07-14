@@ -207,7 +207,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         },
     });
 
-    const lastVote = query.lastVote;
+    const lastVote = query.lastVote.getTime();
 
     if (now - lastVote < 43200000) {
         return logger.error(`${user} already voted`);
@@ -218,7 +218,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
             userId: user,
         },
         data: {
-            lastVote: now,
+            lastVote: new Date(now),
         },
     });
 
@@ -344,7 +344,7 @@ export async function hasVoted(member: GuildMember | string) {
         },
     });
 
-    const lastVote = query.lastVote;
+    const lastVote = query.lastVote.getTime();
 
     if (now - lastVote < 43200000) {
         redis.set(`cache:vote:${id}`, "true");
@@ -959,6 +959,7 @@ export async function createUser(member: GuildMember | string) {
     await prisma.economy.create({
         data: {
             userId: id,
+            lastVote: new Date(0),
         },
     });
     await redis.del(`cache:economy:exists:${id}`);
@@ -1374,7 +1375,7 @@ export async function reset() {
     const deleted = await prisma.economy
         .deleteMany({
             where: {
-                AND: [{ prestige: 0 }, { lastVote: { lt: Date.now() - ms("12 hours") } }, { dms: true }],
+                AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dms: true }],
             },
         })
         .then((r) => r.count);
@@ -2145,7 +2146,7 @@ export async function createGuild(name: string, owner: GuildMember) {
     await prisma.economyGuild.create({
         data: {
             guildName: name,
-            createdAt: Date.now(),
+            createdAt: new Date(),
             ownerId: owner.user.id,
         },
     });
@@ -2153,7 +2154,7 @@ export async function createGuild(name: string, owner: GuildMember) {
         data: {
             userId: owner.user.id,
             guildName: name,
-            joinedAt: Date.now(),
+            joinedAt: new Date(),
         },
     });
 
@@ -2263,7 +2264,7 @@ export async function addMember(name: string, member: GuildMember) {
         data: {
             userId: member.user.id,
             guildName: guild.guildName,
-            joinedAt: Date.now(),
+            joinedAt: new Date(),
         },
     });
 
@@ -2316,7 +2317,7 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
 
 interface EconomyGuild {
     guildName: string;
-    createdAt: number;
+    createdAt: Date;
     balance: number;
     xp: number;
     level: number;
@@ -2328,7 +2329,7 @@ interface EconomyGuild {
 interface EconomyGuildMember {
     userId: string;
     guildName: string;
-    joinedAt: number;
+    joinedAt: Date;
     contributedMoney: number;
     contributedXp: number;
 }

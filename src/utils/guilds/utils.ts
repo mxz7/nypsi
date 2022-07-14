@@ -727,8 +727,8 @@ export async function addCountdown(guild: Guild, date: Date | number, format: st
 
     const id = countdowns.length + 1;
 
-    if (date instanceof Date) {
-        date = date.getTime();
+    if (typeof date == "number") {
+        date = new Date(date);
     }
 
     await prisma.guildCountdown.create({

@@ -358,7 +358,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!timedMute) {
-        await newMute(message.guild, members1, 9999999999999);
+        await newMute(message.guild, members1, new Date(3130000000000));
     }
 
     if (args.join(" ").includes("-s")) return;

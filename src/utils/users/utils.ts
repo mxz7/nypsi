@@ -210,7 +210,7 @@ export async function addNewUsername(member: GuildMember | string, username: str
         data: {
             userId: id,
             value: username,
-            date: Date.now(),
+            date: new Date(),
         },
     });
 }
@@ -275,7 +275,7 @@ export async function addNewAvatar(member: GuildMember | string, url: string) {
             userId: id,
             type: "avatar",
             value: url,
-            date: Date.now(),
+            date: new Date(),
         },
     });
 }

@@ -15,7 +15,7 @@ export default function purgeUsernames() {
     const needed = new Date(Date.parse(d) + 10800000);
 
     const purge = async () => {
-        const old = dayjs().subtract(180, "days").toDate().getTime();
+        const old = dayjs().subtract(180, "days").toDate();
 
         const d = await prisma.username.deleteMany({
             where: {

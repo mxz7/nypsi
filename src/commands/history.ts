@@ -134,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             embed.addField(
                 "case " + case0.caseId,
-                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time / 1000)}:d>`
+                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
             );
         }
     }
@@ -208,7 +208,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     "` - " +
                                     case0.command +
                                     "\non " +
-                                    `<t:${Math.floor(case0.time / 1000)}:d>`
+                                    `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
                             );
                         }
                     }
@@ -243,7 +243,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     "` - " +
                                     case0.command +
                                     "\nat " +
-                                    `<t:${Math.floor(case0.time / 1000)}:d>`
+                                    `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
                             );
                         }
                     }

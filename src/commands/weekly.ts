@@ -42,9 +42,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return notValidForYou();
         }
 
-        const now = new Date().getTime();
+        const now = new Date();
         const lastWeekly = await getLastWeekly(message.author.id);
-        const diff = now - lastWeekly;
+        const diff = now.getTime() - lastWeekly.getTime();
 
         if (diff >= 604800000) {
             await setLastWeekly(message.author.id, now);

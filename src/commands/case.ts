@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setHeader("case " + case0.caseId)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
-        .addField("date/time", `<t:${Math.floor(case0.time / 1000)}>`, true)
+        .addField("date/time", `<t:${Math.floor(case0.time.getTime() / 1000)}>`, true)
         .addField("user", "`" + case0.user + "`", true)
         .addField("reason", reason, true)
         .addField("deleted", case0.deleted.toString(), true);
