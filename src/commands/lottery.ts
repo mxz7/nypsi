@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const help = () => {
+    const help = async () => {
         const embed = new CustomEmbed(message.member, false);
 
         embed.setHeader("lottery", message.author.avatarURL());

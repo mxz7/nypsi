@@ -414,6 +414,11 @@ export function fetchUserMentions(
 
     return mentions;
 }
+
+export function deleteUserMentions(guild: Guild, member: GuildMember) {
+    db.prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?").run(guild.id, member.user.id);
+}
+
 export async function getWordleStats(member: GuildMember) {
     const query = await prisma.wordleStats.findUnique({
         where: {

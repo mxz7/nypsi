@@ -1,14 +1,7 @@
 import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import {
-    usernameProfileExists,
-    createUsernameProfile,
-    fetchAvatarHistory,
-    addNewAvatar,
-    clearAvatarHistory,
-    isTracking,
-} from "../utils/users/utils";
+import { fetchAvatarHistory, addNewAvatar, clearAvatarHistory, isTracking } from "../utils/users/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
 import { formatDate } from "../utils/functions/date";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";

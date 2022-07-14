@@ -3,8 +3,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { fetchUserMentions } from "../utils/users/utils";
-import { getDatabase } from "../utils/database/database";
+import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import { userExists } from "../utils/economy/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import ms = require("ms");
@@ -208,9 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 }
             } else if (reaction == "❌") {
-                getDatabase()
-                    .prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?")
-                    .run(message.guild.id, message.author.id);
+                deleteUserMentions(message.guild, message.member);
 
                 newEmbed.setDescription("✅ mentions cleared");
 
