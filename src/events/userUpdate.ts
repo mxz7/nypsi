@@ -2,24 +2,14 @@ import { User } from "discord.js";
 import { getPrestige, userExists } from "../utils/economy/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
 import { isPremium } from "../utils/premium/utils";
-import {
-    addNewAvatar,
-    addNewUsername,
-    createProfile,
-    hasProfile,
-    isTracking,
-    updateLastKnowntag,
-} from "../utils/users/utils";
+import { addNewAvatar, addNewUsername, hasProfile, isTracking, updateLastKnowntag } from "../utils/users/utils";
 
 const queue: User[] = [];
 let interval;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
     if (oldUser.tag != newUser.tag) {
-        if (!(await hasProfile(newUser.id))) {
-            await createProfile(newUser);
-            await addNewUsername(newUser.id, newUser.tag);
-        } else {
+        if (await hasProfile(newUser.id)) {
             await updateLastKnowntag(newUser.id, newUser.tag);
             if (!(await isTracking(newUser.id))) return;
             await addNewUsername(newUser.id, newUser.tag);
