@@ -7,7 +7,7 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 import { cleanString } from "../functions/string";
 
-const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
+const db = new Database("./out/data/storage.db");
 const optCache = new Map();
 const lastfmUsernameCache = new Map();
 
