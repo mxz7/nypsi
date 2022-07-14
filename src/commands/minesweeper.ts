@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 30);
+    await addCooldown(cmd.name, message.member, 25);
 
     setTimeout(() => {
         if (games.has(message.author.id)) {
