@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { addKarma } from "../utils/karma/utils";
 import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils";
+import { createProfile, hasProfile } from "../utils/users/utils";
 
 /**
  * @param {GuildMember} oldMember
@@ -41,6 +42,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
                 await setTier(newMember.user.id, tier);
                 await renewUser(newMember.user.id);
             } else {
+                if (!(await hasProfile(newMember.user.id))) await createProfile(newMember.user);
                 await addMember(newMember.user.id, tier);
                 await addKarma(newMember.user.id, 50);
             }
