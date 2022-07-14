@@ -25,6 +25,8 @@ export class CustomEmbed extends MessageEmbed {
                 } else {
                     super.setColor(color);
                 }
+            } else {
+                super.setColor(getColor(member));
             }
         }
 
