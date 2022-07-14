@@ -56,8 +56,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi);
-                description = `$${await getBalance(
-                    message.member
+                description = `$${(
+                    await getBalance(message.member)
                 ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
                     multi * 100
                 ).toLocaleString()}**% bonus)`;
