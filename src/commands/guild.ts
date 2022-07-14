@@ -146,7 +146,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
             for (const m of guild.members) {
-                membersText += `\`${m.lastKnownTag}\` `;
+                membersText += `\`${m.user.lastKnownTag}\` `;
 
                 if (m.userId == message.author.id) {
                     embed.setFooter(`you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago`);
