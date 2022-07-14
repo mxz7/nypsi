@@ -48,7 +48,7 @@ jobs:
         name: testing
 
         runs-on: ubuntu-latest
-        timeout-minutes: 5
+        timeout-minutes: 10
 
         env:
             BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
