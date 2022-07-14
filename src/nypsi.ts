@@ -46,7 +46,7 @@ const client = new Discord.Client({
             },
         ],
     },
-    restTimeOffset: 69,
+    restTimeOffset: 0,
     shards: "auto",
     intents: [
         Discord.Intents.FLAGS.DIRECT_MESSAGES,
