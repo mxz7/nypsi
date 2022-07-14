@@ -490,6 +490,8 @@ export async function runCommand(
         cooldown.delete(message.author.id);
     }, 500);
 
+    // captcha check
+
     if (isLockedOut(message.author.id)) {
         if (beingChecked.indexOf(message.author.id) != -1) return;
 
@@ -562,7 +564,9 @@ export async function runCommand(
             }
         }
     }
+
     logCommand(message, args);
+
     if (alias) {
         if (commands.get(aliases.get(cmd)).category == "money") {
             if (await isEcoBanned(message.author.id)) {
@@ -660,7 +664,7 @@ export async function runCommand(
             }
         }
         commands.get(cmd).run(message, args);
-        updateLastCommand(message.member);
+        await updateLastCommand(message.member);
     }
 
     let cmdName = cmd;
@@ -671,31 +675,27 @@ export async function runCommand(
 
     if (getCmdCategory(cmdName) == "money") {
         if (!message.member) return;
-        if (!(await userExists(message.member))) return;
 
         setTimeout(async () => {
+            if (!(await userExists(message.member))) return;
             try {
                 if (!xpCooldown.has(message.author.id)) {
-                    try {
-                        await updateXp(message.member, (await getXp(message.member)) + 1);
+                    await updateXp(message.member, (await getXp(message.member)) + 1);
 
-                        xpCooldown.add(message.author.id);
+                    xpCooldown.add(message.author.id);
 
-                        setTimeout(() => {
-                            try {
-                                xpCooldown.delete(message.author.id);
-                            } catch {
-                                logger.error("error deleting from xpCooldown");
-                            }
-                        }, 60000);
-                    } catch {
-                        /*keeps lint happy*/
-                    }
+                    setTimeout(() => {
+                        try {
+                            xpCooldown.delete(message.author.id);
+                        } catch {
+                            /* */
+                        }
+                    }, 60000);
                 }
-            } catch (e) {
-                logger.error(e);
+            } catch {
+                /* */
             }
-        }, 10000);
+        }, 30000);
     }
 }
 
