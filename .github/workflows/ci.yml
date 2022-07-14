@@ -65,9 +65,6 @@ jobs:
             - name: install packages
               run: npm install
 
-            - name: setup prisma
-              run: npx prisma generate
-
             - name: setup redis
               uses: shogo82148/actions-setup-redis@v1
               with:
@@ -78,6 +75,9 @@ jobs:
 
             - name: build
               run: tsc
+              
+            - name: setup prisma
+              run: npx prisma migrate deploy && npx prisma generate
 
             - name: run bot
               if: env.BOT_TOKEN != null
