@@ -79,13 +79,13 @@ export async function createProfile(member: User | string) {
         id = member;
     }
 
-    await redis.del(`cache:user:exists:${id}`);
     await prisma.user.create({
         data: {
             id: id,
             lastKnownTag: username,
         },
     });
+    await redis.del(`cache:user:exists:${id}`);
 }
 
 export async function updateLastKnowntag(member: GuildMember | string, tag: string) {

@@ -502,8 +502,6 @@ export async function updateBalance(member: GuildMember | string, amount: number
         id = member;
     }
 
-    await redis.del(`cache:economy:balance:${id}`);
-
     await prisma.economy.update({
         where: {
             userId: id,
@@ -512,6 +510,7 @@ export async function updateBalance(member: GuildMember | string, amount: number
             money: amount,
         },
     });
+    await redis.del(`cache:economy:balance:${id}`);
 }
 
 /**
@@ -593,8 +592,6 @@ export async function getXp(member: GuildMember): Promise<number> {
 export async function updateXp(member: GuildMember, amount: number) {
     if (amount >= 69420) return;
 
-    await redis.del(`cache:economy:xp:${member.user.id}`);
-
     await prisma.economy.update({
         where: {
             userId: member.user.id,
@@ -603,6 +600,7 @@ export async function updateXp(member: GuildMember, amount: number) {
             xp: amount,
         },
     });
+    await redis.del(`cache:economy:xp:${member.user.id}`);
 }
 
 /**
@@ -950,8 +948,6 @@ export async function createUser(member: GuildMember | string) {
         id = member;
     }
 
-    await redis.del(`cache:economy:exists:${id}`);
-
     if (!(await hasProfile(id))) {
         if (member instanceof GuildMember) {
             await createProfile(member.user);
@@ -965,6 +961,7 @@ export async function createUser(member: GuildMember | string) {
             userId: id,
         },
     });
+    await redis.del(`cache:economy:exists:${id}`);
 }
 
 /**
@@ -1097,8 +1094,6 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
  * @param {Number} amount
  */
 export async function setPrestige(member: GuildMember, amount: number) {
-    await redis.del(`cache:economy:prestige:${member.user.id}`);
-
     await prisma.economy.update({
         where: {
             userId: member.user.id,
@@ -1107,6 +1102,8 @@ export async function setPrestige(member: GuildMember, amount: number) {
             prestige: amount,
         },
     });
+
+    await redis.del(`cache:economy:prestige:${member.user.id}`);
 }
 
 /**
@@ -1708,13 +1705,12 @@ export async function deleteUser(member: GuildMember | string) {
         id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`);
-
     await prisma.economy.delete({
         where: {
             userId: id,
         },
     });
+    await redis.del(`cache:economy:exists:${id}`);
 }
 
 /**

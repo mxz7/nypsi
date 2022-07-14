@@ -59,8 +59,6 @@ export async function addKarma(member: GuildMember | string, amount: number) {
         id = member;
     }
 
-    await redis.del(`cache:user:karma:${id}`);
-
     await prisma.user.update({
         where: {
             id: id,
@@ -69,6 +67,8 @@ export async function addKarma(member: GuildMember | string, amount: number) {
             karma: { increment: amount },
         },
     });
+
+    await redis.del(`cache:user:karma:${id}`);
 }
 
 /**
@@ -84,8 +84,6 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
         id = member;
     }
 
-    await redis.del(`cache:user:karma:${id}`);
-
     await prisma.user.update({
         where: {
             id: id,
@@ -94,6 +92,8 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
             karma: { decrement: amount },
         },
     });
+
+    await redis.del(`cache:user:karma:${id}`);
 }
 
 /**
@@ -208,8 +208,6 @@ async function deteriorateKarma() {
 
         total += karmaToRemove;
 
-        await redis.del(`cache:user:karma:${user.id}`);
-
         await prisma.user.update({
             where: {
                 id: user.id,
@@ -218,6 +216,8 @@ async function deteriorateKarma() {
                 karma: { decrement: karmaToRemove },
             },
         });
+
+        await redis.del(`cache:user:karma:${user.id}`);
     }
 
     logger.log({
