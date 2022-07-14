@@ -48,6 +48,18 @@ export default async function messageCreate(message: Message) {
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
+    let prefix = await getPrefix(message.guild);
+
+    if (message.client.user.id == "685193083570094101") prefix = "£";
+
+    if (message.content == `<@!${message.client.user.id}>` || message.content == `<@${message.client.user.id}>`) {
+        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
+            return message.member.send({
+                content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
+            });
+        });
+    }
+
     if ((await hasGuild(message.guild)) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         const filter = await getChatFilter(message.guild);
 
@@ -65,39 +77,24 @@ export default async function messageCreate(message: Message) {
         }
     }
 
-    if (
-        message.guild.memberCount < 150000 &&
-        ((await userExists(message.guild.ownerId)) ||
-            (await isPremium(message.guild.ownerId)) ||
-            (await getKarma(message.guild.ownerId)) >= 50 ||
-            (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
-    ) {
-        if (message.mentions.everyone) {
-            if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
-                await message.guild.members.fetch();
-                addCooldown(message.guild, 3600);
-            }
+    if (message.content.startsWith(prefix)) {
+        const args = message.content.substring(prefix.length).split(" ");
 
-            let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members;
+        const cmd = args[0].toLowerCase();
 
-            if (members instanceof ThreadMemberManager) {
-                members = members.cache;
-            }
+        runCommand(cmd, message, args);
+    }
 
-            mentionQueue.push({
-                type: "collection",
-                members: members.clone(),
-                message: message,
-                channelMembers: message.channel.members,
-                guildId: message.guild.id,
-                url: message.url,
-            });
-
-            if (!mentionInterval) {
-                mentionInterval = setInterval(async () => await addMention(), 150);
-            }
-        } else {
-            if (message.mentions.roles.first()) {
+    setTimeout(async () => {
+        if (message.channel.type == "DM") return;
+        if (
+            message.guild.memberCount < 150000 &&
+            ((await userExists(message.guild.ownerId)) ||
+                (await isPremium(message.guild.ownerId)) ||
+                (await getKarma(message.guild.ownerId)) >= 50 ||
+                (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
+        ) {
+            if (message.mentions.everyone) {
                 if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                     await message.guild.members.fetch();
                     addCooldown(message.guild, 3600);
@@ -109,81 +106,88 @@ export default async function messageCreate(message: Message) {
                     members = members.cache;
                 }
 
-                message.mentions.roles.forEach((r) => {
-                    mentionQueue.push({
-                        type: "collection",
-                        members: r.members.clone(),
-                        message: message,
-                        channelMembers: members,
-                        guildId: message.guild.id,
-                        url: message.url,
-                    });
+                mentionQueue.push({
+                    type: "collection",
+                    members: members.clone(),
+                    message: message,
+                    channelMembers: message.channel.members,
+                    guildId: message.guild.id,
+                    url: message.url,
                 });
 
                 if (!mentionInterval) {
                     mentionInterval = setInterval(async () => await addMention(), 150);
                 }
-            }
-
-            if (message.mentions.members.first()) {
-                if (message.mentions.members.size == 1) {
-                    if (message.mentions.members.first().user.id == message.author.id) return;
-                    let content = message.content;
-
-                    if (content.length > 100) {
-                        content = content.substr(0, 97) + "...";
+            } else {
+                if (message.mentions.roles.first()) {
+                    if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
+                        await message.guild.members.fetch();
+                        addCooldown(message.guild, 3600);
                     }
 
-                    content = content.replace(/(\r\n|\n|\r)/gm, " ");
+                    let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+                        message.channel.members;
 
-                    mentionQueue.push({
-                        type: "mention",
-                        data: {
-                            user: message.author.tag,
-                            content: content,
-                            date: message.createdTimestamp,
-                            link: message.url,
-                        },
-                        guildId: message.guild.id,
-                        target: message.mentions.members.first().user.id,
+                    if (members instanceof ThreadMemberManager) {
+                        members = members.cache;
+                    }
+
+                    message.mentions.roles.forEach((r) => {
+                        mentionQueue.push({
+                            type: "collection",
+                            members: r.members.clone(),
+                            message: message,
+                            channelMembers: members,
+                            guildId: message.guild.id,
+                            url: message.url,
+                        });
                     });
-                } else {
-                    mentionQueue.push({
-                        type: "collection",
-                        members: message.mentions.members.clone(),
-                        message: message,
-                        channelMembers: message.channel.members,
-                        guildId: message.guild.id,
-                        url: message.url,
-                    });
+
+                    if (!mentionInterval) {
+                        mentionInterval = setInterval(async () => await addMention(), 150);
+                    }
                 }
 
-                if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 150);
+                if (message.mentions.members.first()) {
+                    if (message.mentions.members.size == 1) {
+                        if (message.mentions.members.first().user.id == message.author.id) return;
+                        let content = message.content;
+
+                        if (content.length > 100) {
+                            content = content.substr(0, 97) + "...";
+                        }
+
+                        content = content.replace(/(\r\n|\n|\r)/gm, " ");
+
+                        mentionQueue.push({
+                            type: "mention",
+                            data: {
+                                user: message.author.tag,
+                                content: content,
+                                date: message.createdTimestamp,
+                                link: message.url,
+                            },
+                            guildId: message.guild.id,
+                            target: message.mentions.members.first().user.id,
+                        });
+                    } else {
+                        mentionQueue.push({
+                            type: "collection",
+                            members: message.mentions.members.clone(),
+                            message: message,
+                            channelMembers: message.channel.members,
+                            guildId: message.guild.id,
+                            url: message.url,
+                        });
+                    }
+
+                    if (!mentionInterval) {
+                        mentionInterval = setInterval(async () => await addMention(), 150);
+                    }
                 }
             }
         }
-    }
-
-    let prefix = await getPrefix(message.guild);
-
-    if (message.client.user.id == "685193083570094101") prefix = "£";
-
-    if (message.content == `<@!${message.client.user.id}>`) {
-        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
-            return message.member.send({
-                content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
-            });
-        });
-    }
-
-    if (!message.content.startsWith(prefix)) return;
-
-    const args = message.content.substring(prefix.length).split(" ");
-
-    const cmd = args[0].toLowerCase();
-
-    return runCommand(cmd, message, args);
+    }, 1500);
 }
 
 let currentInterval = 150;
