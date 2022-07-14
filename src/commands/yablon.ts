@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you are already playing yablon")] });
     }
 
-    await addCooldown(cmd.name, message.member, 30);
+    await addCooldown(cmd.name, message.member, 25);
 
     updateBalance(message.member, getBalance(message.member) - bet);
 

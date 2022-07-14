@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 90);
+    await addCooldown(cmd.name, message.member, 75);
 
     const board = createBoard();
     const word = getWord();
