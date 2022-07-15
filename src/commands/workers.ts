@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const Worker = workers.get(w);
             const worker = new Worker();
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
                     worker.prestige
                 }\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         for (const w of Object.keys(personalWorkers)) {
             const worker = Worker.fromStorage(personalWorkers[w]);
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
                     worker.itemName
                 } / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})\n` +
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}workers buy <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers buy <worker name>`)],
                 });
             }
 
