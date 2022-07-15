@@ -1,4 +1,4 @@
-const workers = new Map();
+const workers: Map<number, Constructor<Worker>> = new Map();
 
 interface Settings {
     maxStorage: number;
@@ -8,8 +8,14 @@ interface Settings {
     prestige: number;
     name: string;
     itemName: string;
-    level?: number;
-    stored?: number;
+    level: number;
+    stored: number;
+    id: number;
+}
+
+export interface WorkerStorageData {
+    stored: number;
+    level: number;
     id: number;
 }
 
@@ -87,21 +93,10 @@ export class Worker {
      * @returns {Worker}
      * @param {Worker} json
      */
-    static fromJSON(json: Worker): Worker {
-        const a = new Worker({
-            maxStorage: json.maxStorage,
-            perItem: json.perItem,
-            perInterval: json.perInterval,
-            cost: json.cost,
-            prestige: json.prestige,
-            name: json.name,
-            id: json.id,
-            itemName: json.itemName,
-            stored: json.stored,
-            level: json.level,
-        });
+    static fromStorage(json: WorkerStorageData): Worker {
+        const worker = workers.get(json.id);
 
-        return a;
+        return new worker(json.level, json.stored);
     }
 }
 
@@ -109,16 +104,26 @@ export class PotatoFarmer extends Worker {
     /**
      * @returns {PotatoFarmer}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 4;
+        let maxStorage = 600;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 600,
-            perItem: 4,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 17,
             cost: 100000,
             prestige: 1,
             name: "potato farmer",
             id: 0,
             itemName: "🥔",
+            stored: stored,
+            level: level,
         });
 
         return this;
@@ -131,16 +136,26 @@ export class Fisherman extends Worker {
     /**
      * @returns {Fisherman}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 15;
+        let maxStorage = 350;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 350,
-            perItem: 15,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 10,
             cost: 250000,
             prestige: 2,
             name: "fisherman",
             id: 1,
             itemName: "🐟",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -153,16 +168,26 @@ export class Miner extends Worker {
     /**
      * @returns {Miner}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 22;
+        let maxStorage = 400;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 400,
-            perItem: 22,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 14,
             cost: 400000,
             prestige: 2,
             name: "miner",
             id: 2,
             itemName: "⛏",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -175,16 +200,26 @@ export class LumberJack extends Worker {
     /**
      * @returns {Butcher}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 35;
+        let maxStorage = 350;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 350,
-            perItem: 35,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 10,
             cost: 500000,
             prestige: 3,
             name: "lumberjack",
             id: 3,
             itemName: "🪓",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -197,16 +232,26 @@ export class Butcher extends Worker {
     /**
      * @returns {Butcher}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 17;
+        let maxStorage = 600;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 600,
-            perItem: 17,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 25,
             cost: 600000,
             prestige: 4,
             name: "butcher",
             id: 4,
             itemName: "🥓",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -219,16 +264,26 @@ export class Tailor extends Worker {
     /**
      * @returns {Tailor}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 20;
+        let maxStorage = 750;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 750,
-            perItem: 20,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 30,
             cost: 700000,
             prestige: 5,
             name: "tailor",
             id: 5,
             itemName: "👕",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -241,16 +296,26 @@ export class SpaceX extends Worker {
     /**
      * @returns {Tailor}
      */
-    constructor() {
+    constructor(level = 1, stored = 0) {
+        let perItem = 50;
+        let maxStorage = 85;
+
+        for (let i = 1; i < level; i++) {
+            perItem = perItem * 2;
+            maxStorage = Math.floor(maxStorage * 1.5);
+        }
+
         super({
-            maxStorage: 85,
-            perItem: 50,
+            maxStorage: maxStorage,
+            perItem: perItem,
             perInterval: 1,
             cost: 1500000,
             prestige: 7,
             name: "spacex",
             id: 6,
             itemName: "🚀",
+            level: level,
+            stored: stored,
         });
 
         return this;
@@ -259,7 +324,7 @@ export class SpaceX extends Worker {
 
 workers.set(6, SpaceX);
 
-export type Constructor<T> = new (...args: any[]) => T;
+export type Constructor<T> = new (level?: number, stored?: number) => T;
 
 /**
  *
