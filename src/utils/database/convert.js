@@ -307,9 +307,7 @@ async function createEconomyStats() {
                     gamble: s.gamble == 1 ? true : false,
                 },
             })
-            .catch((e) => {
-                console.log(`fail economy stats: ${s.id}`);
-            });
+            .catch((e) => {});
         count++;
         if (count % 50 == 0) {
             console.log(`creating economy stats.. ${count}/${economyStats.length}`);
@@ -439,7 +437,7 @@ async function createGuildsChristmas() {
     for (const counter of guildchristmas) {
         if (counter.enabled == 0) continue;
 
-        await prisma.guildchristmas
+        await prisma.guildChristmas
             .create({
                 data: {
                     guildId: counter.guild_id,
