@@ -623,7 +623,7 @@ async function createChatReactionStats() {
     }
 }
 
-async function wholesome() {
+async function wholesomeD() {
     let count = 0;
     for (const w of wholesome) {
         await prisma.wholesomeImage
@@ -646,7 +646,7 @@ async function wholesome() {
 }
 
 async function run() {
-    wholesome();
+    wholesomeD();
 
     await createUsers();
 
