@@ -104,7 +104,8 @@ async function createEconomy() {
     for (const user of economy) {
         const workers = {};
         for (const w of Array.from(Object.keys(JSON.parse(user.workers)))) {
-            workers[w] = {
+            w = JSON.parse(user.workers)[w];
+            workers[w.id] = {
                 id: w.id,
                 stored: w.stored,
                 level: w.level,
