@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you are already playing highlow")] });
     }
 
-    await addCooldown(cmd.name, message.member, 30);
+    await addCooldown(cmd.name, message.member, 25);
 
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
