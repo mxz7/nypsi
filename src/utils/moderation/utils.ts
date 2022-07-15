@@ -581,6 +581,7 @@ async function requestUnban(guild: string | Guild, member: string, client: Clien
 
     if (!guild) {
         logger.warn("unable to find guild");
+        await deleteBan(guild, member);
         return;
     }
 
@@ -599,6 +600,7 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
 
     if (!guild) {
         logger.warn(`unable to find guild ${guild}`);
+        await deleteMute(guild, member);
         return;
     }
 
