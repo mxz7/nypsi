@@ -388,7 +388,8 @@ async function createGuilds() {
 async function createGuildCountdowns() {
     for (const g of guilds) {
         if (Object.keys(JSON.parse(g.countdowns)).length > 0) {
-            for (const x of Array.from(Object.keys(JSON.parse(g.countdowns)))) {
+            for (let x of Array.from(Object.keys(JSON.parse(g.countdowns)))) {
+                x = JSON.parse(g.countdowns)[x];
                 await prisma.guildCountdown
                     .create({
                         data: {
