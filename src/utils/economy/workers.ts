@@ -75,6 +75,14 @@ export class Worker {
         this.maxStorage = Math.floor(this.maxStorage * 1.5);
     }
 
+    toStorage() {
+        return {
+            id: this.id,
+            level: this.level,
+            stored: this.stored,
+        };
+    }
+
     /**
      * @returns {Worker}
      * @param {Worker} json
