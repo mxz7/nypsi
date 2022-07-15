@@ -10,11 +10,11 @@ datasource db {
 // user specific tables (economy etc.)
 
 model User {
-  id             String  @id
+  id             String   @id
   lastKnownTag   String
-  karma          Int     @default(1)
-  lastCommand    Int     @default(0)
-  tracking       Boolean @default(true)
+  karma          Int      @default(1)
+  lastCommand    DateTime
+  tracking       Boolean  @default(true)
   lastfmUsername String?
 
   Economy            Economy?

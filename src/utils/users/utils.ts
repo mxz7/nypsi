@@ -83,6 +83,7 @@ export async function createProfile(member: User | string) {
         data: {
             id: id,
             lastKnownTag: username,
+            lastCommand: new Date(0),
         },
     });
     await redis.del(`cache:user:exists:${id}`);

@@ -31,6 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         data: {
             id: "test_user",
             lastKnownTag: "",
+            lastCommand: new Date(),
         },
     });
     await createUser("user_test");

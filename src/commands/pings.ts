@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ((await userExists(message.guild.ownerId)) ||
             (await isPremium(message.guild.ownerId)) ||
             (await getKarma(message.guild.ownerId)) >= 50 ||
-            (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
+            (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
     ) {
         qualified = true;
     }

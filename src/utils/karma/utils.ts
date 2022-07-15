@@ -108,9 +108,9 @@ export async function updateLastCommand(member: GuildMember | string) {
         id = member;
     }
 
-    const date = Date.now();
+    const date = new Date();
 
-    await redis.set(`cache:user:lastcmd:${id}`, date);
+    await redis.set(`cache:user:lastcmd:${id}`, date.getTime());
 
     await prisma.user.update({
         where: {
@@ -143,7 +143,7 @@ export function closeKarmaShop() {
  * @param {GuildMember} member
  * @returns {number}
  */
-export async function getLastCommand(member: GuildMember | string): Promise<number> {
+export async function getLastCommand(member: GuildMember | string): Promise<Date> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -151,7 +151,8 @@ export async function getLastCommand(member: GuildMember | string): Promise<numb
         id = member;
     }
 
-    if (await redis.exists(`cache:user:lastcmd:${id}`)) return parseInt(await redis.get(`cache:user:lastcmd:${id}`));
+    if (await redis.exists(`cache:user:lastcmd:${id}`))
+        return new Date(parseInt(await redis.get(`cache:user:lastcmd:${id}`)));
 
     const query = await prisma.user.findUnique({
         where: {
@@ -163,7 +164,7 @@ export async function getLastCommand(member: GuildMember | string): Promise<numb
     });
 
     if (!query || !query.lastCommand) {
-        return 0;
+        return new Date(0);
     }
 
     return query.lastCommand;
@@ -176,7 +177,7 @@ async function deteriorateKarma() {
 
     const users = await prisma.user.findMany({
         where: {
-            AND: [{ karma: { gt: 1 } }, { lastCommand: { lt: threshold } }],
+            karma: { gt: 1 },
         },
         select: {
             id: true,
@@ -188,17 +189,19 @@ async function deteriorateKarma() {
     let total = 0;
 
     for (const user of users) {
+        if (user.lastCommand.getTime() > threshold) continue;
+
         let karmaToRemove = 5;
 
-        if (now - ms("1 week") > user.lastCommand) {
+        if (now - ms("1 week") > user.lastCommand.getTime()) {
             karmaToRemove = 35;
         }
 
-        if (now - ms("30 days") > user.lastCommand) {
+        if (now - ms("30 days") > user.lastCommand.getTime()) {
             karmaToRemove = 100;
         }
 
-        if (now - ms("90 days") > user.lastCommand) {
+        if (now - ms("90 days") > user.lastCommand.getTime()) {
             karmaToRemove = 69420;
         }
 
