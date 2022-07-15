@@ -526,24 +526,26 @@ async function createModerationBans() {
 async function createModerationCases() {
     let count = 0;
     for (const c of moderationcases) {
-        await prisma.moderationCase.create({
-            data: {
-                guildId: c.guild_id,
-                caseId: c.case_id,
-                type: case.type,
-                user: case.user,
-                moderator: case.moderator,
-                command: case.command,
-                time: new Date(case.time),
-                deleted: case.deleted == 1 ? true : false
-            },
-        }).catch(() => {
-            console.log(`case skip: ${c.guild_id} ${c.case_id}`)
-        });
+        await prisma.moderationCase
+            .create({
+                data: {
+                    guildId: c.guild_id,
+                    caseId: c.case_id,
+                    type: c.type,
+                    user: c.user,
+                    moderator: c.moderator,
+                    command: c.command,
+                    time: new Date(c.time),
+                    deleted: c.deleted == 1 ? true : false,
+                },
+            })
+            .catch(() => {
+                console.log(`case skip: ${c.guild_id} ${c.case_id}`);
+            });
 
-        count++
+        count++;
         if (count % 50 == 0) {
-            console.log(`cases: ${count}/${moderationcases.length}`)
+            console.log(`cases: ${count}/${moderationcases.length}`);
         }
     }
 }
@@ -551,97 +553,100 @@ async function createModerationCases() {
 async function createChatReaction() {
     let count = 0;
     for (const c of chatreaction) {
-        if (c.random_start == 0) continue
+        if (c.random_start == 0) continue;
 
-        const wordlist = []
+        const wordlist = [];
 
         if (c.word_list) {
             for (const x of c.word_list.split("#@|@#")) {
-                wordlist.push(x)
+                wordlist.push(x);
             }
         }
 
-        const randomchannels = []
+        const randomchannels = [];
 
         if (c.random_channels) {
             for (const x of c.random_channels.split("#@|@#")) {
-                randomchannels.push(x)
+                randomchannels.push(x);
             }
         }
 
-        const blacklisted = []
+        const blacklisted = [];
 
         if (c.blacklisted) {
             for (const x of c.blacklisted.split("#@|@#")) {
-                blacklisted.push(x)
+                blacklisted.push(x);
             }
         }
 
-        await prisma.chatReaction.create({
-            data: {
-                guildId: c.id,
-                wordList: wordlist,
-                randomStart: true,
-                randomChannels: randomchannels,
-                betweenEvents: c.between_events,
-                randomModifier: c.random_modifier,
-                timeout: c.timeout,
-                blacklisted: blacklisted
-            }
-        }).catch(() => {
-            console.log(`chat reaction skip: ${c.id}`)
-        })
+        await prisma.chatReaction
+            .create({
+                data: {
+                    guildId: c.id,
+                    wordList: wordlist,
+                    randomStart: true,
+                    randomChannels: randomchannels,
+                    betweenEvents: c.between_events,
+                    randomModifier: c.random_modifier,
+                    timeout: c.timeout,
+                    blacklisted: blacklisted,
+                },
+            })
+            .catch(() => {
+                console.log(`chat reaction skip: ${c.id}`);
+            });
 
-        count++
-        console.log(`chat reaction: ${count}/${chatreaction.length}`)
+        count++;
+        console.log(`chat reaction: ${count}/${chatreaction.length}`);
     }
 }
 
 async function createChatReactionStats() {
-    let count = 0
+    let count = 0;
     for (const c of chatreactionstats) {
-        await prisma.chatReactionStats.create({
-            data: {
-                chatReactionGuildId: c.guild_id,
-                userId: c.user_id,
-                wins: c.wins,
-                second: c.second,
-                third: c.third,
+        await prisma.chatReactionStats
+            .create({
+                data: {
+                    chatReactionGuildId: c.guild_id,
+                    userId: c.user_id,
+                    wins: c.wins,
+                    second: c.second,
+                    third: c.third,
+                },
+            })
+            .catch(() => {});
 
-            }
-        }).catch(() => {
-
-        })
-
-        count++
+        count++;
         if (count % 50 == 0) {
-            console.log(`chat reaction stats ${count}/${chatreactionstats.length}`)
+            console.log(`chat reaction stats ${count}/${chatreactionstats.length}`);
         }
     }
 }
 
 async function wholesome() {
-    let count = 0
+    let count = 0;
     for (const w of wholesome) {
-        await prisma.wholesomeImage.create({
-            data: {
-                image: w.image,
-                submitter: w.submitter,
-                submitterId: w.submitter_id,
-                uploadDate: new Date(w.upload),
-                accepterId: w.accepter
-            }
-        }).catch(() => {
-            console.log(`skip wholesome: ${w.image}`)
-        })
+        await prisma.wholesomeImage
+            .create({
+                data: {
+                    image: w.image,
+                    submitter: w.submitter,
+                    submitterId: w.submitter_id,
+                    uploadDate: new Date(w.upload),
+                    accepterId: w.accepter,
+                },
+            })
+            .catch(() => {
+                console.log(`skip wholesome: ${w.image}`);
+            });
 
-        count++
-        console.log(`wholesome image ${count}/${wholesome.length}`)
+        count++;
+        console.log(`wholesome image ${count}/${wholesome.length}`);
     }
 }
 
 async function run() {
-    wholesome()
+    wholesome();
 
     await createUsers();
 
@@ -656,19 +661,19 @@ async function run() {
     await createEconomyGuilds();
 
     await createEconomyGuildMembers();
-    
+
     await createPremium();
 
-    await createGuilds()
-    await createGuildCountdowns()
-    await createGuildsCounters()
-    await createGuildsChristmas()
-    await createModeration()
-    await createModerationBans()
-    await createModerationMutes()
-    createModerationCases()
-    await createChatReaction()
-    await createChatReactionStats()
+    await createGuilds();
+    await createGuildCountdowns();
+    await createGuildsCounters();
+    await createGuildsChristmas();
+    await createModeration();
+    await createModerationBans();
+    await createModerationMutes();
+    createModerationCases();
+    await createChatReaction();
+    await createChatReactionStats();
 }
 
 run();
