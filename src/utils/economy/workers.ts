@@ -298,7 +298,7 @@ export class SpaceX extends Worker {
      */
     constructor(level = 1, stored = 0) {
         let perItem = 50;
-        let maxStorage = 85;
+        let maxStorage = 215;
 
         for (let i = 1; i < level; i++) {
             perItem = perItem * 2;
@@ -308,7 +308,7 @@ export class SpaceX extends Worker {
         super({
             maxStorage: maxStorage,
             perItem: perItem,
-            perInterval: 1,
+            perInterval: 3,
             cost: 1500000,
             prestige: 7,
             name: "spacex",
