@@ -42,7 +42,7 @@ if you would like to delete all cases for your server (restart moderation data),
 $dac
 ```
 
-a confirmation message will then be shown to prevent any accidental resets. please not that this is irreversible.
+a confirmation message will then be shown to prevent any accidental resets. please note that this is irreversible.
 
 ## deleting a single case
 
