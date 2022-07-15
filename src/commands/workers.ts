@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <name>`)],
                 });
             }
 
@@ -243,11 +243,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
-            worker = await getWorkers(message.member)[worker.id];
+            const memberWorkers = await getWorkers(message.member);
+
+            worker = memberWorkers[worker.id];
 
             if (!worker) {
                 return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] });
@@ -279,7 +281,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.setHeader("workers", message.author.avatarURL());
 
-            worker = await getWorkers(message.member)[worker.id];
+            worker = (await getWorkers(message.member))[worker.id];
 
             worker = Worker.fromStorage(worker);
 
