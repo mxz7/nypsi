@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .setFooter(`${prefix}workers help`);
 
         for (const w of Object.keys(personalWorkers)) {
-            const worker = Worker.fromJSON(personalWorkers[w]);
+            const worker = Worker.fromStorage(personalWorkers[w]);
             embed.addField(
                 `${worker.name} [${worker.id}]`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
@@ -183,7 +183,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let earnedBreakdown = "";
 
             for (const w of Object.keys(personalWorkers)) {
-                const worker = personalWorkers[w];
+                const worker = Worker.fromStorage(personalWorkers[w]);
 
                 amountEarned += Math.floor(worker.perItem * worker.stored);
                 earnedBreakdown += `\n${worker.name} +$${Math.floor(
@@ -253,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] });
             }
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             if (worker.level >= 5) {
                 return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] });
@@ -281,7 +281,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             worker = await getWorkers(message.member)[worker.id];
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             embed.setDescription(
                 `your ${worker.name} has been upgraded to level ${worker.level}\n\n` +
