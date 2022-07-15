@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const Worker = workers.get(w);
             const worker = new Worker();
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
                     worker.prestige
                 }\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker
@@ -78,9 +78,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .setFooter(`${prefix}workers help`);
 
         for (const w of Object.keys(personalWorkers)) {
-            const worker = Worker.fromJSON(personalWorkers[w]);
+            const worker = Worker.fromStorage(personalWorkers[w]);
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
                     worker.itemName
                 } / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})\n` +
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}workers buy <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers buy <worker name>`)],
                 });
             }
 
@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
@@ -183,7 +183,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let earnedBreakdown = "";
 
             for (const w of Object.keys(personalWorkers)) {
-                const worker = personalWorkers[w];
+                const worker = Worker.fromStorage(personalWorkers[w]);
 
                 amountEarned += Math.floor(worker.perItem * worker.stored);
                 earnedBreakdown += `\n${worker.name} +$${Math.floor(
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <name>`)],
                 });
             }
 
@@ -243,17 +243,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
-            worker = await getWorkers(message.member)[worker.id];
+            const memberWorkers = await getWorkers(message.member);
+
+            worker = memberWorkers[worker.id];
 
             if (!worker) {
                 return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] });
             }
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             if (worker.level >= 5) {
                 return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] });
@@ -279,9 +281,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.setHeader("workers", message.author.avatarURL());
 
-            worker = await getWorkers(message.member)[worker.id];
+            worker = (await getWorkers(message.member))[worker.id];
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             embed.setDescription(
                 `your ${worker.name} has been upgraded to level ${worker.level}\n\n` +

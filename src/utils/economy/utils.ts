@@ -8,7 +8,7 @@ import * as fs from "fs";
 import { addKarma, getKarma } from "../karma/utils";
 import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
-import { Constructor, getAllWorkers, Worker } from "./workers";
+import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import { StatsProfile } from "../models/StatsProfile";
 import * as shufflearray from "shuffle-array";
 import fetch from "node-fetch";
@@ -1196,7 +1196,7 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
  * @param {GuildMember} member
  * @param {String} member
  */
-export async function getWorkers(member: GuildMember | string): Promise<any> {
+export async function getWorkers(member: GuildMember | string): Promise<{ [key: string]: WorkerStorageData }> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1213,7 +1213,7 @@ export async function getWorkers(member: GuildMember | string): Promise<any> {
         },
     });
 
-    return query.workers;
+    return query.workers as any;
 }
 
 /**
@@ -1240,14 +1240,14 @@ export async function addWorker(member: GuildMember, id: number) {
 
     const memberWorkers = await getWorkers(member);
 
-    memberWorkers[id] = worker;
+    memberWorkers[id] = worker.toStorage();
 
     await prisma.economy.update({
         where: {
             userId: memberID,
         },
         data: {
-            workers: memberWorkers,
+            workers: memberWorkers as any,
         },
     });
 }
@@ -1263,11 +1263,7 @@ export async function emptyWorkersStored(member: GuildMember | string) {
     const workers = await getWorkers(memberID);
 
     for (const w of Object.keys(workers)) {
-        const worker: Worker = workers[w];
-
-        worker.stored = 0;
-
-        workers[worker.id] = worker;
+        workers[w].stored = 0;
     }
 
     await prisma.economy.update({
@@ -1275,7 +1271,7 @@ export async function emptyWorkersStored(member: GuildMember | string) {
             userId: memberID,
         },
         data: {
-            workers: workers,
+            workers: workers as any,
         },
     });
 }
@@ -1295,20 +1291,18 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 
     const workers = await getWorkers(memberID);
 
-    let worker = workers[id];
-
-    worker = Worker.fromJSON(worker);
+    const worker = Worker.fromStorage(workers[id]);
 
     worker.upgrade();
 
-    workers[id] = worker;
+    workers[id] = worker.toStorage();
 
     await prisma.economy.update({
         where: {
             userId: memberID,
         },
         data: {
-            workers: workers,
+            workers: workers as any,
         },
     });
 }
