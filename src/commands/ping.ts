@@ -11,6 +11,8 @@ const cmd = new Command(
     Categories.INFO
 ).setAliases(["latency"]);
 
+let pingingDb = false;
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
@@ -26,25 +28,31 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const redisLatency = after - now;
 
-    now = Date.now();
-    await prisma.user.create({
-        data: {
-            id: "test_user",
-            lastKnownTag: "",
-            lastCommand: new Date(),
-        },
-    });
-    await createUser("user_test");
-    await updateBalance("user_test", (await getBalance("user_test")) + 1000);
-    await deleteUser("user_test");
-    await prisma.user.delete({
-        where: {
-            id: "test_user",
-        },
-    });
-    after = Date.now();
+    let dbLatency: number;
 
-    const dbLatency = after - now;
+    if (!pingingDb) {
+        pingingDb = true;
+        now = Date.now();
+        await prisma.user.create({
+            data: {
+                id: "test_user",
+                lastKnownTag: "",
+                lastCommand: new Date(),
+            },
+        });
+        await createUser("user_test");
+        await updateBalance("user_test", (await getBalance("user_test")) + 1000);
+        await deleteUser("user_test");
+        await prisma.user.delete({
+            where: {
+                id: "test_user",
+            },
+        });
+        after = Date.now();
+        pingingDb = false;
+
+        dbLatency = after - now;
+    }
 
     now = Date.now();
     const msg = await message.channel.send({ content: "pong" });
@@ -56,12 +64,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, false);
 
-    embed.setDescription(
-        `discord api \`${discordLatency}ms\`\n` +
-            `bot message \`${msgLatency}ms\`\n` +
-            `redis \`${redisLatency}ms\`\n` +
-            `database \`${dbLatency}ms\``
-    );
+    let desc = `discord api \`${discordLatency}ms\`\n` + `bot message \`${msgLatency}ms\`\n` + `redis \`${redisLatency}ms\``;
+
+    if (dbLatency) {
+        desc += `\ndatabase \`${dbLatency}ms\``;
+    }
+
+    embed.setDescription(desc);
 
     return await msg.edit({ embeds: [embed] });
 }
