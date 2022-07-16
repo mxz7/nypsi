@@ -10,6 +10,7 @@ import { cleanString } from "../functions/string";
 const db = new Database("./out/data/storage.db");
 const optCache = new Map();
 const lastfmUsernameCache = new Map();
+const lastKnownTagCooldown = new Set();
 
 export interface MentionQueueItem {
     type: string;
@@ -95,6 +96,15 @@ export async function updateLastKnowntag(member: GuildMember | string, tag: stri
         id = member.user.id;
     } else {
         id = member;
+    }
+
+    if (lastKnownTagCooldown.has(id)) {
+        return;
+    } else {
+        lastKnownTagCooldown.add(id);
+        setTimeout(() => {
+            lastKnownTagCooldown.delete(id);
+        }, ms("1 hour"));
     }
 
     await prisma.user.update({
