@@ -13,7 +13,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble } from "../utils/logger.js";
-import { getExactMember } from "../utils/functions/member.js";
+import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
 const waiting = [];
@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target;
 
     if (!message.mentions.members.first()) {
-        target = await getExactMember(message.guild, args[0]);
+        target = await getMember(message.guild, args[0]);
     } else {
         target = message.mentions.members.first();
     }
