@@ -13,7 +13,7 @@ cmd.slashEnabled = true;
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     let hasFurnace = false;
@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 600);
 
-    addItemUse(message.member, "furnace");
+    await addItemUse(message.member, "furnace");
 
     const smelted = new Map();
 
@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (inventory["coal"] <= 0) delete inventory["coal"];
     if (inventory["furnace"] <= 0) delete inventory["furnace"];
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     const embed = new CustomEmbed(message.member, false);
     embed.setHeader("furnace", message.author.avatarURL());

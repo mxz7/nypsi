@@ -12,9 +12,9 @@ export default async function guildMemberRemove(member: GuildMember) {
         if (member.roles.cache.has("819870959325413387") || member.roles.cache.has("819870846536646666")) {
             return;
         } else if (member.roles.cache.has("819870727834566696")) {
-            setTier(member.user.id, 2);
+            await setTier(member.user.id, 2);
         } else if (member.roles.cache.has("819870590718181391")) {
-            setTier(member.user.id, 1);
+            await setTier(member.user.id, 1);
         } else {
             expireUser(member.user.id);
         }

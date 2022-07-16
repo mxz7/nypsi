@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { addKarma } from "../utils/karma/utils";
 import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils";
+import { createProfile, hasProfile } from "../utils/users/utils";
 
 /**
  * @param {GuildMember} oldMember
@@ -35,13 +36,14 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 
             if (tier == 0 || tier > 4) return;
 
-            if (isPremium(newMember.user.id)) {
-                if (tier <= getTier(newMember.user.id)) return;
+            if (await isPremium(newMember.user.id)) {
+                if (tier <= (await getTier(newMember.user.id))) return;
 
-                setTier(newMember.user.id, tier);
-                renewUser(newMember.user.id);
+                await setTier(newMember.user.id, tier);
+                await renewUser(newMember.user.id);
             } else {
-                addMember(newMember.user.id, tier);
+                if (!(await hasProfile(newMember.user.id))) await createProfile(newMember.user);
+                await addMember(newMember.user.id, tier);
                 await addKarma(newMember.user.id, 50);
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {

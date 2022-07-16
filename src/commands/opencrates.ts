@@ -35,23 +35,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    // if (!isPremium(message.member)) {
-    //     const embed = new CustomEmbed(
-    //         message.member,
-    //         false,
-    //         "to open multiple crates a time you need the BRONZE tier or higher"
-    //     ).setFooter(`${getPrefix(message.guild)}patreon`)
-
-    //     return send({ embeds: [embed] })
-    // }
-
     if (!(await getDMsEnabled(message.member))) {
         return send({
-            embeds: [new ErrorEmbed(`you must have dms enabled. ${getPrefix(message.guild)}dms`)],
+            embeds: [new ErrorEmbed(`you must have dms enabled. ${await getPrefix(message.guild)}dms`)],
         });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     const crates = [];
@@ -59,8 +49,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let max = 5;
     let hitMax = false;
 
-    if (isPremium(message.member)) {
-        if (getTier(message.member) >= 3) {
+    if (await isPremium(message.member)) {
+        if ((await getTier(message.member)) >= 3) {
             max = 20;
         } else {
             max = 10;
@@ -121,11 +111,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
         let finished = false;
         const crate = crates.shift();
 
-        const found = openCrate(message.member, items[crate]);
+        const found = await openCrate(message.member, items[crate]);
 
         desc += ` - ${found.join("\n - ")}\n`;
 

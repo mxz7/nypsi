@@ -13,7 +13,7 @@ const cmd = new Command("skin", "view the skin of a minecraft account", Categori
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}skin <account>`)] });

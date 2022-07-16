@@ -9,9 +9,9 @@ export default async function guildCreate(client: Client, guild: Guild) {
         message: `added to ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
     });
 
-    if (!hasGuild(guild)) createGuild(guild);
+    if (!(await hasGuild(guild))) await createGuild(guild);
 
-    runCheck(guild);
+    await runCheck(guild);
 
     let amount = Math.floor(guild.memberCount / 10);
 

@@ -10,7 +10,7 @@ const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).s
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
         if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")] });
     }
 
-    setPrefix(message.guild, args.join(" "));
+    await setPrefix(message.guild, args.join(" "));
 
     const embed = new CustomEmbed(message.member, false, "✅ prefix changed to `" + args.join(" ") + "`").setHeader(
         "prefix"

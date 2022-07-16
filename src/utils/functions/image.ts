@@ -1,10 +1,9 @@
+import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, Webhook } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
-import { getDatabase } from "../database/database";
+import prisma from "../database/database";
 import { logger } from "../logger";
-
-const db = getDatabase();
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
@@ -25,14 +24,7 @@ setInterval(() => {
 
 let wholesomeWebhook: Webhook;
 
-let wholesomeCache: Array<{
-    id: number;
-    image: string;
-    submitter: string;
-    submitter_id: string;
-    accepter: string;
-    upload: number;
-}>;
+let wholesomeCache: WholesomeImage[];
 
 export function isImageUrl(url: string): boolean {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
@@ -139,34 +131,48 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
         logger.info(`wholesome webhook assigned as ${wholesomeWebhook.id}`);
     }
 
-    let query = db.prepare("SELECT id FROM wholesome WHERE image = ?").get(image);
+    const query1 = await prisma.wholesomeImage.findUnique({
+        where: {
+            image: image,
+        },
+        select: {
+            id: true,
+        },
+    });
 
-    if (query) {
+    if (query1) {
         return false;
     }
 
-    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image);
+    const query2 = await prisma.wholesomeSuggestion.findUnique({
+        where: {
+            image: image,
+        },
+        select: {
+            id: true,
+        },
+    });
 
-    if (query) {
+    if (query2) {
         return false;
     }
 
-    db.prepare("INSERT INTO wholesome_suggestions (image, submitter, submitter_id, upload) VALUES (?, ?, ?, ?)").run(
-        image,
-        submitter.user.tag,
-        submitter.user.id,
-        Date.now()
-    );
-
-    query = db.prepare("SELECT id FROM wholesome_suggestions WHERE image = ?").get(image);
+    const { id } = await prisma.wholesomeSuggestion.create({
+        data: {
+            image: image,
+            submitter: submitter.user.tag,
+            submitterId: submitter.user.id,
+            uploadDate: new Date(),
+        },
+    });
 
     const { CustomEmbed } = require("../models/EmbedBuilders");
 
-    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + query.id);
+    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + id);
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
 
-    embed.setFooter(`$wholesome accept ${query.id} | $wholesome deny ${query.id}`);
+    embed.setFooter(`$wholesome accept ${id} | $wholesome deny ${id}`);
 
     embed.setImage(image);
 
@@ -181,27 +187,37 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
  * @param {GuildMember} accepter
  */
 export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
-    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id);
+    const query = await prisma.wholesomeSuggestion.findUnique({
+        where: {
+            id: id,
+        },
+    });
 
     if (!query) return false;
 
-    db.prepare("INSERT INTO wholesome (image, submitter, submitter_id, upload, accepter) VALUES (?, ?, ?, ?, ?)").run(
-        query.image,
-        query.submitter,
-        query.submitter_id,
-        query.upload,
-        accepter.user.id
-    );
+    await prisma.wholesomeImage.create({
+        data: {
+            image: query.image,
+            submitter: query.submitter,
+            submitterId: query.submitterId,
+            uploadDate: query.uploadDate,
+            accepterId: accepter.user.id,
+        },
+    });
 
-    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id);
+    await prisma.wholesomeSuggestion.delete({
+        where: {
+            id: id,
+        },
+    });
 
     clearWholesomeCache();
 
     const { requestDM } = require("../../nypsi");
     const { getDMsEnabled } = require("../economy/utils");
 
-    if (await getDMsEnabled(query.submitter_id)) {
-        requestDM(query.submitter_id, `your wholesome image (${query.image}) has been accepted`, true);
+    if (await getDMsEnabled(query.submitterId)) {
+        requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
     }
 
     return true;
@@ -211,12 +227,16 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
  * @returns {Boolean}
  * @param {Number} id
  */
-export function denyWholesomeImage(id: number): boolean {
-    const query = db.prepare("SELECT * FROM wholesome_suggestions WHERE id = ?").get(id);
+export async function denyWholesomeImage(id: number) {
+    const d = await prisma.wholesomeSuggestion.delete({
+        where: {
+            id: id,
+        },
+    });
 
-    if (!query) return false;
-
-    db.prepare("DELETE FROM wholesome_suggestions WHERE id = ?").run(id);
+    if (!d) {
+        return false;
+    }
 
     return true;
 }
@@ -225,22 +245,19 @@ export function denyWholesomeImage(id: number): boolean {
  * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
  * @param {id} Number
  */
-export function getWholesomeImage(id?: number): {
-    id: number;
-    image: string;
-    submitter: string;
-    submitter_id: string;
-    accepter: string;
-    upload: number;
-} {
+export async function getWholesomeImage(id?: number): Promise<WholesomeImage> {
     if (id) {
-        const query = db.prepare("SELECT * FROM wholesome WHERE id = ?").get(id);
+        const query = await prisma.wholesomeImage.findUnique({
+            where: {
+                id: id,
+            },
+        });
         return query;
     } else {
         if (wholesomeCache) {
             return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)];
         } else {
-            const query = db.prepare("SELECT * FROM wholesome").all();
+            const query = await prisma.wholesomeImage.findMany();
 
             wholesomeCache = query;
 
@@ -257,12 +274,16 @@ export function clearWholesomeCache() {
  * @returns {Boolean}
  * @param {Number} id
  */
-export function deleteFromWholesome(id: number): boolean {
-    const query = db.prepare("DELETE FROM wholesome WHERE id = ?").run(id);
+export async function deleteFromWholesome(id: number) {
+    const query = await prisma.wholesomeImage.delete({
+        where: {
+            id: id,
+        },
+    });
 
     clearWholesomeCache();
 
-    if (query.changes > 0) {
+    if (query) {
         return true;
     } else {
         return false;
@@ -272,14 +293,8 @@ export function deleteFromWholesome(id: number): boolean {
 /**
  * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
  */
-export function getAllSuggestions(): Array<{
-    id: number;
-    image: string;
-    submitter: string;
-    submitter_id: string;
-    date: number;
-}> {
-    const query = db.prepare("SELECT * FROM wholesome_suggestions").all();
+export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
+    const query = await prisma.wholesomeSuggestion.findMany();
 
     return query;
 }

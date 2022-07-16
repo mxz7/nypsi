@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(await userExists(member))) createUser(member);
+    if (!(await userExists(member))) await createUser(member);
 
     let furryAmount;
 
@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (cache.has(member.user.id)) {
             cache.delete(member.user.id);
-            updateXp(member, getXp(member) + 1);
+            await updateXp(member, (await getXp(member)) + 1);
         }
     }
 

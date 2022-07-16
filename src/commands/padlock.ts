@@ -11,19 +11,19 @@ const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categ
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader("padlock", message.author.avatarURL());
 
     const padlockPrice = getPadlockPrice();
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 1) {
         return message.channel.send({
             embeds: [new ErrorEmbed(`this has been moved to ${prefix}**buy padlock**`)],
         });
     } else {
-        if (hasPadlock(message.member)) {
+        if (await hasPadlock(message.member)) {
             embed.setColor("#5efb8f");
             embed.setDescription("**protected** 🔒\nyou currently have a padlock");
             return await message.channel.send({ embeds: [embed] }).catch();

@@ -20,8 +20,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    const normalStats = () => {
-        const stats = getStats(message.member);
+    const normalStats = async () => {
+        const stats = await getStats(message.member);
 
         let gambleWins = 0;
         let gambleLoses = 0;
@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     const itemStats = async () => {
-        const stats = getStats(message.member).items;
+        const stats = (await getStats(message.member)).items;
 
         const embed = new CustomEmbed(message.member, true).setHeader("item stats", message.author.avatarURL());
 
@@ -193,8 +193,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return pageManager();
     };
 
-    const gambleStats = () => {
-        const stats = getStats(message.member).gamble;
+    const gambleStats = async () => {
+        const stats = (await getStats(message.member)).gamble;
 
         const embed = new CustomEmbed(message.member, true).setHeader("gamble stats", message.author.avatarURL());
 

@@ -19,6 +19,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil } from "../utils/functions/date.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { updateLastKnowntag } from "../utils/users/utils.js";
 
 const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO);
 
@@ -36,21 +37,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 10);
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
     const embed = new CustomEmbed(message.member, true);
 
+    await updateLastKnowntag(message.member, message.member.user.tag);
+
     //ECONOMY
-    const balance = getBalance(message.member).toLocaleString();
-    const bankBalance = getBankBalance(message.member).toLocaleString();
-    const maxBankBalance = getMaxBankBalance(message.member).toLocaleString();
-    const xp = getXp(message.member).toLocaleString();
-    const prestige = getPrestige(message.member).toLocaleString();
+    const balance = (await getBalance(message.member)).toLocaleString();
+    const bankBalance = (await getBankBalance(message.member)).toLocaleString();
+    const maxBankBalance = (await getMaxBankBalance(message.member)).toLocaleString();
+    const xp = (await getXp(message.member)).toLocaleString();
+    const prestige = (await getPrestige(message.member)).toLocaleString();
     const maxBet = await calcMaxBet(message.member);
     const multi = Math.floor((await getMulti(message.member)) * 100) + "%";
     const voted = await hasVoted(message.member);
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     let inventoryItems;
 
     try {
@@ -62,10 +65,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.addField(
         "💰 economy",
         `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${hasPadlock(
+    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${await hasPadlock(
             message.member
         )}
-    **workers** ${Object.keys(getWorkers(message.member)).length}
+    **workers** ${Object.keys(await getWorkers(message.member)).length}
     **inventory** ${inventoryItems.toLocaleString()} items`,
         true
     );
@@ -73,18 +76,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     //PATREON
     let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate;
 
-    if (isPremium(message.author.id)) {
-        const profile = getPremiumProfile(message.author.id);
+    if (await isPremium(message.author.id)) {
+        const profile = await getPremiumProfile(message.author.id);
 
         tier = profile.level;
         tierString = profile.getLevelString();
         embedColor = profile.embedColor;
-        if (profile.lastDaily != 0) {
+        if (profile.lastDaily.getTime() != 0) {
             lastDaily = daysAgo(profile.lastDaily) + " days ago";
         } else {
             lastDaily = profile.lastDaily;
         }
-        if (profile.lastWeekly != 0) {
+        if (profile.lastWeekly.getTime() != 0) {
             lastWeekly = daysAgo(profile.lastWeekly) + " days ago";
         } else {
             lastWeekly = profile.lastWeekly;

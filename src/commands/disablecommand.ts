@@ -20,9 +20,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
     }
 
-    let filter = getDisabledCommands(message.guild);
+    let filter = await getDisabledCommands(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
@@ -48,11 +48,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .replace(/[^A-z0-9\s]/g, "");
 
         if (filter.indexOf(word) > -1) {
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "❌ `" + getPrefix(message.guild) + word + "` is already disabled"
-            ).setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`);
+            const embed = new CustomEmbed(message.member, false, "❌ `" + prefix + word + "` is already disabled").setFooter(
+                `you can use ${prefix}disablecmd to view currently disabled commands`
+            );
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -60,9 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!commandExists(word)) {
             return message.channel.send({
                 embeds: [
-                    new ErrorEmbed(
-                        `you must use the command's name, you can use ${getPrefix(message.guild)}help <command> to find this`
-                    ),
+                    new ErrorEmbed(`you must use the command's name, you can use ${prefix}help <command> to find this`),
                 ],
             });
         }
@@ -85,13 +81,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [embed] });
         }
 
-        updateDisabledCommands(message.guild, filter);
+        await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(
-            message.member,
-            true,
-            "✅ disabled `" + getPrefix(message.guild) + word + "` command"
-        ).setHeader("disabled commands");
+        const embed = new CustomEmbed(message.member, true, "✅ disabled `" + prefix + word + "` command").setHeader(
+            "disabled commands"
+        );
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
         if (args.length == 1) {
@@ -107,24 +101,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (filter.indexOf(word) > -1) {
             filter.splice(filter.indexOf(word), 1);
         } else {
-            const embed = new CustomEmbed(
-                message.member,
-                false,
-                "❌ `" + getPrefix(message.guild) + word + "` is not disabled"
-            )
+            const embed = new CustomEmbed(message.member, false, "❌ `" + prefix + word + "` is not disabled")
                 .setHeader("disabled commands")
                 .setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`);
 
             return message.channel.send({ embeds: [embed] });
         }
 
-        updateDisabledCommands(message.guild, filter);
+        await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            "✅ `" + getPrefix(message.guild) + word + "` is no longer disabled"
-        )
+        const embed = new CustomEmbed(message.member, false, "✅ `" + prefix + word + "` is no longer disabled")
             .setHeader("disable commands")
             .setFooter(`you can use ${prefix}disablecmd reset to reset disabled commands`);
 
@@ -132,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "reset") {
         filter = [];
 
-        updateDisabledCommands(message.guild, filter);
+        await updateDisabledCommands(message.guild, filter);
 
         const embed = new CustomEmbed(message.member, false, "✅ disabled commands have been").setHeader(
             "disabled commands"

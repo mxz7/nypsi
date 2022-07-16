@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js";
-import { setStatsProfile, getStatsProfile, hasGuild, createGuild, getPeaks, getPrefix } from "../utils/guilds/utils";
+import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { logger } from "../utils/logger";
@@ -26,18 +26,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!hasGuild(message.guild)) createGuild(message.guild);
-
-    const profile = getStatsProfile(message.guild);
-    const prefix = getPrefix(message.guild);
+    let profile = await getGuildCounter(message.guild);
+    if (!profile) {
+        await createGuildCounter(message.guild);
+        profile = await getGuildCounter(message.guild);
+    }
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(
             message.member,
             false,
-            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n**filter bots** \`${
-                profile.filter_bots == 1 ? "true" : "false"
-            }\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
+            `**enabled** \`${profile.enabled}\`\n**filter bots** \`${profile.filterBots}\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
             .setHeader("member count")
             .setFooter(`use ${prefix}counter help to view additional commands`);
@@ -66,14 +66,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let memberCount = await message.guild.members.fetch();
 
-        if (profile.filter_bots) {
+        if (profile.filterBots) {
             memberCount = memberCount.filter((m) => !m.user.bot);
         }
 
         let format = "";
 
         format = profile.format.split("%count%").join(memberCount.size.toLocaleString());
-        format = format.split("%peak%").join(getPeaks(message.guild).toLocaleString());
+        format = format.split("%peak%").join((await getPeaks(message.guild)).toLocaleString());
 
         let fail = false;
 
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         profile.enabled = true;
         profile.channel = channel.id;
 
-        setStatsProfile(message.guild, profile);
+        await setGuildCounter(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ channel successfully created")
             .setHeader("member count")
@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         profile.enabled = false;
         profile.channel = "none";
 
-        setStatsProfile(message.guild, profile);
+        await setGuildCounter(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ counter successfully disabled").setHeader("member count");
 
@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         profile.format = newFormat;
 
-        setStatsProfile(message.guild, profile);
+        await setGuildCounter(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ format updated - will update channel on next interval")
             .setHeader("member count")
@@ -162,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "if this is true, bots will not be counted towards the member count"
             )
                 .setHeader("member count")
-                .addField("current value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`")
+                .addField("current value", "`" + profile.filterBots + "`")
                 .addField("help", `to change this option, do ${prefix}**counter filterbots <new value (true/false)>**`);
 
             return message.channel.send({ embeds: [embed] });
@@ -173,16 +173,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args[1].toLowerCase() == "true") {
-            profile.filter_bots = 1;
+            profile.filterBots = true;
         } else {
-            profile.filter_bots = 0;
+            profile.filterBots = false;
         }
 
-        setStatsProfile(message.guild, profile);
+        await setGuildCounter(message.guild, profile);
 
         const embed = new CustomEmbed(message.member, false, "✅ value updated - will update channel on next interval")
             .setHeader("member count")
-            .addField("new value", "`" + (profile.filter_bots === 1 ? "true" : "false") + "`");
+            .addField("new value", "`" + profile.filterBots + "`");
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "channel") {
@@ -225,18 +225,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         profile.channel = channel.id;
 
-        setStatsProfile(message.guild, profile);
+        await setGuildCounter(message.guild, profile);
 
         let memberCount = await message.guild.members.fetch();
 
-        if (profile.filter_bots) {
+        if (profile.filterBots) {
             memberCount = memberCount.filter((m) => !m.user.bot);
         }
 
         let format = "";
 
         format = profile.format.split("%count%").join(memberCount.size.toLocaleString());
-        format = format.split("%peak%").join(getPeaks(message.guild).toString());
+        format = format.split("%peak%").join((await getPeaks(message.guild)).toString());
 
         const old = channel.name;
 
@@ -258,7 +258,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) {
             profile.enabled = false;
             profile.channel = "none";
-            setStatsProfile(message.guild, profile);
+            await setGuildCounter(message.guild, profile);
             return message.channel.send({ embeds: [new ErrorEmbed("error updating channel")] });
         }
 

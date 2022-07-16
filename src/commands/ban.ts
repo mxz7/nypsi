@@ -45,13 +45,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     let idOnly = false;
     let idUser: string;
     let id: string;
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member, false)
@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const members = message.mentions.members;
     let reason = message.member.user.tag + ": ";
     let days = 1;
-    let unbanDate;
+    let unbanDate: Date;
     let temporary = false;
     let duration;
 
@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         try {
             duration = getDuration(args[0].toLowerCase());
-            unbanDate = new Date().getTime() + duration * 1000;
+            unbanDate = new Date(Date.now() + duration * 1000);
         } catch {
             // eslint happy
         }
@@ -265,9 +265,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (idOnly) {
-        newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1]);
+        await newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1]);
         if (temporary) {
-            newBan(message.guild, id, unbanDate);
+            await newBan(message.guild, id, unbanDate);
         }
     } else {
         const members1 = Array.from(members.keys());
@@ -280,10 +280,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1]);
+        await newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1]);
 
         if (temporary) {
-            newBan(message.guild, members1, unbanDate);
+            await newBan(message.guild, members1, unbanDate);
         }
 
         if (args.join(" ").includes("-s")) return;

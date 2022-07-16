@@ -27,9 +27,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 && message.mentions.members.first() == null) {
         const embed = new CustomEmbed(message.member)
@@ -225,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
+    await newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
 
     for (const member of members1) {
         const m = members.get(member);

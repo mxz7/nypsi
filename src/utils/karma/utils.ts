@@ -1,11 +1,10 @@
 import { GuildMember } from "discord.js";
 import ms = require("ms");
-import { getDatabase } from "../database/database";
+import prisma from "../database/database";
 import redis from "../database/redis";
 import { MStoTime } from "../functions/date";
 import { logger } from "../logger";
-
-const db = getDatabase();
+import { createProfile } from "../users/utils";
 
 let karmaShop = false;
 
@@ -22,15 +21,27 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
         id = member;
     }
 
-    if (await redis.hexists("cache:karma:amount", id)) return parseInt(await redis.hget("cache:karma:amount", id));
+    if (await redis.exists(`cache:user:karma:${id}`)) return parseInt(await redis.get(`cache:user:karma:${id}`));
 
-    const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id);
+    const query = await prisma.user.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            karma: true,
+        },
+    });
 
     if (!query) {
-        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now());
+        if (member instanceof GuildMember) {
+            await createProfile(member.user);
+        } else {
+            await createProfile(id);
+        }
         return 1;
     } else {
-        await redis.hsetnx("cache:karma:amount", id, query.karma);
+        await redis.set(`cache:user:karma:${id}`, query.karma);
+        await redis.expire(`cache:user:karma:${id}`, 300);
         return query.karma;
     }
 }
@@ -48,15 +59,16 @@ export async function addKarma(member: GuildMember | string, amount: number) {
         id = member;
     }
 
-    if (await redis.hexists("cache:karma:amount", id)) redis.hdel("cache:karma:amount", id);
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            karma: { increment: amount },
+        },
+    });
 
-    const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id);
-
-    if (!query) {
-        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, amount + 1, Date.now());
-    } else {
-        db.prepare("UPDATE karma SET karma = karma + ? WHERE id = ?").run(amount, id);
-    }
+    await redis.del(`cache:user:karma:${id}`);
 }
 
 /**
@@ -72,18 +84,16 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
         id = member;
     }
 
-    if (await redis.hexists("cache:karma:amount", id)) redis.hdel("cache:karma:amount", id);
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            karma: { decrement: amount },
+        },
+    });
 
-    const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id);
-
-    if (!query) {
-        db.prepare("INSERT INTO karma (id, karma, last_command) VALUES (?, ?, ?)").run(id, 1, Date.now());
-    } else {
-        if (amount > query.karma) {
-            amount = query.karma - 1;
-        }
-        db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(amount, id);
-    }
+    await redis.del(`cache:user:karma:${id}`);
 }
 
 /**
@@ -98,15 +108,18 @@ export async function updateLastCommand(member: GuildMember | string) {
         id = member;
     }
 
-    await redis.hset("cache:karma:lastcmd", id, Date.now());
+    const date = new Date();
 
-    const query = db.prepare("SELECT karma FROM karma WHERE id = ?").get(id);
+    await redis.set(`cache:user:lastcmd:${id}`, date.getTime());
 
-    if (!query) {
-        db.prepare("INSERT INTO karma (id, last_command) VALUES (?, ?)").run(id, Date.now());
-    } else {
-        db.prepare("UPDATE karma SET last_command = ? WHERE id = ?").run(Date.now(), id);
-    }
+    await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: {
+            lastCommand: date,
+        },
+    });
 }
 
 /**
@@ -130,7 +143,7 @@ export function closeKarmaShop() {
  * @param {GuildMember} member
  * @returns {number}
  */
-export async function getLastCommand(member: GuildMember | string): Promise<number> {
+export async function getLastCommand(member: GuildMember | string): Promise<Date> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -138,43 +151,57 @@ export async function getLastCommand(member: GuildMember | string): Promise<numb
         id = member;
     }
 
-    if (await redis.hexists("cache:karma:lastcmd", id)) return parseInt(await redis.hget("cache:karma:lastcmd", id));
+    if (await redis.exists(`cache:user:lastcmd:${id}`))
+        return new Date(parseInt(await redis.get(`cache:user:lastcmd:${id}`)));
 
-    const query = db.prepare("SELECT last_command FROM karma WHERE id = ?").get(id);
+    const query = await prisma.user.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            lastCommand: true,
+        },
+    });
 
-    if (!query) {
-        return 0;
+    if (!query || !query.lastCommand) {
+        return new Date(0);
     }
 
-    return query.last_command;
+    return query.lastCommand;
 }
 
 async function deteriorateKarma() {
     const now = Date.now();
 
-    const threshold = now - ms("16 hours");
+    const threshold = now - ms("7 hours");
 
-    /**
-     * @type {Array<{id: String, karma: Number, last_command: Number}>}
-     */
-    const users: Array<{ id: string; karma: number; last_command: number }> = db
-        .prepare("SELECT * FROM karma WHERE last_command < ? AND karma > 1")
-        .all(threshold);
+    const users = await prisma.user.findMany({
+        where: {
+            karma: { gt: 1 },
+        },
+        select: {
+            id: true,
+            karma: true,
+            lastCommand: true,
+        },
+    });
 
     let total = 0;
 
     for (const user of users) {
+        if (user.lastCommand.getTime() > threshold) continue;
+
         let karmaToRemove = 5;
 
-        if (now - ms("1 week") > user.last_command) {
+        if (now - ms("1 week") > user.lastCommand.getTime()) {
             karmaToRemove = 35;
         }
 
-        if (now - ms("30 days") > user.last_command) {
+        if (now - ms("30 days") > user.lastCommand.getTime()) {
             karmaToRemove = 100;
         }
 
-        if (now - ms("90 days") > user.last_command) {
+        if (now - ms("90 days") > user.lastCommand.getTime()) {
             karmaToRemove = 69420;
         }
 
@@ -184,15 +211,22 @@ async function deteriorateKarma() {
 
         total += karmaToRemove;
 
-        db.prepare("UPDATE karma SET karma = karma - ? WHERE id = ?").run(karmaToRemove, user.id);
+        await prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                karma: { decrement: karmaToRemove },
+            },
+        });
+
+        await redis.del(`cache:user:karma:${user.id}`);
     }
 
     logger.log({
         level: "auto",
         message: `${total} total karma deteriorated`,
     });
-
-    await redis.del("cache:karma:amount");
 }
 
 // prettier-ignore

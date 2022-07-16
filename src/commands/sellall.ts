@@ -22,7 +22,7 @@ cmd.slashEnabled = true;
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems();
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const selected = new Map();
 
@@ -80,9 +80,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         earned += `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`;
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
-    updateBalance(message.member, getBalance(message.member) + total);
+    await updateBalance(message.member, (await getBalance(message.member)) + total);
 
     const embed = new CustomEmbed(message.member, false);
 

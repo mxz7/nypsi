@@ -1,13 +1,10 @@
 import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
-import { getDatabase } from "../database/database";
+import prisma from "../database/database";
 import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { Case, PunishmentType } from "../models/GuildStorage";
+import { PunishmentType } from "../models/GuildStorage";
 
-declare function require(name: string);
-
-const db = getDatabase();
 const modLogQueue: Map<string, CustomEmbed[]> = new Map();
 const modLogHookCache: Map<string, WebhookClient> = new Map();
 const modLogColors: Map<PunishmentType, ColorResolvable> = new Map();
@@ -20,39 +17,31 @@ modLogColors.set(PunishmentType.KICK, "#ffdfba");
 modLogColors.set(PunishmentType.UNBAN, "#ffb3ba");
 modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9");
 
-setInterval(async () => {
-    const { checkGuild } = require("../../nypsi");
-
-    const query = db.prepare("SELECT id FROM moderation").all();
-
-    for (const guild of query) {
-        const exists = await checkGuild(guild.id);
-
-        if (!exists) {
-            deleteServer(guild.id);
-
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from moderation data`,
-            });
-        }
-    }
-}, 24 * 60 * 60 * 1000);
-
 /**
  *
  * @param {Guild} guild guild to create profile for
  */
-export function createProfile(guild: Guild) {
-    db.prepare("INSERT INTO moderation (id) VALUES (?)").run(guild.id);
+export async function createProfile(guild: Guild) {
+    await prisma.moderation.create({
+        data: {
+            guildId: guild.id,
+        },
+    });
 }
 
 /**
  * @returns {Boolean}
  * @param {Guild} guild check if profile exists for this guild
  */
-export function profileExists(guild: Guild): boolean {
-    const query = db.prepare("SELECT id FROM moderation WHERE id = ?").get(guild.id);
+export async function profileExists(guild: Guild) {
+    const query = await prisma.moderation.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            guildId: true,
+        },
+    });
 
     if (!query) {
         return false;
@@ -65,10 +54,17 @@ export function profileExists(guild: Guild): boolean {
  * @returns {Number}
  * @param {Guild} guild guild to get case count of
  */
-export function getCaseCount(guild: Guild): number {
-    const query = db.prepare("SELECT case_count FROM moderation WHERE id = ?").get(guild.id);
+export async function getCaseCount(guild: Guild) {
+    const query = await prisma.moderation.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            caseCount: true,
+        },
+    });
 
-    return query.case_count;
+    return query.caseCount;
 }
 
 /**
@@ -79,7 +75,7 @@ export function getCaseCount(guild: Guild): number {
  * @param {String} moderator moderator issuing punishment
  * @param {String} command entire message
  */
-export function newCase(
+export async function newCase(
     guild: Guild,
     caseType: PunishmentType,
     userIDs: Array<string> | string,
@@ -90,13 +86,28 @@ export function newCase(
         userIDs = [userIDs];
     }
     for (const userID of userIDs) {
-        const caseCount = getCaseCount(guild);
-        db.prepare(
-            "INSERT INTO moderation_cases (case_id, type, user, moderator, command, time, deleted, guild_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        ).run(caseCount.toString(), caseType, userID, moderator, command, new Date().getTime(), 0, guild.id);
-        db.prepare("UPDATE moderation SET case_count = ? WHERE id = ?").run(caseCount + 1, guild.id);
+        const caseCount = await getCaseCount(guild);
+        await prisma.moderationCase.create({
+            data: {
+                guildId: guild.id,
+                caseId: caseCount.toString(),
+                type: caseType,
+                user: userID,
+                moderator: moderator,
+                command: command,
+                time: new Date(),
+            },
+        });
+        await prisma.moderation.update({
+            where: {
+                guildId: guild.id,
+            },
+            data: {
+                caseCount: { increment: 1 },
+            },
+        });
 
-        if (!isModLogsEnabled(guild)) return;
+        if (!(await isModLogsEnabled(guild))) return;
 
         addModLog(guild, caseType, userID, moderator, command, caseCount);
     }
@@ -146,22 +157,43 @@ export async function addModLog(
     }
 }
 
-export function isModLogsEnabled(guild: Guild) {
+export async function isModLogsEnabled(guild: Guild) {
     if (modLogHookCache.has(guild.id)) return true;
-    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id);
+    const query = await prisma.moderation.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            modlogs: true,
+        },
+    });
 
     if (!query || !query.modlogs) return false;
 
     return true;
 }
 
-export function setModLogs(guild: Guild, hook: string) {
-    db.prepare("UPDATE moderation SET modlogs = ? WHERE id = ?").run(hook, guild.id);
+export async function setModLogs(guild: Guild, hook: string) {
+    await prisma.moderation.update({
+        where: {
+            guildId: guild.id,
+        },
+        data: {
+            modlogs: hook,
+        },
+    });
     if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id);
 }
 
-export function getModLogsHook(guild: Guild): WebhookClient | undefined {
-    const query = db.prepare("SELECT modlogs FROM moderation WHERE id = ?").get(guild.id);
+export async function getModLogsHook(guild: Guild): Promise<WebhookClient | undefined> {
+    const query = await prisma.moderation.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            modlogs: true,
+        },
+    });
 
     if (!query.modlogs) return undefined;
 
@@ -173,18 +205,22 @@ export function getModLogsHook(guild: Guild): WebhookClient | undefined {
  * @param {Guild} guild guild to delete case in
  * @param {String} caseID case to delete
  */
-export function deleteCase(guild: Guild, caseID: string) {
-    db.prepare("UPDATE moderation_cases SET deleted = 1 WHERE guild_id = ? AND case_id = ?").run(
-        guild.id,
-        caseID.toString()
-    );
+export async function deleteCase(guild: Guild, caseID: string) {
+    await prisma.moderationCase.updateMany({
+        where: {
+            AND: [{ guildId: guild.id }, { caseId: caseID.toString() }],
+        },
+        data: {
+            deleted: true,
+        },
+    });
 }
 
 /**
  *
  * @param {Guild} guild guild to delete data for
  */
-export function deleteServer(guild: Guild | string) {
+export async function deleteServer(guild: Guild | string) {
     let id: string;
     if (guild instanceof Guild) {
         id = guild.id;
@@ -192,10 +228,26 @@ export function deleteServer(guild: Guild | string) {
         id = guild;
     }
 
-    db.prepare("DELETE FROM moderation_cases WHERE guild_id = ?").run(id);
-    db.prepare("DELETE FROM moderation_mutes WHERE guild_id = ?").run(id);
-    db.prepare("DELETE FROM moderation_bans WHERE guild_id = ?").run(id);
-    db.prepare("DELETE FROM moderation WHERE id = ?").run(id);
+    await prisma.moderationMute.deleteMany({
+        where: {
+            guildId: id,
+        },
+    });
+    await prisma.moderationBan.deleteMany({
+        where: {
+            guildId: id,
+        },
+    });
+    await prisma.moderationCase.deleteMany({
+        where: {
+            guildId: id,
+        },
+    });
+    await prisma.moderation.delete({
+        where: {
+            guildId: id,
+        },
+    });
 }
 
 /**
@@ -203,12 +255,12 @@ export function deleteServer(guild: Guild | string) {
  * @param {Guild} guild guild to get cases of
  * @param {String} userID user to get cases of
  */
-export function getCases(guild: Guild, userID: string): Array<Case> {
-    const query = db.prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND user = ?").all(guild.id, userID);
-
-    for (const d of query) {
-        d.case_id = parseInt(d.case_id);
-    }
+export async function getCases(guild: Guild, userID: string) {
+    const query = await prisma.moderationCase.findMany({
+        where: {
+            AND: [{ guildId: guild.id }, { user: userID }],
+        },
+    });
 
     return query.reverse();
 }
@@ -217,8 +269,18 @@ export function getCases(guild: Guild, userID: string): Array<Case> {
  * @returns {Object}
  * @param {Guild} guild guild to get cases of
  */
-export function getAllCases(guild: Guild): Case[] {
-    const query = db.prepare("SELECT user, moderator, type, deleted FROM moderation_cases WHERE guild_id = ?").all(guild.id);
+export async function getAllCases(guild: Guild) {
+    const query = await prisma.moderationCase.findMany({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            user: true,
+            moderator: true,
+            type: true,
+            deleted: true,
+        },
+    });
 
     return query.reverse();
 }
@@ -228,22 +290,16 @@ export function getAllCases(guild: Guild): Case[] {
  * @param {Guild} guild guild to search for case in
  * @param {Number} caseID case to fetch
  */
-export function getCase(guild: Guild, caseID: number): Case {
-    if (caseID > getCaseCount(guild)) return undefined;
+export async function getCase(guild: Guild, caseID: number) {
+    if (caseID > (await getCaseCount(guild))) return undefined;
 
-    let query = db
-        .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
-        .get(guild.id, caseID.toString());
-
-    if (!query) {
-        query = db
-            .prepare("SELECT * FROM moderation_cases WHERE guild_id = ? AND case_id = ?")
-            .get(guild.id, caseID.toString() + ".0");
-    }
+    const query = await prisma.moderationCase.findFirst({
+        where: {
+            AND: [{ guildId: guild.id }, { caseId: caseID.toString() }],
+        },
+    });
 
     if (!query) return undefined;
-
-    query.case_id = parseInt(query.case_id);
 
     return query;
 }
@@ -254,16 +310,18 @@ export function getCase(guild: Guild, caseID: number): Case {
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export function newMute(guild: Guild, userIDs: Array<string>, date: number) {
+export async function newMute(guild: Guild, userIDs: Array<string>, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }
     for (const userID of userIDs) {
-        db.prepare("INSERT INTO moderation_mutes (user, unmute_time, guild_id) VALUES (?, ?, ?)").run(
-            userID,
-            date,
-            guild.id
-        );
+        await prisma.moderationMute.create({
+            data: {
+                userId: userID,
+                expire: date,
+                guildId: guild.id,
+            },
+        });
     }
 }
 
@@ -273,13 +331,19 @@ export function newMute(guild: Guild, userIDs: Array<string>, date: number) {
  * @param {Array<String>} userIDs
  * @param {Date} date
  */
-export function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
+export async function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }
 
     for (const userID of userIDs) {
-        db.prepare("INSERT INTO moderation_bans (user, unban_time, guild_id) VALUES (?, ?, ?)").run(userID, date, guild.id);
+        await prisma.moderationBan.create({
+            data: {
+                userId: userID,
+                expire: date,
+                guildId: guild.id,
+            },
+        });
     }
 }
 
@@ -288,10 +352,15 @@ export function newBan(guild: Guild, userIDs: Array<string> | string, date: Date
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function isMuted(guild: Guild, member: GuildMember): boolean {
-    const query = db
-        .prepare("SELECT user FROM moderation_mutes WHERE guild_id = ? AND user = ?")
-        .get(guild.id, member.user.id);
+export async function isMuted(guild: Guild, member: GuildMember) {
+    const query = await prisma.moderationMute.findFirst({
+        where: {
+            AND: [{ guildId: guild.id }, { userId: member.user.id }],
+        },
+        select: {
+            userId: true,
+        },
+    });
 
     if (query) {
         return true;
@@ -305,10 +374,15 @@ export function isMuted(guild: Guild, member: GuildMember): boolean {
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function isBanned(guild: Guild, member: GuildMember): boolean {
-    const query = db
-        .prepare("SELECT user FROM moderation_bans WHERE guild_id = ? AND user = ?")
-        .get(guild.id, member.user.id);
+export async function isBanned(guild: Guild, member: GuildMember) {
+    const query = await prisma.moderationBan.findFirst({
+        where: {
+            AND: [{ guildId: guild.id }, { userId: member.user.id }],
+        },
+        select: {
+            userId: true,
+        },
+    });
 
     if (query) {
         return true;
@@ -322,58 +396,89 @@ export function isBanned(guild: Guild, member: GuildMember): boolean {
  * @param {Client} client
  */
 export function runModerationChecks(client: Client) {
-    setInterval(() => {
-        const date = new Date().getTime();
+    setInterval(async () => {
+        const date = new Date();
 
-        let query = db.prepare("SELECT user, guild_id FROM moderation_mutes WHERE unmute_time <= ?").all(date);
+        const query1 = await prisma.moderationMute.findMany({
+            where: {
+                expire: { lte: date },
+            },
+            select: {
+                userId: true,
+                guildId: true,
+            },
+        });
 
-        for (const unmute of query) {
+        for (const unmute of query1) {
             logger.log({
                 level: "auto",
-                message: `requesting unmute in ${unmute.guild_id} for ${unmute.user}`,
+                message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
             });
-            requestUnmute(unmute.guild_id, unmute.user, client);
+            requestUnmute(unmute.guildId, unmute.userId, client);
         }
 
-        query = db.prepare("SELECT user, guild_id FROM moderation_bans WHERE unban_time <= ?").all(date);
+        const query2 = await prisma.moderationBan.findMany({
+            where: {
+                expire: { lte: date },
+            },
+            select: {
+                userId: true,
+                guildId: true,
+            },
+        });
 
-        for (const unban of query) {
+        for (const unban of query2) {
             logger.log({
                 level: "auto",
-                message: `requesting unban in ${unban.guild_id} for ${unban.user}`,
+                message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
             });
-            requestUnban(unban.guild_id, unban.user, client);
+            await requestUnban(unban.guildId, unban.userId, client);
         }
 
-        query = db.prepare("SELECT modlogs, id FROM moderation WHERE modlogs != ''").all();
+        const query3 = await prisma.moderation.findMany({
+            where: {
+                NOT: { modlogs: "" },
+            },
+            select: {
+                modlogs: true,
+                guildId: true,
+            },
+        });
 
-        for (const modlog of query) {
-            if (!modLogQueue.has(modlog.id) || modLogQueue.get(modlog.id).length == 0) continue;
+        for (const modlog of query3) {
+            if (!modLogQueue.has(modlog.guildId) || modLogQueue.get(modlog.guildId).length == 0) continue;
             let webhook: WebhookClient;
 
-            if (modLogHookCache.has(modlog.id)) {
-                webhook = modLogHookCache.get(modlog.id);
+            if (modLogHookCache.has(modlog.guildId)) {
+                webhook = modLogHookCache.get(modlog.guildId);
             } else {
                 webhook = new WebhookClient({ url: modlog.modlogs });
-                modLogHookCache.set(modlog.id, webhook);
+                modLogHookCache.set(modlog.guildId, webhook);
             }
 
             let embeds: CustomEmbed[];
 
-            if (modLogQueue.get(modlog.id).length > 10) {
-                const current = modLogQueue.get(modlog.id);
+            if (modLogQueue.get(modlog.guildId).length > 10) {
+                const current = modLogQueue.get(modlog.guildId);
                 embeds = current.splice(0, 10);
-                modLogQueue.set(modlog.id, current);
+                modLogQueue.set(modlog.guildId, current);
             } else {
-                embeds = modLogQueue.get(modlog.id);
-                modLogQueue.set(modlog.id, []);
+                embeds = modLogQueue.get(modlog.guildId);
+                modLogQueue.set(modlog.guildId, []);
             }
 
-            webhook.send({ embeds: embeds }).catch((e) => {
-                logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`);
+            webhook.send({ embeds: embeds }).catch(async (e) => {
+                logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
                 logger.error(e);
 
-                db.prepare("UPDATE moderation SET modlogs = '' WHERE id = ?").run(modlog.id);
+                await prisma.moderation.update({
+                    where: {
+                        guildId: modlog.guildId,
+                    },
+                    data: {
+                        modlogs: "",
+                    },
+                });
             });
         }
     }, 30000);
@@ -385,11 +490,18 @@ export function runModerationChecks(client: Client) {
  * @param {Number} caseID
  * @param {String} reason
  */
-export function setReason(guild: Guild, caseID: number, reason: string) {
-    db.prepare("UPDATE moderation_cases SET command = ? WHERE case_id = ? AND guild_id = ?").run(reason, caseID, guild.id);
+export async function setReason(guild: Guild, caseID: number, reason: string) {
+    await prisma.moderationCase.updateMany({
+        where: {
+            AND: [{ caseId: caseID.toString() }, { guildId: guild.id }],
+        },
+        data: {
+            command: reason,
+        },
+    });
 }
 
-export function deleteMute(guild: Guild, member: GuildMember | string) {
+export async function deleteMute(guild: Guild, member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.id;
@@ -397,10 +509,14 @@ export function deleteMute(guild: Guild, member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("DELETE FROM moderation_mutes WHERE user = ? AND guild_id = ?").run(id, guild.id);
+    await prisma.moderationMute.deleteMany({
+        where: {
+            AND: [{ userId: id }, { guildId: guild.id }],
+        },
+    });
 }
 
-export function deleteBan(guild: Guild, member: GuildMember | string) {
+export async function deleteBan(guild: Guild, member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.id;
@@ -408,20 +524,31 @@ export function deleteBan(guild: Guild, member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("DELETE FROM moderation_bans WHERE user = ? AND guild_id = ?").run(id, guild.id);
+    await prisma.moderationBan.deleteMany({
+        where: {
+            AND: [{ userId: id }, { guildId: guild.id }],
+        },
+    });
 }
 /**
  *
  * @param {Guild} guild
  * @returns {String}
  */
-export function getMuteRole(guild: Guild): string {
-    const query = db.prepare("SELECT mute_role FROM moderation WHERE id = ?").get(guild.id);
+export async function getMuteRole(guild: Guild) {
+    const query = await prisma.moderation.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            muteRole: true,
+        },
+    });
 
-    if (query.mute_role == "") {
+    if (query.muteRole == "") {
         return undefined;
     } else {
-        return query.mute_role;
+        return query.muteRole;
     }
 }
 
@@ -430,17 +557,26 @@ export function getMuteRole(guild: Guild): string {
  * @param {Guild} guild
  * @param {Role} role
  */
-export function setMuteRole(guild: Guild, role: Role | string) {
-    const query = db.prepare("UPDATE moderation SET mute_role = ? WHERE id = ?");
+export async function setMuteRole(guild: Guild, role: Role | string) {
+    let id: string;
 
     if (role instanceof Role) {
-        query.run(role.id, guild.id);
+        id = role.id;
     } else {
-        query.run(role, guild.id);
+        id = role;
     }
+
+    await prisma.moderation.update({
+        where: {
+            guildId: guild.id,
+        },
+        data: {
+            muteRole: id,
+        },
+    });
 }
 
-function requestUnban(guild: string | Guild, member: string, client: Client) {
+async function requestUnban(guild: string | Guild, member: string, client: Client) {
     guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
@@ -448,7 +584,7 @@ function requestUnban(guild: string | Guild, member: string, client: Client) {
         return;
     }
 
-    deleteBan(guild, member);
+    await deleteBan(guild, member);
 
     guild.members.unban(member, "ban expired");
 
@@ -484,13 +620,13 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
         });
         if (!newMember) {
             logger.warn("unable to find member, deleting mute..");
-            return deleteMute(guild, member);
+            return await deleteMute(guild, member);
         }
     }
 
     await guild.roles.fetch();
 
-    const muteRoleID = getMuteRole(guild);
+    const muteRoleID = await getMuteRole(guild);
 
     let muteRole = guild.roles.cache.find((r) => r.id == muteRoleID);
 
@@ -500,10 +636,10 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
 
     if (!muteRole) {
         logger.warn("unable to find mute role, deleting mute..");
-        return deleteMute(guild, newMember);
+        return await deleteMute(guild, newMember);
     }
 
-    deleteMute(guild, member);
+    await deleteMute(guild, member);
 
     logger.log({
         level: "success",
@@ -515,8 +651,12 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
     });
 }
 
-export function getMutedUsers(guild: Guild): Array<{ user: string; unmute_time: number }> {
-    const query = db.prepare("SELECT user, unmute_time FROM moderation_mutes WHERE guild_id = ?").all(guild.id);
+export async function getMutedUsers(guild: Guild) {
+    const query = await prisma.moderationMute.findMany({
+        where: {
+            guildId: guild.id,
+        },
+    });
 
     return query;
 }

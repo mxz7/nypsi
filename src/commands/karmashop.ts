@@ -6,6 +6,7 @@ import { isPremium, getTier, setExpireDate } from "../utils/premium/utils";
 import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -23,7 +24,7 @@ const amount = new Map();
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
     if (message.author.id == "672793821850894347") {
         if (args[0] && args[0].toLowerCase() == "open") {
             return openKarmaShop();
@@ -48,9 +49,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let limit = 15;
 
-    if (isPremium(message.author.id)) {
+    if (await isPremium(message.author.id)) {
         limit = 20;
-        if (getTier(message.author.id) == 4) {
+        if ((await getTier(message.author.id)) == 4) {
             limit = 50;
         }
     }
@@ -266,7 +267,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (selected.id) {
             case "bronze":
-                if (isPremium(message.member) && getTier(message.member) >= 1) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 1) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -283,7 +284,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "silver":
-                if (isPremium(message.member) && getTier(message.member) >= 2) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 2) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -300,7 +301,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "gold":
-                if (isPremium(message.member) && getTier(message.member) >= 3) {
+                if ((await isPremium(message.member)) && (await getTier(message.member)) >= 3) {
                     return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
@@ -317,13 +318,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
                 break;
             case "100xp":
-                updateXp(message.member, getXp(message.member) + 100);
+                await updateXp(message.member, (await getXp(message.member)) + 100);
                 break;
             case "1000xp":
-                updateXp(message.member, getXp(message.member) + 1000);
+                await updateXp(message.member, (await getXp(message.member)) + 1000);
                 break;
             case "basic_crate":
-                const inventory = getInventory(message.member); // eslint-disable-line
+                const inventory = await getInventory(message.member); // eslint-disable-line
 
                 if (inventory["basic_crate"]) {
                     inventory["basic_crate"]++;
@@ -331,11 +332,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     inventory["basic_crate"] = 1;
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
         }
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
-            setExpireDate(message.member, new Date().setDate(new Date().getDate() + 15));
+            await setExpireDate(message.member, dayjs().add(15, "days").toDate());
         }
 
         if (amount.has(message.author.id)) {

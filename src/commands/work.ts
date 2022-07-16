@@ -19,13 +19,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
-    if (getBalance(message.member) <= 0) {
+    if ((await getBalance(message.member)) <= 0) {
         return message.channel.send({ embeds: [new ErrorEmbed("you need money to work")] });
     }
 
-    if (getBalance(message.member) > 1000000) {
+    if ((await getBalance(message.member)) > 1000000) {
         return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });
     }
 
@@ -33,16 +33,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let earnedMax = 20;
 
-    if (getBalance(message.member) <= 100000) {
+    if ((await getBalance(message.member)) <= 100000) {
         earnedMax = 35;
-    } else if (getBalance(message.member) >= 250000) {
+    } else if ((await getBalance(message.member)) >= 250000) {
         earnedMax = 10;
     }
 
     const earnedPercent = Math.floor(Math.random() * earnedMax) + 1;
-    let earned = Math.round((earnedPercent / 100) * getBalance(message.member));
+    let earned = Math.round((earnedPercent / 100) * (await getBalance(message.member)));
 
-    if (getBalance(message.member) >= 2000000) {
+    if ((await getBalance(message.member)) >= 2000000) {
         const base = 25000;
         const bonus = Math.floor(Math.random() * 75000);
         const total = base + bonus;
@@ -52,12 +52,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const work = workMessages[Math.floor(Math.random() * workMessages.length)];
 
-    updateBalance(message.member, getBalance(message.member) + earned);
+    await updateBalance(message.member, (await getBalance(message.member)) + earned);
 
     const embed = new CustomEmbed(message.member, true, work).setHeader("work", message.author.avatarURL());
 
-    message.channel.send({ embeds: [embed] }).then((m) => {
-        if (getBalance(message.member) >= 2000000) {
+    message.channel.send({ embeds: [embed] }).then(async (m) => {
+        if ((await getBalance(message.member)) >= 2000000) {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**");
         } else {
             embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**");

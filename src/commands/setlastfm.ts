@@ -22,12 +22,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false);
 
-        const username = getLastfmUsername(message.member);
+        const username = await getLastfmUsername(message.member);
 
         if (username) {
-            embed.setDescription(`your last.fm username is set to \`${username.username}\``);
+            embed.setDescription(`your last.fm username is set to \`${username}\``);
         } else {
-            embed.setDescription(`your username has not been set, ${getPrefix(message.guild)}**slfm <username>**`);
+            embed.setDescription(`your username has not been set, ${await getPrefix(message.guild)}**slfm <username>**`);
         }
 
         return message.channel.send({ embeds: [embed] });

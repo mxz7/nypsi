@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length < 2) {
         const embed = new CustomEmbed(message.member)
@@ -79,18 +79,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (isEcoBanned(target.user.id)) {
+    if (await isEcoBanned(target.user.id)) {
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (!(await userExists(target))) createUser(target);
+    if (!(await userExists(target))) await createUser(target);
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (args[1].toLowerCase() == "all") {
-        args[1] = getBalance(message.member).toString();
+        args[1] = (await getBalance(message.member)).toString();
     } else if (args[1].toLowerCase() == "half") {
-        args[1] = (getBalance(message.member) / 2).toString();
+        args[1] = ((await getBalance(message.member)) / 2).toString();
     }
 
     const amount = formatNumber(args[1]);
@@ -99,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid payment")] });
     }
 
-    if (amount > getBalance(message.member)) {
+    if (amount > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
     }
 
@@ -107,10 +107,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid payment")] });
     }
 
-    const targetPrestige = getPrestige(target);
+    const targetPrestige = await getPrestige(target);
 
     if (targetPrestige < 2) {
-        const targetXp = getXp(target);
+        const targetXp = await getXp(target);
 
         let payLimit = 150000;
 
@@ -139,23 +139,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         tax = 0.05;
     }
 
-    if (isPremium(message.member)) {
+    if (await isPremium(message.member)) {
         tax = 0;
     }
 
-    updateBalance(message.member, getBalance(message.member) - amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
     if (tax > 0) {
-        updateBalance(target, getBalance(target) + (amount - Math.round(amount * tax)));
+        await updateBalance(target, (await getBalance(target)) + (amount - Math.round(amount * tax)));
     } else {
-        updateBalance(target, getBalance(target) + amount);
+        await updateBalance(target, (await getBalance(target)) + amount);
     }
 
     const embed = new CustomEmbed(message.member)
         .setHeader("payment", message.author.avatarURL())
         .addField(
             message.member.user.tag,
-            "$" + (getBalance(message.member) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString()
+            "$" + ((await getBalance(message.member)) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString()
         );
 
     if (tax > 0) {
@@ -165,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField(
             target.user.tag,
             "$" +
-                (getBalance(target) - amount).toLocaleString() +
+                ((await getBalance(target)) - amount).toLocaleString() +
                 "\n**+** $" +
                 (amount - Math.round(amount * tax)).toLocaleString()
         );
@@ -173,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(message.member.user.toString() + " -> " + target.user.toString());
         embed.addField(
             target.user.tag,
-            "$" + (getBalance(target) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString()
+            "$" + ((await getBalance(target)) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString()
         );
     }
 
@@ -186,17 +186,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    send({ embeds: [embed] }).then((m) => {
+    send({ embeds: [embed] }).then(async (m) => {
         const embed = new CustomEmbed(message.member)
             .setHeader("payment", message.author.avatarURL())
             .setDescription(message.member.user.toString() + " -> " + target.user.toString())
-            .addField(message.member.user.tag, "$" + getBalance(message.member).toLocaleString());
+            .addField(message.member.user.tag, "$" + (await getBalance(message.member)).toLocaleString());
 
         if (tax > 0) {
             embed.addField(
                 target.user.tag,
                 "$" +
-                    getBalance(target).toLocaleString() +
+                    (await getBalance(target)).toLocaleString() +
                     " (+$**" +
                     (amount - Math.round(amount * tax)).toLocaleString() +
                     "**)"
@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             embed.addField(
                 target.user.tag,
-                "$" + getBalance(target).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)"
+                "$" + (await getBalance(target)).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)"
             );
         }
 

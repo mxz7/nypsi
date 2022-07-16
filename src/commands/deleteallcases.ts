@@ -23,7 +23,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!profileExists(message.guild))
+    if (!(await profileExists(message.guild)))
         return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] });
 
     const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
 
     if (reaction == "✅") {
-        deleteServer(message.guild);
+        await deleteServer(message.guild);
 
         const newEmbed = new CustomEmbed(message.member, false, "✅ all cases have been deleted").setDescription(
             "✅ all cases have been deleted"

@@ -24,7 +24,7 @@ cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescripti
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
@@ -59,15 +59,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "all") {
-        args[0] = getBalance(message.member).toString();
+        args[0] = (await getBalance(message.member)).toString();
         const amount = parseInt(args[0]);
-        if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
-            args[0] = (getMaxBankBalance(message.member) - getBankBalance(message.member)).toString();
+        if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
+            args[0] = ((await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))).toString();
         }
     }
 
     if (args[0] == "half") {
-        args[0] = (getBankBalance(message.member) / 2).toString();
+        args[0] = ((await getBankBalance(message.member)) / 2).toString();
     }
 
     const amount = formatNumber(args[0]);
@@ -76,11 +76,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > getBalance(message.member)) {
+    if (amount > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
     }
 
-    if (amount > getMaxBankBalance(message.member) - getBankBalance(message.member)) {
+    if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("your bank is not big enough for this payment")] });
     }
 
@@ -95,26 +95,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
 
     const m = await send({ embeds: [embed] });
 
-    updateBalance(message.member, getBalance(message.member) - amount);
-    updateBankBalance(message.member, getBankBalance(message.member) + amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - amount);
+    await updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
 
     const embed1 = new CustomEmbed(message.member, false)
         .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",
             "$**" +
-                getBankBalance(message.member).toLocaleString() +
+                (await getBankBalance(message.member)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(message.member).toLocaleString() +
+                (await getMaxBankBalance(message.member)).toLocaleString() +
                 "**"
         )
         .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");

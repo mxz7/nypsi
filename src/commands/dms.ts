@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const current = await getDMsEnabled(message.member);
 
@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed = new CustomEmbed(message.member, false, "✅ you will now receive dms from nypsi");
     }
 
-    setDMsEnabled(message.member, newValue);
+    await setDMsEnabled(message.member, newValue);
 
     return await message.channel.send({ embeds: [embed] });
 }
