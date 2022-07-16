@@ -574,7 +574,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "top") {
         await addCooldown(cmd.name, message.member, 15);
 
-        const top = topGuilds(parseInt(args[1]) ?? 5);
+        let limit = 5;
+
+        if (!isNaN(parseInt(args[1]))) {
+            limit = parseInt(args[1]);
+        }
+
+        const top = topGuilds(limit);
 
         const embed = new CustomEmbed(message.member, false).setHeader(
             `top ${args[1] ?? 5} guilds`,
