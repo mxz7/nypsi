@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`;
 
-            description += `\n\n**color** #${embedColor} - ${await getPrefix(message.guild)}setcolor`;
+            description += `\n\n**color** ${embedColor} - ${await getPrefix(message.guild)}setcolor`;
 
             if (profile.level > 2) {
                 const cmd = await getUserCommand(message.author.id);
