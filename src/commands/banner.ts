@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const banner = user.bannerURL({ dynamic: true, size: 512 });
 
-    const embed = new CustomEmbed(member, false).setHeader(member.user.tag).setImage(banner);
+    const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(banner);
 
     return message.channel.send({ embeds: [embed] });
 }

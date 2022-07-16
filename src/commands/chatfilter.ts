@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
+        const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("current chat filter")
             .setFooter(`use ${prefix}filter (add/del/+/-) to modify the filter`);
 
@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (filter.indexOf(word) > -1) {
-            const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` already exists in the filter")
+            const embed = new CustomEmbed(message.member, "❌ `" + word + "` already exists in the filter")
                 .setHeader("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`);
 
@@ -69,7 +69,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                true,
                 `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`
             ).setHeader("chat filter");
 
@@ -78,9 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateChatFilter(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setHeader(
-            "chat filter"
-        );
+        const embed = new CustomEmbed(message.member, "✅ added `" + word + "` to the filter").setHeader("chat filter");
         return message.channel.send({ embeds: [embed] });
     }
 
@@ -98,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (filter.indexOf(word) > -1) {
             filter.splice(filter.indexOf(word), 1);
         } else {
-            const embed = new CustomEmbed(message.member, false, "❌ `" + word + "` not found in the filter")
+            const embed = new CustomEmbed(message.member, "❌ `" + word + "` not found in the filter")
                 .setHeader("chat filter")
                 .setFooter(`you can use ${prefix}filter to view the filter`);
 
@@ -107,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateChatFilter(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
+        const embed = new CustomEmbed(message.member, "✅ removed `" + word + "` from the filter")
             .setHeader("chat filter")
             .setFooter(`you can use ${prefix}filter reset to reset the filter`);
 
@@ -119,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateChatFilter(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setHeader("chat filter");
+        const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader("chat filter");
 
         return message.channel.send({ embeds: [embed] });
     }

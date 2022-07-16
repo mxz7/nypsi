@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, `[**#${color}**](https://color.tekoh.net/#${color})`);
+    const embed = new CustomEmbed(message.member, `[**#${color}**](https://color.tekoh.net/#${color})`);
 
     try {
         embed.setColor(color);

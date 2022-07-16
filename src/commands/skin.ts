@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const skin = await getSkin(username);
 
-    const embed = new CustomEmbed(message.member, false, `[download](https://mc-heads.net/download/${uuid.id})`)
+    const embed = new CustomEmbed(message.member, `[download](https://mc-heads.net/download/${uuid.id})`)
         .setTitle(uuid.name)
         .setURL("https://namemc.com/profile/" + username)
         .setImage(skin.render);

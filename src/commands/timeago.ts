@@ -59,9 +59,9 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
     }
 
     if (label) {
-        return send({ embeds: [new CustomEmbed(message.member, false, `${label} was **${length} ago**`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `${label} was **${length} ago**`)] });
     } else {
-        return send({ embeds: [new CustomEmbed(message.member, false, `${length} ago`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `${length} ago`)] });
     }
 }
 

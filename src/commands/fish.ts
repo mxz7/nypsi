@@ -285,7 +285,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
     await setInventory(message.member, inventory);
 
-    const embed = new CustomEmbed(message.member, false, `you go to the pond and cast your **${items[fishingRod].name}**`);
+    const embed = new CustomEmbed(message.member, `you go to the pond and cast your **${items[fishingRod].name}**`);
 
     const msg = await send({ embeds: [embed] });
 

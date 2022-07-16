@@ -105,7 +105,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(
             message.member,
-            false,
             "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
         ).setHeader("purge");
 
@@ -172,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
         if (!(message instanceof Message)) {
-            message.editReply({ embeds: [new CustomEmbed(message.member, false, "operation complete (:")] }).catch(() => {});
+            message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch(() => {});
         }
         return m.delete().catch();
     }

@@ -103,7 +103,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
                 ).setHeader("milf finder"),
             ],
@@ -124,7 +123,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                true,
                 `a match has been made from **${key.guild.name}**\n\n` +
                     `go ahead and send **${key.user.tag}** a *private* message 😉😏`
             ).setHeader("milf finder");
@@ -143,7 +141,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed2 = new CustomEmbed(
                 undefined,
-                true,
                 `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
             )
                 .setHeader("milf finder")
@@ -165,7 +162,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
                 ).setHeader("milf finder"),
             ],
@@ -190,7 +186,7 @@ setInterval(() => {
                 await obj.user
                     .send({
                         embeds: [
-                            new CustomEmbed(undefined, false, "unfortunately we couldn't find you a milf 😢")
+                            new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
                                 .setColor("#e4334f")
                                 .setHeader("milf finder"),
                         ],

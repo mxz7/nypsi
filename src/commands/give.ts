@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("give", message.author.avatarURL());
 
         embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     try {
         searchTag = args[1].toLowerCase();
     } catch {
-        const embed = new CustomEmbed(message.member, false).setHeader("give", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("give", message.author.avatarURL());
 
         embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
@@ -194,7 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.id == "ring") {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "you may now kiss the bride :heart:")],
+            embeds: [new CustomEmbed(message.member, "you may now kiss the bride :heart:")],
         });
     }
 
@@ -202,7 +202,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
             new CustomEmbed(
                 message.member,
-                false,
                 `you have given **${amount}** ${selected.emoji} ${selected.name} to **${target.toString()}**`
             ),
         ],

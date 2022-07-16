@@ -11,7 +11,6 @@ const cmd = new Command("github", "view code for the bot on github", Categories.
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(
         message.member,
-        true,
         "nypsi is open source!!\n" + "click [here](https://github.com/tekoh/nypsi) to view the source code on github"
     )
         .setTitle("github")

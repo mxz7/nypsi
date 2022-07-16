@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await createUser(message.member);
     }
 
-    const embed = new CustomEmbed(message.member, true);
+    const embed = new CustomEmbed(message.member);
 
     await updateLastKnowntag(message.member, message.member.user.tag);
 

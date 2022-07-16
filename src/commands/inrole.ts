@@ -83,11 +83,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!memberList.get(1)) {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "that role has no members")],
+            embeds: [new CustomEmbed(message.member, "that role has no members")],
         });
     }
 
-    const embed = new CustomEmbed(message.member, false, memberList.get(1).join("\n"))
+    const embed = new CustomEmbed(message.member, memberList.get(1).join("\n"))
         .setHeader(role.name + " [" + count.toLocaleString() + "]")
         .setFooter(`page 1/${memberList.size}`);
 

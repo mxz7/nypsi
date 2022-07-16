@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         worth = 1000 * amount;
     }
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
         `${amount} ${selected.emoji} **${selected.name}** is worth $${worth.toLocaleString()} ${

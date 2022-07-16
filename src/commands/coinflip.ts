@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length != 2) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("coinflip help")
             .addField("usage", `${prefix}coinflip @user <bet>`)
             .addField("help", "if you win, you will double your bet")
@@ -131,7 +131,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const requestEmbed = new CustomEmbed(
         message.member,
-        false,
         `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
     ).setFooter("expires in 60 seconds");
 
@@ -230,7 +229,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(
             message.member,
-            true,
             `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
         ).setHeader("coinflip");
 
@@ -251,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
         waiting.splice(waiting.indexOf(message.author.id), 1);
-        return message.channel.send({ embeds: [new CustomEmbed(target, false, "✅ coinflip request denied")] });
+        return message.channel.send({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
     }
 }
 

@@ -24,7 +24,7 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO).
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const defaultMessage = async () => {
         if (await isPremium(message.member)) {
-            const embed = new CustomEmbed(message.member, false);
+            const embed = new CustomEmbed(message.member);
 
             embed.setHeader("premium status", message.author.avatarURL());
 
@@ -56,7 +56,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             const embed = new CustomEmbed(
                 message.member,
-                false,
                 "you currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
             );
 
@@ -86,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!user) return message.channel.send({ embeds: [new ErrorEmbed("user doesnt exist")] });
 
         if (await isPremium(user.id)) {
-            const embed = new CustomEmbed(message.member, false);
+            const embed = new CustomEmbed(message.member);
 
             embed.setHeader("premium status", message.author.avatarURL());
 
@@ -108,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             return message.channel.send({ embeds: [embed] });
         } else {
-            const embed = new CustomEmbed(message.member, false, "no premium membership");
+            const embed = new CustomEmbed(message.member, "no premium membership");
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -135,17 +134,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "level":
                 await setTier(args[2], parseInt(args[3]));
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ tier changed to ${args[3]}`)],
+                    embeds: [new CustomEmbed(message.member, `✅ tier changed to ${args[3]}`)],
                 });
             case "embed":
                 await setEmbedColor(args[2], args[3]);
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ embed color changed to ${args[3]}`)],
+                    embeds: [new CustomEmbed(message.member, `✅ embed color changed to ${args[3]}`)],
                 });
             case "status":
                 await setStatus(args[2], parseInt(args[3]));
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ status changed to ${args[3]}`)],
+                    embeds: [new CustomEmbed(message.member, `✅ status changed to ${args[3]}`)],
                 });
         }
     } else if (args[0].toLowerCase() == "add") {
@@ -160,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await addMember(args[1], parseInt(args[2]));
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ created profile at tier " + args[2])],
+            embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
         });
     } else if (args[0].toLowerCase() == "renew") {
         if (message.author.id != "672793821850894347") {
@@ -173,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await renewUser(args[1]);
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ membership renewed")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
     } else if (args[0].toLowerCase() == "expire") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage();
@@ -185,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         expireUser(args[1]);
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ membership expired")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership expired")] });
     }
 }
 

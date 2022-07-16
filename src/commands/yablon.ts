@@ -75,7 +75,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0] == "info") {
         const embed = new CustomEmbed(
             message.member,
-            false,
             "yablon works exactly how it would in real life\n" +
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
@@ -239,7 +238,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
     );
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
+    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("yablon", message.author.avatarURL())
         .addField("cards", getCards(message.member));
 
@@ -367,7 +366,7 @@ async function playGame(message, m) {
     const bet = games.get(message.member.user.id).bet;
     const nextCard = games.get(message.member.user.id).nextCard;
 
-    const newEmbed = new CustomEmbed(message.member, true).setHeader("yablon", message.author.avatarURL());
+    const newEmbed = new CustomEmbed(message.member).setHeader("yablon", message.author.avatarURL());
 
     const edit = async (data) => {
         if (message.interaction) {

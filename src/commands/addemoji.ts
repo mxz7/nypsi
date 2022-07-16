@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (fail) return;
 
     return send({
-        embeds: [new CustomEmbed(message.member, false, `✅ emoji added as \`:${name}:\``)],
+        embeds: [new CustomEmbed(message.member, `✅ emoji added as \`:${name}:\``)],
     });
 }
 

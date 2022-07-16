@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    const embed = new CustomEmbed(message.member, true).setHeader("top cases");
+    const embed = new CustomEmbed(message.member).setHeader("top cases");
 
     const prefix = await getPrefix(message.guild);
 

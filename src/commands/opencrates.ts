@@ -79,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 120);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setTitle("opening crates");
 
@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [reply] });
         }
     } else {
-        const reply = new CustomEmbed(message.member, false, "✅ check your dms");
+        const reply = new CustomEmbed(message.member, "✅ check your dms");
         if (message.interaction) {
             await send({ embeds: [reply], ephemeral: true });
         } else {

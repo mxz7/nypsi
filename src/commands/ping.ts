@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const discordLatency = Math.round(message.client.ws.ping);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     let desc = `discord api \`${discordLatency}ms\`\n` + `bot message \`${msgLatency}ms\`\n` + `redis \`${redisLatency}ms\``;
 

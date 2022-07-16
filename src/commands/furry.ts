@@ -110,7 +110,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        false,
         `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`
     ).setHeader("furry detector 5000", member.user.avatarURL());
 

@@ -35,7 +35,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `buy items from ${await getPrefix(message.guild)}shop by using the item id or item name without spaces`
                 ),
             ],
@@ -134,7 +133,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
             new CustomEmbed(
                 message.member,
-                false,
                 `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
                     selected.worth * amount
                 ).toLocaleString()}`
