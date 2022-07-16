@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             confirm = false;
         }, 120000);
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "run command again to confirm")],
+            embeds: [new CustomEmbed(message.member, "run command again to confirm")],
         });
     } else {
         startRestart();
@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 20000);
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ bot will shut down soon")],
+            embeds: [new CustomEmbed(message.member, "✅ bot will shut down soon")],
         });
     }
 }

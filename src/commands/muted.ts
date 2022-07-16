@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!muted || muted.length == 0) {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "there is noone currently muted with nypsi")],
+            embeds: [new CustomEmbed(message.member, "there is noone currently muted with nypsi")],
         });
     }
 
@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, false).setHeader("muted users");
+    const embed = new CustomEmbed(message.member).setHeader("muted users");
 
     embed.setDescription(pages.get(1).join("\n"));
     embed.setFooter(`1/${pages.size}`);

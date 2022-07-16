@@ -22,7 +22,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(
             message.member,
-            false,
             "current prefix: `" + prefix + "`\n\nuse " + prefix + "**prefix** <new prefix> to change the current prefix"
         ).setHeader("prefix");
 
@@ -35,9 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setPrefix(message.guild, args.join(" "));
 
-    const embed = new CustomEmbed(message.member, false, "✅ prefix changed to `" + args.join(" ") + "`").setHeader(
-        "prefix"
-    );
+    const embed = new CustomEmbed(message.member, "✅ prefix changed to `" + args.join(" ") + "`").setHeader("prefix");
 
     return await message.channel.send({ embeds: [embed] });
 }

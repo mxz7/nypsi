@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const mentions = fetchUserMentions(message.guild, message.member);
 
     if (!mentions || mentions.length == 0) {
-        return send({ embeds: [new CustomEmbed(message.member, false, "no recent mentions")] });
+        return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
     }
 
     const pages = new Map();
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, false).setHeader("recent mentions", message.author.avatarURL());
+    const embed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 
     for (const i of pages.get(1)) {
         const fieldName = i.split("|6|9|")[0];
@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!reaction) return;
 
-            const newEmbed = new CustomEmbed(message.member, false).setHeader("recent mentions", message.author.avatarURL());
+            const newEmbed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 
             if (reaction == "⬅") {
                 if (currentPage <= 1) {

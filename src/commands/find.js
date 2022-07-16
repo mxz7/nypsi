@@ -29,7 +29,7 @@ async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return;
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setDescription(
             "$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top"
@@ -75,7 +75,7 @@ async function run(message, args) {
     } else if (args[0].toLowerCase() == "top") {
         const balTop = await topAmountGlobal(10, message.client, false);
 
-        const embed = new CustomEmbed(message.member, false, balTop.join("\n")).setTitle("top " + balTop.length);
+        const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle("top " + balTop.length);
 
         return message.channel.send({ embeds: [embed] });
     }
@@ -102,7 +102,7 @@ async function showGuild(message, guild) {
         .then((invites) => Array.from(invites.keys()))
         .catch(() => {});
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setDescription(`\`${guild.id}\``)
         .setTitle(guild.name)
         .addField(
@@ -143,7 +143,7 @@ async function showUser(message, user) {
         }
     });
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setTitle(user.tag)
         .setDescription(
             `\`${user.id}\`${

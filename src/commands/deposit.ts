@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("deposit help")
             .addField("usage", `${prefix}deposit <amount>`)
             .addField(
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30);
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",
@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
     await updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
 
-    const embed1 = new CustomEmbed(message.member, false)
+    const embed1 = new CustomEmbed(message.member)
         .setHeader("bank deposit", message.author.avatarURL())
         .addField(
             "bank balance",

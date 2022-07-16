@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const subreddit = subredditChoice.split("/")[4];
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setTitle(title)
         .setHeader("u/" + author + " | r/" + subreddit)
         .setURL(url)

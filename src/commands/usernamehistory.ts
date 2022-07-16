@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[0].toLowerCase() == "-clear") {
             await clearUsernameHistory(message.member);
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "✅ your username history has been cleared")],
+                embeds: [new CustomEmbed(message.member, "✅ your username history has been cleared")],
             });
         }
 
@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (history.length == 0) {
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "this user has no username history")],
+            embeds: [new CustomEmbed(message.member, "this user has no username history")],
         });
     }
 
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, true)
+    const embed = new CustomEmbed(message.member)
         .setTitle(member.user.tag)
         .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }));
 
@@ -132,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!reaction) return;
 
-        const newEmbed = new CustomEmbed(message.member, false)
+        const newEmbed = new CustomEmbed(message.member)
             .setTitle(member.user.tag)
             .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }));
 

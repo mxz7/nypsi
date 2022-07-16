@@ -16,7 +16,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const captcha = createCaptcha();
 
-    const embed = new CustomEmbed(message.member, false, "please type the string sent to console");
+    const embed = new CustomEmbed(message.member, "please type the string sent to console");
 
     console.log(
         "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---\n" +
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const c = await reset();
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `${c} users reset`)],
+            embeds: [new CustomEmbed(message.member, `${c} users reset`)],
         });
     }
 }

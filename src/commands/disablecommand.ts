@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
+        const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("disabled commands")
             .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`);
 
@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .replace(/[^A-z0-9\s]/g, "");
 
         if (filter.indexOf(word) > -1) {
-            const embed = new CustomEmbed(message.member, false, "❌ `" + prefix + word + "` is already disabled").setFooter(
+            const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is already disabled").setFooter(
                 `you can use ${prefix}disablecmd to view currently disabled commands`
             );
 
@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (word == "disablecommand") {
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "nice try")] });
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, "nice try")] });
         }
 
         filter.push(word);
@@ -74,7 +74,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                true,
                 `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`
             ).setHeader("chat filter");
 
@@ -83,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, true, "✅ disabled `" + prefix + word + "` command").setHeader(
+        const embed = new CustomEmbed(message.member, "✅ disabled `" + prefix + word + "` command").setHeader(
             "disabled commands"
         );
         return message.channel.send({ embeds: [embed] });
@@ -101,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (filter.indexOf(word) > -1) {
             filter.splice(filter.indexOf(word), 1);
         } else {
-            const embed = new CustomEmbed(message.member, false, "❌ `" + prefix + word + "` is not disabled")
+            const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is not disabled")
                 .setHeader("disabled commands")
                 .setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`);
 
@@ -110,7 +109,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, false, "✅ `" + prefix + word + "` is no longer disabled")
+        const embed = new CustomEmbed(message.member, "✅ `" + prefix + word + "` is no longer disabled")
             .setHeader("disable commands")
             .setFooter(`you can use ${prefix}disablecmd reset to reset disabled commands`);
 
@@ -120,13 +119,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, false, "✅ disabled commands have been").setHeader(
-            "disabled commands"
-        );
+        const embed = new CustomEmbed(message.member, "✅ disabled commands have been").setHeader("disabled commands");
 
         return message.channel.send({ embeds: [embed] });
     } else {
-        const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
+        const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("disabled commands")
             .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`);
 

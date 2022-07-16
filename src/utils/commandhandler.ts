@@ -472,7 +472,7 @@ export async function runCommand(
             addUse(customCommand.owner);
             logCommand(message, ["", "", ""]);
 
-            const embed = new CustomEmbed(message.member, false, content).setFooter(
+            const embed = new CustomEmbed(message.member, content).setFooter(
                 `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
             );
 
@@ -497,7 +497,7 @@ export async function runCommand(
 
         const captcha = createCaptcha();
 
-        const embed = new CustomEmbed(message.member, false).setTitle("you have been locked");
+        const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
         embed.setDescription(
             `please note that using macros / auto typers is not allowed with nypsi\n\ntype: \`${captcha.display}\` to be unlocked`
@@ -555,11 +555,11 @@ export async function runCommand(
             logCommand(message, args);
             if (message instanceof Message) {
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "nypsi is rebooting, try again in a few minutes")],
+                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                 });
             } else {
                 return message.reply({
-                    embeds: [new CustomEmbed(message.member, false, "nypsi is rebooting, try again in a few minutes")],
+                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                 });
             }
         }

@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader("wordle help");
         embed.setDescription(
@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
         }
 
-        const embed = new CustomEmbed(message.member, false).setHeader(
+        const embed = new CustomEmbed(message.member).setHeader(
             `${message.author.username}'s wordle stats`,
             message.author.avatarURL()
         );
@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const board = createBoard();
     const word = getWord();
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
     embed.setDescription(renderBoard(board));
@@ -197,7 +197,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 
     if (response.length != 5) {
         const m = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "guesses must be 5 letter words")],
+            embeds: [new CustomEmbed(message.member, "guesses must be 5 letter words")],
         });
 
         setTimeout(() => {
@@ -206,7 +206,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
         return play(message);
     } else if (!wordList.includes(response)) {
         const msg = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `\`${response}\` is not in the word list`)],
+            embeds: [new CustomEmbed(message.member, `\`${response}\` is not in the word list`)],
         });
 
         setTimeout(() => {
@@ -215,7 +215,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
         return play(message);
     } else if (games.get(message.author.id).guesses.includes(response)) {
         const msg = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `you have already guessed \`${response}\``)],
+            embeds: [new CustomEmbed(message.member, `you have already guessed \`${response}\``)],
         });
 
         setTimeout(() => {

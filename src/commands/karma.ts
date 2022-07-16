@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (message.author.id == "672793821850894347" && args[0] == "remove") {
             if (!args[1] || !args[2]) {
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "$karma remove <userid> <amount>")],
+                    embeds: [new CustomEmbed(message.member, "$karma remove <userid> <amount>")],
                 });
             }
 
@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const karma = await getKarma(target);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     if (target.user.id == message.author.id) {
         embed.setHeader("your karma", message.author.avatarURL());

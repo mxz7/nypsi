@@ -33,7 +33,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     "sell items from your inventory\n\ncoins have a set fee of **5**% per coin, while standard items have a **50**% fee"
                 ),
             ],
@@ -127,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) + sellWorth);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
         `you sold **${amount}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${

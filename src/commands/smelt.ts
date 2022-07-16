@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(message.member, inventory);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
     embed.setHeader("furnace", message.author.avatarURL());
     embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...");
 

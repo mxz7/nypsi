@@ -20,7 +20,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastSet = formatDate(news.date);
 
-        const embed = new CustomEmbed(message.member, false, `${news.text}\n\nset on: ${lastSet}`);
+        const embed = new CustomEmbed(message.member, `${news.text}\n\nset on: ${lastSet}`);
 
         return message.channel.send({ embeds: [embed] });
     } else {
@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastSet = formatDate(news.date);
 
-        const embed = new CustomEmbed(message.member, false, `${news.text}\n\nset on: ${lastSet}`);
+        const embed = new CustomEmbed(message.member, `${news.text}\n\nset on: ${lastSet}`);
 
         return message.channel.send({ embeds: [embed] });
     }

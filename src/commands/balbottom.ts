@@ -46,13 +46,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (filtered.length == 0) {
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "no members to show")],
+            embeds: [new CustomEmbed(message.member, "no members to show")],
         });
     }
 
-    const embed = new CustomEmbed(message.member, false)
-        .setHeader("bottom " + filtered.length)
-        .setDescription(filtered.join("\n"));
+    const embed = new CustomEmbed(message.member).setHeader("bottom " + filtered.length).setDescription(filtered.join("\n"));
 
     message.channel.send({ embeds: [embed] });
 }

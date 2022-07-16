@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     const help = () => {
-        const embed = new CustomEmbed(message.member, false).setHeader("street race");
+        const embed = new CustomEmbed(message.member).setHeader("street race");
 
         embed.setDescription(
             `${prefix}**sr start <entry fee>** *start a street race*\n` +
@@ -386,7 +386,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!(message instanceof Message)) {
             await message.reply({
-                embeds: [new CustomEmbed(message.member, false, "you have joined the race")],
+                embeds: [new CustomEmbed(message.member, "you have joined the race")],
                 ephemeral: true,
             });
         } else {

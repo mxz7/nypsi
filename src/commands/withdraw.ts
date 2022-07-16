@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 30);
 
-    const embed = new CustomEmbed(message.member, true)
+    const embed = new CustomEmbed(message.member)
         .setHeader("bank withdrawal", message.author.avatarURL())
         .addField(
             "bank balance",
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
     await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
-    const embed1 = new CustomEmbed(message.member, true)
+    const embed1 = new CustomEmbed(message.member)
         .setHeader("bank withdrawal", message.author.avatarURL())
         .addField(
             "bank balance",

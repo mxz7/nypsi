@@ -106,7 +106,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        false,
         `${member.user.toString()}\n**${hotAmount}**% hot ${hotEmoji}\n${hotText}`
     ).setHeader("hotness calculator", member.user.avatarURL());
 

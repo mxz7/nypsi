@@ -57,7 +57,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
                 ).setHeader("prestige", message.author.avatarURL()),
             ],
@@ -66,7 +65,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        true,
         "are you sure you want to prestige?\n\n" +
             `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
     ).setHeader("prestige", message.author.avatarURL());
@@ -111,7 +109,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embeds: [
                     new CustomEmbed(
                         message.member,
-                        false,
                         `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
                     ).setHeader("prestige", message.author.avatarURL()),
                 ],

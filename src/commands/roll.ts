@@ -25,7 +25,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
             new CustomEmbed(
                 message.member,
-                false,
                 "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
             ),
         ],

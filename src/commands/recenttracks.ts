@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ).then((res) => res.json());
 
     if (!res.recenttracks) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
     }
 
     /**
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     recenttracks = recenttracks.slice(0, 5);
 
     if (recenttracks.length == 0) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "no recent songs")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
     }
 
     let msg = "";
@@ -86,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const embed = new CustomEmbed(message.member, false, msg).setTitle("recent songs");
+    const embed = new CustomEmbed(message.member, msg).setTitle("recent songs");
 
     embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) });
 

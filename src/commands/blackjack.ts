@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("blackjack help")
             .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
             .addField(
@@ -79,7 +79,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0] == "info") {
         const embed = new CustomEmbed(
             message.member,
-            false,
             "blackjack works exactly how it would in real life\n" +
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
@@ -203,7 +202,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     newDealerCard(message.member);
     newCard(message.member);
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
+    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -393,7 +392,7 @@ async function playGame(message, m) {
     const first = games.get(message.member.user.id).first;
     const dealerPlaya = games.get(message.member.user.id).dealerPlay;
 
-    const newEmbed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString()).setHeader(
+    const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
         "blackjack",
         message.author.avatarURL()
     );
@@ -534,7 +533,7 @@ async function playGame(message, m) {
                 return lose();
             }
 
-            const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
                 .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -564,7 +563,7 @@ async function playGame(message, m) {
 
             return playGame(message, m);
         } else if (reaction == "2️⃣") {
-            const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -618,7 +617,7 @@ async function playGame(message, m) {
 
             newCard(message.member);
 
-            const newEmbed1 = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString())
+            const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
                 .setHeader("blackjack", message.author.avatarURL())
                 .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
                 .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");

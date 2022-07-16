@@ -101,7 +101,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        false,
         `${member.user.toString()}\n**${hornyAmount}**% horny ${hornyEmoji}\n${hornyText}`
     ).setHeader("horny calculator", member.user.avatarURL());
 

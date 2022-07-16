@@ -141,12 +141,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 700);
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setHeader(
+    const embed = new CustomEmbed(message.member, "robbing " + target.user.toString() + "..").setHeader(
         "robbery",
         message.author.avatarURL()
     );
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + target.user.toString() + "..").setHeader(
+    const embed2 = new CustomEmbed(message.member, "robbing " + target.user.toString() + "..").setHeader(
         "robbery",
         message.author.avatarURL()
     );

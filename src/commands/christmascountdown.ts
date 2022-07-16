@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `${daysUntilChristmas()} days until christmas`)],
+            embeds: [new CustomEmbed(message.member, `${daysUntilChristmas()} days until christmas`)],
         });
     }
 
@@ -43,7 +43,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const help = () => {
         const embed = new CustomEmbed(
             message.member,
-            true,
             `${prefix}**xmas enable <channel>** *enables the christmas countdown in the given channel*\n` +
                 `${prefix}**xmas disable** *disables the christmas countdown*\n` +
                 `${prefix}**xmas channel <channel>** *change the channel used*\n` +
@@ -55,7 +54,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(
             message.member,
-            false,
             `**enabled** \`${profile.enabled}\`\n` + `**format** ${profile.format}\n**channel** \`${profile.channel}\``
         )
             .setHeader("christmas countdown")
@@ -109,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown enabled")],
+            embeds: [new CustomEmbed(message.member, "✅ christmas countdown enabled")],
         });
     } else if (args[0].toLowerCase() == "disable") {
         if (!profile.enabled) {
@@ -122,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setChristmasCountdown(message.guild, profile);
 
         return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown disabled")],
+            embeds: [new CustomEmbed(message.member, "✅ christmas countdown disabled")],
         });
     } else if (args[0].toLowerCase() == "format") {
         if (args.length == 1) {
@@ -130,7 +128,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                false,
                 "this is how the message will appear\n%days% will be replaced with how many days are left until christmas"
             )
                 .setHeader("christmas countdown")
@@ -175,14 +172,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ format updated").setHeader("christmas countdown");
+        const embed = new CustomEmbed(message.member, "✅ format updated").setHeader("christmas countdown");
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "channel") {
         if (args.length == 1) {
             const embed = new CustomEmbed(
                 message.member,
-                false,
                 "by setting the channel it will change the channel that the message is sent in"
             )
                 .setHeader("christmas countdown")
@@ -232,7 +228,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        const embed = new CustomEmbed(message.member, false, "✅ channel updated").setHeader("christmas countdown");
+        const embed = new CustomEmbed(message.member, "✅ channel updated").setHeader("christmas countdown");
 
         return message.channel.send({ embeds: [embed] });
     } else {

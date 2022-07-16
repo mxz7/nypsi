@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         content = content.substr(0, 50);
     }
 
-    const embed = new CustomEmbed(message.member, false, `press **F** to pay your respects to **${content}**`);
+    const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);
 
     const row = new MessageActionRow().addComponents(
         new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
@@ -61,9 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         reactions.push(i.user.id);
 
         return await message.channel.send({
-            embeds: [
-                new CustomEmbed(message.member, false, `${i.user.toString()} has paid respects to **${args.join(" ")}**`),
-            ],
+            embeds: [new CustomEmbed(message.member, `${i.user.toString()} has paid respects to **${args.join(" ")}**`)],
         });
     });
 
@@ -72,7 +70,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `**${reactions.length.toLocaleString()}** ${
                         reactions.length != 1 ? "people" : "person"
                     } paid their respects to **${content}**`

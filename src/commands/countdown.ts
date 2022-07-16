@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const countdowns = await getCountdowns(message.guild);
 
-        const embed = new CustomEmbed(message.member, false).setHeader("countdown");
+        const embed = new CustomEmbed(message.member).setHeader("countdown");
 
         if (countdowns.length == 0) {
             embed.setDescription(`use ${prefix}**countdown create** to create a countdown`);
@@ -68,7 +68,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(
             message.member,
-            false,
             "what date do you want to count down to?\n\nplease use the following format: `MM/DD/YYYY` - example: 12/25/2069"
         );
 
@@ -222,9 +221,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await deleteCountdown(message.guild, args[1].toString());
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ countdown deleted")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ countdown deleted")] });
     } else {
-        const embed = new CustomEmbed(message.member, true);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader("countdown");
         embed.setDescription(

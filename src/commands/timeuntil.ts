@@ -59,9 +59,9 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
     }
 
     if (label) {
-        return send({ embeds: [new CustomEmbed(message.member, false, `**${length}** until ${label}`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `**${length}** until ${label}`)] });
     } else {
-        return send({ embeds: [new CustomEmbed(message.member, false, `${length}`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `${length}`)] });
     }
 }
 

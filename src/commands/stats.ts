@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             itemsUsed += stats.items[item];
         }
 
-        const embed = new CustomEmbed(message.member, true).setHeader("stats", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
 
         embed.addField(
             "gamble",
@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const itemStats = async () => {
         const stats = (await getStats(message.member)).items;
 
-        const embed = new CustomEmbed(message.member, true).setHeader("item stats", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("item stats", message.author.avatarURL());
 
         /**
          * @type {Map<Number, Array<String>}
@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!reaction) return;
 
-            const newEmbed = new CustomEmbed(message.member, false).setHeader("item stats", message.author.avatarURL());
+            const newEmbed = new CustomEmbed(message.member).setHeader("item stats", message.author.avatarURL());
 
             if (reaction == "⬅") {
                 if (currentPage <= 1) {
@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const gambleStats = async () => {
         const stats = (await getStats(message.member)).gamble;
 
-        const embed = new CustomEmbed(message.member, true).setHeader("gamble stats", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("gamble stats", message.author.avatarURL());
 
         for (const gambleStat in stats) {
             embed.addField(

@@ -184,7 +184,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        true,
         "*rock..paper..scissors..* **shoot!!**\n\n**choice** " +
             choice +
             " " +

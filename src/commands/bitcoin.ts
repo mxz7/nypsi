@@ -25,7 +25,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        false,
         `**worth** $${bitcoin.worth.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
             bitcoinAmount * bitcoin.worth
         ).toLocaleString()})`
