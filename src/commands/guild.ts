@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const showGuild = async (guild) => {
         await addCooldown(cmd.name, message.member, 5);
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         if (!guild) {
             embed.setDescription(
@@ -209,7 +209,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await createGuild(name, message.member);
 
-        return send({ embeds: [new CustomEmbed(message.member, false, `you are now the owner of **${name}**`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `you are now the owner of **${name}**`)] });
     }
 
     if (args[0].toLowerCase() == "invite" || args[0].toLowerCase() == "add" || args[0].toLowerCase() == "inv") {
@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         invited.push(target.user.id);
 
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader("guild invitation");
         embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
@@ -323,11 +323,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (res) {
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ you have left **${guild.guildName}**`)],
+                embeds: [new CustomEmbed(message.member, `✅ you have left **${guild.guildName}**`)],
             });
         } else {
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, "failed while leaving guild")],
+                embeds: [new CustomEmbed(message.member, "failed while leaving guild")],
             });
         }
     }
@@ -403,13 +403,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (res) {
             return send({
-                embeds: [
-                    new CustomEmbed(message.member, false, `✅ \`${target}\` has been kicked from **${guild.guildName}**`),
-                ],
+                embeds: [new CustomEmbed(message.member, `✅ \`${target}\` has been kicked from **${guild.guildName}**`)],
             });
         } else {
             return send({
-                embeds: [new CustomEmbed(message.member, false, `failed to kick ${target}`)],
+                embeds: [new CustomEmbed(message.member, `failed to kick ${target}`)],
             });
         }
     }
@@ -427,7 +425,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await deleteGuild(guild.guildName);
 
-        return send({ embeds: [new CustomEmbed(message.member, false, `✅ **${guild.guildName}** has been deleted`)] });
+        return send({ embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)] });
     }
 
     if (args[0].toLowerCase() == "deposit" || args[0].toLowerCase() == "dep") {
@@ -463,7 +461,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addToGuildBank(guild.guildName, amount, message.member);
 
-        const embed = new CustomEmbed(message.member, false).setHeader("guild deposit", message.author.avatarURL());
+        const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
 
         embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
 
@@ -487,10 +485,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         inPlaceSort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
 
-        const embed = new CustomEmbed(message.member, false).setHeader(
-            `${guild.guildName} stats`,
-            message.author.avatarURL()
-        );
+        const embed = new CustomEmbed(message.member).setHeader(`${guild.guildName} stats`, message.author.avatarURL());
 
         let desc = "";
 
@@ -517,14 +512,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (guild.level == 5) {
-            return send({ embeds: [new CustomEmbed(message.member, false, `**${guild.guildName}** is at max level`)] });
+            return send({ embeds: [new CustomEmbed(message.member, `**${guild.guildName}** is at max level`)] });
         }
 
         await addCooldown(cmd.name, message.member, 3);
 
         const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader(guild.guildName, message.author.avatarURL());
         embed.setDescription(
@@ -567,7 +562,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await setGuildMOTD(guild.guildName, motd);
 
-        return send({ embeds: [new CustomEmbed(message.member, false, "✅ motd has been updated")] });
+        return send({ embeds: [new CustomEmbed(message.member, "✅ motd has been updated")] });
     }
 
     if (args[0].toLowerCase() == "top") {
@@ -581,10 +576,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const top = await topGuilds(limit);
 
-        const embed = new CustomEmbed(message.member, false).setHeader(
-            `top ${args[1] ?? 5} guilds`,
-            message.author.avatarURL()
-        );
+        const embed = new CustomEmbed(message.member).setHeader(`top ${args[1] ?? 5} guilds`, message.author.avatarURL());
 
         embed.setDescription(top.join("\n"));
 

@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     eSnipe.delete(channel.id);
 
     return message.channel.send({
-        embeds: [new CustomEmbed(message.member, false, "✅ snipe cleared in " + channel.toString())],
+        embeds: [new CustomEmbed(message.member, "✅ snipe cleared in " + channel.toString())],
     });
 }
 

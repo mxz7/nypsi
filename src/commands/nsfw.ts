@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ ${channel.toString()} is now nsfw`)],
+            embeds: [new CustomEmbed(message.member, `✅ ${channel.toString()} is now nsfw`)],
         });
     } else {
         let fail = false;
@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ ${channel.toString()} is no longer nsfw`)],
+            embeds: [new CustomEmbed(message.member, `✅ ${channel.toString()} is no longer nsfw`)],
         });
     }
 }

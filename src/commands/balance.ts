@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         footer += ` | prestige: ${await getPrestige(target)}`;
     }
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setDescription(
             "💰 $**" +
                 (await getBalance(target)).toLocaleString() +

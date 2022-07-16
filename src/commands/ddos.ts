@@ -44,7 +44,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        true,
         member.user.toString() +
             "\n\n" +
             "**ip** *obtaining..*" +

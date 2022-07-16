@@ -79,9 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let msg;
             if (message instanceof Message) {
                 msg = await send({
-                    embeds: [
-                        new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
-                    ],
+                    embeds: [new CustomEmbed(message.member, `sorting ${membersSorted.length.toLocaleString()} members..`)],
                 });
             } else {
                 await message.deferReply();
@@ -111,7 +109,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        false,
         `joined on **${joinedServer}**\n - **${timeAgo.toLocaleString()}** days ago\njoin position is **${
             joinPos != "invalid" ? joinPos.toLocaleString() : "--"
         }**`

@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.join(" ").includes("-id")) {
-        const embed = new CustomEmbed(message.member, false, "`" + member.user.id + "`").setHeader(member.user.tag);
+        const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(member.user.tag);
         return message.channel.send({ embeds: [embed] });
     }
 
@@ -74,9 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (membersSorted.length > 1000) {
             const msg = await message.channel.send({
-                embeds: [
-                    new CustomEmbed(message.member, false, `sorting ${membersSorted.length.toLocaleString()} members..`),
-                ],
+                embeds: [new CustomEmbed(message.member, `sorting ${membersSorted.length.toLocaleString()} members..`)],
             });
             membersSorted = await workerSort(membersSorted, membersMap);
             await msg.delete();
@@ -107,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     rolesText = rolesText.split("@everyone").join("");
 
-    const embed = new CustomEmbed(message.member, false, member.user.toString())
+    const embed = new CustomEmbed(message.member, member.user.toString())
         .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
         .setHeader(member.user.tag)
 

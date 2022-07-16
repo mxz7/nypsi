@@ -69,7 +69,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `this will kick **${members.size.toLocaleString()}** members, are you sure?`
                 ),
             ],
@@ -104,7 +103,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (members.size >= 15) {
         status = new CustomEmbed(
             message.member,
-            false,
             statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
         );
     }
@@ -136,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (status) {
             if (msg.deleted) {
                 return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")],
+                    embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
                 });
             }
         }
@@ -172,7 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
                 if (fail) {
                     return message.channel.send({
-                        embeds: [new CustomEmbed(message.member, false, "✅ operation cancelled")],
+                        embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
                     });
                 }
                 interval = 0;

@@ -78,7 +78,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0] == "info") {
         const embed = new CustomEmbed(
             message.member,
-            false,
             "highlow works exactly how it would in real life\n" +
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
@@ -207,7 +206,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
     );
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setHeader("highlow", message.author.avatarURL())
         .addField("card", "| " + games.get(message.member.user.id).card + " |");
 
@@ -275,7 +274,7 @@ async function playGame(message, m) {
     let win = games.get(message.member.user.id).win;
     let card = games.get(message.member.user.id).card;
 
-    const newEmbed = new CustomEmbed(message.member, true).setHeader("highlow", message.author.avatarURL());
+    const newEmbed = new CustomEmbed(message.member).setHeader("highlow", message.author.avatarURL());
 
     const edit = async (data) => {
         if (message.interaction) {

@@ -12,7 +12,7 @@ export class CustomEmbed extends MessageEmbed {
      * @param {Boolean} footer
      * @param {String} text
      */
-    constructor(member?: GuildMember, footer?: boolean, text?: string) {
+    constructor(member?: GuildMember, text?: string) {
         super();
 
         if (member) {
@@ -38,9 +38,9 @@ export class CustomEmbed extends MessageEmbed {
             super.setDescription(text);
         }
 
-        if (footer) {
-            super.setFooter({ text: "nypsi.xyz" });
-        }
+        const chance = Math.floor(Math.random() * 20);
+
+        if (chance == 7) super.setFooter("nypsi.xyz");
 
         return this;
     }

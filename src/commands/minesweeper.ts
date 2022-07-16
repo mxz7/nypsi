@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         voted: voteMulti,
     });
 
-    const embed = new CustomEmbed(message.member, true, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
+    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
         .setHeader("minesweeper", message.author.avatarURL())
         .addField("your grid", table)
         .addField("help", "type `finish` to stop playing");
@@ -353,7 +353,7 @@ async function playGame(message, msg) {
 
     let table;
 
-    const embed = new CustomEmbed(message.member, true).setHeader("minesweeper", message.author.avatarURL());
+    const embed = new CustomEmbed(message.member).setHeader("minesweeper", message.author.avatarURL());
 
     const edit = async (data) => {
         if (message.interaction) {
