@@ -38,9 +38,9 @@ export class CustomEmbed extends MessageEmbed {
             super.setDescription(text);
         }
 
-        if (footer) {
-            super.setFooter({ text: "nypsi.xyz" });
-        }
+        const chance = Math.floor(Math.random() * 30);
+
+        if (chance == 7) super.setFooter("nypsi.xyz");
 
         return this;
     }
