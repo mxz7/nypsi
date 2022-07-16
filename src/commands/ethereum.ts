@@ -13,9 +13,9 @@ const cmd = new Command("ethereum", "view the current ethereum value (reflects r
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
     const ethereum = getItems()["ethereum"];
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     let ethereumAmount = 0;
 

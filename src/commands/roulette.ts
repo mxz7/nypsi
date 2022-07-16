@@ -94,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (args.length == 1 && args[0].toLowerCase() == "odds") {
         return send({
@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
@@ -181,7 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (bet > getBalance(message.member)) {
+    if (bet > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
@@ -199,8 +199,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let colorBet = args[0].toLowerCase();
 
-    updateBalance(message.member, getBalance(message.member) - bet);
-
     let roll = values[Math.floor(Math.random() * values.length)];
 
     let win = false;
@@ -213,7 +211,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             winnings = Math.round(bet * 1.5);
         }
-        updateBalance(message.member, getBalance(message.member) + winnings);
     }
 
     if (colorBet == "b") {
@@ -239,10 +236,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (win) {
         multi = await getMulti(message.member);
 
+        winnings -= bet;
+
         if (multi > 0) {
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi));
+            await updateBalance(
+                message.member,
+                (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+            );
             winnings = winnings + Math.round(winnings * multi);
+        } else {
+            await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         }
+    } else {
+        await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
 
     const embed = new CustomEmbed(
@@ -259,7 +265,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    send({ embeds: [embed] }).then((m) => {
+    send({ embeds: [embed] }).then(async (m) => {
         embed.setDescription(
             "**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
         );
@@ -279,16 +285,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
             }
 
-            const earnedXp = calcEarnedXp(message.member, bet);
+            const earnedXp = await calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp);
+                await updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 embed.setFooter(`+${earnedXp}xp`);
 
-                const guild = getGuildByUser(message.member);
+                const guild = await getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guild_name, earnedXp, message.member);
+                    await addToGuildXP(guild.guildName, earnedXp, message.member);
                 }
             }
 
@@ -303,7 +309,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 2000);
     });
     gamble(message.author, "roulette", bet, win, winnings);
-    addGamble(message.member, "roulette", win);
+    await addGamble(message.member, "roulette", win);
 }
 
 cmd.setRun(run);

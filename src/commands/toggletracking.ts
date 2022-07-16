@@ -2,13 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getPrefix } from "../utils/guilds/utils";
-import {
-    isTracking,
-    disableTracking,
-    enableTracking,
-    usernameProfileExists,
-    createUsernameProfile,
-} from "../utils/users/utils";
+import { isTracking, disableTracking, enableTracking } from "../utils/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO);
@@ -24,21 +18,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!usernameProfileExists(message.member)) createUsernameProfile(message.member, message.author.tag);
-
     await addCooldown(cmd.name, message.member, 90);
 
-    if (isTracking(message.author.id)) {
-        disableTracking(message.author.id);
+    if (await isTracking(message.author.id)) {
+        await disableTracking(message.author.id);
         return message.channel.send({
             embeds: [
                 new CustomEmbed(message.member, false, "✅ username and avatar tracking has been disabled").setFooter(
-                    `use ${getPrefix(message.guild)}(un/avh) -clear to clear your history`
+                    `use ${await getPrefix(message.guild)}(un/avh) -clear to clear your history`
                 ),
             ],
         });
     } else {
-        enableTracking(message.author.id);
+        await enableTracking(message.author.id);
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ username and avatar tracking has been enabled")],
         });

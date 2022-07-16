@@ -20,7 +20,7 @@ const cmd = new Command("sell", "sell items", Categories.MONEY);
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const searchTag = args[0].toLowerCase();
 
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         delete inventory[selected.id];
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     let sellWorth = Math.floor(selected.worth * 0.5 * amount);
 
@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         sellWorth = 1000 * amount;
     }
 
-    updateBalance(message.member, getBalance(message.member) + sellWorth);
+    await updateBalance(message.member, (await getBalance(message.member)) + sellWorth);
 
     const embed = new CustomEmbed(message.member, false);
 

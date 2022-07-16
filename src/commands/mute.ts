@@ -6,6 +6,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
@@ -28,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -57,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
@@ -117,14 +118,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let mode = "role";
     const failed = [];
 
-    let muteRole: Role = await message.guild.roles.fetch(getMuteRole(message.guild));
+    let muteRole: Role = await message.guild.roles.fetch(await getMuteRole(message.guild));
 
-    if (!getMuteRole(message.guild)) {
+    if (!(await getMuteRole(message.guild))) {
         muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        if (getMuteRole(message.guild) == "timeout") mode = "timeout";
+        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
     }
 
     if (!muteRole && mode == "role") {
@@ -175,12 +176,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let timedMute = false;
-    let unmuteDate;
+    let unmuteDate: Date;
     let time = 0;
 
     if (reason != "") {
         time = getDuration(reason.split(" ")[0].toLowerCase());
-        unmuteDate = new Date().getTime() + time * 1000;
+        unmuteDate = new Date(Date.now() + time * 1000);
 
         if (time) {
             timedMute = true;
@@ -191,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (mode == "timeout" && !timedMute) {
-        unmuteDate = new Date().getTime() + ms("1 week");
+        unmuteDate = dayjs().add(1, "week").toDate();
         time = ms("1 week") / 1000;
 
         timedMute = true;
@@ -345,20 +346,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
+    await newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
 
     for (const m of members1) {
-        if (isMuted(message.guild, members.get(m))) {
-            deleteMute(message.guild, members.get(m));
+        if (await isMuted(message.guild, members.get(m))) {
+            await deleteMute(message.guild, members.get(m));
         }
     }
 
     if (timedMute) {
-        newMute(message.guild, members1, unmuteDate);
+        await newMute(message.guild, members1, unmuteDate);
     }
 
     if (!timedMute) {
-        newMute(message.guild, members1, 9999999999999);
+        await newMute(message.guild, members1, new Date(3130000000000));
     }
 
     if (args.join(" ").includes("-s")) return;

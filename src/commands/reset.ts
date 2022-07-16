@@ -29,14 +29,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     let earnedKarma = 0;
 
     let inventoryWorth = 0;
     const multi = await getMulti(message.member);
 
-    let inventory = getInventory(message.member);
+    let inventory = await getInventory(message.member);
     const items = getItems();
 
     let itemIDs = Array.from(Object.keys(inventory));
@@ -60,9 +60,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    earnedKarma += getPrestige(message.member) * 30;
-    earnedKarma += getXp(message.member) / 100;
-    earnedKarma += getBalance(message.member) / 100000 / 2;
+    earnedKarma += (await getPrestige(message.member)) * 30;
+    earnedKarma += (await getXp(message.member)) / 100;
+    earnedKarma += (await getBalance(message.member)) / 100000 / 2;
     earnedKarma += inventoryWorth / 100000 / 2;
 
     earnedKarma = Math.floor(earnedKarma * 2.2);
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         earnedKarma = 0;
         inventoryWorth = 0;
 
-        inventory = getInventory(message.member);
+        inventory = await getInventory(message.member);
 
         itemIDs = Array.from(Object.keys(inventory));
 
@@ -124,16 +124,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        earnedKarma += getPrestige(message.member) * 30;
-        earnedKarma += getXp(message.member) / 100;
-        earnedKarma += getBalance(message.member) / 100000 / 2;
+        earnedKarma += (await getPrestige(message.member)) * 30;
+        earnedKarma += (await getXp(message.member)) / 100;
+        earnedKarma += (await getBalance(message.member)) / 100000 / 2;
         earnedKarma += inventoryWorth / 100000 / 2;
 
         earnedKarma = Math.floor(earnedKarma * 2.2);
 
         await addKarma(message.member, earnedKarma);
 
-        deleteUser(message.member);
+        await deleteUser(message.member);
 
         embed.setDescription(
             `your economy profile has been reset.\n\nyou have been given **${earnedKarma.toLocaleString()}** karma`

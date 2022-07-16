@@ -33,12 +33,14 @@ cmd.slashData
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
-    const tickets = getTickets(message.member);
+    const tickets = await getTickets(message.member);
 
-    const prestigeBonus = Math.floor((getPrestige(message.member) > 10 ? 10 : getPrestige(message.member)) / 2.5);
-    const premiumBonus = Math.floor(isPremium(message.member) ? getTier(message.member) : 0);
+    const prestigeBonus = Math.floor(
+        ((await getPrestige(message.member)) > 10 ? 10 : await getPrestige(message.member)) / 2.5
+    );
+    const premiumBonus = Math.floor((await isPremium(message.member)) ? await getTier(message.member) : 0);
     const karmaBonus = Math.floor((await getKarma(message.member)) / 75);
 
     let max = 5 + prestigeBonus + premiumBonus + karmaBonus;
@@ -57,13 +59,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const help = () => {
+    const help = async () => {
         const embed = new CustomEmbed(message.member, false);
 
         embed.setHeader("lottery", message.author.avatarURL());
         embed.setDescription(
             "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
-                `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${getPrefix(
+                `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
                     message.guild
                 )}**lotto buy**\nyou can have a maximum of **${max}** tickets`
         );
@@ -116,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] });
         }
 
-        if (getBalance(message.member) < lotteryTicketPrice * amount) {
+        if ((await getBalance(message.member)) < lotteryTicketPrice * amount) {
             return send({
                 embeds: [new ErrorEmbed("you cannot afford this")],
             });
@@ -124,10 +126,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 10);
 
-        updateBalance(message.member, getBalance(message.member) - lotteryTicketPrice * amount);
+        await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
         for (let i = 0; i < amount; i++) {
-            addTicket(message.member);
+            await addTicket(message.member);
         }
 
         const embed = new CustomEmbed(

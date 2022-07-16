@@ -29,7 +29,7 @@ const cmd = new Command("hypixel", "view hypixel stats for a minecraft account",
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}h <username>`)] });

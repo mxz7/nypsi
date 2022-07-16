@@ -22,7 +22,7 @@ export async function addCooldown(cmd: string, member: GuildMember, seconds?: nu
         seconds = 69420;
     }
 
-    const expire = calculateCooldownLength(seconds, member);
+    const expire = await calculateCooldownLength(seconds, member);
 
     const data: CooldownData = {
         date: Date.now(),
@@ -36,7 +36,7 @@ export async function addCooldown(cmd: string, member: GuildMember, seconds?: nu
 export async function addExpiry(cmd: string, member: GuildMember, seconds: number) {
     const key = `cd:${cmd}:${member.user.id}`;
 
-    const expire = calculateCooldownLength(seconds, member);
+    const expire = await calculateCooldownLength(seconds, member);
 
     const data: CooldownData = {
         date: Date.now(),
@@ -76,16 +76,16 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
 
     const random = Math.floor(Math.random() * 50);
 
-    if (random == 7 && !isPremium(member)) {
-        embed.setFooter(`premium members get 50% shorter cooldowns (${getPrefix(member.guild)}donate)`);
+    if (random == 7 && !(await isPremium(member))) {
+        embed.setFooter(`premium members get 50% shorter cooldowns (${await getPrefix(member.guild)}donate)`);
     }
 
     return embed;
 }
 
-function calculateCooldownLength(seconds: number, member: GuildMember): number {
-    if (isPremium(member)) {
-        if (getTier(member) == 4) {
+async function calculateCooldownLength(seconds: number, member: GuildMember): Promise<number> {
+    if (await isPremium(member)) {
+        if ((await getTier(member)) == 4) {
             return Math.round(seconds * 0.25);
         } else {
             return Math.round(seconds * 0.5);

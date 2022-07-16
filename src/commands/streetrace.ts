@@ -57,7 +57,7 @@ const carCooldown = new Map();
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -71,12 +71,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
+    const prefix = await getPrefix(message.guild);
+
     const help = () => {
         const embed = new CustomEmbed(message.member, false).setHeader("street race");
 
         embed.setDescription(
-            `${getPrefix(message.guild)}**sr start <entry fee>** *start a street race*\n` +
-                `${getPrefix(message.guild)}**sr join** *join a street race in the current channel*`
+            `${prefix}**sr start <entry fee>** *start a street race*\n` +
+                `${prefix}**sr join** *join a street race in the current channel*`
         );
 
         return send({ embeds: [embed] });
@@ -93,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (args.length == 1) {
             return send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
+                embeds: [new ErrorEmbed(`${prefix}sr start <entry fee> (speed limit)`)],
             });
         }
 
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (bet <= 0) {
             return send({
-                embeds: [new ErrorEmbed(`${getPrefix(message.guild)}sr start <entry fee> (speed limit)`)],
+                embeds: [new ErrorEmbed(`${prefix}sr start <entry fee> (speed limit)`)],
             });
         }
 
@@ -165,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.author.avatarURL()
         );
 
-        embed.setFooter(`use ${getPrefix(message.guild)}sr join to join`);
+        embed.setFooter(`use ${prefix}sr join to join`);
 
         embed.setDescription(
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
@@ -178,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         races.set(message.channel.id, game);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!races.has(message.channel.id)) return;
             if (races.get(message.channel.id).id != id) return;
             if (races.get(message.channel.id).users.size < 2) {
@@ -189,7 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 for (let user of races.get(message.channel.id).users.keys()) {
                     user = races.get(message.channel.id).users.get(user);
 
-                    updateBalance(user.user.id, getBalance(user.user.id) + bet);
+                    await updateBalance(user.user.id, (await getBalance(user.user.id)) + bet);
                 }
                 races.delete(message.channel.id);
             } else {
@@ -222,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const race = races.get(message.channel.id);
 
-        if (race.bet > getBalance(message.member)) {
+        if (race.bet > (await getBalance(message.member))) {
             return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] });
         }
 
@@ -239,7 +241,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         const items = getItems();
-        const inventory = getInventory(message.member);
+        const inventory = await getInventory(message.member);
 
         let car: Item;
         let cycle = false;
@@ -305,9 +307,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({
                 embeds: [
                     new ErrorEmbed(
-                        `your ${car.name} is too fast for this race, select another with ${getPrefix(
-                            message.guild
-                        )}**sr join <car>**`
+                        `your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`
                     ),
                 ],
             });
@@ -319,11 +319,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (current.includes(car.id)) {
                 return send({
                     embeds: [
-                        new ErrorEmbed(
-                            `your ${car.name} is on cooldown, select another with ${getPrefix(
-                                message.guild
-                            )}**sr join <car>**`
-                        ),
+                        new ErrorEmbed(`your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`),
                     ],
                 });
             } else {
@@ -360,7 +356,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        updateBalance(message.member, getBalance(message.member) - race.bet);
+        await updateBalance(message.member, (await getBalance(message.member)) - race.bet);
 
         race.users.set(message.author.id, {
             user: message.author,
@@ -502,7 +498,7 @@ async function startRace(id) {
     if (winner) {
         const winnings = race.bet * race.users.size;
 
-        updateBalance(winner.id, getBalance(winner.id) + race.bet * race.users.size);
+        await updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
 
         description +=
             `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${

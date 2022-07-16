@@ -1,6 +1,9 @@
 import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js";
+import redis from "../database/redis";
 import { getColor } from "../functions/color";
-import { getEmbedColor, getTier, isPremium } from "../premium/utils";
+import { getEmbedColor } from "../premium/utils";
+
+const embedColorCache: Map<string, string> = new Map();
 
 export class CustomEmbed extends MessageEmbed {
     /**
@@ -13,16 +16,14 @@ export class CustomEmbed extends MessageEmbed {
         super();
 
         if (member) {
-            if (isPremium(member.user.id)) {
-                if (getTier(member.user.id) >= 1) {
-                    const color = getEmbedColor(member.user.id);
-                    if (color != "default") {
-                        super.setColor(color);
-                    } else {
-                        super.setColor(getColor(member));
-                    }
-                } else {
+            checkPremium(member.user.id);
+            const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
+
+            if (color && color != "none") {
+                if (color == "default") {
                     super.setColor(getColor(member));
+                } else {
+                    super.setColor(color);
                 }
             } else {
                 super.setColor(getColor(member));
@@ -269,5 +270,23 @@ export class ErrorEmbed extends MessageEmbed {
         }
 
         return this;
+    }
+}
+
+async function checkPremium(id: string) {
+    const x = parseInt(await redis.get(`cache:premium:level:${id}`));
+
+    if (x > 0) {
+        const embedColor = await getEmbedColor(id);
+
+        embedColorCache.set(id, embedColor);
+        setTimeout(() => {
+            embedColorCache.delete(id);
+        }, 300 * 1000);
+    } else {
+        embedColorCache.set(id, "none");
+        setTimeout(() => {
+            embedColorCache.delete(id);
+        }, 300 * 1000);
     }
 }

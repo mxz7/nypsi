@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getUserCount, getUserCountGuild } from "../utils/economy/utils.js";
+import { getUserCount } from "../utils/economy/utils.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { cpu } from "node-os-utils";
@@ -73,12 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 uptime,
             true
         )
-        .addField(
-            "economy",
-            `**users** ${getUserCount().toLocaleString()}
-         -- **this server** ${getUserCountGuild(message.guild).toLocaleString()}`,
-            true
-        )
+        .addField("economy", `**users** ${(await getUserCount()).toLocaleString()}`, true)
         .addField(
             "cache",
             "**snipe** " +

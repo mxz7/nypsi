@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!(await userExists(m))) continue;
 
-        const inventory = getInventory(m);
+        const inventory = await getInventory(m);
 
         if (inventory[selected.id]) {
             inventory[selected.id] += amount;
@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             inventory[selected.id] = amount;
         }
 
-        setInventory(m, inventory);
+        await setInventory(m, inventory);
         logger.info(`${amount} ${selected.id} given to ${m.user.tag} (${m.user.id})`);
         count += amount;
     }

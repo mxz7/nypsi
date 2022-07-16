@@ -94,41 +94,6 @@ export { logger };
 
 /**
  *
- * @param {String} content
- */
-export function databaseLog(content: string) {
-    const day = new Date().getDate();
-    const month = new Date().getMonth() + 1;
-
-    content = `\`\`\`[${day}/${month} ${getTimestamp()}] ${content}\`\`\``;
-
-    if (!nextLogMsg.get("sql")) {
-        nextLogMsg.set("sql", content);
-    } else {
-        let current = nextLogMsg.get("sql");
-
-        if (current.length >= 1500) {
-            let lastLine = current.substr(current.lastIndexOf("\n"), 50);
-
-            const amount = parseInt(lastLine.split(" ")[0].substring(1, lastLine.length));
-
-            if (!amount) {
-                lastLine = "+1 more";
-            } else {
-                lastLine = `+${amount + 1} more`;
-            }
-
-            current = current.substr(0, 1500) + "\n\n" + lastLine;
-        } else {
-            current = current + content;
-        }
-
-        nextLogMsg.set("sql", current);
-    }
-}
-
-/**
- *
  * @param {User} from
  * @param {User} to
  * @param {Number} amount

@@ -43,17 +43,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    let username: any = getLastfmUsername(message.member);
+    const username = await getLastfmUsername(message.member);
 
     if (!username) {
         return message.channel.send({
-            embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)],
+            embeds: [new ErrorEmbed(`you have not set your last.fm username (${await getPrefix(message.guild)}**slfm**)`)],
         });
     }
 
     await addCooldown(cmd.name, message.member, 10);
-
-    username = username.username;
 
     const res = await fetch(
         `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&period=${length}&api_key=${process.env.LASTFM_TOKEN}&format=json`

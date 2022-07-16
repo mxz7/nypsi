@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (response != captcha.answer) {
         return message.channel.send({ embeds: [new ErrorEmbed("captcha failed")] });
     } else {
-        const c = reset();
+        const c = await reset();
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, `${c} users reset`)],

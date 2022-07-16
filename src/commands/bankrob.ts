@@ -20,9 +20,9 @@ const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Ca
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
-    if (getBalance(message.member) < 1000) {
+    if ((await getBalance(message.member)) < 1000) {
         return await message.channel.send({
             embeds: [new ErrorEmbed("you must have atleast $1k in your wallet to rob a bank")],
         });
@@ -30,38 +30,38 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const bankWorth = new Map();
 
-    if (getBalance(message.member) > 100000000) {
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.01));
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 0.008));
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 0.0125));
-        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.0075));
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.009));
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.005));
-        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 0.01));
-    } else if (getBalance(message.member) > 10000000) {
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 0.1));
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 0.08));
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 0.125));
-        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.075));
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.09));
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.05));
-        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 0.1));
-    } else if (getBalance(message.member) > 500000) {
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 1));
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 0.8));
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 1.25));
-        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 0.75));
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 0.9));
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 0.5));
-        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 1));
+    if ((await getBalance(message.member)) > 100000000) {
+        bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 0.01));
+        bankWorth.set("santander", Math.round((await getBalance(message.member)) * 0.008));
+        bankWorth.set("bankofamerica", Math.round((await getBalance(message.member)) * 0.0125));
+        bankWorth.set("lloyds", Math.round((await getBalance(message.member)) * 0.0075));
+        bankWorth.set("hsbc", Math.round((await getBalance(message.member)) * 0.009));
+        bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 0.005));
+        bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 0.01));
+    } else if ((await getBalance(message.member)) > 10000000) {
+        bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 0.1));
+        bankWorth.set("santander", Math.round((await getBalance(message.member)) * 0.08));
+        bankWorth.set("bankofamerica", Math.round((await getBalance(message.member)) * 0.125));
+        bankWorth.set("lloyds", Math.round((await getBalance(message.member)) * 0.075));
+        bankWorth.set("hsbc", Math.round((await getBalance(message.member)) * 0.09));
+        bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 0.05));
+        bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 0.1));
+    } else if ((await getBalance(message.member)) > 500000) {
+        bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 1));
+        bankWorth.set("santander", Math.round((await getBalance(message.member)) * 0.8));
+        bankWorth.set("bankofamerica", Math.round((await getBalance(message.member)) * 1.25));
+        bankWorth.set("lloyds", Math.round((await getBalance(message.member)) * 0.75));
+        bankWorth.set("hsbc", Math.round((await getBalance(message.member)) * 0.9));
+        bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 0.5));
+        bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 1));
     } else {
-        bankWorth.set("barclays", Math.round(getBalance(message.member) * 2));
-        bankWorth.set("santander", Math.round(getBalance(message.member) * 1.7));
-        bankWorth.set("bankofamerica", Math.round(getBalance(message.member) * 2.5));
-        bankWorth.set("lloyds", Math.round(getBalance(message.member) * 1.5));
-        bankWorth.set("hsbc", Math.round(getBalance(message.member) * 1.8));
-        bankWorth.set("fleeca", Math.round(getBalance(message.member) * 1.1));
-        bankWorth.set("mazebank", Math.round(getBalance(message.member) * 2));
+        bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 2));
+        bankWorth.set("santander", Math.round((await getBalance(message.member)) * 1.7));
+        bankWorth.set("bankofamerica", Math.round((await getBalance(message.member)) * 2.5));
+        bankWorth.set("lloyds", Math.round((await getBalance(message.member)) * 1.5));
+        bankWorth.set("hsbc", Math.round((await getBalance(message.member)) * 1.8));
+        bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 1.1));
+        bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 2));
     }
 
     if (args[0] == "status") {
@@ -109,21 +109,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (caught <= 10) {
         percentLost = Math.floor(Math.random() * 50) + 10;
-        amountLost = Math.round((percentLost / 100) * getBalance(message.member));
+        amountLost = Math.round((percentLost / 100) * (await getBalance(message.member)));
 
-        const inventory = getInventory(message.member);
+        const inventory = await getInventory(message.member);
 
         if (inventory["lawyer"] && inventory["lawyer"] > 0) {
-            addItemUse(message.member, "lawyer");
+            await addItemUse(message.member, "lawyer");
             inventory["lawyer"]--;
 
             if (inventory["lawyer"] == 0) {
                 delete inventory["lawyer"];
             }
 
-            setInventory(message.member, inventory);
+            await setInventory(message.member, inventory);
 
-            updateBalance(message.member, getBalance(message.member) - Math.floor(amountLost * 0.25));
+            await updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
 
             embed2.addField(
                 "**you were caught**",
@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
             embed2.setColor("#e4334f");
         } else {
-            updateBalance(message.member, getBalance(message.member) - amountLost);
+            await updateBalance(message.member, (await getBalance(message.member)) - amountLost);
 
             embed2.addField(
                 "**you were caught**",
@@ -142,7 +142,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         robbedAmount = Math.round((amount / 100) * bankWorth.get(bank));
 
-        updateBalance(message.member, getBalance(message.member) + robbedAmount);
+        await updateBalance(message.member, (await getBalance(message.member)) + robbedAmount);
 
         embed2.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " from **" + bank + "**");
         embed2.setColor("#5efb8f");

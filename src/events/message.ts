@@ -1,6 +1,5 @@
 import { Collection, GuildMember, Message, Permissions, ThreadMember, ThreadMemberManager } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
-import { getDatabase } from "../utils/database/database";
 import { userExists } from "../utils/economy/utils";
 import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
 import { logger } from "../utils/logger";
@@ -14,10 +13,11 @@ import { encrypt } from "../utils/functions/string";
 import { addModLog } from "../utils/moderation/utils";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils";
+import Database = require("better-sqlite3");
 
 // declare function require(name: string)
 
-const db = getDatabase();
+const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 );
@@ -48,8 +48,20 @@ export default async function messageCreate(message: Message) {
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
-    if (hasGuild(message.guild) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        const filter = getChatFilter(message.guild);
+    let prefix = await getPrefix(message.guild);
+
+    if (message.client.user.id == "685193083570094101") prefix = "£";
+
+    if (message.content == `<@!${message.client.user.id}>` || message.content == `<@${message.client.user.id}>`) {
+        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
+            return message.member.send({
+                content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
+            });
+        });
+    }
+
+    if ((await hasGuild(message.guild)) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        const filter = await getChatFilter(message.guild);
 
         let content: string | string[] = message.content.toLowerCase().normalize("NFD");
 
@@ -65,39 +77,24 @@ export default async function messageCreate(message: Message) {
         }
     }
 
-    if (
-        message.guild.memberCount < 150000 &&
-        ((await userExists(message.guild.ownerId)) ||
-            isPremium(message.guild.ownerId) ||
-            (await getKarma(message.guild.ownerId)) >= 50 ||
-            (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
-    ) {
-        if (message.mentions.everyone) {
-            if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
-                await message.guild.members.fetch();
-                addCooldown(message.guild, 3600);
-            }
+    if (message.content.startsWith(prefix)) {
+        const args = message.content.substring(prefix.length).split(" ");
 
-            let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members;
+        const cmd = args[0].toLowerCase();
 
-            if (members instanceof ThreadMemberManager) {
-                members = members.cache;
-            }
+        runCommand(cmd, message, args);
+    }
 
-            mentionQueue.push({
-                type: "collection",
-                members: members.clone(),
-                message: message,
-                channelMembers: message.channel.members,
-                guildId: message.guild.id,
-                url: message.url,
-            });
-
-            if (!mentionInterval) {
-                mentionInterval = setInterval(async () => await addMention(), 150);
-            }
-        } else {
-            if (message.mentions.roles.first()) {
+    setTimeout(async () => {
+        if (message.channel.type == "DM") return;
+        if (
+            message.guild.memberCount < 150000 &&
+            ((await userExists(message.guild.ownerId)) ||
+                (await isPremium(message.guild.ownerId)) ||
+                (await getKarma(message.guild.ownerId)) >= 50 ||
+                (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
+        ) {
+            if (message.mentions.everyone) {
                 if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
                     await message.guild.members.fetch();
                     addCooldown(message.guild, 3600);
@@ -109,81 +106,88 @@ export default async function messageCreate(message: Message) {
                     members = members.cache;
                 }
 
-                message.mentions.roles.forEach((r) => {
-                    mentionQueue.push({
-                        type: "collection",
-                        members: r.members.clone(),
-                        message: message,
-                        channelMembers: members,
-                        guildId: message.guild.id,
-                        url: message.url,
-                    });
+                mentionQueue.push({
+                    type: "collection",
+                    members: members.clone(),
+                    message: message,
+                    channelMembers: message.channel.members,
+                    guildId: message.guild.id,
+                    url: message.url,
                 });
 
                 if (!mentionInterval) {
                     mentionInterval = setInterval(async () => await addMention(), 150);
                 }
-            }
-
-            if (message.mentions.members.first()) {
-                if (message.mentions.members.size == 1) {
-                    if (message.mentions.members.first().user.id == message.author.id) return;
-                    let content = message.content;
-
-                    if (content.length > 100) {
-                        content = content.substr(0, 97) + "...";
+            } else {
+                if (message.mentions.roles.first()) {
+                    if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
+                        await message.guild.members.fetch();
+                        addCooldown(message.guild, 3600);
                     }
 
-                    content = content.replace(/(\r\n|\n|\r)/gm, " ");
+                    let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+                        message.channel.members;
 
-                    mentionQueue.push({
-                        type: "mention",
-                        data: {
-                            user: message.author.tag,
-                            content: content,
-                            date: message.createdTimestamp,
-                            link: message.url,
-                        },
-                        guildId: message.guild.id,
-                        target: message.mentions.members.first().user.id,
+                    if (members instanceof ThreadMemberManager) {
+                        members = members.cache;
+                    }
+
+                    message.mentions.roles.forEach((r) => {
+                        mentionQueue.push({
+                            type: "collection",
+                            members: r.members.clone(),
+                            message: message,
+                            channelMembers: members,
+                            guildId: message.guild.id,
+                            url: message.url,
+                        });
                     });
-                } else {
-                    mentionQueue.push({
-                        type: "collection",
-                        members: message.mentions.members.clone(),
-                        message: message,
-                        channelMembers: message.channel.members,
-                        guildId: message.guild.id,
-                        url: message.url,
-                    });
+
+                    if (!mentionInterval) {
+                        mentionInterval = setInterval(async () => await addMention(), 150);
+                    }
                 }
 
-                if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 150);
+                if (message.mentions.members.first()) {
+                    if (message.mentions.members.size == 1) {
+                        if (message.mentions.members.first().user.id == message.author.id) return;
+                        let content = message.content;
+
+                        if (content.length > 100) {
+                            content = content.substr(0, 97) + "...";
+                        }
+
+                        content = content.replace(/(\r\n|\n|\r)/gm, " ");
+
+                        mentionQueue.push({
+                            type: "mention",
+                            data: {
+                                user: message.author.tag,
+                                content: content,
+                                date: message.createdTimestamp,
+                                link: message.url,
+                            },
+                            guildId: message.guild.id,
+                            target: message.mentions.members.first().user.id,
+                        });
+                    } else {
+                        mentionQueue.push({
+                            type: "collection",
+                            members: message.mentions.members.clone(),
+                            message: message,
+                            channelMembers: message.channel.members,
+                            guildId: message.guild.id,
+                            url: message.url,
+                        });
+                    }
+
+                    if (!mentionInterval) {
+                        mentionInterval = setInterval(async () => await addMention(), 150);
+                    }
                 }
             }
         }
-    }
-
-    let prefix = getPrefix(message.guild);
-
-    if (message.client.user.id == "685193083570094101") prefix = "£";
-
-    if (message.content == `<@!${message.client.user.id}>`) {
-        return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
-            return message.member.send({
-                content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
-            });
-        });
-    }
-
-    if (!message.content.startsWith(prefix)) return;
-
-    const args = message.content.substring(prefix.length).split(" ");
-
-    const cmd = args[0].toLowerCase();
-
-    return runCommand(cmd, message, args);
+    }, 1500);
 }
 
 let currentInterval = 150;
@@ -303,8 +307,8 @@ async function addMention() {
 
         let limit = 6;
 
-        if (isPremium(target)) {
-            const tier = getTier(target);
+        if (await isPremium(target)) {
+            const tier = await getTier(target);
 
             limit += tier * 2;
         }

@@ -17,7 +17,7 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, createGuild, hasGuild, runChristmas, runCountdowns } from "./utils/guilds/utils";
+import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
 import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
@@ -46,7 +46,7 @@ const client = new Discord.Client({
             },
         ],
     },
-    restTimeOffset: 69,
+    restTimeOffset: 0,
     shards: "auto",
     intents: [
         Discord.Intents.FLAGS.DIRECT_MESSAGES,
@@ -113,12 +113,6 @@ export function checkGuild(guildID: string) {
 }
 
 function runChecks() {
-    setInterval(() => {
-        client.guilds.cache.forEach((guild) => {
-            if (!hasGuild(guild)) return createGuild(guild);
-        });
-    }, 3600000);
-
     checkStats();
 
     if (client.user.id != "678711738845102087") return;

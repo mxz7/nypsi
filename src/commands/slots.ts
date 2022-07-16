@@ -80,10 +80,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
@@ -128,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (bet > getBalance(message.member)) {
+    if (bet > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
@@ -143,8 +143,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 10);
-
-    updateBalance(message.member, getBalance(message.member) - bet);
 
     let one = reel1[Math.floor(Math.random() * reel1.length)];
     const two = reel2[Math.floor(Math.random() * reel2.length)];
@@ -206,24 +204,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         win = true;
         winnings = Math.round(multiplier * bet);
-
-        updateBalance(message.member, getBalance(message.member) + winnings);
     } else if (one == two) {
         win = true;
         winnings = Math.round(bet * 1.2);
-
-        updateBalance(message.member, getBalance(message.member) + winnings);
     }
 
     let multi = 0;
 
     if (win) {
         multi = await getMulti(message.member);
+        winnings -= bet;
 
         if (multi > 0) {
-            updateBalance(message.member, getBalance(message.member) + Math.round(winnings * multi));
+            await updateBalance(
+                message.member,
+                (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+            );
             winnings = winnings + Math.round(winnings * multi);
+        } else {
+            await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         }
+    } else {
+        await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
 
     const embed = new CustomEmbed(
@@ -247,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    send({ embeds: [embed] }).then((m) => {
+    send({ embeds: [embed] }).then(async (m) => {
         if (win) {
             if (multi > 0) {
                 embed.addField(
@@ -263,16 +265,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
             }
 
-            const earnedXp = calcEarnedXp(message.member, bet);
+            const earnedXp = await calcEarnedXp(message.member, bet);
 
             if (earnedXp > 0) {
-                updateXp(message.member, getXp(message.member) + earnedXp);
+                await updateXp(message.member, (await getXp(message.member)) + earnedXp);
                 embed.setFooter(`+${earnedXp}xp`);
 
-                const guild = getGuildByUser(message.member);
+                const guild = await getGuildByUser(message.member);
 
                 if (guild) {
-                    addToGuildXP(guild.guild_name, earnedXp, message.member);
+                    await addToGuildXP(guild.guildName, earnedXp, message.member);
                 }
             }
 
@@ -288,7 +290,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     gamble(message.author, "slots", bet, win, winnings);
-    addGamble(message.member, "slots", win);
+    await addGamble(message.member, "slots", win);
 }
 
 cmd.setRun(run);

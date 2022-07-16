@@ -23,6 +23,7 @@ import { formatDate, MStoTime } from "./functions/date";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
+import { createProfile, hasProfile } from "./users/utils";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
@@ -166,7 +167,7 @@ async function helpCmd(message: Message, args: Array<string>) {
 
     const helpCategories = new Map();
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     for (const cmd of commands.keys()) {
         const category = getCmdCategory(cmd);
@@ -272,15 +273,14 @@ async function helpCmd(message: Message, args: Array<string>) {
 
             embed.setTitle(`${cmd.name} command`);
             embed.setDescription(desc);
-        } else if (getCommand(args[0].toLowerCase())) {
-            const member = message.guild.members.cache.find((m) => m.id == getCommand(args[0].toLowerCase()).owner);
+        } else if (await getCommand(args[0].toLowerCase())) {
+            const owner = (await getCommand(args[0].toLowerCase())).owner;
+            const member = message.guild.members.cache.find((m) => m.id == owner);
             embed.setTitle("custom command");
             embed.setDescription(
                 `this is a custom command${
                     member ? ` owned by ${member.toString()}` : ""
-                }\n\nto disable custom commands in your server you can do:\n${getPrefix(
-                    message.guild
-                )}disablecmd + customcommand`
+                }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`
             );
         } else {
             return message.channel.send({ embeds: [new ErrorEmbed("unknown command")] });
@@ -382,7 +382,7 @@ export async function runCommand(
     message: Message | (NypsiCommandInteraction & CommandInteraction),
     args: Array<string>
 ) {
-    if (!hasGuild(message.guild)) createGuild(message.guild);
+    if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
     if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
 
@@ -423,11 +423,13 @@ export async function runCommand(
         return helpCmd(message, args);
     }
 
+    if (!(await hasProfile(message.member))) await createProfile(message.member.user);
+
     let alias = false;
     if (!commandExists(cmd) && message instanceof Message) {
         if (!aliases.has(cmd)) {
             if (isLockedOut(message.author.id)) return;
-            const customCommand = getCommand(cmd);
+            const customCommand = await getCommand(cmd);
 
             if (!customCommand) {
                 return;
@@ -443,13 +445,13 @@ export async function runCommand(
                 cooldown.delete(message.author.id);
             }, 1500);
 
-            if (getDisabledCommands(message.guild).indexOf("customcommand") != -1) {
+            if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
                 return message.channel.send({
                     embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
                 });
             }
 
-            const filter = getChatFilter(message.guild);
+            const filter = await getChatFilter(message.guild);
 
             let contentToCheck: string | string[] = content.toLowerCase().normalize("NFD");
 
@@ -487,6 +489,8 @@ export async function runCommand(
     setTimeout(() => {
         cooldown.delete(message.author.id);
     }, 500);
+
+    // captcha check
 
     if (isLockedOut(message.author.id)) {
         if (beingChecked.indexOf(message.author.id) != -1) return;
@@ -562,9 +566,10 @@ export async function runCommand(
     }
 
     logCommand(message, args);
+
     if (alias) {
         if (commands.get(aliases.get(cmd)).category == "money") {
-            if (isEcoBanned(message.author.id)) {
+            if (await isEcoBanned(message.author.id)) {
                 return;
             }
         }
@@ -605,7 +610,7 @@ export async function runCommand(
 
         updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member);
 
-        if (getDisabledCommands(message.guild).indexOf(aliases.get(cmd)) != -1) {
+        if ((await getDisabledCommands(message.guild)).indexOf(aliases.get(cmd)) != -1) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {
@@ -616,7 +621,7 @@ export async function runCommand(
         await updateLastCommand(message.member);
     } else {
         if (commands.get(cmd).category == "money") {
-            if (isEcoBanned(message.author.id)) {
+            if (await isEcoBanned(message.author.id)) {
                 return;
             }
         }
@@ -651,7 +656,7 @@ export async function runCommand(
 
         updatePopularCommands(commands.get(cmd).name, message.member);
 
-        if (getDisabledCommands(message.guild).indexOf(cmd) != -1) {
+        if ((await getDisabledCommands(message.guild)).indexOf(cmd) != -1) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {
@@ -659,7 +664,7 @@ export async function runCommand(
             }
         }
         commands.get(cmd).run(message, args);
-        updateLastCommand(message.member);
+        await updateLastCommand(message.member);
     }
 
     let cmdName = cmd;
@@ -670,31 +675,27 @@ export async function runCommand(
 
     if (getCmdCategory(cmdName) == "money") {
         if (!message.member) return;
-        if (!(await userExists(message.member))) return;
 
-        setTimeout(() => {
+        setTimeout(async () => {
+            if (!(await userExists(message.member))) return;
             try {
                 if (!xpCooldown.has(message.author.id)) {
-                    try {
-                        updateXp(message.member, getXp(message.member) + 1);
+                    await updateXp(message.member, (await getXp(message.member)) + 1);
 
-                        xpCooldown.add(message.author.id);
+                    xpCooldown.add(message.author.id);
 
-                        setTimeout(() => {
-                            try {
-                                xpCooldown.delete(message.author.id);
-                            } catch {
-                                logger.error("error deleting from xpCooldown");
-                            }
-                        }, 60000);
-                    } catch {
-                        /*keeps lint happy*/
-                    }
+                    setTimeout(() => {
+                        try {
+                            xpCooldown.delete(message.author.id);
+                        } catch {
+                            /* */
+                        }
+                    }, 60000);
                 }
-            } catch (e) {
-                logger.error(e);
+            } catch {
+                /* */
             }
-        }, 10000);
+        }, 30000);
     }
 }
 
