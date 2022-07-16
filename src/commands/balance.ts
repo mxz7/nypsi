@@ -35,18 +35,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!target) {
             target = args[0];
-            if (!(await userExists(target))) createUser(target);
+            if (!(await userExists(target))) await createUser(target);
         }
 
         if (args[1] == "reset") {
-            deleteUser(target);
+            await deleteUser(target);
             if (!(message instanceof Message)) return;
             return message.react("✅");
         }
 
         const amount = parseInt(args[1]);
 
-        updateBalance(target, amount);
+        await updateBalance(target, amount);
 
         if (!(message instanceof Message)) return;
         return message.react("✅");
@@ -66,23 +66,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(await userExists(target))) createUser(target);
+    if (!(await userExists(target))) await createUser(target);
 
-    let footer = `xp: ${getXp(target).toLocaleString()}`;
+    let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
 
-    if (getPrestige(target) > 0) {
-        footer += ` | prestige: ${getPrestige(target)}`;
+    if ((await getPrestige(target)) > 0) {
+        footer += ` | prestige: ${await getPrestige(target)}`;
     }
 
     const embed = new CustomEmbed(message.member, false)
         .setDescription(
             "💰 $**" +
-                getBalance(target).toLocaleString() +
+                (await getBalance(target)).toLocaleString() +
                 "**\n" +
                 "💳 $**" +
-                getBankBalance(target).toLocaleString() +
+                (await getBankBalance(target)).toLocaleString() +
                 "** / $**" +
-                getMaxBankBalance(target).toLocaleString() +
+                (await getMaxBankBalance(target)).toLocaleString() +
                 "**"
         )
         .setFooter(footer);
@@ -103,12 +103,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.member == target) {
         if (
-            getXp(target) >= getPrestigeRequirement(target) &&
-            getBankBalance(target) >= getPrestigeRequirementBal(getXp(target)) &&
-            getPrestige(target) < 20
+            (await getXp(target)) >= (await getPrestigeRequirement(target)) &&
+            (await getBankBalance(target)) >= getPrestigeRequirementBal(await getXp(target)) &&
+            (await getPrestige(target)) < 20
         ) {
             return send({
-                content: `you are eligible to prestige, use ${getPrefix(message.guild)}prestige for more info`,
+                content: `you are eligible to prestige, use ${await getPrefix(message.guild)}prestige for more info`,
                 embeds: [embed],
             });
         }

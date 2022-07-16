@@ -56,14 +56,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false);
 
         embed.setHeader("wordle help");
         embed.setDescription(
-            `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n**${getPrefix(
-                message.guild
-            )}wordle play**`
+            `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n**${prefix}wordle play**`
         );
         embed.setFooter("type 'stop' to cancel the game when you're playing");
 
@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() == "stats") {
-        const stats = getWordleStats(message.member);
+        const stats = await getWordleStats(message.member);
 
         if (!stats) {
             return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[0].toLowerCase() != "start" && args[0].toLowerCase() != "play" && args[0].toLowerCase() != "p") {
-        return send({ embeds: [new ErrorEmbed(`${getPrefix(message.guild)}wordle play`)] });
+        return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
     }
 
     if (await onCooldown(cmd.name, message.member)) {
@@ -186,7 +186,12 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 
     if (!(typeof response == "string")) return;
 
-    if (response == "stop" || response == "cancel" || response == "" || response.startsWith(getPrefix(message.guild))) {
+    if (
+        response == "stop" ||
+        response == "cancel" ||
+        response == "" ||
+        response.startsWith(await getPrefix(message.guild))
+    ) {
         return cancel(message, m);
     }
 

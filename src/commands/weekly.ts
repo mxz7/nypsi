@@ -22,54 +22,54 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 90);
 
     if (!(await userExists(message.member))) {
-        createUser(message.member);
+        await createUser(message.member);
     }
 
+    const prefix = await getPrefix(message.guild);
+
     const notValidForYou = () => {
-        const embed = new CustomEmbed(
-            message.member,
-            false,
-            `${getPrefix(message.guild)}weekly is for SILVER tier and higher`
-        ).setFooter(`${getPrefix(message.guild)}patreon`);
+        const embed = new CustomEmbed(message.member, false, `${prefix}weekly is for SILVER tier and higher`).setFooter(
+            `${prefix}patreon`
+        );
 
         return message.channel.send({ embeds: [embed] });
     };
 
-    if (!isPremium(message.author.id)) {
+    if (!(await isPremium(message.author.id))) {
         return notValidForYou();
     } else {
-        if (getTier(message.author.id) < 2) {
+        if ((await getTier(message.author.id)) < 2) {
             return notValidForYou();
         }
 
-        const now = new Date().getTime();
-        const lastWeekly = getLastWeekly(message.author.id);
-        const diff = now - lastWeekly;
+        const now = new Date();
+        const lastWeekly = await getLastWeekly(message.author.id);
+        const diff = now.getTime() - lastWeekly.getTime();
 
         if (diff >= 604800000) {
-            setLastWeekly(message.author.id, now);
+            await setLastWeekly(message.author.id, now);
 
             let amount = 150000;
             const multi = await getMulti(message.member);
 
-            let description = `$${getBalance(message.member).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
+            let description = `$${(await getBalance(message.member)).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
 
             if (multi > 0) {
                 amount = amount + Math.round(amount * multi);
-                description = `$${getBalance(
-                    message.member
+                description = `$${(
+                    await getBalance(message.member)
                 ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
                     multi * 100
                 ).toLocaleString()}**% bonus)`;
             }
 
-            updateBalance(message.member, getBalance(message.member) + amount);
+            await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
             const embed = new CustomEmbed(message.member, false, description);
 
             return message.channel.send({ embeds: [embed] }).then((msg) => {
-                setTimeout(() => {
-                    embed.setDescription(`new balance: $**${getBalance(message.member).toLocaleString()}**`);
+                setTimeout(async () => {
+                    embed.setDescription(`new balance: $**${(await getBalance(message.member)).toLocaleString()}**`);
                     msg.edit({ embeds: [embed] });
                 }, 2000);
             });

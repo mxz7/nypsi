@@ -13,7 +13,7 @@ const cmd = new Command("ascii", "create ascii text", Categories.FUN);
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (!(await getDMsEnabled(message.member))) {
         return message.channel.send({

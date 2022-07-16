@@ -18,10 +18,10 @@ export default async function guildDelete(client: Client, guild: Guild) {
         message: `removed from ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
     });
 
-    setPrefix(guild, "$");
-    updateDisabledCommands(guild, []);
-    if (profileExists(guild)) {
-        setMuteRole(guild, "");
+    await setPrefix(guild, "$");
+    await updateDisabledCommands(guild, []);
+    if (await profileExists(guild)) {
+        await setMuteRole(guild, "");
     }
 
     let amount = Math.floor(guild.memberCount / 10);

@@ -53,12 +53,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    let username: any = getLastfmUsername(member);
+    const username = await getLastfmUsername(member);
 
     if (!username) {
         if (message.author.id == member.user.id) {
             return send({
-                embeds: [new ErrorEmbed(`you have not set your last.fm username (${getPrefix(message.guild)}**slfm**)`)],
+                embeds: [
+                    new ErrorEmbed(`you have not set your last.fm username (${await getPrefix(message.guild)}**slfm**)`),
+                ],
             });
         } else {
             return send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] });
@@ -66,8 +68,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 10);
-
-    username = username.username;
 
     const res = await fetch(
         `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`

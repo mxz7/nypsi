@@ -24,7 +24,7 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
     };
 
     if (args.length == 0) {
-        return send({ embeds: [new ErrorEmbed(`${getPrefix(message.guild)}ta <date> (label...)`)] });
+        return send({ embeds: [new ErrorEmbed(`${await getPrefix(message.guild)}ta <date> (label...)`)] });
     }
 
     let target = dayjs(args[0]);

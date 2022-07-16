@@ -114,7 +114,7 @@ async function showGuild(message, guild) {
         .addField(
             "member info",
             `**members** ${guild.memberCount.toLocaleString()}
-    **peak** ${getPeaks(guild).toLocaleString()}`,
+    **peak** ${(await getPeaks(guild)).toLocaleString()}`,
             true
         );
 
@@ -146,9 +146,9 @@ async function showUser(message, user) {
     const embed = new CustomEmbed(message.member, false)
         .setTitle(user.tag)
         .setDescription(
-            `\`${user.id}\`${isPremium(user.id) ? ` (${getPremiumProfile(user.id).getLevelString()}) ` : ""} ${
-                isEcoBanned(user.id) ? "[banned]" : ""
-            }`
+            `\`${user.id}\`${
+                (await isPremium(user.id)) ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) ` : ""
+            } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`
         )
         .addField(
             "user",
@@ -166,11 +166,13 @@ async function showUser(message, user) {
         const voted = await hasVoted(user.id);
         embed.addField(
             "economy",
-            `💰 $**${getBalance(user.id).toLocaleString()}**
-            💳 $**${getBankBalance(user.id).toLocaleString()}** / $**${getMaxBankBalance(user.id).toLocaleString()}**
-            **xp** ${getXp(user.id).toLocaleString()}
+            `💰 $**${(await getBalance(user.id)).toLocaleString()}**
+            💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
+                await getMaxBankBalance(user.id)
+            ).toLocaleString()}**
+            **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
-            **prestige** ${getPrestige(user.id)}
+            **prestige** ${await getPrestige(user.id)}
             **bonus** ${Math.floor((await getMulti(user.id)) * 100)}%`,
             true
         );

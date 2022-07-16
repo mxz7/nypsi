@@ -13,9 +13,9 @@ const cmd = new Command("clearinventory", "clear your inventory. this cannot be 
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     let amount = 0;
 
@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
 
     if (reaction == "❌") {
-        setInventory(message.member, {});
+        await setInventory(message.member, {});
 
         embed.setDescription("✅ your inventory has been cleared");
 

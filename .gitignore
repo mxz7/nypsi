@@ -10,6 +10,7 @@ out/
 *.db-shm
 *.db-wal
 *.DS_STORE
+*.sql
 
 !lists.json
 !items.json
@@ -22,3 +23,4 @@ out/
 !.prettierignore
 !tsconfig.json
 !.commitlintrc.json
+!migration_lock.toml

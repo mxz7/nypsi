@@ -18,9 +18,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
-    if (getBalance(message.member) > 500000) {
+    if ((await getBalance(message.member)) > 500000) {
         return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });
     }
 
@@ -28,28 +28,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let amount = 1000;
 
-    if (isPremium(message.author.id)) {
-        if (getTier(message.author.id) == 1) {
+    if (await isPremium(message.author.id)) {
+        if ((await getTier(message.author.id)) == 1) {
             amount = 2500;
-        } else if (getTier(message.author.id) == 2) {
+        } else if ((await getTier(message.author.id)) == 2) {
             amount = 5000;
-        } else if (getTier(message.author.id) == 3) {
+        } else if ((await getTier(message.author.id)) == 3) {
             amount = 7500;
-        } else if (getTier(message.author.id) == 4) {
+        } else if ((await getTier(message.author.id)) == 4) {
             amount = 10000;
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) + amount);
+    await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
     const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setHeader(
         "free money",
         message.author.avatarURL()
     );
 
-    message.channel.send({ embeds: [embed] }).then((msg) => {
+    message.channel.send({ embeds: [embed] }).then(async (msg) => {
         embed.setDescription(
-            `+$**${amount.toLocaleString()}**\nnew balance: $**${getBalance(message.member).toLocaleString()}**`
+            `+$**${amount.toLocaleString()}**\nnew balance: $**${(await getBalance(message.member)).toLocaleString()}**`
         );
         setTimeout(() => {
             msg.edit({ embeds: [embed] });

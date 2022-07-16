@@ -1,12 +1,10 @@
 import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { getDatabase, toArray, toStorage } from "../database/database";
 import { logger } from "../logger";
 import fetch from "node-fetch";
+import prisma from "../database/database";
 
 declare function require(name: string);
-
-const db = getDatabase();
 
 const currentChannels = new Set();
 const existsCache = new Set();
@@ -14,41 +12,29 @@ const enabledCache = new Map();
 const lastGame = new Map();
 
 setInterval(async () => {
-    const { checkGuild } = require("../../nypsi");
-
-    const query = db.prepare("SELECT id FROM chat_reaction").all();
-
-    for (const guild of query) {
-        const exists = await checkGuild(guild.id);
-
-        if (!exists) {
-            db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id);
-            db.prepare("DELETE FROM chat_reaction WHERE id = ?").run(guild.id);
-
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from chat reaction data`,
-            });
-        }
-    }
-}, 24 * 60 * 60 * 1000);
-
-setInterval(async () => {
     let count = 0;
 
-    const query = db
-        .prepare("SELECT id, random_channels, between_events, random_modifier FROM chat_reaction WHERE random_start = 1")
-        .all();
+    const query = await prisma.chatReaction.findMany({
+        where: {
+            randomStart: true,
+        },
+        select: {
+            guildId: true,
+            randomChannels: true,
+            betweenEvents: true,
+            randomModifier: true,
+        },
+    });
 
     for (const guildData of query) {
         const { getGuild } = require("../../nypsi");
-        const guild = await getGuild(guildData.id);
+        const guild = await getGuild(guildData.guildId);
 
         if (!guild) {
             continue;
         }
 
-        const channels = toArray(guildData.random_channels);
+        const channels = guildData.randomChannels;
 
         if (channels.length == 0) continue;
 
@@ -97,20 +83,20 @@ setInterval(async () => {
                 continue;
             }
 
-            const base = guildData.between_events;
+            const base = guildData.betweenEvents;
             let final;
 
-            if (guildData.random_modifier == 0) {
+            if (guildData.randomModifier == 0) {
                 final = base;
             } else {
                 const o = ["+", "-"];
                 let operator = o[Math.floor(Math.random() * o.length)];
 
-                if (base - guildData.random_modifier < 120) {
+                if (base - guildData.randomModifier < 120) {
                     operator = "+";
                 }
 
-                const amount = Math.floor(Math.random() * guildData.random_modifier);
+                const amount = Math.floor(Math.random() * guildData.randomModifier);
 
                 if (operator == "+") {
                     final = base + amount;
@@ -138,19 +124,30 @@ setInterval(async () => {
 /**
  * @param {Guild} guild
  */
-export function createReactionProfile(guild: Guild) {
-    db.prepare("INSERT INTO chat_reaction (id) VALUES (?)").run(guild.id);
+export async function createReactionProfile(guild: Guild) {
+    await prisma.chatReaction.create({
+        data: {
+            guildId: guild.id,
+        },
+    });
 }
 
 /**
  * @param {Guild} guild
  */
-export function hasReactionProfile(guild: Guild) {
+export async function hasReactionProfile(guild: Guild) {
     if (existsCache.has(guild.id)) {
         return true;
     }
 
-    const query = db.prepare("SELECT id FROM chat_reaction WHERE id = ?").get(guild.id);
+    const query = await prisma.chatReaction.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            guildId: true,
+        },
+    });
 
     if (query) {
         existsCache.add(guild.id);
@@ -164,17 +161,22 @@ export function hasReactionProfile(guild: Guild) {
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-export async function getWords(guild: Guild): Promise<Array<string>> {
-    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id);
+export async function getWords(guild: Guild) {
+    const query = await prisma.chatReaction.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            wordList: true,
+        },
+    });
 
-    const wordList = toArray(query.word_list);
-
-    if (wordList.length == 0) {
+    if (query.wordList.length == 0) {
         const a = await getDefaultWords();
 
         return a;
     } else {
-        return wordList;
+        return query.wordList;
     }
 }
 
@@ -182,84 +184,81 @@ export async function getWords(guild: Guild): Promise<Array<string>> {
  * @param {Guild} guild
  * @param {Array<String>} newWordList
  */
-export function updateWords(guild: Guild, newWordList: Array<string>) {
-    const list = toStorage(newWordList);
-
-    db.prepare("UPDATE chat_reaction SET word_list = ? WHERE id = ?").run(list, guild.id);
+export async function updateWords(guild: Guild, newWordList: Array<string>) {
+    await prisma.chatReaction.update({
+        where: {
+            guildId: guild.id,
+        },
+        data: {
+            wordList: newWordList,
+        },
+    });
 }
 
 /**
  * @param {Guild} guild
  * @returns {Array<String>}
  */
-export function getWordList(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT word_list FROM chat_reaction WHERE id = ?").get(guild.id);
+export async function getWordList(guild: Guild) {
+    const query = await prisma.chatReaction.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            wordList: true,
+        },
+    });
 
-    return toArray(query.word_list);
-}
-
-/**
- * @param {Guild} guild
- * @returns {Boolean}
- */
-export function isUsingDefaultWords(guild: Guild): boolean {
-    if (getWordList(guild).length == 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return query.wordList;
 }
 
 /**
  * @param {Guild} guild
  * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
-export function getReactionSettings(guild: Guild): {
-    randomStart: boolean;
-    randomChannels: Array<string>;
-    timeBetweenEvents: number;
-    randomModifier: number;
-    timeout: number;
-} {
-    const query = db
-        .prepare(
-            "SELECT random_start, random_channels, between_events, random_modifier, timeout FROM chat_reaction WHERE id = ?"
-        )
-        .get(guild.id);
+export async function getReactionSettings(guild: Guild) {
+    const query = await prisma.chatReaction.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            randomStart: true,
+            randomChannels: true,
+            betweenEvents: true,
+            randomModifier: true,
+            timeout: true,
+        },
+    });
 
-    return {
-        randomStart: query.random_start == 1 ? true : false,
-        randomChannels: toArray(query.random_channels),
-        timeBetweenEvents: query.between_events,
-        randomModifier: query.random_modifier,
-        timeout: query.timeout,
-    };
+    return query;
 }
 
 /**
  * @param {Guild} guild
  * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
-export function updateReactionSettings(
+export async function updateReactionSettings(
     guild: Guild,
     settings: {
         randomStart: boolean;
-        randomChannels: Array<string>;
-        timeBetweenEvents: number;
+        randomChannels: string[];
+        betweenEvents: number;
         randomModifier: number;
         timeout: number;
     }
 ) {
-    db.prepare(
-        "UPDATE chat_reaction SET random_start = ?, random_channels = ?, between_events = ?, random_modifier = ?, timeout = ? WHERE id = ?"
-    ).run(
-        settings.randomStart ? 1 : 0,
-        toStorage(settings.randomChannels),
-        settings.timeBetweenEvents,
-        settings.randomModifier,
-        settings.timeout,
-        guild.id
-    );
+    await prisma.chatReaction.update({
+        where: {
+            guildId: guild.id,
+        },
+        data: {
+            randomStart: settings.randomStart,
+            randomChannels: settings.randomChannels,
+            randomModifier: settings.randomModifier,
+            betweenEvents: settings.betweenEvents,
+            timeout: settings.timeout,
+        },
+    });
 
     if (enabledCache.has(guild.id)) enabledCache.delete(guild.id);
 }
@@ -269,13 +268,17 @@ export function updateReactionSettings(
  * @param {GuildMember} member
  * @returns {{wins: number, secondPlace: number, thirdPlace: number}}
  */
-export function getReactionStats(
-    guild: Guild,
-    member: GuildMember
-): { wins: number; secondPlace: number; thirdPlace: number } {
-    const query = db
-        .prepare("SELECT wins, second, third FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
-        .get(guild.id, member.user.id);
+export async function getReactionStats(guild: Guild, member: GuildMember) {
+    const query = await prisma.chatReactionStats.findFirst({
+        where: {
+            AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
+        },
+        select: {
+            wins: true,
+            second: true,
+            third: true,
+        },
+    });
 
     return {
         wins: query.wins,
@@ -323,14 +326,15 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     const winnersIDs = [];
 
     let waiting = false;
+    const blacklisted = await getBlacklisted(guild);
 
-    const filter = (m) =>
+    const filter = async (m) =>
         m.content.toLowerCase() == chosenWord.toLowerCase() &&
         winnersIDs.indexOf(m.author.id) == -1 &&
         !m.member.user.bot &&
-        getBlacklisted(guild).indexOf(m.author.id) == -1;
+        blacklisted.indexOf(m.author.id) == -1;
 
-    const timeout = getReactionSettings(guild).timeout;
+    const timeout = (await getReactionSettings(guild)).timeout;
 
     const collector = channel.createMessageCollector({
         filter,
@@ -349,12 +353,12 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
         time = ((time - start) / 1000).toFixed(2);
 
-        if (!hasReactionStatsProfile(guild, message.member)) createReactionStatsProfile(guild, message.member);
+        if (!(await hasReactionStatsProfile(guild, message.member))) await createReactionStatsProfile(guild, message.member);
 
         if (winners.size == 0) {
             embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``);
 
-            addWin(guild, message.member);
+            await addWin(guild, message.member);
 
             setTimeout(() => {
                 if (winners.size != 3) {
@@ -375,11 +379,11 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
                         field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``;
 
-                        add2ndPlace(guild, winners.get(2).member);
+                        await add2ndPlace(guild, winners.get(2).member);
 
                         if (winners.get(3)) {
                             field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``;
-                            add3rdPlace(guild, winners.get(3).member);
+                            await add3rdPlace(guild, winners.get(3).member);
                         }
 
                         return await msg.edit({ embeds: [embed] }).catch(() => {
@@ -393,7 +397,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
                     field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``;
 
-                    add3rdPlace(guild, message.member);
+                    await add3rdPlace(guild, message.member);
                 }
             }
         }
@@ -433,10 +437,15 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
  * @param {GuildMember} member
  * @returns {Boolean}
  */
-export function hasReactionStatsProfile(guild: Guild, member: GuildMember): boolean {
-    const query = db
-        .prepare("SELECT user_id FROM chat_reaction_stats WHERE guild_id = ? AND user_id = ?")
-        .get(guild.id, member.user.id);
+export async function hasReactionStatsProfile(guild: Guild, member: GuildMember) {
+    const query = await prisma.chatReactionStats.findFirst({
+        where: {
+            AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
+        },
+        select: {
+            userId: true,
+        },
+    });
 
     if (query) {
         return true;
@@ -450,27 +459,13 @@ export function hasReactionStatsProfile(guild: Guild, member: GuildMember): bool
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function createReactionStatsProfile(guild: Guild, member: GuildMember) {
-    db.prepare("INSERT INTO chat_reaction_stats (guild_id, user_id) VALUES (?, ?)").run(guild.id, member.user.id);
-}
-
-/**
- * @param {Guild} guild
- * @param {GuildMember} member
- * @param {{wins: number, secondPlace: number, thirdPlace: number}} newStats
- */
-export function updateStats(
-    guild: Guild,
-    member: GuildMember,
-    newStats: { wins: number; secondPlace: number; thirdPlace: number }
-) {
-    db.prepare("UPDATE chat_reaction_stats SET wins = ?, second = ?, third = ? WHERE guild_id = ? AND user_id = ?").run(
-        newStats.wins,
-        newStats.secondPlace,
-        newStats.thirdPlace,
-        guild.id,
-        member.user.id
-    );
+export async function createReactionStatsProfile(guild: Guild, member: GuildMember) {
+    await prisma.chatReactionStats.create({
+        data: {
+            chatReactionGuildId: guild.id,
+            userId: member.user.id,
+        },
+    });
 }
 
 /**
@@ -478,11 +473,15 @@ export function updateStats(
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function addWin(guild: Guild, member: GuildMember) {
-    db.prepare("UPDATE chat_reaction_stats SET wins = wins + 1 WHERE guild_id = ? AND user_id = ?").run(
-        guild.id,
-        member.user.id
-    );
+export async function addWin(guild: Guild, member: GuildMember) {
+    await prisma.chatReactionStats.updateMany({
+        where: {
+            AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
+        },
+        data: {
+            wins: { increment: 1 },
+        },
+    });
 }
 
 /**
@@ -490,11 +489,15 @@ export function addWin(guild: Guild, member: GuildMember) {
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function add2ndPlace(guild: Guild, member: GuildMember) {
-    db.prepare("UPDATE chat_reaction_stats SET second = second + 1 WHERE guild_id = ? AND user_id = ?").run(
-        guild.id,
-        member.user.id
-    );
+export async function add2ndPlace(guild: Guild, member: GuildMember) {
+    await prisma.chatReactionStats.updateMany({
+        where: {
+            AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
+        },
+        data: {
+            second: { increment: 1 },
+        },
+    });
 }
 
 /**
@@ -502,11 +505,15 @@ export function add2ndPlace(guild: Guild, member: GuildMember) {
  * @param {Guild} guild
  * @param {GuildMember} member
  */
-export function add3rdPlace(guild: Guild, member: GuildMember) {
-    db.prepare("UPDATE chat_reaction_stats SET third = third + 1 WHERE guild_id = ? AND user_id = ?").run(
-        guild.id,
-        member.user.id
-    );
+export async function add3rdPlace(guild: Guild, member: GuildMember) {
+    await prisma.chatReactionStats.updateMany({
+        where: {
+            AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
+        },
+        data: {
+            third: { increment: 1 },
+        },
+    });
 }
 
 /**
@@ -542,32 +549,40 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     const overallWins = [];
     const overallStats = new Map();
 
-    const query = db
-        .prepare("SELECT user_id, wins, second, third FROM chat_reaction_stats WHERE guild_id = ?")
-        .all(guild.id);
+    const query = await prisma.chatReactionStats.findMany({
+        where: {
+            chatReactionGuildId: guild.id,
+        },
+        select: {
+            userId: true,
+            wins: true,
+            second: true,
+            third: true,
+        },
+    });
 
     for (const user of query) {
         let overall = false;
 
-        if (members.find((member) => member.user.id == user.user_id) && user.wins != 0) {
-            usersWins.push(user.user_id);
-            winsStats.set(user.user_id, user.wins);
+        if (members.find((member) => member.user.id == user.userId) && user.wins != 0) {
+            usersWins.push(user.userId);
+            winsStats.set(user.userId, user.wins);
             overall = true;
         }
-        if (members.find((member) => member.user.id == user.user_id) && user.second != 0) {
-            usersSecond.push(user.user_id);
-            secondStats.set(user.user_id, user.second);
+        if (members.find((member) => member.user.id == user.userId) && user.second != 0) {
+            usersSecond.push(user.userId);
+            secondStats.set(user.userId, user.second);
             overall = true;
         }
-        if (members.find((member) => member.user.id == user.user_id) && user.third != 0) {
-            usersThird.push(user.user_id);
-            thirdStats.set(user.user_id, user.third);
+        if (members.find((member) => member.user.id == user.userId) && user.third != 0) {
+            usersThird.push(user.userId);
+            thirdStats.set(user.userId, user.third);
             overall = true;
         }
 
         if (overall) {
-            overallWins.push(user.user_id);
-            overallStats.set(user.user_id, user.wins + user.second + user.third);
+            overallWins.push(user.userId);
+            overallStats.set(user.userId, user.wins + user.second + user.third);
         }
     }
 
@@ -665,58 +680,46 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
 
 /**
  * @param {Guild} guild
- * @returns {Boolean}
- */
-export function hasRandomReactionsEnabled(guild: Guild): boolean {
-    if (enabledCache.has(guild.id)) {
-        return enabledCache.get(guild.id);
-    }
-
-    const query = db.prepare("SELECT random_start FROM chat_reaction WHERE id = ?").get(guild.id);
-
-    if (query.random_start == 1) {
-        enabledCache.set(guild.id, true);
-        return true;
-    } else {
-        enabledCache.set(guild.id, false);
-        return false;
-    }
-}
-
-/**
- * @param {Guild} guild
  * @returns {Array<String>}
  */
-export function getRandomChannels(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT random_channels FROM chat_reaction WHERE id = ?").get(guild.id);
+export async function getBlacklisted(guild: Guild) {
+    const query = await prisma.chatReaction.findUnique({
+        where: {
+            guildId: guild.id,
+        },
+        select: {
+            blacklisted: true,
+        },
+    });
 
-    return toArray(query.random_channels);
-}
-
-/**
- * @param {Guild} guild
- * @returns {Array<String>}
- */
-export function getBlacklisted(guild: Guild): Array<string> {
-    const query = db.prepare("SELECT blacklisted FROM chat_reaction WHERE id = ?").get(guild.id);
-
-    return toArray(query.blacklisted);
+    return query.blacklisted;
 }
 
 /**
  * @param {Guild} guild
  * @param {Array<String>} blacklisted
  */
-export function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
-    db.prepare("UPDATE chat_reaction SET blacklisted = ? WHERE id = ?").run(toStorage(blacklisted), guild.id);
+export async function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
+    await prisma.chatReaction.update({
+        where: {
+            guildId: guild.id,
+        },
+        data: {
+            blacklisted: blacklisted,
+        },
+    });
 }
 
 /**
  *
  * @param {Guild} guild
  */
-export function deleteStats(guild: Guild) {
-    db.prepare("DELETE FROM chat_reaction_stats WHERE guild_id = ?").run(guild.id);
+export async function deleteStats(guild: Guild) {
+    await prisma.chatReactionStats.deleteMany({
+        where: {
+            chatReactionGuildId: guild.id,
+        },
+    });
 }
 
 /**

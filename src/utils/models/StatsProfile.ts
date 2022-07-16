@@ -6,7 +6,7 @@ export class StatsProfile {
      *
      * @param {Array<{id: string, type: string, win: number, lose: number, gamble: number}>} data
      */
-    constructor(data: Array<{ id: string; type: string; win: number; lose: number; gamble: number }>) {
+    constructor(data: Array<{ economyUserId: string; type: string; win: number; lose: number; gamble: boolean }>) {
         this.gamble = {};
         this.items = {};
         this.rob = {

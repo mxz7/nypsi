@@ -36,20 +36,20 @@ const filterxd = [
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!isPremium(message.author.id)) {
+    if (!(await isPremium(message.author.id))) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be at least GOLD tier for this command")],
         });
     }
 
-    if (getTier(message.author.id) < 3) {
+    if ((await getTier(message.author.id)) < 3) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be at least GOLD tier for this command")],
         });
     }
 
     if (args.length == 0) {
-        const cmd = getUserCommand(message.author.id);
+        const cmd = await getUserCommand(message.author.id);
 
         const embed = new CustomEmbed(message.member, false);
 
@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed.setDescription("you don't have a custom command");
         }
 
-        embed.setFooter(`use ${getPrefix(message.guild)}mycmd <content> to set the content of your custom command`);
+        embed.setFooter(`use ${await getPrefix(message.guild)}mycmd <content> to set the content of your custom command`);
 
         return message.channel.send({ embeds: [embed] });
     } else {
@@ -128,18 +128,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("this command already exists")] });
         }
 
-        const command = getUserCommand(message.author.id);
+        const command = await getUserCommand(message.author.id);
         let trigger: string;
 
         if (command) {
             trigger = command.trigger;
         }
 
-        if (getCommand(res) && trigger != res) {
+        if ((await getCommand(res)) && trigger != res) {
             return message.channel.send({ embeds: [new ErrorEmbed("this command already exists")] });
         }
 
-        setCommand(message.author.id, res, content);
+        await setCommand(message.author.id, res, content);
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ your custom command has been updated")],

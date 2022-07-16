@@ -3,8 +3,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { fetchUserMentions } from "../utils/users/utils";
-import { getDatabase } from "../utils/database/database";
+import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import { userExists } from "../utils/economy/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import ms = require("ms");
@@ -48,18 +47,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (
         message.guild.memberCount < 150000 &&
         ((await userExists(message.guild.ownerId)) ||
-            isPremium(message.guild.ownerId) ||
+            (await isPremium(message.guild.ownerId)) ||
             (await getKarma(message.guild.ownerId)) >= 50 ||
-            (await getLastCommand(message.guild.ownerId)) >= Date.now() - ms("1 days"))
+            (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
     ) {
         qualified = true;
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (!qualified) {
         const embed = new ErrorEmbed(
-            `this server does not qualify to track mentions (${getPrefix(
-                message.guild
-            )}pings)\n\njoin the support server for help (${getPrefix(message.guild)}support)`
+            `this server does not qualify to track mentions (${prefix}pings)\n\njoin the support server for help (${prefix}support)`
         );
 
         return send({ embeds: [embed] });
@@ -208,9 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 }
             } else if (reaction == "❌") {
-                getDatabase()
-                    .prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?")
-                    .run(message.guild.id, message.author.id);
+                deleteUserMentions(message.guild, message.member);
 
                 newEmbed.setDescription("✅ mentions cleared");
 

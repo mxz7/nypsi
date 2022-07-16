@@ -15,7 +15,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ content: "dumbass" });
     }
 
-    toggleBan(args[0]);
+    await toggleBan(args[0]);
 
     if (!(message instanceof Message)) return;
 
