@@ -21,7 +21,12 @@ import { daysAgo, daysUntil } from "../utils/functions/date.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { updateLastKnowntag } from "../utils/users/utils.js";
 
-const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO);
+const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO).setAliases([
+    "data",
+    "viewdata",
+    "showmemydatazuckerberg",
+]);
+const db = new Database("./out/data/storage.db");
 
 /**
  * @param {Message} message
