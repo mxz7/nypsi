@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         count++;
     }
 
-    const embed = new CustomEmbed(message.member, false).setHeader(
+    const embed = new CustomEmbed(message.member).setHeader(
         `${username}'s top artists [${lengthDisplay}]`,
         message.author.avatarURL()
     );

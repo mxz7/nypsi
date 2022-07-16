@@ -318,7 +318,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!reaction) return;
 
-            const newEmbed = new CustomEmbed(message.member, false).setHeader("wholesome queue");
+            const newEmbed = new CustomEmbed(message.member).setHeader("wholesome queue");
 
             if (reaction == "⬅") {
                 if (currentPage <= 1) {

@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         shopList = shopList + "the most you can recieve on one robbery is 90% of the store's balance";
 
-        const embed = new CustomEmbed(message.member, false, shopList).setHeader("current store balances");
+        const embed = new CustomEmbed(message.member, shopList).setHeader("current store balances");
 
         return message.channel.send({ embeds: [embed] });
     }
@@ -96,12 +96,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let percentLost;
     let amountLost;
 
-    const embed = new CustomEmbed(message.member, true, "robbing " + shop + "..").setHeader(
+    const embed = new CustomEmbed(message.member, "robbing " + shop + "..").setHeader(
         "store robbery",
         message.author.avatarURL()
     );
 
-    const embed2 = new CustomEmbed(message.member, true, "robbing " + shop + "..").setHeader(
+    const embed2 = new CustomEmbed(message.member, "robbing " + shop + "..").setHeader(
         "store robbery",
         message.author.avatarURL()
     );

@@ -20,7 +20,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("poll help")
             .addField("usage", `${prefix}poll (choices) <title> | (text) | (hex color)`)
             .addField(

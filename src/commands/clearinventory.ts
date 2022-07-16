@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("you dont have anything in your inventory")] });
     }
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setDescription(`are you sure you want to clear your inventory of **${amount}** items?\n\nthis cannot be undone.`);
 

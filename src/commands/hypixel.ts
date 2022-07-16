@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("error reading hypixel data")] });
     }
 
-    const embed = new CustomEmbed(message.member, true)
+    const embed = new CustomEmbed(message.member)
         .setTitle("[" + rank + "] " + uuid.name)
         .addField("first login date", "`" + firstLog + "`", true)
         .addField("logged in", "`" + lastLog, true)

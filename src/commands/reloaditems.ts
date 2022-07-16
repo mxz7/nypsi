@@ -14,7 +14,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const d = loadItems();
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, false, d)] });
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, d)] });
 }
 
 cmd.setRun(run);

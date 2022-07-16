@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const help = async () => {
         const current = await getModLogsHook(message.guild);
 
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader("mod logs");
 
@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "disable") {
         await setModLogs(message.guild, "");
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, false, "✅ modlogs have been disabled")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ modlogs have been disabled")] });
     } else {
         let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[0];
 
@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setModLogs(message.guild, hook.url);
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ modlogs set to ${channel.toString()}`)],
+            embeds: [new CustomEmbed(message.member, `✅ modlogs set to ${channel.toString()}`)],
         });
     }
 }

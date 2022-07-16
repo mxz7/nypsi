@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) + total);
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     embed.setDescription(`+$**${total.toLocaleString()}**\n${earned}`);
 

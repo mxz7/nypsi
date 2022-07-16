@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return message.channel.send({
-        embeds: [new CustomEmbed(message.member, false, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
+        embeds: [new CustomEmbed(message.member, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
     });
 }
 

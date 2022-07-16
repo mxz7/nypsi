@@ -92,11 +92,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     sizeMsg = sizeMsg + "D";
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
-    ).setHeader("pp predictor 1337", member.user.avatarURL());
+    const embed = new CustomEmbed(message.member, `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`).setHeader(
+        "pp predictor 1337",
+        member.user.avatarURL()
+    );
 
     return send({ embeds: [embed] });
 }

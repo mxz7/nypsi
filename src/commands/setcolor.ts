@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setDescription(`**color** #${await getEmbedColor(
             message.author.id
@@ -69,11 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({
         embeds: [
-            new CustomEmbed(
-                message.member,
-                false,
-                `your color has been updated to **${await getEmbedColor(message.author.id)}**`
-            ),
+            new CustomEmbed(message.member, `your color has been updated to **${await getEmbedColor(message.author.id)}**`),
         ],
     });
 }

@@ -69,7 +69,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        true,
         "are you sure you want to reset your economy profile?\n\n" +
             `you will lose **everything**, but you will receive ${earnedKarma.toLocaleString()} karma`
     ).setHeader("reset", message.author.avatarURL());

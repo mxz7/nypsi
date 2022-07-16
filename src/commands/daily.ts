@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, false, `${prefix}daily is for BRONZE tier and higher`).setFooter(
+        const embed = new CustomEmbed(message.member, `${prefix}daily is for BRONZE tier and higher`).setFooter(
             `${prefix}patreon`
         );
 
@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
-            const embed = new CustomEmbed(message.member, false, description);
+            const embed = new CustomEmbed(message.member, description);
 
             return message.channel.send({ embeds: [embed] }).then((msg) => {
                 setTimeout(async () => {
@@ -79,7 +79,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                false,
                 "you have already used your daily reward! come back in **" + dd + "**"
             );
 

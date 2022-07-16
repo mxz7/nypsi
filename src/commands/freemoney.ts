@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) + amount);
 
-    const embed = new CustomEmbed(message.member, false, `+$**${amount.toLocaleString()}**`).setHeader(
+    const embed = new CustomEmbed(message.member, `+$**${amount.toLocaleString()}**`).setHeader(
         "free money",
         message.author.avatarURL()
     );

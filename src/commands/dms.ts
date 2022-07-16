@@ -33,10 +33,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (current) {
         newValue = false;
-        embed = new CustomEmbed(message.member, false, "✅ you will no longer receive dms from nypsi");
+        embed = new CustomEmbed(message.member, "✅ you will no longer receive dms from nypsi");
     } else {
         newValue = true;
-        embed = new CustomEmbed(message.member, false, "✅ you will now receive dms from nypsi");
+        embed = new CustomEmbed(message.member, "✅ you will now receive dms from nypsi");
     }
 
     await setDMsEnabled(message.member, newValue);

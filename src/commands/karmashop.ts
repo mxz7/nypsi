@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!isKarmaShopOpen()) {
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
         embed.setDescription(
             "the karma shop is currently closed\nyou can join the [official nypsi server](https://discord.gg/hJTDNST) to be notified when it is opened"
         );
@@ -228,7 +228,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embeds: [
                     new CustomEmbed(
                         message.member,
-                        false,
                         `you have reached your limit for buying from the karma shop (${limit} items)`
                     ),
                 ],
@@ -355,7 +354,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `you have bought ${selected.emoji} ${selected.name} for ${selected.cost.toLocaleString()} karma`
                 ),
             ],

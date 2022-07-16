@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)] });
         }
 
-        const embed = new CustomEmbed(message.member, false, msg).setHeader("reload");
+        const embed = new CustomEmbed(message.member, msg).setHeader("reload");
 
         message.channel.send({ embeds: [embed] });
     }

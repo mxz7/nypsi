@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     const helpCmd = () => {
-        const embed = new CustomEmbed(message.member, true).setHeader("chat reactions");
+        const embed = new CustomEmbed(message.member).setHeader("chat reactions");
 
         embed.setDescription(
             `${prefix}**cr start** *start a random chat reaction*\n` +
@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const showStats = async () => {
         await addCooldown(cmd.name, message.member, 10);
 
-        const embed = new CustomEmbed(message.member, false).setHeader(`${message.author.username}'s stats`);
+        const embed = new CustomEmbed(message.member).setHeader(`${message.author.username}'s stats`);
 
         const stats = await getReactionStats(message.guild, message.member);
 
@@ -205,7 +205,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const showLeaderboard = async () => {
         await addCooldown(cmd.name, message.member, 10);
 
-        const embed = new CustomEmbed(message.member, false).setHeader("chat reactions leaderboard");
+        const embed = new CustomEmbed(message.member).setHeader("chat reactions leaderboard");
 
         let amount = 3;
 
@@ -264,7 +264,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await deleteStats(message.guild);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ stats have been deleted")],
+                    embeds: [new CustomEmbed(message.member, "✅ stats have been deleted")],
                 });
             }
         }
@@ -280,7 +280,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length == 1 || args[1].toLowerCase() == "list") {
-            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions");
+            const embed = new CustomEmbed(message.member).setHeader("chat reactions");
 
             const blacklisted = await getBlacklisted(message.guild);
 
@@ -333,7 +333,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await setBlacklisted(message.guild, blacklisted);
 
-                const embed = new CustomEmbed(message.member, false, `✅ ${user.toString()} has been blacklisted`);
+                const embed = new CustomEmbed(message.member, `✅ ${user.toString()} has been blacklisted`);
 
                 return send({ embeds: [embed] });
             } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
@@ -372,13 +372,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await setBlacklisted(message.guild, blacklisted);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ user has been unblacklisted")],
+                    embeds: [new CustomEmbed(message.member, "✅ user has been unblacklisted")],
                 });
             } else if (args[1].toLowerCase() == "reset" || args[1].toLowerCase() == "empty") {
                 await setBlacklisted(message.guild, []);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ blacklist was emptied")],
+                    embeds: [new CustomEmbed(message.member, "✅ blacklist was emptied")],
                 });
             }
         }
@@ -391,7 +391,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length == 1 || args[1].toLowerCase() == "view") {
-            const embed = new CustomEmbed(message.member, false);
+            const embed = new CustomEmbed(message.member);
 
             embed.setHeader("chat reactions");
 
@@ -418,7 +418,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [embed] });
         } else if (args.length == 2) {
             if (args[1].toLowerCase() == "help") {
-                const embed = new CustomEmbed(message.member, false);
+                const embed = new CustomEmbed(message.member);
 
                 embed.setHeader("chat reactions");
 
@@ -448,7 +448,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateReactionSettings(message.guild, settings);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been enabled")],
+                    embeds: [new CustomEmbed(message.member, "✅ automatic start has been enabled")],
                 });
             } else if (args[1].toLowerCase() == "disable") {
                 const settings = await getReactionSettings(message.guild);
@@ -462,7 +462,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateReactionSettings(message.guild, settings);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, "✅ automatic start has been disabled")],
+                    embeds: [new CustomEmbed(message.member, "✅ automatic start has been disabled")],
                 });
             } else if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
                 return send({
@@ -544,7 +544,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await updateReactionSettings(message.guild, settings);
 
-                const embed = new CustomEmbed(message.member, false);
+                const embed = new CustomEmbed(message.member);
 
                 if (added) {
                     embed.setDescription(`${channel.name} has been added as a random channel`);
@@ -579,7 +579,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateReactionSettings(message.guild, settings);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ event cooldown set to \`${length}s\``)],
+                    embeds: [new CustomEmbed(message.member, `✅ event cooldown set to \`${length}s\``)],
                 });
             } else if (args[1].toLowerCase() == "offset") {
                 let length = parseInt(args[2]);
@@ -605,7 +605,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateReactionSettings(message.guild, settings);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ cooldown max offset set to \`${length}s\``)],
+                    embeds: [new CustomEmbed(message.member, `✅ cooldown max offset set to \`${length}s\``)],
                 });
             } else if (args[1].toLowerCase() == "length") {
                 const length = parseInt(args[2]);
@@ -631,7 +631,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await updateReactionSettings(message.guild, settings);
 
                 return send({
-                    embeds: [new CustomEmbed(message.member, false, `✅ max length set to \`${length}s\``)],
+                    embeds: [new CustomEmbed(message.member, `✅ max length set to \`${length}s\``)],
                 });
             } else {
                 return send({ embeds: [new ErrorEmbed(`${prefix}cr settings help`)] });
@@ -646,7 +646,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length == 1) {
-            const embed = new CustomEmbed(message.member, false).setHeader("chat reactions");
+            const embed = new CustomEmbed(message.member).setHeader("chat reactions");
 
             embed.setDescription(
                 `${prefix}**cr words list** *view the current wordlist*\n` +
@@ -704,7 +704,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await updateWords(message.guild, words);
 
             return send({
-                embeds: [new CustomEmbed(message.member, false, `✅ added \`${phrase}\` to wordlist`)],
+                embeds: [new CustomEmbed(message.member, `✅ added \`${phrase}\` to wordlist`)],
             });
         } else if (args[1].toLowerCase() == "del" || args[1] == "-") {
             if (args.length == 2) {
@@ -728,18 +728,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await updateWords(message.guild, words);
 
             return send({
-                embeds: [new CustomEmbed(message.member, false, `✅ removed \`${phrase}\` from wordlist`)],
+                embeds: [new CustomEmbed(message.member, `✅ removed \`${phrase}\` from wordlist`)],
             });
         } else if (args[1].toLowerCase() == "reset") {
             await updateWords(message.guild, []);
 
             return send({
-                embeds: [new CustomEmbed(message.member, false, "✅ wordlist has been reset")],
+                embeds: [new CustomEmbed(message.member, "✅ wordlist has been reset")],
             });
         } else if (args[1].toLowerCase() == "list") {
             const words = await getWordList(message.guild);
 
-            const embed = new CustomEmbed(message.member, false);
+            const embed = new CustomEmbed(message.member);
 
             if (words.length == 0) {
                 embed.setDescription(

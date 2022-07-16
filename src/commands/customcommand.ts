@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const cmd = await getUserCommand(message.author.id);
 
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         if (cmd) {
             if (cmd.content) {
@@ -92,7 +92,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         await message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "please enter your command name / trigger")],
+            embeds: [new CustomEmbed(message.member, "please enter your command name / trigger")],
         });
 
         const filter = (msg) => message.author.id == msg.author.id;
@@ -142,7 +142,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setCommand(message.author.id, res, content);
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ your custom command has been updated")],
+            embeds: [new CustomEmbed(message.member, "✅ your custom command has been updated")],
         });
     }
 }

@@ -11,7 +11,6 @@ const cmd = new Command("invite", "generate an invite link for the bot", Categor
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(
         message.member,
-        false,
         "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST"
     )
         .setHeader("nypsi")

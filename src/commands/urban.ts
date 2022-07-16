@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!result) return;
     if (!result.word) return;
 
-    const embed = new CustomEmbed(message.member, false, result.definition + "\n\n" + result.example)
+    const embed = new CustomEmbed(message.member, result.definition + "\n\n" + result.example)
         .setTitle(result.word)
         .setHeader("published by " + result.author)
         .addField("👍", result.thumbs_up.toLocaleString(), true)

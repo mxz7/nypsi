@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     const help = async () => {
-        const embed = new CustomEmbed(message.member, false);
+        const embed = new CustomEmbed(message.member);
 
         embed.setHeader("lottery", message.author.avatarURL());
         embed.setDescription(
@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let amount = 1;
 
         if (args.length == 1) {
-            return send({ embeds: [new CustomEmbed(message.member, false, "😐")] });
+            return send({ embeds: [new CustomEmbed(message.member, "😐")] });
         }
 
         if (parseInt(args[1])) {
@@ -134,7 +134,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(
             message.member,
-            false,
             `you have bought **${amount}** lottery ticket${amount > 1 ? "s" : ""} for $**${(
                 lotteryTicketPrice * amount
             ).toLocaleString()}**`

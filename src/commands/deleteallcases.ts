@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await profileExists(message.guild)))
         return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] });
 
-    const embed = new CustomEmbed(message.member, false, "react with ✅ to delete all punishment/moderation cases")
+    const embed = new CustomEmbed(message.member, "react with ✅ to delete all punishment/moderation cases")
         .setHeader("confirmation")
         .setFooter("this cannot be reversed");
 
@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (reaction == "✅") {
         await deleteServer(message.guild);
 
-        const newEmbed = new CustomEmbed(message.member, false, "✅ all cases have been deleted").setDescription(
+        const newEmbed = new CustomEmbed(message.member, "✅ all cases have been deleted").setDescription(
             "✅ all cases have been deleted"
         );
 

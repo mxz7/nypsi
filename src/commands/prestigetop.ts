@@ -41,9 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return el != null;
     });
 
-    const embed = new CustomEmbed(message.member, false)
-        .setHeader("top " + filtered.length)
-        .setDescription(filtered.join("\n"));
+    const embed = new CustomEmbed(message.member).setHeader("top " + filtered.length).setDescription(filtered.join("\n"));
 
     message.channel.send({ embeds: [embed] });
 }

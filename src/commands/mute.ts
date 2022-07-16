@@ -292,7 +292,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("i was unable to mute any users")] });
     }
 
-    const embed = new CustomEmbed(message.member, false, `✅ **${count}** member(s) muted`);
+    const embed = new CustomEmbed(message.member, `✅ **${count}** member(s) muted`);
 
     if (timedMute) {
         if (count == 1 && failed.length == 0) {
