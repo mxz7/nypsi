@@ -1,25 +1,13 @@
-import { CommandInteraction, Message } from "discord.js";
-import {
-    userExists,
-    createUser,
-    getBalance,
-    getBankBalance,
-    getMaxBankBalance,
-    getXp,
-    getPrestige,
-    calcMaxBet,
-    getMulti,
-    hasVoted,
-    hasPadlock,
-    getWorkers,
-    getInventory,
-} from "../utils/economy/utils.js";
-import { isPremium, getPremiumProfile } from "../utils/premium/utils";
+import { CommandInteraction, Message, MessageActionRow, MessageAttachment, MessageButton } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { daysAgo, daysUntil } from "../utils/functions/date.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import { updateLastKnowntag } from "../utils/users/utils.js";
+import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import prisma from "../utils/database/database";
+import { logger } from "../utils/logger";
+import * as fs from "fs/promises";
+import Database = require("better-sqlite3");
+import { getDMsEnabled } from "../utils/economy/utils";
+import { getPrefix } from "../utils/guilds/utils";
 
 const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO).setAliases([
     "data",
@@ -28,92 +16,143 @@ const cmd = new Command("profile", "view an overview of your profile and data", 
 ]);
 const db = new Database("./out/data/storage.db");
 
+const cooldown = new Set();
+
+// @ts-expect-error ts doesnt like that
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 /**
  * @param {Message} message
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    if (cooldown.has(message.author.id)) {
+        return message.channel.send({ embeds: [new ErrorEmbed("please wait before doing that again")] });
+    }
     if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+        const embed = new ErrorEmbed("you have already received your data recently.");
 
         return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 10);
-
-    if (!(await userExists(message.member))) {
-        await createUser(message.member);
+    if (!(await getDMsEnabled(message.member))) {
+        return await message.channel.send({
+            embeds: [new ErrorEmbed(`you must have your dms enabled - (${await getPrefix(message.guild)})dms`)],
+        });
     }
 
-    const embed = new CustomEmbed(message.member);
+    const embed = new CustomEmbed(message.member).setHeader("data request", message.author.avatarURL());
 
-    await updateLastKnowntag(message.member, message.member.user.tag);
+    embed.setDescription("you can request and view all of your data stored by nypsi (excluding moderation data)");
 
-    //ECONOMY
-    const balance = (await getBalance(message.member)).toLocaleString();
-    const bankBalance = (await getBankBalance(message.member)).toLocaleString();
-    const maxBankBalance = (await getMaxBankBalance(message.member)).toLocaleString();
-    const xp = (await getXp(message.member)).toLocaleString();
-    const prestige = (await getPrestige(message.member)).toLocaleString();
-    const maxBet = await calcMaxBet(message.member);
-    const multi = Math.floor((await getMulti(message.member)) * 100) + "%";
-    const voted = await hasVoted(message.member);
-    const inventory = await getInventory(message.member);
-    let inventoryItems;
-
-    try {
-        inventoryItems = Array.from(Object.values(inventory)).reduce((a: any, b: any) => a + b);
-    } catch {
-        inventoryItems = 0;
-    }
-
-    embed.addField(
-        "💰 economy",
-        `**balance** $${balance}\n**bank** $${bankBalance} / $${maxBankBalance}\n**xp** ${xp}\n**prestige** ${prestige}
-    **max bet** $${maxBet.toLocaleString()}\n**bonus** ${multi}\n**voted** ${voted}\n**padlock** ${await hasPadlock(
-            message.member
-        )}
-    **workers** ${Object.keys(await getWorkers(message.member)).length}
-    **inventory** ${inventoryItems.toLocaleString()} items`,
-        true
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("y").setLabel("request data").setStyle("SUCCESS")
     );
 
-    //PATREON
-    let tier, tierString, embedColor, lastDaily, lastWeekly, status, revokeReason, startDate, expireDate;
+    cooldown.add(message.author.id);
 
-    if (await isPremium(message.author.id)) {
-        const profile = await getPremiumProfile(message.author.id);
+    setTimeout(() => {
+        cooldown.delete(message.author.id);
+    }, 60000);
 
-        tier = profile.level;
-        tierString = profile.getLevelString();
-        embedColor = profile.embedColor;
-        if (profile.lastDaily.getTime() != 0) {
-            lastDaily = daysAgo(profile.lastDaily) + " days ago";
-        } else {
-            lastDaily = profile.lastDaily;
-        }
-        if (profile.lastWeekly.getTime() != 0) {
-            lastWeekly = daysAgo(profile.lastWeekly) + " days ago";
-        } else {
-            lastWeekly = profile.lastWeekly;
-        }
-        status = profile.status;
-        revokeReason = profile.revokeReason;
-        startDate = daysAgo(profile.startDate) + " days ago";
-        expireDate = daysUntil(profile.expireDate) + " days left";
+    const m = await message.channel.send({ embeds: [embed], components: [row] });
 
-        embed.addField(
-            "💲 patreon",
-            `**tier** ${tierString}\n**level** ${tier}\n**color** #${embedColor}\n**daily** ${lastDaily}
-        **weekly** ${lastWeekly}\n**status** ${status}\n**reason** ${revokeReason}\n**start** ${startDate}\n**expire** ${expireDate}`,
-            true
+    const filter = (i) => i.user.id == message.author.id;
+    let fail = false;
+
+    const response = await m
+        .awaitMessageComponent({ filter, time: 15000 })
+        .then(async (collected) => {
+            await collected.deferUpdate();
+            return collected.customId;
+        })
+        .catch(async () => {
+            fail = true;
+        });
+
+    if (fail) return;
+
+    if (typeof response != "string") return;
+
+    if (response == "y") {
+        embed.setDescription("fetching your data...");
+
+        await m.edit({ embeds: [embed], components: [] });
+
+        logger.info(`fetching user data for ${message.author.tag}...`);
+        const userData = await prisma.user.findUnique({
+            where: {
+                id: message.author.id,
+            },
+            include: {
+                Economy: {
+                    include: {
+                        EconomyStats: true,
+                    },
+                },
+                EconomyGuild: true,
+                EconomyGuildMember: true,
+                Premium: true,
+                Username: true,
+                WordleStats: true,
+            },
+        });
+
+        logger.info(`fetching chat reaction stats data for ${message.author.tag}`);
+        const chatReactionStats = await prisma.chatReactionStats.findMany({
+            where: {
+                userId: message.author.id,
+            },
+        });
+
+        logger.info(`fetching mentions data for ${message.author.tag}`);
+        const mentionsTargetedData = db.prepare("select * from mentions where target_id = ?").all(message.author.id);
+        const mentionsSenderData = db.prepare("select * from mentions where user_tag = ?").all(message.author.tag);
+
+        const file = `temp/${message.author.id}.txt`;
+
+        logger.info("packing into text file...");
+        await fs.writeFile(
+            file,
+            `nypsi data for ${message.author.id} (${
+                message.author.tag
+            } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
         );
+        await fs.appendFile(file, JSON.stringify(userData, null, 2));
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(chatReactionStats, null, 2));
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targetted at you)\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(mentionsTargetedData, null, 2));
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on discord tag)\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(mentionsSenderData, null, 2));
+
+        const buffer = await fs.readFile(file);
+
+        let fail = false;
+        await message.member.send({ files: [new MessageAttachment(buffer, "data.txt")] }).catch((e) => {
+            console.log(e);
+            fail = true;
+        });
+        if (fail) {
+            embed.setDescription("could not dm you, enable your direct messages");
+        } else {
+            await addCooldown(cmd.name, message.member, 604800);
+            embed.setDescription("check your direct messages");
+        }
+        await m.edit({ embeds: [embed] });
+        await fs.unlink(file);
     }
-
-    embed.setHeader(message.author.tag);
-    embed.setThumbnail(message.member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }));
-
-    return message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
