@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, Permissions } from "discord.js";
-import { getSnipeFilter, updateFilter, getPrefix } from "../utils/guilds/utils";
+import { getSnipeFilter, getPrefix, updateSnipeFilter } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -19,9 +19,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
     }
 
-    let filter = getSnipeFilter(message.guild);
+    let filter = await getSnipeFilter(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false, "`" + filter.join("`\n`") + "`")
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [embed] });
         }
 
-        updateFilter(message.guild, filter);
+        await updateSnipeFilter(message.guild, filter);
 
         const embed = new CustomEmbed(message.member, true, "✅ added `" + word + "` to the filter").setHeader(
             "snipe filter"
@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [embed] });
         }
 
-        updateFilter(message.guild, filter);
+        await updateSnipeFilter(message.guild, filter);
 
         const embed = new CustomEmbed(message.member, false, "✅ removed `" + word + "` from the filter")
             .setHeader("snipe filter")
@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[0].toLowerCase() == "reset") {
         filter = ["discordgg", "discordcom"];
 
-        updateFilter(message.guild, filter);
+        await updateSnipeFilter(message.guild, filter);
 
         const embed = new CustomEmbed(message.member, false, "✅ filter has been reset").setHeader("snipe filter");
 

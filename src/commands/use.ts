@@ -45,7 +45,7 @@ cmd.slashData
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -65,20 +65,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
                     false,
-                    `${getPrefix(message.guild)}use <item>\n\nuse items to open crates or to simply use the item's function`
+                    `${prefix}use <item>\n\nuse items to open crates or to simply use the item's function`
                 ).setHeader("use", message.author.avatarURL()),
             ],
         });
     }
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const searchTag = args[0].toLowerCase();
 
@@ -110,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "car") {
         return send({
-            embeds: [new ErrorEmbed(`cars are used for street races (${getPrefix(message.guild)}sr)`)],
+            embeds: [new ErrorEmbed(`cars are used for street races (${prefix}sr)`)],
         });
     }
 
@@ -128,18 +130,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.id.includes("gun")) {
         return send({
-            embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}hunt`)],
+            embeds: [new ErrorEmbed(`this item is used with ${prefix}hunt`)],
         });
     } else if (selected.id.includes("fishing")) {
         return send({
-            embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}fish`)],
+            embeds: [new ErrorEmbed(`this item is used with ${prefix}fish`)],
         });
     } else if (selected.id.includes("coin")) {
         return send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] });
     } else if (selected.id.includes("pickaxe")) {
-        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}mine`)] });
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}mine`)] });
     } else if (selected.id.includes("furnace")) {
-        return send({ embeds: [new ErrorEmbed(`this item is used with ${getPrefix(message.guild)}smelt`)] });
+        return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}smelt`)] });
     }
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
@@ -147,8 +149,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let laterDescription;
 
     if (selected.role == "crate") {
-        addItemUse(message.member, selected.id);
-        const itemsFound = openCrate(message.member, selected);
+        await addItemUse(message.member, selected.id);
+        const itemsFound = await openCrate(message.member, selected);
 
         embed.setDescription(`opening ${selected.emoji} ${selected.name}...`);
 
@@ -158,46 +160,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (selected.id) {
             case "standard_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "golden_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your *golden* 😏 watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "diamond_watch":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look down at your 💎 *diamond* 💎 watch to check the time..");
                 laterDescription = `you look down at your watch to check the time..\n\nit's ${new Date().toTimeString()}`;
                 break;
 
             case "calendar":
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
                 embed.setDescription("you look at your calendar to check the date..");
                 laterDescription = `you look at your calendar to check the date..\n\nit's ${new Date().toDateString()}`;
                 break;
 
             case "padlock":
-                if (hasPadlock(message.member)) {
+                if (await hasPadlock(message.member)) {
                     return send({
                         embeds: [new ErrorEmbed("you already have a padlock on your balance")],
                     });
                 }
 
-                setPadlock(message.member, true);
+                await setPadlock(message.member, true);
                 inventory["padlock"]--;
 
                 if (inventory["padlock"] <= 0) {
                     delete inventory["padlock"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 embed.setDescription("✅ your padlock has been applied");
                 break;
@@ -213,7 +215,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use lockpick <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use lockpick <member>`)],
                     });
                 }
 
@@ -231,7 +233,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 if (message.member == lockPickTarget) {
                     if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
-                        addItemUse(message.member, selected.id);
+                        await addItemUse(message.member, selected.id);
                         await redis.del(`cd:sex-chastity:${message.author.id}`);
 
                         embed.setDescription("picking chastity cage...");
@@ -241,13 +243,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid user")] });
                 }
 
-                if (!hasPadlock(lockPickTarget)) {
+                if (!(await hasPadlock(lockPickTarget))) {
                     return send({
                         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
                     });
                 }
 
-                setPadlock(lockPickTarget, false);
+                await setPadlock(lockPickTarget, false);
 
                 inventory["lock_pick"]--;
 
@@ -255,9 +257,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["lock_pick"];
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms"); // eslint-disable-line
 
@@ -306,15 +308,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["mask"];
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
                 break;
 
             case "radio":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use radio <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use radio <member>`)],
                     });
                 }
 
@@ -340,7 +342,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 await redis.set(`cd:rob-radio:${radioTarget.user.id}`, Date.now());
                 await redis.expire(`cd:rob-radio:${radioTarget.user.id}`, 900);
@@ -351,7 +353,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["radio"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("putting report out on police scanner...");
                 laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`;
@@ -360,7 +362,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "chastity_cage":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use chastity <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use chastity <member>`)],
                     });
                 }
 
@@ -388,7 +390,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 await redis.set(`cd:sex-chastity:${chastityTarget.user.id}`, Date.now());
                 await redis.expire(`cd:sex-chastity:${chastityTarget.user.id}`, 10800);
@@ -399,7 +401,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["chastity_cage"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("locking chastity cage...");
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
@@ -408,7 +410,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "handcuffs":
                 if (args.length == 1) {
                     return send({
-                        embeds: [new ErrorEmbed(`${getPrefix(message.guild)}use handcuffs <member>`)],
+                        embeds: [new ErrorEmbed(`${prefix}use handcuffs <member>`)],
                     });
                 }
 
@@ -434,7 +436,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
 
-                addItemUse(message.member, selected.id);
+                await addItemUse(message.member, selected.id);
 
                 addHandcuffs(handcuffsTarget.id);
 
@@ -444,7 +446,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["handcuffs"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`);
                 laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`;

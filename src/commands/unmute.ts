@@ -46,9 +46,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
         return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
@@ -85,24 +85,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const members = message.mentions.members;
 
-    let muteRole = await message.guild.roles.fetch(getMuteRole(message.guild));
+    let muteRole = await message.guild.roles.fetch(await getMuteRole(message.guild));
     let mode = "role";
 
-    if (!getMuteRole(message.guild)) {
+    if (!(await getMuteRole(message.guild))) {
         muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
-        if (getMuteRole(message.guild) == "timeout") mode = "timeout";
+        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
     }
 
     if (!muteRole && mode == "role") {
         return send({
             embeds: [
                 new ErrorEmbed(
-                    `no mute role could be found, set one with ${getPrefix(
-                        message.guild
-                    )}muterole, or create a role called "muted"`
+                    `no mute role could be found, set one with ${prefix}muterole, or create a role called "muted"`
                 ),
             ],
         });
@@ -204,12 +202,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     for (const m of members1) {
-        if (isMuted(message.guild, members.get(m))) {
-            deleteMute(message.guild, members.get(m));
+        if (await isMuted(message.guild, members.get(m))) {
+            await deleteMute(message.guild, members.get(m));
         }
     }
 
-    newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content);
+    await newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content);
 }
 
 cmd.setRun(run);

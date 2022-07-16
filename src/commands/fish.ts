@@ -26,7 +26,7 @@ cmd.slashEnabled = true;
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     let fishingRod;
@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         fishItems.push(i);
     }
 
-    addItemUse(message.member, fishingRod);
+    await addItemUse(message.member, fishingRod);
 
     inventory[fishingRod]--;
 
@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         delete inventory[fishingRod];
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     let times = 1;
 
@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (chosen == "bitcoin") {
             const owned = inventory["bitcoin"] || 0;
-            const max = getMaxBitcoin(message.member);
+            const max = await getMaxBitcoin(message.member);
 
             if (owned + 1 > max) {
                 i--;
@@ -239,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         } else if (chosen == "ethereum") {
             const owned = inventory["ethereum"] || 0;
-            const max = getMaxEthereum(message.member);
+            const max = await getMaxEthereum(message.member);
 
             if (owned + 1 > max) {
                 i--;
@@ -256,12 +256,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (chosen.includes("money:")) {
                 const amount = parseInt(chosen.substr(6));
 
-                updateBalance(message.member, getBalance(message.member) + amount);
+                await updateBalance(message.member, (await getBalance(message.member)) + amount);
                 foundItems.push("$" + amount.toLocaleString());
             } else if (chosen.includes("xp:")) {
                 const amount = parseInt(chosen.substr(3));
 
-                updateXp(message.member, getXp(message.member) + amount);
+                await updateXp(message.member, (await getXp(message.member)) + amount);
                 foundItems.push(amount + "xp");
             }
         } else {
@@ -283,7 +283,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
         }
     }
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     const embed = new CustomEmbed(message.member, false, `you go to the pond and cast your **${items[fishingRod].name}**`);
 

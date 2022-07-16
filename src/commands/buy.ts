@@ -22,7 +22,7 @@ const cmd = new Command("buy", "buy items from the shop", Categories.MONEY);
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -36,14 +36,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 new CustomEmbed(
                     message.member,
                     false,
-                    `buy items from ${getPrefix(message.guild)}shop by using the item id or item name without spaces`
+                    `buy items from ${await getPrefix(message.guild)}shop by using the item id or item name without spaces`
                 ),
             ],
         });
     }
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const searchTag = args[0].toLowerCase();
 
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount > 50) amount = 50;
 
-    if (getBalance(message.member) < selected.worth * amount) {
+    if ((await getBalance(message.member)) < selected.worth * amount) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
@@ -105,21 +105,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.id == "bitcoin") {
         const owned = inventory["bitcoin"] || 0;
-        const max = getMaxBitcoin(message.member);
+        const max = await getMaxBitcoin(message.member);
 
         if (owned + amount > max) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] });
         }
     } else if (selected.id == "ethereum") {
         const owned = inventory["ethereum"] || 0;
-        const max = getMaxEthereum(message.member);
+        const max = await getMaxEthereum(message.member);
 
         if (owned + amount > max) {
             return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this much ethereum yet")] });
         }
     }
 
-    updateBalance(message.member, getBalance(message.member) - selected.worth * amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - selected.worth * amount);
     inventory[selected.id] + amount;
 
     if (inventory[selected.id]) {
@@ -128,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         inventory[selected.id] = amount;
     }
 
-    setInventory(message.member, inventory);
+    await setInventory(message.member, inventory);
 
     return message.channel.send({
         embeds: [

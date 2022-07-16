@@ -28,19 +28,19 @@ export function toggleLock(string: string) {
 }
 
 /**
- * @returns {captcha}
+ * @returns {Captcha}
  */
-export function createCaptcha(): captcha {
-    return new captcha(Math.random().toString(36).substr(2, 7));
+export function createCaptcha(): Captcha {
+    return new Captcha(Math.random().toString(36).substr(2, 7));
 }
 
-class captcha {
+class Captcha {
     public answer: string;
     public display: string;
     /**
      *
      * @param {String} d random letters
-     * @returns {captcha}
+     * @returns {Captcha}
      */
     constructor(d: string) {
         this.answer = d;

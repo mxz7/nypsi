@@ -8,9 +8,9 @@ export default async function messageDelete(message: Message) {
     if (!message.member) return;
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
-        if (!hasGuild(message.guild)) createGuild(message.guild);
+        if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
-        const filter = getSnipeFilter(message.guild);
+        const filter = await getSnipeFilter(message.guild);
 
         let content = message.content.toLowerCase().normalize("NFD");
 
@@ -20,7 +20,7 @@ export default async function messageDelete(message: Message) {
             if (content.includes(word.toLowerCase())) return;
         }
 
-        const chatFilter = getChatFilter(message.guild);
+        const chatFilter = await getChatFilter(message.guild);
 
         for (const word of chatFilter) {
             if (content.includes(word.toLowerCase())) return;

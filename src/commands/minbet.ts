@@ -11,13 +11,13 @@ const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const requiredBet = getRequiredBetForXp(message.member);
+    const requiredBet = await getRequiredBetForXp(message.member);
 
-    let earned = calcMinimumEarnedXp(message.member) + 2;
+    let earned = (await calcMinimumEarnedXp(message.member)) + 2;
 
     let max = 6;
 
-    const guild = getGuildByUser(message.member);
+    const guild = await getGuildByUser(message.member);
 
     if (guild) {
         max += guild.level - 1;

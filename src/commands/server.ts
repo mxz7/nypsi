@@ -16,7 +16,7 @@ const cmd = new Command("server", "view information about the server", Categorie
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const server = message.guild;
 
-    runCheck(server);
+    await runCheck(server);
 
     const created = formatDate(server.createdAt).toLowerCase();
 
@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `**total** ${server.memberCount.toLocaleString()}\n` +
                     `**humans** ${users.size.toLocaleString()}\n` +
                     `**bots** ${bots.size.toLocaleString()}\n` +
-                    `**member peak** ${getPeaks(message.guild).toLocaleString()}`
+                    `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`
             );
 
         return message.channel.send({ embeds: [embed] });
@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `**total** ${server.memberCount.toLocaleString()}\n` +
                 `**humans** ${users.size.toLocaleString()}\n` +
                 `**bots** ${bots.size.toLocaleString()}\n` +
-                `**member peak** ${getPeaks(message.guild).toLocaleString()}`
+                `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`
         );
 
     if (server.memberCount >= 25000) {

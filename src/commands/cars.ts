@@ -33,10 +33,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const items = getItems();
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
 
     const itemIDs = Array.from(Object.keys(items));
 

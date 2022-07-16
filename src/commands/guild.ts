@@ -7,7 +7,6 @@ import {
     createGuild,
     createUser,
     deleteGuild,
-    EconomyGuild,
     formatNumber,
     getBalance,
     getGuildByName,
@@ -21,7 +20,6 @@ import {
     setGuildMOTD,
     topGuilds,
     updateBalance,
-    updateLastKnownTag,
     userExists,
 } from "../utils/economy/utils";
 import { daysAgo, formatDate } from "../utils/functions/date";
@@ -90,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (message instanceof CommandInteraction) {
         await message.deferReply();
@@ -117,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const showGuild = async (guild: EconomyGuild) => {
+    const showGuild = async (guild) => {
         await addCooldown(cmd.name, message.member, 5);
         const embed = new CustomEmbed(message.member, false);
 
@@ -126,14 +124,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`
             );
         } else {
-            embed.setHeader(guild.guild_name, message.author.avatarURL());
+            embed.setHeader(guild.guildName, message.author.avatarURL());
             // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
             embed.setDescription(guild.motd);
             embed.addField(
                 "info",
                 `**level** ${guild.level}\n` +
-                    `**created on** ${formatDate(guild.created_at)}\n` +
-                    `**owner** ${guild.members[0].last_known_tag}`,
+                    `**created on** ${formatDate(guild.createdAt)}\n` +
+                    `**owner** ${guild.members[0].user.lastKnownTag}`,
                 true
             );
             if (guild.level != 5) {
@@ -145,13 +143,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             let membersText = "";
-            const maxMembers = getMaxMembersForGuild(guild.guild_name);
+            const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
             for (const m of guild.members) {
-                membersText += `\`${m.last_known_tag}\` `;
+                membersText += `\`${m.user.lastKnownTag}\` `;
 
-                if (m.user_id == message.author.id) {
-                    embed.setFooter(`you joined ${daysAgo(m.joined_at).toLocaleString()} days ago`);
+                if (m.userId == message.author.id) {
+                    embed.setFooter(`you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago`);
                 }
             }
 
@@ -161,30 +159,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     };
 
-    const guild = getGuildByUser(message.member);
-    const prefix = getPrefix(message.guild);
-
-    if (guild) {
-        for (const m of guild.members) {
-            if (m.user_id == message.author.id) {
-                if (m.last_known_tag != message.author.tag) {
-                    updateLastKnownTag(message.author.id, message.author.tag);
-                }
-                break;
-            }
-        }
-    }
+    const guild = await getGuildByUser(message.member);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         return showGuild(guild);
     }
 
     if (args[0].toLowerCase() == "create") {
-        if (getPrestige(message.member) < 1) {
+        if ((await getPrestige(message.member)) < 1) {
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
         }
 
-        if (getBalance(message.member) < 500000) {
+        if ((await getBalance(message.member)) < 500000) {
             return send({ embeds: [new ErrorEmbed("it costs $500,000 to create a guild. you cannot afford this")] });
         }
 
@@ -206,7 +193,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("guild names must be shorter than 25 characters")] });
         }
 
-        if (getGuildByName(name)?.guild_name.toLowerCase() == name.toLowerCase()) {
+        if ((await getGuildByName(name))?.guildName.toLowerCase() == name.toLowerCase()) {
             return send({ embeds: [new ErrorEmbed("that guild already exists")] });
         }
 
@@ -218,9 +205,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 3);
 
-        updateBalance(message.member, getBalance(message.member) - 500000);
+        await updateBalance(message.member, (await getBalance(message.member)) - 500000);
 
-        createGuild(name, message.member);
+        await createGuild(name, message.member);
 
         return send({ embeds: [new CustomEmbed(message.member, false, `you are now the owner of **${name}**`)] });
     }
@@ -230,11 +217,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")] });
         }
 
-        if (guild.owner != message.author.id) {
+        if (guild.ownerId != message.author.id) {
             return send({ embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")] });
         }
 
-        if (guild.members.length >= getMaxMembersForGuild(guild.guild_name)) {
+        if (guild.members.length >= (await getMaxMembersForGuild(guild.guildName))) {
             let msg = "your guild already has the max amount of members";
 
             if (guild.level != 5) {
@@ -258,7 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("this user has already been invited to a guild")] });
         }
 
-        if (isEcoBanned(target.user.id)) {
+        if (await isEcoBanned(target.user.id)) {
             return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
 
@@ -266,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid user")] });
         }
 
-        if (getGuildByUser(target)) {
+        if (await getGuildByUser(target)) {
             return send({ embeds: [new ErrorEmbed("that user is already in a guild")] });
         }
 
@@ -277,7 +264,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member, false);
 
         embed.setHeader("guild invitation");
-        embed.setDescription(`you have been invited to join **${guild.guild_name}**\n\ndo you accept?`);
+        embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
         const row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("yes").setLabel("accept").setStyle("SUCCESS")
@@ -303,16 +290,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) return;
 
         if (reaction == "yes") {
-            const targetGuild = getGuildByUser(target.user.id);
-            const refreshedGuild = getGuildByName(guild.guild_name);
+            const targetGuild = await getGuildByUser(target.user.id);
+            const refreshedGuild = await getGuildByName(guild.guildName);
 
             if (targetGuild) {
                 embed.setDescription("❌ you are already in a guild");
-            } else if (refreshedGuild.members.length >= getMaxMembersForGuild(refreshedGuild.guild_name)) {
+            } else if (refreshedGuild.members.length >= (await getMaxMembersForGuild(refreshedGuild.guildName))) {
                 embed.setDescription("❌ this guild has too many members");
             } else {
-                addMember(guild.guild_name, target);
-                embed.setDescription(`you have successfully joined **${guild.guild_name}**`);
+                await addMember(guild.guildName, target);
+                embed.setDescription(`you have successfully joined **${guild.guildName}**`);
             }
         } else {
             embed.setDescription("invitation denied");
@@ -326,17 +313,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
         }
 
-        if (guild.owner == message.author.id) {
+        if (guild.ownerId == message.author.id) {
             return send({ embeds: [new ErrorEmbed("you are the guild owner, you must delete the guild")] });
         }
 
         await addCooldown(cmd.name, message.member, 20);
 
-        removeMember(message.author.id, RemoveMemberMode.ID);
+        const res = await removeMember(message.author.id, RemoveMemberMode.ID);
 
-        return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, `✅ you have left **${guild.guild_name}**`)],
-        });
+        if (res) {
+            return message.channel.send({
+                embeds: [new CustomEmbed(message.member, false, `✅ you have left **${guild.guildName}**`)],
+            });
+        } else {
+            return message.channel.send({
+                embeds: [new CustomEmbed(message.member, false, "failed while leaving guild")],
+            });
+        }
     }
 
     if (args[0].toLowerCase() == "forcekick") {
@@ -346,7 +339,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
         }
 
-        return removeMember(args[1], RemoveMemberMode.ID);
+        return await removeMember(args[1], RemoveMemberMode.ID);
     }
 
     if (args[0].toLowerCase() == "kick") {
@@ -354,7 +347,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
         }
 
-        if (guild.owner != message.author.id) {
+        if (guild.ownerId != message.author.id) {
             return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
         }
 
@@ -368,7 +361,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (message.mentions?.members?.first()) {
             let found = false;
             for (const m of guild.members) {
-                if (m.user_id == message.mentions.members.first().user.id) {
+                if (m.userId == message.mentions.members.first().user.id) {
                     found = true;
                     break;
                 }
@@ -377,7 +370,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (!found) {
                 return send({
                     embeds: [
-                        new ErrorEmbed(`\`${message.mentions.members.first().user.tag}\` is not in **${guild.guild_name}**`),
+                        new ErrorEmbed(`\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`),
                     ],
                 });
             }
@@ -386,11 +379,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             let found = false;
             for (const m of guild.members) {
-                if (m.user_id == args[1]) {
+                if (m.userId == args[1]) {
                     found = true;
                     mode = RemoveMemberMode.ID;
                     break;
-                } else if (m.last_known_tag == args[1]) {
+                } else if (m.user.lastKnownTag == args[1]) {
                     found = true;
                     mode = RemoveMemberMode.TAG;
                     break;
@@ -398,7 +391,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (!found) {
-                return send({ embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guild_name}**`)] });
+                return send({ embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guildName}**`)] });
             }
 
             target = args[1];
@@ -406,13 +399,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 10);
 
-        removeMember(target, mode);
+        const res = await removeMember(target, mode);
 
-        return send({
-            embeds: [
-                new CustomEmbed(message.member, false, `✅ \`${target}\` has been kicked from **${guild.guild_name}**`),
-            ],
-        });
+        if (res) {
+            return send({
+                embeds: [
+                    new CustomEmbed(message.member, false, `✅ \`${target}\` has been kicked from **${guild.guildName}**`),
+                ],
+            });
+        } else {
+            return send({
+                embeds: [new CustomEmbed(message.member, false, `failed to kick ${target}`)],
+            });
+        }
     }
 
     if (args[0].toLowerCase() == "delete") {
@@ -420,15 +419,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
         }
 
-        if (guild.owner != message.author.id) {
+        if (guild.ownerId != message.author.id) {
             return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
         }
 
         await addCooldown(cmd.name, message.member, 30);
 
-        deleteGuild(guild.guild_name);
+        await deleteGuild(guild.guildName);
 
-        return send({ embeds: [new CustomEmbed(message.member, false, `✅ **${guild.guild_name}** has been deleted`)] });
+        return send({ embeds: [new CustomEmbed(message.member, false, `✅ **${guild.guildName}** has been deleted`)] });
     }
 
     if (args[0].toLowerCase() == "deposit" || args[0].toLowerCase() == "dep") {
@@ -441,9 +440,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args[1].toLowerCase() == "all") {
-            args[1] = getBalance(message.member).toString();
+            args[1] = (await getBalance(message.member)).toString();
         } else if (args[1].toLowerCase() == "half") {
-            args[1] = (getBalance(message.member) / 2).toString();
+            args[1] = ((await getBalance(message.member)) / 2).toString();
         }
 
         const amount = formatNumber(args[1]);
@@ -452,7 +451,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid payment")] });
         }
 
-        if (amount > getBalance(message.member)) {
+        if (amount > (await getBalance(message.member))) {
             return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
         }
 
@@ -460,9 +459,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("invalid payment")] });
         }
 
-        updateBalance(message.member, getBalance(message.member) - amount);
+        await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
-        addToGuildBank(guild.guild_name, amount, message.member);
+        await addToGuildBank(guild.guildName, amount, message.member);
 
         const embed = new CustomEmbed(message.member, false).setHeader("guild deposit", message.author.avatarURL());
 
@@ -486,10 +485,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const members = guild.members;
 
-        inPlaceSort(members).desc([(i) => i.contributed_money, (i) => i.contributed_xp]);
+        inPlaceSort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
 
         const embed = new CustomEmbed(message.member, false).setHeader(
-            `${guild.guild_name} stats`,
+            `${guild.guildName} stats`,
             message.author.avatarURL()
         );
 
@@ -503,8 +502,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (position == 3) position = "🥉";
 
             desc += `${position} **${
-                m.last_known_tag
-            }** $${m.contributed_money.toLocaleString()} **|** ${m.contributed_xp.toLocaleString()}xp\n`;
+                m.user.lastKnownTag
+            }** $${m.contributedMoney.toLocaleString()} **|** ${m.contributedXp.toLocaleString()}xp\n`;
         }
 
         embed.setDescription(desc);
@@ -518,16 +517,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (guild.level == 5) {
-            return send({ embeds: [new CustomEmbed(message.member, false, `**${guild.guild_name}** is at max level`)] });
+            return send({ embeds: [new CustomEmbed(message.member, false, `**${guild.guildName}** is at max level`)] });
         }
 
         await addCooldown(cmd.name, message.member, 3);
 
-        const requirements = getRequiredForGuildUpgrade(guild.guild_name);
+        const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
         const embed = new CustomEmbed(message.member, false);
 
-        embed.setHeader(guild.guild_name, message.author.avatarURL());
+        embed.setHeader(guild.guildName, message.author.avatarURL());
         embed.setDescription(
             `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
                 `**money** $${guild.balance.toLocaleString()}/$${requirements.money.toLocaleString()}\n` +
@@ -543,7 +542,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
         }
 
-        if (guild.owner != message.author.id) {
+        if (guild.ownerId != message.author.id) {
             return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
         }
 
@@ -566,7 +565,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 3);
 
-        setGuildMOTD(guild.guild_name, motd);
+        await setGuildMOTD(guild.guildName, motd);
 
         return send({ embeds: [new CustomEmbed(message.member, false, "✅ motd has been updated")] });
     }
@@ -580,7 +579,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             limit = parseInt(args[1]);
         }
 
-        const top = topGuilds(limit);
+        const top = await topGuilds(limit);
 
         const embed = new CustomEmbed(message.member, false).setHeader(
             `top ${args[1] ?? 5} guilds`,
@@ -600,7 +599,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 7);
 
-    const targetGuild = getGuildByName(name);
+    const targetGuild = await getGuildByName(name);
 
     if (!targetGuild) {
         return send({ embeds: [new ErrorEmbed("invalid guild")] });

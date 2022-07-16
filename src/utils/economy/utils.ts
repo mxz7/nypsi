@@ -1,15 +1,14 @@
-import { getDatabase } from "../database/database";
 import * as express from "express";
 import * as topgg from "@top-gg/sdk";
 import { logger } from "../logger";
-import { EconomyProfile, Item, LotteryTicket } from "../models/Economy";
+import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import * as fs from "fs";
 import { addKarma, getKarma } from "../karma/utils";
 import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
-import { Constructor, getAllWorkers, Worker } from "./workers";
+import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import { StatsProfile } from "../models/StatsProfile";
 import * as shufflearray from "shuffle-array";
 import fetch from "node-fetch";
@@ -17,10 +16,10 @@ import workerSort from "../workers/sort";
 import { MStoTime } from "../functions/date";
 import ms = require("ms");
 import redis from "../database/redis";
+import prisma from "../database/database";
+import { createProfile, hasProfile } from "../users/utils";
 
 declare function require(name: string);
-
-const db = getDatabase();
 
 const webhook = new topgg.Webhook("123");
 const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
@@ -43,11 +42,21 @@ app.post(
 
 app.listen(5000);
 
-setInterval(() => {
-    const query = db.prepare("SELECT id, workers FROM economy WHERE workers != '{}'").all();
+setInterval(async () => {
+    const query = await prisma.economy.findMany({
+        where: {
+            NOT: {
+                workers: {},
+            },
+        },
+        select: {
+            userId: true,
+            workers: true,
+        },
+    });
 
     for (const user of query) {
-        const workers = JSON.parse(user.workers);
+        const workers = user.workers;
 
         for (const w of Object.keys(workers)) {
             const worker: any = workers[w];
@@ -61,9 +70,14 @@ setInterval(() => {
             }
         }
 
-        if (workers != JSON.parse(user.workers)) {
-            db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), user.id);
-        }
+        await prisma.economy.update({
+            where: {
+                userId: user.userId,
+            },
+            data: {
+                workers: workers,
+            },
+        });
     }
 }, 5 * 60 * 1000);
 
@@ -122,43 +136,6 @@ export function loadItems(): string {
     logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
 
     txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`;
-
-    let deleted = 0;
-
-    const query = db.prepare("SELECT id, inventory FROM economy").all();
-
-    for (const user of query) {
-        let inventory = JSON.parse(user.inventory);
-
-        if (!inventory) {
-            inventory = {};
-            db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(user.id);
-        }
-
-        const inventory1 = JSON.parse(user.inventory);
-
-        for (const item of Array.from(Object.keys(inventory))) {
-            if (!Array.from(Object.keys(items)).includes(item)) {
-                delete inventory[item];
-                deleted++;
-            } else if (!inventory[item]) {
-                delete inventory[item];
-                deleted++;
-            } else if (inventory[item] == 0) {
-                delete inventory[item];
-                deleted++;
-            }
-        }
-
-        if (inventory != inventory1) {
-            db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), user.id);
-        }
-    }
-
-    if (deleted != 0) {
-        logger.info(`${deleted} items deleted from inventories`);
-        txt += `\n${deleted.toLocaleString()} items deleted from inventories`;
-    }
 
     setTimeout(() => {
         updateCryptoWorth();
@@ -221,15 +198,29 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
 
     const now = new Date().getTime();
 
-    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(user);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: user,
+        },
+        select: {
+            lastVote: true,
+        },
+    });
 
-    const lastVote = query.lastVote;
+    const lastVote = query.lastVote.getTime();
 
     if (now - lastVote < 43200000) {
         return logger.error(`${user} already voted`);
     }
 
-    db.prepare("UPDATE economy SET last_vote = ? WHERE id = ?").run(now, user);
+    await prisma.economy.update({
+        where: {
+            userId: user,
+        },
+        data: {
+            lastVote: new Date(now),
+        },
+    });
 
     redis.set(`cache:vote:${user}`, "true");
     redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
@@ -247,27 +238,27 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         memberID = member.id;
     }
 
-    let prestige = getPrestige(memberID);
+    let prestige = await getPrestige(memberID);
 
     if (prestige > 15) prestige = 15;
 
     const amount = 15000 * (prestige + 1);
     const multi = Math.floor((await getMulti(memberID)) * 100);
-    const inventory = getInventory(memberID);
+    const inventory = await getInventory(memberID);
 
-    updateBalance(memberID, getBalance(memberID) + amount);
+    await updateBalance(memberID, (await getBalance(memberID)) + amount);
     addKarma(memberID, 10);
 
-    const tickets = getTickets(memberID);
+    const tickets = await getTickets(memberID);
 
-    const prestigeBonus = Math.floor((getPrestige(memberID) > 20 ? 20 : getPrestige(memberID)) / 2.5);
-    const premiumBonus = Math.floor(isPremium(memberID) ? getTier(memberID) : 0);
+    const prestigeBonus = Math.floor(((await getPrestige(memberID)) > 20 ? 20 : await getPrestige(memberID)) / 2.5);
+    const premiumBonus = Math.floor((await isPremium(memberID)) ? await getTier(memberID) : 0);
     const karmaBonus = Math.floor((await getKarma(memberID)) / 100);
 
     const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
 
     if (tickets.length < max) {
-        addTicket(memberID);
+        await addTicket(memberID);
     }
 
     let crateAmount = Math.floor(prestige / 2 + 1);
@@ -280,7 +271,7 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
         inventory["vote_crate"] = crateAmount;
     }
 
-    setInventory(memberID, inventory);
+    await setInventory(memberID, inventory);
 
     logger.log({
         level: "success",
@@ -344,9 +335,16 @@ export async function hasVoted(member: GuildMember | string) {
 
     const now = new Date().getTime();
 
-    const query = db.prepare("SELECT last_vote FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            lastVote: true,
+        },
+    });
 
-    const lastVote = query.last_vote;
+    const lastVote = query.lastVote.getTime();
 
     if (now - lastVote < 43200000) {
         redis.set(`cache:vote:${id}`, "true");
@@ -379,14 +377,14 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
         multi += 3;
     }
 
-    const prestige = getPrestige(member);
+    const prestige = await getPrestige(member);
 
     const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2;
 
     multi += prestigeBonus;
 
-    if (isPremium(id)) {
-        switch (getTier(id)) {
+    if (await isPremium(id)) {
+        switch (await getTier(id)) {
             case 2:
                 multi += 4;
                 break;
@@ -398,7 +396,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
         }
     }
 
-    const guild = getGuildByUser(id);
+    const guild = await getGuildByUser(id);
 
     if (guild) {
         multi += guild.level - 1;
@@ -414,34 +412,21 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 /**
  * @returns {Number}
  */
-export function getUserCount(): number {
-    const query = db.prepare("SELECT id FROM economy").all();
+export async function getUserCount(): Promise<number> {
+    const query = await prisma.economy.findMany({
+        select: {
+            userId: true,
+        },
+    });
 
     return query.length;
-}
-
-/**
- * @param {Guild} guild - guild object to get economy user count of
- */
-export function getUserCountGuild(guild: Guild) {
-    let count = 0;
-
-    const query = db.prepare("SELECT id FROM economy").all();
-
-    for (const user of query) {
-        if (guild.members.cache.find((member) => member.user.id == user.id)) {
-            count++;
-        }
-    }
-
-    return count;
 }
 
 /**
  *
  * @param {GuildMember} member - get balance
  */
-export function getBalance(member: GuildMember | string) {
+export async function getBalance(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -449,9 +434,23 @@ export function getBalance(member: GuildMember | string) {
         id = member;
     }
 
-    const query = db.prepare("SELECT money FROM economy WHERE id = ?").get(id);
+    if (await redis.exists(`cache:economy:balance:${id}`)) {
+        return parseInt(await redis.get(`cache:economy:balance:${id}`));
+    }
 
-    return parseInt(query.money);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            money: true,
+        },
+    });
+
+    await redis.set(`cache:economy:balance:${id}`, query.money);
+    await redis.expire(`cache:economy:balance:${id}`, 30);
+
+    return query.money;
 }
 
 /**
@@ -471,7 +470,14 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
         return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false;
     }
 
-    const query = db.prepare("SELECT id FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            userId: true,
+        },
+    });
 
     if (query) {
         await redis.set(`cache:economy:exists:${id}`, "true");
@@ -488,7 +494,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
  * @param {GuildMember} member to modify balance of
  * @param {Number} amount to update balance to
  */
-export function updateBalance(member: GuildMember | string, amount: number) {
+export async function updateBalance(member: GuildMember | string, amount: number) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -496,16 +502,22 @@ export function updateBalance(member: GuildMember | string, amount: number) {
         id = member;
     }
 
-    const amount1 = amount;
-
-    db.prepare("UPDATE economy SET money = ? WHERE id = ?").run(amount1, id);
+    await prisma.economy.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            money: amount,
+        },
+    });
+    await redis.del(`cache:economy:balance:${id}`);
 }
 
 /**
  * @returns {Number} bank balance of user
  * @param {GuildMember} member to get bank balance of
  */
-export function getBankBalance(member: GuildMember): number {
+export async function getBankBalance(member: GuildMember): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -513,9 +525,16 @@ export function getBankBalance(member: GuildMember): number {
         id = member;
     }
 
-    const query = db.prepare("SELECT bank FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            bank: true,
+        },
+    });
 
-    return parseInt(query.bank);
+    return query.bank;
 }
 
 /**
@@ -523,15 +542,22 @@ export function getBankBalance(member: GuildMember): number {
  * @param {GuildMember} member to modify balance of
  * @param {Number} amount to update balance to
  */
-export function updateBankBalance(member: GuildMember, amount: number) {
-    db.prepare("UPDATE economy SET bank = ? WHERE id = ?").run(amount, member.user.id);
+export async function updateBankBalance(member: GuildMember, amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            bank: amount,
+        },
+    });
 }
 
 /**
  * @returns {Number} xp of user
  * @param {GuildMember} member to get xp of
  */
-export function getXp(member: GuildMember): number {
+export async function getXp(member: GuildMember): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -539,9 +565,23 @@ export function getXp(member: GuildMember): number {
         id = member;
     }
 
-    const query = db.prepare("SELECT xp FROM economy WHERE id = ?").get(id);
+    if (await redis.exists(`cache:economy:xp:${id}`)) {
+        return parseInt(await redis.get(`cache:economy:xp:${id}`));
+    }
 
-    return parseInt(query.xp);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            xp: true,
+        },
+    });
+
+    await redis.set(`cache:economy:xp:${id}`, query.xp);
+    await redis.expire(`cache:economy:xp:${id}`, 30);
+
+    return query.xp;
 }
 
 /**
@@ -549,18 +589,26 @@ export function getXp(member: GuildMember): number {
  * @param {GuildMember} member to modify xp of
  * @param {Number} amount to update xp to
  */
-export function updateXp(member: GuildMember, amount: number) {
+export async function updateXp(member: GuildMember, amount: number) {
     if (amount >= 69420) return;
 
-    db.prepare("UPDATE economy SET xp = ? WHERE id = ?").run(amount, member.user.id);
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            xp: amount,
+        },
+    });
+    await redis.del(`cache:economy:xp:${member.user.id}`);
 }
 
 /**
  * @returns {Number} max balance of user
  * @param {GuildMember} member to get max balance of
  */
-export function getMaxBankBalance(member: GuildMember): number {
-    const xp = getXp(member);
+export async function getMaxBankBalance(member: GuildMember): Promise<number> {
+    const xp = await getXp(member);
     const constant = 550;
     const starting = 15000;
     const bonus = xp * constant;
@@ -576,14 +624,22 @@ export function getMaxBankBalance(member: GuildMember): number {
  * @param {Boolean} anon
  */
 export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<Array<string>> {
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
+    const query = await prisma.economy.findMany({
+        where: {
+            money: { gt: 1000 },
+        },
+        select: {
+            userId: true,
+            money: true,
+        },
+    });
 
     const userIDs = [];
     const balances = new Map();
 
     for (const user of query) {
-        userIDs.push(user.id);
-        balances.set(user.id, user.money);
+        userIDs.push(user.userId);
+        balances.set(user.userId, user.money);
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i));
@@ -646,15 +702,23 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
         return !m.user.bot;
     });
 
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
+    const query = await prisma.economy.findMany({
+        where: {
+            money: { gt: 1000 },
+        },
+        select: {
+            userId: true,
+            money: true,
+        },
+    });
 
     let userIDs = [];
     const balances = new Map();
 
     for (const user of query) {
-        if (members.has(user.id)) {
-            userIDs.push(user.id);
-            balances.set(user.id, user.money);
+        if (members.has(user.userId)) {
+            userIDs.push(user.userId);
+            balances.set(user.userId, user.money);
         }
     }
 
@@ -721,15 +785,23 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<Array<
         return !m.user.bot;
     });
 
-    const query = db.prepare("SELECT id, money FROM economy WHERE money > 1000").all();
+    const query = await prisma.economy.findMany({
+        where: {
+            money: { gt: 1000 },
+        },
+        select: {
+            userId: true,
+            money: true,
+        },
+    });
 
     let userIDs = [];
     const balances = new Map();
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id)) {
-            userIDs.push(user.id);
-            balances.set(user.id, user.money);
+        if (members.find((member) => member.user.id == user.userId)) {
+            userIDs.push(user.userId);
+            balances.set(user.userId, user.money);
         }
     }
 
@@ -795,15 +867,23 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<A
         return !m.user.bot;
     });
 
-    const query = db.prepare("SELECT id, prestige FROM economy WHERE prestige > 0").all();
+    const query = await prisma.economy.findMany({
+        where: {
+            prestige: { gt: 0 },
+        },
+        select: {
+            userId: true,
+            prestige: true,
+        },
+    });
 
     let userIDs = [];
     const prestiges = new Map();
 
     for (const user of query) {
-        if (members.find((member) => member.user.id == user.id)) {
-            userIDs.push(user.id);
-            prestiges.set(user.id, user.prestige);
+        if (members.find((member) => member.user.id == user.userId)) {
+            userIDs.push(user.userId);
+            prestiges.set(user.userId, user.prestige);
         }
     }
 
@@ -860,7 +940,7 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<A
  *
  * @param {GuildMember} member to create profile for
  */
-export function createUser(member: GuildMember | string) {
+export async function createUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -868,9 +948,21 @@ export function createUser(member: GuildMember | string) {
         id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`);
+    if (!(await hasProfile(id))) {
+        if (member instanceof GuildMember) {
+            await createProfile(member.user);
+        } else {
+            await createProfile(id);
+        }
+    }
 
-    db.prepare("INSERT INTO economy (id, money, bank) VALUES (?, ?, ?)").run(id, 1000, 4000);
+    await prisma.economy.create({
+        data: {
+            userId: id,
+            lastVote: new Date(0),
+        },
+    });
+    await redis.del(`cache:economy:exists:${id}`);
 }
 
 /**
@@ -881,14 +973,14 @@ export async function formatBet(bet: string | number, member: GuildMember): Prom
     const maxBet = await calcMaxBet(member);
 
     if (bet.toString().toLowerCase() == "all") {
-        bet = getBalance(member);
+        bet = await getBalance(member);
         if (bet > maxBet) {
             bet = maxBet;
         }
     } else if (bet.toString().toLowerCase() == "max") {
         bet = maxBet;
     } else if (bet.toString().toLowerCase() == "half") {
-        bet = Math.floor(getBalance(member) / 2);
+        bet = Math.floor((await getBalance(member)) / 2);
     }
 
     const formatted = formatNumber(bet.toString());
@@ -919,10 +1011,17 @@ export function formatNumber(number: string): number | void {
  * @returns {boolean}
  * @param {GuildMember} member to check
  */
-export function hasPadlock(member: GuildMember): boolean {
-    const query = db.prepare("SELECT padlock FROM economy WHERE id = ?").get(member.user.id);
+export async function hasPadlock(member: GuildMember): Promise<boolean> {
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: member.user.id,
+        },
+        select: {
+            padlock: true,
+        },
+    });
 
-    return query.padlock == 1 ? true : false;
+    return query.padlock;
 }
 
 /**
@@ -930,10 +1029,15 @@ export function hasPadlock(member: GuildMember): boolean {
  * @param {GuildMember} member to update padlock setting of
  * @param {Boolean} setting padlock to true or false
  */
-export function setPadlock(member: GuildMember, setting: boolean | number) {
-    setting = setting ? 1 : 0;
-
-    db.prepare("UPDATE economy SET padlock = ? WHERE id = ?").run(setting, member.user.id);
+export async function setPadlock(member: GuildMember, setting: boolean) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            padlock: setting,
+        },
+    });
 }
 
 /**
@@ -958,7 +1062,7 @@ export function updateStats(guildCount: number, shardCount: number) {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function getPrestige(member: GuildMember | string): number {
+export async function getPrestige(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -966,7 +1070,21 @@ export function getPrestige(member: GuildMember | string): number {
         id = member;
     }
 
-    const query = db.prepare("SELECT prestige FROM economy WHERE id = ?").get(id);
+    if (await redis.exists(`cache:economy:prestige:${id}`)) {
+        return parseInt(await redis.get(`cache:economy:prestige:${id}`));
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            prestige: true,
+        },
+    });
+
+    await redis.set(`cache:economy:prestige:${id}`, query.prestige);
+    await redis.expire(`cache:economy:prestige:${id}`, ms("1 hour") / 1000);
 
     return query.prestige;
 }
@@ -976,17 +1094,26 @@ export function getPrestige(member: GuildMember | string): number {
  * @param {GuildMember} member
  * @param {Number} amount
  */
-export function setPrestige(member: GuildMember, amount: number) {
-    db.prepare("UPDATE economy SET prestige = ? WHERE id = ?").run(amount, member.user.id);
+export async function setPrestige(member: GuildMember, amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            prestige: amount,
+        },
+    });
+
+    await redis.del(`cache:economy:prestige:${member.user.id}`);
 }
 
 /**
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function getPrestigeRequirement(member: GuildMember): number {
+export async function getPrestigeRequirement(member: GuildMember): Promise<number> {
     const constant = 250;
-    const extra = getPrestige(member) * constant;
+    const extra = (await getPrestige(member)) * constant;
 
     return 500 + extra;
 }
@@ -1014,15 +1141,18 @@ export async function getDMsEnabled(member: GuildMember | string): Promise<boole
         id = member;
     }
 
-    if (!(await userExists(id))) createUser(id);
+    if (!(await userExists(id))) await createUser(id);
 
-    const query = db.prepare("SELECT dms FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            dms: true,
+        },
+    });
 
-    if (query.dms == 1) {
-        return true;
-    } else {
-        return false;
-    }
+    return query.dms;
 }
 
 /**
@@ -1030,10 +1160,15 @@ export async function getDMsEnabled(member: GuildMember | string): Promise<boole
  * @param {GuildMember} member
  * @param {Boolean} value
  */
-export function setDMsEnabled(member: GuildMember, value: boolean) {
-    const setting = value ? 1 : 0;
-
-    db.prepare("UPDATE economy SET dms = ? WHERE id = ?").run(setting, member.user.id);
+export async function setDMsEnabled(member: GuildMember, value: boolean) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            dms: value,
+        },
+    });
 }
 
 /**
@@ -1051,7 +1186,7 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
         total += 50000;
     }
 
-    const prestige = getPrestige(member);
+    const prestige = await getPrestige(member);
 
     return total + bonus * (prestige > 15 ? 15 : prestige);
 }
@@ -1061,7 +1196,7 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
  * @param {GuildMember} member
  * @param {String} member
  */
-export function getWorkers(member: GuildMember | string): any {
+export async function getWorkers(member: GuildMember | string): Promise<{ [key: string]: WorkerStorageData }> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1069,28 +1204,16 @@ export function getWorkers(member: GuildMember | string): any {
         id = member;
     }
 
-    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            workers: true,
+        },
+    });
 
-    return JSON.parse(query.workers);
-}
-
-/**
- *
- * @param {GuildMember} member
- * @param {String} id
- * @returns {Worker}
- */
-export function getWorker(member: GuildMember, id: string): Worker {
-    let memberID: string;
-    if (member instanceof GuildMember) {
-        memberID = member.user.id;
-    } else {
-        memberID = member;
-    }
-
-    const query = db.prepare("SELECT workers FROM economy WHERE id = ?").get(memberID);
-
-    return JSON.parse(query.workers)[id];
+    return query.workers as any;
 }
 
 /**
@@ -1099,7 +1222,7 @@ export function getWorker(member: GuildMember, id: string): Worker {
  * @param {Number} id
  * @returns
  */
-export function addWorker(member: GuildMember, id: number) {
+export async function addWorker(member: GuildMember, id: number) {
     let memberID: string;
     if (member instanceof GuildMember) {
         memberID = member.user.id;
@@ -1115,14 +1238,21 @@ export function addWorker(member: GuildMember, id: number) {
 
     worker = new worker();
 
-    const memberWorkers = getWorkers(member);
+    const memberWorkers = await getWorkers(member);
 
-    memberWorkers[id] = worker;
+    memberWorkers[id] = worker.toStorage();
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(memberWorkers), memberID);
+    await prisma.economy.update({
+        where: {
+            userId: memberID,
+        },
+        data: {
+            workers: memberWorkers as any,
+        },
+    });
 }
 
-export function emptyWorkersStored(member: GuildMember | string) {
+export async function emptyWorkersStored(member: GuildMember | string) {
     let memberID: string;
     if (member instanceof GuildMember) {
         memberID = member.user.id;
@@ -1130,17 +1260,20 @@ export function emptyWorkersStored(member: GuildMember | string) {
         memberID = member;
     }
 
-    const workers = getWorkers(memberID);
+    const workers = await getWorkers(memberID);
 
     for (const w of Object.keys(workers)) {
-        const worker: Worker = workers[w];
-
-        worker.stored = 0;
-
-        workers[worker.id] = worker;
+        workers[w].stored = 0;
     }
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID);
+    await prisma.economy.update({
+        where: {
+            userId: memberID,
+        },
+        data: {
+            workers: workers as any,
+        },
+    });
 }
 
 /**
@@ -1148,7 +1281,7 @@ export function emptyWorkersStored(member: GuildMember | string) {
  * @param {GuildMember} member
  * @param {String} id
  */
-export function upgradeWorker(member: GuildMember | string, id: string) {
+export async function upgradeWorker(member: GuildMember | string, id: string) {
     let memberID: string;
     if (member instanceof GuildMember) {
         memberID = member.user.id;
@@ -1156,24 +1289,36 @@ export function upgradeWorker(member: GuildMember | string, id: string) {
         memberID = member;
     }
 
-    const workers = getWorkers(memberID);
+    const workers = await getWorkers(memberID);
 
-    let worker = workers[id];
-
-    worker = Worker.fromJSON(worker);
+    const worker = Worker.fromStorage(workers[id]);
 
     worker.upgrade();
 
-    workers[id] = worker;
+    workers[id] = worker.toStorage();
 
-    db.prepare("UPDATE economy SET workers = ? WHERE id = ?").run(JSON.stringify(workers), memberID);
+    await prisma.economy.update({
+        where: {
+            userId: memberID,
+        },
+        data: {
+            workers: workers as any,
+        },
+    });
 }
 
-export function isEcoBanned(id: string) {
+export async function isEcoBanned(id: string) {
     if (bannedCache.has(id)) {
         return bannedCache.get(id);
     } else {
-        const query = db.prepare("SELECT banned FROM economy WHERE id = ?").get(id);
+        const query = await prisma.economy.findUnique({
+            where: {
+                userId: id,
+            },
+            select: {
+                banned: true,
+            },
+        });
 
         if (!query) {
             bannedCache.set(id, false);
@@ -1190,53 +1335,77 @@ export function isEcoBanned(id: string) {
     }
 }
 
-export function toggleBan(id: string) {
-    if (isEcoBanned(id)) {
-        db.prepare("UPDATE economy SET banned = 0 WHERE id = ?").run(id);
+export async function toggleBan(id: string) {
+    if (await isEcoBanned(id)) {
+        await prisma.economy.update({
+            where: {
+                userId: id,
+            },
+            data: {
+                banned: false,
+            },
+        });
     } else {
-        db.prepare("UPDATE economy SET banned = 1 WHERE id = ?").run(id);
+        await prisma.economy.update({
+            where: {
+                userId: id,
+            },
+            data: {
+                banned: true,
+            },
+        });
     }
 
     bannedCache.delete(id);
 }
 
-export function reset() {
-    const query: EconomyProfile[] = db.prepare("SELECT * FROM economy").all();
-    db.prepare("delete from economy_guild_members").run();
-    db.prepare("delete from economy_guild");
+export async function reset() {
+    await prisma.economy.deleteMany({
+        where: {
+            banned: true,
+        },
+    });
+
+    const deleted = await prisma.economy
+        .deleteMany({
+            where: {
+                AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dms: true }],
+            },
+        })
+        .then((r) => r.count);
+
+    const query = await prisma.economy.findMany();
+    await prisma.economyGuildMember.deleteMany();
+    await prisma.economyGuild.deleteMany();
 
     let updated = 0;
-    let deleted = 0;
 
     for (const user of query) {
         const prestige = user.prestige;
-        const lastVote = user.last_vote;
-        let inventory = JSON.parse(user.inventory);
+        const lastVote = user.lastVote;
         const dms = user.dms;
 
-        if (!inventory) inventory = {};
+        await prisma.economy.update({
+            where: {
+                userId: user.userId,
+            },
+            data: {
+                money: 500,
+                bank: 9500,
+                xp: 0,
+                prestige: prestige,
+                padlock: false,
+                dms: dms,
+                lastVote: lastVote,
+                inventory: {},
+                workers: {},
+            },
+        });
 
-        if (Array.from(Object.keys(inventory)).length == 0) {
-            inventory = undefined;
-        } else {
-            for (const item of Array.from(Object.keys(inventory))) {
-                if (items[item].role != "collectable") {
-                    delete inventory[item];
-                }
-            }
-        }
-
-        if (!inventory && prestige == 0 && user.money < 10000 && user.xp < 300) {
-            db.prepare("DELETE FROM economy WHERE id = ?").run(user.id);
-            deleted++;
-        } else {
-            db.prepare(
-                "UPDATE economy SET money = 1000, bank = 4000, xp = 0, prestige = ?, padlock = 0, dms = ?, last_vote = ?, inventory = ?, workers = '{}' WHERE id = ?"
-            ).run(prestige, dms, lastVote, JSON.stringify(inventory), user.id);
-            updated++;
-        }
+        updated++;
     }
-    db.prepare("DELETE FROM economy_stats");
+
+    await prisma.economyStats.deleteMany();
 
     return { updated: updated, deleted: deleted };
 }
@@ -1245,7 +1414,7 @@ export function reset() {
  * @returns {StatsProfile}
  * @param {GuildMember} member
  */
-export function getStats(member: GuildMember): StatsProfile {
+export async function getStats(member: GuildMember): Promise<StatsProfile> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1253,7 +1422,11 @@ export function getStats(member: GuildMember): StatsProfile {
         id = member;
     }
 
-    const query = db.prepare("SELECT * FROM economy_stats WHERE id = ?").all(id);
+    const query = await prisma.economyStats.findMany({
+        where: {
+            economyUserId: id,
+        },
+    });
 
     return new StatsProfile(query);
 }
@@ -1264,7 +1437,7 @@ export function getStats(member: GuildMember): StatsProfile {
  * @param {String} game
  * @param {Boolean} win
  */
-export function addGamble(member: GuildMember, game: string, win: boolean) {
+export async function addGamble(member: GuildMember, game: string, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1272,19 +1445,54 @@ export function addGamble(member: GuildMember, game: string, win: boolean) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, game);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id }, { type: game }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, game);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: game }],
+                },
+                data: {
+                    win: { increment: 1 },
+                },
+            });
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = ?").run(id, game);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: game }],
+                },
+                data: {
+                    lose: { increment: 1 },
+                },
+            });
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: game,
+                    win: 1,
+                    gamble: true,
+                },
+            });
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose, gamble) VALUES (?, ?, ?, 1)").run(id, game, 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: game,
+                    lose: 1,
+                    gamble: true,
+                },
+            });
         }
     }
 }
@@ -1294,7 +1502,7 @@ export function addGamble(member: GuildMember, game: string, win: boolean) {
  * @param {GuildMember} member
  * @param {Boolean} win
  */
-export function addRob(member: GuildMember, win: boolean) {
+export async function addRob(member: GuildMember, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1302,19 +1510,54 @@ export function addRob(member: GuildMember, win: boolean) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = 'rob'").get(id);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id }, { type: "rob" }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
         if (win) {
-            db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = 'rob'").run(id);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: "rob" }],
+                },
+                data: {
+                    win: { increment: 1 },
+                },
+            });
         } else {
-            db.prepare("UPDATE economy_stats SET lose = lose + 1 WHERE id = ? AND type = 'rob'").run(id);
+            await prisma.economyStats.updateMany({
+                where: {
+                    AND: [{ economyUserId: id }, { type: "rob" }],
+                },
+                data: {
+                    lose: { increment: 1 },
+                },
+            });
         }
     } else {
         if (win) {
-            db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, ?)").run(id, "rob", 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: "rob",
+                    win: 1,
+                    gamble: true,
+                },
+            });
         } else {
-            db.prepare("INSERT INTO economy_stats (id, type, lose) VALUES (?, ?, ?)").run(id, "rob", 1);
+            await prisma.economyStats.create({
+                data: {
+                    economyUserId: id,
+                    type: "rob",
+                    lose: 1,
+                    gamble: true,
+                },
+            });
         }
     }
 }
@@ -1323,7 +1566,7 @@ export function addRob(member: GuildMember, win: boolean) {
  *
  * @param {GuildMember} member
  */
-export function addItemUse(member: GuildMember, item) {
+export async function addItemUse(member: GuildMember, item: string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1331,21 +1574,44 @@ export function addItemUse(member: GuildMember, item) {
         id = member;
     }
 
-    const query = db.prepare("SELECT id FROM economy_stats WHERE id = ? AND type = ?").get(id, item);
+    const query = await prisma.economyStats.findFirst({
+        where: {
+            AND: [{ economyUserId: id, type: item }],
+        },
+        select: {
+            economyUserId: true,
+        },
+    });
 
     if (query) {
-        db.prepare("UPDATE economy_stats SET win = win + 1 WHERE id = ? AND type = ?").run(id, item);
+        await prisma.economyStats.updateMany({
+            where: {
+                AND: [{ economyUserId: id }, { type: item }],
+            },
+            data: {
+                win: { increment: 1 },
+            },
+        });
     } else {
-        db.prepare("INSERT INTO economy_stats (id, type, win) VALUES (?, ?, 1)").run(id, item);
+        await prisma.economyStats.create({
+            data: {
+                economyUserId: id,
+                type: item,
+                win: 1,
+                gamble: false,
+            },
+        });
     }
 }
+
+type Inventory = { [key: string]: number };
 
 /**
  *
  * @param {GuildMember} member
  * @returns
  */
-export function getInventory(member: GuildMember | string): { [key: string]: number } {
+export async function getInventory(member: GuildMember | string): Promise<Inventory> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1353,14 +1619,20 @@ export function getInventory(member: GuildMember | string): { [key: string]: num
         id = member;
     }
 
-    const query = db.prepare("SELECT inventory FROM economy WHERE id = ?").get(id);
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            inventory: true,
+        },
+    });
 
     if (!query.inventory) {
-        db.prepare("UPDATE economy SET inventory = '{}' WHERE id = ?").run(id);
         return {};
     }
 
-    return JSON.parse(query.inventory);
+    return query.inventory as Inventory;
 }
 
 /**
@@ -1368,14 +1640,22 @@ export function getInventory(member: GuildMember | string): { [key: string]: num
  * @param {GuildMember} member
  * @param {Object} inventory
  */
-export function setInventory(member: GuildMember | string, inventory: object) {
+export async function setInventory(member: GuildMember | string, inventory: object) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
     } else {
         id = member;
     }
-    db.prepare("UPDATE economy SET inventory = ? WHERE id = ?").run(JSON.stringify(inventory), id);
+
+    await prisma.economy.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            inventory: inventory,
+        },
+    });
 }
 
 export function getItems(): { [key: string]: Item } {
@@ -1386,14 +1666,14 @@ export function getItems(): { [key: string]: Item } {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function getMaxBitcoin(member: GuildMember): number {
+export async function getMaxBitcoin(member: GuildMember): Promise<number> {
     const base = 10;
 
-    const prestige = getPrestige(member);
+    const prestige = await getPrestige(member);
 
     const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige);
 
-    let xpBonus = 1 * Math.floor(getXp(member) / 100);
+    let xpBonus = 1 * Math.floor((await getXp(member)) / 100);
 
     if (xpBonus > 5) xpBonus = 5;
 
@@ -1404,15 +1684,15 @@ export function getMaxBitcoin(member: GuildMember): number {
  * @returns {Number}
  * @param {GuildMember} member
  */
-export function getMaxEthereum(member: GuildMember): number {
-    return getMaxBitcoin(member) * 10;
+export async function getMaxEthereum(member: GuildMember): Promise<number> {
+    return (await getMaxBitcoin(member)) * 10;
 }
 
 /**
  *
  * @param {GuildMember} member
  */
-export function deleteUser(member: GuildMember | string) {
+export async function deleteUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1420,9 +1700,12 @@ export function deleteUser(member: GuildMember | string) {
         id = member;
     }
 
-    redis.del(`cache:economy:exists:${id}`);
-
-    db.prepare("DELETE FROM economy WHERE id = ?").run(id);
+    await prisma.economy.delete({
+        where: {
+            userId: id,
+        },
+    });
+    await redis.del(`cache:economy:exists:${id}`);
 }
 
 /**
@@ -1430,7 +1713,7 @@ export function deleteUser(member: GuildMember | string) {
  * @param {GuildMember} member
  * @returns {Array<{ user_id: string, id: number }>}
  */
-export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
+export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1438,7 +1721,11 @@ export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
         id = member;
     }
 
-    const query: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets WHERE user_id = ?").all(id);
+    const query = await prisma.lotteryTicket.findMany({
+        where: {
+            userId: id,
+        },
+    });
 
     return query;
 }
@@ -1447,7 +1734,7 @@ export function getTickets(member: GuildMember | string): Array<LotteryTicket> {
  *
  * @param {GuildMember} member
  */
-export function addTicket(member: GuildMember | string) {
+export async function addTicket(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1455,7 +1742,11 @@ export function addTicket(member: GuildMember | string) {
         id = member;
     }
 
-    db.prepare("INSERT INTO lottery_tickets (user_id) VALUES (?)").run(id);
+    await prisma.lotteryTicket.create({
+        data: {
+            userId: id,
+        },
+    });
 
     if (!(member instanceof GuildMember)) return;
 
@@ -1472,9 +1763,9 @@ export function addTicket(member: GuildMember | string) {
  */
 async function doLottery(client: Client) {
     logger.info("performing lottery..");
-    const tickets: LotteryTicket[] = db.prepare("SELECT * FROM lottery_tickets").all();
+    const tickets = await prisma.lotteryTicket.findMany();
 
-    if (tickets.length < 10) {
+    if (tickets.length < 100) {
         logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
 
         const embed = new CustomEmbed();
@@ -1490,10 +1781,7 @@ async function doLottery(client: Client) {
 
     const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
 
-    /**
-     * @type {Array<{ user_id: string, id: number }>}
-     */
-    const shuffledTickets: Array<{ user_id: string; id: number }> = shufflearray(tickets);
+    const shuffledTickets = shufflearray(tickets);
 
     let chosen: LotteryTicket;
     let user: User;
@@ -1501,9 +1789,9 @@ async function doLottery(client: Client) {
     while (!user) {
         chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
 
-        logger.info(`winner: ${chosen.user_id} with ticket #${chosen.id}`);
+        logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
 
-        user = await client.users.fetch(chosen.user_id);
+        user = await client.users.fetch(chosen.userId);
     }
 
     logger.log({
@@ -1511,7 +1799,7 @@ async function doLottery(client: Client) {
         message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
     });
 
-    updateBalance(user.id, getBalance(user.id) + total);
+    await updateBalance(user.id, (await getBalance(user.id)) + total);
 
     const embed = new CustomEmbed();
 
@@ -1545,9 +1833,9 @@ async function doLottery(client: Client) {
             });
     }
 
-    const { changes } = db.prepare("DELETE FROM lottery_tickets").run();
+    const { count } = await prisma.lotteryTicket.deleteMany();
 
-    logger.info(`${changes.toLocaleString()} tickets deleted from database`);
+    logger.info(`${count.toLocaleString()} tickets deleted from database`);
 }
 
 /**
@@ -1581,8 +1869,8 @@ export function runLotteryInterval(client: Client) {
  * @param {JSON} item
  * @returns {string}
  */
-export function openCrate(member: GuildMember, item: Item): string[] {
-    const inventory = getInventory(member);
+export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
+    const inventory = await getInventory(member);
     const items = getItems();
 
     const crateItems = [
@@ -1608,7 +1896,7 @@ export function openCrate(member: GuildMember, item: Item): string[] {
         delete inventory[item.id];
     }
 
-    setInventory(member, inventory);
+    await setInventory(member, inventory);
 
     let times = 2;
     const names = [];
@@ -1616,7 +1904,7 @@ export function openCrate(member: GuildMember, item: Item): string[] {
     if (item.id.includes("vote")) {
         times = 1;
     } else if (item.id.includes("69420")) {
-        updateBalance(member, getBalance(member) + 69420);
+        await updateBalance(member, (await getBalance(member)) + 69420);
         names.push("$69,420");
     }
 
@@ -1655,7 +1943,7 @@ export function openCrate(member: GuildMember, item: Item): string[] {
 
         if (chosen == "bitcoin") {
             const owned = inventory["bitcoin"] || 0;
-            const max = getMaxBitcoin(member);
+            const max = await getMaxBitcoin(member);
 
             if (owned + 1 > max) {
                 i--;
@@ -1670,7 +1958,7 @@ export function openCrate(member: GuildMember, item: Item): string[] {
             }
         } else if (chosen == "ethereum") {
             const owned = inventory["ethereum"] || 0;
-            const max = getMaxEthereum(member);
+            const max = await getMaxEthereum(member);
 
             if (owned + 1 > max) {
                 i--;
@@ -1687,12 +1975,12 @@ export function openCrate(member: GuildMember, item: Item): string[] {
             if (chosen.includes("money:")) {
                 const amount = parseInt(chosen.substr(6));
 
-                updateBalance(member, getBalance(member) + amount);
+                await updateBalance(member, (await getBalance(member)) + amount);
                 names.push("$" + amount.toLocaleString());
             } else if (chosen.includes("xp:")) {
                 const amount = parseInt(chosen.substr(3));
 
-                updateXp(member, getXp(member) + amount);
+                await updateXp(member, (await getXp(member)) + amount);
                 names.push(amount + "xp");
             }
         } else {
@@ -1715,15 +2003,15 @@ export function openCrate(member: GuildMember, item: Item): string[] {
         }
     }
 
-    setInventory(member, inventory);
+    await setInventory(member, inventory);
 
     return names;
 }
 
-export function getRequiredBetForXp(member: GuildMember): number {
+export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
     let requiredBet = 1000;
 
-    const prestige = getPrestige(member);
+    const prestige = await getPrestige(member);
 
     if (prestige > 2) requiredBet = 10000;
 
@@ -1732,13 +2020,13 @@ export function getRequiredBetForXp(member: GuildMember): number {
     return requiredBet;
 }
 
-export function calcMinimumEarnedXp(member: GuildMember): number {
+export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
     let earned = 1;
-    earned += getPrestige(member);
+    earned += await getPrestige(member);
 
     let max = 6;
 
-    const guild = getGuildByUser(member);
+    const guild = await getGuildByUser(member);
 
     if (guild) {
         max += guild.level - 1;
@@ -1749,14 +2037,14 @@ export function calcMinimumEarnedXp(member: GuildMember): number {
     return earned;
 }
 
-export function calcEarnedXp(member: GuildMember, bet: number): number {
-    const requiredBet = getRequiredBetForXp(member);
+export async function calcEarnedXp(member: GuildMember, bet: number): Promise<number> {
+    const requiredBet = await getRequiredBetForXp(member);
 
     if (bet < requiredBet) {
         return 0;
     }
 
-    let earned = calcMinimumEarnedXp(member);
+    let earned = await calcMinimumEarnedXp(member);
 
     const random = Math.floor(Math.random() * 3);
 
@@ -1764,7 +2052,7 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
 
     let max = 6;
 
-    const guild = getGuildByUser(member);
+    const guild = await getGuildByUser(member);
 
     if (guild) {
         max += guild.level - 1;
@@ -1775,60 +2063,33 @@ export function calcEarnedXp(member: GuildMember, bet: number): number {
     return earned;
 }
 
-export interface EconomyGuild {
-    guild_name: string;
-    created_at: number;
-    balance: number;
-    xp: number;
-    level: number;
-    motd: string;
-    owner: string;
-    members: EconomyGuildMember[];
-}
-
-interface EconomyGuildMember {
-    user_id: string;
-    guild_id: string;
-    joined_at: number;
-    contributed_money: number;
-    contributed_xp: number;
-    last_known_tag: string;
-}
-
-export function guildExists(name: string): boolean {
-    if (guildExistsCache.has(name)) {
-        return guildExistsCache.get(name);
-    }
-
-    const query = db.prepare("select guild_name from economy_guild where guild_name = ?").get(name);
-
-    if (!query) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-export function getGuildByName(name: string): EconomyGuild {
-    const guild = db.prepare("select * from economy_guild where guild_name = ? collate nocase").get(name);
-    const members: EconomyGuildMember[] = db
-        .prepare("select * from economy_guild_members where guild_id = ? collate nocase")
-        .all(name);
-
-    if (!guild) return null;
-
-    guild.members = members;
-
-    for (const m of members) {
-        if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id);
-        }
-    }
+export async function getGuildByName(name: string) {
+    const guild = await prisma.economyGuild
+        .findMany({
+            where: {
+                guildName: {
+                    mode: "insensitive",
+                    equals: name,
+                },
+            },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                lastKnownTag: true,
+                            },
+                        },
+                    },
+                },
+            },
+        })
+        .then((r) => r[0]);
 
     return guild;
 }
 
-export function getGuildByUser(member: GuildMember | string): EconomyGuild | null {
+export async function getGuildByUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1841,95 +2102,133 @@ export function getGuildByUser(member: GuildMember | string): EconomyGuild | nul
     if (guildUserCache.has(id)) {
         guildName = guildUserCache.get(id);
 
-        if (!guildName) return null;
+        if (!guildName) return undefined;
     } else {
-        const query = db.prepare("select guild_id from economy_guild_members where user_id = ?").get(id);
+        const query = await prisma.economyGuildMember.findUnique({
+            where: {
+                userId: id,
+            },
+            select: {
+                guild: {
+                    include: {
+                        members: {
+                            include: {
+                                user: {
+                                    select: {
+                                        lastKnownTag: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
 
-        if (!query) {
-            guildUserCache.set(id, null);
-            return null;
+        if (!query || !query.guild) {
+            guildUserCache.set(id, undefined);
+            return undefined;
         }
 
-        guildName = query.guild_id;
+        return query.guild;
     }
 
-    const guild = db.prepare("select * from economy_guild where guild_name = ?").get(guildName);
-    const members = db.prepare("select * from economy_guild_members where guild_id = ?").all(guildName);
-
-    for (const m of members) {
-        if (!guildUserCache.has(m.user_id)) {
-            guildUserCache.set(m.user_id, m.guild_id);
-        }
-    }
-
-    guild.members = members;
-
-    return guild;
+    return await getGuildByName(guildName);
 }
 
-export function createGuild(name: string, owner: GuildMember) {
-    db.prepare("insert into economy_guild (guild_name, created_at, owner) values (?, ?, ?)").run(
-        name,
-        Date.now(),
-        owner.user.id
-    );
-    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
-        owner.user.id,
-        name,
-        Date.now(),
-        owner.user.tag
-    );
+export async function createGuild(name: string, owner: GuildMember) {
+    await prisma.economyGuild.create({
+        data: {
+            guildName: name,
+            createdAt: new Date(),
+            ownerId: owner.user.id,
+        },
+    });
+    await prisma.economyGuildMember.create({
+        data: {
+            userId: owner.user.id,
+            guildName: name,
+            joinedAt: new Date(),
+        },
+    });
 
     if (guildUserCache.has(owner.user.id)) {
         guildUserCache.delete(owner.user.id);
     }
 }
 
-export function deleteGuild(name: string) {
-    const members = getGuildByName(name).members;
-
-    for (const m of members) {
-        guildUserCache.delete(m.user_id);
-    }
+export async function deleteGuild(name: string) {
+    guildUserCache.clear();
 
     guildExistsCache.delete(name);
 
-    db.prepare("delete from economy_guild_members where guild_id = ?").run(name);
-    db.prepare("delete from economy_guild where guild_name = ?").run(name);
+    await prisma.economyGuild.delete({
+        where: {
+            guildName: name,
+        },
+    });
+
+    await prisma.economyGuildMember.deleteMany({
+        where: {
+            guildName: name,
+        },
+    });
 }
 
-export function addToGuildBank(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set balance = balance + ? where guild_name = ?").run(amount, name);
-    db.prepare("update economy_guild_members set contributed_money = contributed_money + ? where user_id = ?").run(
-        amount,
-        member.user.id
-    );
+export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            balance: { increment: amount },
+        },
+    });
+    await prisma.economyGuildMember.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            contributedMoney: { increment: amount },
+        },
+    });
 
     return checkUpgrade(name);
 }
 
-export function addToGuildXP(name: string, amount: number, member: GuildMember) {
-    db.prepare("update economy_guild set xp = xp + ? where guild_name = ?").run(amount, name);
-    db.prepare("update economy_guild_members set contributed_xp = contributed_xp + ? where user_id = ?").run(
-        amount,
-        member.user.id
-    );
+export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            xp: { increment: amount },
+        },
+    });
+    await prisma.economyGuildMember.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            contributedXp: { increment: amount },
+        },
+    });
 
     return checkUpgrade(name);
 }
 
-export function getMaxMembersForGuild(name: string) {
-    const guild = getGuildByName(name);
+export async function getMaxMembersForGuild(name: string) {
+    const guild = await getGuildByName(name);
 
     return guild.level * 3;
 }
 
-export function getRequiredForGuildUpgrade(name: string): { money: number; xp: number } {
+export async function getRequiredForGuildUpgrade(name: string): Promise<{ money: number; xp: number }> {
     if (guildRequirementsCache.has(name)) {
         return guildRequirementsCache.get(name);
     }
 
-    const guild = getGuildByName(name);
+    const guild = await getGuildByName(name);
 
     const baseMoney = 1900000 * Math.pow(guild.level, 2);
     const baseXP = 1425 * Math.pow(guild.level, 2);
@@ -1948,19 +2247,20 @@ export function getRequiredForGuildUpgrade(name: string): { money: number; xp: n
     };
 }
 
-export function addMember(name: string, member: GuildMember): boolean {
-    const guild = getGuildByName(name);
+export async function addMember(name: string, member: GuildMember) {
+    const guild = await getGuildByName(name);
 
-    if (guild.members.length + 1 > getMaxMembersForGuild(guild.guild_name)) {
+    if (guild.members.length + 1 > (await getMaxMembersForGuild(guild.guildName))) {
         return false;
     }
 
-    db.prepare("insert into economy_guild_members (user_id, guild_id, joined_at, last_known_tag) values (?, ?, ?, ?)").run(
-        member.user.id,
-        guild.guild_name,
-        Date.now(),
-        member.user.tag
-    );
+    await prisma.economyGuildMember.create({
+        data: {
+            userId: member.user.id,
+            guildName: guild.guildName,
+            joinedAt: new Date(),
+        },
+    });
 
     if (guildUserCache.has(member.user.id)) {
         guildUserCache.delete(member.user.id);
@@ -1974,49 +2274,96 @@ export enum RemoveMemberMode {
     TAG,
 }
 
-export function removeMember(member: string, mode: RemoveMemberMode) {
-    if (mode == RemoveMemberMode.ID) {
-        db.prepare("delete from economy_guild_members where user_id = ?").run(member);
-    } else {
-        db.prepare("delete from economy_guild_members where last_known_tag = ?").run(member);
-    }
-
+export async function removeMember(member: string, mode: RemoveMemberMode) {
     guildUserCache.clear();
+
+    if (mode == RemoveMemberMode.ID) {
+        await prisma.economyGuildMember.delete({
+            where: {
+                userId: member,
+            },
+        });
+        return true;
+    } else {
+        const user = await prisma.user.findFirst({
+            where: {
+                lastKnownTag: member,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (!user || !user.id) {
+            return false;
+        }
+
+        const x = await prisma.economyGuildMember.delete({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        if (x) return true;
+        return false;
+    }
 }
 
-export function updateLastKnownTag(id: string, tag: string) {
-    db.prepare("update economy_guild_members set last_known_tag = ? where user_id = ?").run(tag, id);
+interface EconomyGuild {
+    guildName: string;
+    createdAt: Date;
+    balance: number;
+    xp: number;
+    level: number;
+    motd: string;
+    ownerId: string;
+    members?: EconomyGuildMember[];
+}
+
+interface EconomyGuildMember {
+    userId: string;
+    guildName: string;
+    joinedAt: Date;
+    contributedMoney: number;
+    contributedXp: number;
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (typeof guild == "string") {
-        guild = getGuildByName(guild);
+        guild = await getGuildByName(guild);
     }
 
     if (guild.level == 5) return;
-    const requirements = getRequiredForGuildUpgrade(guild.guild_name);
+    const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
     if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
-        db.prepare(
-            "update economy_guild set level = level + 1, balance = balance - ?, xp = xp - ? where guild_name = ?"
-        ).run(requirements.money, requirements.xp, guild.guild_name);
+        await prisma.economyGuild.update({
+            where: {
+                guildName: guild.guildName,
+            },
+            data: {
+                level: { increment: 1 },
+                balance: { decrement: requirements.money },
+                xp: { decrement: requirements.xp },
+            },
+        });
 
-        logger.info(`${guild.guild_name} has upgraded to level ${guild.level + 1}`);
+        logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
         guildRequirementsCache.clear();
 
         const embed = new CustomEmbed().setColor("#5efb8f");
 
-        embed.setHeader(guild.guild_name);
+        embed.setHeader(guild.guildName);
         embed.setDescription(
-            `**${guild.guild_name}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
+            `**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
                 `\n +**${guild.level}** basic crates` +
                 "\n +**1**% multiplier" +
                 "\n +**1** max xp gain"
         );
 
         for (const member of guild.members) {
-            const inventory = getInventory(member.user_id);
+            const inventory = await getInventory(member.userId);
 
             if (inventory["basic_crate"]) {
                 inventory["basic_crate"] += guild.level;
@@ -2024,12 +2371,12 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
                 inventory["basic_crate"] = guild.level;
             }
 
-            setInventory(member.user_id, inventory);
+            await setInventory(member.userId, inventory);
 
-            if (await getDMsEnabled(member.user_id)) {
+            if (await getDMsEnabled(member.userId)) {
                 const { requestDM } = require("../../nypsi");
 
-                await requestDM(member.user_id, `${guild.guild_name} has been upgraded!`, false, embed);
+                await requestDM(member.userId, `${guild.guildName} has been upgraded!`, false, embed);
             }
         }
 
@@ -2038,14 +2385,29 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     return false;
 }
 
-export function setGuildMOTD(name: string, motd: string) {
-    db.prepare("update economy_guild set motd = ? where guild_name = ?").run(motd, name);
+export async function setGuildMOTD(name: string, motd: string) {
+    await prisma.economyGuild.update({
+        where: {
+            guildName: name,
+        },
+        data: {
+            motd: motd,
+        },
+    });
 }
 
-export function topGuilds(limit = 5): string[] {
-    const guilds: EconomyGuild[] = db
-        .prepare("select guild_name, balance, xp, level from economy_guild where balance > 1000")
-        .all();
+export async function topGuilds(limit = 5) {
+    const guilds = await prisma.economyGuild.findMany({
+        where: {
+            balance: { gt: 1000 },
+        },
+        select: {
+            guildName: true,
+            balance: true,
+            xp: true,
+            level: true,
+        },
+    });
 
     inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp]);
 
@@ -2059,7 +2421,7 @@ export function topGuilds(limit = 5): string[] {
         if (position == 2) position = "🥈";
         if (position == 3) position = "🥉";
 
-        out.push(`${position} **${guild.guild_name}**[${guild.level}] $${guild.balance.toLocaleString()}`);
+        out.push(`${position} **${guild.guildName}**[${guild.level}] $${guild.balance.toLocaleString()}`);
     }
 
     return out;

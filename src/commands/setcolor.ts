@@ -13,13 +13,13 @@ const cmd = new Command("setcolor", "set the color of the bot's messages (premiu
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!isPremium(message.author.id)) {
+    if (!(await isPremium(message.author.id))) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi")],
         });
     }
 
-    if (getTier(message.author.id) < 1) {
+    if ((await getTier(message.author.id)) < 1) {
         return message.channel.send({
             embeds: [
                 new ErrorEmbed(
@@ -29,15 +29,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
+    const prefix = await getPrefix(message.guild);
+
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false);
 
-        embed.setDescription(`**color** #${getEmbedColor(message.author.id)}\n\nuse \`${getPrefix(
-            message.guild
-        )}setcolor <hex color code>\` to change this
-        you can use ${getPrefix(
-            message.guild
-        )}color to find a color, or an [online color picker tool](https://color.tekoh.net)`);
+        embed.setDescription(`**color** #${await getEmbedColor(
+            message.author.id
+        )}\n\nuse \`${prefix}setcolor <hex color code>\` to change this
+        you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`);
 
         return message.channel.send({ embeds: [embed] });
     }
@@ -65,11 +65,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    setEmbedColor(message.author.id, color);
+    await setEmbedColor(message.author.id, color);
 
     return message.channel.send({
         embeds: [
-            new CustomEmbed(message.member, false, `your color has been updated to **${getEmbedColor(message.author.id)}**`),
+            new CustomEmbed(
+                message.member,
+                false,
+                `your color has been updated to **${await getEmbedColor(message.author.id)}**`
+            ),
         ],
     });
 }

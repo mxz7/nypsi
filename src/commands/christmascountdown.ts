@@ -1,8 +1,6 @@
 import { CommandInteraction, Message, Permissions } from "discord.js";
 import { daysUntilChristmas } from "../utils/functions/date";
 import {
-    hasGuild,
-    createGuild,
     getChristmasCountdown,
     getPrefix,
     setChristmasCountdown,
@@ -37,12 +35,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!hasGuild(message.guild)) createGuild(message.guild);
+    if (!(await hasChristmasCountdown(message.guild))) await createNewChristmasCountdown(message.guild);
 
-    if (!hasChristmasCountdown(message.guild)) createNewChristmasCountdown(message.guild);
-
-    let profile = getChristmasCountdown(message.guild);
-    const prefix = getPrefix(message.guild);
+    let profile = await getChristmasCountdown(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const help = () => {
         const embed = new CustomEmbed(
@@ -60,8 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(
             message.member,
             false,
-            `**enabled** \`${profile.enabled == 1 ? "true" : "false"}\`\n` +
-                `**format** ${profile.format}\n**channel** \`${profile.channel}\``
+            `**enabled** \`${profile.enabled}\`\n` + `**format** ${profile.format}\n**channel** \`${profile.channel}\``
         )
             .setHeader("christmas countdown")
             .setFooter(`use ${prefix}xmas help to view additional commands`);
@@ -98,14 +93,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("error creating/getting channel")] });
         }
 
-        profile.enabled = 1;
+        profile.enabled = true;
         profile.channel = channel.id;
 
-        setChristmasCountdown(message.guild, profile);
+        await setChristmasCountdown(message.guild, profile);
 
         await checkChristmasCountdown(message.guild);
 
-        profile = getChristmasCountdown(message.guild);
+        profile = await getChristmasCountdown(message.guild);
 
         if (!profile.enabled) {
             return message.channel.send({
@@ -121,10 +116,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("already disabled")] });
         }
 
-        profile.enabled = 0;
+        profile.enabled = false;
         profile.channel = "none";
 
-        setChristmasCountdown(message.guild, profile);
+        await setChristmasCountdown(message.guild, profile);
 
         return await message.channel.send({
             embeds: [new CustomEmbed(message.member, false, "✅ christmas countdown disabled")],
@@ -160,18 +155,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         profile.format = newFormat;
 
-        setChristmasCountdown(message.guild, profile);
+        await setChristmasCountdown(message.guild, profile);
 
         await checkChristmasCountdown(message.guild);
 
-        profile = getChristmasCountdown(message.guild);
+        profile = await getChristmasCountdown(message.guild);
 
-        setChristmasCountdown(message.guild, profile);
+        await setChristmasCountdown(message.guild, profile);
 
         if (profile.enabled) {
             await checkChristmasCountdown(message.guild);
 
-            profile = getChristmasCountdown(message.guild);
+            profile = await getChristmasCountdown(message.guild);
 
             if (!profile.enabled) {
                 return message.channel.send({
@@ -223,12 +218,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         profile.channel = channel.id;
 
-        setChristmasCountdown(message.guild, profile);
+        await setChristmasCountdown(message.guild, profile);
 
         if (profile.enabled) {
             await checkChristmasCountdown(message.guild);
 
-            profile = getChristmasCountdown(message.guild);
+            profile = await getChristmasCountdown(message.guild);
 
             if (!profile.enabled) {
                 return message.channel.send({

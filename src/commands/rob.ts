@@ -79,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
@@ -95,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (message.guild.id == "747056029795221513") {
         return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] });
@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (isEcoBanned(target.user.id)) {
+    if (await isEcoBanned(target.user.id)) {
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
@@ -123,19 +123,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cant rob yourself")] });
     }
 
-    if (!(await userExists(target)) || getBalance(target) <= 500) {
+    if (!(await userExists(target)) || (await getBalance(target)) <= 500) {
         return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
     }
 
-    const targetGuild = getGuildByUser(target);
+    const targetGuild = await getGuildByUser(target);
 
     if (targetGuild) {
-        if (targetGuild.guild_name == getGuildByUser(message.member)?.guild_name) {
+        if (targetGuild.guildName == (await getGuildByUser(message.member))?.guildName) {
             return send({ embeds: [new ErrorEmbed("you cannot rob someone in your own guild")] });
         }
     }
 
-    if (getBalance(message.member) < 750) {
+    if ((await getBalance(message.member)) < 750) {
         return send({ embeds: [new ErrorEmbed("you need $750 in your wallet to rob someone")] });
     }
 
@@ -157,10 +157,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (playerCooldown.has(target.user.id)) {
         const amount = Math.floor(Math.random() * 9) + 1;
-        const amountMoney = Math.round(getBalance(message.member) * (amount / 100));
+        const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-        updateBalance(target, getBalance(target) + amountMoney);
-        updateBalance(message.member, getBalance(message.member) - amountMoney);
+        await updateBalance(target, (await getBalance(target)) + amountMoney);
+        await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
 
         embed2.setColor("#e4334f");
         embed2.addField(
@@ -184,11 +184,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 amountMoney.toLocaleString() +
                 "**"
         );
-    } else if (hasPadlock(target)) {
-        setPadlock(target, false);
+    } else if (await hasPadlock(target)) {
+        await setPadlock(target, false);
 
         const amount = Math.floor(Math.random() * 35) + 5;
-        const amountMoney = Math.round(getBalance(target) * (amount / 100));
+        const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
         embed2.setColor("#e4334f");
         embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken");
@@ -212,10 +212,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             robberySuccess = true;
 
             const amount = Math.floor(Math.random() * 35) + 5;
-            const amountMoney = Math.round(getBalance(target) * (amount / 100));
+            const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
-            updateBalance(target, getBalance(target) - amountMoney);
-            updateBalance(message.member, getBalance(message.member) + amountMoney);
+            await updateBalance(target, (await getBalance(target)) - amountMoney);
+            await updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
 
             embed2.setColor("#5efb8f");
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
@@ -223,7 +223,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const voted = await hasVoted(message.member);
 
             if (voted) {
-                updateXp(message.member, getXp(message.member) + 1);
+                await updateXp(message.member, (await getXp(message.member)) + 1);
                 embed2.setFooter("+1xp");
             }
 
@@ -249,19 +249,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }, length * 1000);
         } else {
             const amount = Math.floor(Math.random() * 20) + 5;
-            const amountMoney = Math.round(getBalance(message.member) * (amount / 100));
+            const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-            const inventory = getInventory(message.member);
+            const inventory = await getInventory(message.member);
 
             if (inventory["lawyer"] && inventory["lawyer"] > 0) {
-                addItemUse(message.member, "lawyer");
+                await addItemUse(message.member, "lawyer");
                 inventory["lawyer"]--;
 
                 if (inventory["lawyer"] == 0) {
                     delete inventory["lawyer"];
                 }
 
-                setInventory(message.member, inventory);
+                await setInventory(message.member, inventory);
 
                 embed2.addField(
                     "fail!!",
@@ -276,8 +276,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "they were caught by the police, but a lawyer protected their money"
                 );
             } else {
-                updateBalance(target, getBalance(target) + amountMoney);
-                updateBalance(message.member, getBalance(message.member) - amountMoney);
+                await updateBalance(target, (await getBalance(target)) + amountMoney);
+                await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
                 embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
                 embed3.setDescription(
                     "**" +
@@ -313,11 +313,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (await getDMsEnabled(target)) {
                 if (robberySuccess) {
-                    addRob(message.member, true);
-                    target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
+                    await addRob(message.member, true);
+                    await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
                 } else {
-                    addRob(message.member, false);
-                    target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
+                    await addRob(message.member, false);
+                    await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
                 }
             }
         }, 1500);

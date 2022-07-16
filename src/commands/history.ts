@@ -5,6 +5,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { ModerationCase } from "@prisma/client";
 
 const cmd = new Command("history", "view punishment history for a given user", Categories.MODERATION)
     .setAliases(["modlogs", "hist"])
@@ -44,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
@@ -54,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
     let member;
     let unknownMember = false;
@@ -86,13 +87,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    let cases;
-    const pages = [];
+    let cases: ModerationCase[];
+    const pages: ModerationCase[][] = [];
 
     if (!unknownMember) {
-        cases = getCases(message.guild, member.user.id);
+        cases = await getCases(message.guild, member.user.id);
     } else {
-        cases = getCases(message.guild, member);
+        cases = await getCases(message.guild, member);
     }
 
     if (cases.length == 0) {
@@ -102,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 7);
 
     let count = 0;
-    let page = [];
+    let page: ModerationCase[] = [];
     for (const case0 of cases) {
         if (count == 5) {
             pages.push(page);
@@ -129,11 +130,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const case0 of pages[0]) {
         if (case0.deleted) {
-            embed.addField("case " + case0.case_id, "`[deleted]`");
+            embed.addField("case " + case0.caseId, "`[deleted]`");
         } else {
             embed.addField(
-                "case " + case0.case_id,
-                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time / 1000)}:d>`
+                "case " + case0.caseId,
+                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
             );
         }
     }
@@ -198,16 +199,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     currentPage--;
                     for (const case0 of pages[currentPage]) {
                         if (case0.deleted) {
-                            newEmbed.addField("case " + case0.case_id, "`[deleted]`");
+                            newEmbed.addField("case " + case0.caseId, "`[deleted]`");
                         } else {
                             newEmbed.addField(
-                                "case " + case0.case_id,
+                                "case " + case0.caseId,
                                 "`" +
                                     case0.type +
                                     "` - " +
                                     case0.command +
                                     "\non " +
-                                    `<t:${Math.floor(case0.time / 1000)}:d>`
+                                    `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
                             );
                         }
                     }
@@ -233,16 +234,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     currentPage++;
                     for (const case0 of pages[currentPage]) {
                         if (case0.deleted) {
-                            newEmbed.addField("case " + case0.case_id, "`[deleted]`");
+                            newEmbed.addField("case " + case0.caseId, "`[deleted]`");
                         } else {
                             newEmbed.addField(
-                                "case " + case0.case_id,
+                                "case " + case0.caseId,
                                 "`" +
                                     case0.type +
                                     "` - " +
                                     case0.command +
                                     "\nat " +
-                                    `<t:${Math.floor(case0.time / 1000)}:d>`
+                                    `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
                             );
                         }
                     }

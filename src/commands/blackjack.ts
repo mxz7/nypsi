@@ -35,7 +35,7 @@ cmd.slashData.addIntegerOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, false)
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`${prefix}blackjack <bet>`)] });
     }
 
-    if (bet > getBalance(message.member)) {
+    if (bet > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 25);
 
-    updateBalance(message.member, getBalance(message.member) - bet);
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const id = Math.random();
 
@@ -189,11 +189,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         voted: multi,
     });
 
-    setTimeout(() => {
+    setTimeout(async () => {
         if (games.has(message.author.id)) {
             if (games.get(message.author.id).id == id) {
                 games.delete(message.author.id);
-                updateBalance(message.member, getBalance(message.member) + bet);
+                await updateBalance(message.member, (await getBalance(message.member)) + bet);
             }
         }
     }, 180000);
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let row;
 
-    if (getBalance(message.member) >= bet) {
+    if ((await getBalance(message.member)) >= bet) {
         row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
             new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY"),
@@ -400,7 +400,7 @@ async function playGame(message, m) {
 
     const lose = async () => {
         gamble(message.author, "blackjack", bet, false, 0);
-        addGamble(message.member, "blackjack", false);
+        await addGamble(message.member, "blackjack", false);
         newEmbed.setColor("#e4334f");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
@@ -436,37 +436,37 @@ async function playGame(message, m) {
             );
         }
 
-        const earnedXp = calcEarnedXp(message.member, bet);
+        const earnedXp = await calcEarnedXp(message.member, bet);
 
         if (earnedXp > 0) {
-            updateXp(message.member, getXp(message.member) + earnedXp);
+            await updateXp(message.member, (await getXp(message.member)) + earnedXp);
             newEmbed.setFooter(`+${earnedXp}xp`);
 
-            const guild = getGuildByUser(message.member);
+            const guild = await getGuildByUser(message.member);
 
             if (guild) {
-                addToGuildXP(guild.guild_name, earnedXp, message.member);
+                await addToGuildXP(guild.guildName, earnedXp, message.member);
             }
         }
 
         gamble(message.author, "blackjack", bet, true, winnings);
-        addGamble(message.member, "blackjack", true);
+        await addGamble(message.member, "blackjack", true);
 
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
         newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        updateBalance(message.member, getBalance(message.member) + winnings);
+        await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
         return await edit({ embeds: [newEmbed], components: [] });
     };
 
     const draw = async () => {
         gamble(message.author, "blackjack", bet, true, bet);
-        addGamble(message.member, "blackjack", true);
+        await addGamble(message.member, "blackjack", true);
         newEmbed.setColor("#E5FF00");
         newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
         newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
         newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        updateBalance(message.member, getBalance(message.member) + bet);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
         games.delete(message.author.id);
         return await edit({ embeds: [newEmbed], components: [] });
     };
@@ -601,7 +601,7 @@ async function playGame(message, m) {
                 }
             }, 1500);
         } else if (reaction == "3️⃣") {
-            updateBalance(message.member, getBalance(message.member) - bet);
+            await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
             bet = bet * 2;
 

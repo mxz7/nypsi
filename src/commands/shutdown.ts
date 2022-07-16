@@ -2,7 +2,6 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { startRestart } from "../utils/commandhandler";
-import { vacuum } from "../utils/database/database";
 import { logger } from "../utils/logger";
 import { setCustomPresence } from "../utils/functions/presence";
 
@@ -42,7 +41,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setTimeout(() => {
             logger.info("vacuuming database...");
-            vacuum();
             logger.info("vacuum finished");
 
             logger.info("nypsi shutting down in 10 seconds...");

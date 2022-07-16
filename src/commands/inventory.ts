@@ -15,7 +15,7 @@ cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const inventory = getInventory(message.member);
+    const inventory = await getInventory(message.member);
     const items = getItems();
 
     const itemIDs = Array.from(Object.keys(inventory));

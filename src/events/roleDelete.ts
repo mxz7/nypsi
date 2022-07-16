@@ -1,10 +1,10 @@
 import { Role } from "discord.js";
 import { getMuteRole, profileExists, setMuteRole } from "../utils/moderation/utils";
 
-export default function roleDelete(role: Role) {
-    if (!profileExists(role.guild)) return;
+export default async function roleDelete(role: Role) {
+    if (!(await profileExists(role.guild))) return;
 
-    if (getMuteRole(role.guild) == role.id) {
-        setMuteRole(role.guild, "");
+    if ((await getMuteRole(role.guild)) == role.id) {
+        await setMuteRole(role.guild, "");
     }
 }

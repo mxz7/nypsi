@@ -32,7 +32,7 @@ const cmd = new Command("workers", "view the available workers and manage your o
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     const workers = getAllWorkers();
 
-    if (!(await userExists(message.member))) createUser(message.member);
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -42,16 +42,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 5);
 
+    const prefix = await getPrefix(message.guild);
+
     const listAllWorkers = () => {
         const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")
             .setHeader("workers", message.author.avatarURL())
-            .setFooter(`${getPrefix(message.guild)}workers help`);
+            .setFooter(`${prefix}workers help`);
 
         for (const w of Array.from(workers.keys())) {
             const Worker = workers.get(w);
             const worker = new Worker();
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**cost** $${worker.cost.toLocaleString()}\n**prestige** ${
                     worker.prestige
                 }\n**item worth** $${worker.perItem.toLocaleString()} / ${worker.itemName}\n**rate** ${worker
@@ -64,8 +66,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     };
 
-    const listPersonalWorkers = () => {
-        const personalWorkers = getWorkers(message.member);
+    const listPersonalWorkers = async () => {
+        const personalWorkers = await getWorkers(message.member);
 
         const embed = new CustomEmbed(
             message.member,
@@ -73,12 +75,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
             .setHeader("your workers", message.author.avatarURL())
-            .setFooter(`${getPrefix(message.guild)}workers help`);
+            .setFooter(`${prefix}workers help`);
 
         for (const w of Object.keys(personalWorkers)) {
-            const worker = Worker.fromJSON(personalWorkers[w]);
+            const worker = Worker.fromStorage(personalWorkers[w]);
             embed.addField(
-                `${worker.name} [${worker.id}]`,
+                `${worker.name}`,
                 `**inventory** ${worker.stored.toLocaleString()} ${
                     worker.itemName
                 } / ${worker.maxStorage.toLocaleString()} ($${(worker.stored * worker.perItem).toLocaleString()})\n` +
@@ -95,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     if (args.length == 0) {
-        if (Object.keys(getWorkers(message.member)).length == 0) {
+        if (Object.keys(await getWorkers(message.member)).length == 0) {
             return listAllWorkers();
         } else {
             return listPersonalWorkers();
@@ -104,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers buy <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers buy <worker name>`)],
                 });
             }
 
@@ -137,27 +139,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
-            if (worker.prestige > getPrestige(message.member)) {
+            if (worker.prestige > (await getPrestige(message.member))) {
                 return message.channel.send({
                     embeds: [
                         new ErrorEmbed(
                             `you need to be prestige **${
                                 worker.prestige
-                            }** to buy this worker, you are prestige **${getPrestige(message.member)}**`
+                            }** to buy this worker, you are prestige **${await getPrestige(message.member)}**`
                         ),
                     ],
                 });
             }
 
-            if (getBalance(message.member) < worker.cost) {
+            if ((await getBalance(message.member)) < worker.cost) {
                 return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this worker")] });
             }
 
-            const personalWorkers = getWorkers(message.member);
+            const personalWorkers = await getWorkers(message.member);
 
             for (const w of Object.keys(personalWorkers)) {
                 const worker1 = personalWorkers[w];
@@ -167,21 +169,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }
             }
 
-            updateBalance(message.member, getBalance(message.member) - worker.cost);
+            await updateBalance(message.member, (await getBalance(message.member)) - worker.cost);
 
-            addWorker(message.member, worker.id);
+            await addWorker(message.member, worker.id);
 
             return message.channel.send({
                 embeds: [new CustomEmbed(message.member, false, `✅ you have bought a **${worker.name}**`)],
             });
         } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
-            const personalWorkers = getWorkers(message.member);
+            const personalWorkers = await getWorkers(message.member);
 
             let amountEarned = 0;
             let earnedBreakdown = "";
 
             for (const w of Object.keys(personalWorkers)) {
-                const worker = personalWorkers[w];
+                const worker = Worker.fromStorage(personalWorkers[w]);
 
                 amountEarned += Math.floor(worker.perItem * worker.stored);
                 earnedBreakdown += `\n${worker.name} +$${Math.floor(
@@ -195,8 +197,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            emptyWorkersStored(message.member);
-            updateBalance(message.member, getBalance(message.member) + amountEarned);
+            await emptyWorkersStored(message.member);
+            await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
             const embed = new CustomEmbed(
                 message.member,
@@ -208,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed(`${getPrefix(message.guild)}workers upgrade <id or name>`)],
+                    embeds: [new ErrorEmbed(`${prefix}workers upgrade <name>`)],
                 });
             }
 
@@ -241,23 +243,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!worker) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("invalid worker, please use the worker ID or worker name")],
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
-            worker = getWorkers(message.member)[worker.id];
+            const memberWorkers = await getWorkers(message.member);
+
+            worker = memberWorkers[worker.id];
 
             if (!worker) {
                 return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] });
             }
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             if (worker.level >= 5) {
                 return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] });
             }
 
-            if (getBalance(message.member) < worker.getUpgradeCost()) {
+            if ((await getBalance(message.member)) < worker.getUpgradeCost()) {
                 return message.channel.send({
                     embeds: [
                         new ErrorEmbed(
@@ -269,17 +273,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            updateBalance(message.member, getBalance(message.member) - worker.getUpgradeCost());
+            await updateBalance(message.member, (await getBalance(message.member)) - worker.getUpgradeCost());
 
-            upgradeWorker(message.member, worker.id);
+            await upgradeWorker(message.member, worker.id);
 
             const embed = new CustomEmbed(message.member, true);
 
             embed.setHeader("workers", message.author.avatarURL());
 
-            worker = getWorkers(message.member)[worker.id];
+            worker = (await getWorkers(message.member))[worker.id];
 
-            worker = Worker.fromJSON(worker);
+            worker = Worker.fromStorage(worker);
 
             embed.setDescription(
                 `your ${worker.name} has been upgraded to level ${worker.level}\n\n` +
@@ -298,21 +302,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             args[0].toLowerCase() == "patreon" ||
             args[0].toLowerCase() == "premium"
         ) {
-            if (!isPremium(message.author.id)) {
+            if (!(await isPremium(message.author.id))) {
                 return message.channel.send({
-                    embeds: [
-                        new ErrorEmbed("you must have a premium membership for this").setFooter(
-                            `${getPrefix(message.guild)}patreon`
-                        ),
-                    ],
+                    embeds: [new ErrorEmbed("you must have a premium membership for this").setFooter(`${prefix}patreon`)],
                 });
             }
 
             let msg = "";
 
-            const personalWorkers = getWorkers(message.member);
+            const personalWorkers = await getWorkers(message.member);
 
-            if (getTier(message.author.id) >= 2) {
+            if ((await getTier(message.author.id)) >= 2) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];
@@ -323,14 +323,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                 }
                 if (!has) {
-                    addWorker(message.member, 1);
+                    await addWorker(message.member, 1);
                     let name: any = workers.get(1);
                     name = new name().name;
                     msg += "+ " + name + "\n";
                 }
             }
 
-            if (getTier(message.author.id) >= 3) {
+            if ((await getTier(message.author.id)) >= 3) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];
@@ -341,14 +341,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                 }
                 if (!has) {
-                    addWorker(message.member, 3);
+                    await addWorker(message.member, 3);
                     let name: any = workers.get(3);
                     name = new name().name;
                     msg += "+ " + name + "\n";
                 }
             }
 
-            if (getTier(message.author.id) >= 4) {
+            if ((await getTier(message.author.id)) >= 4) {
                 let has = false;
                 for (const w of Object.keys(personalWorkers)) {
                     const worker1 = personalWorkers[w];
@@ -359,7 +359,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                 }
                 if (!has) {
-                    addWorker(message.member, 6);
+                    await addWorker(message.member, 6);
                     let name: any = workers.get(6);
                     name = new name().name;
                     msg += "+ " + name + "\n";
@@ -375,10 +375,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const embed = new CustomEmbed(message.member, false).setHeader("workers", message.author.avatarURL());
 
             embed.setDescription(
-                `${getPrefix(message.guild)}**workers list** *list all available workers*\n` +
-                    `${getPrefix(message.guild)}**workers buy** *buy a worker*\n` +
-                    `${getPrefix(message.guild)}**workers claim** *claim money from your workers*\n` +
-                    `${getPrefix(message.guild)}**workers upgrade** *upgrade a worker*`
+                `${prefix}**workers list** *list all available workers*\n` +
+                    `${prefix}**workers buy** *buy a worker*\n` +
+                    `${prefix}**workers claim** *claim money from your workers*\n` +
+                    `${prefix}**workers upgrade** *upgrade a worker*`
             );
 
             return message.channel.send({ embeds: [embed] });

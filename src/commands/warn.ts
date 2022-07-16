@@ -20,9 +20,9 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
-    if (!profileExists(message.guild)) createProfile(message.guild);
+    if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const prefix = getPrefix(message.guild);
+    const prefix = await getPrefix(message.guild);
 
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -172,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason);
+    await newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason);
 }
 
 cmd.setRun(run);
