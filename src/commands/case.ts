@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     if (args.length == 0) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("case help")
             .addField("usage", `${prefix}case <caseID>`)
             .addField(
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         reason = "no reason specified";
     }
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setHeader("case " + case0.caseId)
         .addField("type", "`" + case0.type + "`", true)
         .addField("moderator", case0.moderator, true)
@@ -123,7 +123,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const newEmbed = new CustomEmbed(
             message.member,
-            false,
             "✅ case `" + case0.caseId + "` successfully deleted by " + message.member.toString()
         );
 

@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "tails",
     ];
 
-    const embed = new CustomEmbed(message.member, false);
+    const embed = new CustomEmbed(message.member);
 
     if (args.length == 0) {
         const answer = headTails[Math.floor(Math.random() * headTails.length)];

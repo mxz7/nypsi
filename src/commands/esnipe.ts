@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const created = new Date(eSnipe.get(channel.id).createdTimestamp);
 
-    const embed = new CustomEmbed(message.member, false, content)
+    const embed = new CustomEmbed(message.member, content)
         .setHeader(eSnipe.get(channel.id).member, eSnipe.get(channel.id).memberAvatar)
         .setFooter(timeSince(created) + " ago");
 

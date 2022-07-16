@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new MessageButton().setCustomId("x").setLabel("show server avatar").setStyle("PRIMARY")
     );
 
-    const embed = new CustomEmbed(member, false).setHeader(member.user.tag).setImage(avatar);
+    const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);
 
     let msg;
 

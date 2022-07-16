@@ -40,7 +40,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(
             message.member,
-            false,
             "create a color palette from the roles in the server, uses https://color.tekoh.net"
         );
 
@@ -121,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     url += `&?${color}`;
 
-    const embed = new CustomEmbed(message.member, true).setTitle("palette").setURL(url);
+    const embed = new CustomEmbed(message.member).setTitle("palette").setURL(url);
 
     if (url.length < 500) {
         embed.setDescription(url);

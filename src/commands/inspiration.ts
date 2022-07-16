@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("error fetching image")] });
     }
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, false).setImage(res)] });
+    return message.channel.send({ embeds: [new CustomEmbed(message.member).setImage(res)] });
 }
 
 cmd.setRun(run);

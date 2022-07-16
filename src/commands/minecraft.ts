@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const names = nameHistory.toPages(7, "`$username` | `$date`");
 
-    const embed = new CustomEmbed(message.member, false, names.get(1).join("\n"))
+    const embed = new CustomEmbed(message.member, names.get(1).join("\n"))
         .setTitle(username)
         .setURL("https://namemc.com/profile/" + username)
         .setThumbnail(skin);

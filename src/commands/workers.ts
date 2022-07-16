@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     const listAllWorkers = () => {
-        const embed = new CustomEmbed(message.member, false, "workers create items over time, which you can sell for money")
+        const embed = new CustomEmbed(message.member, "workers create items over time, which you can sell for money")
             .setHeader("workers", message.author.avatarURL())
             .setFooter(`${prefix}workers help`);
 
@@ -71,7 +71,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(
             message.member,
-            false,
             `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
             .setHeader("your workers", message.author.avatarURL())
@@ -174,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await addWorker(message.member, worker.id);
 
             return message.channel.send({
-                embeds: [new CustomEmbed(message.member, false, `✅ you have bought a **${worker.name}**`)],
+                embeds: [new CustomEmbed(message.member, `✅ you have bought a **${worker.name}**`)],
             });
         } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
             const personalWorkers = await getWorkers(message.member);
@@ -202,7 +201,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                false,
                 `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`
             ).setHeader("workers", message.author.avatarURL());
 
@@ -277,7 +275,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await upgradeWorker(message.member, worker.id);
 
-            const embed = new CustomEmbed(message.member, true);
+            const embed = new CustomEmbed(message.member);
 
             embed.setHeader("workers", message.author.avatarURL());
 
@@ -370,9 +368,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 msg = "you weren't able to claim any free workers";
             }
 
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, false, msg)] });
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, msg)] });
         } else {
-            const embed = new CustomEmbed(message.member, false).setHeader("workers", message.author.avatarURL());
+            const embed = new CustomEmbed(message.member).setHeader("workers", message.author.avatarURL());
 
             embed.setDescription(
                 `${prefix}**workers list** *list all available workers*\n` +

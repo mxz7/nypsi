@@ -72,7 +72,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `${prefix}use <item>\n\nuse items to open crates or to simply use the item's function`
                 ).setHeader("use", message.author.avatarURL()),
             ],

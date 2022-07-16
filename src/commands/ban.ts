@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0 || !args[0]) {
-        const embed = new CustomEmbed(message.member, false)
+        const embed = new CustomEmbed(message.member)
             .setHeader("ban help")
             .addField("usage", `${prefix}ban <@user(s)> (reason) [-s] [-k]`)
             .addField(

@@ -63,11 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         response = res.answer.toLowerCase();
     }
 
-    const embed = new CustomEmbed(
-        message.member,
-        false,
-        `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`
-    );
+    const embed = new CustomEmbed(message.member, `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`);
 
     message.channel.send({ embeds: [embed] });
 }

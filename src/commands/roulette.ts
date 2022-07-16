@@ -101,7 +101,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     "🔴 " +
                         (values.length - 1) / 2 +
                         "/" +
@@ -253,7 +252,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        true,
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
     ).setHeader("roulette", message.author.avatarURL());
 

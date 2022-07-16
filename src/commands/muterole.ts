@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, text).setHeader("mute role")],
+            embeds: [new CustomEmbed(message.member, text).setHeader("mute role")],
         });
     };
 
@@ -89,7 +89,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    false,
                     `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
                 ),
             ],
@@ -98,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setMuteRole(message.guild, "default");
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ muterole has been reset")],
+            embeds: [new CustomEmbed(message.member, "✅ muterole has been reset")],
         });
     } else if (args[0].toLowerCase() == "update") {
         let channelError = false;
@@ -155,14 +154,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, false, "✅ permissions were updated")],
+            embeds: [new CustomEmbed(message.member, "✅ permissions were updated")],
         });
     } else if (args[0].toLowerCase() == "timeout") {
         await setMuteRole(message.guild, "timeout");
 
         const embed = new CustomEmbed(
             message.member,
-            false,
             `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
         );
 

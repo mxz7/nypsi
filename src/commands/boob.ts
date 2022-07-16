@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }, 60 * 1000);
     }
 
-    const embed = new CustomEmbed(message.member, false)
+    const embed = new CustomEmbed(message.member)
         .setHeader("boob calculator", member.user.avatarURL())
         .setDescription(member.user.toString() + `\n${sizeMsg}\n${sizeEmoji}`);
 

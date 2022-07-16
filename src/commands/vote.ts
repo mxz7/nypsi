@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (crateAmount > 5) crateAmount = 5;
 
-    const embed = new CustomEmbed(message.member, true, "https://top.gg/bot/678711738845102087/vote")
+    const embed = new CustomEmbed(message.member, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
         .setFooter("you get increased rewards for prestiging");
 

@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (itemIDs.length == 0) {
         return send({
             embeds: [
-                new CustomEmbed(message.member, false, "your inventory is empty").setHeader(
+                new CustomEmbed(message.member, "your inventory is empty").setHeader(
                     "your inventory",
                     message.author.avatarURL()
                 ),

@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         count++;
     }
 
-    const embed = new CustomEmbed(message.member, false, choices)
+    const embed = new CustomEmbed(message.member, choices)
         .setHeader("poll by " + message.member.user.username)
         .setFooter("use $ezpoll to make a quick poll")
         .setDescription(choices);
