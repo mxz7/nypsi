@@ -1,4 +1,5 @@
 mkdir out
+mkdir temp
 cd out
 mkdir data
 cd data
