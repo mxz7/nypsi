@@ -308,7 +308,7 @@ export class SpaceX extends Worker {
         super({
             maxStorage: maxStorage,
             perItem: perItem,
-            perInterval: 3,
+            perInterval: 7,
             cost: 1500000,
             prestige: 7,
             name: "spacex",
