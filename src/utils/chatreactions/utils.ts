@@ -55,7 +55,7 @@ setInterval(async () => {
                 continue;
             }
 
-            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 15 }).catch(() => {});
+            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 50 }).catch(() => {});
             let stop = false;
 
             if (!messages) continue;
