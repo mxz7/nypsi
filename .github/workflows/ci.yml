@@ -55,9 +55,10 @@ jobs:
               uses: appleboy/ssh-action@master
               with:
                   host: ${{ secrets.HOST }}
-                  USERNAME: ${{ secrets.USERNAME }}
-                  PORT: 22
-                  KEY: ${{ secrets.KEY }}
+                  username: ${{ secrets.USERNAME }}
+                  port: 22
+                  password: ${{ secrets.PASS }}
+                  key: ${{ secrets.KEY }}
                   script: |
                       cd ~/nypsi
                       git pull
