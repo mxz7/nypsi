@@ -23,7 +23,7 @@ import { formatDate, MStoTime } from "./functions/date";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
-import { createProfile, hasProfile } from "./users/utils";
+import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
@@ -423,7 +423,11 @@ export async function runCommand(
         return helpCmd(message, args);
     }
 
-    if (!(await hasProfile(message.member))) await createProfile(message.member.user);
+    if (!(await hasProfile(message.member))) {
+        await createProfile(message.member.user);
+    } else {
+        updateLastKnowntag(message.author.id, message.author.tag);
+    }
 
     let alias = false;
     if (!commandExists(cmd) && message instanceof Message) {
