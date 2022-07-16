@@ -335,7 +335,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
-            await setExpireDate(message.member, dayjs().add(15, "days").toDate());
+            setTimeout(async () => {
+                await setExpireDate(message.member, dayjs().add(15, "days").toDate());
+            }, 1000);
         }
 
         if (amount.has(message.author.id)) {
