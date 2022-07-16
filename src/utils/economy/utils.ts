@@ -44,11 +44,6 @@ app.listen(5000);
 
 setInterval(async () => {
     const query = await prisma.economy.findMany({
-        where: {
-            NOT: {
-                workers: {},
-            },
-        },
         select: {
             userId: true,
             workers: true,
@@ -58,14 +53,18 @@ setInterval(async () => {
     for (const user of query) {
         const workers = user.workers;
 
-        for (const w of Object.keys(workers)) {
-            const worker: any = workers[w];
+        if (JSON.stringify(workers) == "{}") continue;
 
-            if (worker.stored < worker.maxStorage) {
-                if (worker.stored + worker.perInterval > worker.maxStorage) {
-                    worker.stored = worker.maxStorage;
+        for (const w of Object.keys(workers)) {
+            const worker = workers[w];
+
+            const workerData = Worker.fromStorage(worker);
+
+            if (worker.stored < workerData.maxStorage) {
+                if (worker.stored + workerData.perInterval > workerData.maxStorage) {
+                    worker.stored = workerData.maxStorage;
                 } else {
-                    worker.stored += worker.perInterval;
+                    worker.stored += workerData.perInterval;
                 }
             }
         }
