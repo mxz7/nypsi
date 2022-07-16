@@ -447,10 +447,10 @@ export async function getBalance(member: GuildMember | string) {
         },
     });
 
-    await redis.set(`cache:economy:balance:${id}`, query.money);
+    await redis.set(`cache:economy:balance:${id}`, Number(query.money));
     await redis.expire(`cache:economy:balance:${id}`, 30);
 
-    return query.money;
+    return Number(query.money);
 }
 
 /**
