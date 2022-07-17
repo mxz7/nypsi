@@ -10,10 +10,12 @@ import {
     renewUser,
     expireUser,
     getUserCommand,
+    setExpireDate,
 } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon", "donate"]);
 
@@ -87,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (await isPremium(user.id)) {
             const embed = new CustomEmbed(message.member);
 
-            embed.setHeader("premium status", message.author.avatarURL());
+            embed.setHeader(`premium status of ${user.id}`);
 
             const profile = await getPremiumProfile(user.id);
 
@@ -130,6 +132,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
+        const expire = (await getPremiumProfile(args[2])).expireDate;
+        let date: dayjs.Dayjs;
+
         switch (args[1].toLowerCase()) {
             case "level":
                 await setTier(args[2], parseInt(args[3]));
@@ -145,6 +150,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await setStatus(args[2], parseInt(args[3]));
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, `✅ status changed to ${args[3]}`)],
+                });
+            case "adddays":
+                date = dayjs(expire);
+
+                date = date.add(parseInt(args[3]), "days");
+
+                await setExpireDate(args[2], date.toDate());
+                return message.channel.send({
+                    embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
+                });
+            case "remdays":
+                date = dayjs(expire);
+
+                date = date.subtract(parseInt(args[3]), "days");
+
+                await setExpireDate(args[2], date.toDate());
+                return message.channel.send({
+                    embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
                 });
         }
     } else if (args[0].toLowerCase() == "add") {
