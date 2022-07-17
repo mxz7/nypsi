@@ -6,13 +6,13 @@ import { Command, NypsiCommandInteraction } from "./models/Command";
 import { getTimestamp, logger } from "./logger";
 import {
     ActionRowBuilder,
-    BaseGuildTextChannel,
     ButtonBuilder,
     ButtonStyle,
     Client,
     CommandInteraction,
     GuildMember,
     Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
@@ -293,13 +293,16 @@ async function helpCmd(message: Message, args: Array<string>) {
      */
     let msg: Message;
 
-    let row = new ActionRowBuilder().addComponents(
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
     if (pageSystemNeeded) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] });
+        msg = await message.channel.send({
+            embeds: [embed],
+            components: [row],
+        });
     } else {
         return await message.channel.send({ embeds: [embed] });
     }
@@ -332,7 +335,7 @@ async function helpCmd(message: Message, args: Array<string>) {
                 embed.setDescription(pages.get(currentPage).join("\n"));
                 embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == 1) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -345,7 +348,7 @@ async function helpCmd(message: Message, args: Array<string>) {
                             .setDisabled(false)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -369,7 +372,7 @@ async function helpCmd(message: Message, args: Array<string>) {
                 embed.setDescription(pages.get(currentPage).join("\n"));
                 embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == lastPage) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -378,7 +381,7 @@ async function helpCmd(message: Message, args: Array<string>) {
                         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
