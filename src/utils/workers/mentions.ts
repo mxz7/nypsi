@@ -77,6 +77,7 @@ if (!isMainThread) {
             clearInterval(interval);
             db.close();
             parentPort.postMessage(0);
+            process.exit(0);
         }
     }, 50);
 }
