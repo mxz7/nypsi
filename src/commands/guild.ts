@@ -1,3 +1,4 @@
+import { EconomyGuild, EconomyGuildMember, User } from "@prisma/client";
 import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -115,7 +116,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const showGuild = async (guild) => {
+    const showGuild = async (
+        guild: EconomyGuild & {
+            owner: User;
+            members: (EconomyGuildMember & {
+                user: {
+                    lastKnownTag: string;
+                };
+            })[];
+        }
+    ) => {
         await addCooldown(cmd.name, message.member, 5);
         const embed = new CustomEmbed(message.member);
 
@@ -131,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "info",
                 `**level** ${guild.level}\n` +
                     `**created on** ${formatDate(guild.createdAt)}\n` +
-                    `**owner** ${guild.members[0].user.lastKnownTag}`,
+                    `**owner** ${guild.owner.lastKnownTag}`,
                 true
             );
             if (guild.level != 5) {
