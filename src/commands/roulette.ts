@@ -250,6 +250,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
 
+    winnings += bet;
+
     const embed = new CustomEmbed(
         message.member,
         "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
