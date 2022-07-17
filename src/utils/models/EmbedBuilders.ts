@@ -1,11 +1,11 @@
-import { ColorResolvable, GuildMember, MessageEmbed } from "discord.js";
+import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
 import redis from "../database/redis";
 import { getColor } from "../functions/color";
 import { getEmbedColor } from "../premium/utils";
 
 const embedColorCache: Map<string, string> = new Map();
 
-export class CustomEmbed extends MessageEmbed {
+export class CustomEmbed extends EmbedBuilder {
     /**
      * @returns {CustomEmbed}
      * @param {GuildMember} member
@@ -40,7 +40,10 @@ export class CustomEmbed extends MessageEmbed {
 
         const chance = Math.floor(Math.random() * 20);
 
-        if (chance == 7) super.setFooter("nypsi.xyz");
+        if (chance == 7)
+            super.setFooter({
+                text: "nypsi.xyz",
+            });
 
         return this;
     }
@@ -64,12 +67,12 @@ export class CustomEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title: string, text: string, inline?: boolean) {
+    addField(title: string, text: string, inline = false) {
         if (text.length > 1000) {
             text = text.substr(0, 1000);
         }
 
-        super.addField(title, text, inline);
+        super.data.fields.push({ name: title, value: text, inline: inline });
 
         return this;
     }
@@ -149,7 +152,7 @@ export class CustomEmbed extends MessageEmbed {
     }
 }
 
-export class ErrorEmbed extends MessageEmbed {
+export class ErrorEmbed extends EmbedBuilder {
     /**
      * @returns {ErrorEmbed}
      * @param {String} text
@@ -164,7 +167,7 @@ export class ErrorEmbed extends MessageEmbed {
     }
 
     removeTitle() {
-        delete this.title;
+        delete this.data.title;
 
         return this;
     }
@@ -188,12 +191,12 @@ export class ErrorEmbed extends MessageEmbed {
      * @param {String} text
      * @param {Boolean} inline
      */
-    addField(title: string, text: string, inline?: boolean) {
+    addField(title: string, text: string, inline = false) {
         if (text.length > 1000) {
-            text = text.substring(0, 1000);
+            text = text.substr(0, 1000);
         }
 
-        super.addField(title, text, inline);
+        super.data.fields.push({ name: title, value: text, inline: inline });
 
         return this;
     }
