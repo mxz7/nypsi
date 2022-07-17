@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         embed.setImage(wholesome.image);
-        embed.setFooter(`submitted on ${formatDate(wholesome.uploadDate)}`);
+        embed.setFooter({ text: `submitted on ${formatDate(wholesome.uploadDate)}` });
     } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
         if (message.guild.id != "747056029795221513") return;
 
@@ -274,7 +274,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         for (const image of queue) {
-            if (embed.fields.length >= 6) break;
+            if (embed.data.fields.length >= 6) break;
 
             embed.addField(
                 image.id.toString(),
@@ -289,7 +289,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (pages.size != 0) {
-            embed.setFooter(`page 1/${pages.size}`);
+            embed.setFooter({ text: `page 1/${pages.size}` });
         }
 
         const msg = await send({ embeds: [embed] });
@@ -333,7 +333,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         );
                     }
 
-                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                    newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                     await msg.edit({ embeds: [newEmbed] });
                     return pageManager();
                 }
@@ -350,7 +350,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         );
                     }
 
-                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                    newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                     await msg.edit({ embeds: [newEmbed] });
                     return pageManager();
                 }
@@ -383,7 +383,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const chance = Math.floor(Math.random() * 25);
 
-    if (chance == 7) embed.setFooter(`submit your own image with ${prefix}wholesome suggest (:`);
+    if (chance == 7) embed.setFooter({ text: `submit your own image with ${prefix}wholesome suggest (:` });
 
     if (target) {
         if (message instanceof Message) {
