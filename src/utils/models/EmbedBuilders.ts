@@ -72,7 +72,11 @@ export class CustomEmbed extends EmbedBuilder {
             text = text.substr(0, 1000);
         }
 
-        super.data.fields.push({ name: title, value: text, inline: inline });
+        if (super.data?.fields) {
+            super.data.fields.push({ name: title, value: text, inline: inline });
+        } else {
+            super.addFields([{ name: title, value: text, inline: inline }]);
+        }
 
         return this;
     }
@@ -196,7 +200,11 @@ export class ErrorEmbed extends EmbedBuilder {
             text = text.substr(0, 1000);
         }
 
-        super.data.fields.push({ name: title, value: text, inline: inline });
+        if (super.data?.fields) {
+            super.data.fields.push({ name: title, value: text, inline: inline });
+        } else {
+            super.addFields([{ name: title, value: text, inline: inline }]);
+        }
 
         return this;
     }
