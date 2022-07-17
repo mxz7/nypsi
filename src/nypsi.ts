@@ -1,7 +1,6 @@
 const startUp = Date.now();
 
 import "dotenv/config";
-import * as Discord from "discord.js";
 import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler";
 import guildCreate from "./events/guildCreate";
 import ready from "./events/ready";
@@ -24,12 +23,13 @@ import { runModerationChecks } from "./utils/moderation/utils";
 import { WebhookPayload } from "@top-gg/sdk";
 import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
+import { Client, EmbedBuilder, GatewayIntentBits, Guild, Options } from "discord.js";
 
-const client = new Discord.Client({
+const client = new Client({
     allowedMentions: {
         parse: ["users", "roles"],
     },
-    makeCache: Discord.Options.cacheWithLimits({
+    makeCache: Options.cacheWithLimits({
         MessageManager: 100,
     }),
     sweepers: {
@@ -46,18 +46,19 @@ const client = new Discord.Client({
             },
         ],
     },
-    restTimeOffset: 0,
+    rest: {
+        offset: 0,
+    },
     shards: "auto",
     intents: [
-        Discord.Intents.FLAGS.DIRECT_MESSAGES,
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_BANS,
-        Discord.Intents.FLAGS.GUILD_MEMBERS,
-        Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-        Discord.Intents.FLAGS.GUILD_WEBHOOKS,
-        Discord.Intents.FLAGS.GUILD_INVITES,
-        Discord.Intents.FLAGS.GUILD_MESSAGES,
-        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildBans,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildEmojisAndStickers,
+        GatewayIntentBits.GuildWebhooks,
+        GatewayIntentBits.GuildInvites,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
     ],
 });
 
@@ -145,12 +146,7 @@ export async function onVote(vote: WebhookPayload) {
  * @param {String} id
  * @param {Boolean} dontDmTekoh
  */
-export async function requestDM(
-    id: string,
-    content: string,
-    dontDmTekoh: boolean,
-    embed?: Discord.MessageEmbed
-): Promise<boolean> {
+export async function requestDM(id: string, content: string, dontDmTekoh: boolean, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
 
@@ -241,11 +237,7 @@ export async function requestRemoveRole(id: string, roleID: string) {
     return await user.roles.remove(role);
 }
 
-/**
- * @param {String} guildID
- * @returns {Discord.Guild}
- */
-export async function getGuild(guildID: string): Promise<Discord.Guild | void> {
+export async function getGuild(guildID: string): Promise<Guild | void> {
     let a = true;
 
     const guild = await client.guilds.fetch(guildID).catch(() => {
@@ -265,7 +257,6 @@ setTimeout(() => {
             activities: [
                 {
                     name: "loading..",
-                    type: "PLAYING",
                 },
             ],
         });
