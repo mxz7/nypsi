@@ -22,7 +22,7 @@ setInterval(async () => {
     });
 
     for (const user of query) {
-        expireUser(user.userId);
+        await expireUser(user.userId);
     }
 }, 600000);
 
@@ -362,11 +362,15 @@ export async function expireUser(member: string) {
         },
     });
 
-    await prisma.premiumCommand.delete({
-        where: {
-            owner: member,
-        },
-    });
+    await prisma.premiumCommand
+        .delete({
+            where: {
+                owner: member,
+            },
+        })
+        .catch(() => {
+            // doesnt need to find one
+        });
 
     await redis.del(`cache:premium:level:${member}`);
 
@@ -519,7 +523,7 @@ export async function setExpireDate(member: GuildMember | string, date: Date) {
 
 export function createPremUser(query: any) {
     return PremUser.fromData({
-        id: query.id,
+        id: query.userId,
         level: query.level,
         embedColor: query.embedColor,
         lastDaily: query.lastDaily,
