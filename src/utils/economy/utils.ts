@@ -2074,6 +2074,7 @@ export async function getGuildByName(name: string) {
                 },
             },
             include: {
+                owner: true,
                 members: {
                     include: {
                         user: {
@@ -2112,6 +2113,7 @@ export async function getGuildByUser(member: GuildMember | string) {
             select: {
                 guild: {
                     include: {
+                        owner: true,
                         members: {
                             include: {
                                 user: {
