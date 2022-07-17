@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import ms = require("ms");
 import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -23,7 +23,7 @@ interface Game {
     message: Message;
     guesses: string[];
     board: string[][];
-    embed: MessageEmbed | CustomEmbed;
+    embed: CustomEmbed;
     start: number;
 }
 
@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(
             `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n**${prefix}wordle play**`
         );
-        embed.setFooter("type 'stop' to cancel the game when you're playing");
+        embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
         return await send({ embeds: [embed] });
     }
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (stats.history.length > 2) {
             const average = stats.history.reduce((a, b) => Number(a) + Number(b)) / stats.history.length;
 
-            embed.setFooter(`average length of winning game: ${MStoTime(average)}`);
+            embed.setFooter({ text: `average length of winning game: ${MStoTime(average)}` });
         }
 
         return send({ embeds: [embed] });
@@ -126,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
     embed.setDescription(renderBoard(board));
-    embed.setFooter("type your guess in chat");
+    embed.setFooter({ text: "type your guess in chat" });
 
     const msg = await send({ embeds: [embed] });
 
@@ -145,10 +145,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
 async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const m = games.get(message.author.id).message;
-    if (m.deleted) {
-        games.delete(message.author.id);
-        return;
-    }
     const edit = async (data) => {
         if (!(message instanceof Message)) {
             await message.editReply(data).catch(() => {
@@ -226,10 +222,10 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
         const res = guessWord(response, message.author.id);
 
         embed.setDescription(renderBoard(games.get(message.author.id).board));
-        embed.setFooter("'stop' to end the game");
+        embed.setFooter({ text: "'stop' to end the game" });
 
         if (games.get(message.author.id).notInWord.length > 0) {
-            embed.fields[0] = {
+            embed.data.fields[0] = {
                 name: "letters not in wordle",
                 value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
                 inline: false,
@@ -293,7 +289,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = games.get(message.author.id).embed;
     embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations");
     embed.setColor("#5efb8f");
-    embed.setFooter(`completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}`);
+    embed.setFooter({ text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}` });
 
     edit({ embeds: [embed] });
     games.delete(message.author.id);
