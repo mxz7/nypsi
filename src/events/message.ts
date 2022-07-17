@@ -86,7 +86,12 @@ export default async function messageCreate(message: Message) {
     }
 
     setTimeout(async () => {
-        if (message.channel.type == "DM") return;
+        try {
+            if (message.channel.type == "DM") return;
+        } catch {
+            // eslint
+        }
+
         if (
             message.guild.memberCount < 150000 &&
             ((await userExists(message.guild.ownerId)) ||
@@ -187,7 +192,7 @@ export default async function messageCreate(message: Message) {
                 }
             }
         }
-    }, 1500);
+    }, 1000);
 }
 
 let currentInterval = 150;
