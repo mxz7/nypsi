@@ -25,7 +25,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
         queue.push(newUser);
 
         if (!interval) {
-            interval = setInterval(doQueue, 60000);
+            interval = setInterval(doQueue, 10000);
         }
     }
 }
