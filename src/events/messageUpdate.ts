@@ -1,4 +1,4 @@
-import { Message, Permissions } from "discord.js";
+import { Message, PermissionFlagsBits } from "discord.js";
 import { eSnipe } from "../nypsi";
 import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils";
 import { PunishmentType } from "../utils/models/GuildStorage";
@@ -9,7 +9,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
 
     if (!message.member) return;
 
-    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
         const filter = await getChatFilter(message.guild);
 
         let content: string | string[] = newMessage.content.toLowerCase().normalize("NFD");
