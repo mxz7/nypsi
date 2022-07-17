@@ -873,7 +873,7 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
             embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)`);
         }
 
-        if (channel.type != "GUILD_TEXT") return;
+        if (channel.type != ChannelType.GuildText) return;
 
         await channel.send({ embeds: [embed] });
         logger.log({
@@ -898,7 +898,7 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
             return logger.error("unable to find channel for hourly command use log", serverID, channelID);
         }
 
-        if (channel.type != "GUILD_TEXT") return;
+        if (channel.type != ChannelType.GuildText) return;
 
         for (const user of commandUses.keys()) {
             const uses = commandUses.get(user);
@@ -988,7 +988,7 @@ async function failedCaptcha(member: GuildMember, client: Client) {
         captchaFails.set(member.user.id, 1);
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (channel.type != ChannelType.GuildText) return;
 
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
@@ -1025,7 +1025,7 @@ async function passedCaptcha(member: GuildMember, client: Client) {
         captchaPasses.set(member.user.id, 1);
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (channel.type != ChannelType.GuildText) return;
 
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(

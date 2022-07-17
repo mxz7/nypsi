@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (channel.type != ChannelType.GuildText) return;
 
     await addCooldown(cmd.name, message.member, 3);
 
