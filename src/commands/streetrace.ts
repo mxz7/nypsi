@@ -35,17 +35,19 @@ cmd.slashData
                 option
                     .setName("car")
                     .setDescription("what car would you like to use")
-                    .addChoice("🚗 fiat", "fiat")
-                    .addChoice("🚗 ford fiesta", "ford_fiesta")
-                    .addChoice("🚗 mitsubishi lancer evo x", "lancer_evox")
-                    .addChoice("🚗 lightning mcqueen", "lightning_mcqueen")
-                    .addChoice("🏎️ nissan skyline gtr r34", "skyline_r34")
-                    .addChoice("🚗 smart car", "smart_car")
-                    .addChoice("🚗 subuwu", "subaru_wrx")
-                    .addChoice("🚗 tesla model x", "tesla_modelx")
-                    .addChoice("🏎️ toyota supra mk4", "toyota_supra")
-                    .addChoice("🚗 corsa 2003", "vauxhall_corsa")
-                    .addChoice("🚲 bicycle", "bike")
+                    .setChoices(
+                        { name: "🚗 fiat", value: "fiat" },
+                        { name: "🚗 ford fiesta", value: "ford_fiesta" },
+                        { name: "🚗 mitsubishi lancer evo x", value: "lancer_evox" },
+                        { name: "🚗 lightning mcqueen", value: "lightning_mcqueen" },
+                        { name: "🏎️ nissan skyline gtr r34", value: "skyline_r34" },
+                        { name: "🚗 smart car", value: "smart_car" },
+                        { name: "🚗 subuwu", value: "subaru_wrx" },
+                        { name: "🚗 tesla model x", value: "tesla_modelx" },
+                        { name: "🏎️ toyota supra mk4", value: "toyota_supra" },
+                        { name: "🚗 corsa 2003", value: "vauxhall_corsa" },
+                        { name: "🚲 bicycle", value: "bike" }
+                    )
             )
     );
 
@@ -167,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.author.avatarURL()
         );
 
-        embed.setFooter(`use ${prefix}sr join to join`);
+        embed.setFooter({ text: `use ${prefix}sr join to join` });
 
         embed.setDescription(
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
@@ -185,7 +187,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (races.get(message.channel.id).id != id) return;
             if (races.get(message.channel.id).users.size < 2) {
                 embed.setDescription("race cancelled ):");
-                embed.setFooter("race cancelled");
+                embed.setFooter({ text: "race cancelled" });
                 msg.edit({ embeds: [embed] }).catch(() => {});
 
                 for (let user of races.get(message.channel.id).users.keys()) {
@@ -478,7 +480,7 @@ async function startRace(id) {
         }
     }
 
-    const embed = race.embed;
+    const embed: CustomEmbed = race.embed;
 
     let description = "";
 
@@ -489,7 +491,7 @@ async function startRace(id) {
     }
 
     embed.setDescription(description);
-    embed.setFooter("race has started");
+    embed.setFooter({ text: "race has started" });
 
     await race.message.edit({ embeds: [embed] }).catch(() => {});
 
@@ -506,7 +508,7 @@ async function startRace(id) {
             }\n` + `+$${winnings.toLocaleString()}`;
 
         embed.setDescription(description);
-        embed.setFooter("race has ended");
+        embed.setFooter({ text: "race has ended" });
 
         return setTimeout(async () => {
             await race.message.edit({ embeds: [embed] }).catch(() => {});
