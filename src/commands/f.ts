@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -35,8 +35,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setStyle("PRIMARY").setLabel("F").setCustomId("boobies")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId("boobies")
     );
 
     await message.channel.send({ embeds: [embed], components: [row] });

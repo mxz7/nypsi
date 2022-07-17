@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageAttachment, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, MessageAttachment, ButtonBuilder } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -47,8 +47,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription("you can request and view all of your data stored by nypsi (excluding moderation data)");
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("y").setLabel("request data").setStyle("SUCCESS")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle("SUCCESS")
     );
 
     cooldown.add(message.author.id);

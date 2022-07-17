@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -42,8 +42,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         serverAvatar = undefined;
     }
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("x").setLabel("show server avatar").setStyle("PRIMARY")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("x").setLabel("show server avatar").setStyle(ButtonStyle.Primary)
     );
 
     const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);

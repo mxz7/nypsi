@@ -4,7 +4,7 @@ import { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma }
 import { inPlaceSort } from "fast-sort";
 import { isPremium, getTier, setExpireDate } from "../utils/premium/utils";
 import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -110,8 +110,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
         }
 
-        let row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+        let row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
         );
 
@@ -169,8 +169,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             ).toLocaleString()} karma ${displayItemsLeft()}`
                         );
                         if (currentPage == 0) {
-                            row = new MessageActionRow().addComponents(
-                                new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                            row = new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setCustomId("⬅")
+                                    .setLabel("back")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(true),
                                 new ButtonBuilder()
                                     .setCustomId("➡")
                                     .setLabel("next")
@@ -178,8 +182,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     .setDisabled(false)
                             );
                         } else {
-                            row = new MessageActionRow().addComponents(
-                                new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            row = new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setCustomId("⬅")
+                                    .setLabel("back")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false),
                                 new ButtonBuilder()
                                     .setCustomId("➡")
                                     .setLabel("next")
@@ -211,8 +219,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             ).toLocaleString()} karma ${displayItemsLeft()}`
                         );
                         if (currentPage + 1 == lastPage) {
-                            row = new MessageActionRow().addComponents(
-                                new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            row = new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setCustomId("⬅")
+                                    .setLabel("back")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false),
                                 new ButtonBuilder()
                                     .setCustomId("➡")
                                     .setLabel("next")
@@ -220,8 +232,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                     .setDisabled(true)
                             );
                         } else {
-                            row = new MessageActionRow().addComponents(
-                                new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                            row = new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setCustomId("⬅")
+                                    .setLabel("back")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false),
                                 new ButtonBuilder()
                                     .setCustomId("➡")
                                     .setLabel("next")

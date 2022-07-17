@@ -8,7 +8,7 @@ import {
     isEcoBanned,
     addGamble,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
@@ -129,9 +129,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("y").setLabel("accept").setStyle("SUCCESS"),
-        new MessageButton().setCustomId("n").setLabel("deny").setStyle("DANGER")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle("SUCCESS"),
+        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle("DANGER")
     );
 
     const requestEmbed = new CustomEmbed(

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -102,10 +102,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter(`page 1/${pages.size}`);
     }
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+    let row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-        new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+        new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
     );
 
     /**
@@ -163,24 +163,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == 1) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(true),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         );
                     }
                     await edit({ embeds: [newEmbed], components: [row] });
@@ -199,24 +207,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                     newEmbed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == lastPage) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(true),
-                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new MessageButton().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
                         );
                     }
                     await edit({ embeds: [newEmbed], components: [row] });

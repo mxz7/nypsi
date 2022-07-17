@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -88,8 +88,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
     }
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+    let row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -147,8 +147,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`);
                     if (currentPage == 0) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(true),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -156,8 +160,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(false)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -189,8 +197,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                     newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`);
                     if (currentPage + 1 == lastPage) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -198,8 +210,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(true)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import {
     userExists,
     createUser,
@@ -233,9 +233,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         newNextCard(message.member);
     }
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("1️⃣").setLabel("in").setStyle("PRIMARY"),
-        new MessageButton().setCustomId("2️⃣").setLabel("out").setStyle("PRIMARY")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("1️⃣").setLabel("in").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("2️⃣").setLabel("out").setStyle(ButtonStyle.Primary)
     );
 
     const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())

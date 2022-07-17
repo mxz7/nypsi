@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import {
     userExists,
     createUser,
@@ -200,10 +200,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     newCard(message.member);
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
-        new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
-        new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
     );
 
     const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
@@ -431,17 +431,17 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             });
 
-            let row = new MessageActionRow().addComponents(
-                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
-                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
-                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            let row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
             );
 
             if (win >= 1) {
-                row = new MessageActionRow().addComponents(
-                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
-                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
-                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
                 );
             }
 
@@ -484,17 +484,17 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             });
 
-            let row = new MessageActionRow().addComponents(
-                new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
-                new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
-                new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+            let row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
             );
 
             if (win >= 1) {
-                row = new MessageActionRow().addComponents(
-                    new MessageButton().setCustomId("⬆").setLabel("higher").setStyle("PRIMARY"),
-                    new MessageButton().setCustomId("⬇").setLabel("lower").setStyle("PRIMARY"),
-                    new MessageButton().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
                 );
             }
 

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -72,8 +72,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
      */
     let msg;
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+    let row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -119,8 +119,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setDescription(names.get(currentPage).join("\n"));
                     embed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == 1) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(true),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -128,8 +132,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(false)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -148,8 +156,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setDescription(names.get(currentPage).join("\n"));
                     embed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == lastPage) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")
@@ -157,8 +169,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(true)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                        row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
                             new ButtonBuilder()
                                 .setCustomId("➡")
                                 .setLabel("next")

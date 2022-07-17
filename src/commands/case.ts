@@ -1,4 +1,4 @@
-import { Message, Permissions, MessageActionRow, MessageButton, CommandInteraction } from "discord.js";
+import { Message, Permissions, ActionRowBuilder, ButtonBuilder, CommandInteraction } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -85,8 +85,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("punished user: " + target.toString());
     }
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("❌").setLabel("delete").setStyle("DANGER")
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle("DANGER")
     );
 
     let msg;

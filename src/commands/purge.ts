@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount < 60) amount++;
 
-    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
         if (amount > 100) {
             amount = 100;
         }

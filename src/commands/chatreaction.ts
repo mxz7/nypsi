@@ -1,8 +1,8 @@
 import {
     Message,
     Permissions,
-    MessageActionRow,
-    MessageButton,
+    ActionRowBuilder,
+    ButtonBuilder,
     CommandInteraction,
     TextChannel,
     GuildMember,
@@ -771,8 +771,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setFooter(`page 1/${pages.size}`);
 
                 if (pages.size > 1) {
-                    let row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                    let row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true),
                         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
                     );
                     const msg = await send({ embeds: [embed], components: [row] });
@@ -813,29 +817,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == 1) {
-                                    row = new MessageActionRow().addComponents(
-                                        new MessageButton()
+                                    row = new ActionRowBuilder().addComponents(
+                                        new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(true),
-                                        new MessageButton()
+                                        new ButtonBuilder()
                                             .setCustomId("➡")
                                             .setLabel("next")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false)
                                     );
                                 } else {
-                                    row = new MessageActionRow().addComponents(
-                                        new MessageButton()
+                                    row = new ActionRowBuilder().addComponents(
+                                        new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false),
-                                        new MessageButton()
+                                        new ButtonBuilder()
                                             .setCustomId("➡")
                                             .setLabel("next")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false)
                                     );
                                 }
@@ -852,29 +856,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == lastPage) {
-                                    row = new MessageActionRow().addComponents(
-                                        new MessageButton()
+                                    row = new ActionRowBuilder().addComponents(
+                                        new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false),
-                                        new MessageButton()
+                                        new ButtonBuilder()
                                             .setCustomId("➡")
                                             .setLabel("next")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(true)
                                     );
                                 } else {
-                                    row = new MessageActionRow().addComponents(
-                                        new MessageButton()
+                                    row = new ActionRowBuilder().addComponents(
+                                        new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false),
-                                        new MessageButton()
+                                        new ButtonBuilder()
                                             .setCustomId("➡")
                                             .setLabel("next")
-                                            .setStyle("PRIMARY")
+                                            .setStyle(ButtonStyle.Primary)
                                             .setDisabled(false)
                                     );
                                 }

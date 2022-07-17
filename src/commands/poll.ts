@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(description);
     }
 
-    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
         embed.setHeader(message.member.user.tag);
     }
 
