@@ -86,12 +86,6 @@ export default async function messageCreate(message: Message) {
     }
 
     setTimeout(async () => {
-        try {
-            if (message.channel.type == "DM") return;
-        } catch {
-            // eslint
-        }
-
         if (
             message.guild.memberCount < 150000 &&
             ((await userExists(message.guild.ownerId)) ||
@@ -105,6 +99,7 @@ export default async function messageCreate(message: Message) {
                     addCooldown(message.guild, 3600);
                 }
 
+                // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
                 let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members;
 
                 if (members instanceof ThreadMemberManager) {
@@ -115,6 +110,7 @@ export default async function messageCreate(message: Message) {
                     type: "collection",
                     members: members.clone(),
                     message: message,
+                    // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
                     channelMembers: message.channel.members,
                     guildId: message.guild.id,
                     url: message.url,
@@ -131,6 +127,7 @@ export default async function messageCreate(message: Message) {
                     }
 
                     let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+                        // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
                         message.channel.members;
 
                     if (members instanceof ThreadMemberManager) {
@@ -180,6 +177,7 @@ export default async function messageCreate(message: Message) {
                             type: "collection",
                             members: message.mentions.members.clone(),
                             message: message,
+                            // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
                             channelMembers: message.channel.members,
                             guildId: message.guild.id,
                             url: message.url,
