@@ -18,6 +18,7 @@ import ms = require("ms");
 import redis from "../database/redis";
 import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
+import _ = require("lodash");
 
 declare function require(name: string);
 
@@ -53,7 +54,7 @@ setInterval(async () => {
     for (const user of query) {
         const workers = user.workers;
 
-        if (JSON.stringify(workers) == "{}") continue;
+        if (_.isEmpty(workers)) continue;
 
         for (const w of Object.keys(workers)) {
             const worker = workers[w];
@@ -78,7 +79,8 @@ setInterval(async () => {
             },
         });
     }
-}, 5 * 60 * 1000);
+    // }, 5 * 60 * 1000);
+}, 5000);
 
 let items: { [key: string]: Item };
 
