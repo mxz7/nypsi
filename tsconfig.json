@@ -6,6 +6,7 @@
         "module": "commonjs",
         "allowJs": true,
         "strictFunctionTypes": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "noImplicitAny": true
     },
 }
