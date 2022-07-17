@@ -1,7 +1,7 @@
 import { table, getBorderCharacters } from "table";
 import * as fs from "fs";
 import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v9";
+import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import { Command, NypsiCommandInteraction } from "./models/Command";
 import { getTimestamp, logger } from "./logger";
 import {
@@ -330,10 +330,14 @@ async function helpCmd(message: Message, args: Array<string>) {
             } else {
                 currentPage--;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == 1) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
+                    row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true),
                         new ButtonBuilder()
                             .setCustomId("➡")
                             .setLabel("next")
@@ -341,8 +345,12 @@ async function helpCmd(message: Message, args: Array<string>) {
                             .setDisabled(false)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                    row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
                         new ButtonBuilder()
                             .setCustomId("➡")
                             .setLabel("next")
@@ -359,15 +367,23 @@ async function helpCmd(message: Message, args: Array<string>) {
             } else {
                 currentPage++;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == lastPage) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                    row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
                         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
+                    row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
                         new ButtonBuilder()
                             .setCustomId("➡")
                             .setLabel("next")
@@ -397,9 +413,10 @@ export async function runCommand(
 ) {
     if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+    if (message.channel.isDMBased()) return;
 
-    if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
         return message.member
             .send(
                 "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
@@ -407,7 +424,7 @@ export async function runCommand(
             .catch(() => {});
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
         return message.channel.send({
             content:
                 "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
@@ -415,7 +432,7 @@ export async function runCommand(
         });
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages)) {
         return message.channel.send(
             "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
                 "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
@@ -423,7 +440,7 @@ export async function runCommand(
         );
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.AddReactions)) {
         return message.channel.send({
             content:
                 "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
@@ -489,9 +506,9 @@ export async function runCommand(
             addUse(customCommand.owner);
             logCommand(message, ["", "", ""]);
 
-            const embed = new CustomEmbed(message.member, content).setFooter(
-                `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
-            );
+            const embed = new CustomEmbed(message.member, content).setFooter({
+                text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+            });
 
             return message.channel.send({ embeds: [embed] });
         } else {
@@ -879,11 +896,11 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
         embed.setColor("#111111");
 
         if (client.uptime < 86400 * 1000) {
-            embed.setFooter("data is from less than 24 hours");
+            embed.setFooter({ text: "data is from less than 24 hours" });
         } else {
             const noLifer = sortedNoLifers.keys().next().value;
 
-            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)`);
+            embed.setFooter({ text: `${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)` });
         }
 
         if (!channel.isTextBased()) return;
