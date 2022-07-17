@@ -18,9 +18,9 @@ export default async function channelCreate(channel: GuildChannel) {
 
     channel.permissionOverwrites
         .edit(muteRole, {
-            SEND_MESSAGES: false,
-            SPEAK: false,
-            ADD_REACTIONS: false,
+            SendMessages: false,
+            Speak: false,
+            AddReactions: false,
         })
         .catch(() => {});
 }
