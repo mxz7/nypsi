@@ -1,4 +1,12 @@
-import { Collection, CommandInteraction, CommandInteractionOption, GuildMember, Interaction } from "discord.js";
+import {
+    ApplicationCommandOptionType,
+    Collection,
+    CommandInteraction,
+    CommandInteractionOption,
+    GuildMember,
+    Interaction,
+    InteractionType,
+} from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -8,7 +16,7 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
  * @param {Interaction} interaction
  */
 export default async function interactionCreate(interaction: Interaction) {
-    if (!interaction.isCommand()) return;
+    if (interaction.type != InteractionType.ApplicationCommand) return;
 
     if (!interaction.guild) {
         const embed = new CustomEmbed()
@@ -31,7 +39,7 @@ export default async function interactionCreate(interaction: Interaction) {
      */
     const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
-            case "USER":
+            case ApplicationCommandOptionType.User:
                 const user = arg.user;
                 args.push(`<@${user.id}>`);
                 const guildMember = await interaction.guild.members.fetch(user.id);
@@ -44,25 +52,25 @@ export default async function interactionCreate(interaction: Interaction) {
                     };
                 }
                 break;
-            case "STRING":
+            case ApplicationCommandOptionType.String:
                 for (const str of arg.value.toString().split(" ")) {
                     args.push(str);
                 }
                 break;
-            case "INTEGER":
+            case ApplicationCommandOptionType.Integer:
                 args.push(arg.value.toString());
                 break;
-            case "CHANNEL":
+            case ApplicationCommandOptionType.Channel:
                 // @ts-expect-error will always error bc typescript doesnt know type has been validated
                 args.push(arg.value);
                 break;
-            case "SUB_COMMAND_GROUP":
+            case ApplicationCommandOptionType.SubcommandGroup:
                 args.push(arg.name);
                 for (const arg1 of arg.options) {
                     await parseArgument(arg1);
                 }
                 break;
-            case "SUB_COMMAND":
+            case ApplicationCommandOptionType.Subcommand:
                 args.push(arg.name);
                 for (const arg1 of arg.options) {
                     await parseArgument(arg1);
