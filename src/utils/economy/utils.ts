@@ -465,6 +465,8 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
         id = member;
     }
 
+    if (!id) return;
+
     if (await redis.exists(`cache:economy:exists:${id}`)) {
         return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false;
     }
