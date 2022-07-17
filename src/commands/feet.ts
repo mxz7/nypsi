@@ -19,11 +19,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
 
-    if (message.channel instanceof ThreadChannel) {
+    if (message.channel.isDMBased()) return;
+
+    if (message.channel.isThread())
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
-    }
 
     if (!message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });

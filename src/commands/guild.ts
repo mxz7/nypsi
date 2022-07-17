@@ -276,7 +276,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader("guild invitation");
         embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
-        const row = new ActionRowBuilder().addComponents(
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle("SUCCESS")
         );
 

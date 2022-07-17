@@ -200,7 +200,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     newCard(message.member);
 
-    const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
@@ -431,14 +431,14 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             });
 
-            let row = new ActionRowBuilder().addComponents(
+            let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
             );
 
             if (win >= 1) {
-                row = new ActionRowBuilder().addComponents(
+                row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
@@ -484,14 +484,14 @@ async function playGame(message, m) {
                 voted: games.get(message.member.user.id).voted,
             });
 
-            let row = new ActionRowBuilder().addComponents(
+            let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
             );
 
             if (win >= 1) {
-                row = new ActionRowBuilder().addComponents(
+                row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)

@@ -17,7 +17,7 @@ cmd.slashData.addIntegerOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         return;
     }
 

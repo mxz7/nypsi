@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);
 
-    const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId("boobies")
     );
 

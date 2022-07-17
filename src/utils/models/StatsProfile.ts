@@ -1,3 +1,5 @@
+type StatsData = { economyUserId: string; type: string; win: number; lose: number; gamble: boolean };
+
 export class StatsProfile {
     public gamble: any;
     public items: any;
@@ -6,7 +8,7 @@ export class StatsProfile {
      *
      * @param {Array<{id: string, type: string, win: number, lose: number, gamble: number}>} data
      */
-    constructor(data: Array<{ economyUserId: string; type: string; win: number; lose: number; gamble: boolean }>) {
+    constructor(data: StatsData[]) {
         this.gamble = {};
         this.items = {};
         this.rob = {
@@ -21,7 +23,7 @@ export class StatsProfile {
         return this;
     }
 
-    setData(data) {
+    setData(data: StatsData[]) {
         for (const d of data) {
             if (d.gamble) {
                 this.gamble[d.type] = {

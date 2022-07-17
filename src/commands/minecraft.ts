@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
      */
     let msg;
 
-    let row = new ActionRowBuilder().addComponents(
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setDescription(names.get(currentPage).join("\n"));
                     embed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == 1) {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -132,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(false)
                         );
                     } else {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -156,7 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setDescription(names.get(currentPage).join("\n"));
                     embed.setFooter("page " + currentPage + "/" + lastPage);
                     if (currentPage == lastPage) {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -169,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(true)
                         );
                     } else {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")

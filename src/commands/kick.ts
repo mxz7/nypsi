@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!message.member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return send({ embeds: [new ErrorEmbed("you need the `kick members` permission")] });
         }
         return;

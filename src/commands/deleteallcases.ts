@@ -12,10 +12,10 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", Catego
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
     if (
-        message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
+        message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
         message.guild.ownerId != message.member.user.id
     ) {
         const embed = new ErrorEmbed("to delete all cases you must be the server owner");

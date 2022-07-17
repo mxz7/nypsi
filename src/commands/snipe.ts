@@ -4,7 +4,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"]);
 
-declare function require(name: string);
+declare function require(name: string): any;
 
 /**
  * @param {Message} message
@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, content)
         .setHeader(snipe.get(channel.id).member, snipe.get(channel.id).memberAvatar)
-        .setFooter(timeSince(created) + " ago");
+        .setFooter({ text: timeSince(created) + " ago" });
 
     message.channel.send({ embeds: [embed] });
 }

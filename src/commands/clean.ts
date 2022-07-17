@@ -12,7 +12,7 @@ const cmd = new Command("clean", "clean up bot commands and responses", Categori
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

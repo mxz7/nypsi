@@ -16,7 +16,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
         return;

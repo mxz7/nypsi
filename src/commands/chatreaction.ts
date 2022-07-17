@@ -239,10 +239,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     if (args.length == 0) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return showStats();
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return showStats();
         return helpCmd();
     } else if (args[0].toLowerCase() == "start") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
         if (!(message.channel instanceof TextChannel)) {
             return send({ embeds: [new ErrorEmbed("this is an invalid channel")] });
         }
@@ -255,7 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     } else if (args[0].toLowerCase() == "stats") {
         if (args.length == 2 && args[1].toLowerCase() == "reset") {
-            if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+            if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
                 if (message.author.id != message.guild.ownerId) {
                     return send({
                         embeds: [new ErrorEmbed("you need the to be the server owner for this command")],
@@ -272,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
         return showLeaderboard();
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
@@ -383,7 +383,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
     } else if (args[0].toLowerCase() == "settings") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
@@ -638,7 +638,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
         if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
@@ -771,7 +771,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setFooter(`page 1/${pages.size}`);
 
                 if (pages.size > 1) {
-                    let row = new ActionRowBuilder().addComponents(
+                    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -817,7 +817,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == 1) {
-                                    row = new ActionRowBuilder().addComponents(
+                                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                         new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
@@ -830,7 +830,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setDisabled(false)
                                     );
                                 } else {
-                                    row = new ActionRowBuilder().addComponents(
+                                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                         new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
@@ -856,7 +856,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 embed.setFooter("page " + currentPage + "/" + lastPage);
 
                                 if (currentPage == lastPage) {
-                                    row = new ActionRowBuilder().addComponents(
+                                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                         new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")
@@ -869,7 +869,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                             .setDisabled(true)
                                     );
                                 } else {
-                                    row = new ActionRowBuilder().addComponents(
+                                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                         new ButtonBuilder()
                                             .setCustomId("⬅")
                                             .setLabel("back")

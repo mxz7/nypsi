@@ -129,7 +129,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
-    const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle("SUCCESS"),
         new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle("DANGER")
     );

@@ -20,7 +20,7 @@ cmd.slashData.addIntegerOption((option) =>
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
             return;
         }
@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("punished user: " + target.toString());
     }
 
-    const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle("DANGER")
     );
 

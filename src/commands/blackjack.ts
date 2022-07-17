@@ -210,13 +210,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let row;
 
     if ((await getBalance(message.member)) >= bet) {
-        row = new ActionRowBuilder().addComponents(
+        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle("SECONDARY")
         );
     } else {
-        row = new ActionRowBuilder().addComponents(
+        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
         );

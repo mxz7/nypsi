@@ -15,7 +15,7 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] });
         }
         return;

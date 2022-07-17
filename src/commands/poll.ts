@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (
-            !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
+            !message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
             !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) &&
             num > 2
         ) {
