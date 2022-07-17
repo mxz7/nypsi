@@ -225,11 +225,15 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
         embed.setFooter({ text: "'stop' to end the game" });
 
         if (games.get(message.author.id).notInWord.length > 0) {
-            embed.data.fields[0] = {
-                name: "letters not in wordle",
-                value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
-                inline: false,
-            };
+            if (embed.data?.fields) {
+                embed.data.fields[0] = {
+                    name: "letters not in wordle",
+                    value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
+                    inline: false,
+                };
+            } else {
+                embed.addField("letters not in wordle", `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`);
+            }
         }
 
         await edit({ embeds: [embed] });
