@@ -1,5 +1,13 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { Collection, CommandInteraction, GuildMember, Message, Role, TextBasedChannel, User } from "discord.js";
+import {
+    Collection,
+    CommandInteraction,
+    GuildMember,
+    Message,
+    Role,
+    SlashCommandBuilder,
+    TextBasedChannel,
+    User,
+} from "discord.js";
 
 export class Command {
     public name: string;
