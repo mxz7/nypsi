@@ -18,7 +18,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
     if (oldUser.displayAvatarURL({ dynamic: true, size: 256 }) != newUser.displayAvatarURL({ dynamic: true, size: 256 })) {
         if (!(await userExists(newUser.id))) return;
-        if (!(await isPremium(newUser.id)) && (await getPrestige(newUser.id)) < 2) return;
+        if (!(await isPremium(newUser.id)) && (await getPrestige(newUser.id)) < 1) return;
 
         if (!(await isTracking(newUser.id))) return;
 
