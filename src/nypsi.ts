@@ -73,7 +73,7 @@ client.once("ready", ready.bind(null, client, startUp));
 if (!process.env.GITHUB_ACTION) {
     client.on("guildCreate", guildCreate.bind(null, client));
     client.on("guildDelete", guildDelete.bind(null, client));
-    client.on("rateLimit", (rate) => {
+    client.rest.on("rateLimited", (rate) => {
         const a = rate.route.split("/");
         const reason = a[a.length - 1];
         logger.warn("rate limit: " + reason);
