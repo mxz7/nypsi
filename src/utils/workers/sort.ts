@@ -24,4 +24,5 @@ if (!isMainThread) {
     inPlaceSort(arr).asc((i) => sortData.get(i));
 
     parentPort.postMessage(arr);
+    process.exit(0);
 }
