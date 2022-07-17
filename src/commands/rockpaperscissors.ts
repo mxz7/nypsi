@@ -182,6 +182,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
 
+    winnings += bet;
+
     const embed = new CustomEmbed(
         message.member,
         "*rock..paper..scissors..* **shoot!!**\n\n**choice** " +
