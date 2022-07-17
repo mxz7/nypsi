@@ -51,6 +51,8 @@ const client = new Client({
     },
     shards: "auto",
     intents: [
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.MessageContent,
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildBans,
         GatewayIntentBits.GuildMembers,
