@@ -773,7 +773,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (pages.size > 1) {
                     let row = new MessageActionRow().addComponents(
                         new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+                        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
                     );
                     const msg = await send({ embeds: [embed], components: [row] });
 

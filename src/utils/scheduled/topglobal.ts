@@ -1,4 +1,4 @@
-import { ChannelType, Client } from "discord.js";
+import { Client } from "discord.js";
 import { topAmountGlobal } from "../economy/utils";
 import { MStoTime } from "../functions/date";
 import { logger } from "../logger";
@@ -28,7 +28,7 @@ export async function showTopGlobalBal(client: Client) {
             return logger.error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP");
         }
 
-        if (channel.type != ChannelType.GuildText) return;
+        if (!channel.isTextBased()) return;
 
         const baltop = await topAmountGlobal(10, client, true);
 

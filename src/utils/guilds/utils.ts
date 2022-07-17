@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ChannelType, Client, Collection, Guild, GuildMember } from "discord.js";
+import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
 import ms = require("ms");
 import prisma from "../database/database";
 import redis from "../database/redis";
@@ -562,7 +562,7 @@ export async function checkChristmasCountdown(guild: Guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
     }
 
-    if (channel.type != ChannelType.GuildText) return;
+    if (!channel.isTextBased()) return;
 
     return await channel
         .send({

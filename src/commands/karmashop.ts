@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
         );
 
         /**
@@ -171,12 +171,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         if (currentPage == 0) {
                             row = new MessageActionRow().addComponents(
                                 new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-                                new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                                new ButtonBuilder()
+                                    .setCustomId("➡")
+                                    .setLabel("next")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false)
                             );
                         } else {
                             row = new MessageActionRow().addComponents(
                                 new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                                new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                                new ButtonBuilder()
+                                    .setCustomId("➡")
+                                    .setLabel("next")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false)
                             );
                         }
                         await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -205,12 +213,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         if (currentPage + 1 == lastPage) {
                             row = new MessageActionRow().addComponents(
                                 new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                                new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                                new ButtonBuilder()
+                                    .setCustomId("➡")
+                                    .setLabel("next")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(true)
                             );
                         } else {
                             row = new MessageActionRow().addComponents(
                                 new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                                new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                                new ButtonBuilder()
+                                    .setCustomId("➡")
+                                    .setLabel("next")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setDisabled(false)
                             );
                         }
                         await msg.edit({ embeds: [newEmbed], components: [row] });
