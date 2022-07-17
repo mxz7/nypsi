@@ -79,8 +79,7 @@ setInterval(async () => {
             },
         });
     }
-    // }, 5 * 60 * 1000);
-}, 5000);
+}, 5 * 60 * 1000);
 
 let items: { [key: string]: Item };
 
