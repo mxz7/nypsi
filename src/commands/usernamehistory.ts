@@ -1,4 +1,12 @@
-import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    MessageActionRowComponentBuilder,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
@@ -96,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: `page 1/${pages.size}` });
     }
 
-    let row = new ActionRowBuilder().addComponents(
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -152,7 +160,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == 1) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -165,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setDisabled(false)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -197,7 +205,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == lastPage) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -206,7 +214,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
