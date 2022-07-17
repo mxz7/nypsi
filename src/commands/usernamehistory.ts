@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member)
         .setTitle(member.user.tag)
-        .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }));
+        .setThumbnail(member.user.displayAvatarURL({ size: 256 }));
 
     let description = "";
 
@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(description);
 
     if (pages.size > 1) {
-        embed.setFooter(`page 1/${pages.size}`);
+        embed.setFooter({ text: `page 1/${pages.size}` });
     }
 
     let row = new ActionRowBuilder().addComponents(
@@ -134,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const newEmbed = new CustomEmbed(message.member)
             .setTitle(member.user.tag)
-            .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }));
+            .setThumbnail(member.user.displayAvatarURL({ size: 256 }));
 
         if (reaction == "⬅") {
             if (currentPage <= 1) {
@@ -150,7 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setDescription(description);
 
-                newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == 1) {
                     row = new ActionRowBuilder().addComponents(
                         new ButtonBuilder()
@@ -195,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setDescription(description);
 
-                newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == lastPage) {
                     row = new ActionRowBuilder().addComponents(
                         new ButtonBuilder()
