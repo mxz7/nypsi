@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { logger } from "../logger";
 
 declare function require(name: string);
@@ -161,7 +162,11 @@ export class PremUser {
     }
 
     renew() {
-        this.expireDate = new Date(new Date().setDate(new Date().getDate() + 35));
+        if (Math.abs(dayjs().diff(dayjs(this.expireDate), "days")) < 10) {
+            this.expireDate = dayjs().add(35, "days").toDate();
+        } else {
+            this.expireDate = dayjs(this.expireDate).add(35, "days").toDate();
+        }
     }
 
     /**
