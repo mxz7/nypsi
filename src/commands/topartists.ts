@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import fetch from "node-fetch";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -104,10 +111,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     embed.setDescription(pages.get(1).join("\n"));
-    embed.setFooter(`${total.toLocaleString()} total artists | page 1/${pages.size}`);
+    embed.setFooter({ text: `${total.toLocaleString()} total artists | page 1/${pages.size}` });
     // embed.setThumbnail(artists[0].image[1]["#text"])
 
-    let row = new ActionRowBuilder().addComponents(
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -142,9 +149,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage--;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`${total.toLocaleString()} total artists | page ${currentPage}/${pages.size}`);
+                embed.setFooter({ text: `${total.toLocaleString()} total artists | page ${currentPage}/${pages.size}` });
                 if (currentPage == 1) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -157,7 +164,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setDisabled(false)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -179,9 +186,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage++;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`${total.toLocaleString()} total artists | page ${currentPage}/${pages.size}`);
+                embed.setFooter({ text: `${total.toLocaleString()} total artists | page ${currentPage}/${pages.size}` });
                 if (currentPage == lastPage) {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -190,7 +197,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new ActionRowBuilder().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
