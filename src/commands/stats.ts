@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getStats } from "../utils/economy/utils";
@@ -82,16 +89,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     }
                 }
             }
-            embed.setFooter(`page 1/${pages.size}`);
+            embed.setFooter({ text: `page 1/${pages.size}` });
         }
 
         for (const item in stats) {
-            if (embed.fields.length >= 6) break;
+            if (embed.data.fields.length >= 6) break;
 
             embed.addField(item, `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`, true);
         }
 
-        let row = new ActionRowBuilder().addComponents(
+        let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
         );
@@ -143,9 +150,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         );
                     }
 
-                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                    newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                     if (currentPage == 1) {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -158,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(false)
                         );
                     } else {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -188,9 +195,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         );
                     }
 
-                    newEmbed.setFooter(`page ${currentPage}/${lastPage}`);
+                    newEmbed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                     if (currentPage == lastPage) {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
@@ -203,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setDisabled(true)
                         );
                     } else {
-                        row = new ActionRowBuilder().addComponents(
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId("⬅")
                                 .setLabel("back")
