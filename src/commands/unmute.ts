@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, Permissions } from "discord.js";
+import { CommandInteraction, GuildMember, Message, PermissionFlagsBits } from "discord.js";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -19,8 +19,8 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("u
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -38,8 +38,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) ||
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles) ||
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
