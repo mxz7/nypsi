@@ -311,7 +311,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
     let fail = false;
 
     logger.info(`uploading ${url}`);
-    const boobies: any = await imgur
+    const boobies = await imgur
         .upload({
             image: url,
         })
@@ -331,7 +331,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
         fallback = true;
     }
 
-    if (fallback) {
+    if (fallback || !boobies) {
         logger.info("using fallback uploader..");
 
         const res = await fallbackUpload(url);
