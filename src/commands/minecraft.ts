@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -64,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setThumbnail(skin);
 
     if (names.size >= 2) {
-        embed.setFooter(`page 1/${names.size}`);
+        embed.setFooter({ text: `page 1/${names.size}` });
     }
 
     /**
@@ -117,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 } else {
                     currentPage--;
                     embed.setDescription(names.get(currentPage).join("\n"));
-                    embed.setFooter("page " + currentPage + "/" + lastPage);
+                    embed.setFooter({ text: "page " + currentPage + "/" + lastPage });
                     if (currentPage == 1) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
@@ -154,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 } else {
                     currentPage++;
                     embed.setDescription(names.get(currentPage).join("\n"));
-                    embed.setFooter("page " + currentPage + "/" + lastPage);
+                    embed.setFooter({ text: "page " + currentPage + "/" + lastPage });
                     if (currentPage == lastPage) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
