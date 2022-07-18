@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import fetch from "node-fetch";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -124,9 +125,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentPage = 1;
     const lastPage = pages.size;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    async function pageManager() {
+    async function pageManager(): Promise<void> {
         const reaction = await msg
             .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
