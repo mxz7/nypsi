@@ -14,5 +14,6 @@ export interface RedditJSONPost {
         permalink: string;
         author: string;
         subreddit_name_prefixed: string;
+        over_18: boolean;
     };
 }
