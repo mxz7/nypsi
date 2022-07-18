@@ -1,4 +1,12 @@
-import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { fetchAvatarHistory, addNewAvatar, clearAvatarHistory, isTracking } from "../utils/users/utils";
@@ -46,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let history = await fetchAvatarHistory(member);
 
     if (history.length == 0) {
-        const url = await uploadImageToImgur(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }));
+        const url = await uploadImageToImgur(member.user.displayAvatarURL({ size: 256 }));
         if (url) {
             await addNewAvatar(member, url);
             history = await fetchAvatarHistory(member);
@@ -66,10 +74,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member)
         .setHeader(`${member.user.tag} [${index + 1}]`)
         .setImage(history[index].value)
-        .setFooter(formatDate(history[index].date));
+        .setFooter({ text: formatDate(history[index].date) });
 
     if (history.length > 1) {
-        embed.setFooter(`${formatDate(history[index].date)} | ${index + 1}/${history.length}`);
+        embed.setFooter({ text: `${formatDate(history[index].date)} | ${index + 1}/${history.length}` });
     }
 
     if (!(await isTracking(member))) {
@@ -124,7 +132,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setHeader(`${member.user.tag} [${currentPage}]`);
                 newEmbed.setImage(history[currentPage - 1].value);
-                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`);
+                newEmbed.setFooter({
+                    text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
+                });
                 if (currentPage == 1) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
@@ -163,7 +173,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setHeader(`${member.user.tag} [${currentPage}]`);
                 newEmbed.setImage(history[currentPage - 1].value);
-                newEmbed.setFooter(`${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`);
+                newEmbed.setFooter({
+                    text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
+                });
                 if (currentPage == lastPage) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
