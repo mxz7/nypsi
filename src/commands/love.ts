@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -13,12 +13,12 @@ cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this person your one true love?!"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
             } else {
-                await message.reply(data);
+                await message.reply(data as InteractionReplyOptions);
             }
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
@@ -46,7 +46,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
         target1 = message.member;
 
-        const members = [];
+        const members: string[] = [];
         const members1 = message.guild.members.cache;
 
         members1.forEach((m) => {
