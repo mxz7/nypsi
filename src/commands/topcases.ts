@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { profileExists, getAllCases } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
@@ -16,8 +16,8 @@ const cmd = new Command("topcases", "see who has the top moderation cases", Cate
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -121,11 +121,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("top members", memberText.join("\n"), true);
 
         if (deletedCaseCount) {
-            embed.setFooter(
-                `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`
-            );
+            embed.setFooter({
+                text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`,
+            });
         } else {
-            embed.setFooter(`${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`);
+            embed.setFooter({ text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases` });
         }
     } else {
         let member;

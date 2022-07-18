@@ -24,9 +24,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await disableTracking(message.author.id);
         return message.channel.send({
             embeds: [
-                new CustomEmbed(message.member, "✅ username and avatar tracking has been disabled").setFooter(
-                    `use ${await getPrefix(message.guild)}(un/avh) -clear to clear your history`
-                ),
+                new CustomEmbed(message.member, "✅ username and avatar tracking has been disabled").setFooter({
+                    text: `use ${await getPrefix(message.guild)}(un/avh) -clear to clear your history`,
+                }),
             ],
         });
     } else {

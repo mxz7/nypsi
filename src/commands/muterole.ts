@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getPrefix } from "../utils/guilds/utils";
@@ -11,8 +11,8 @@ const cmd = new Command("muterole", "set the muterole for the server", Categorie
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
         return;
@@ -126,9 +126,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (channel instanceof ThreadChannel) return;
                 await channel.permissionOverwrites
                     .edit(muteRole, {
-                        SEND_MESSAGES: false,
-                        SPEAK: false,
-                        ADD_REACTIONS: false,
+                        SendMessages: false,
+                        Speak: false,
+                        AddReactions: false,
                     })
                     .catch(() => {
                         channelError = true;

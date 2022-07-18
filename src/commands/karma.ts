@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`);
     }
 
-    embed.setFooter(`whats karma? do ${await getPrefix(message.guild)}karmahelp`);
+    embed.setFooter({ text: `whats karma? do ${await getPrefix(message.guild)}karmahelp` });
 
     return message.channel.send({ embeds: [embed] });
 }

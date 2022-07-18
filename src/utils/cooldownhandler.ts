@@ -77,7 +77,7 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
     const random = Math.floor(Math.random() * 50);
 
     if (random == 7 && !(await isPremium(member))) {
-        embed.setFooter(`premium members get 50% shorter cooldowns (${await getPrefix(member.guild)}donate)`);
+        embed.setFooter({ text: `premium members get 50% shorter cooldowns (${await getPrefix(member.guild)}donate)` });
     }
 
     return embed;

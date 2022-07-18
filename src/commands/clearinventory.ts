@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
@@ -31,8 +38,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(`are you sure you want to clear your inventory of **${amount}** items?\n\nthis cannot be undone.`);
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("❌").setLabel("clear").setStyle("DANGER")
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger)
     );
 
     const msg = await message.channel.send({ embeds: [embed], components: [row] });

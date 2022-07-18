@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -37,14 +37,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageEmojisAndStickers)) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage emojis` permission for this command to work")],
         });
     }
 
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageEmojisAndStickers)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return send({ embeds: [new ErrorEmbed("you need the `manage emojis` permission")] });
         }
         return;
@@ -118,11 +118,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let fail = false;
 
-    await message.guild.emojis.create(url, name).catch((e) => {
-        fail = true;
+    await message.guild.emojis
+        .create({
+            attachment: url,
+            name: name,
+        })
+        .catch((e) => {
+            fail = true;
 
-        return send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] });
-    });
+            return send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] });
+        });
 
     if (fail) return;
 

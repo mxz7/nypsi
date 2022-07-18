@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -65,9 +72,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         pages.push(pageOfItems);
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(
-        `page ${page + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`
-    );
+    const embed = new CustomEmbed(message.member).setFooter({
+        text: `page ${page + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`,
+    });
 
     embed.setHeader("car magazine", message.author.avatarURL());
 
@@ -88,9 +95,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
     }
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
     /**
@@ -145,16 +152,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             true
                         );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`);
+                    newEmbed.setFooter({
+                        text: `page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`,
+                    });
                     if (currentPage == 0) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(true),
+                            new ButtonBuilder()
+                                .setCustomId("➡")
+                                .setLabel("next")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
+                            new ButtonBuilder()
+                                .setCustomId("➡")
+                                .setLabel("next")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false)
                         );
                     }
                     await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -179,16 +204,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             true
                         );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`);
+                    newEmbed.setFooter({
+                        text: `page ${currentPage + 1}/${pages.length} | owned: ${totalOwned}/${totalCars}`,
+                    });
                     if (currentPage + 1 == lastPage) {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
+                            new ButtonBuilder()
+                                .setCustomId("➡")
+                                .setLabel("next")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(true)
                         );
                     } else {
-                        row = new MessageActionRow().addComponents(
-                            new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                            new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId("⬅")
+                                .setLabel("back")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false),
+                            new ButtonBuilder()
+                                .setCustomId("➡")
+                                .setLabel("next")
+                                .setStyle(ButtonStyle.Primary)
+                                .setDisabled(false)
                         );
                     }
                     await msg.edit({ embeds: [newEmbed], components: [row] });

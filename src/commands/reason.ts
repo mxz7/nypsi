@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { getCase, setReason } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -13,7 +13,7 @@ const cmd = new Command("reason", "set a reason for a case/punishment", Categori
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
     const prefix = await getPrefix(message.guild);
 

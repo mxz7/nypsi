@@ -28,7 +28,7 @@ export async function showTopGlobalBal(client: Client) {
             return logger.error("UNABLE TO FIND CHANNEL FOR GLOBAL BAL TOP");
         }
 
-        if (channel.type != "GUILD_TEXT") return;
+        if (!channel.isTextBased()) return;
 
         const baltop = await topAmountGlobal(10, client, true);
 
