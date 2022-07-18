@@ -1,13 +1,11 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
 import ms = require("ms");
-import { eSnipe, getGuild, snipe } from "../../nypsi";
+import { checkGuild, eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
-
-declare function require(name: string): any;
 
 setInterval(() => {
     const now = new Date().getTime();
@@ -49,8 +47,6 @@ setInterval(() => {
 }, 3600000);
 
 setInterval(async () => {
-    const { checkGuild } = require("../../nypsi");
-
     const query = await prisma.guild.findMany({
         select: {
             id: true,
@@ -58,15 +54,15 @@ setInterval(async () => {
     });
 
     for (const guild of query) {
-        const exists = await checkGuild(guild.id);
+        const exists = checkGuild(guild.id);
 
         if (!exists) {
-            await prisma.guildCounter.delete({
+            await prisma.guildCounter.deleteMany({
                 where: {
                     guildId: guild.id,
                 },
             });
-            await prisma.guildChristmas.delete({
+            await prisma.guildChristmas.deleteMany({
                 where: {
                     guildId: guild.id,
                 },
@@ -81,7 +77,7 @@ setInterval(async () => {
                     chatReactionGuildId: guild.id,
                 },
             });
-            await prisma.chatReaction.delete({
+            await prisma.chatReaction.deleteMany({
                 where: {
                     guildId: guild.id,
                 },
@@ -101,12 +97,12 @@ setInterval(async () => {
                     guildId: guild.id,
                 },
             });
-            await prisma.moderation.delete({
+            await prisma.moderation.deleteMany({
                 where: {
                     guildId: guild.id,
                 },
             });
-            await prisma.guild.delete({
+            await prisma.guild.deleteMany({
                 where: {
                     id: guild.id,
                 },
