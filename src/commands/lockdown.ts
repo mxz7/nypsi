@@ -16,7 +16,7 @@ cmd.slashData.addChannelOption((option) => option.setName("channel").setDescript
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {

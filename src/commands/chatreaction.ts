@@ -139,9 +139,9 @@ cmd.slashData
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data);
@@ -748,7 +748,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setHeader("chat reactions");
             } else {
                 /**
-                 * @type {Map<Number, Array<String>>}
+                 * @type {Map<Number, string[]>}
                  */
                 const pages = new Map();
 

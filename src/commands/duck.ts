@@ -10,7 +10,7 @@ const cmd = new Command("duck", "get a random picture of a duck", Categories.ANI
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

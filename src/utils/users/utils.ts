@@ -34,7 +34,7 @@ const mentionQueue: MentionQueueItem[] = [];
 
 export { mentionQueue };
 
-const deleteQueue: Array<string> = [];
+const deleteQueue: string[] = [];
 
 export { deleteQueue };
 
@@ -399,17 +399,9 @@ export async function setLastfmUsername(member: GuildMember, username: string) {
     return true;
 }
 
-/**
- * @param {Guild} guild
- * @param {GuildMember} member
- * @param {Number} amount
- * @returns {Array<{ date: Number, user_tag: String, url: String, content: String }>}
- */
-export function fetchUserMentions(
-    guild: Guild,
-    member: GuildMember | string,
-    amount = 100
-): Array<{ date: number; user_tag: string; url: string; content: string }> {
+type UserMention = { date: number; user_tag: string; url: string; content: string };
+
+export function fetchUserMentions(guild: Guild, member: GuildMember | string, amount = 100): UserMention[] {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;

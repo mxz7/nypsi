@@ -25,7 +25,7 @@ BigInt.prototype.toJSON = function () {
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (cooldown.has(message.author.id)) {

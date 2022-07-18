@@ -17,9 +17,9 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("a
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
             await message.reply(data);

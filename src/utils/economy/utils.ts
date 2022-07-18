@@ -620,12 +620,12 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
 }
 
 /**
- * @returns {Array<String>} global bal top
+ * @returns {string[]} global bal top
  * @param {Number} amount of people to pull
  * @param {Client} client
  * @param {Boolean} anon
  */
-export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<Array<string>> {
+export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
             money: { gt: 1000 },
@@ -685,11 +685,11 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
 }
 
 /**
- * @returns {Array<String>}
+ * @returns {string[]}
  * @param {Guild} guild to pull data from
  * @param {Number} amount of users to return with
  */
-export async function topAmount(guild: Guild, amount: number): Promise<Array<string>> {
+export async function topAmount(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
@@ -767,12 +767,12 @@ export async function topAmount(guild: Guild, amount: number): Promise<Array<str
 }
 
 /**
- * @returns {Array<String>}
+ * @returns {string[]}
  * @param {Guild} guild to pull data from
  * @param {Number} amount of users to return with
  * @param {Number} min minimum balance
  */
-export async function bottomAmount(guild: Guild, amount: number): Promise<Array<string>> {
+export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
@@ -850,11 +850,11 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<Array<
 }
 
 /**
- * @returns {Array<String>}
+ * @returns {string[]}
  * @param {Guild} guild to pull data from
  * @param {Number} amount of users to return with
  */
-export async function topAmountPrestige(guild: Guild, amount: number): Promise<Array<string>> {
+export async function topAmountPrestige(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
     if (guild.memberCount == guild.members.cache.size) {
@@ -1710,11 +1710,6 @@ export async function deleteUser(member: GuildMember | string) {
     await redis.del(`cache:economy:exists:${id}`);
 }
 
-/**
- *
- * @param {GuildMember} member
- * @returns {Array<{ user_id: string, id: number }>}
- */
 export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
     let id: string;
     if (member instanceof GuildMember) {

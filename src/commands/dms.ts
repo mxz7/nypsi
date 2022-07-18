@@ -13,7 +13,7 @@ const cmd = new Command("dms", "enable/disable dms with the bot", Categories.INF
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

@@ -7,9 +7,9 @@ const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).s
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const prefix = await getPrefix(message.guild);
 
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
