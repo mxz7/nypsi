@@ -24,7 +24,7 @@ const cmd = new Command("prestige", "prestige to gain extra benefits", Categorie
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

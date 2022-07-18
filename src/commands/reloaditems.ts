@@ -7,7 +7,7 @@ const cmd = new Command("reloaditems", "reload items", Categories.NONE).setPermi
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.member.user.id != "672793821850894347") return;

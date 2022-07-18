@@ -11,9 +11,9 @@ const cmd = new Command("server", "view information about the server", Categorie
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const server = message.guild;
 
     await runCheck(server);

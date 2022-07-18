@@ -9,7 +9,7 @@ const cmd = new Command("reseteco", "reset economy except prestige", Categories.
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.author.id != "672793821850894347") return;

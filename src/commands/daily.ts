@@ -10,7 +10,7 @@ const cmd = new Command("daily", "get your daily bonus (patreon only)", Categori
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

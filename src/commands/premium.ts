@@ -21,9 +21,9 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO).
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const defaultMessage = async () => {
         if (await isPremium(message.member)) {
             const embed = new CustomEmbed(message.member);
