@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -9,14 +9,14 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", Categories.ADMIN).se
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage channels` permission")] });
         }
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")],
         });
