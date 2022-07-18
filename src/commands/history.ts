@@ -1,4 +1,12 @@
-import { Message, Permissions, ActionRowBuilder, ButtonBuilder, CommandInteraction } from "discord.js";
+import {
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    CommandInteraction,
+    PermissionFlagsBits,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { getCases, profileExists, createProfile } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -22,7 +30,7 @@ cmd.slashData.addStringOption((option) =>
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -120,7 +128,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         pages.push(page);
     }
 
-    const embed = new CustomEmbed(message.member).setFooter("page 1/" + pages.length + " | total: " + cases.length);
+    const embed = new CustomEmbed(message.member).setFooter({
+        text: "page 1/" + pages.length + " | total: " + cases.length,
+    });
 
     if (unknownMember) {
         embed.setHeader("history for " + member);
@@ -212,7 +222,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             );
                         }
                     }
-                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length);
+                    newEmbed.setFooter({
+                        text: "page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length,
+                    });
                     if (currentPage == 0) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
@@ -263,7 +275,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             );
                         }
                     }
-                    newEmbed.setFooter("page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length);
+                    newEmbed.setFooter({
+                        text: "page " + (currentPage + 1) + "/" + pages.length + " | total: " + cases.length,
+                    });
                     if (currentPage + 1 == lastPage) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
