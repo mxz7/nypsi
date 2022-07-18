@@ -151,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.author.avatarURL()
     );
 
-    const embed3 = new CustomEmbed().setFooter("use $optout to optout of bot dms");
+    const embed3 = new CustomEmbed().setFooter({ text: "use $optout to optout of bot dms" });
 
     let robberySuccess = false;
 
@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (voted) {
                 await updateXp(message.member, (await getXp(message.member)) + 1);
-                embed2.setFooter("+1xp");
+                embed2.setFooter({ text: "+1xp" });
             }
 
             embed3.setTitle("you have been robbed");
