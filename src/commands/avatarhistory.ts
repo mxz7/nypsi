@@ -6,6 +6,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -85,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    let msg;
+    let msg: Message;
 
     if (history.length == 1) {
         return await message.channel.send({ embeds: [embed] });
@@ -96,11 +97,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentPage = index + 1;
     const lastPage = history.length;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager = async () => {
+    const pageManager = async (): Promise<void> => {
         const reaction = await msg
-            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
                 await collected.deferUpdate();
                 return collected.customId;
