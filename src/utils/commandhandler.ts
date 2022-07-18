@@ -43,6 +43,11 @@ const openingCratesBlock = new Set();
 
 const beingChecked: string[] = [];
 
+let commandsSize = 0;
+let aliasesSize = 0;
+
+export { commandsSize, aliasesSize };
+
 let restarting = false;
 
 export function loadCommands() {
@@ -91,8 +96,8 @@ export function loadCommands() {
             logger.error(e);
         }
     }
-    exports.aliasesSize = aliases.size;
-    exports.commandsSize = commands.size;
+    aliasesSize = aliases.size;
+    commandsSize = commands.size;
 
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }));
@@ -139,18 +144,18 @@ export function reloadCommand(commandsArray: string[]) {
                     }
                 }
                 reloadTable.push([commandData.name, "✅"]);
-                exports.commandsSize = commands.size;
+                commandsSize = commands.size;
             } else {
                 reloadTable.push([cmd, "❌"]);
-                exports.commandsSize = commands.size;
+                commandsSize = commands.size;
             }
         } catch (e) {
             reloadTable.push([cmd, "❌"]);
             logger.error(e);
         }
     }
-    exports.aliasesSize = aliases.size;
-    exports.commandsSize = commands.size;
+    aliasesSize = aliases.size;
+    commandsSize = commands.size;
     console.log(table(reloadTable, { border: getBorderCharacters("ramac") }));
     return table(reloadTable, { border: getBorderCharacters("ramac") });
 }
