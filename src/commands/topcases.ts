@@ -135,7 +135,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 member = members.find((m) => m.user.id == args[0]);
 
                 if (!member) {
-                    member = args[0];
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("couldn't find that member")],
+                    });
                 }
             } else {
                 member = await getMember(message.guild, args.join(" "));
