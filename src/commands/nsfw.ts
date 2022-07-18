@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    let channel;
+    let channel: Channel;
 
     if (args.length == 0) {
         channel = message.channel;
@@ -40,8 +40,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
     }
 
-    if (!channel.isText()) {
+    if (!channel.isTextBased()) {
         return message.channel.send({ embeds: [new ErrorEmbed("this is not a text channel")] });
+    }
+
+    if (channel.isDMBased()) return;
+
+    if (channel.isThread()) {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
     }
 
     if (!channel.nsfw) {
