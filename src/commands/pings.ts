@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -99,13 +106,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (pages.size >= 2) {
-        embed.setFooter(`page 1/${pages.size}`);
+        embed.setFooter({ text: `page 1/${pages.size}` });
     }
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+        new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
     );
 
     /**
@@ -161,7 +168,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         newEmbed.addField(fieldName, fieldValue);
                     }
 
-                    newEmbed.setFooter("page " + currentPage + "/" + lastPage);
+                    newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
                     if (currentPage == 1) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
@@ -174,7 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
                         );
                     } else {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -188,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
                         );
                     }
                     await edit({ embeds: [newEmbed], components: [row] });
@@ -205,7 +212,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
                         newEmbed.addField(fieldName, fieldValue);
                     }
-                    newEmbed.setFooter("page " + currentPage + "/" + lastPage);
+                    newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
                     if (currentPage == lastPage) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
@@ -218,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(true),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
                         );
                     } else {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -232,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 .setLabel("next")
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle("DANGER")
+                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
                         );
                     }
                     await edit({ embeds: [newEmbed], components: [row] });
