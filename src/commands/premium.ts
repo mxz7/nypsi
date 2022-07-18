@@ -17,7 +17,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import dayjs = require("dayjs");
 
-const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon", "donate"]);
+const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon", "donate", "prem"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const defaultMessage = async () => {
