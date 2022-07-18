@@ -1,15 +1,14 @@
 import {
     Message,
-    Permissions,
     ActionRowBuilder,
     ButtonBuilder,
     CommandInteraction,
     TextChannel,
     GuildMember,
-    GuildChannel,
-    DMChannel,
-    ThreadChannel,
-    PartialDMChannel,
+    PermissionFlagsBits,
+    Channel,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
 } from "discord.js";
 import {
     createReactionProfile,
@@ -196,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const blacklisted = await getBlacklisted(message.guild);
 
         if (blacklisted.indexOf(message.author.id) != -1) {
-            embed.setFooter("you are blacklisted from chat reactions in this server");
+            embed.setFooter({ text: "you are blacklisted from chat reactions in this server" });
         }
 
         return send({ embeds: [embed] });
@@ -213,7 +212,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             amount = parseInt(args[1]);
 
             if (amount > 10) {
-                if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10;
+                if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
             }
         }
 
@@ -273,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return showLeaderboard();
     } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
         if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             });
@@ -290,7 +289,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setDescription(`\`${blacklisted.join("`\n`")}\``);
             }
 
-            embed.setFooter(`use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users`);
+            embed.setFooter({ text: `use ${prefix}cr blacklist (add/del/+/-) to edit blacklisted users` });
 
             return send({ embeds: [embed] });
         } else {
@@ -384,7 +383,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     } else if (args[0].toLowerCase() == "settings") {
         if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             });
@@ -413,7 +412,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `**max game length** \`${settings.timeout}s\``
             );
 
-            embed.setFooter(`use ${prefix}cr settings help to change this settings`);
+            embed.setFooter({ text: `use ${prefix}cr settings help to change this settings` });
 
             return send({ embeds: [embed] });
         } else if (args.length == 2) {
@@ -485,7 +484,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         } else if (args.length == 3) {
             if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
-                let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[2];
+                let channel: string | Channel = args[2];
 
                 if (channel.length != 18) {
                     if (!message.mentions.channels.first()) {
@@ -507,9 +506,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("invalid channel")] });
                 }
 
-                if (channel.type != "GUILD_TEXT") {
-                    return send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
-                }
+                if (!channel.isTextBased()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
+
+                if (channel.isDMBased()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
+
+                if (channel.isThread()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
 
                 const settings = await getReactionSettings(message.guild);
 
@@ -639,7 +640,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     } else if (args[0].toLowerCase() == "words" || args[0].toLowerCase() == "word") {
         if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-        if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
             return send({
                 embeds: [new ErrorEmbed("you need the `manage server` permission to do this")],
             });
@@ -687,7 +688,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`);
 
                 if (maxSize == 100) {
-                    error.setFooter("become a patreon ($patreon) to double this limit");
+                    error.setFooter({ text: "become a patreon ($patreon) to double this limit" });
                 }
 
                 return send({ embeds: [error] });
@@ -768,7 +769,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 embed.setHeader(`word list [${words.length}]`);
                 embed.setDescription(`${pages.get(1).join("\n")}`);
-                embed.setFooter(`page 1/${pages.size}`);
+                embed.setFooter({ text: `page 1/${pages.size}` });
 
                 if (pages.size > 1) {
                     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -814,7 +815,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             } else {
                                 currentPage--;
                                 embed.setDescription(pages.get(currentPage).join("\n"));
-                                embed.setFooter("page " + currentPage + "/" + lastPage);
+                                embed.setFooter({ text: "page " + currentPage + "/" + lastPage });
 
                                 if (currentPage == 1) {
                                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -853,7 +854,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             } else {
                                 currentPage++;
                                 embed.setDescription(pages.get(currentPage).join("\n"));
-                                embed.setFooter("page " + currentPage + "/" + lastPage);
+                                embed.setFooter({ text: "page " + currentPage + "/" + lastPage });
 
                                 if (currentPage == lastPage) {
                                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
