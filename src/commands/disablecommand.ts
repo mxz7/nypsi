@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix, getDisabledCommands, updateDisabledCommands } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -13,7 +13,7 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("disabled commands")
-            .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`);
+            .setFooter({ text: `use ${prefix}disablecmd (add/del/+/-) to modify the list` });
 
         if (filter.length == 0) {
             embed.setDescription("`❌` no commands disabled");
@@ -48,9 +48,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .replace(/[^A-z0-9\s]/g, "");
 
         if (filter.indexOf(word) > -1) {
-            const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is already disabled").setFooter(
-                `you can use ${prefix}disablecmd to view currently disabled commands`
-            );
+            const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is already disabled").setFooter({
+                text: `you can use ${prefix}disablecmd to view currently disabled commands`,
+            });
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -102,7 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is not disabled")
                 .setHeader("disabled commands")
-                .setFooter(`you can use ${prefix}disablecmd to view currently disabled commands`);
+                .setFooter({ text: `you can use ${prefix}disablecmd to view currently disabled commands` });
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -111,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member, "✅ `" + prefix + word + "` is no longer disabled")
             .setHeader("disable commands")
-            .setFooter(`you can use ${prefix}disablecmd reset to reset disabled commands`);
+            .setFooter({ text: `you can use ${prefix}disablecmd reset to reset disabled commands` });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "reset") {
@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("disabled commands")
-            .setFooter(`use ${prefix}disablecmd (add/del/+/-) to modify the list`);
+            .setFooter({ text: `use ${prefix}disablecmd (add/del/+/-) to modify the list` });
 
         if (filter.length == 0) {
             embed.setDescription("`❌` no commands disabled");
