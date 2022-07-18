@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 (await getMaxBankBalance(target)).toLocaleString() +
                 "**"
         )
-        .setFooter(footer);
+        .setFooter({ text: footer });
 
     if (target.user.id == message.author.id) {
         embed.setHeader("your balance | season 3", message.author.avatarURL());
