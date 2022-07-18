@@ -36,9 +36,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         logger.info("nypsi shutting down soon...");
 
         setTimeout(() => {
-            logger.info("vacuuming database...");
-            logger.info("vacuum finished");
-
             logger.info("nypsi shutting down in 10 seconds...");
 
             setTimeout(() => {
