@@ -21,15 +21,8 @@ declare function require(name: string);
 
 const items = require("../../data/karmashop.json");
 
-/**
- * @type {Map<string, number>}
- */
 const amount = new Map();
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
     if (message.author.id == "672793821850894347") {
@@ -88,10 +81,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member);
 
-        /**
-         *
-         * @returns {string}
-         */
         const displayItemsLeft = () => {
             let text;
             if (amount.has(message.author.id)) {
@@ -124,9 +113,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
         );
 
-        /**
-         * @type {Message}
-         */
         let msg;
 
         if (pages.length == 1) {

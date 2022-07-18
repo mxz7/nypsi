@@ -11,10 +11,6 @@ const cmd = new Command("gay", "very accurate gay level calculator", Categories.
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are u gay"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

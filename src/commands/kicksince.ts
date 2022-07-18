@@ -9,10 +9,6 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
     .setPermissions(["ADMINISTRATOR"])
     .setAliases(["fuckoffsince"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -107,9 +103,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
     }
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     if (status) {

@@ -15,10 +15,6 @@ cmd.slashData
     .addUserOption((option) => option.setName("user").setDescription("member to ban from the server").setRequired(true))
     .addStringOption((option) => option.setName("reason").setDescription("reason for the ban").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

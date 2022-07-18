@@ -28,10 +28,6 @@ cmd.slashData
     )
     .addSubcommand((tickets) => tickets.setName("tickets").setDescription("view your current tickets"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

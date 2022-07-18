@@ -14,10 +14,6 @@ declare function require(name: string);
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.author.id != "672793821850894347") return;
     if (await onCooldown(cmd.name, message.member)) {

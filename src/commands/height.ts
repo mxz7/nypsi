@@ -11,10 +11,6 @@ const cmd = new Command("height", "accurate prediction of your height", Categori
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i bet ur short"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

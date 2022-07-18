@@ -20,10 +20,6 @@ cmd.slashData.addStringOption((option) =>
     option.setName("username").setDescription("username to get the name history for").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -74,9 +70,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: `page 1/${names.size}` });
     }
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

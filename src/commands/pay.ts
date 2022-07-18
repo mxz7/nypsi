@@ -28,10 +28,6 @@ cmd.slashData
         option.setName("amount").setDescription("how much would you like to send").setRequired(true)
     );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

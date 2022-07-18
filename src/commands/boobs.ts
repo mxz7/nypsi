@@ -14,10 +14,6 @@ const cmd = new Command("boobs", "get a random boob image", Categories.NSFW).set
     "boobie",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

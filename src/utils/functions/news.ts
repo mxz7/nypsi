@@ -8,9 +8,6 @@ const news: News = {
     date: new Date().getTime(),
 };
 
-/**
- * @returns {String}
- */
 export function getNews(): News {
     return news;
 }

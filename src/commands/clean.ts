@@ -7,10 +7,6 @@ const cmd = new Command("clean", "clean up bot commands and responses", Categori
     "MANAGE_MESSAGES",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 

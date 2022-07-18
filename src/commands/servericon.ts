@@ -4,10 +4,6 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("servericon", "get the server icon", Categories.INFO);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     return message.channel.send({
         embeds: [

@@ -9,10 +9,6 @@ const cmd = new Command("crateall", "give every user in the current guild a crat
     "bot owner",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id != "672793821850894347") return;
 

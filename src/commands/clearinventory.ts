@@ -14,11 +14,6 @@ const cmd = new Command("clearinventory", "clear your inventory. this cannot be 
     "clearinv",
 ]);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

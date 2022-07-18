@@ -135,19 +135,10 @@ function runChecks() {
     });
 }
 
-/**
- *
- * @param {JSON} vote
- */
 export async function onVote(vote: WebhookPayload) {
     doVote(client, vote);
 }
 
-/**
- * @returns {Boolean}
- * @param {String} id
- * @param {Boolean} dontDmTekoh
- */
 export async function requestDM(id: string, content: string, dontDmTekoh: boolean, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
@@ -194,10 +185,6 @@ export async function requestDM(id: string, content: string, dontDmTekoh: boolea
     }
 }
 
-/**
- * @param {String} id
- * @param {String} roleid
- */
 export async function requestRemoveRole(id: string, roleID: string) {
     const guild = await client.guilds.fetch("747056029795221513");
 

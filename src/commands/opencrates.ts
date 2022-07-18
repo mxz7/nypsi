@@ -11,11 +11,6 @@ const cmd = new Command("opencrates", "open all of your crates with one command"
 
 cmd.slashEnabled = true;
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

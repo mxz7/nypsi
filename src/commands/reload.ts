@@ -7,10 +7,6 @@ declare function require(name: string);
 
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id != "672793821850894347") return;
     const { loadCommands, reloadCommand } = require("../utils/commandhandler");

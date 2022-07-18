@@ -136,10 +136,6 @@ cmd.slashData
             )
     );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -748,9 +744,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 );
                 embed.setHeader("chat reactions");
             } else {
-                /**
-                 * @type {Map<Number, string[]>}
-                 */
                 const pages = new Map();
 
                 for (const word of words) {

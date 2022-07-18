@@ -26,9 +26,6 @@ const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?");
 let mentionInterval;
 let workerCount = 0;
 
-/**
- * @param {Message} message
- */
 export default async function messageCreate(message: Message) {
     if (message.author.bot) return;
     if (!message.member) return;

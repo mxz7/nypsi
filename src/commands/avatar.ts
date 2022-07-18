@@ -21,10 +21,6 @@ avatar.slashData.addUserOption((option) =>
     option.setName("user").setDescription("view avatar of this user").setRequired(false)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member: GuildMember;
 

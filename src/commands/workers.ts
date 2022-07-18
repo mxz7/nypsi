@@ -25,10 +25,6 @@ const cmd = new Command("workers", "view the available workers and manage your o
     "slaves",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const workers = getAllWorkers();
 

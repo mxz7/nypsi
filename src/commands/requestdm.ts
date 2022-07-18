@@ -10,10 +10,6 @@ const cmd = new Command(
     Categories.NONE
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.author.id != "672793821850894347") return;
 

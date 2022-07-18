@@ -7,10 +7,6 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", Catego
     .setAliases(["dac"])
     .setPermissions(["server owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 

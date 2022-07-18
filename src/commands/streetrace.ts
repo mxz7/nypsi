@@ -54,10 +54,6 @@ cmd.slashData
 const races = new Map();
 const carCooldown = new Map();
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -416,11 +412,6 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-/**
- * @returns {Number}
- * @param {Number} current
- * @param {Number} speed
- */
 function getNewPosition(current, speed) {
     const randomness = Math.floor(Math.random() * 12) - 4;
 
@@ -431,11 +422,6 @@ function getNewPosition(current, speed) {
     return current + movement;
 }
 
-/**
- * @returns {String}
- * @param {String} emoji
- * @param {Number} position
- */
 function getRacePosition(emoji, position) {
     let racePos = Math.floor(position / 5);
 
@@ -460,9 +446,6 @@ function getRacePosition(emoji, position) {
 async function startRace(id) {
     const race = races.get(id);
 
-    /**
-     * @type {User}
-     */
     let winner;
 
     for (let user of race.users.keys()) {

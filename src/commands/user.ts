@@ -12,10 +12,6 @@ const cmd = new Command("user", "view info about a user in the server", Categori
 
 const sortCache = new Map();
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member;
 

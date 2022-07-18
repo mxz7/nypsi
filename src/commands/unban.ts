@@ -13,10 +13,6 @@ cmd.slashData.addStringOption((option) =>
     option.setName("user").setDescription("tag/id of user to unban").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

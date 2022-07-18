@@ -8,10 +8,6 @@ const cmd = new Command("smelt", "smelt your ores into ingots with coal", Catego
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

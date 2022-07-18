@@ -102,10 +102,6 @@ export function loadCommands() {
     logger.info(`${aliases.size.toLocaleString()} aliases loaded`);
 }
 
-/**
- *
- * @param {Array} commandsArray
- */
 export function reloadCommand(commandsArray: string[]) {
     const reloadTable = [];
 
@@ -158,11 +154,6 @@ export function reloadCommand(commandsArray: string[]) {
     return table(reloadTable, { border: getBorderCharacters("ramac") });
 }
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
@@ -288,9 +279,6 @@ async function helpCmd(message: Message, args: string[]) {
         }
     }
 
-    /**
-     * @type {Message}
-     */
     let msg: Message;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -403,12 +391,6 @@ async function helpCmd(message: Message, args: string[]) {
     return pageManager();
 }
 
-/**
- *
- * @param {String} cmd
- * @param {Message} message
- * @param {string[]} args
- */
 export async function runCommand(
     cmd: string,
     message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -736,10 +718,6 @@ export async function runCommand(
     }
 }
 
-/**
- *
- * @param {String} cmd
- */
 export function commandExists(cmd: string) {
     if (commands.has(cmd)) {
         return true;
@@ -774,12 +752,6 @@ export function getRandomCommand(): Command {
     return choice;
 }
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- * @param {String} commandName
- */
 export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     args.shift();
 
@@ -803,10 +775,6 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     });
 }
 
-/**
- * @param {String} command
- * @param {GuildMember} member
- */
 function updatePopularCommands(command: string, member: GuildMember) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1);
@@ -839,11 +807,6 @@ function updatePopularCommands(command: string, member: GuildMember) {
     }, 90000);
 }
 
-/**
- * @param {Client} client
- * @param {String} serverID
- * @param {string[]} channelID
- */
 export function runPopularCommandsTimer(client: Client, serverID: string, channelID: string[]) {
     const now = new Date();
 
@@ -993,12 +956,6 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Client} client
- * @returns
- */
 async function failedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513";
     const channelID = "912710094955892817";
@@ -1030,12 +987,6 @@ async function failedCaptcha(member: GuildMember, client: Client) {
     );
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Client} client
- * @returns
- */
 async function passedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513";
     const channelID = "912710094955892817";
@@ -1083,27 +1034,14 @@ export function startRestart() {
     restarting = true;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export function startOpeningCrates(member: GuildMember) {
     openingCratesBlock.add(member.user.id);
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export function stopOpeningCrates(member: GuildMember) {
     openingCratesBlock.delete(member.user.id);
 }
 
-/**
- *
- * @param {string} guildID
- * @param {string} clientID
- */
 export async function uploadGuildCommands(guildID: string, clientID: string) {
     logger.info("started refresh of [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
@@ -1126,11 +1064,6 @@ export async function uploadGuildCommands(guildID: string, clientID: string) {
     }
 }
 
-/**
- *
- * @param {string} guildID
- * @param {string} clientID
- */
 export async function uploadGuildCommandsGlobal(clientID: string) {
     logger.info("started refresh of global [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);

@@ -121,9 +121,6 @@ setInterval(async () => {
     }
 }, 60000);
 
-/**
- * @param {Guild} guild
- */
 export async function createReactionProfile(guild: Guild) {
     await prisma.chatReaction.create({
         data: {
@@ -132,9 +129,6 @@ export async function createReactionProfile(guild: Guild) {
     });
 }
 
-/**
- * @param {Guild} guild
- */
 export async function hasReactionProfile(guild: Guild) {
     if (existsCache.has(guild.id)) {
         return true;
@@ -157,10 +151,6 @@ export async function hasReactionProfile(guild: Guild) {
     }
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getWords(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -180,10 +170,6 @@ export async function getWords(guild: Guild) {
     }
 }
 
-/**
- * @param {Guild} guild
- * @param {string[]} newWordList
- */
 export async function updateWords(guild: Guild, newWordList: string[]) {
     await prisma.chatReaction.update({
         where: {
@@ -195,10 +181,6 @@ export async function updateWords(guild: Guild, newWordList: string[]) {
     });
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getWordList(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -212,10 +194,6 @@ export async function getWordList(guild: Guild) {
     return query.wordList;
 }
 
-/**
- * @param {Guild} guild
- * @returns {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
- */
 export async function getReactionSettings(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -233,10 +211,6 @@ export async function getReactionSettings(guild: Guild) {
     return query;
 }
 
-/**
- * @param {Guild} guild
- * @param {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
- */
 export async function updateReactionSettings(
     guild: Guild,
     settings: {
@@ -263,11 +237,6 @@ export async function updateReactionSettings(
     if (enabledCache.has(guild.id)) enabledCache.delete(guild.id);
 }
 
-/**
- * @param {Guild} guild
- * @param {GuildMember} member
- * @returns {{wins: number, secondPlace: number, thirdPlace: number}}
- */
 export async function getReactionStats(guild: Guild, member: GuildMember) {
     const query = await prisma.chatReactionStats.findFirst({
         where: {
@@ -287,10 +256,6 @@ export async function getReactionStats(guild: Guild, member: GuildMember) {
     };
 }
 
-/**
- * @param {Guild} guild
- * @param {TextChannel} channel
- */
 export async function startReaction(guild: Guild, channel: TextChannel) {
     if (currentChannels.has(channel.id)) return "xoxo69";
 
@@ -429,12 +394,6 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- * @returns {Boolean}
- */
 export async function hasReactionStatsProfile(guild: Guild, member: GuildMember) {
     const query = await prisma.chatReactionStats.findFirst({
         where: {
@@ -452,11 +411,6 @@ export async function hasReactionStatsProfile(guild: Guild, member: GuildMember)
     }
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function createReactionStatsProfile(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.create({
         data: {
@@ -466,11 +420,6 @@ export async function createReactionStatsProfile(guild: Guild, member: GuildMemb
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function addWin(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -482,11 +431,6 @@ export async function addWin(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function add2ndPlace(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -498,11 +442,6 @@ export async function add2ndPlace(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function add3rdPlace(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -514,11 +453,6 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- * @param {Guild} guild
- * @param {Number} amount
- * @returns {Map}
- */
 export async function getServerLeaderboard(guild: Guild, amount: number): Promise<Map<string, string>> {
     const { inCooldown, addCooldown } = require("../guilds/utils");
 
@@ -676,10 +610,6 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg);
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getBlacklisted(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -693,10 +623,6 @@ export async function getBlacklisted(guild: Guild) {
     return query.blacklisted;
 }
 
-/**
- * @param {Guild} guild
- * @param {string[]} blacklisted
- */
 export async function setBlacklisted(guild: Guild, blacklisted: string[]) {
     await prisma.chatReaction.update({
         where: {
@@ -708,10 +634,6 @@ export async function setBlacklisted(guild: Guild, blacklisted: string[]) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- */
 export async function deleteStats(guild: Guild) {
     await prisma.chatReactionStats.deleteMany({
         where: {
@@ -720,9 +642,6 @@ export async function deleteStats(guild: Guild) {
     });
 }
 
-/**
- * @returns {string[]}
- */
 async function getDefaultWords(): Promise<string[]> {
     const res = await fetch(
         "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"

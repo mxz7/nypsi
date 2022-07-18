@@ -17,10 +17,6 @@ const cmd = new Command("inventory", "view items in your inventory", Categories.
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription("page number"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -133,9 +129,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     if (pages.length == 1) {

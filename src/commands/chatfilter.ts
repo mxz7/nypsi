@@ -7,10 +7,6 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
     .setAliases(["filter"])
     .setPermissions(["MANAGE_SERVER"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

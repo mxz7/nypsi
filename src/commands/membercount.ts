@@ -8,10 +8,6 @@ const cmd = new Command("membercount", "create an updating member count channel 
     .setAliases(["counter"])
     .setPermissions(["MANAGE_SERVER"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

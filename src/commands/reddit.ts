@@ -10,10 +10,6 @@ const blacklisted = ["body", "shit"];
 
 const cmd = new Command("reddit", "get a random image from any subreddit", Categories.UTILITY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

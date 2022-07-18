@@ -8,10 +8,6 @@ declare function require(name: string);
 
 const cmd = new Command("cat", "get a random picture of a cat", Categories.ANIMALS).setAliases(["kitty"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

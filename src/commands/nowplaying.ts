@@ -15,10 +15,6 @@ const cmd = new Command(
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -90,9 +86,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    /**
-     * @type {{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}}
-     */
     const track = res.recenttracks.track[0];
 
     if (!track) {

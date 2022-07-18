@@ -38,10 +38,6 @@ cmd.slashData
     )
     .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

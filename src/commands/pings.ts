@@ -24,10 +24,6 @@ const cmd = new Command("pings", "view who mentioned you recently", Categories.U
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data) => {
         if (!(message instanceof Message)) {
@@ -115,9 +111,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
     );
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     if (pages.size == 1) {

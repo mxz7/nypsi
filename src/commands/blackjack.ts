@@ -37,10 +37,6 @@ cmd.slashData.addIntegerOption((option) =>
     option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -379,10 +375,6 @@ function getDealerCards(member) {
     return "| " + cards.join(" | ") + " |";
 }
 
-/**
- * @param {Message} message
- * @param {Message} m
- */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return;
 

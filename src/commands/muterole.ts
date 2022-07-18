@@ -6,10 +6,6 @@ import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils
 
 const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

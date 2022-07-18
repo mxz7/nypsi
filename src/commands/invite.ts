@@ -4,10 +4,6 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("invite", "generate an invite link for the bot", Categories.INFO).setAliases(["bot"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(
         message.member,

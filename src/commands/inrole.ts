@@ -16,10 +16,6 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -101,9 +97,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setHeader(role.name + " [" + count.toLocaleString() + "]")
         .setFooter({ text: `page 1/${memberList.size}` });
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

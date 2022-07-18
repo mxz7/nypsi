@@ -128,10 +128,6 @@ const disableCache = new Map();
 const chatFilterCache = new Map();
 const snipeFilterCache = new Map();
 
-/**
- *
- * @param {Guild} guild run check for guild
- */
 export async function runCheck(guild: Guild) {
     if (!(await hasGuild(guild))) await createGuild(guild);
 
@@ -162,10 +158,6 @@ export async function runCheck(guild: Guild) {
     }
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild
- */
 export async function hasGuild(guild: Guild): Promise<boolean> {
     if (existsCooldown.has(guild.id)) return true;
     const query = await prisma.guild.findUnique({
@@ -190,10 +182,6 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
     }
 }
 
-/**
- * @returns {JSON}
- * @param {Guild} guild
- */
 export async function getPeaks(guild: Guild) {
     const query = await prisma.guild.findUnique({
         where: {
@@ -207,10 +195,6 @@ export async function getPeaks(guild: Guild) {
     return query.peak;
 }
 
-/**
- *
- * @param {Guild} guild create guild profile
- */
 export async function createGuild(guild: Guild) {
     await prisma.guild.create({
         data: {
@@ -226,10 +210,6 @@ export async function createGuild(guild: Guild) {
     }, 43200000);
 }
 
-/**
- * @param {Guild} guild get snipe filter
- * @returns {string[]}
- */
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
     if (snipeFilterCache.has(guild.id)) {
         return snipeFilterCache.get(guild.id);
@@ -255,11 +235,6 @@ export async function getSnipeFilter(guild: Guild): Promise<string[]> {
     return filter;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {string[]} array
- */
 export async function updateSnipeFilter(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
@@ -272,10 +247,6 @@ export async function updateSnipeFilter(guild: Guild, array: string[]) {
     if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id);
 }
 
-/**
- * @returns {JSON}
- * @param {Guild} guild
- */
 export async function getGuildCounter(guild: Guild) {
     const query = await prisma.guildCounter.findUnique({
         where: {
@@ -294,11 +265,6 @@ export async function createGuildCounter(guild: Guild) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {JSON} profile
- */
 export async function setGuildCounter(guild: Guild, profile: any) {
     await prisma.guildCounter.update({
         where: {
@@ -390,11 +356,6 @@ export function checkStats() {
     }, 600000);
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {Number} seconds
- */
 export function addCooldown(guild: Guild, seconds: number) {
     fetchCooldown.add(guild.id);
 
@@ -403,10 +364,6 @@ export function addCooldown(guild: Guild, seconds: number) {
     }, seconds * 1000);
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild
- */
 export function inCooldown(guild: Guild): boolean {
     if (fetchCooldown.has(guild.id)) {
         return true;
@@ -415,10 +372,6 @@ export function inCooldown(guild: Guild): boolean {
     }
 }
 
-/**
- * @returns {String}
- * @param {Guild} guild
- */
 export async function getPrefix(guild: Guild): Promise<string> {
     try {
         if (await redis.exists(`cache:guild:prefix:${guild.id}`)) {
@@ -457,11 +410,6 @@ export async function getPrefix(guild: Guild): Promise<string> {
     }
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {String} prefix
- */
 export async function setPrefix(guild: Guild, prefix: string) {
     await prisma.guild.update({
         where: {
@@ -475,10 +423,6 @@ export async function setPrefix(guild: Guild, prefix: string) {
     await redis.del(`cache:guild:prefix:${guild.id}`);
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild
- */
 export async function hasChristmasCountdown(guild: Guild) {
     const query = await prisma.guildChristmas.findUnique({
         where: {
@@ -504,10 +448,6 @@ export async function createNewChristmasCountdown(guild: Guild) {
     });
 }
 
-/**
- * @returns {JSON}
- * @param {Guild} guild
- */
 export async function getChristmasCountdown(guild: Guild) {
     const query = await prisma.guildChristmas.findUnique({
         where: {
@@ -518,11 +458,6 @@ export async function getChristmasCountdown(guild: Guild) {
     return query;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {JSON} xmas
- */
 export async function setChristmasCountdown(guild: Guild, xmas: any) {
     await prisma.guildChristmas.update({
         where: {
@@ -536,10 +471,6 @@ export async function setChristmasCountdown(guild: Guild, xmas: any) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- */
 export async function checkChristmasCountdown(guild: Guild) {
     const profile = await getChristmasCountdown(guild);
 
@@ -583,10 +514,6 @@ export async function checkChristmasCountdown(guild: Guild) {
         });
 }
 
-/**
- * @param {Guild} guild get chat filter
- * @returns {string[]}
- */
 export async function getChatFilter(guild: Guild): Promise<string[]> {
     if (chatFilterCache.has(guild.id)) {
         return chatFilterCache.get(guild.id);
@@ -610,11 +537,6 @@ export async function getChatFilter(guild: Guild): Promise<string[]> {
     return query.chatFilter;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {string[]} array
- */
 export async function updateChatFilter(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
@@ -628,10 +550,6 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
     if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getDisabledCommands(guild: Guild): Promise<string[]> {
     if (disableCache.has(guild.id)) {
         return disableCache.get(guild.id);
@@ -655,11 +573,6 @@ export async function getDisabledCommands(guild: Guild): Promise<string[]> {
     return query.disabledCommands;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {string[]} array
- */
 export async function updateDisabledCommands(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
@@ -673,11 +586,6 @@ export async function updateDisabledCommands(guild: Guild, array: string[]) {
     if (disableCache.has(guild.id)) disableCache.delete(guild.id);
 }
 
-/**
- *
- * @param {Guild} guild
- * @returns {{}}
- */
 export async function getCountdowns(guild: Guild | string) {
     let guildID;
 
@@ -714,14 +622,6 @@ export async function getCountdown(guild: Guild | string, id: string) {
     return query;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {Date} date
- * @param {String} format
- * @param {String} finalFormat
- * @param {String} channel
- */
 export async function addCountdown(guild: Guild, date: Date | number, format: string, finalFormat: string, channel: string) {
     const countdowns = await getCountdowns(guild);
 
@@ -743,11 +643,6 @@ export async function addCountdown(guild: Guild, date: Date | number, format: st
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {String} id
- */
 export async function deleteCountdown(guild: Guild | string, id: string | number) {
     let guildID: string;
 
@@ -766,10 +661,6 @@ export async function deleteCountdown(guild: Guild | string, id: string | number
     });
 }
 
-/**
- *
- * @param {Client} client
- */
 export function runCountdowns(client: Client) {
     const now = new Date();
 
@@ -843,10 +734,6 @@ export function runCountdowns(client: Client) {
     });
 }
 
-/**
- *
- * @param {Client} client
- */
 export function runChristmas(client: Client) {
     const now = new Date();
 

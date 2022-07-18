@@ -36,10 +36,6 @@ const cmd = new Command("minesweeper", "play minesweeper", Categories.MONEY).set
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

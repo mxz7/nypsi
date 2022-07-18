@@ -19,10 +19,6 @@ const cmd = new Command("deposit", "deposit money into your bank", Categories.MO
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

@@ -14,10 +14,6 @@ const cmd = new Command(
 cmd.slashEnabled = true;
 cmd.slashData.addChannelOption((option) => option.setName("channel").setDescription("channel to lock").setRequired(false));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

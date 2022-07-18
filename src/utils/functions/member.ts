@@ -80,11 +80,6 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     return target;
 }
 
-/**
- *
- * @param {Message} guild
- * @param {String} memberName
- */
 export async function getExactMember(guild: Guild, memberName: string): Promise<GuildMember> {
     if (!guild) return null;
 

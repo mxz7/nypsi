@@ -6,10 +6,6 @@ const cmd = new Command("snipe", "snipe the most recently deleted message", Cate
 
 declare function require(name: string): any;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const { snipe } = require("../nypsi.js");
 

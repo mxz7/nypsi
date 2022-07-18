@@ -13,10 +13,6 @@ const cmd = new Command(
     Categories.MUSIC
 ).setAliases(["recentsongs", "recents"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

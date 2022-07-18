@@ -115,11 +115,6 @@ export async function redditImage(post: any, allowed: any): Promise<string> {
     return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author;
 }
 
-/**
- * @returns {Boolean}
- * @param {GuildMember} submitter
- * @param {String} image
- */
 export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
         const { getGuild } = require("../../nypsi");
@@ -181,11 +176,6 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
     return true;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- * @param {GuildMember} accepter
- */
 export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
     const query = await prisma.wholesomeSuggestion.findUnique({
         where: {
@@ -223,10 +213,6 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
     return true;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- */
 export async function denyWholesomeImage(id: number) {
     const d = await prisma.wholesomeSuggestion.delete({
         where: {
@@ -241,10 +227,6 @@ export async function denyWholesomeImage(id: number) {
     return true;
 }
 
-/**
- * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
- * @param {id} Number
- */
 export async function getWholesomeImage(id?: number): Promise<WholesomeImage> {
     if (id) {
         const query = await prisma.wholesomeImage.findUnique({
@@ -270,10 +252,6 @@ export function clearWholesomeCache() {
     wholesomeCache = undefined;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- */
 export async function deleteFromWholesome(id: number) {
     const query = await prisma.wholesomeImage.delete({
         where: {
@@ -296,10 +274,6 @@ export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
     return query;
 }
 
-/**
- * @returns {String}
- * @param {String} url
- */
 export async function uploadImageToImgur(url: string): Promise<string> {
     let fallback = false;
 

@@ -42,10 +42,6 @@ cmd.slashData
     )
     .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

@@ -13,11 +13,6 @@ cmd.slashData.addStringOption((option) =>
     option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
 );
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data) => {
         if (!(message instanceof Message)) {

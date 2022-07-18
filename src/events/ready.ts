@@ -6,10 +6,6 @@ import { logger } from "../utils/logger";
 
 declare function require(name: string);
 
-/**
- * @param {Client} client
- * @param {Number} startUp
- */
 export default function ready(client: Client, startUp: number) {
     setTimeout(() => {
         if (getCustomPresence()) return;

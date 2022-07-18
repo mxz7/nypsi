@@ -25,10 +25,6 @@ cmd.slashData.addUserOption((option) =>
     option.setName("user").setDescription("view balance of this user").setRequired(false)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
         let target: GuildMember | string = message.mentions.members.first();

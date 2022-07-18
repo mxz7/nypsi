@@ -8,10 +8,6 @@ const cmd = new Command("hunt", "go to a field and hunt", Categories.MONEY);
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

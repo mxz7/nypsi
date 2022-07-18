@@ -14,10 +14,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.j
 
 const cmd = new Command("storerob", "attempt to rob a store for a reward", Categories.MONEY).setAliases(["shoprob"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

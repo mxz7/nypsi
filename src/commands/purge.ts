@@ -12,10 +12,6 @@ cmd.slashData.addIntegerOption((option) =>
     option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         return;

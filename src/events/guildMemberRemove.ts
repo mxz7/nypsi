@@ -1,10 +1,6 @@
 import { GuildMember } from "discord.js";
 import { expireUser, setTier } from "../utils/premium/utils";
 
-/**
- *
- * @param {GuildMember} member
- */
 export default async function guildMemberRemove(member: GuildMember) {
     if (member.guild.id != "747056029795221513") return;
 

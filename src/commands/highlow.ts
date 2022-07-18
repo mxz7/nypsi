@@ -35,10 +35,6 @@ const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).set
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -268,12 +264,6 @@ function getValue(member) {
     }
 }
 
-/**
- *
- * @param {Message} message
- * @param {Message} m
- * @returns
- */
 async function playGame(message, m) {
     if (!games.has(message.author.id)) return;
 

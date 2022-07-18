@@ -19,10 +19,6 @@ const cmd = new Command("usernamehistory", "view a user's username history", Cat
     "usernames",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -106,9 +102,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     if (pages.size == 1) {

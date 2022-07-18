@@ -30,10 +30,6 @@ BigInt.prototype.toJSON = function () {
     return this.toString();
 };
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (cooldown.has(message.author.id)) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait before doing that again")] });

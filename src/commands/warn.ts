@@ -13,10 +13,6 @@ cmd.slashData
     .addUserOption((option) => option.setName("user").setDescription("user to warn").setRequired(true))
     .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 

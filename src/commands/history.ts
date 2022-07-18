@@ -24,10 +24,6 @@ cmd.slashData.addStringOption((option) =>
     option.setName("user").setDescription("use the user's id or username").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -149,9 +145,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    /**
-     * @type {Message}
-     */
     let msg;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
