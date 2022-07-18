@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 }
 
-function timeUntil(date) {
+function timeUntil(date: number) {
     const ms = Math.floor(date - new Date().getTime());
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
