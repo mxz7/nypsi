@@ -1,8 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
+import { requestDM } from "../nypsi";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed } from "../utils/models/EmbedBuilders";
-
-declare function require(name: string);
 
 const cmd = new Command(
     "requestdm",
@@ -16,8 +15,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length < 2) {
         return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
     }
-
-    const { requestDM } = require("../nypsi");
 
     const user = args[0];
 

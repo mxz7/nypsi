@@ -140,7 +140,7 @@ export async function onVote(vote: WebhookPayload) {
     doVote(client, vote);
 }
 
-export async function requestDM(id: string, content: string, dontDmTekoh: boolean, embed?: EmbedBuilder): Promise<boolean> {
+export async function requestDM(id: string, content: string, dontDmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
 
