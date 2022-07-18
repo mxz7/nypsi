@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import {
     userExists,
     createUser,
@@ -203,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+        new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle(ButtonStyle.Success).setDisabled(true)
     );
 
     const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
@@ -346,7 +353,7 @@ async function playGame(message, m) {
 
         if (earnedXp > 0) {
             await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-            newEmbed.setFooter(`+${earnedXp}xp`);
+            newEmbed.setFooter({ text: `+${earnedXp}xp` });
 
             const guild = await getGuildByUser(message.member);
 
@@ -434,14 +441,18 @@ async function playGame(message, m) {
             let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
-                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle(ButtonStyle.Success).setDisabled(true)
             );
 
             if (win >= 1) {
                 row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
-                    new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                    new ButtonBuilder()
+                        .setCustomId("💰")
+                        .setLabel("cash out")
+                        .setStyle(ButtonStyle.Success)
+                        .setDisabled(false)
                 );
             }
 
@@ -487,14 +498,18 @@ async function playGame(message, m) {
             let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                 new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
-                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(true)
+                new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle(ButtonStyle.Success).setDisabled(true)
             );
 
             if (win >= 1) {
                 row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
                     new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
-                    new ButtonBuilder().setCustomId("💰").setLabel("cash out").setStyle("SUCCESS").setDisabled(false)
+                    new ButtonBuilder()
+                        .setCustomId("💰")
+                        .setLabel("cash out")
+                        .setStyle(ButtonStyle.Success)
+                        .setDisabled(false)
                 );
             }
 
