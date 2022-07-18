@@ -23,9 +23,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10);
 
+    let fail = false;
+
     const results = await urban.define(args.join()).catch(() => {
-        return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+        fail = true;
     });
+
+    if (fail) return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+
+    if (!results) {
+        return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+    }
 
     inPlaceSort(results).desc((i: any) => i.thumbs_up);
 
