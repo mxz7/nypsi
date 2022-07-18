@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { deleteServer, profileExists } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, "react with ✅ to delete all punishment/moderation cases")
         .setHeader("confirmation")
-        .setFooter("this cannot be reversed");
+        .setFooter({ text: "this cannot be reversed" });
 
     const msg = await message.channel.send({ embeds: [embed] });
 
