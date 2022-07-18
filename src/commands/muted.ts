@@ -1,4 +1,13 @@
-import { CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder, Permissions } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    PermissionFlagsBits,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -11,7 +20,7 @@ const cmd = new Command("muted", "view the currently muted members in the server
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -65,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member).setHeader("muted users");
 
     embed.setDescription(pages.get(1).join("\n"));
-    embed.setFooter(`1/${pages.size}`);
+    embed.setFooter({ text: `1/${pages.size}` });
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -105,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 currentPage--;
 
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `${currentPage}/${lastPage}` });
 
                 if (currentPage == 1) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -136,7 +145,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 currentPage++;
 
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `${currentPage}/${lastPage}` });
 
                 if (currentPage == lastPage) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
