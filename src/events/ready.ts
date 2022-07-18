@@ -1,15 +1,10 @@
 import { Client } from "discord.js";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
+import { commandsSize } from "../utils/commandhandler";
 import { getCustomPresence, randomPresence } from "../utils/functions/presence";
 import { logger } from "../utils/logger";
 
-declare function require(name: string);
-
-/**
- * @param {Client} client
- * @param {Number} startUp
- */
 export default function ready(client: Client, startUp: number) {
     setTimeout(() => {
         if (getCustomPresence()) return;
@@ -38,8 +33,6 @@ export default function ready(client: Client, startUp: number) {
             ],
         });
     }, 30 * 60 * 1000);
-
-    const { commandsSize } = require("../utils/commandhandler");
 
     let memberCount = 0;
 

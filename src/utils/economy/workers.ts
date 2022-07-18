@@ -30,10 +30,6 @@ export class Worker {
     public itemName: string;
     public level: number;
     public stored: number;
-    /**
-     * @returns {Worker}
-     * @param {JSON} settings
-     */
     constructor(settings: Settings) {
         this.maxStorage = settings.maxStorage;
         this.perItem = settings.perItem;
@@ -57,9 +53,6 @@ export class Worker {
         return this;
     }
 
-    /**
-     * @returns {Number}
-     */
     getUpgradeCost(): number {
         const base = this.cost;
         const currentLevel = this.level;
@@ -67,10 +60,6 @@ export class Worker {
         return base + base * currentLevel;
     }
 
-    /**
-     *
-     * @returns {Number}
-     */
     getHourlyRate(): number {
         return this.perInterval * 12;
     }
@@ -89,10 +78,6 @@ export class Worker {
         };
     }
 
-    /**
-     * @returns {Worker}
-     * @param {Worker} json
-     */
     static fromStorage(json: WorkerStorageData): Worker {
         const worker = workers.get(json.id);
 
@@ -101,9 +86,6 @@ export class Worker {
 }
 
 export class PotatoFarmer extends Worker {
-    /**
-     * @returns {PotatoFarmer}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 4;
         let maxStorage = 600;
@@ -133,9 +115,6 @@ export class PotatoFarmer extends Worker {
 workers.set(0, PotatoFarmer);
 
 export class Fisherman extends Worker {
-    /**
-     * @returns {Fisherman}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 15;
         let maxStorage = 350;
@@ -165,9 +144,6 @@ export class Fisherman extends Worker {
 workers.set(1, Fisherman);
 
 export class Miner extends Worker {
-    /**
-     * @returns {Miner}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 22;
         let maxStorage = 400;
@@ -197,9 +173,6 @@ export class Miner extends Worker {
 workers.set(2, Miner);
 
 export class LumberJack extends Worker {
-    /**
-     * @returns {Butcher}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 35;
         let maxStorage = 350;
@@ -229,9 +202,6 @@ export class LumberJack extends Worker {
 workers.set(3, LumberJack);
 
 export class Butcher extends Worker {
-    /**
-     * @returns {Butcher}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 17;
         let maxStorage = 600;
@@ -261,9 +231,6 @@ export class Butcher extends Worker {
 workers.set(4, Butcher);
 
 export class Tailor extends Worker {
-    /**
-     * @returns {Tailor}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 20;
         let maxStorage = 750;
@@ -293,9 +260,6 @@ export class Tailor extends Worker {
 workers.set(5, Tailor);
 
 export class SpaceX extends Worker {
-    /**
-     * @returns {Tailor}
-     */
     constructor(level = 1, stored = 0) {
         let perItem = 50;
         let maxStorage = 215;
@@ -326,10 +290,6 @@ workers.set(6, SpaceX);
 
 export type Constructor<T> = new (level?: number, stored?: number) => T;
 
-/**
- *
- * @returns {Map<Number, Worker>}
- */
 export function getAllWorkers(): Map<number, Constructor<Worker>> {
     return workers;
 }

@@ -7,10 +7,6 @@ import { getPrefix } from "../utils/guilds/utils";
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let target = message.member;
 

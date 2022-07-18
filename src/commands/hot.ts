@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
@@ -12,14 +12,10 @@ const cmd = new Command("hot", "measure how hot you are", Categories.FUN).setAli
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("hot or not"));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -37,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 7);
 
-    let member;
+    let member: GuildMember;
 
     if (args.length == 0) {
         member = message.member;

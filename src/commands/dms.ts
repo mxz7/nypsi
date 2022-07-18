@@ -10,11 +10,6 @@ const cmd = new Command("dms", "enable/disable dms with the bot", Categories.INF
     "stopmessagingme",
 ]);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

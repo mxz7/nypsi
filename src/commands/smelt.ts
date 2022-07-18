@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { userExists, createUser, getInventory, getItems, addItemUse, setInventory } from "../utils/economy/utils";
@@ -8,16 +8,12 @@ const cmd = new Command("smelt", "smelt your ores into ingots with coal", Catego
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -128,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed] });
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();

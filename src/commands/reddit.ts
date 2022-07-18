@@ -5,15 +5,12 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { RedditJSON } from "../utils/models/Reddit";
 
 const blacklisted = ["body", "shit"];
 
 const cmd = new Command("reddit", "get a random image from any subreddit", Categories.UTILITY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -51,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let allowed;
 
     try {
-        const res = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then((a) => a.json());
+        const res: RedditJSON = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then((a) => a.json());
 
         allowed = res.data.children.filter((post) => !post.data.is_self);
     } catch (e) {

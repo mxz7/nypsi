@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -14,11 +15,6 @@ const cmd = new Command("clearinventory", "clear your inventory. this cannot be 
     "clearinv",
 ]);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -44,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const reaction = await msg
         .awaitMessageComponent({ filter, time: 15000 })

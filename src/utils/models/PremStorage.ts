@@ -13,11 +13,6 @@ export class PremUser {
     public revokeReason: string;
     public startDate: Date;
     public expireDate: Date;
-    /**
-     * @returns {PremUser}
-     * @param {String} id user id
-     * @param {Number} level tier level
-     */
     constructor(id: string, level: number) {
         this.id = id;
         this.level = level;
@@ -32,30 +27,18 @@ export class PremUser {
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Number} level
-     */
     setLevel(level: number): PremUser {
         this.level = level;
 
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {String} color
-     */
     setEmbedColor(color: string): PremUser {
         this.embedColor = color;
 
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Date} date
-     */
     setLastDaily(date: Date): PremUser {
         if (date instanceof Date) {
             this.lastDaily = date;
@@ -66,10 +49,6 @@ export class PremUser {
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Date} date
-     */
     setLastWeekly(date: Date): PremUser {
         if (date instanceof Date) {
             this.lastWeekly = date;
@@ -80,30 +59,18 @@ export class PremUser {
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Number} status
-     */
     setStatus(status: number): PremUser {
         this.status = status;
 
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {String} reason
-     */
     setReason(reason: string): PremUser {
         this.revokeReason = reason;
 
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Date} date
-     */
     setStartDate(date: Date): PremUser {
         if (date instanceof Date) {
             this.startDate = date;
@@ -114,10 +81,6 @@ export class PremUser {
         return this;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Date} date
-     */
     setExpireDate(date: Date): PremUser {
         if (date instanceof Date) {
             this.expireDate = date;
@@ -128,9 +91,6 @@ export class PremUser {
         return this;
     }
 
-    /**
-     * @returns {String}
-     */
     getLevelString(): string {
         switch (this.level) {
             case 0:
@@ -169,10 +129,6 @@ export class PremUser {
         }
     }
 
-    /**
-     *
-     * @returns {PremUser}
-     */
     async expire(): Promise<PremUser | string> {
         const { requestDM, requestRemoveRole } = require("../../nypsi");
 
@@ -213,10 +169,6 @@ export class PremUser {
         return;
     }
 
-    /**
-     * @returns {PremUser}
-     * @param {Object} object
-     */
     static fromData(object: any): PremUser {
         const a = new PremUser(object.id, object.level);
         a.setEmbedColor(object.embedColor);

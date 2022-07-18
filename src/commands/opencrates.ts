@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { startOpeningCrates, stopOpeningCrates } from "../utils/commandhandler";
@@ -11,21 +11,16 @@ const cmd = new Command("opencrates", "open all of your crates with one command"
 
 cmd.slashEnabled = true;
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
@@ -44,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const inventory = await getInventory(message.member);
     const items = getItems();
 
-    const crates = [];
+    const crates: string[] = [];
 
     let max = 5;
     let hitMax = false;

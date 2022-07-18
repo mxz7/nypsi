@@ -8,10 +8,6 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
     .setAliases(["disablecmd", "disable"])
     .setPermissions(["MANAGE_SERVER"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

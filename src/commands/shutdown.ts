@@ -9,10 +9,6 @@ const cmd = new Command("shutdown", "shutdown bot", Categories.NONE).setPermissi
 
 let confirm = false;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.member.user.id != "672793821850894347") return;
 

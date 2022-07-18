@@ -10,10 +10,6 @@ const cmd = new Command("inspiration", "generate an inspirational quote (inspiro
     "inspire",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

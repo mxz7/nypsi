@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import ms = require("ms");
 import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -40,9 +40,9 @@ const karmaCooldown: Set<string> = new Set();
 let wordList: string[];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data).catch();
+            await message.reply(data as InteractionReplyOptions).catch();
             const replyMsg = await message.fetchReply().catch();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -143,9 +143,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return play(message);
 }
 
-async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)): Promise<void> {
     const m = games.get(message.author.id).message;
-    const edit = async (data) => {
+    const edit = async (data: MessageEditOptions) => {
         if (!(message instanceof Message)) {
             await message.editReply(data).catch(() => {
                 games.delete(message.author.id);
@@ -162,7 +162,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 
     const embed = games.get(message.author.id).embed;
 
-    const filter = (m) => m.author.id == message.author.id && !m.content.includes(" ");
+    const filter = (m: Message) => m.author.id == message.author.id && !m.content.includes(" ");
     let fail = false;
 
     const response: any = await message.channel
@@ -249,7 +249,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 }
 
 async function cancel(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data) => {
+    const edit = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
@@ -274,7 +274,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data) => {
+    const edit = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
@@ -310,7 +310,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 }
 
 async function lose(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data) => {
+    const edit = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();

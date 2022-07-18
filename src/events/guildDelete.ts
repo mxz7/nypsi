@@ -4,10 +4,6 @@ import { removeKarma } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { profileExists, setMuteRole } from "../utils/moderation/utils";
 
-/**
- * @param {Client} client
- * @param {Guild} guild
- */
 export default async function guildDelete(client: Client, guild: Guild) {
     if (!guild.name) {
         return;

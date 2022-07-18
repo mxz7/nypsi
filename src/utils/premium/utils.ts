@@ -26,10 +26,6 @@ setInterval(async () => {
     }
 }, 600000);
 
-/**
- * @returns {Boolean}
- * @param {GuildMember} member
- */
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -80,10 +76,6 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     }
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function getTier(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -109,10 +101,6 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     return query.level;
 }
 
-/**
- * @param {GuildMember} member
- * @param {Number} level
- */
 export async function addMember(member: GuildMember | string, level: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -152,10 +140,6 @@ export async function addMember(member: GuildMember | string, level: number) {
     await redis.del(`cache:premium:level:${id}`);
 }
 
-/**
- * @returns {PremUser}
- * @param {GuildMember} member
- */
 export async function getPremiumProfile(member: GuildMember | string): Promise<PremUser> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -173,10 +157,6 @@ export async function getPremiumProfile(member: GuildMember | string): Promise<P
     return createPremUser(query);
 }
 
-/**
- * @param {GuildMember} member
- * @param {Number} level
- */
 export async function setTier(member: GuildMember | string, level: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -202,10 +182,6 @@ export async function setTier(member: GuildMember | string, level: number) {
     await redis.del(`cache:premium:level:${id}`);
 }
 
-/**
- * @param {GuildMember} member
- * @param {String} color
- */
 export async function setEmbedColor(member: GuildMember | string, color: string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -228,10 +204,6 @@ export async function setEmbedColor(member: GuildMember | string, color: string)
     }
 }
 
-/**
- * @returns {String}
- * @param {String} member id
- */
 export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
     if (colorCache.has(member)) {
         return colorCache.get(member);
@@ -251,10 +223,6 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
     return query.embedColor as `#${string}` | "default";
 }
 
-/**
- * @param {GuildMember} member
- * @param {Date} date
- */
 export async function setLastDaily(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -273,10 +241,6 @@ export async function setLastDaily(member: GuildMember | string, date: Date) {
     });
 }
 
-/**
- * @param {GuildMember} member
- * @param {Date} date
- */
 export async function setLastWeekly(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -295,10 +259,6 @@ export async function setLastWeekly(member: GuildMember | string, date: Date) {
     });
 }
 
-/**
- * @param {GuildMember} member
- * @param {Number} status
- */
 export async function setStatus(member: GuildMember | string, status: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -317,9 +277,6 @@ export async function setStatus(member: GuildMember | string, status: number) {
     });
 }
 
-/**
- * @param {String} member id
- */
 export async function renewUser(member: string) {
     const profile = await getPremiumProfile(member);
 
@@ -344,9 +301,6 @@ export async function renewUser(member: string) {
     }
 }
 
-/**
- * @param {String} member id
- */
 export async function expireUser(member: string) {
     const profile = await getPremiumProfile(member);
 
@@ -379,10 +333,6 @@ export async function expireUser(member: string) {
     }
 }
 
-/**
- * @returns {Date}
- * @param {String} member id
- */
 export async function getLastDaily(member: string) {
     const query = await prisma.premium.findUnique({
         where: {
@@ -396,10 +346,6 @@ export async function getLastDaily(member: string) {
     return query.lastDaily;
 }
 
-/**
- * @returns {Date}
- * @param {String} member id
- */
 export async function getLastWeekly(member: string) {
     const query = await prisma.premium.findUnique({
         where: {
@@ -445,13 +391,6 @@ export async function getUserCommand(id: string) {
     });
 }
 
-/**
- *
- * @param {String} id
- * @param {String} trigger
- * @param {String} content
- * @param {Number} uses
- */
 export async function setCommand(id: string, trigger: string, content: string) {
     const query = await prisma.premiumCommand.findUnique({
         where: {
@@ -495,11 +434,6 @@ export async function addUse(id: string) {
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {number} date
- */
 export async function setExpireDate(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {

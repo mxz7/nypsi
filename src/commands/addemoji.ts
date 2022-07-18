@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -13,15 +13,10 @@ cmd.slashData.addStringOption((option) =>
     option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
 );
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -120,13 +115,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.guild.emojis
         .create({
-            attachment: url,
+            attachment: url as Buffer,
             name: name,
         })
         .catch((e) => {
             fail = true;
 
-            return send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] });
+            return send({ embeds: [new ErrorEmbed(`\`\`\`${e.message}\`\`\``)] });
         });
 
     if (fail) return;

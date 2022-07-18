@@ -7,11 +7,6 @@ const cmd = new Command("bitcoin", "view the current bitcoin value (reflects rea
     "btc",
 ]);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
     const bitcoin = getItems()["bitcoin"];

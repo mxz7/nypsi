@@ -17,10 +17,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("buy", "buy items from the shop", Categories.MONEY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

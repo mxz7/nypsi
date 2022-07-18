@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
+import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -15,12 +15,8 @@ cmd.slashData
     .addUserOption((option) => option.setName("user").setDescription("member to ban from the server").setRequired(true))
     .addStringOption((option) => option.setName("reason").setDescription("reason for the ban").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {
@@ -321,37 +317,37 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getDuration(duration) {
+function getDuration(duration: string) {
     duration.toLowerCase();
 
     if (duration.includes("d")) {
         if (!parseInt(duration.split("d")[0])) return undefined;
 
-        const num = duration.split("d")[0];
+        const num = parseInt(duration.split("d")[0]);
 
         return num * 86400;
     } else if (duration.includes("h")) {
         if (!parseInt(duration.split("h")[0])) return undefined;
 
-        const num = duration.split("h")[0];
+        const num = parseInt(duration.split("h")[0]);
 
         return num * 3600;
     } else if (duration.includes("m")) {
         if (!parseInt(duration.split("m")[0])) return undefined;
 
-        const num = duration.split("m")[0];
+        const num = parseInt(duration.split("m")[0]);
 
         return num * 60;
     } else if (duration.includes("s")) {
         if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = duration.split("s")[0];
+        const num = parseInt(duration.split("s")[0]);
 
         return num;
     }
 }
 
-function getTime(ms) {
+function getTime(ms: number) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
     const daysms = ms % (24 * 60 * 60 * 1000);
     const hours = Math.floor(daysms / (60 * 60 * 1000));

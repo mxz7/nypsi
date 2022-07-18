@@ -4,9 +4,6 @@ import { deleteMute, getMuteRole, isMuted, profileExists } from "../utils/modera
 
 const queue = new Set();
 
-/**
- * @param {GuildMember} member
- */
 export default async function guildMemberAdd(member: GuildMember) {
     if (!(await hasGuild(member.guild))) await createGuild(member.guild);
 

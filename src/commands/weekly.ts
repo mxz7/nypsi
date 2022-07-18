@@ -8,10 +8,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.j
 
 const cmd = new Command("weekly", "get your weekly bonus (patreon only)", Categories.MONEY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -87,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 }
 
-function timeUntil(date) {
+function timeUntil(date: number) {
     const ms = Math.floor(date - new Date().getTime());
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));

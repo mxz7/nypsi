@@ -30,11 +30,6 @@ const filterxd = [
     "bitly",
 ];
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await isPremium(message.author.id))) {
         return message.channel.send({
@@ -97,7 +92,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [new CustomEmbed(message.member, "please enter your command name / trigger")],
         });
 
-        const filter = (msg) => message.author.id == msg.author.id;
+        const filter = (msg: Message) => message.author.id == msg.author.id;
 
         let fail = false;
 

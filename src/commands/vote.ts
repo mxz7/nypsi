@@ -9,10 +9,6 @@ const cmd = new Command(
     Categories.MONEY
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

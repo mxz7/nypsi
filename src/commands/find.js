@@ -21,10 +21,6 @@ const { formatDate, daysAgo } = require("../utils/functions/date");
 
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return;
 
@@ -81,11 +77,6 @@ async function run(message, args) {
     }
 }
 
-/**
- *
- * @param {Message} message
- * @param {Guild} guild
- */
 async function showGuild(message, guild) {
     let balTop = await topAmount(guild, 5);
 
@@ -129,11 +120,6 @@ async function showGuild(message, guild) {
     return message.channel.send({ embeds: [embed] });
 }
 
-/**
- *
- * @param {Message} message
- * @param {User} user
- */
 async function showUser(message, user) {
     const guilds = [];
 

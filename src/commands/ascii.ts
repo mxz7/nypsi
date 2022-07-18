@@ -8,10 +8,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("ascii", "create ascii text", Categories.FUN);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const prefix = await getPrefix(message.guild);
 
@@ -101,22 +97,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let asciiString = "";
     let fail = false;
 
-    await ascii(
-        text,
-        {
-            font: font,
-        },
-        async (err, data) => {
-            if (!err) {
-                asciiString = "```" + data + "```";
-            } else {
-                fail = true;
-                return message.channel.send({
-                    embeds: [new ErrorEmbed("error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**")],
-                });
-            }
+    ascii.text(text, font as ascii.Fonts, async (err, data) => {
+        if (!err) {
+            asciiString = "```" + data + "```";
+        } else {
+            fail = true;
+            return message.channel.send({
+                embeds: [new ErrorEmbed("error - maybe an incorrect font - fonts are **cAsE sEnSiTiVe**")],
+            });
         }
-    );
+    });
 
     setTimeout(() => {
         if (fail) {

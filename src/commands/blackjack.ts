@@ -5,6 +5,11 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    GuildMember,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import {
     userExists,
@@ -37,16 +42,12 @@ cmd.slashData.addIntegerOption((option) =>
     option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -231,7 +232,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     send({ embeds: [embed], components: [row] })
         .then((m) => {
-            playGame(message, m).catch((e) => {
+            playGame(message, m).catch((e: string) => {
                 logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
                 logger.error(e);
                 return message.channel.send({
@@ -246,7 +247,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function newCard(member) {
+function newCard(member: GuildMember) {
     const bet = games.get(member.user.id).bet;
     const deck = games.get(member.user.id).deck;
     const cards = games.get(member.user.id).cards;
@@ -273,7 +274,7 @@ function newCard(member) {
     });
 }
 
-function newDealerCard(member) {
+function newDealerCard(member: GuildMember) {
     const bet = games.get(member.user.id).bet;
     const deck = games.get(member.user.id).deck;
     const cards = games.get(member.user.id).cards;
@@ -300,7 +301,7 @@ function newDealerCard(member) {
     });
 }
 
-function calcTotal(member) {
+function calcTotal(member: GuildMember) {
     const cards = games.get(member.user.id).cards;
 
     let total = 0;
@@ -338,7 +339,7 @@ function calcTotal(member) {
     return total;
 }
 
-function calcTotalDealer(member) {
+function calcTotalDealer(member: GuildMember) {
     const cards = games.get(member.user.id).dealerCards;
 
     let total = 0;
@@ -367,27 +368,23 @@ function calcTotalDealer(member) {
     return total;
 }
 
-function getCards(member) {
+function getCards(member: GuildMember) {
     const cards = games.get(member.user.id).cards;
 
     return "| " + cards.join(" | ") + " |";
 }
 
-function getDealerCards(member) {
+function getDealerCards(member: GuildMember) {
     const cards = games.get(member.user.id).dealerCards;
 
     return "| " + cards.join(" | ") + " |";
 }
 
-/**
- * @param {Message} message
- * @param {Message} m
- */
-async function playGame(message, m) {
+async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), m: Message): Promise<void> {
     if (!games.has(message.author.id)) return;
 
-    const edit = async (data) => {
-        if (message.interaction) {
+    const edit = async (data: MessageEditOptions) => {
+        if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
         } else {
@@ -478,11 +475,13 @@ async function playGame(message, m) {
     };
 
     if (calcTotalDealer(message.member) > 21) {
-        return win();
+        win();
+        return;
     } else if (calcTotalDealer(message.member) == 21 && !first && dealerPlaya) {
-        return lose();
+        lose();
+        return;
     } else if (calcTotal(message.member) == 21) {
-        return setTimeout(() => {
+        setTimeout(() => {
             dealerPlay(message);
 
             if (calcTotal(message.member) == calcTotalDealer(message.member)) {
@@ -501,8 +500,10 @@ async function playGame(message, m) {
                 }
             }
         }, 1500);
+        return;
     } else if (calcTotal(message.member) > 21) {
-        return lose();
+        lose();
+        return;
     } else {
         games.set(message.member.user.id, {
             bet: bet,
@@ -515,12 +516,12 @@ async function playGame(message, m) {
             voted: games.get(message.member.user.id).voted,
         });
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
         let fail = false;
 
         const reaction = await m
-            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
                 await collected.deferUpdate();
                 return collected.customId;
@@ -537,7 +538,8 @@ async function playGame(message, m) {
             newCard(message.member);
 
             if (calcTotal(message.member) > 21) {
-                return lose();
+                lose();
+                return;
             }
 
             const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
@@ -547,7 +549,7 @@ async function playGame(message, m) {
             await edit({ embeds: [newEmbed1] });
 
             if (calcTotal(message.member) == 21) {
-                return setTimeout(() => {
+                setTimeout(() => {
                     dealerPlay(message);
 
                     if (calcTotal(message.member) == calcTotalDealer(message.member)) {
@@ -566,6 +568,7 @@ async function playGame(message, m) {
                         }
                     }
                 }, 1500);
+                return;
             }
 
             return playGame(message, m);
@@ -631,9 +634,10 @@ async function playGame(message, m) {
             edit({ embeds: [newEmbed1] });
 
             if (calcTotal(message.member) > 21) {
-                return setTimeout(() => {
+                setTimeout(() => {
                     return lose();
                 }, 1500);
+                return;
             }
 
             setTimeout(() => {
@@ -656,12 +660,13 @@ async function playGame(message, m) {
                 }
             }, 1500);
         } else {
-            return games.delete(message.author.id);
+            games.delete(message.author.id);
+            return;
         }
     }
 }
 
-function dealerPlay(message) {
+function dealerPlay(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     while (calcTotalDealer(message.member) < 17) {
         newDealerCard(message.member);
     }

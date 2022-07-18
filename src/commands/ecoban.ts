@@ -4,10 +4,6 @@ import { toggleBan } from "../utils/economy/utils";
 
 const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.author.id != "672793821850894347") return;
 

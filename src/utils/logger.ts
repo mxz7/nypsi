@@ -4,13 +4,7 @@ import * as winston from "winston";
 import "winston-daily-rotate-file";
 import * as DiscordTransport from "winston-discord-webhook";
 
-/**
- * @type {Map<String, Webhook>}
- */
 const webhook: Map<string, Webhook> = new Map();
-/**
- * @type {Map<String, String>}
- */
 const nextLogMsg: Map<string, string> = new Map();
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
@@ -92,12 +86,6 @@ const logger = winston.createLogger({
 
 export { logger };
 
-/**
- *
- * @param {User} from
- * @param {User} to
- * @param {Number} amount
- */
 export function payment(from: User, to: User, amount: number) {
     if (!nextLogMsg.get("pay")) {
         nextLogMsg.set(
@@ -113,14 +101,6 @@ export function payment(from: User, to: User, amount: number) {
     }
 }
 
-/**
- *
- * @param {User} user
- * @param {String} game
- * @param {Number} amount
- * @param {Boolean} win
- * @param {Number} winAmount
- */
 export function gamble(user: User, game: string, amount: number, win: boolean, winAmount?: number) {
     if (!nextLogMsg.get("gamble")) {
         nextLogMsg.set(
@@ -140,9 +120,6 @@ export function gamble(user: User, game: string, amount: number, win: boolean, w
     }
 }
 
-/**
- * @returns {String}
- */
 export function getTimestamp(): string {
     const date = new Date();
     let hours = date.getHours().toString();
@@ -166,10 +143,6 @@ export function getTimestamp(): string {
     return timestamp;
 }
 
-/**
- *
- * @param {Client} client
- */
 export async function getWebhooks(client: Client) {
     if (client.user.id != "678711738845102087") return;
 

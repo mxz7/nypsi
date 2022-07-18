@@ -1,9 +1,10 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { getDMsEnabled } from "../utils/economy/utils.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import redis from "../utils/database/redis.js";
+import { MilfSearchData } from "../utils/models/Sex.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
     "findhornymilfsinmyarea",
@@ -15,18 +16,14 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
 
-const looking = new Map();
+const looking: Map<string, MilfSearchData> = new Map();
 
 const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -68,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 45);
 
-    const addToLooking = (description) => {
+    const addToLooking = (description: string) => {
         const obj = {
             user: message.author,
             guild: message.guild,
@@ -114,8 +111,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        for (let key of looking.keys()) {
-            key = looking.get(key);
+        for (const k of looking.keys()) {
+            const key = looking.get(k);
 
             if (message.guild.id == key.guild.id) continue;
 
@@ -137,7 +134,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await send({ embeds: [embed] });
 
-            const channel = await key.guild.channels.cache.find((ch) => ch.id == key.channel);
+            const channel = key.guild.channels.cache.find((ch) => ch.id == key.channel);
+
+            if (!channel.isTextBased()) return;
 
             const embed2 = new CustomEmbed(
                 undefined,
@@ -154,7 +153,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 );
             }
 
-            return await channel.send({ content: key.user.toString() + " a match has been found", embeds: [embed2] });
+            return await channel
+                .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })
+                .catch(() => {});
         }
 
         addToLooking(description);

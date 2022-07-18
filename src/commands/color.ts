@@ -1,14 +1,10 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ColorResolvable, CommandInteraction, Message } from "discord.js";
 import { getMember } from "../utils/functions/member";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("color", "get a random hex color code", Categories.INFO).setAliases(["colour"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let color;
     let member;
@@ -40,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member, `[**#${color}**](https://color.tekoh.net/#${color})`);
 
     try {
-        embed.setColor(color);
+        embed.setColor(color as ColorResolvable);
     } catch {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid color")] });
     }
