@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { daysUntilChristmas } from "../utils/functions/date";
 import {
     getChristmasCountdown,
@@ -20,7 +20,7 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", Ca
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")],
         });
@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `**enabled** \`${profile.enabled}\`\n` + `**format** ${profile.format}\n**channel** \`${profile.channel}\``
         )
             .setHeader("christmas countdown")
-            .setFooter(`use ${prefix}xmas help to view additional commands`);
+            .setFooter({ text: `use ${prefix}xmas help to view additional commands` });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "enable") {
@@ -68,7 +68,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let channel;
 
         if (args.length == 1) {
-            channel = await message.guild.channels.create("christmas", {});
+            channel = await message.guild.channels.create({
+                name: "christmas",
+            });
         } else {
             if (args[1].length != 18) {
                 if (message.mentions.channels.first()) {
