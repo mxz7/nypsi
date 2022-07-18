@@ -4,7 +4,14 @@ import { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma }
 import { inPlaceSort } from "fast-sort";
 import { isPremium, getTier, setExpireDate } from "../utils/premium/utils";
 import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -97,7 +104,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         };
 
         embed.setHeader("karma shop", message.author.avatarURL());
-        embed.setFooter(`you have ${(await getKarma(message.member)).toLocaleString()} karma ${displayItemsLeft()}`);
+        embed.setFooter({
+            text: `you have ${(await getKarma(message.member)).toLocaleString()} karma ${displayItemsLeft()}`,
+        });
 
         for (let item of pages[page]) {
             item = items[item];
@@ -163,11 +172,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 true
                             );
                         }
-                        newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${(
+                        newEmbed.setFooter({
+                            text: `page ${currentPage + 1}/${pages.length} | you have ${(
                                 await getKarma(message.member)
-                            ).toLocaleString()} karma ${displayItemsLeft()}`
-                        );
+                            ).toLocaleString()} karma ${displayItemsLeft()}`,
+                        });
                         if (currentPage == 0) {
                             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                 new ButtonBuilder()
@@ -213,11 +222,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                                 true
                             );
                         }
-                        newEmbed.setFooter(
-                            `page ${currentPage + 1}/${pages.length} | you have ${(
+                        newEmbed.setFooter({
+                            text: `page ${currentPage + 1}/${pages.length} | you have ${(
                                 await getKarma(message.member)
-                            ).toLocaleString()} karma ${displayItemsLeft()}`
-                        );
+                            ).toLocaleString()} karma ${displayItemsLeft()}`,
+                        });
                         if (currentPage + 1 == lastPage) {
                             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                                 new ButtonBuilder()
