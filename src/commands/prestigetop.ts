@@ -1,5 +1,5 @@
 import { topAmountPrestige } from "../utils/economy/utils.js";
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     amount = parseInt(args[0]);
 
-    if (amount > 10 && !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) amount = 10;
+    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
 
     if (amount < 5) amount = 5;
 
