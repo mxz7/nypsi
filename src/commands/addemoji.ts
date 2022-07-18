@@ -113,17 +113,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let fail = false;
 
-    if (!(url instanceof Buffer)) return;
-
     await message.guild.emojis
         .create({
-            attachment: url,
+            attachment: url as Buffer,
             name: name,
         })
         .catch((e) => {
             fail = true;
 
-            return send({ embeds: [new ErrorEmbed(`discord error: \n\`\`\`${e.message}\`\`\``)] });
+            return send({ embeds: [new ErrorEmbed(`\`\`\`${e.message}\`\`\``)] });
         });
 
     if (fail) return;
