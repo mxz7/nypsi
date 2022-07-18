@@ -16,9 +16,9 @@ const cmd = new Command("stats", "view your economy stats", Categories.MONEY);
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader("item stats", message.author.avatarURL());
 
         /**
-         * @type {Map<Number, Array<String>}
+         * @type {Map<Number, string[]}
          */
         const pages = new Map();
 

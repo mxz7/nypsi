@@ -9,7 +9,7 @@ const cmd = new Command("clean", "clean up bot commands and responses", Categori
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;

@@ -10,9 +10,9 @@ const cmd = new Command("clearsnipe", "delete the current sniped thing", Categor
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
     const { snipe, eSnipe } = require("../nypsi.js");
 

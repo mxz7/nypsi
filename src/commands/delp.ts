@@ -7,7 +7,7 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", Categorie
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

@@ -364,9 +364,6 @@ async function addMention() {
         lastChange = Date.now();
     }
 
-    /**
-     * @type {Array<{ type: String, members: Collection, message: Message, guild: String }>}
-     */
     exports.mentionQueue = mentionQueue;
 }
 

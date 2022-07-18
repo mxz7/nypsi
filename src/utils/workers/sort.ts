@@ -1,7 +1,8 @@
 import { inPlaceSort } from "fast-sort";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
-export default function workerSort(array: Array<string>, sortData: Map<string, number>): Promise<Array<string>> {
+export default function workerSort(array: string[], sortData: Map<string, number>): Promise<string[]> {
+
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, {
             workerData: [array, sortData],

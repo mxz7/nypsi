@@ -4,10 +4,6 @@ export class StatsProfile {
     public gamble: any;
     public items: any;
     public rob: { wins: number; lose: number };
-    /**
-     *
-     * @param {Array<{id: string, type: string, win: number, lose: number, gamble: number}>} data
-     */
     constructor(data: StatsData[]) {
         this.gamble = {};
         this.items = {};

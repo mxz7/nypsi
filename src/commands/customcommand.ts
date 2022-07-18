@@ -33,9 +33,9 @@ const filterxd = [
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await isPremium(message.author.id))) {
         return message.channel.send({
             embeds: [new ErrorEmbed("you must be at least GOLD tier for this command")],

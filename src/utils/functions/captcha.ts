@@ -1,6 +1,6 @@
 import { getZeroWidth } from "../chatreactions/utils";
 
-const locked: Array<string> = [];
+const locked: string[] = [];
 
 /**
  *

@@ -13,12 +13,12 @@ export class Command {
     public name: string;
     public description: string;
     public category: string;
-    public permissions?: Array<string>;
-    public aliases?: Array<string>;
+    public permissions?: string[];
+    public aliases?: string[];
     public slashData?: SlashCommandBuilder;
     public slashEnabled: boolean;
     public data?: any;
-    public run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: Array<string>) => void;
+    public run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void;
 
     constructor(name: string, description: string, category: Categories) {
         this.name = name.toLowerCase();
@@ -32,17 +32,17 @@ export class Command {
         return this;
     }
 
-    public setPermissions(permissions: Array<string>) {
+    public setPermissions(permissions: string[]) {
         this.permissions = permissions;
         return this;
     }
 
-    public setAliases(aliases: Array<string>) {
+    public setAliases(aliases: string[]) {
         this.aliases = aliases;
         return this;
     }
 
-    public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: Array<string>) => void) {
+    public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void) {
         this.run = run;
         return this;
     }

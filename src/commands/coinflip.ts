@@ -29,9 +29,9 @@ const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) {
         await createUser(message.member);
     }

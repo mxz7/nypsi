@@ -16,7 +16,7 @@ cmd.slashData.addUserOption((option) =>
 
 const sortCache = new Map();
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member: GuildMember;
 
     if (args.length == 0) {

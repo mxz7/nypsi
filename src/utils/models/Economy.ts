@@ -5,7 +5,7 @@ export interface Item {
     description: string;
     worth?: number;
     role?: string;
-    aliases?: Array<string>;
+    aliases?: string[];
     speed?: number;
     rarity?: number;
     boobies?: string;

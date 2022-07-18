@@ -7,9 +7,9 @@ const cmd = new Command("banner", "get a person's banner", Categories.INFO);
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member: GuildMember;
 
     if (args.length == 0) {

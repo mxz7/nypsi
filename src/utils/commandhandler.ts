@@ -106,7 +106,7 @@ export function loadCommands() {
  *
  * @param {Array} commandsArray
  */
-export function reloadCommand(commandsArray: Array<string>) {
+export function reloadCommand(commandsArray: string[]) {
     const reloadTable = [];
 
     for (const cmd of commandsArray) {
@@ -161,9 +161,9 @@ export function reloadCommand(commandsArray: Array<string>) {
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function helpCmd(message: Message, args: Array<string>) {
+async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
     const helpCategories = new Map();
@@ -407,12 +407,12 @@ async function helpCmd(message: Message, args: Array<string>) {
  *
  * @param {String} cmd
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 export async function runCommand(
     cmd: string,
     message: Message | (NypsiCommandInteraction & CommandInteraction),
-    args: Array<string>
+    args: string[]
 ) {
     if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
@@ -777,10 +777,10 @@ export function getRandomCommand(): Command {
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  * @param {String} commandName
  */
-export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     args.shift();
 
     let msg: string;
@@ -842,9 +842,9 @@ function updatePopularCommands(command: string, member: GuildMember) {
 /**
  * @param {Client} client
  * @param {String} serverID
- * @param {Array<String>} channelID
+ * @param {string[]} channelID
  */
-export function runPopularCommandsTimer(client: Client, serverID: string, channelID: Array<string>) {
+export function runPopularCommandsTimer(client: Client, serverID: string, channelID: string[]) {
     const now = new Date();
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
