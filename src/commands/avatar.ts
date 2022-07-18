@@ -6,6 +6,10 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
@@ -52,15 +56,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);
 
-    let msg;
+    let msg: Message;
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
+            return replyMsg;
         } else {
             return await message.channel.send(data);
         }
@@ -72,9 +74,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const edit = async (data) => {
+    const edit = async (data: MessageEditOptions) => {
         if (!(message instanceof Message)) {
-            await msg.editReply(data);
+            await message.editReply(data);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -84,10 +86,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const reaction = await msg
-        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
             await collected.deferUpdate();
             return collected.customId;
