@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ethereumAmount * ethereum.worth
         ).toLocaleString()})`
     )
-        .setFooter("not real ethereum, although it reflects current worth in USD")
+        .setFooter({ text: "not real ethereum, although it reflects current worth in USD" })
         .setHeader("your ethereum", message.author.avatarURL());
 
     return message.channel.send({ embeds: [embed] });
