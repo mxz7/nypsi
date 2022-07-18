@@ -1,9 +1,5 @@
 import * as CryptoJS from "crypto-js";
 
-/**
- * @returns {String}
- * @param {String} string
- */
 export function cleanString(string: string): string {
     return string.replace(/[^A-z0-9\s]/g, "");
 }

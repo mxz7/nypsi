@@ -5,11 +5,6 @@ import { calcMinimumEarnedXp, getRequiredBetForXp, getGuildByUser } from "../uti
 
 const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", Categories.MONEY);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const requiredBet = await getRequiredBetForXp(message.member);
 

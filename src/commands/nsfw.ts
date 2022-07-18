@@ -4,10 +4,6 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("nsfw", "toggle nsfw on a channel", Categories.ADMIN).setPermissions(["MANAGE_CHANNELS"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

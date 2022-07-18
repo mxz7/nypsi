@@ -17,10 +17,6 @@ modLogColors.set(PunishmentType.KICK, "#ffdfba");
 modLogColors.set(PunishmentType.UNBAN, "#ffb3ba");
 modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9");
 
-/**
- *
- * @param {Guild} guild guild to create profile for
- */
 export async function createProfile(guild: Guild) {
     await prisma.moderation.create({
         data: {
@@ -29,10 +25,6 @@ export async function createProfile(guild: Guild) {
     });
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild check if profile exists for this guild
- */
 export async function profileExists(guild: Guild) {
     const query = await prisma.moderation.findUnique({
         where: {
@@ -50,10 +42,6 @@ export async function profileExists(guild: Guild) {
     }
 }
 
-/**
- * @returns {Number}
- * @param {Guild} guild guild to get case count of
- */
 export async function getCaseCount(guild: Guild) {
     const query = await prisma.moderation.findUnique({
         where: {
@@ -67,14 +55,6 @@ export async function getCaseCount(guild: Guild) {
     return query.caseCount;
 }
 
-/**
- *
- * @param {Guild} guild guild to create new case in
- * @param {String} caseType mute, unmute, kick, warn, ban, unban
- * @param {string[]} userIDs list of user ids
- * @param {String} moderator moderator issuing punishment
- * @param {String} command entire message
- */
 export async function newCase(
     guild: Guild,
     caseType: PunishmentType,
@@ -200,11 +180,6 @@ export async function getModLogsHook(guild: Guild): Promise<WebhookClient | unde
     return new WebhookClient({ url: query.modlogs });
 }
 
-/**
- *
- * @param {Guild} guild guild to delete case in
- * @param {String} caseID case to delete
- */
 export async function deleteCase(guild: Guild, caseID: string) {
     await prisma.moderationCase.updateMany({
         where: {
@@ -216,10 +191,6 @@ export async function deleteCase(guild: Guild, caseID: string) {
     });
 }
 
-/**
- *
- * @param {Guild} guild guild to delete data for
- */
 export async function deleteServer(guild: Guild | string) {
     let id: string;
     if (guild instanceof Guild) {
@@ -250,11 +221,6 @@ export async function deleteServer(guild: Guild | string) {
     });
 }
 
-/**
- * @returns {Array}
- * @param {Guild} guild guild to get cases of
- * @param {String} userID user to get cases of
- */
 export async function getCases(guild: Guild, userID: string) {
     const query = await prisma.moderationCase.findMany({
         where: {
@@ -265,10 +231,6 @@ export async function getCases(guild: Guild, userID: string) {
     return query.reverse();
 }
 
-/**
- * @returns {Object}
- * @param {Guild} guild guild to get cases of
- */
 export async function getAllCases(guild: Guild) {
     const query = await prisma.moderationCase.findMany({
         where: {
@@ -285,11 +247,6 @@ export async function getAllCases(guild: Guild) {
     return query.reverse();
 }
 
-/**
- * @returns {JSON} case
- * @param {Guild} guild guild to search for case in
- * @param {Number} caseID case to fetch
- */
 export async function getCase(guild: Guild, caseID: number) {
     if (caseID > (await getCaseCount(guild))) return undefined;
 
@@ -304,12 +261,6 @@ export async function getCase(guild: Guild, caseID: number) {
     return query;
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {string[]} userIDs
- * @param {Date} date
- */
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
@@ -325,12 +276,6 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
     }
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {string[]} userIDs
- * @param {Date} date
- */
 export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
@@ -347,11 +292,6 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
     }
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function isMuted(guild: Guild, member: GuildMember) {
     const query = await prisma.moderationMute.findFirst({
         where: {
@@ -369,11 +309,6 @@ export async function isMuted(guild: Guild, member: GuildMember) {
     }
 }
 
-/**
- * @returns {Boolean}
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function isBanned(guild: Guild, member: GuildMember) {
     const query = await prisma.moderationBan.findFirst({
         where: {
@@ -391,10 +326,6 @@ export async function isBanned(guild: Guild, member: GuildMember) {
     }
 }
 
-/**
- *
- * @param {Client} client
- */
 export function runModerationChecks(client: Client) {
     setInterval(async () => {
         const date = new Date();
@@ -484,12 +415,6 @@ export function runModerationChecks(client: Client) {
     }, 30000);
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {Number} caseID
- * @param {String} reason
- */
 export async function setReason(guild: Guild, caseID: number, reason: string) {
     await prisma.moderationCase.updateMany({
         where: {
@@ -530,11 +455,7 @@ export async function deleteBan(guild: Guild, member: GuildMember | string) {
         },
     });
 }
-/**
- *
- * @param {Guild} guild
- * @returns {String}
- */
+
 export async function getMuteRole(guild: Guild) {
     const query = await prisma.moderation.findUnique({
         where: {
@@ -552,11 +473,6 @@ export async function getMuteRole(guild: Guild) {
     }
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {Role} role
- */
 export async function setMuteRole(guild: Guild, role: Role | string) {
     let id: string;
 

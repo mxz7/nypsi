@@ -19,10 +19,6 @@ import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO).setAliases(["patreon", "donate"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const defaultMessage = async () => {
         if (await isPremium(message.member)) {

@@ -8,6 +8,7 @@ import {
     Role,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { inCooldown, addCooldown as addGuildCooldown, getPrefix } from "../utils/guilds/utils";
@@ -16,10 +17,6 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -101,10 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setHeader(role.name + " [" + count.toLocaleString() + "]")
         .setFooter({ text: `page 1/${memberList.size}` });
 
-    /**
-     * @type {Message}
-     */
-    let msg;
+    let msg: Message;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -122,11 +116,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentPage = 1;
     const lastPage = memberList.size;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    async function pageManager() {
+    async function pageManager(): Promise<void> {
         const reaction = await msg
-            .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+            .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
                 await collected.deferUpdate();
                 return collected.customId;

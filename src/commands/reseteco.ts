@@ -6,11 +6,6 @@ import { createCaptcha } from "../utils/functions/captcha";
 
 const cmd = new Command("reseteco", "reset economy except prestige", Categories.NONE);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.author.id != "672793821850894347") return;
 
@@ -27,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.send({ embeds: [embed] });
 
-    const filter = (msg) => message.author.id == msg.author.id;
+    const filter = (msg: Message) => message.author.id == msg.author.id;
 
     let response: any = await message.channel.awaitMessages({
         filter,

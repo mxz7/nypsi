@@ -4,10 +4,6 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 
 const cmd = new Command("captchatest", "test an account", Categories.NONE);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.author.id != "672793821850894347") return;
 

@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
@@ -28,11 +29,6 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -84,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const reaction = await msg
         .awaitMessageComponent({ filter, time: 15000 })

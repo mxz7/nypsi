@@ -14,10 +14,6 @@ const cmd = new Command(
 
 const regex = /[^a-f0-9]/g;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -54,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const roles = await message.guild.roles.fetch();
 
-    const sortedRoleIDs = [];
+    const sortedRoleIDs: string[] = [];
 
     roles.forEach((r) => sortedRoleIDs.push(r.id));
 

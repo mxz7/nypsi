@@ -24,6 +24,7 @@ import { WebhookPayload } from "@top-gg/sdk";
 import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, Options } from "discord.js";
+import { SnipedMessage } from "./utils/models/Snipe";
 
 const client = new Client({
     allowedMentions: {
@@ -64,8 +65,8 @@ const client = new Client({
     ],
 });
 
-const snipe = new Map();
-const eSnipe = new Map();
+const snipe: Map<string, SnipedMessage> = new Map();
+const eSnipe: Map<string, SnipedMessage> = new Map();
 
 export { eSnipe, snipe };
 
@@ -135,20 +136,11 @@ function runChecks() {
     });
 }
 
-/**
- *
- * @param {JSON} vote
- */
 export async function onVote(vote: WebhookPayload) {
     doVote(client, vote);
 }
 
-/**
- * @returns {Boolean}
- * @param {String} id
- * @param {Boolean} dontDmTekoh
- */
-export async function requestDM(id: string, content: string, dontDmTekoh: boolean, embed?: EmbedBuilder): Promise<boolean> {
+export async function requestDM(id: string, content: string, dontDmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
 
@@ -194,10 +186,6 @@ export async function requestDM(id: string, content: string, dontDmTekoh: boolea
     }
 }
 
-/**
- * @param {String} id
- * @param {String} roleid
- */
 export async function requestRemoveRole(id: string, roleID: string) {
     const guild = await client.guilds.fetch("747056029795221513");
 
@@ -239,7 +227,7 @@ export async function requestRemoveRole(id: string, roleID: string) {
     return await user.roles.remove(role);
 }
 
-export async function getGuild(guildID: string): Promise<Guild | void> {
+export async function getGuild(guildID: string): Promise<Guild> {
     let a = true;
 
     const guild = await client.guilds.fetch(guildID).catch(() => {
@@ -247,6 +235,8 @@ export async function getGuild(guildID: string): Promise<Guild | void> {
     });
 
     if (!a) return undefined;
+
+    if (!guild) return undefined;
 
     return guild;
 }

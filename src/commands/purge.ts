@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -12,18 +12,14 @@ cmd.slashData.addIntegerOption((option) =>
     option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         return;
     }
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -117,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 let messages = await message.channel.messages.fetch({ limit: amount, before: m.id });
 
                 messages = messages.filter((m) => {
-                    return timeSince(new Date(m.createdTimestamp)) < 14;
+                    return timeSince(new Date(m.createdTimestamp).getTime()) < 14;
                 });
 
                 await message.channel.bulkDelete(messages).catch();
@@ -127,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let messages = await message.channel.messages.fetch({ limit: 100, before: m.id });
 
             messages = messages.filter((m) => {
-                return timeSince(new Date(m.createdTimestamp)) < 14;
+                return timeSince(new Date(m.createdTimestamp).getTime()) < 14;
             });
 
             if (messages.size < 100) {
@@ -189,7 +185,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function timeSince(date) {
+function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));

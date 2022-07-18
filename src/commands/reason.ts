@@ -8,10 +8,6 @@ const cmd = new Command("reason", "set a reason for a case/punishment", Categori
     "MANAGE_MESSAGES",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 

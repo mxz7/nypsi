@@ -7,6 +7,6 @@
         "allowJs": true,
         "strictFunctionTypes": true,
         "skipLibCheck": true,
-        // "noImplicitAny": true
+        "noImplicitAny": true
     },
 }

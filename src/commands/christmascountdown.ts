@@ -15,10 +15,6 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", Ca
     .setAliases(["christmas", "xmas"])
     .setPermissions(["MANAGE_SERVER"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

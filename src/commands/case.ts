@@ -6,6 +6,10 @@ import {
     PermissionFlagsBits,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils";
@@ -23,10 +27,6 @@ cmd.slashData.addIntegerOption((option) =>
     option.setName("case-number").setDescription("what case would you like to view").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -36,9 +36,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger)
     );
 
-    let msg;
+    let msg: Message;
 
     if (message.member.permissions.has(PermissionFlagsBits.ManageGuild) && !case0.deleted) {
         msg = await send({ embeds: [embed], components: [row] });
@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await send({ embeds: [embed] });
     }
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data).catch(() => {});
             return await message.fetchReply();
@@ -114,10 +114,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const reaction = await msg
-        .awaitMessageComponent({ filter, time: 15000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 15000 })
         .then(async (collected) => {
             await collected.deferUpdate();
             return collected.customId;

@@ -6,10 +6,6 @@ import { getPrefix } from "../utils/guilds/utils";
 
 const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categories.MONEY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

@@ -7,6 +7,7 @@ import {
     PermissionFlagsBits,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -92,9 +93,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentPage = 1;
     const lastPage = pages.size;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager = async () => {
+    const pageManager = async (): Promise<void> => {
         const reaction = await msg
             .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {

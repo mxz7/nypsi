@@ -3,10 +3,6 @@ import { addKarma } from "../utils/karma/utils";
 import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils";
 import { createProfile, hasProfile } from "../utils/users/utils";
 
-/**
- * @param {GuildMember} oldMember
- * @param {GuildMember} newMember
- */
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
     if (newMember.guild.id == "747056029795221513") {
         if (oldMember.roles.cache.size < newMember.roles.cache.size) {
