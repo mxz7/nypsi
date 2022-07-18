@@ -1,10 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { redditImage } from "../utils/functions/image";
+import { images } from "../utils/imghandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-
-declare function require(name: string);
 
 const cmd = new Command("thighs", "get a random thighs image", Categories.NSFW);
 
@@ -25,8 +24,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
     }
-
-    const { images } = require("../utils/imghandler");
 
     const thighsCache = images.get("thighs");
 
