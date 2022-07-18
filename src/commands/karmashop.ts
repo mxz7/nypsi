@@ -11,15 +11,17 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import dayjs = require("dayjs");
+import { KarmaShopItem } from "../utils/models/Karmashop";
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
-declare function require(name: string);
+declare function require(name: string): any;
 
-const items = require("../../data/karmashop.json");
+const items: { [key: string]: KarmaShopItem } = require("../../data/karmashop.json");
 
 const amount = new Map();
 
@@ -61,9 +63,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0 || args.length == 1) {
         inPlaceSort(itemIDs).asc((i) => items[i].cost);
 
-        const pages = [];
+        const pages: string[][] = [];
 
-        let pageOfItems = [];
+        let pageOfItems: string[] = [];
         for (const item of itemIDs) {
             if (pageOfItems.length == 6) {
                 pages.push(pageOfItems);
@@ -97,8 +99,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             text: `you have ${(await getKarma(message.member)).toLocaleString()} karma ${displayItemsLeft()}`,
         });
 
-        for (let item of pages[page]) {
-            item = items[item];
+        for (const i of pages[page]) {
+            const item = items[i];
             embed.addField(
                 item.id,
                 `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${
@@ -113,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
         );
 
-        let msg;
+        let msg: Message;
 
         if (pages.length == 1) {
             return await message.channel.send({ embeds: [embed] });
@@ -126,11 +128,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const lastPage = pages.length;
 
-            const filter = (i) => i.user.id == message.author.id;
+            const filter = (i: Interaction) => i.user.id == message.author.id;
 
-            const pageManager = async () => {
+            const pageManager = async (): Promise<void> => {
                 const reaction = await msg
-                    .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                    .awaitMessageComponent({ filter, time: 30000 })
                     .then(async (collected) => {
                         await collected.deferUpdate();
                         return collected.customId;
@@ -148,8 +150,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         return pageManager();
                     } else {
                         currentPage--;
-                        for (let item of pages[currentPage]) {
-                            item = items[item];
+                        for (const i of pages[currentPage]) {
+                            const item = items[i];
                             embed.addField(
                                 item.id,
                                 `${item.emoji} **${item.name}**\n${
@@ -198,8 +200,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         return pageManager();
                     } else {
                         currentPage++;
-                        for (let item of pages[currentPage]) {
-                            item = items[item];
+                        for (const i of pages[currentPage]) {
+                            const item = items[i];
                             embed.addField(
                                 item.id,
                                 `${item.emoji} **${item.name}**\n${
