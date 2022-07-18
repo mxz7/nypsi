@@ -138,6 +138,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
+            if (!(worker instanceof Worker)) {
+                return message.channel.send({
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
+                });
+            }
+
             if (worker.prestige > (await getPrestige(message.member))) {
                 return message.channel.send({
                     embeds: [
@@ -243,6 +249,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const memberWorkers = await getWorkers(message.member);
 
+            if (!(worker instanceof Worker)) {
+                return message.channel.send({
+                    embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
+                });
+            }
+
             worker = memberWorkers[worker.id];
 
             if (!worker) {
@@ -269,7 +281,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await updateBalance(message.member, (await getBalance(message.member)) - worker.getUpgradeCost());
 
-            await upgradeWorker(message.member, worker.id);
+            await upgradeWorker(message.member, worker.id.toString());
 
             const embed = new CustomEmbed(message.member);
 
