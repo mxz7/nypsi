@@ -228,7 +228,7 @@ export async function createGuild(guild: Guild) {
 
 /**
  * @param {Guild} guild get snipe filter
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
     if (snipeFilterCache.has(guild.id)) {
@@ -258,9 +258,9 @@ export async function getSnipeFilter(guild: Guild): Promise<string[]> {
 /**
  *
  * @param {Guild} guild
- * @param {Array<String>} array
+ * @param {string[]} array
  */
-export async function updateSnipeFilter(guild: Guild, array: Array<string>) {
+export async function updateSnipeFilter(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
             id: guild.id,
@@ -585,7 +585,7 @@ export async function checkChristmasCountdown(guild: Guild) {
 
 /**
  * @param {Guild} guild get chat filter
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getChatFilter(guild: Guild): Promise<string[]> {
     if (chatFilterCache.has(guild.id)) {
@@ -613,9 +613,9 @@ export async function getChatFilter(guild: Guild): Promise<string[]> {
 /**
  *
  * @param {Guild} guild
- * @param {Array<String>} array
+ * @param {string[]} array
  */
-export async function updateChatFilter(guild: Guild, array: Array<string>) {
+export async function updateChatFilter(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
             id: guild.id,
@@ -630,7 +630,7 @@ export async function updateChatFilter(guild: Guild, array: Array<string>) {
 
 /**
  * @param {Guild} guild
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getDisabledCommands(guild: Guild): Promise<string[]> {
     if (disableCache.has(guild.id)) {
@@ -658,9 +658,9 @@ export async function getDisabledCommands(guild: Guild): Promise<string[]> {
 /**
  *
  * @param {Guild} guild
- * @param {Array<String>} array
+ * @param {string[]} array
  */
-export async function updateDisabledCommands(guild: Guild, array: Array<string>) {
+export async function updateDisabledCommands(guild: Guild, array: string[]) {
     await prisma.guild.update({
         where: {
             id: guild.id,
