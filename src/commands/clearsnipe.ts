@@ -1,22 +1,15 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { eSnipe, snipe } from "../nypsi";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-
-declare function require(name: string);
 
 const cmd = new Command("clearsnipe", "delete the current sniped thing", Categories.MODERATION)
     .setAliases(["cs"])
     .setPermissions(["MANAGE_MESSAGES"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-    const { snipe, eSnipe } = require("../nypsi.js");
-
-    let channel: any = message.channel;
+    let channel: Channel = message.channel;
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {

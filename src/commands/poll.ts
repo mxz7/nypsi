@@ -6,10 +6,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("poll", "create a poll with a lot of customisation", Categories.UTILITY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -22,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member)
             .setHeader("poll help")
-            .addField("usage", `${prefix}poll (choices) <title> | (text) | (hex color)`)
+            .addField("usage", `${prefix}poll (choices) <title> | (text)`)
             .addField(
                 "help",
                 "**<>** required | **()** optional\n" +
@@ -30,12 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     "if a number isnt found for choices then 👍👎 emojis will be used\n" +
                     "largest number of choices is 10, and 1 is minimum"
             )
-            .addField(
-                "examples",
-                `${prefix}poll question?\n` +
-                    `${prefix}poll 2 title | this is a description\n` +
-                    `${prefix}poll 9 hello | this is a description | #13c696`
-            );
+            .addField("examples", `${prefix}poll question?\n` + `${prefix}poll 2 title | this is a description`);
 
         return message.channel.send({ embeds: [embed] });
     }
@@ -75,24 +66,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         mode = "title_only";
     } else if (args.join(" ").split("|").length == 2) {
         mode = "title_desc";
-    } else if (args.join(" ").split("|").length == 3) {
-        mode = "title_desc_color";
     }
 
     const title = args.join(" ").split("|")[0];
-    let description, color;
+    let description;
 
     if (mode.includes("desc")) {
         description = args.join(" ").split("|")[1];
     }
 
-    if (mode.includes("color")) {
-        color = args.join(" ").split("|")[2];
-    }
-
     const embed = new CustomEmbed(message.member).setTitle(title);
-
-    if (color) embed.setColor(color);
 
     if (mode.includes("desc")) {
         embed.setDescription(description);

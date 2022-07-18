@@ -5,10 +5,6 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("raffle", "select a random user all server members or from a specific role", Categories.FUN);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -18,7 +14,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 5);
 
-    const members = [];
+    const members: string[] = [];
 
     if (args.length == 0) {
         const members1 = message.guild.members.cache;
@@ -46,13 +42,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    let chosen = members[Math.floor(Math.random() * members.length)];
+    const chosen = members[Math.floor(Math.random() * members.length)];
 
-    chosen = await message.guild.members.fetch(chosen);
+    const chosenMember = await message.guild.members.fetch(chosen);
 
     const embed = new CustomEmbed(message.member)
         .setHeader(`${message.member.user.username}'s raffle`, message.author.avatarURL())
-        .setDescription(`${chosen.user.toString()} | \`${chosen.user.tag}\``);
+        .setDescription(`${chosenMember.user.toString()} | \`${chosenMember.user.tag}\``);
 
     return message.channel.send({ embeds: [embed] });
 }

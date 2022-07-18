@@ -204,11 +204,6 @@ export async function enableTracking(member: GuildMember | string) {
     }
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {String} username
- */
 export async function addNewUsername(member: GuildMember | string, username: string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -249,10 +244,6 @@ export async function fetchUsernameHistory(member: GuildMember | string) {
     return query;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function clearUsernameHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -268,11 +259,6 @@ export async function clearUsernameHistory(member: GuildMember | string) {
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {String} url
- */
 export async function addNewAvatar(member: GuildMember | string, url: string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -314,10 +300,6 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
     return query;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function clearAvatarHistory(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -362,11 +344,6 @@ export async function getLastfmUsername(member: GuildMember | string) {
     }
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {String} username
- */
 export async function setLastfmUsername(member: GuildMember, username: string) {
     let id: string;
     if (member instanceof GuildMember) {

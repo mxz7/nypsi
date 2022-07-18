@@ -5,7 +5,7 @@ import { isPremium } from "../utils/premium/utils";
 import { addNewAvatar, addNewUsername, hasProfile, isTracking, updateLastKnowntag } from "../utils/users/utils";
 
 const queue: User[] = [];
-let interval;
+let interval: NodeJS.Timer;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
     if (oldUser.tag != newUser.tag) {

@@ -11,10 +11,6 @@ const cmd = new Command("topcases", "see who has the top moderation cases", Cate
     "MODERATE_MEMBERS",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -139,7 +135,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 member = members.find((m) => m.user.id == args[0]);
 
                 if (!member) {
-                    member = args[0];
+                    return message.channel.send({
+                        embeds: [new ErrorEmbed("couldn't find that member")],
+                    });
                 }
             } else {
                 member = await getMember(message.guild, args.join(" "));

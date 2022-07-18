@@ -4,10 +4,6 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("github", "view code for the bot on github", Categories.INFO).setAliases(["git"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(
         message.member,

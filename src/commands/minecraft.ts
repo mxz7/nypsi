@@ -5,6 +5,10 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    Interaction,
+    MessageEditOptions,
 } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -20,14 +24,10 @@ cmd.slashData.addStringOption((option) =>
     option.setName("username").setDescription("username to get the name history for").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -74,10 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: `page 1/${names.size}` });
     }
 
-    /**
-     * @type {Message}
-     */
-    let msg;
+    let msg: Message;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -94,9 +91,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let currentPage = 1;
         const lastPage = names.size;
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const edit = async (data, msg) => {
+        const edit = async (data: MessageEditOptions, msg: Message) => {
             if (!(message instanceof Message)) {
                 await message.editReply(data);
                 return await message.fetchReply();
@@ -105,9 +102,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         };
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;

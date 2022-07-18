@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChannelType, CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import {
@@ -14,6 +14,7 @@ import {
 import { getPrefix } from "../utils/guilds/utils";
 import { Item } from "../utils/models/Economy";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { RaceDetails, RaceUserDetails } from "../utils/models/StreetRace";
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"]);
 
@@ -51,19 +52,15 @@ cmd.slashData
             )
     );
 
-const races = new Map();
+const races: Map<string, RaceDetails> = new Map();
 const carCooldown = new Map();
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -148,21 +145,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
+        if (message.channel.isThread()) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+        }
+
+        if (message.channel.isDMBased()) return;
+
+        if (message.channel.isVoiceBased()) return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+
+        if (message.channel.type != ChannelType.GuildText) return;
+
         await addCooldown(cmd.name, message.member, 180);
 
         const id = Math.random();
-
-        const game = {
-            channel: message.channel,
-            users: new Map(),
-            bet: bet,
-            message: undefined,
-            id: id,
-            start: new Date().getTime() + 30000,
-            embed: undefined,
-            started: false,
-            speedLimit: speedLimit,
-        };
 
         const embed = new CustomEmbed(message.member).setHeader(
             `${message.author.username}'s street race`,
@@ -177,8 +172,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const msg = await message.channel.send({ embeds: [embed] });
 
-        game.message = msg;
-        game.embed = embed;
+        const usersMap: Map<string, RaceUserDetails> = new Map();
+
+        const game = {
+            channel: message.channel,
+            users: usersMap,
+            bet: bet,
+            message: msg,
+            id: id,
+            start: new Date().getTime() + 30000,
+            embed: embed,
+            started: false,
+            speedLimit: speedLimit,
+        };
 
         races.set(message.channel.id, game);
 
@@ -190,8 +196,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setFooter({ text: "race cancelled" });
                 msg.edit({ embeds: [embed] }).catch(() => {});
 
-                for (let user of races.get(message.channel.id).users.keys()) {
-                    user = races.get(message.channel.id).users.get(user);
+                for (const u of races.get(message.channel.id).users.keys()) {
+                    const user = races.get(message.channel.id).users.get(u);
 
                     await updateBalance(user.user.id, (await getBalance(user.user.id)) + bet);
                 }
@@ -370,8 +376,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let description = "";
 
-        for (let user of race.users.keys()) {
-            user = race.users.get(user);
+        for (const u of race.users.keys()) {
+            const user = race.users.get(u);
 
             description += `\n\`${user.user.username}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`;
         }
@@ -416,12 +422,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-/**
- * @returns {Number}
- * @param {Number} current
- * @param {Number} speed
- */
-function getNewPosition(current, speed) {
+function getNewPosition(current: number, speed: number) {
     const randomness = Math.floor(Math.random() * 12) - 4;
 
     const movement = speed + randomness;
@@ -431,12 +432,7 @@ function getNewPosition(current, speed) {
     return current + movement;
 }
 
-/**
- * @returns {String}
- * @param {String} emoji
- * @param {Number} position
- */
-function getRacePosition(emoji, position) {
+function getRacePosition(emoji: string, position: number) {
     let racePos = Math.floor(position / 5);
 
     if (racePos > 9) racePos = 9;
@@ -457,16 +453,13 @@ function getRacePosition(emoji, position) {
     return line;
 }
 
-async function startRace(id) {
+async function startRace(id: string) {
     const race = races.get(id);
 
-    /**
-     * @type {User}
-     */
     let winner;
 
-    for (let user of race.users.keys()) {
-        user = race.users.get(user);
+    for (const u of race.users.keys()) {
+        const user = race.users.get(u);
 
         const newPos = getNewPosition(user.position, user.car.speed);
 
@@ -484,8 +477,8 @@ async function startRace(id) {
 
     let description = "";
 
-    for (let user of race.users.keys()) {
-        user = race.users.get(user);
+    for (const u of race.users.keys()) {
+        const user = race.users.get(u);
 
         description += `\n\`${user.user.username}\` ${getRacePosition(user.car.emoji, user.position)} 🏁`;
     }

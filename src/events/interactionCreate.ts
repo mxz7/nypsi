@@ -11,10 +11,6 @@ import { runCommand } from "../utils/commandhandler";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
-/**
- *
- * @param {Interaction} interaction
- */
 export default async function interactionCreate(interaction: Interaction) {
     if (interaction.type != InteractionType.ApplicationCommand) return;
 
@@ -33,10 +29,6 @@ export default async function interactionCreate(interaction: Interaction) {
 
     const args = [""];
 
-    /**
-     *
-     * @param {CommandInteractionOption} arg
-     */
     const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
             case ApplicationCommandOptionType.User:

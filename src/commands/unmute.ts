@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, GuildMember, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -14,10 +14,6 @@ const cmd = new Command("unmute", "unmute one or more users", Categories.MODERAT
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -25,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {

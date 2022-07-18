@@ -23,8 +23,8 @@
             "error",
             "double"
         ],
-        "semi": "off",
-        "@typescript-eslint/semi": ["error"],
+        "semi": "warn",
+        "@typescript-eslint/semi": ["warn"],
         "no-unreachable": "error",
         "no-case-declarations": "off",
         "@typescript-eslint/no-explicit-any": "off",

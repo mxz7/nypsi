@@ -1,5 +1,5 @@
 import { topAmount } from "../utils/economy/utils.js";
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
@@ -8,12 +8,8 @@ const cmd = new Command("baltop", "view top balances in the server", Categories.
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {

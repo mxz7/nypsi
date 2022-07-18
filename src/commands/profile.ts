@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
@@ -30,10 +31,6 @@ BigInt.prototype.toJSON = function () {
     return this.toString();
 };
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (cooldown.has(message.author.id)) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait before doing that again")] });
@@ -66,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const m = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
     let fail = false;
 
     const response = await m

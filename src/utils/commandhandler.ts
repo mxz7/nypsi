@@ -11,6 +11,7 @@ import {
     Client,
     CommandInteraction,
     GuildMember,
+    Interaction,
     Message,
     MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -28,19 +29,24 @@ import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
-const popularCommands = new Map();
-const noLifers = new Map();
-const commandUses = new Map();
-const handcuffs = new Map();
-const captchaFails = new Map();
-const captchaPasses = new Map();
+const popularCommands: Map<string, number> = new Map();
+const noLifers: Map<string, number> = new Map();
+const commandUses: Map<string, number> = new Map();
+const handcuffs: Map<string, Date> = new Map();
+const captchaFails: Map<string, number> = new Map();
+const captchaPasses: Map<string, number> = new Map();
 
-const karmaCooldown = new Set();
-const xpCooldown = new Set();
-const cooldown = new Set();
+const karmaCooldown: Set<string> = new Set();
+const xpCooldown: Set<string> = new Set();
+const cooldown: Set<string> = new Set();
 const openingCratesBlock = new Set();
 
-const beingChecked = [];
+const beingChecked: string[] = [];
+
+let commandsSize = 0;
+let aliasesSize = 0;
+
+export { commandsSize, aliasesSize };
 
 let restarting = false;
 
@@ -90,8 +96,8 @@ export function loadCommands() {
             logger.error(e);
         }
     }
-    exports.aliasesSize = aliases.size;
-    exports.commandsSize = commands.size;
+    aliasesSize = aliases.size;
+    commandsSize = commands.size;
 
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }));
@@ -102,10 +108,6 @@ export function loadCommands() {
     logger.info(`${aliases.size.toLocaleString()} aliases loaded`);
 }
 
-/**
- *
- * @param {Array} commandsArray
- */
 export function reloadCommand(commandsArray: string[]) {
     const reloadTable = [];
 
@@ -115,7 +117,8 @@ export function reloadCommand(commandsArray: string[]) {
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)];
             } catch (e) {
-                return logger.error("error deleting from cache");
+                logger.error("error deleting from cache");
+                return;
             }
 
             let commandData: Command | number = 0;
@@ -142,27 +145,22 @@ export function reloadCommand(commandsArray: string[]) {
                     }
                 }
                 reloadTable.push([commandData.name, "✅"]);
-                exports.commandsSize = commands.size;
+                commandsSize = commands.size;
             } else {
                 reloadTable.push([cmd, "❌"]);
-                exports.commandsSize = commands.size;
+                commandsSize = commands.size;
             }
         } catch (e) {
             reloadTable.push([cmd, "❌"]);
             logger.error(e);
         }
     }
-    exports.aliasesSize = aliases.size;
-    exports.commandsSize = commands.size;
+    aliasesSize = aliases.size;
+    commandsSize = commands.size;
     console.log(table(reloadTable, { border: getBorderCharacters("ramac") }));
     return table(reloadTable, { border: getBorderCharacters("ramac") });
 }
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
@@ -288,9 +286,6 @@ async function helpCmd(message: Message, args: string[]) {
         }
     }
 
-    /**
-     * @type {Message}
-     */
     let msg: Message;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -312,9 +307,9 @@ async function helpCmd(message: Message, args: string[]) {
     let currentPage = 1;
     const lastPage = pages.size;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager = async () => {
+    const pageManager = async (): Promise<void> => {
         const reaction = await msg
             .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
@@ -403,12 +398,6 @@ async function helpCmd(message: Message, args: string[]) {
     return pageManager();
 }
 
-/**
- *
- * @param {String} cmd
- * @param {Message} message
- * @param {string[]} args
- */
 export async function runCommand(
     cmd: string,
     message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -546,7 +535,7 @@ export async function runCommand(
 
         logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
 
-        const filter = (m) => m.author.id == message.author.id;
+        const filter = (m: Message) => m.author.id == message.author.id;
 
         let fail = false;
 
@@ -614,7 +603,7 @@ export async function runCommand(
         if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id);
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init) / 1000);
+            const diff = Math.round((curr - init.getTime()) / 1000);
             const time = 60 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -666,7 +655,7 @@ export async function runCommand(
         if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id);
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init) / 1000);
+            const diff = Math.round((curr - init.getTime()) / 1000);
             const time = 120 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -736,10 +725,6 @@ export async function runCommand(
     }
 }
 
-/**
- *
- * @param {String} cmd
- */
 export function commandExists(cmd: string) {
     if (commands.has(cmd)) {
         return true;
@@ -761,7 +746,7 @@ function getCmdCategory(cmd: string): string {
 }
 
 export function getRandomCommand(): Command {
-    const a = [];
+    const a: Command[] = [];
 
     commands.forEach((d) => {
         if (d.category != "none" && d.category != "nsfw") {
@@ -774,12 +759,6 @@ export function getRandomCommand(): Command {
     return choice;
 }
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- * @param {String} commandName
- */
 export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     args.shift();
 
@@ -803,10 +782,6 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     });
 }
 
-/**
- * @param {String} command
- * @param {GuildMember} member
- */
 function updatePopularCommands(command: string, member: GuildMember) {
     if (popularCommands.has(command)) {
         popularCommands.set(command, popularCommands.get(command) + 1);
@@ -839,11 +814,6 @@ function updatePopularCommands(command: string, member: GuildMember) {
     }, 90000);
 }
 
-/**
- * @param {Client} client
- * @param {String} serverID
- * @param {string[]} channelID
- */
 export function runPopularCommandsTimer(client: Client, serverID: string, channelID: string[]) {
     const now = new Date();
 
@@ -993,12 +963,6 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Client} client
- * @returns
- */
 async function failedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513";
     const channelID = "912710094955892817";
@@ -1030,12 +994,6 @@ async function failedCaptcha(member: GuildMember, client: Client) {
     );
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Client} client
- * @returns
- */
 async function passedCaptcha(member: GuildMember, client: Client) {
     const serverID = "747056029795221513";
     const channelID = "912710094955892817";
@@ -1083,27 +1041,14 @@ export function startRestart() {
     restarting = true;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export function startOpeningCrates(member: GuildMember) {
     openingCratesBlock.add(member.user.id);
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export function stopOpeningCrates(member: GuildMember) {
     openingCratesBlock.delete(member.user.id);
 }
 
-/**
- *
- * @param {string} guildID
- * @param {string} clientID
- */
 export async function uploadGuildCommands(guildID: string, clientID: string) {
     logger.info("started refresh of [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
@@ -1126,11 +1071,6 @@ export async function uploadGuildCommands(guildID: string, clientID: string) {
     }
 }
 
-/**
- *
- * @param {string} guildID
- * @param {string} clientID
- */
 export async function uploadGuildCommandsGlobal(clientID: string) {
     logger.info("started refresh of global [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);

@@ -6,10 +6,6 @@ import { getPrefix } from "../utils/guilds/utils";
 
 const cmd = new Command("worth", "check the worth of items", Categories.MONEY).setAliases(["price"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

@@ -5,10 +5,6 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
 

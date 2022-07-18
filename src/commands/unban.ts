@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { profileExists, createProfile, newCase, deleteBan } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -13,12 +13,8 @@ cmd.slashData.addStringOption((option) =>
     option.setName("user").setDescription("tag/id of user to unban").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {
@@ -65,8 +61,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const members = [];
-    const failed = [];
+    const members: User[] = [];
+    const failed: string[] = [];
 
     for (const arg of args) {
         if (arg.length == 18) {

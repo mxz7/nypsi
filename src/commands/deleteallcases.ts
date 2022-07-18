@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import { deleteServer, profileExists } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -7,10 +7,6 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", Catego
     .setAliases(["dac"])
     .setPermissions(["server owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
@@ -34,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await msg.react("✅");
 
-    const filter = (reaction, user) => {
+    const filter = (reaction: MessageReaction, user: User) => {
         return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
     };
 

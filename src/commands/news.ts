@@ -6,10 +6,6 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("news", "set the news for the help command", Categories.INFO);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (args.length == 0 || message.member.user.id != "672793821850894347") {
         const news = getNews();

@@ -8,11 +8,6 @@ import { createProfile } from "../users/utils";
 
 let karmaShop = false;
 
-/**
- *
- * @param {GuildMember} member
- * @returns {Number}
- */
 export async function getKarma(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -46,11 +41,6 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
     }
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Number} amount
- */
 export async function addKarma(member: GuildMember | string, amount: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -71,11 +61,6 @@ export async function addKarma(member: GuildMember | string, amount: number) {
     await redis.del(`cache:user:karma:${id}`);
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Number} amount
- */
 export async function removeKarma(member: GuildMember | string, amount: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -96,10 +81,6 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
     await redis.del(`cache:user:karma:${id}`);
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function updateLastCommand(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -122,10 +103,6 @@ export async function updateLastCommand(member: GuildMember | string) {
     });
 }
 
-/**
- *
- * @returns {Boolean}
- */
 export function isKarmaShopOpen(): boolean {
     return karmaShop;
 }
@@ -138,11 +115,6 @@ export function closeKarmaShop() {
     karmaShop = false;
 }
 
-/**
- *
- * @param {GuildMember} member
- * @returns {number}
- */
 export async function getLastCommand(member: GuildMember | string): Promise<Date> {
     let id: string;
     if (member instanceof GuildMember) {

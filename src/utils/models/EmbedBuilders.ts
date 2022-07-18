@@ -6,12 +6,6 @@ import { getEmbedColor } from "../premium/utils";
 const embedColorCache: Map<string, string> = new Map();
 
 export class CustomEmbed extends EmbedBuilder {
-    /**
-     * @returns {CustomEmbed}
-     * @param {GuildMember} member
-     * @param {Boolean} footer
-     * @param {String} text
-     */
     constructor(member?: GuildMember, text?: string) {
         super();
 
@@ -48,10 +42,6 @@ export class CustomEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} text
-     */
     setDescription(text: string) {
         if (text.length > 2000) {
             text = text.substr(0, 2000);
@@ -61,12 +51,6 @@ export class CustomEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} title
-     * @param {String} text
-     * @param {Boolean} inline
-     */
     addField(title: string, text: string, inline = false) {
         if (text.length > 1000) {
             text = text.substr(0, 1000);
@@ -81,70 +65,42 @@ export class CustomEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {string} text
-     */
     setTitle(text: string) {
         super.setTitle(text);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} url
-     */
     setImage(url: string) {
         super.setImage(url);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} url
-     */
     setThumbnail(url: string) {
         super.setThumbnail(url);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} url
-     */
     setURL(url: string) {
         super.setURL(url);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} text
-     */
     setHeader(text: string, image?: string) {
         super.setAuthor({ name: text, iconURL: image });
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} color
-     */
     setColor(color: `#${string}` | ColorResolvable) {
         super.setColor(color);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {Date} date
-     */
     setTimestamp(date?: Date | number) {
         if (date) {
             super.setTimestamp(date);
@@ -157,10 +113,6 @@ export class CustomEmbed extends EmbedBuilder {
 }
 
 export class ErrorEmbed extends EmbedBuilder {
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} text
-     */
     constructor(text: string) {
         super();
         super.setColor("#e31937");
@@ -176,10 +128,6 @@ export class ErrorEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} text
-     */
     setDescription(text: string) {
         if (text.length > 2000) {
             text = text.substring(0, 2000);
@@ -189,12 +137,6 @@ export class ErrorEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {String} title
-     * @param {String} text
-     * @param {Boolean} inline
-     */
     addField(title: string, text: string, inline = false) {
         if (text.length > 1000) {
             text = text.substr(0, 1000);
@@ -209,70 +151,42 @@ export class ErrorEmbed extends EmbedBuilder {
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {string} text
-     */
     setTitle(text: string) {
         super.setTitle(text);
 
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} url
-     */
     setImage(url: string) {
         super.setImage(url);
 
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} url
-     */
     setThumbnail(url: string) {
         super.setThumbnail(url);
 
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} url
-     */
     setURL(url: string) {
         super.setURL(url);
 
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} text
-     */
     setHeader(text: string): ErrorEmbed {
         super.setAuthor({ name: text });
 
         return this;
     }
 
-    /**
-     * @returns {ErrorEmbed}
-     * @param {String} color
-     */
     setColor(color: `#${string}` | ColorResolvable) {
         super.setColor(color);
 
         return this;
     }
 
-    /**
-     * @returns {CustomEmbed}
-     * @param {Date} date
-     */
     setTimestamp(date: Date | number) {
         if (date) {
             super.setTimestamp(date);

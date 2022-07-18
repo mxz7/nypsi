@@ -7,6 +7,8 @@ import {
     MessageOptions,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -88,7 +90,7 @@ cmd.slashData
 
 const filter = ["nig", "fag", "queer", "delete", "inv", "create", "leave", "stats", "top", "hitler", "kick", "forcekick"];
 
-const invited = [];
+const invited: Set<string> = new Set();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
@@ -99,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    if (message instanceof CommandInteraction) {
+    if (!(message instanceof Message)) {
         await message.deferReply();
     }
 
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    const edit = async (data: MessageOptions, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data).catch(() => {});
             return await message.fetchReply();
@@ -259,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const target = message.mentions.members.first();
 
-        if (invited.includes(target.user.id)) {
+        if (invited.has(target.user.id)) {
             return send({ embeds: [new ErrorEmbed("this user has already been invited to a guild")] });
         }
 
@@ -277,7 +279,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await addCooldown(cmd.name, message.member, 15);
 
-        invited.push(target.user.id);
+        invited.add(target.user.id);
 
         const embed = new CustomEmbed(message.member);
 
@@ -288,10 +290,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success)
         );
 
-        const msg = await message.channel.send({ content: target.toString(), embeds: [embed], components: [row] });
+        const msg = await message.channel
+            .send({ content: target.toString(), embeds: [embed], components: [row] })
+            .catch(() => {
+                invited.delete(target.user.id);
+            });
 
-        const filter = (i) => i.user.id == target.user.id;
+        const filter = (i: Interaction) => i.user.id == target.user.id;
         let fail = false;
+
+        if (!msg) return;
 
         const reaction = await msg
             .awaitMessageComponent({ filter, time: 30000 })
@@ -300,9 +308,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return collected.customId;
             })
             .catch(async () => {
-                await edit({ components: [] }, msg);
+                await edit({ components: [] }, msg).catch(() => {});
                 fail = true;
-                invited.splice(invited.indexOf(target.user.id), 1);
+                invited.delete(target.user.id);
             });
 
         if (fail) return;
