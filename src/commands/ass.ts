@@ -3,8 +3,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-
-declare function require(name: string);
+import { images } from "../utils/imghandler";
 
 const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAliases(["peach"]);
 
@@ -25,8 +24,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
     }
-
-    const { images } = require("../utils/imghandler");
 
     const assCache = images.get("ass");
 
