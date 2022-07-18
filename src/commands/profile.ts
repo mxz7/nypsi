@@ -16,7 +16,7 @@ import Database = require("better-sqlite3");
 import { getDMsEnabled } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
 
-const cmd = new Command("profile", "view an overview of your profile and data", Categories.INFO).setAliases([
+const cmd = new Command("profile", "view the raw data stored in nypsi's database", Categories.INFO).setAliases([
     "data",
     "viewdata",
     "showmemydatazuckerberg",
