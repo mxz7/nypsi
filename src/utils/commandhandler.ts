@@ -117,7 +117,8 @@ export function reloadCommand(commandsArray: string[]) {
             try {
                 delete require.cache[require.resolve(`../commands/${cmd}`)];
             } catch (e) {
-                return logger.error("error deleting from cache");
+                logger.error("error deleting from cache");
+                return;
             }
 
             let commandData: Command | number = 0;
