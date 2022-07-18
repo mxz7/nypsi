@@ -290,9 +290,6 @@ export async function deleteFromWholesome(id: number) {
     }
 }
 
-/**
- * @returns {{Array<{ id: Number, image: String, submitter: String, submitter_id: String, date: Date }>}}
- */
 export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
     const query = await prisma.wholesomeSuggestion.findMany();
 

@@ -85,7 +85,7 @@ const lizardLinks = [
 const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"];
 const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 
-async function cacheUpdate(links: Array<string>, name: string) {
+async function cacheUpdate(links: string[], name: string) {
     const start = new Date().getTime();
 
     const map: Map<string, object> = new Map();
