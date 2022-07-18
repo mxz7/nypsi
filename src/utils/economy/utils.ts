@@ -20,7 +20,7 @@ import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
 import _ = require("lodash");
 
-declare function require(name: string);
+declare function require(name: string): any;
 
 const webhook = new topgg.Webhook("123");
 const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
@@ -52,7 +52,7 @@ setInterval(async () => {
     });
 
     for (const user of query) {
-        const workers = user.workers;
+        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
 
         if (_.isEmpty(workers)) continue;
 
@@ -75,7 +75,7 @@ setInterval(async () => {
                 userId: user.userId,
             },
             data: {
-                workers: workers,
+                workers: workers as any,
             },
         });
     }
@@ -670,7 +670,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
@@ -746,7 +746,7 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
@@ -823,7 +823,7 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
