@@ -30,9 +30,11 @@ cmd.slashData
             .setName("choice")
             .setDescription("choice for the bet")
             .setRequired(true)
-            .addChoice("🗿 rock", "rock")
-            .addChoice("📰 paper", "paper")
-            .addChoice("✂ scissors", "scissors")
+            .setChoices(
+                { name: "🗿 rock", value: "rock" },
+                { name: "📰 paper", value: "paper" },
+                { name: "✂ scissors", value: "scissors" }
+            )
     )
     .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
@@ -236,7 +238,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (earnedXp > 0) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-                embed.setFooter(`+${earnedXp}xp`);
+                embed.setFooter({ text: `+${earnedXp}xp` });
 
                 const guild = await getGuildByUser(message.member);
 
