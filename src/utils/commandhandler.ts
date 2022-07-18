@@ -11,6 +11,7 @@ import {
     Client,
     CommandInteraction,
     GuildMember,
+    Interaction,
     Message,
     MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -28,19 +29,19 @@ import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
-const popularCommands = new Map();
-const noLifers = new Map();
-const commandUses = new Map();
-const handcuffs = new Map();
-const captchaFails = new Map();
-const captchaPasses = new Map();
+const popularCommands: Map<string, number> = new Map();
+const noLifers: Map<string, number> = new Map();
+const commandUses: Map<string, number> = new Map();
+const handcuffs: Map<string, Date> = new Map();
+const captchaFails: Map<string, number> = new Map();
+const captchaPasses: Map<string, number> = new Map();
 
-const karmaCooldown = new Set();
-const xpCooldown = new Set();
-const cooldown = new Set();
+const karmaCooldown: Set<string> = new Set();
+const xpCooldown: Set<string> = new Set();
+const cooldown: Set<string> = new Set();
 const openingCratesBlock = new Set();
 
-const beingChecked = [];
+const beingChecked: string[] = [];
 
 let restarting = false;
 
@@ -300,9 +301,9 @@ async function helpCmd(message: Message, args: string[]) {
     let currentPage = 1;
     const lastPage = pages.size;
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager = async () => {
+    const pageManager = async (): Promise<void> => {
         const reaction = await msg
             .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
@@ -528,7 +529,7 @@ export async function runCommand(
 
         logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
 
-        const filter = (m) => m.author.id == message.author.id;
+        const filter = (m: Message) => m.author.id == message.author.id;
 
         let fail = false;
 
@@ -596,7 +597,7 @@ export async function runCommand(
         if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id);
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init) / 1000);
+            const diff = Math.round((curr - init.getTime()) / 1000);
             const time = 60 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -648,7 +649,7 @@ export async function runCommand(
         if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
             const init = handcuffs.get(message.member.user.id);
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init) / 1000);
+            const diff = Math.round((curr - init.getTime()) / 1000);
             const time = 120 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -739,7 +740,7 @@ function getCmdCategory(cmd: string): string {
 }
 
 export function getRandomCommand(): Command {
-    const a = [];
+    const a: Command[] = [];
 
     commands.forEach((d) => {
         if (d.category != "none" && d.category != "nsfw") {
