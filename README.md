@@ -3,7 +3,6 @@
 <p align="center">
   <a href="https://discord.gg/hJTDNST"><img src="https://badgen.net/discord/members/hJTDNST"></a>
   <a href="https://top.gg/bot/678711738845102087"><img src="https://top.gg/api/widget/servers/678711738845102087.svg"></a>
-  <a href="https://github.com/tekoh/nypsi"><img src ="https://tokei.rs/b1/github/tekoh/nypsi"></a>
   <br>
   <a href="https://ko-fi.com/U7U4AEDXM"><img src = "https://ko-fi.com/img/githubbutton_sm.svg"></a>
 </p>
