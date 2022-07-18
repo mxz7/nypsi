@@ -1,10 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { redditImage } from "../utils/functions/image";
+import { images } from "../utils/imghandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-
-declare function require(name: string);
 
 const cmd = new Command("cat", "get a random picture of a cat", Categories.ANIMALS).setAliases(["kitty"]);
 
@@ -14,8 +13,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [embed] });
     }
-
-    const { images } = require("../utils/imghandler");
 
     const catCache = images.get("cat");
 
