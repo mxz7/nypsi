@@ -9,8 +9,7 @@ import { workerCount } from "../events/message.js";
 import { deleteQueue, mentionQueue } from "../utils/users/utils.js";
 import * as os from "os";
 import { MStoTime } from "../utils/functions/date.js";
-
-declare function require(name: string);
+import { aliasesSize, commandsSize } from "../utils/commandhandler";
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
@@ -23,8 +22,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 5);
-
-    const { commandsSize, aliasesSize } = require("../utils/commandhandler");
 
     const systemUptime = MStoTime(os.uptime() * 1000);
     const uptime = MStoTime(message.client.uptime);
