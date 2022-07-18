@@ -562,7 +562,7 @@ export async function checkChristmasCountdown(guild: Guild) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (!channel.isTextBased()) return;
 
     return await channel
         .send({

@@ -1,17 +1,18 @@
 import { table, getBorderCharacters } from "table";
 import * as fs from "fs";
 import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v9";
+import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import { Command, NypsiCommandInteraction } from "./models/Command";
 import { getTimestamp, logger } from "./logger";
 import {
-    BaseGuildTextChannel,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     Client,
     CommandInteraction,
     GuildMember,
     Message,
-    MessageActionRow,
-    MessageButton,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
@@ -199,7 +200,7 @@ async function helpCmd(message: Message, args: string[]) {
         }
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`v${version}`);
+    const embed = new CustomEmbed(message.member).setFooter({ text: `v${version}` });
 
     /**
      * FINDING WHAT THE USER REQUESTED
@@ -227,7 +228,7 @@ async function helpCmd(message: Message, args: string[]) {
                 `my prefix for this server is \`${prefix}\``
         );
         embed.addField("command categories", categoriesMsg, true);
-        embed.setThumbnail(message.client.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }));
+        embed.setThumbnail(message.client.user.displayAvatarURL({ size: 128 }));
 
         if (news.text != "") {
             embed.addField("news", `${news.text} - *${lastSet}*`);
@@ -250,7 +251,7 @@ async function helpCmd(message: Message, args: string[]) {
 
             embed.setTitle(`${args[0].toLowerCase()} commands`);
             embed.setDescription(pages.get(1).join("\n"));
-            embed.setFooter(`page 1/${pages.size} | v${version}`);
+            embed.setFooter({ text: `page 1/${pages.size} | v${version}` });
         } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
             let cmd: Command;
 
@@ -292,13 +293,16 @@ async function helpCmd(message: Message, args: string[]) {
      */
     let msg: Message;
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
     if (pageSystemNeeded) {
-        msg = await message.channel.send({ embeds: [embed], components: [row] });
+        msg = await message.channel.send({
+            embeds: [embed],
+            components: [row],
+        });
     } else {
         return await message.channel.send({ embeds: [embed] });
     }
@@ -329,16 +333,32 @@ async function helpCmd(message: Message, args: string[]) {
             } else {
                 currentPage--;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == 1) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 }
                 await msg.edit({ embeds: [embed], components: [row] });
@@ -350,16 +370,28 @@ async function helpCmd(message: Message, args: string[]) {
             } else {
                 currentPage++;
                 embed.setDescription(pages.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage} | v${version}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
                 if (currentPage == lastPage) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 }
                 await msg.edit({ embeds: [embed], components: [row] });
@@ -384,9 +416,10 @@ export async function runCommand(
 ) {
     if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+    if (message.channel.isDMBased()) return;
 
-    if (!message.channel.permissionsFor(message.client.user).has("SEND_MESSAGES")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
         return message.member
             .send(
                 "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
@@ -394,7 +427,7 @@ export async function runCommand(
             .catch(() => {});
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("EMBED_LINKS")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
         return message.channel.send({
             content:
                 "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
@@ -402,7 +435,7 @@ export async function runCommand(
         });
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("MANAGE_MESSAGES")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages)) {
         return message.channel.send(
             "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
                 "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
@@ -410,7 +443,7 @@ export async function runCommand(
         );
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has("ADD_REACTIONS")) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.AddReactions)) {
         return message.channel.send({
             content:
                 "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
@@ -476,9 +509,9 @@ export async function runCommand(
             addUse(customCommand.owner);
             logCommand(message, ["", "", ""]);
 
-            const embed = new CustomEmbed(message.member, content).setFooter(
-                `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`
-            );
+            const embed = new CustomEmbed(message.member, content).setFooter({
+                text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+            });
 
             return message.channel.send({ embeds: [embed] });
         } else {
@@ -866,14 +899,14 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
         embed.setColor("#111111");
 
         if (client.uptime < 86400 * 1000) {
-            embed.setFooter("data is from less than 24 hours");
+            embed.setFooter({ text: "data is from less than 24 hours" });
         } else {
             const noLifer = sortedNoLifers.keys().next().value;
 
-            embed.setFooter(`${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)`);
+            embed.setFooter({ text: `${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)` });
         }
 
-        if (channel.type != "GUILD_TEXT") return;
+        if (!channel.isTextBased()) return;
 
         await channel.send({ embeds: [embed] });
         logger.log({
@@ -898,7 +931,7 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
             return logger.error("unable to find channel for hourly command use log", serverID, channelID);
         }
 
-        if (channel.type != "GUILD_TEXT") return;
+        if (!channel.isTextBased()) return;
 
         for (const user of commandUses.keys()) {
             const uses = commandUses.get(user);
@@ -988,7 +1021,7 @@ async function failedCaptcha(member: GuildMember, client: Client) {
         captchaFails.set(member.user.id, 1);
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (!channel.isTextBased()) return;
 
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
@@ -1025,7 +1058,7 @@ async function passedCaptcha(member: GuildMember, client: Client) {
         captchaPasses.set(member.user.id, 1);
     }
 
-    if (channel.type != "GUILD_TEXT") return;
+    if (!channel.isTextBased()) return;
 
     await channel.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(

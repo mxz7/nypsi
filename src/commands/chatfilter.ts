@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getChatFilter, updateChatFilter, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -12,8 +12,8 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
         return;
@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
             .setHeader("current chat filter")
-            .setFooter(`use ${prefix}filter (add/del/+/-) to modify the filter`);
+            .setFooter({ text: `use ${prefix}filter (add/del/+/-) to modify the filter` });
 
         if (filter.length == 0) {
             embed.setDescription("`❌` empty chat filter");
@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (filter.indexOf(word) > -1) {
             const embed = new CustomEmbed(message.member, "❌ `" + word + "` already exists in the filter")
                 .setHeader("chat filter")
-                .setFooter(`you can use ${prefix}filter to view the filter`);
+                .setFooter({ text: `you can use ${prefix}filter to view the filter` });
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             const embed = new CustomEmbed(message.member, "❌ `" + word + "` not found in the filter")
                 .setHeader("chat filter")
-                .setFooter(`you can use ${prefix}filter to view the filter`);
+                .setFooter({ text: `you can use ${prefix}filter to view the filter` });
 
             return message.channel.send({ embeds: [embed] });
         }
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member, "✅ removed `" + word + "` from the filter")
             .setHeader("chat filter")
-            .setFooter(`you can use ${prefix}filter reset to reset the filter`);
+            .setFooter({ text: `you can use ${prefix}filter reset to reset the filter` });
 
         return message.channel.send({ embeds: [embed] });
     }

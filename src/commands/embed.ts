@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -10,7 +10,7 @@ const cmd = new Command("embed", "create an embed message", Categories.UTILITY).
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         return;
     }
 

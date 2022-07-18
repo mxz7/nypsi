@@ -28,9 +28,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, `${prefix}daily is for BRONZE tier and higher`).setFooter(
-            `${prefix}patreon`
-        );
+        const embed = new CustomEmbed(message.member, `${prefix}daily is for BRONZE tier and higher`).setFooter({
+            text: `${prefix}patreon`,
+        });
 
         return message.channel.send({ embeds: [embed] });
     };

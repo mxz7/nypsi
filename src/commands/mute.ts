@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions, Role, ThreadChannel } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
 import { profileExists, createProfile, newCase, newMute, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -23,8 +23,8 @@ cmd.slashData
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -44,15 +44,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) ||
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles) ||
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
         });
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ModerateMembers)) {
         return send({
             embeds: [new ErrorEmbed("i need the `moderate members` permission for this command to work")],
         });
@@ -147,9 +147,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (channel instanceof ThreadChannel) return;
                 await channel.permissionOverwrites
                     .edit(muteRole, {
-                        SEND_MESSAGES: false,
-                        SPEAK: false,
-                        ADD_REACTIONS: false,
+                        SendMessages: false,
+                        Speak: false,
+                        AddReactions: false,
                     })
                     .catch(() => {
                         channelError = true;
@@ -379,7 +379,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
                 .addField("length", `\`${mutedLength}\``, true)
-                .setFooter("unmuted at:")
+                .setFooter({ text: "unmuted at:" })
                 .setTimestamp(unmuteDate);
 
             if (reason != "") {

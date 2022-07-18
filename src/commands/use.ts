@@ -29,14 +29,16 @@ cmd.slashData
             .setName("item")
             .setDescription("the item you want to use")
             .setRequired(true)
-            .addChoice("📦 vote", "vote")
-            .addChoice("📦 basic", "basic")
-            .addChoice("🔒 padlock", "padlock")
-            .addChoice("🧰 lock pick", "lock_pick")
-            .addChoice("😷 mask", "mask")
-            .addChoice("📻 radio", "radio")
-            .addChoice("handcuffs", "handcuffs")
-            .addChoice("chastity_cage", "chastity_cage")
+            .setChoices(
+                { name: "📦 vote", value: "vote" },
+                { name: "📦 basic", value: "basic" },
+                { name: "🔒 padlock", value: "padlock" },
+                { name: "🧰 lock pick", value: "lock_pick" },
+                { name: "😷 mask", value: "mask" },
+                { name: "📻 radio", value: "radio" },
+                { name: "handcuffs", value: "handcuffs" },
+                { name: "chastity_cage", value: "chastity_cage" }
+            )
     )
     .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
 
@@ -260,7 +262,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await setInventory(message.member, inventory);
 
-                const targetEmbed = new CustomEmbed().setFooter("use $optout to optout of bot dms"); // eslint-disable-line
+                const targetEmbed = new CustomEmbed().setFooter({ text: "use $optout to optout of bot dms" });
 
                 targetEmbed.setColor("#e4334f");
                 targetEmbed.setTitle("your padlock has been picked");

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("you must be a patreon for this command")] });
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage roles` permission for this command to work")],
         });

@@ -5,7 +5,7 @@ import { formatDate } from "../functions/date";
 import { logger } from "../logger";
 import { PremUser } from "../models/PremStorage";
 
-declare function require(name: string);
+declare function require(name: string): any;
 
 const colorCache = new Map();
 

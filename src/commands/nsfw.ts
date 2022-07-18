@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -9,20 +9,20 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", Categories.ADMIN).se
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage channels` permission")] });
         }
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")],
         });
     }
 
-    let channel;
+    let channel: Channel;
 
     if (args.length == 0) {
         channel = message.channel;
@@ -40,8 +40,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
     }
 
-    if (!channel.isText()) {
+    if (!channel.isTextBased()) {
         return message.channel.send({ embeds: [new ErrorEmbed("this is not a text channel")] });
+    }
+
+    if (channel.isDMBased()) return;
+
+    if (channel.isThread()) {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
     }
 
     if (!channel.nsfw) {

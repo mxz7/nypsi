@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, MessageActionRow, MessageAttachment, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -47,8 +54,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription("you can request and view all of your data stored by nypsi (excluding moderation data)");
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("y").setLabel("request data").setStyle("SUCCESS")
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle(ButtonStyle.Success)
     );
 
     cooldown.add(message.author.id);
@@ -140,10 +147,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const buffer = await fs.readFile(file);
 
         let fail = false;
-        await message.member.send({ files: [new MessageAttachment(buffer, "data.txt")] }).catch((e) => {
-            console.log(e);
-            fail = true;
-        });
+        await message.member
+            .send({
+                files: [
+                    {
+                        attachment: buffer,
+                        name: "your data.txt",
+                    },
+                ],
+            })
+            .catch((e) => {
+                console.log(e);
+                fail = true;
+            });
         if (fail) {
             embed.setDescription("could not dm you, enable your direct messages");
         } else {

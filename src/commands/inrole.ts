@@ -1,4 +1,14 @@
-import { Collection, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton, Role } from "discord.js";
+import {
+    Collection,
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    Role,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { inCooldown, addCooldown as addGuildCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -89,16 +99,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, memberList.get(1).join("\n"))
         .setHeader(role.name + " [" + count.toLocaleString() + "]")
-        .setFooter(`page 1/${memberList.size}`);
+        .setFooter({ text: `page 1/${memberList.size}` });
 
     /**
      * @type {Message}
      */
     let msg;
 
-    let row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY")
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
     if (memberList.size >= 2) {
@@ -133,16 +143,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage--;
                 embed.setDescription(memberList.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == 1) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(true),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 }
                 await msg.edit({ embeds: [embed], components: [row] });
@@ -154,16 +180,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage++;
                 embed.setDescription(memberList.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == lastPage) {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(true)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
                     );
                 } else {
-                    row = new MessageActionRow().addComponents(
-                        new MessageButton().setCustomId("⬅").setLabel("back").setStyle("PRIMARY").setDisabled(false),
-                        new MessageButton().setCustomId("➡").setLabel("next").setStyle("PRIMARY").setDisabled(false)
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("⬅")
+                            .setLabel("back")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false),
+                        new ButtonBuilder()
+                            .setCustomId("➡")
+                            .setLabel("next")
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(false)
                     );
                 }
                 await msg.edit({ embeds: [embed], components: [row] });

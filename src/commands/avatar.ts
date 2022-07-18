@@ -1,4 +1,12 @@
-import { CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -34,16 +42,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    const avatar = member.user.displayAvatarURL({ dynamic: true, size: 256 });
+    const avatar = member.user.displayAvatarURL({ size: 256 });
 
-    let serverAvatar = member.displayAvatarURL({ dynamic: true, size: 256 });
+    let serverAvatar = member.displayAvatarURL({ size: 256 });
 
     if (avatar == serverAvatar) {
         serverAvatar = undefined;
     }
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("x").setLabel("show server avatar").setStyle("PRIMARY")
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("x").setLabel("show server avatar").setStyle(ButtonStyle.Primary)
     );
 
     const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);

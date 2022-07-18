@@ -69,9 +69,11 @@ cmd.slashData
             .setName("color")
             .setDescription("color to bet on")
             .setRequired(true)
-            .addChoice("🔴 red", "red")
-            .addChoice("⚫ black", "black")
-            .addChoice("🟢 green", "green")
+            .setChoices(
+                { name: "🔴 red", value: "red" },
+                { name: "⚫ black", value: "black" },
+                { name: "🟢 green", value: "green" }
+            )
     )
     .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
@@ -289,7 +291,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (earnedXp > 0) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-                embed.setFooter(`+${earnedXp}xp`);
+                embed.setFooter({ text: `+${earnedXp}xp` });
 
                 const guild = await getGuildByUser(message.member);
 
