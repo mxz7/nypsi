@@ -1,6 +1,6 @@
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { Permissions, Message, CommandInteraction, BaseGuildTextChannel } from "discord.js";
+import { Message, CommandInteraction, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
@@ -20,7 +20,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+
+    if (message.channel.isDMBased()) return;
 
     await addCooldown(cmd.name, message.member, 15);
 
