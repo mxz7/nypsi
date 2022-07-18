@@ -230,6 +230,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         format = profile.format.split("%count%").join(memberCount.size.toLocaleString());
         format = format.split("%peak%").join((await getPeaks(message.guild)).toString());
 
+        if (channel.isDMBased()) return;
+
         const old = channel.name;
 
         let fail = false;
