@@ -1710,11 +1710,6 @@ export async function deleteUser(member: GuildMember | string) {
     await redis.del(`cache:economy:exists:${id}`);
 }
 
-/**
- *
- * @param {GuildMember} member
- * @returns {Array<{ user_id: string, id: number }>}
- */
 export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
     let id: string;
     if (member instanceof GuildMember) {

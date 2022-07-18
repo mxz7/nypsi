@@ -57,9 +57,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    /**
-     * @type {Map<Number, Array<{ value: String, date: Number }>}
-     */
     const pages = new Map();
 
     for (const item of history) {
