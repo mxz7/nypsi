@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const user = await message.client.users.fetch(member.user.id, { force: true });
 
-    const banner = user.bannerURL({ dynamic: true, size: 512 });
+    const banner = user.bannerURL({ size: 512 });
 
     const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(banner);
 
