@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getMember } from "../utils/functions/member";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -17,7 +17,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("$ddos <user>")] });
     }
 
-    let member;
+    let member: GuildMember;
 
     if (args.length == 0) {
         member = message.member;
