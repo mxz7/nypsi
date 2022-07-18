@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -45,11 +46,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     inPlaceSort(itemIDs).asc();
 
-    const pages = [];
+    const pages: string[][] = [];
     let totalCars = 0;
     let totalOwned = 0;
 
-    let pageOfItems = [];
+    let pageOfItems: string[] = [];
     for (const item of itemIDs) {
         if (items[item].role != "car") continue;
         totalCars++;
@@ -78,9 +79,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         page = 0;
     }
 
-    for (let item of pages[page]) {
+    for (const i of pages[page]) {
         let owned = false;
-        item = items[item];
+        const item = items[i];
 
         if (inventory[item.id] && inventory[item.id] > 0) owned = true;
 
@@ -96,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    let msg;
+    let msg: Message;
 
     if (pages.length == 1) {
         return await message.channel.send({ embeds: [embed] });
@@ -109,11 +110,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastPage = pages.length;
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;
@@ -131,9 +132,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage--;
-                    for (let item of pages[currentPage]) {
+                    for (const i of pages[currentPage]) {
                         let owned = false;
-                        item = items[item];
+                        const item = items[i];
 
                         if (inventory[item.id] && inventory[item.id] > 0) owned = true;
 
@@ -183,9 +184,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage++;
-                    for (let item of pages[currentPage]) {
+                    for (const i of pages[currentPage]) {
                         let owned = false;
-                        item = items[item];
+                        const item = items[i];
 
                         if (inventory[item.id] && inventory[item.id] > 0) owned = true;
 
