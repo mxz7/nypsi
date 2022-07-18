@@ -2,8 +2,12 @@ import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, Webhook } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
+import { getGuild, requestDM } from "../../nypsi";
 import prisma from "../database/database";
+import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { RedditJSONPost } from "../models/Reddit";
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
@@ -11,8 +15,6 @@ const imgur = new ImgurClient({
     clientSecret: process.env.IMGUR_CLIENTSECRET,
     refreshToken: process.env.IMGUR_REFRESHTOKEN,
 });
-
-declare function require(name: string);
 
 let uploadDisabled = false;
 
@@ -30,7 +32,7 @@ export function isImageUrl(url: string): boolean {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
-export async function redditImage(post: any, allowed: any): Promise<string> {
+export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[]): Promise<string> {
     let image = post.data.url;
 
     if (image.includes("imgur.com/a/")) {
@@ -115,14 +117,8 @@ export async function redditImage(post: any, allowed: any): Promise<string> {
     return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author;
 }
 
-/**
- * @returns {Boolean}
- * @param {GuildMember} submitter
- * @param {String} image
- */
 export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
-        const { getGuild } = require("../../nypsi");
         const guild = await getGuild("747056029795221513");
 
         const webhooks = await guild.fetchWebhooks();
@@ -166,13 +162,11 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
         },
     });
 
-    const { CustomEmbed } = require("../models/EmbedBuilders");
-
     const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + id);
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
 
-    embed.setFooter(`$wholesome accept ${id} | $wholesome deny ${id}`);
+    embed.setFooter({ text: `$wholesome accept ${id} | $wholesome deny ${id}` });
 
     embed.setImage(image);
 
@@ -181,11 +175,6 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
     return true;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- * @param {GuildMember} accepter
- */
 export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
     const query = await prisma.wholesomeSuggestion.findUnique({
         where: {
@@ -213,20 +202,13 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
 
     clearWholesomeCache();
 
-    const { requestDM } = require("../../nypsi");
-    const { getDMsEnabled } = require("../economy/utils");
-
     if (await getDMsEnabled(query.submitterId)) {
-        requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
+        await requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
     }
 
     return true;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- */
 export async function denyWholesomeImage(id: number) {
     const d = await prisma.wholesomeSuggestion.delete({
         where: {
@@ -241,10 +223,6 @@ export async function denyWholesomeImage(id: number) {
     return true;
 }
 
-/**
- * @returns {{ id: Number, image: String, submitter: String, submitter_id: String, accepter: String, date: Date }}
- * @param {id} Number
- */
 export async function getWholesomeImage(id?: number): Promise<WholesomeImage> {
     if (id) {
         const query = await prisma.wholesomeImage.findUnique({
@@ -270,10 +248,6 @@ export function clearWholesomeCache() {
     wholesomeCache = undefined;
 }
 
-/**
- * @returns {Boolean}
- * @param {Number} id
- */
 export async function deleteFromWholesome(id: number) {
     const query = await prisma.wholesomeImage.delete({
         where: {
@@ -296,10 +270,6 @@ export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
     return query;
 }
 
-/**
- * @returns {String}
- * @param {String} url
- */
 export async function uploadImageToImgur(url: string): Promise<string> {
     let fallback = false;
 

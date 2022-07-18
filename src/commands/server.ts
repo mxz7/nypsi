@@ -9,10 +9,6 @@ const cmd = new Command("server", "view information about the server", Categorie
     "membercount",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const server = message.guild;
 

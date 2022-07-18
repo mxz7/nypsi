@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -14,10 +15,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -46,9 +43,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     inPlaceSort(itemIDs).asc();
 
-    const pages = [];
+    const pages: string[][] = [];
 
-    let pageOfItems = [];
+    let pageOfItems: string[] = [];
     for (const item of itemIDs) {
         if (!items[item].worth) continue;
         if (
@@ -80,8 +77,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         page = 0;
     }
 
-    for (let item of pages[page]) {
-        item = items[item];
+    for (const i of pages[page]) {
+        const item = items[i];
         embed.addField(
             item.id,
             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
@@ -94,10 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    /**
-     * @type {Message}
-     */
-    let msg;
+    let msg: Message;
 
     if (pages.length == 1) {
         return await message.channel.send({ embeds: [embed] });
@@ -110,11 +104,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastPage = pages.length;
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;
@@ -132,8 +126,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage--;
-                    for (let item of pages[currentPage]) {
-                        item = items[item];
+                    for (const i of pages[currentPage]) {
+                        const item = items[i];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
@@ -176,8 +170,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage++;
-                    for (let item of pages[currentPage]) {
-                        item = items[item];
+                    for (const i of pages[currentPage]) {
+                        const item = items[i];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,

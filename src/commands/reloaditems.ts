@@ -5,10 +5,6 @@ import { loadItems } from "../utils/economy/utils";
 
 const cmd = new Command("reloaditems", "reload items", Categories.NONE).setPermissions(["bot owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.member.user.id != "672793821850894347") return;
 

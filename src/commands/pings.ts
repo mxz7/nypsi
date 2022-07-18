@@ -5,6 +5,10 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { isPremium } from "../utils/premium/utils";
@@ -24,14 +28,10 @@ const cmd = new Command("pings", "view who mentioned you recently", Categories.U
 
 cmd.slashEnabled = true;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -115,10 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
     );
 
-    /**
-     * @type {Message}
-     */
-    let msg;
+    let msg: Message;
 
     if (pages.size == 1) {
         return await send({ embeds: [embed] });
@@ -130,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let currentPage = 1;
         const lastPage = pages.size;
 
-        const edit = async (data) => {
+        const edit = async (data: MessageEditOptions) => {
             if (!(message instanceof Message)) {
                 await message.editReply(data);
                 return await message.fetchReply();
@@ -139,11 +136,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         };
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;
@@ -250,7 +247,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 newEmbed.setDescription("✅ mentions cleared");
 
-                return edit({ embeds: [newEmbed], components: [] });
+                edit({ embeds: [newEmbed], components: [] });
+                return;
             }
         };
 

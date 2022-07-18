@@ -1,5 +1,4 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getUserCount } from "../utils/economy/utils.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { cpu } from "node-os-utils";
@@ -8,15 +7,12 @@ import { version } from "../../package.json";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { workerCount } from "../events/message.js";
 import { deleteQueue, mentionQueue } from "../utils/users/utils.js";
-
-declare function require(name: string);
+import * as os from "os";
+import { MStoTime } from "../utils/functions/date.js";
+import { aliasesSize, commandsSize } from "../utils/commandhandler";
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.author.id != "672793821850894347") return;
     if (await onCooldown(cmd.name, message.member)) {
@@ -27,12 +23,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 5);
 
-    const { commandsSize, aliasesSize } = require("../utils/commandhandler");
-    const { snipe, eSnipe } = require("../nypsi.js");
-    // const { mentionQueue, deleteQueue } = require("../utils/users/utils")
-    const snipedMessages = snipe.size + eSnipe.size;
-    const uptime = getUptime(message.client.uptime);
-    const memUsage = Math.round(process.memoryUsage().rss / 1024 / 1024);
+    const systemUptime = MStoTime(os.uptime() * 1000);
+    const uptime = MStoTime(message.client.uptime);
+    const totalMem = Math.round(os.totalmem() / 1024 / 1024);
+    const freeMem = Math.round(os.freemem() / 1024 / 1024);
+    const memUsage = Math.round(totalMem - freeMem);
     const cpuUsage = await cpu.usage();
 
     let memberCount = 0;
@@ -73,13 +68,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 uptime,
             true
         )
-        .addField("economy", `**users** ${(await getUserCount()).toLocaleString()}`, true)
         .addField(
-            "cache",
-            "**snipe** " +
-                snipedMessages.toLocaleString() +
-                "\n" +
-                "\n**mention queue** " +
+            "mention queue",
+            "**total** " +
                 mentionQueue.length.toLocaleString() +
                 "\n-- **collections** " +
                 collections.toLocaleString() +
@@ -91,7 +82,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 workerCount.toLocaleString(),
             true
         )
-        .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true);
+        .addField(
+            "system",
+            `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n**cpu** ${cpuUsage}%\n**uptime** ${systemUptime}`,
+            true
+        );
 
     embed.setFooter({ text: `v${version}` });
 
@@ -101,33 +96,3 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function getUptime(ms) {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    const daysms = ms % (24 * 60 * 60 * 1000);
-    const hours = Math.floor(daysms / (60 * 60 * 1000));
-    const hoursms = ms % (60 * 60 * 1000);
-    const minutes = Math.floor(hoursms / (60 * 1000));
-    const minutesms = ms % (60 * 1000);
-    const sec = Math.floor(minutesms / 1000);
-
-    let output = "";
-
-    if (days > 0) {
-        output = output + days + "d ";
-    }
-
-    if (hours > 0) {
-        output = output + hours + "h ";
-    }
-
-    if (minutes > 0) {
-        output = output + minutes + "m ";
-    }
-
-    if (sec > 0) {
-        output = output + sec + "s";
-    }
-
-    return output;
-}

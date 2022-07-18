@@ -2,11 +2,6 @@ import { getZeroWidth } from "../chatreactions/utils";
 
 const locked: string[] = [];
 
-/**
- *
- * @param {String} string user id
- * @returns {Boolean}
- */
 export function isLockedOut(string: string): boolean {
     if (locked.indexOf(string) == -1) {
         return false;
@@ -15,10 +10,6 @@ export function isLockedOut(string: string): boolean {
     }
 }
 
-/**
- *
- * @param {String} string user id
- */
 export function toggleLock(string: string) {
     if (isLockedOut(string)) {
         locked.splice(locked.indexOf(string), 1);
@@ -27,9 +18,6 @@ export function toggleLock(string: string) {
     }
 }
 
-/**
- * @returns {Captcha}
- */
 export function createCaptcha(): Captcha {
     return new Captcha(Math.random().toString(36).substr(2, 7));
 }
@@ -37,11 +25,6 @@ export function createCaptcha(): Captcha {
 class Captcha {
     public answer: string;
     public display: string;
-    /**
-     *
-     * @param {String} d random letters
-     * @returns {Captcha}
-     */
     constructor(d: string) {
         this.answer = d;
 

@@ -13,10 +13,6 @@ const cmd = new Command(
 
 let pingingDb = false;
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     /**
      * not perfect latency testing i know but it works!!

@@ -15,16 +15,8 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    const send = async (data) => {
-        if (!(message instanceof Message)) {
-            await message.reply(data);
-        } else {
-            return await message.channel.send(data);
-        }
-    };
-
     if (args.length == 0) {
-        return send({ embeds: [new ErrorEmbed(`${await getPrefix(message.guild)}ta <date> (label...)`)] });
+        return message.channel.send({ embeds: [new ErrorEmbed(`${await getPrefix(message.guild)}ta <date> (label...)`)] });
     }
 
     let target = dayjs(args[0]);
@@ -38,11 +30,11 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
     }
 
     if (isNaN(target.unix())) {
-        return send({ embeds: [new ErrorEmbed("invalid date")] });
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid date")] });
     }
 
     if (target.isAfter(dayjs())) {
-        return send({ embeds: [new ErrorEmbed("date must be in the past")] });
+        return message.channel.send({ embeds: [new ErrorEmbed("date must be in the past")] });
     }
 
     await addCooldown(cmd.name, message.member, 10);
@@ -59,9 +51,9 @@ async function run(message: Message | (CommandInteraction & NypsiCommandInteract
     }
 
     if (label) {
-        return send({ embeds: [new CustomEmbed(message.member, `${label} was **${length} ago**`)] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, `${label} was **${length} ago**`)] });
     } else {
-        return send({ embeds: [new CustomEmbed(message.member, `${length} ago`)] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, `${length} ago`)] });
     }
 }
 

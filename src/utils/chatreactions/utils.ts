@@ -1,10 +1,11 @@
-import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { ChannelType, Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { logger } from "../logger";
 import fetch from "node-fetch";
 import prisma from "../database/database";
-
-declare function require(name: string);
+import { getGuild } from "../../nypsi";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { addCooldown, inCooldown } from "../guilds/utils";
 
 const currentChannels = new Set();
 const existsCache = new Set();
@@ -27,7 +28,6 @@ setInterval(async () => {
     });
 
     for (const guildData of query) {
-        const { getGuild } = require("../../nypsi");
         const guild = await getGuild(guildData.guildId);
 
         if (!guild) {
@@ -49,13 +49,18 @@ setInterval(async () => {
                 }
             }
 
-            const channel = await guild.channels.cache.find((cha) => cha.id == ch);
+            const channel = guild.channels.cache.find((cha) => cha.id == ch);
 
             if (!channel) {
                 continue;
             }
 
-            const messages: Collection<string, Message> = await channel.messages.fetch({ limit: 50 }).catch(() => {});
+            if (!channel.isTextBased()) return;
+            if (channel.isThread()) return;
+            if (channel.type == ChannelType.GuildVoice) return;
+            if (channel.type == ChannelType.GuildNews) return;
+
+            const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
             let stop = false;
 
             if (!messages) continue;
@@ -121,9 +126,6 @@ setInterval(async () => {
     }
 }, 60000);
 
-/**
- * @param {Guild} guild
- */
 export async function createReactionProfile(guild: Guild) {
     await prisma.chatReaction.create({
         data: {
@@ -132,9 +134,6 @@ export async function createReactionProfile(guild: Guild) {
     });
 }
 
-/**
- * @param {Guild} guild
- */
 export async function hasReactionProfile(guild: Guild) {
     if (existsCache.has(guild.id)) {
         return true;
@@ -157,10 +156,6 @@ export async function hasReactionProfile(guild: Guild) {
     }
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getWords(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -180,10 +175,6 @@ export async function getWords(guild: Guild) {
     }
 }
 
-/**
- * @param {Guild} guild
- * @param {string[]} newWordList
- */
 export async function updateWords(guild: Guild, newWordList: string[]) {
     await prisma.chatReaction.update({
         where: {
@@ -195,10 +186,6 @@ export async function updateWords(guild: Guild, newWordList: string[]) {
     });
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getWordList(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -212,10 +199,6 @@ export async function getWordList(guild: Guild) {
     return query.wordList;
 }
 
-/**
- * @param {Guild} guild
- * @returns {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
- */
 export async function getReactionSettings(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -233,10 +216,6 @@ export async function getReactionSettings(guild: Guild) {
     return query;
 }
 
-/**
- * @param {Guild} guild
- * @param {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
- */
 export async function updateReactionSettings(
     guild: Guild,
     settings: {
@@ -263,11 +242,6 @@ export async function updateReactionSettings(
     if (enabledCache.has(guild.id)) enabledCache.delete(guild.id);
 }
 
-/**
- * @param {Guild} guild
- * @param {GuildMember} member
- * @returns {{wins: number, secondPlace: number, thirdPlace: number}}
- */
 export async function getReactionStats(guild: Guild, member: GuildMember) {
     const query = await prisma.chatReactionStats.findFirst({
         where: {
@@ -287,10 +261,6 @@ export async function getReactionStats(guild: Guild, member: GuildMember) {
     };
 }
 
-/**
- * @param {Guild} guild
- * @param {TextChannel} channel
- */
 export async function startReaction(guild: Guild, channel: TextChannel) {
     if (currentChannels.has(channel.id)) return "xoxo69";
 
@@ -311,8 +281,6 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
         displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos);
     }
 
-    const { CustomEmbed } = require("../models/EmbedBuilders");
-
     const embed = new CustomEmbed().setColor("#5efb8f");
 
     embed.setHeader("chat reaction");
@@ -322,13 +290,13 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
     const start = new Date().getTime();
 
-    const winners = new Map();
-    const winnersIDs = [];
+    const winners: Map<number, { mention: string; time: string; member: GuildMember }> = new Map();
+    const winnersIDs: string[] = [];
 
     let waiting = false;
     const blacklisted = await getBlacklisted(guild);
 
-    const filter = async (m) =>
+    const filter = async (m: Message) =>
         m.content.toLowerCase() == chosenWord.toLowerCase() &&
         winnersIDs.indexOf(m.author.id) == -1 &&
         !m.member.user.bot &&
@@ -369,7 +337,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
                     if (winners.size == 1) {
                         return;
                     } else {
-                        const field = await embed.fields.find((f) => f.name == "winners");
+                        const field = embed.data.fields.find((f) => f.name == "winners");
 
                         field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``;
 
@@ -389,7 +357,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
                 }, 250);
             } else {
                 if (!waiting) {
-                    const field = await embed.fields.find((f) => f.name == "winners");
+                    const field = embed.data.fields.find((f) => f.name == "winners");
 
                     field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``;
 
@@ -418,23 +386,17 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
         currentChannels.delete(channel.id);
         setTimeout(async () => {
             if (winners.size == 0) {
-                embed.setDescription(embed.description + "\n\nnobody won ):");
+                embed.setDescription(embed.data.description + "\n\nnobody won ):");
             } else if (winners.size == 1) {
-                embed.setFooter("ended with 1 winner");
+                embed.setFooter({ text: "ended with 1 winner" });
             } else {
-                embed.setFooter(`ended with ${winners.size} winners`);
+                embed.setFooter({ text: `ended with ${winners.size} winners` });
             }
             await msg.edit({ embeds: [embed] }).catch(() => {});
         }, 500);
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- * @returns {Boolean}
- */
 export async function hasReactionStatsProfile(guild: Guild, member: GuildMember) {
     const query = await prisma.chatReactionStats.findFirst({
         where: {
@@ -452,11 +414,6 @@ export async function hasReactionStatsProfile(guild: Guild, member: GuildMember)
     }
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function createReactionStatsProfile(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.create({
         data: {
@@ -466,11 +423,6 @@ export async function createReactionStatsProfile(guild: Guild, member: GuildMemb
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function addWin(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -482,11 +434,6 @@ export async function addWin(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function add2ndPlace(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -498,11 +445,6 @@ export async function add2ndPlace(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- * @param {GuildMember} member
- */
 export async function add3rdPlace(guild: Guild, member: GuildMember) {
     await prisma.chatReactionStats.updateMany({
         where: {
@@ -514,14 +456,7 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
     });
 }
 
-/**
- * @param {Guild} guild
- * @param {Number} amount
- * @returns {Map}
- */
 export async function getServerLeaderboard(guild: Guild, amount: number): Promise<Map<string, string>> {
-    const { inCooldown, addCooldown } = require("../guilds/utils");
-
     let members: Collection<string, GuildMember>;
 
     if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -584,7 +519,7 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
         }
     }
 
-    const getMember = (id) => {
+    const getMember = (id: string) => {
         const target = members.find((member) => member.user.id == id);
 
         return target;
@@ -676,10 +611,6 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg);
 }
 
-/**
- * @param {Guild} guild
- * @returns {string[]}
- */
 export async function getBlacklisted(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
         where: {
@@ -693,10 +624,6 @@ export async function getBlacklisted(guild: Guild) {
     return query.blacklisted;
 }
 
-/**
- * @param {Guild} guild
- * @param {string[]} blacklisted
- */
 export async function setBlacklisted(guild: Guild, blacklisted: string[]) {
     await prisma.chatReaction.update({
         where: {
@@ -708,10 +635,6 @@ export async function setBlacklisted(guild: Guild, blacklisted: string[]) {
     });
 }
 
-/**
- *
- * @param {Guild} guild
- */
 export async function deleteStats(guild: Guild) {
     await prisma.chatReactionStats.deleteMany({
         where: {
@@ -720,9 +643,6 @@ export async function deleteStats(guild: Guild) {
     });
 }
 
-/**
- * @returns {string[]}
- */
 async function getDefaultWords(): Promise<string[]> {
     const res = await fetch(
         "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"

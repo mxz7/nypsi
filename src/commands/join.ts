@@ -1,4 +1,4 @@
-import { Collection, CommandInteraction, GuildMember, Message } from "discord.js";
+import { Collection, CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
@@ -29,12 +29,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
             } else {
-                await message.reply(data);
+                await message.reply(data as InteractionReplyOptions);
             }
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {

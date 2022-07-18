@@ -1,4 +1,12 @@
-import { Channel, CommandInteraction, Message, PermissionFlagsBits, PermissionsBitField } from "discord.js";
+import {
+    Channel,
+    CommandInteraction,
+    InteractionReplyOptions,
+    Message,
+    MessageOptions,
+    PermissionFlagsBits,
+    PermissionsBitField,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -14,14 +22,10 @@ const cmd = new Command(
 cmd.slashEnabled = true;
 cmd.slashData.addChannelOption((option) => option.setName("channel").setDescription("channel to lock").setRequired(false));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;

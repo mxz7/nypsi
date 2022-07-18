@@ -6,6 +6,10 @@ import {
     PermissionFlagsBits,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    GuildMember,
+    Interaction,
+    MessageEditOptions,
 } from "discord.js";
 import { getCases, profileExists, createProfile } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -24,10 +28,6 @@ cmd.slashData.addStringOption((option) =>
     option.setName("user").setDescription("use the user's id or username").setRequired(true)
 );
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {
@@ -65,8 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    let member;
-    let unknownMember = false;
+    let member: GuildMember | string;
 
     if (!message.interaction && message.mentions.members.first()) {
         member = message.mentions.members.first();
@@ -77,7 +76,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             member = members.find((m) => m.user.id == args[0]);
 
             if (!member) {
-                unknownMember = true;
                 member = args[0];
             }
         } else {
@@ -98,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let cases: ModerationCase[];
     const pages: ModerationCase[][] = [];
 
-    if (!unknownMember) {
+    if (member instanceof GuildMember) {
         cases = await getCases(message.guild, member.user.id);
     } else {
         cases = await getCases(message.guild, member);
@@ -132,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         text: "page 1/" + pages.length + " | total: " + cases.length,
     });
 
-    if (unknownMember) {
+    if (!(member instanceof GuildMember)) {
         embed.setHeader("history for " + member);
     } else {
         embed.setHeader("history for " + member.user.tag);
@@ -149,10 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    /**
-     * @type {Message}
-     */
-    let msg;
+    let msg: Message;
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -170,9 +165,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastPage = pages.length;
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const edit = async (data, msg?) => {
+        const edit = async (data: MessageEditOptions, msg?: Message) => {
             if (!(message instanceof Message)) {
                 await message.editReply(data);
                 return await message.fetchReply();
@@ -181,9 +176,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         };
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;
@@ -194,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const newEmbed = new CustomEmbed(message.member);
 
-            if (unknownMember) {
+            if (!(member instanceof GuildMember)) {
                 newEmbed.setHeader("history for " + member);
             } else {
                 newEmbed.setHeader("history for " + member.user.tag);

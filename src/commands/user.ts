@@ -12,10 +12,6 @@ const cmd = new Command("user", "view info about a user in the server", Categori
 
 const sortCache = new Map();
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member;
 
@@ -58,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         addCooldown(message.guild, 3600);
     }
 
-    let membersSorted = [];
+    let membersSorted: string[] = [];
 
     if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
         membersSorted = sortCache.get(message.guild.id);
@@ -106,7 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     rolesText = rolesText.split("@everyone").join("");
 
     const embed = new CustomEmbed(message.member, member.user.toString())
-        .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }))
+        .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
         .setHeader(member.user.tag)
 
         .addField("account", `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`, true)
@@ -120,8 +116,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
         .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
 
-    if (member._roles.length > 0) {
-        embed.addField("roles [" + member._roles.length + "]", rolesText);
+    if (member.roles.cache.size > 0) {
+        embed.addField("roles [" + member.roles.cache.size + "]", rolesText);
     }
 
     message.channel.send({ embeds: [embed] });

@@ -20,7 +20,7 @@ import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
 import _ = require("lodash");
 
-declare function require(name: string);
+declare function require(name: string): any;
 
 const webhook = new topgg.Webhook("123");
 const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
@@ -52,7 +52,7 @@ setInterval(async () => {
     });
 
     for (const user of query) {
-        const workers = user.workers;
+        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
 
         if (_.isEmpty(workers)) continue;
 
@@ -75,7 +75,7 @@ setInterval(async () => {
                 userId: user.userId,
             },
             data: {
-                workers: workers,
+                workers: workers as any,
             },
         });
     }
@@ -122,10 +122,6 @@ setInterval(() => {
     lotteryHook.send({ embeds: [embed] });
 }, ms("30 minutes"));
 
-/**
- *
- * @returns {String}
- */
 export function loadItems(): string {
     let txt = "";
 
@@ -183,11 +179,6 @@ async function updateCryptoWorth() {
 
 setInterval(updateCryptoWorth, 1500000);
 
-/**
- *
- * @param {Client} client
- * @param {JSON} vote
- */
 export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     const { user } = vote;
 
@@ -308,9 +299,6 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
     }
 }
 
-/**
- * @returns {Number}
- */
 export function getPadlockPrice(): number {
     return padlockPrice;
 }
@@ -357,10 +345,6 @@ export async function hasVoted(member: GuildMember | string) {
     }
 }
 
-/**
- * @param {GuildMember} member
- * @returns {Number}
- */
 export async function getMulti(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -409,9 +393,6 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     return parseFloat(multi.toFixed(2));
 }
 
-/**
- * @returns {Number}
- */
 export async function getUserCount(): Promise<number> {
     const query = await prisma.economy.findMany({
         select: {
@@ -422,10 +403,6 @@ export async function getUserCount(): Promise<number> {
     return query.length;
 }
 
-/**
- *
- * @param {GuildMember} member - get balance
- */
 export async function getBalance(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -453,11 +430,6 @@ export async function getBalance(member: GuildMember | string) {
     return Number(query.money);
 }
 
-/**
- *
- * @param {GuildMember} member
- * @returns {Boolean}
- */
 export async function userExists(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -492,10 +464,6 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
     }
 }
 
-/**
- * @param {GuildMember} member to modify balance of
- * @param {Number} amount to update balance to
- */
 export async function updateBalance(member: GuildMember | string, amount: number) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -515,10 +483,6 @@ export async function updateBalance(member: GuildMember | string, amount: number
     await redis.del(`cache:economy:balance:${id}`);
 }
 
-/**
- * @returns {Number} bank balance of user
- * @param {GuildMember} member to get bank balance of
- */
 export async function getBankBalance(member: GuildMember): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -539,11 +503,6 @@ export async function getBankBalance(member: GuildMember): Promise<number> {
     return query.bank;
 }
 
-/**
- *
- * @param {GuildMember} member to modify balance of
- * @param {Number} amount to update balance to
- */
 export async function updateBankBalance(member: GuildMember, amount: number) {
     await prisma.economy.update({
         where: {
@@ -555,10 +514,6 @@ export async function updateBankBalance(member: GuildMember, amount: number) {
     });
 }
 
-/**
- * @returns {Number} xp of user
- * @param {GuildMember} member to get xp of
- */
 export async function getXp(member: GuildMember): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -586,11 +541,6 @@ export async function getXp(member: GuildMember): Promise<number> {
     return query.xp;
 }
 
-/**
- *
- * @param {GuildMember} member to modify xp of
- * @param {Number} amount to update xp to
- */
 export async function updateXp(member: GuildMember, amount: number) {
     if (amount >= 69420) return;
 
@@ -605,10 +555,6 @@ export async function updateXp(member: GuildMember, amount: number) {
     await redis.del(`cache:economy:xp:${member.user.id}`);
 }
 
-/**
- * @returns {Number} max balance of user
- * @param {GuildMember} member to get max balance of
- */
 export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     const xp = await getXp(member);
     const constant = 550;
@@ -619,12 +565,6 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     return max;
 }
 
-/**
- * @returns {string[]} global bal top
- * @param {Number} amount of people to pull
- * @param {Client} client
- * @param {Boolean} anon
- */
 export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
@@ -684,11 +624,6 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
     return usersFinal;
 }
 
-/**
- * @returns {string[]}
- * @param {Guild} guild to pull data from
- * @param {Number} amount of users to return with
- */
 export async function topAmount(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
@@ -735,7 +670,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
@@ -766,12 +701,6 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
     return usersFinal;
 }
 
-/**
- * @returns {string[]}
- * @param {Guild} guild to pull data from
- * @param {Number} amount of users to return with
- * @param {Number} min minimum balance
- */
 export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
@@ -817,7 +746,7 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
@@ -849,11 +778,6 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
     return usersFinal;
 }
 
-/**
- * @returns {string[]}
- * @param {Guild} guild to pull data from
- * @param {Number} amount of users to return with
- */
 export async function topAmountPrestige(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
@@ -899,7 +823,7 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
 
     let count = 0;
 
-    const getMemberID = (guild, id) => {
+    const getMemberID = (guild: Guild, id: string) => {
         const target = guild.members.cache.find((member) => {
             return member.user.id == id;
         });
@@ -938,10 +862,6 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
     return usersFinal;
 }
 
-/**
- *
- * @param {GuildMember} member to create profile for
- */
 export async function createUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -967,10 +887,6 @@ export async function createUser(member: GuildMember | string) {
     await redis.del(`cache:economy:exists:${id}`);
 }
 
-/**
- * @returns {Number} formatted bet
- * @param {String} number to format
- */
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
     const maxBet = await calcMaxBet(member);
 
@@ -1009,10 +925,6 @@ export function formatNumber(number: string): number | void {
     return Math.floor(parseInt(number));
 }
 
-/**
- * @returns {boolean}
- * @param {GuildMember} member to check
- */
 export async function hasPadlock(member: GuildMember): Promise<boolean> {
     const query = await prisma.economy.findUnique({
         where: {
@@ -1026,11 +938,6 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
     return query.padlock;
 }
 
-/**
- *
- * @param {GuildMember} member to update padlock setting of
- * @param {Boolean} setting padlock to true or false
- */
 export async function setPadlock(member: GuildMember, setting: boolean) {
     await prisma.economy.update({
         where: {
@@ -1042,11 +949,6 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
     });
 }
 
-/**
- *
- * @param {Number} guildCount guild count
- * @param {Number} shardCount
- */
 export function updateStats(guildCount: number, shardCount: number) {
     topggStats.postStats({
         serverCount: guildCount,
@@ -1060,10 +962,6 @@ export function updateStats(guildCount: number, shardCount: number) {
     // }) FOR POSTING TO DISCORD.BOTS.GG
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function getPrestige(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1091,11 +989,6 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     return query.prestige;
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Number} amount
- */
 export async function setPrestige(member: GuildMember, amount: number) {
     await prisma.economy.update({
         where: {
@@ -1109,10 +1002,6 @@ export async function setPrestige(member: GuildMember, amount: number) {
     await redis.del(`cache:economy:prestige:${member.user.id}`);
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function getPrestigeRequirement(member: GuildMember): Promise<number> {
     const constant = 250;
     const extra = (await getPrestige(member)) * constant;
@@ -1120,10 +1009,6 @@ export async function getPrestigeRequirement(member: GuildMember): Promise<numbe
     return 500 + extra;
 }
 
-/**
- * @returns {Number}
- * @param {Number} xp
- */
 export function getPrestigeRequirementBal(xp: number): number {
     const constant = 500;
     const bonus = xp * constant;
@@ -1131,10 +1016,6 @@ export function getPrestigeRequirementBal(xp: number): number {
     return bonus;
 }
 
-/**
- * @returns {Boolean}
- * @param {GuildMember} member
- */
 export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1157,11 +1038,6 @@ export async function getDMsEnabled(member: GuildMember | string): Promise<boole
     return query.dms;
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Boolean} value
- */
 export async function setDMsEnabled(member: GuildMember, value: boolean) {
     await prisma.economy.update({
         where: {
@@ -1173,10 +1049,6 @@ export async function setDMsEnabled(member: GuildMember, value: boolean) {
     });
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function calcMaxBet(member: GuildMember): Promise<number> {
     const base = 100000;
     const voted = await hasVoted(member);
@@ -1193,11 +1065,6 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
     return total + bonus * (prestige > 15 ? 15 : prestige);
 }
 
-/**
- * @returns {JSON}
- * @param {GuildMember} member
- * @param {String} member
- */
 export async function getWorkers(member: GuildMember | string): Promise<{ [key: string]: WorkerStorageData }> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1218,12 +1085,6 @@ export async function getWorkers(member: GuildMember | string): Promise<{ [key: 
     return query.workers as any;
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Number} id
- * @returns
- */
 export async function addWorker(member: GuildMember, id: number) {
     let memberID: string;
     if (member instanceof GuildMember) {
@@ -1278,11 +1139,6 @@ export async function emptyWorkersStored(member: GuildMember | string) {
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {String} id
- */
 export async function upgradeWorker(member: GuildMember | string, id: string) {
     let memberID: string;
     if (member instanceof GuildMember) {
@@ -1412,10 +1268,6 @@ export async function reset() {
     return { updated: updated, deleted: deleted };
 }
 
-/**
- * @returns {StatsProfile}
- * @param {GuildMember} member
- */
 export async function getStats(member: GuildMember): Promise<StatsProfile> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1433,12 +1285,6 @@ export async function getStats(member: GuildMember): Promise<StatsProfile> {
     return new StatsProfile(query);
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {String} game
- * @param {Boolean} win
- */
 export async function addGamble(member: GuildMember, game: string, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1499,11 +1345,6 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
     }
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Boolean} win
- */
 export async function addRob(member: GuildMember, win: boolean) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1564,10 +1405,6 @@ export async function addRob(member: GuildMember, win: boolean) {
     }
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function addItemUse(member: GuildMember, item: string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1608,11 +1445,6 @@ export async function addItemUse(member: GuildMember, item: string) {
 
 type Inventory = { [key: string]: number };
 
-/**
- *
- * @param {GuildMember} member
- * @returns
- */
 export async function getInventory(member: GuildMember | string): Promise<Inventory> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1637,11 +1469,6 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
     return query.inventory as Inventory;
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {Object} inventory
- */
 export async function setInventory(member: GuildMember | string, inventory: object) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1664,10 +1491,6 @@ export function getItems(): { [key: string]: Item } {
     return items;
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function getMaxBitcoin(member: GuildMember): Promise<number> {
     const base = 10;
 
@@ -1682,18 +1505,10 @@ export async function getMaxBitcoin(member: GuildMember): Promise<number> {
     return base + prestigeBonus + xpBonus;
 }
 
-/**
- * @returns {Number}
- * @param {GuildMember} member
- */
 export async function getMaxEthereum(member: GuildMember): Promise<number> {
     return (await getMaxBitcoin(member)) * 10;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function deleteUser(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1727,10 +1542,6 @@ export async function getTickets(member: GuildMember | string): Promise<LotteryT
     return query;
 }
 
-/**
- *
- * @param {GuildMember} member
- */
 export async function addTicket(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1754,10 +1565,6 @@ export async function addTicket(member: GuildMember | string) {
     }
 }
 
-/**
- *
- * @param {Client} client
- */
 async function doLottery(client: Client) {
     logger.info("performing lottery..");
     const tickets = await prisma.lotteryTicket.findMany();
@@ -1835,10 +1642,6 @@ async function doLottery(client: Client) {
     logger.info(`${count.toLocaleString()} tickets deleted from database`);
 }
 
-/**
- *
- * @param {Client} client
- */
 export function runLotteryInterval(client: Client) {
     const now = new Date();
     const saturday = new Date();
@@ -1860,12 +1663,6 @@ export function runLotteryInterval(client: Client) {
     });
 }
 
-/**
- *
- * @param {GuildMember} member
- * @param {JSON} item
- * @returns {string}
- */
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
     const inventory = await getInventory(member);
     const items = getItems();

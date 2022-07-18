@@ -8,10 +8,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("skin", "view the skin of a minecraft account", Categories.MINECRAFT);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const prefix = await getPrefix(message.guild);
 

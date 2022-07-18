@@ -4,10 +4,6 @@ import { uploadGuildCommands, uploadGuildCommandsGlobal } from "../utils/command
 
 const cmd = new Command("reloadslash", "reload data for slash commands", Categories.NONE).setPermissions(["bot owner"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id != "672793821850894347") return;
 

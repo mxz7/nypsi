@@ -7,11 +7,6 @@ const cmd = new Command("ethereum", "view the current ethereum value (reflects r
     ["eth"]
 );
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
     const ethereum = getItems()["ethereum"];

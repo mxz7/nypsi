@@ -13,7 +13,7 @@ import {
     getGuildByUser,
     addToGuildXP,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import * as shuffle from "shuffle-array";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -38,14 +38,10 @@ cmd.slashData
     )
     .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -196,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             bet.toLocaleString()
     ).setHeader("rock paper scissors", message.author.avatarURL());
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();

@@ -8,10 +8,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("urban", "get a definition from urban dictionary", Categories.INFO).setAliases(["define"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -27,9 +23,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 10);
 
+    let fail = false;
+
     const results = await urban.define(args.join()).catch(() => {
-        return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+        fail = true;
     });
+
+    if (fail) return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+
+    if (!results) {
+        return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+    }
 
     inPlaceSort(results).desc((i: any) => i.thumbs_up);
 

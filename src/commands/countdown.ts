@@ -9,11 +9,6 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
     .setAliases(["countdowns"])
     .setPermissions(["MANAGE_SERVER"]);
 
-/**
- *
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -73,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await message.channel.send({ embeds: [embed] });
 
-        const filter = (msg) => message.author.id == msg.author.id;
+        const filter = (msg: Message) => message.author.id == msg.author.id;
 
         let fail = false;
 

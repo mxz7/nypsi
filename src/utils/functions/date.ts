@@ -13,9 +13,6 @@ export function daysAgo(date: Date | number): number {
     return days;
 }
 
-/**
- * @returns {String}
- */
 export function daysUntilChristmas(): string {
     let date = new Date(Date.parse(`12/25/${new Date().getUTCFullYear()}`));
     const current = new Date();

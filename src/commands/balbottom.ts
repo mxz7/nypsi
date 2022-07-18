@@ -9,10 +9,6 @@ const cmd = new Command("balbottom", "view bottom balances in the server", Categ
     "brokeboys",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);

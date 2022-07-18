@@ -24,10 +24,6 @@ ranks.set("VIP", "VIP");
 
 const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", Categories.MINECRAFT).setAliases(["h"]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const prefix = await getPrefix(message.guild);
 
@@ -86,10 +82,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const url = "https://plancke.io/hypixel/player/stats/" + uuid.id;
     const skin = `https://mc-heads.net/avatar/${uuid.id}/256`;
 
-    let lastLog, firstLog, level, rank, streak, topStreak, karma, challenges, quests;
+    let lastLog: any,
+        firstLog: any,
+        level: any,
+        rank: any,
+        streak: any,
+        topStreak: any,
+        karma: any,
+        challenges: any,
+        quests: any;
 
     try {
-        lastLog = timeSince(new Date(hypixelData.player.lastLogin));
+        lastLog = timeSince(new Date(hypixelData.player.lastLogin).getTime());
         firstLog = new Date(hypixelData.player.firstLogin).toLocaleString().split(", ")[0];
         level = getLevel(hypixelData.player.networkExp);
         rank = ranks.get(hypixelData.player.newPackageRank);
@@ -179,11 +183,11 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getLevel(exp) {
+function getLevel(exp: number) {
     return exp < 0 ? 1 : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp));
 }
 
-function timeSince(date) {
+function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));

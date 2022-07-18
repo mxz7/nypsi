@@ -8,10 +8,6 @@ const cmd = new Command("setcolor", "set the color of the bot's messages (premiu
     "setcolour",
 ]);
 
-/**
- * @param {Message} message
- * @param {string[]} args
- */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await isPremium(message.author.id))) {
         return message.channel.send({
