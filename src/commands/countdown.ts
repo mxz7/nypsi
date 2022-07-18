@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { getCountdowns, getPrefix, addCountdown, deleteCountdown } from "../utils/guilds/utils";
@@ -15,7 +15,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
  * @param {Array<String>} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        embed.setFooter(`use ${prefix}countdown help for more commands`);
+        embed.setFooter({ text: `use ${prefix}countdown help for more commands` });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "create" || args[0].toLowerCase() == "new") {
@@ -113,9 +113,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (date.getTime() - now > 63072000000) {
             return message.channel.send({
                 embeds: [
-                    new ErrorEmbed("thats more than 2 years away man. i might not live that long").setFooter(
-                        "so become a patreon 😏"
-                    ),
+                    new ErrorEmbed("thats more than 2 years away man. i might not live that long").setFooter({
+                        text: "so become a patreon 😏",
+                    }),
                 ],
             });
         }
