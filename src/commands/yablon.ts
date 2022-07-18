@@ -371,7 +371,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     const newEmbed = new CustomEmbed(message.member).setHeader("yablon", message.author.avatarURL());
 
     const edit = async (data: MessageEditOptions) => {
-        if (message instanceof CommandInteraction) {
+        if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
         } else {
