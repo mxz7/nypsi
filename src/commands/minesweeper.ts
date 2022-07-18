@@ -13,7 +13,7 @@ import {
     getGuildByUser,
     addToGuildXP,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
@@ -39,9 +39,9 @@ cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription(
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -183,7 +183,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed] });
 
-    playGame(message, msg).catch((e) => {
+    playGame(message, msg).catch((e: string) => {
         logger.error(`error occured playing minesweeper - ${message.author.tag} (${message.author.id})`);
         logger.error(e);
         return send({
@@ -196,7 +196,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getFront(grid) {
+function getFront(grid: string[]) {
     const gridFront = [];
 
     for (const item of grid) {
@@ -219,7 +219,7 @@ function getFront(grid) {
     return gridFront;
 }
 
-function getExposedFront(grid) {
+function getExposedFront(grid: string[]) {
     const gridFront = [];
 
     for (const item of grid) {
@@ -242,7 +242,7 @@ function getExposedFront(grid) {
     return gridFront;
 }
 
-function toTable(grid) {
+function toTable(grid: string[]) {
     let table =
         ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:";
     let count = 0;
@@ -282,7 +282,7 @@ function toTable(grid) {
     return table;
 }
 
-function toExposedTable(grid) {
+function toExposedTable(grid: string[]) {
     let table =
         ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:";
     let count = 0;
@@ -322,7 +322,7 @@ function toExposedTable(grid) {
     return table;
 }
 
-function toLocation(coordinate) {
+function toLocation(coordinate: string) {
     const letter = coordinate.split("")[0];
     const number = coordinate.split("")[1];
 
@@ -340,19 +340,19 @@ function toLocation(coordinate) {
     }
 }
 
-async function playGame(message, msg) {
+async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), msg: Message): Promise<void> {
     if (!games.has(message.author.id)) return;
 
     const bet = games.get(message.author.id).bet;
     let win = games.get(message.author.id).win;
     const grid = games.get(message.author.id).grid;
 
-    let table;
+    let table: string;
 
     const embed = new CustomEmbed(message.member).setHeader("minesweeper", message.author.avatarURL());
 
-    const edit = async (data) => {
-        if (message.interaction) {
+    const edit = async (data: MessageEditOptions) => {
+        if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
         } else {
@@ -460,10 +460,11 @@ async function playGame(message, msg) {
     };
 
     if (win == 15) {
-        return win1();
+        win1();
+        return;
     }
 
-    const filter = (m) => m.author.id == message.author.id;
+    const filter = (m: Message) => m.author.id == message.author.id;
     let fail = false;
 
     const response = await message.channel
@@ -480,6 +481,8 @@ async function playGame(message, msg) {
 
     if (fail) return;
 
+    if (typeof response != "string") return;
+
     if (response.length != 2 && response != "finish") {
         await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
         return playGame(message, msg);
@@ -488,11 +491,14 @@ async function playGame(message, msg) {
     if (response == "finish") {
         table = toExposedTable(grid);
         if (win < 1) {
-            return lose();
+            lose();
+            return;
         } else if (win == 1) {
-            return draw();
+            draw();
+            return;
         } else {
-            return win1();
+            win1();
+            return;
         }
     } else {
         const letter = response.split("")[0];
@@ -529,7 +535,8 @@ async function playGame(message, msg) {
         case "b":
             grid[location] = "x";
             table = toExposedTable(grid);
-            return lose();
+            lose();
+            return;
         case "c":
             return playGame(message, msg);
         case "a":
