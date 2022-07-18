@@ -9,6 +9,10 @@ import {
     Channel,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import {
     createReactionProfile,
@@ -137,9 +141,9 @@ cmd.slashData
     );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -778,9 +782,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     let currentPage = 1;
                     const lastPage = pages.size;
 
-                    const filter = (i) => i.user.id == message.author.id;
+                    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-                    const edit = async (data, msg) => {
+                    const edit = async (data: MessageEditOptions, msg: Message) => {
                         if (!(message instanceof Message)) {
                             await message.editReply(data);
                             return await message.fetchReply();
@@ -789,7 +793,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         }
                     };
 
-                    const pageManager = async () => {
+                    const pageManager = async (): Promise<void> => {
                         const reaction = await msg
                             .awaitMessageComponent({ filter, time: 30000 })
                             .then(async (collected) => {
