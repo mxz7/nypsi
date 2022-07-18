@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, msg).setTitle("recent songs");
 
-    embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }) });
+    embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ size: 128 }) });
 
     return message.channel.send({ embeds: [embed] });
 }
