@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { ChannelType, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -13,14 +13,14 @@ const cmd = new Command("membercount", "create an updating member count channel 
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage channels` permission for this command to work")],
         });
@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `**enabled** \`${profile.enabled}\`\n**filter bots** \`${profile.filterBots}\`\n**channel** \`${profile.channel}\`\n**format** \`${profile.format}\``
         )
             .setHeader("member count")
-            .setFooter(`use ${prefix}counter help to view additional commands`);
+            .setFooter({ text: `use ${prefix}counter help to view additional commands` });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "help") {
@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter channel** *set a channel as the channel to be used*`
         )
             .setHeader("member count")
-            .setFooter("channel will be updated every 10 minutes");
+            .setFooter({ text: "channel will be updated every 10 minutes" });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "enable") {
@@ -76,12 +76,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let fail = false;
 
         const channel = await message.guild.channels
-            .create(format, {
-                type: "GUILD_VOICE",
+            .create({
+                name: format,
+                type: ChannelType.GuildVoice,
                 permissionOverwrites: [
                     {
                         id: role.id,
-                        deny: ["CONNECT", "SEND_MESSAGES"],
+                        deny: [PermissionFlagsBits.Connect, PermissionFlagsBits.SendMessages],
                     },
                 ],
             })
@@ -99,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member, "✅ channel successfully created")
             .setHeader("member count")
-            .setFooter("channel will be updated every 10 minutes");
+            .setFooter({ text: "channel will be updated every 10 minutes" });
 
         return message.channel.send({ embeds: [embed] });
     } else if (args[0].toLowerCase() == "disable") {
@@ -271,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `${prefix}**counter filterbots** *view/change the setting to filter bots*`
         )
             .setHeader("member count")
-            .setFooter("member count will be updated every 10 minutes");
+            .setFooter({ text: "member count will be updated every 10 minutes" });
 
         return message.channel.send({ embeds: [embed] });
     }

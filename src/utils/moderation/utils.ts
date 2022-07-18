@@ -612,7 +612,7 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
         addCooldown(guild, 3600);
     }
 
-    let newMember = await members.find((m) => m.id == member);
+    let newMember: void | GuildMember = members.find((m) => m.id == member);
 
     if (!newMember) {
         newMember = await guild.members.fetch(member).catch(() => {

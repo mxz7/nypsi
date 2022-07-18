@@ -14,7 +14,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new CustomEmbed(message.member).setImage(
                 message.guild.iconURL({
                     size: 256,
-                    dynamic: true,
                 })
             ),
         ],

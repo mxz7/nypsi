@@ -1,4 +1,4 @@
-import { Collection, GuildMember, Message, Permissions, ThreadMember, ThreadMemberManager } from "discord.js";
+import { Collection, GuildMember, Message, PermissionsBitField, ThreadMember, ThreadMemberManager } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import { userExists } from "../utils/economy/utils";
 import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
@@ -33,7 +33,7 @@ export default async function messageCreate(message: Message) {
     if (message.author.bot) return;
     if (!message.member) return;
 
-    if (message.channel.type == "DM") {
+    if (message.channel.isDMBased()) {
         logger.info("message in DM from " + message.author.tag + ": " + message.content);
 
         const embed = new CustomEmbed()
@@ -60,7 +60,7 @@ export default async function messageCreate(message: Message) {
         });
     }
 
-    if ((await hasGuild(message.guild)) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if ((await hasGuild(message.guild)) && !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
         const filter = await getChatFilter(message.guild);
 
         let content: string | string[] = message.content.toLowerCase().normalize("NFD");

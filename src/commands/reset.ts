@@ -1,4 +1,12 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+    Interaction,
+} from "discord.js";
 import {
     getXp,
     getPrestige,
@@ -75,13 +83,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member);
 
-    const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId("✅").setLabel("do it.").setStyle("SUCCESS")
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
     );
 
     const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const reaction = await msg
         .awaitMessageComponent({ filter, time: 15000 })

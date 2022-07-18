@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { deleteServer, profileExists } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -12,10 +12,10 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", Catego
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
     if (
-        message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) &&
+        message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
         message.guild.ownerId != message.member.user.id
     ) {
         const embed = new ErrorEmbed("to delete all cases you must be the server owner");
@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, "react with ✅ to delete all punishment/moderation cases")
         .setHeader("confirmation")
-        .setFooter("this cannot be reversed");
+        .setFooter({ text: "this cannot be reversed" });
 
     const msg = await message.channel.send({ embeds: [embed] });
 

@@ -1,6 +1,5 @@
+import { inPlaceSort } from "fast-sort";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
-
-declare function require(name: string);
 
 export default function workerSort(array: string[], sortData: Map<string, number>): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -16,8 +15,6 @@ export default function workerSort(array: string[], sortData: Map<string, number
 }
 
 if (!isMainThread) {
-    const { inPlaceSort } = require("fast-sort");
-
     const arr: string[] = workerData[0];
     const sortData: Map<string, number> = workerData[1];
 

@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ).setHeader("furry detector 5000", member.user.avatarURL());
 
     if (furryAmount < 7) {
-        embed.setFooter("+1xp");
+        embed.setFooter({ text: "+1xp" });
     }
 
     return await send({ embeds: [embed] });

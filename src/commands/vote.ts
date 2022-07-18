@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setFooter("you get increased rewards for prestiging");
+        .setFooter({ text: "you get increased rewards for prestiging" });
 
     if (voted) {
         embed.setHeader("vote ✅", message.author.avatarURL());
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 crateAmount > 1 ? "s" : ""
             }`
         );
-        embed.setFooter("you get increased rewards for prestiging");
+        embed.setFooter({ text: "you get increased rewards for prestiging" });
     }
 
     message.channel.send({ embeds: [embed] });

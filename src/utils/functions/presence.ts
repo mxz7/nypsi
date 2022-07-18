@@ -12,7 +12,6 @@ export function updatePresence(presence = "", client: Client) {
         activities: [
             {
                 name: current,
-                type: "PLAYING",
             },
         ],
     });

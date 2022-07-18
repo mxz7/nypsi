@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             embed.setDescription(description);
-            embed.setFooter("thank you so much for supporting!");
+            embed.setFooter({ text: "thank you so much for supporting!" });
 
             return message.channel.send({ embeds: [embed] });
         } else {

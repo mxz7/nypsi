@@ -1,8 +1,10 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import { MentionQueueItem } from "../users/utils";
 import ms = require("ms");
+import Database = require("better-sqlite3");
+import { encrypt } from "../functions/string";
 
-declare function require(name: string);
+const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
 
 export default function doCollection(array: MentionQueueItem): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -21,8 +23,6 @@ if (!isMainThread) {
     setTimeout(() => {
         parentPort.postMessage(1);
     }, ms("1 hour"));
-    const db = require("better-sqlite3")("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
-    const { encrypt } = require("../functions/string");
     const insertMention = db.prepare(
         "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
     );

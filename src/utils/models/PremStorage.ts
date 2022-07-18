@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { logger } from "../logger";
 
-declare function require(name: string);
+declare function require(name: string): any;
 
 export class PremUser {
     public id: string;
@@ -193,7 +193,7 @@ export class PremUser {
                 break;
         }
 
-        const e = await requestRemoveRole(this.id, roleID).catch((e) => {
+        const e = await requestRemoveRole(this.id, roleID).catch((e: any) => {
             logger.error(`error removing role (premium) ${this.id}`);
             logger.error(e);
         });
