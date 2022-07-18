@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 1 && args[0] == "-m") {
         const embed = new CustomEmbed(message.member)
-            .setThumbnail(server.iconURL({ format: "png", dynamic: true, size: 128 }))
+            .setThumbnail(server.iconURL({ size: 128 }))
             .setHeader(server.name)
 
             .addField(
@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member)
-        .setThumbnail(server.iconURL({ format: "png", dynamic: true, size: 128 }))
+        .setThumbnail(server.iconURL({ size: 128 }))
         .setHeader(server.name)
 
         .addField(
@@ -86,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
 
     if (server.memberCount >= 25000) {
-        embed.setFooter("humans and bots may be inaccurate due to server size");
+        embed.setFooter({ text: "humans and bots may be inaccurate due to server size" });
     }
 
     message.channel.send({ embeds: [embed] });
