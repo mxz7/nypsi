@@ -128,10 +128,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(renderBoard(board));
     embed.setFooter({ text: "type your guess in chat" });
 
-    const msg = await send({ embeds: [embed] });
+    let fail = false;
+    const msg = await send({ embeds: [embed] }).catch(() => {
+        fail = true;
+    });
+
+    if (fail) return;
 
     games.set(message.author.id, {
-        message: msg,
+        message: msg as Message,
         word: word,
         notInWord: [],
         guesses: [],
