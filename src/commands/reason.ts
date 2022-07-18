@@ -10,9 +10,9 @@ const cmd = new Command("reason", "set a reason for a case/punishment", Categori
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
     const prefix = await getPrefix(message.guild);

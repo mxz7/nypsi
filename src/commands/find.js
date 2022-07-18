@@ -23,7 +23,7 @@ const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["b
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return;

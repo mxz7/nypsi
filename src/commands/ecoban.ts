@@ -6,9 +6,9 @@ const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.author.id != "672793821850894347") return;
 
     if (args.length == 0 || args[0].length != 18) {

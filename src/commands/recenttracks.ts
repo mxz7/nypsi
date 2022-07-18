@@ -15,9 +15,9 @@ const cmd = new Command(
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -64,9 +64,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
     }
 
-    /**
-     * @type {Array<{artist: {"#text": String}, name: String, "@attr": {nowplaying: Boolean}, url: String, date: {uts: String}}>}
-     */
     let recenttracks = res.recenttracks.track;
 
     recenttracks = recenttracks.slice(0, 5);

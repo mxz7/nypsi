@@ -6,7 +6,7 @@ const cmd = new Command("invite", "generate an invite link for the bot", Categor
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(
