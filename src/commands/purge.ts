@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -55,7 +55,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await addCooldown(cmd.name, message.member, 30);
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+    if (message.channel.isDMBased()) return;
 
     if (message instanceof Message && message.mentions.members.first()) {
         await message.delete();
@@ -110,11 +111,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const m = await message.channel.send({ embeds: [embed] });
         for (let i = 0; i < amount1 / 100; i++) {
-            if (m.deleted) {
-                embed.setDescription("✅ operation cancelled");
-                return await message.channel.send({ embeds: [embed] });
-            }
-
             if (amount < 10) return await m.delete().catch();
 
             if (amount <= 100) {
@@ -144,7 +140,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 );
-                await m.edit({ embeds: [embed] });
+                let stop = false;
+                await m.edit({ embeds: [embed] }).catch(() => {
+                    stop = true;
+                    embed.setDescription("✅ operation cancelled");
+                    return message.channel.send({ embeds: [embed] });
+                });
+                if (stop) return;
             }
 
             await message.channel.bulkDelete(messages).catch(() => {
@@ -167,7 +169,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         amount1 +
                         "` messages..\n - if you'd like to cancel this operation, delete this message"
                 );
-                await m.edit({ embeds: [embed] }).catch(() => {});
+                let stop = false;
+                await m.edit({ embeds: [embed] }).catch(() => {
+                    stop = true;
+                    embed.setDescription("✅ operation cancelled");
+                    return message.channel.send({ embeds: [embed] });
+                });
+                if (stop) return;
             }
         }
         if (!(message instanceof Message)) {
