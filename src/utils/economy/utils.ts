@@ -1219,6 +1219,9 @@ export async function toggleBan(id: string) {
 
 export async function reset() {
     await prisma.economyStats.deleteMany();
+    await prisma.economyGuildMember.deleteMany();
+    await prisma.economyGuild.deleteMany();
+
     await prisma.economy.deleteMany({
         where: {
             banned: true,
@@ -1234,9 +1237,6 @@ export async function reset() {
         .then((r) => r.count);
 
     const query = await prisma.economy.findMany();
-    await prisma.economyGuildMember.deleteMany();
-    await prisma.economyGuild.deleteMany();
-
     let updated = 0;
 
     for (const user of query) {
