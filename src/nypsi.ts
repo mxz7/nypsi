@@ -227,7 +227,7 @@ export async function requestRemoveRole(id: string, roleID: string) {
     return await user.roles.remove(role);
 }
 
-export async function getGuild(guildID: string): Promise<Guild | void> {
+export async function getGuild(guildID: string): Promise<Guild> {
     let a = true;
 
     const guild = await client.guilds.fetch(guildID).catch(() => {
@@ -235,6 +235,8 @@ export async function getGuild(guildID: string): Promise<Guild | void> {
     });
 
     if (!a) return undefined;
+
+    if (!guild) return undefined;
 
     return guild;
 }

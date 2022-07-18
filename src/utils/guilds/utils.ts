@@ -1,6 +1,6 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
 import ms = require("ms");
-import { eSnipe, snipe } from "../../nypsi";
+import { eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
@@ -287,7 +287,6 @@ export function checkStats() {
         });
 
         for (const profile of query) {
-            const { getGuild } = require("../../nypsi");
             const guild = await getGuild(profile.guildId);
 
             if (!guild) continue;
@@ -299,7 +298,7 @@ export function checkStats() {
                 await setGuildCounter(guild, profile);
                 memberCount = guild.memberCount;
             } else if (profile.filterBots) {
-                let members: Collection<string, GuildMember>;
+                let members: Collection<string, GuildMember> | void;
 
                 if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
                     members = guild.members.cache;
