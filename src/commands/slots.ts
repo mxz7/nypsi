@@ -13,7 +13,14 @@ import {
     getGuildByUser,
     addToGuildXP,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, Message } from "discord.js";
+import {
+    CommandInteraction,
+    InteractionReplyOptions,
+    InteractionResponse,
+    Message,
+    MessageEditOptions,
+    MessageOptions,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
@@ -61,9 +68,9 @@ cmd.slashData.addIntegerOption((option) =>
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
-        if (message.interaction) {
-            return await message.reply(data);
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            return await message.reply(data as InteractionReplyOptions);
         } else {
             return await message.channel.send(data);
         }
@@ -96,6 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let txt = "";
 
         for (const item in multipliers) {
+            // @ts-expect-error uhh its weird
             txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`;
         }
 
@@ -196,6 +204,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let winnings = 0;
 
     if (one == two && two == three) {
+        // @ts-expect-error uhh its weird
         const multiplier = multipliers[one];
 
         win = true;
@@ -238,10 +247,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             bet.toLocaleString()
     ).setHeader("slots", message.author.avatarURL());
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {
+            if (msg instanceof InteractionResponse) return;
             return await msg.edit(data);
         }
     };
