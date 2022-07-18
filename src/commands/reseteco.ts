@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.send({ embeds: [embed] });
 
-    const filter = (msg) => message.author.id == msg.author.id;
+    const filter = (msg: Message) => message.author.id == msg.author.id;
 
     let response: any = await message.channel.awaitMessages({
         filter,
