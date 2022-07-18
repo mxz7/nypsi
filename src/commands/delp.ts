@@ -1,6 +1,6 @@
 import { isPremium, getTier } from "../utils/premium/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { BaseGuildTextChannel, Collection, CommandInteraction, Message } from "discord.js";
+import { Collection, CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("delp", "bulk delete/purge your own messages", Categories.MODERATION).setAliases(["dp", "d"]);
@@ -57,7 +57,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+
+    if (message.channel.isDMBased()) return;
 
     await message.channel.bulkDelete(collected).catch(() => {});
 }
