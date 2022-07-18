@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { redditImage } from "../utils/functions/image";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";

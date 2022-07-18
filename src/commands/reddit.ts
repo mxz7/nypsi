@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, ThreadChannel } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -27,14 +27,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}reddit <subreddit>`)] });
     }
 
-    if (!(message.channel instanceof BaseGuildTextChannel || message.channel.type == "GUILD_PUBLIC_THREAD")) return;
+    if (!message.channel.isTextBased()) return;
+
+    if (message.channel.isDMBased()) return;
+
+    if (message.channel.isThread())
+        return message.channel.send({ embeds: [new ErrorEmbed("you cannot use this command in a thread")] });
 
     for (const bannedSubReddit of blacklisted) {
-        if (
-            args[0].toLowerCase() == bannedSubReddit &&
-            !(message.channel instanceof ThreadChannel) &&
-            !message.channel.nsfw
-        ) {
+        if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
             return message.channel.send({
                 embeds: [
                     new ErrorEmbed(
@@ -63,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("unable to find image")] });
     }
 
-    if (chosen.data.over_18 && !(message.channel instanceof ThreadChannel) && !message.channel.nsfw) {
+    if (chosen.data.over_18 && !message.channel.nsfw) {
         return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
     }
 
