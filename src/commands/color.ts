@@ -7,9 +7,9 @@ const cmd = new Command("color", "get a random hex color code", Categories.INFO)
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let color;
     let member;
 

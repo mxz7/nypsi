@@ -27,9 +27,9 @@ const cmd = new Command("workers", "view the available workers and manage your o
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const workers = getAllWorkers();
 
     if (!(await userExists(message.member))) await createUser(message.member);

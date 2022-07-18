@@ -6,7 +6,7 @@ const cmd = new Command("github", "view code for the bot on github", Categories.
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const embed = new CustomEmbed(

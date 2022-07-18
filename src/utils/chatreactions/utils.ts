@@ -159,7 +159,7 @@ export async function hasReactionProfile(guild: Guild) {
 
 /**
  * @param {Guild} guild
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getWords(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
@@ -182,9 +182,9 @@ export async function getWords(guild: Guild) {
 
 /**
  * @param {Guild} guild
- * @param {Array<String>} newWordList
+ * @param {string[]} newWordList
  */
-export async function updateWords(guild: Guild, newWordList: Array<string>) {
+export async function updateWords(guild: Guild, newWordList: string[]) {
     await prisma.chatReaction.update({
         where: {
             guildId: guild.id,
@@ -197,7 +197,7 @@ export async function updateWords(guild: Guild, newWordList: Array<string>) {
 
 /**
  * @param {Guild} guild
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getWordList(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
@@ -214,7 +214,7 @@ export async function getWordList(guild: Guild) {
 
 /**
  * @param {Guild} guild
- * @returns {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
+ * @returns {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}}
  */
 export async function getReactionSettings(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
@@ -235,7 +235,7 @@ export async function getReactionSettings(guild: Guild) {
 
 /**
  * @param {Guild} guild
- * @param {{ randomStart: Boolean, randomChannels: Array<String>, timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
+ * @param {{ randomStart: Boolean, randomChannels: string[], timeBetweenEvents: Number, randomModifier: Number, timeout: Number}} settings
  */
 export async function updateReactionSettings(
     guild: Guild,
@@ -680,7 +680,7 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
 
 /**
  * @param {Guild} guild
- * @returns {Array<String>}
+ * @returns {string[]}
  */
 export async function getBlacklisted(guild: Guild) {
     const query = await prisma.chatReaction.findUnique({
@@ -697,9 +697,9 @@ export async function getBlacklisted(guild: Guild) {
 
 /**
  * @param {Guild} guild
- * @param {Array<String>} blacklisted
+ * @param {string[]} blacklisted
  */
-export async function setBlacklisted(guild: Guild, blacklisted: Array<string>) {
+export async function setBlacklisted(guild: Guild, blacklisted: string[]) {
     await prisma.chatReaction.update({
         where: {
             guildId: guild.id,
@@ -723,9 +723,9 @@ export async function deleteStats(guild: Guild) {
 }
 
 /**
- * @returns {Array<String>}
+ * @returns {string[]}
  */
-async function getDefaultWords(): Promise<Array<string>> {
+async function getDefaultWords(): Promise<string[]> {
     const res = await fetch(
         "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"
     );

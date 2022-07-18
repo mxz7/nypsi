@@ -27,9 +27,9 @@ cmd.slashData.addUserOption((option) =>
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id == "672793821850894347" && args.length == 2) {
         let target: GuildMember | string = message.mentions.members.first();
 
