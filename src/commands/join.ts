@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }**`
     )
         .setTitle(member.user.tag)
-        .setThumbnail(member.user.displayAvatarURL({ format: "png", dynamic: true, size: 128 }));
+        .setThumbnail(member.user.displayAvatarURL({ size: 128 }));
 
     return send({ embeds: [embed] });
 }
