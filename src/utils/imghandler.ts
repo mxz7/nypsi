@@ -1,7 +1,8 @@
 import { logger } from "./logger";
 import fetch from "node-fetch";
+import { RedditJSON, RedditJSONPost } from "./models/reddit";
 
-const images: Map<string, Map<string, any>> = new Map();
+const images: Map<string, Map<string, RedditJSONPost[]>> = new Map();
 
 const bdsmLinks = [
     "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -88,11 +89,11 @@ const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 async function cacheUpdate(links: string[], name: string) {
     const start = new Date().getTime();
 
-    const map: Map<string, object> = new Map();
+    const map: Map<string, RedditJSONPost[]> = new Map();
 
     let amount = 0;
     for (const link of links) {
-        const res = await fetch(link).then((a) => a.json());
+        const res: RedditJSON = await fetch(link).then((a) => a.json());
 
         if (res.message == "Forbidden") {
             logger.warn(`skipped ${link} due to private subreddit`);
@@ -151,7 +152,5 @@ export async function updateCache() {
         message: "images updated (" + total + ")",
     });
 }
-
-exports.images = images;
 
 export { images };

@@ -4,6 +4,7 @@ import ImgurClient from "imgur";
 import fetch from "node-fetch";
 import prisma from "../database/database";
 import { logger } from "../logger";
+import { RedditJSONPost } from "../models/reddit";
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
@@ -30,7 +31,7 @@ export function isImageUrl(url: string): boolean {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
-export async function redditImage(post: any, allowed: any): Promise<string> {
+export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[]): Promise<string> {
     let image = post.data.url;
 
     if (image.includes("imgur.com/a/")) {
