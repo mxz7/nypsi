@@ -260,12 +260,12 @@ function getValue(member: GuildMember) {
     } else if (card.includes("j")) {
         return 11;
     } else if (card.includes("a")) {
-        return "1";
+        return 1;
     } else {
-        if (!parseInt(card.split()[0])) {
+        if (!parseInt(card)) {
             return "ERROR";
         }
-        return parseInt(card.split()[0]);
+        return parseInt(card);
     }
 }
 

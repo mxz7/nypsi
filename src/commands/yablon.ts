@@ -317,7 +317,7 @@ function getValue(card: string) {
     if (card.includes("q")) return 12;
     if (card.includes("j")) return 11;
     // if (!parseInt(card.split()[0])) return "ERROR"
-    return parseInt(card.split("")[0]);
+    return parseInt(card);
 }
 
 function invalidCardDistance(member: GuildMember) {
