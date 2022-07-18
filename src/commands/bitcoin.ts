@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             bitcoinAmount * bitcoin.worth
         ).toLocaleString()})`
     )
-        .setFooter("not real bitcoin, although it reflects current worth in USD")
+        .setFooter({ text: "not real bitcoin, although it reflects current worth in USD" })
         .setHeader("your bitcoin", message.author.avatarURL());
 
     return message.channel.send({ embeds: [embed] });
