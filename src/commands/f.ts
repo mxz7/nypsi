@@ -43,7 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.send({ embeds: [embed], components: [row] });
 
-    const reactions = [];
+    const reactions: string[] = [];
 
     const collector = message.channel.createMessageComponentCollector({ time: 60000 });
 
