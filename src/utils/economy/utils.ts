@@ -1218,6 +1218,7 @@ export async function toggleBan(id: string) {
 }
 
 export async function reset() {
+    await prisma.economyStats.deleteMany();
     await prisma.economy.deleteMany({
         where: {
             banned: true,
@@ -1263,9 +1264,7 @@ export async function reset() {
         updated++;
     }
 
-    await prisma.economyStats.deleteMany();
-
-    return { updated: updated, deleted: deleted };
+    return updated + deleted;
 }
 
 export async function getStats(member: GuildMember): Promise<StatsProfile> {
