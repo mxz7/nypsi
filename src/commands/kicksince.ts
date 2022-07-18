@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import { profileExists, createProfile, newCase } from "../utils/moderation/utils";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await confirm.react("✅");
 
-        const filter = (reaction, user) => {
+        const filter = (reaction: MessageReaction, user: User) => {
             return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
         };
 
@@ -123,14 +123,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const member of members.keys()) {
         interval++;
-
-        if (status) {
-            if (msg.deleted) {
-                return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
-                });
-            }
-        }
 
         const targetHighestRole = members.get(member).roles.highest;
         const memberHighestRole = message.member.roles.highest;
@@ -237,31 +229,31 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getDuration(duration) {
+function getDuration(duration: string) {
     duration.toLowerCase();
 
     if (duration.includes("d")) {
         if (!parseInt(duration.split("d")[0])) return undefined;
 
-        const num = duration.split("d")[0];
+        const num = parseInt(duration.split("d")[0]);
 
         return num * 86400;
     } else if (duration.includes("h")) {
         if (!parseInt(duration.split("h")[0])) return undefined;
 
-        const num = duration.split("h")[0];
+        const num = parseInt(duration.split("h")[0]);
 
         return num * 3600;
     } else if (duration.includes("m")) {
         if (!parseInt(duration.split("m")[0])) return undefined;
 
-        const num = duration.split("m")[0];
+        const num = parseInt(duration.split("m")[0]);
 
         return num * 60;
     } else if (duration.includes("s")) {
         if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = duration.split("s")[0];
+        const num = parseInt(duration.split("s")[0]);
 
         return num;
     }
