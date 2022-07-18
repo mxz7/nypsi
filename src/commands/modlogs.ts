@@ -1,13 +1,4 @@
-import {
-    BaseGuildTextChannel,
-    CommandInteraction,
-    DMChannel,
-    GuildChannel,
-    Message,
-    PartialDMChannel,
-    Permissions,
-    ThreadChannel,
-} from "discord.js";
+import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -18,7 +9,7 @@ const cmd = new Command("modlogs", "set/update the modlogs channel", Categories.
 ]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
         }
@@ -26,8 +17,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS) ||
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageWebhooks) ||
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
     ) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `manage webhooks` and `manage channels` permissions for this command")],
@@ -71,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ modlogs have been disabled")] });
     } else {
-        let channel: string | GuildChannel | DMChannel | PartialDMChannel | ThreadChannel = args[0];
+        let channel: string | Channel = args[0];
 
         if (channel.length != 18) {
             if (!message.mentions.channels.first()) {
@@ -93,14 +84,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
         }
 
-        if (!(channel instanceof BaseGuildTextChannel)) {
+        if (!channel.isTextBased()) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
+        }
+
+        if (channel.isDMBased()) return;
+
+        if (channel.isThread()) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
         }
 
         let fail = false;
 
         const hook = await channel
-            .createWebhook("nypsi", {
+            .createWebhook({
+                name: "nypsi",
                 avatar: "https://i.imgur.com/4CnL3aP.png",
             })
             .catch(() => {
