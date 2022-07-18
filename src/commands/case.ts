@@ -1,4 +1,12 @@
-import { Message, Permissions, ActionRowBuilder, ButtonBuilder, CommandInteraction } from "discord.js";
+import {
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    CommandInteraction,
+    PermissionFlagsBits,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -21,7 +29,7 @@ cmd.slashData.addIntegerOption((option) =>
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-        if (!message.member.permissions.has(Permissions.FLAGS.MODERATE_MEMBERS)) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             return;
         }
     }
@@ -86,12 +94,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle("DANGER")
+        new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger)
     );
 
     let msg;
 
-    if (message.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) && !case0.deleted) {
+    if (message.member.permissions.has(PermissionFlagsBits.ManageGuild) && !case0.deleted) {
         msg = await send({ embeds: [embed], components: [row] });
     } else {
         return await send({ embeds: [embed] });
