@@ -15,15 +15,13 @@ import { PunishmentType } from "../utils/models/GuildStorage";
 import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils";
 import Database = require("better-sqlite3");
 
-// declare function require(name: string)
-
 const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
 const addMentionToDatabase = db.prepare(
     "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
 );
 const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC");
 const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?");
-let mentionInterval;
+let mentionInterval: NodeJS.Timer;
 let workerCount = 0;
 
 export default async function messageCreate(message: Message) {
