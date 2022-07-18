@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { newCase, profileExists, createProfile } from "../utils/moderation/utils";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -20,7 +20,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             return await message.editReply(data);
         } else {
@@ -91,8 +91,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let count = 0;
-    const failed = [];
-    const error = [];
+    const failed: User[] = [];
+    const error: User[] = [];
 
     for (const member of members.keys()) {
         const targetHighestRole = members.get(member).roles.highest;
