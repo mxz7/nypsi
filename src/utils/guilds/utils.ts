@@ -1,22 +1,21 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
 import ms = require("ms");
+import { eSnipe, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
-declare function require(name: string);
+declare function require(name: string): any;
 
-setInterval(async () => {
-    const { snipe, eSnipe } = require("../../nypsi");
-
+setInterval(() => {
     const now = new Date().getTime();
 
     let snipeCount = 0;
     let eSnipeCount = 0;
 
-    await snipe.forEach((msg) => {
+    snipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp;
 
         if (diff >= 43200000) {
@@ -32,7 +31,7 @@ setInterval(async () => {
         });
     }
 
-    await eSnipe.forEach((msg) => {
+    eSnipe.forEach((msg) => {
         const diff = now - msg.createdTimestamp;
 
         if (diff >= 43200000) {

@@ -24,6 +24,7 @@ import { WebhookPayload } from "@top-gg/sdk";
 import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, Options } from "discord.js";
+import { SnipedMessage } from "./utils/models/Snipe";
 
 const client = new Client({
     allowedMentions: {
@@ -64,8 +65,8 @@ const client = new Client({
     ],
 });
 
-const snipe = new Map();
-const eSnipe = new Map();
+const snipe: Map<string, SnipedMessage> = new Map();
+const eSnipe: Map<string, SnipedMessage> = new Map();
 
 export { eSnipe, snipe };
 
