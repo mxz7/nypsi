@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const roles = await message.guild.roles.fetch();
 
-    const sortedRoleIDs = [];
+    const sortedRoleIDs: string[] = [];
 
     roles.forEach((r) => sortedRoleIDs.push(r.id));
 
