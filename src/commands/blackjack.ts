@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import {
     userExists,
     createUser,
@@ -213,7 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle("SECONDARY")
+            new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle(ButtonStyle.Secondary)
         );
     } else {
         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -439,7 +446,7 @@ async function playGame(message, m) {
 
         if (earnedXp > 0) {
             await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-            newEmbed.setFooter(`+${earnedXp}xp`);
+            newEmbed.setFooter({ text: `+${earnedXp}xp` });
 
             const guild = await getGuildByUser(message.member);
 
