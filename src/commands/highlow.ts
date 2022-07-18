@@ -5,6 +5,11 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    GuildMember,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import {
     userExists,
@@ -38,9 +43,9 @@ cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription(
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -214,7 +219,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField("card", "| " + games.get(message.member.user.id).card + " |");
 
     send({ embeds: [embed], components: [row] }).then((m) => {
-        playGame(message, m).catch((e) => {
+        playGame(message, m).catch((e: string) => {
             logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`);
             logger.error(e);
             return send({
@@ -228,7 +233,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function newCard(member) {
+function newCard(member: GuildMember) {
     const deck = games.get(member.user.id).deck;
 
     const choice = deck[0];
@@ -245,7 +250,7 @@ function newCard(member) {
     });
 }
 
-function getValue(member) {
+function getValue(member: GuildMember) {
     const card = games.get(member.user.id).card.toLowerCase();
 
     if (card.includes("k")) {
@@ -264,7 +269,7 @@ function getValue(member) {
     }
 }
 
-async function playGame(message, m) {
+async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), m: Message): Promise<void> {
     if (!games.has(message.author.id)) return;
 
     const bet = games.get(message.member.user.id).bet;
@@ -273,8 +278,8 @@ async function playGame(message, m) {
 
     const newEmbed = new CustomEmbed(message.member).setHeader("highlow", message.author.avatarURL());
 
-    const edit = async (data) => {
-        if (message.interaction) {
+    const edit = async (data: MessageEditOptions) => {
+        if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
         } else {
@@ -383,15 +388,16 @@ async function playGame(message, m) {
     };
 
     if (win == 15) {
-        return win1();
+        win1();
+        return;
     }
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     let fail = false;
 
     const reaction = await m
-        .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 30000 })
         .then(async (collected) => {
             await collected.deferUpdate();
             return collected.customId;
@@ -461,7 +467,8 @@ async function playGame(message, m) {
             await edit({ embeds: [newEmbed] });
             return playGame(message, m);
         } else {
-            return lose();
+            lose();
+            return;
         }
     } else if (reaction == "⬇") {
         const oldCard = getValue(message.member);
@@ -517,18 +524,22 @@ async function playGame(message, m) {
             await edit({ embeds: [newEmbed] });
             return playGame(message, m);
         } else {
-            return lose();
+            lose();
+            return;
         }
     } else if (reaction == "💰") {
         if (win < 1) {
             return playGame(message, m);
         } else if (win == 1) {
-            return draw();
+            draw();
+            return;
         } else {
-            return win1();
+            win1();
+            return;
         }
     } else {
         games.delete(message.author.id);
-        return m.reactions.removeAll();
+        m.reactions.removeAll();
+        return;
     }
 }
