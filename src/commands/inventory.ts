@@ -5,6 +5,10 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    InteractionReplyOptions,
+    MessageOptions,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -20,9 +24,9 @@ cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -71,8 +75,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     inPlaceSort(itemIDs).asc();
 
-    const pages = [];
-    let pageOfItems = [];
+    const pages: string[][] = [];
+    let pageOfItems: string[] = [];
     let worth = 0;
     const multi = await getMulti(message.member);
 
@@ -115,8 +119,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         page = 0;
     }
 
-    for (let item of pages[page]) {
-        item = items[item];
+    for (const i of pages[page]) {
+        const item = items[i];
         embed.addField(
             item.id,
             `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
@@ -129,7 +133,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    let msg;
+    let msg: Message;
 
     if (pages.length == 1) {
         return await send({ embeds: [embed] });
@@ -137,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         msg = await send({ embeds: [embed], components: [row] });
     }
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
@@ -151,11 +155,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const lastPage = pages.length;
 
-        const filter = (i) => i.user.id == message.author.id;
+        const filter = (i: Interaction) => i.user.id == message.author.id;
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+                .awaitMessageComponent({ filter, time: 30000 })
                 .then(async (collected) => {
                     await collected.deferUpdate();
                     return collected.customId;
@@ -173,8 +177,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage--;
-                    for (let item of pages[currentPage]) {
-                        item = items[item];
+                    for (const i of pages[currentPage]) {
+                        const item = items[i];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
@@ -219,8 +223,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return pageManager();
                 } else {
                     currentPage++;
-                    for (let item of pages[currentPage]) {
-                        item = items[item];
+                    for (const i of pages[currentPage]) {
+                        const item = items[i];
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
