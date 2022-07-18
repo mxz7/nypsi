@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import {
     getBalance,
     createUser,
@@ -89,9 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader(`${target.user.username}'s balance | season 3`, target.user.avatarURL());
     }
 
-    const send = async (data) => {
-        if (message.interaction) {
-            return await message.reply(data);
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            return await message.reply(data as InteractionReplyOptions);
         } else {
             return await message.channel.send(data);
         }
