@@ -31,14 +31,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let mode = "";
-    let color;
 
     if (!message.content.includes("|")) {
         mode = "title_only";
     } else if (args.join(" ").split("|").length == 2) {
         mode = "title_desc";
-    } else if (args.join(" ").split("|").length == 3) {
-        mode = "title_desc_color";
     }
 
     const title = args.join(" ").split("|")[0];
@@ -48,18 +45,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         description = args.join(" ").split("|")[1];
     }
 
-    if (mode.includes("color")) {
-        color = args.join(" ").split("|")[2];
-    }
-
     const embed = new CustomEmbed(message.member).setTitle(title);
 
     if (mode.includes("desc")) {
         embed.setDescription(description);
-    }
-
-    if (color) {
-        embed.setColor(color);
     }
 
     if (!(message instanceof Message)) return;
