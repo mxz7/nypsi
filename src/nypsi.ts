@@ -23,7 +23,7 @@ import { runModerationChecks } from "./utils/moderation/utils";
 import { WebhookPayload } from "@top-gg/sdk";
 import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
-import { Client, EmbedBuilder, GatewayIntentBits, Guild, Options } from "discord.js";
+import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 
 const client = new Client({
@@ -140,11 +140,11 @@ export async function onVote(vote: WebhookPayload) {
     doVote(client, vote);
 }
 
-export async function requestDM(id: string, content: string, dontDmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
+export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
 
-    let payload: any = {
+    let payload: MessageOptions = {
         content: content,
     };
 
@@ -166,7 +166,7 @@ export async function requestDM(id: string, content: string, dontDmTekoh = false
             })
             .catch(async () => {
                 logger.warn(`failed to send DM to ${member.tag} (${member.id})`);
-                if (!dontDmTekoh) {
+                if (dmTekoh) {
                     const tekoh = await client.users.fetch("672793821850894347");
 
                     await tekoh.send({ content: `failed to send dm to ${id}` });
@@ -176,7 +176,7 @@ export async function requestDM(id: string, content: string, dontDmTekoh = false
         return true;
     } else {
         logger.warn(`failed to send DM to ${member.id}`);
-        if (!dontDmTekoh) {
+        if (dmTekoh) {
             const tekoh = await client.users.fetch("672793821850894347");
 
             await tekoh.send({ content: `failed to send dm to ${id}` });
