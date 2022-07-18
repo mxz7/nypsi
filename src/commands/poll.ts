@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (
             !message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
-            !message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) &&
+            !message.member.permissions.has(PermissionFlagsBits.Administrator) &&
             num > 2
         ) {
             choices = 2;
