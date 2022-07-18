@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, MessageReaction, User } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
@@ -29,9 +29,9 @@ const cmd = new Command("wholesome", "get a random wholesome picture", Categorie
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -298,11 +298,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let currentPage = 1;
         const lastPage = pages.size;
 
-        const filter = (reaction, user) => {
+        const filter = (reaction: MessageReaction, user: User) => {
             return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id;
         };
 
-        const pageManager = async () => {
+        const pageManager = async (): Promise<void> => {
             const reaction = await msg
                 .awaitReactions({ filter, max: 1, time: 30000, errors: ["time"] })
                 .then((collected) => {
