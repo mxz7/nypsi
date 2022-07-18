@@ -1,4 +1,14 @@
-import { Collection, CommandInteraction, GuildMember, Message, ActionRowBuilder, ButtonBuilder, Role } from "discord.js";
+import {
+    Collection,
+    CommandInteraction,
+    GuildMember,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    Role,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { inCooldown, addCooldown as addGuildCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -89,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, memberList.get(1).join("\n"))
         .setHeader(role.name + " [" + count.toLocaleString() + "]")
-        .setFooter(`page 1/${memberList.size}`);
+        .setFooter({ text: `page 1/${memberList.size}` });
 
     /**
      * @type {Message}
@@ -133,7 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage--;
                 embed.setDescription(memberList.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == 1) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
@@ -170,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage++;
                 embed.setDescription(memberList.get(currentPage).join("\n"));
-                embed.setFooter(`page ${currentPage}/${lastPage}`);
+                embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
                 if (currentPage == lastPage) {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
