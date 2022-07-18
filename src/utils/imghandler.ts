@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 import fetch from "node-fetch";
-import { RedditJSON, RedditJSONPost } from "./models/reddit";
+import { RedditJSON, RedditJSONPost } from "./models/Reddit";
 
 const images: Map<string, Map<string, RedditJSONPost[]>> = new Map();
 

@@ -4,7 +4,7 @@ import ImgurClient from "imgur";
 import fetch from "node-fetch";
 import prisma from "../database/database";
 import { logger } from "../logger";
-import { RedditJSONPost } from "../models/reddit";
+import { RedditJSONPost } from "../models/Reddit";
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
