@@ -26,9 +26,9 @@ const cmd = new Command("hypixel", "view hypixel stats for a minecraft account",
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {

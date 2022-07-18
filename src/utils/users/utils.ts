@@ -34,7 +34,7 @@ const mentionQueue: MentionQueueItem[] = [];
 
 export { mentionQueue };
 
-const deleteQueue: Array<string> = [];
+const deleteQueue: string[] = [];
 
 export { deleteQueue };
 

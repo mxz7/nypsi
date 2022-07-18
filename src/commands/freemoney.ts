@@ -9,7 +9,7 @@ const cmd = new Command("freemoney", "get $1k every 5 minutes", Categories.MONEY
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
