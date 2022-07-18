@@ -15,6 +15,8 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    GuildMember,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -23,7 +25,7 @@ import { gamble } from "../utils/logger.js";
 import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const waiting = [];
+const waiting: Set<string> = new Set();
 
 const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories.MONEY).setAliases(["cf"]);
 
@@ -50,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (waiting.includes(message.author.id)) {
+    if (waiting.has(message.author.id)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("please wait until your game has been accepted or denied")],
         });
@@ -60,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[0].toLowerCase() == "h") args[0] = "heads";
 
-    let target;
+    let target: GuildMember;
 
     if (!message.mentions.members.first()) {
         target = await getMember(message.guild, args[0]);
@@ -128,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    waiting.push(message.author.id);
+    waiting.add(message.author.id);
 
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
@@ -148,7 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         components: [row],
     });
 
-    const filter = (i) => i.user.id == target.id;
+    const filter = (i: Interaction) => i.user.id == target.id;
     let fail = false;
 
     const response = await m
@@ -160,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
         .catch(async () => {
             fail = true;
-            waiting.splice(waiting.indexOf(message.author.id), 1);
+            waiting.delete(message.author.id);
             await updateBalance(message.member, (await getBalance(message.member)) + bet);
             return message.channel.send({ content: message.author.toString() + " coinflip request expired" });
         });
@@ -212,8 +214,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const choice = lols[Math.floor(Math.random() * lols.length)];
         let thingy = `${message.author.username}\n${target.user.username}`;
 
-        let winner;
-        let loser;
+        let winner: GuildMember;
+        let loser: GuildMember;
 
         if (choice == "heads") {
             winner = message.member;
@@ -230,7 +232,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 
-        waiting.splice(waiting.indexOf(message.author.id), 1);
+        waiting.delete(message.author.id);
 
         const embed = new CustomEmbed(
             message.member,
@@ -253,7 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     } else {
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
-        waiting.splice(waiting.indexOf(message.author.id), 1);
+        waiting.delete(message.author.id);
         return message.channel.send({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
     }
 }
