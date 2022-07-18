@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import {
     userExists,
     createUser,
@@ -210,15 +217,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let row;
 
     if ((await getBalance(message.member)) >= bet) {
-        row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("3️⃣").setLabel("double down").setStyle("SECONDARY")
+        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle(ButtonStyle.Secondary)
         );
     } else {
-        row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("1️⃣").setLabel("hit").setStyle("PRIMARY"),
-            new MessageButton().setCustomId("2️⃣").setLabel("stand").setStyle("PRIMARY")
+        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
         );
     }
 
@@ -439,7 +446,7 @@ async function playGame(message, m) {
 
         if (earnedXp > 0) {
             await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-            newEmbed.setFooter(`+${earnedXp}xp`);
+            newEmbed.setFooter({ text: `+${earnedXp}xp` });
 
             const guild = await getGuildByUser(message.member);
 

@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const listAllWorkers = () => {
         const embed = new CustomEmbed(message.member, "workers create items over time, which you can sell for money")
             .setHeader("workers", message.author.avatarURL())
-            .setFooter(`${prefix}workers help`);
+            .setFooter({ text: `${prefix}workers help` });
 
         for (const w of Array.from(workers.keys())) {
             const Worker = workers.get(w);
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `you have ${Object.keys(personalWorkers).length} worker${Object.keys(personalWorkers).length == 1 ? "" : "s"}`
         )
             .setHeader("your workers", message.author.avatarURL())
-            .setFooter(`${prefix}workers help`);
+            .setFooter({ text: `${prefix}workers help` });
 
         for (const w of Object.keys(personalWorkers)) {
             const worker = Worker.fromStorage(personalWorkers[w]);
@@ -302,7 +302,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ) {
             if (!(await isPremium(message.author.id))) {
                 return message.channel.send({
-                    embeds: [new ErrorEmbed("you must have a premium membership for this").setFooter(`${prefix}patreon`)],
+                    embeds: [
+                        new ErrorEmbed("you must have a premium membership for this").setFooter({
+                            text: `${prefix}patreon`,
+                        }),
+                    ],
                 });
             }
 

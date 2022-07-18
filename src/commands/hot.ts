@@ -110,7 +110,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ).setHeader("hotness calculator", member.user.avatarURL());
 
     if (hotAmount >= 95) {
-        embed.setFooter("+$1,069");
+        embed.setFooter({ text: "+$1,069" });
     }
 
     return await send({ embeds: [embed] });

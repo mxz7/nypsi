@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
         .addField("usage", `**memory** ${memUsage}mb\n**cpu** ${cpuUsage}%`, true);
 
-    embed.setFooter(`v${version}`);
+    embed.setFooter({ text: `v${version}` });
 
     message.channel.send({ embeds: [embed] });
 }

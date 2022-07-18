@@ -16,7 +16,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
         }
     }
 
-    if (oldUser.displayAvatarURL({ dynamic: true, size: 256 }) != newUser.displayAvatarURL({ dynamic: true, size: 256 })) {
+    if (oldUser.displayAvatarURL({ size: 256 }) != newUser.displayAvatarURL({ size: 256 })) {
         if (!(await userExists(newUser.id))) return;
         if (!(await isPremium(newUser.id)) && (await getPrestige(newUser.id)) < 1) return;
 
@@ -35,7 +35,7 @@ async function doQueue() {
 
     if (!user) return;
 
-    const url = await uploadImageToImgur(user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }));
+    const url = await uploadImageToImgur(user.displayAvatarURL({ size: 256 }));
 
     if (!url) return;
 

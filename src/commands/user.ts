@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }`,
             true
         )
-        .setFooter(`${(await getKarma(member)).toLocaleString()} karma`);
+        .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
 
     if (member._roles.length > 0) {
         embed.addField("roles [" + member._roles.length + "]", rolesText);

@@ -1,5 +1,13 @@
 import { EconomyGuild, EconomyGuildMember, User } from "@prisma/client";
-import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageOptions,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
@@ -159,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 membersText += `\`${m.user.lastKnownTag}\` `;
 
                 if (m.userId == message.author.id) {
-                    embed.setFooter(`you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago`);
+                    embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
                 }
             }
 
@@ -276,8 +284,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader("guild invitation");
         embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
-        const row = new MessageActionRow().addComponents(
-            new MessageButton().setCustomId("yes").setLabel("accept").setStyle("SUCCESS")
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success)
         );
 
         const msg = await message.channel.send({ content: target.toString(), embeds: [embed], components: [row] });

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions, User } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
 import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -32,14 +32,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await message.deferReply();
     }
 
-    if (!message.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] });
         }
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
         return send({
             embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
         });
@@ -142,7 +142,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (idOnly) {
         await message.guild.members
             .ban(id, {
-                days: days,
+                deleteMessageDays: days,
                 reason: reason,
             })
             .then((banned) => {
@@ -185,7 +185,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await message.guild.members
                 .ban(member, {
-                    days: days,
+                    deleteMessageDays: days,
                     reason: reason,
                 })
                 .then(() => {
@@ -305,7 +305,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 if (temporary) {
                     embed.addField("length", `\`${banLength}\``, true);
-                    embed.setFooter("unbanned at:");
+                    embed.setFooter({ text: "unbanned at:" });
                     embed.setTimestamp(unbanDate);
                 }
 

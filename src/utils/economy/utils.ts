@@ -1805,7 +1805,7 @@ async function doLottery(client: Client) {
         `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
             `they have won a total of $**${total.toLocaleString()}**`
     );
-    embed.setFooter(`a total of ${tickets.length.toLocaleString()} tickets were bought`);
+    embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
     embed.setColor("#111111");
 
     await lotteryHook.send({ embeds: [embed] });

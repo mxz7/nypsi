@@ -5,6 +5,8 @@
         "target": "ESNext",
         "module": "commonjs",
         "allowJs": true,
-        "strictFunctionTypes": true
+        "strictFunctionTypes": true,
+        "skipLibCheck": true,
+        // "noImplicitAny": true
     },
 }

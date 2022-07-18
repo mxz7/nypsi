@@ -343,12 +343,6 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     });
 
     collector.on("collect", async (message): Promise<void> => {
-        if (msg.deleted) {
-            currentChannels.delete(channel.id);
-            collector.stop();
-            return;
-        }
-
         let time: number | string = new Date().getTime();
 
         time = ((time - start) / 1000).toFixed(2);
@@ -387,7 +381,9 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
                         }
 
                         return await msg.edit({ embeds: [embed] }).catch(() => {
+                            currentChannels.delete(channel.id);
                             collector.stop();
+                            return;
                         });
                     }
                 }, 250);
@@ -410,7 +406,9 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
         winnersIDs.push(message.author.id);
         if (!waiting) {
             await msg.edit({ embeds: [embed] }).catch(() => {
+                currentChannels.delete(channel.id);
                 collector.stop();
+                return;
             });
             return;
         }

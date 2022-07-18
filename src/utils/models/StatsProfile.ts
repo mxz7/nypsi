@@ -19,7 +19,7 @@ export class StatsProfile {
         return this;
     }
 
-    setData(data) {
+    setData(data: StatsData[]) {
         for (const d of data) {
             if (d.gamble) {
                 this.gamble[d.type] = {

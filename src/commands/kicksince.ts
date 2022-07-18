@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { profileExists, createProfile, newCase } from "../utils/moderation/utils";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -14,14 +14,14 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
  * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
-        if (message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+    if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
+        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] });
         }
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
         });
