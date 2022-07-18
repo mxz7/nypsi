@@ -1,15 +1,12 @@
-import { CommandInteraction, Message } from "discord.js";
+import { Channel, CommandInteraction, Message } from "discord.js";
+import { eSnipe } from "../nypsi";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("esnipe", "snipe the most recently edited message", Categories.FUN).setAliases(["es"]);
 
-declare function require(name: string);
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const { eSnipe } = require("../nypsi.js");
-
-    let channel: any = message.channel;
+    let channel: Channel = message.channel;
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
@@ -17,6 +14,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         channel = message.mentions.channels.first();
+
+        if (channel.isDMBased()) return;
+        if (channel.isThread()) {
+            return message.channel.send({ embeds: [new ErrorEmbed("you cannot do this")] });
+        }
 
         if (!channel.members.find((m) => m.user.id == message.author.id)) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
@@ -43,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, content)
         .setHeader(eSnipe.get(channel.id).member, eSnipe.get(channel.id).memberAvatar)
-        .setFooter({ text: timeSince(created) + " ago" });
+        .setFooter({ text: timeSince(created.getTime()) + " ago" });
 
     message.channel.send({ embeds: [embed] });
 }
@@ -52,7 +54,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function timeSince(date) {
+function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
