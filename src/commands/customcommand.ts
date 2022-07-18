@@ -92,7 +92,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [new CustomEmbed(message.member, "please enter your command name / trigger")],
         });
 
-        const filter = (msg) => message.author.id == msg.author.id;
+        const filter = (msg: Message) => message.author.id == msg.author.id;
 
         let fail = false;
 
