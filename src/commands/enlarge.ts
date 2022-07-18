@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return message.channel.send({
-        embeds: [new CustomEmbed(message.member).setImage(url).setFooter(`id: ${emojiID}`)],
+        embeds: [new CustomEmbed(message.member).setImage(url).setFooter({ text: `id: ${emojiID}` })],
     });
 }
 
