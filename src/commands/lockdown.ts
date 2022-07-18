@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildBasedChannel, Message, Permissions, TextBasedChannel } from "discord.js";
+import { Channel, CommandInteraction, Message, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     if (
-        !message.member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
+        !message.member.permissions.has(PermissionFlagsBits.ManageChannels) ||
         !message.member.permissions.has(PermissionFlagsBits.ManageMessages)
     ) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -44,8 +44,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) ||
-        !message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels) ||
+        !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles)
     ) {
         return send({
             embeds: [new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work")],
@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    let channel: TextBasedChannel | GuildBasedChannel = message.channel;
+    let channel: Channel = message.channel;
 
     if (args.length != 0) {
         const id = args[0];
@@ -71,12 +71,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             channel = message.mentions.channels.first();
         }
 
-        if (channel.type != "GUILD_TEXT") {
+        if (!channel.isTextBased()) {
             return send({ embeds: [new ErrorEmbed("invalid channel")] });
         }
     }
 
     if (!channel.isTextBased()) return;
+
+    if (channel.isDMBased()) return;
+
+    if (channel.isThread()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
 
     await addCooldown(cmd.name, message.member, 3);
 
@@ -93,15 +97,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (!a.deny.bitfield) {
         locked = false;
     } else {
-        const b = new Permissions(a.deny.bitfield).toArray();
-        if (b.includes("SEND_MESSAGES")) {
+        const b = new PermissionsBitField(a.deny.bitfield).toArray();
+        if (b.includes("SendMessages")) {
             locked = true;
         }
     }
 
     if (!locked) {
         await channel.permissionOverwrites.edit(role, {
-            SEND_MESSAGES: false,
+            SendMessages: false,
         });
 
         const embed = new CustomEmbed(message.member, "✅ " + channel.toString() + " has been locked");
@@ -111,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     } else {
         await channel.permissionOverwrites.edit(role, {
-            SEND_MESSAGES: null,
+            SendMessages: null,
         });
         const embed = new CustomEmbed(message.member, "✅ " + channel.toString() + " has been unlocked");
 
