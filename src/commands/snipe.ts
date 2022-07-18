@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         channel = message.mentions.channels.first();
 
-        if (!channel.members.find((m) => m.user.id == message.author.id)) {
+        if (!channel.members.find((m: GuildMember) => m.user.id == message.author.id)) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
         }
 
@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, content)
         .setHeader(snipe.get(channel.id).member, snipe.get(channel.id).memberAvatar)
-        .setFooter({ text: timeSince(created) + " ago" });
+        .setFooter({ text: timeSince(created.getTime()) + " ago" });
 
     message.channel.send({ embeds: [embed] });
 }
@@ -50,7 +50,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function timeSince(date) {
+function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
