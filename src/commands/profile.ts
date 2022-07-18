@@ -5,6 +5,7 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    Interaction,
 } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
@@ -62,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const m = await message.channel.send({ embeds: [embed], components: [row] });
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
     let fail = false;
 
     const response = await m
