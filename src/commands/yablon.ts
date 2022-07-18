@@ -5,6 +5,11 @@ import {
     ButtonBuilder,
     MessageActionRowComponentBuilder,
     ButtonStyle,
+    MessageOptions,
+    InteractionReplyOptions,
+    GuildMember,
+    MessageEditOptions,
+    Interaction,
 } from "discord.js";
 import {
     userExists,
@@ -38,9 +43,9 @@ cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription(
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -260,7 +265,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function newCard(member) {
+function newCard(member: GuildMember) {
     const bet = games.get(member.user.id).bet;
     const win = games.get(member.user.id).win;
     const deck = games.get(member.user.id).deck;
@@ -286,7 +291,7 @@ function newCard(member) {
     });
 }
 
-function newNextCard(member) {
+function newNextCard(member: GuildMember) {
     const deck = games.get(member.user.id).deck;
 
     const choice = deck[0];
@@ -304,7 +309,7 @@ function newNextCard(member) {
     });
 }
 
-function getValue(card) {
+function getValue(card: string) {
     card = card.toLowerCase();
 
     if (card.includes("a")) return 14;
@@ -312,10 +317,10 @@ function getValue(card) {
     if (card.includes("q")) return 12;
     if (card.includes("j")) return 11;
     // if (!parseInt(card.split()[0])) return "ERROR"
-    return parseInt(card.split()[0]);
+    return parseInt(card.split("")[0]);
 }
 
-function invalidCardDistance(member) {
+function invalidCardDistance(member: GuildMember) {
     const value1 = getValue(games.get(member.user.id).cards[0]);
     const value2 = getValue(games.get(member.user.id).cards[1]);
 
@@ -326,7 +331,7 @@ function invalidCardDistance(member) {
     return !(value2 - value1 >= minNeeded) || !(value2 - value1 <= maxAllowed);
 }
 
-function equalCards(member) {
+function equalCards(member: GuildMember) {
     const value1 = getValue(games.get(member.user.id).cards[0]);
     const value2 = getValue(games.get(member.user.id).cards[1]);
     const value3 = getValue(games.get(member.user.id).nextCard);
@@ -334,7 +339,7 @@ function equalCards(member) {
     return false;
 }
 
-function nextCardInBetween(member) {
+function nextCardInBetween(member: GuildMember) {
     const value1 = getValue(games.get(member.user.id).cards[0]);
     const value2 = getValue(games.get(member.user.id).cards[1]);
     const value3 = getValue(games.get(member.user.id).nextCard);
@@ -351,13 +356,13 @@ function nextCardInBetween(member) {
     return false;
 }
 
-function getCards(member) {
+function getCards(member: GuildMember) {
     const cards = games.get(member.user.id).cards;
 
     return "| " + cards.join(" | ") + " |";
 }
 
-async function playGame(message, m) {
+async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), m: Message) {
     if (!games.has(message.author.id)) return;
 
     const bet = games.get(message.member.user.id).bet;
@@ -365,8 +370,8 @@ async function playGame(message, m) {
 
     const newEmbed = new CustomEmbed(message.member).setHeader("yablon", message.author.avatarURL());
 
-    const edit = async (data) => {
-        if (message.interaction) {
+    const edit = async (data: MessageEditOptions) => {
+        if (message instanceof CommandInteraction) {
             await message.editReply(data);
             return await message.fetchReply();
         } else {
@@ -445,12 +450,12 @@ async function playGame(message, m) {
         return await edit({ embeds: [newEmbed], components: [] });
     };
 
-    const filter = (i) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
     let fail = false;
 
     const reaction = await m
-        .awaitMessageComponent({ filter, time: 30000, errors: ["time"] })
+        .awaitMessageComponent({ filter, time: 30000 })
         .then(async (collected) => {
             await collected.deferUpdate();
             return collected.customId;
