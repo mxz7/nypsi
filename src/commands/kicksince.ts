@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Permissions } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { profileExists, createProfile, newCase } from "../utils/moderation/utils";
 import { getPrefix } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -21,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
     }
 
-    if (!message.guild.me.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
         return message.channel.send({
             embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
         });
