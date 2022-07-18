@@ -1,4 +1,11 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    InteractionReplyOptions,
+    Message,
+    MessageEditOptions,
+    MessageOptions,
+} from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import {
@@ -17,8 +24,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
-
-declare function require(name: string);
+import { addHandcuffs, isHandcuffed } from "../utils/commandhandler";
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"]);
 
@@ -45,9 +51,9 @@ cmd.slashData
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data) => {
+    const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data);
+            await message.reply(data as InteractionReplyOptions);
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -143,7 +149,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
 
-    let laterDescription;
+    let laterDescription: string;
 
     if (selected.role == "crate") {
         await addItemUse(message.member, selected.id);
@@ -153,8 +159,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`;
     } else {
-        const { isHandcuffed, addHandcuffs } = require("../utils/commandhandler");
-
         switch (selected.id) {
             case "standard_watch":
                 await addItemUse(message.member, selected.id);
@@ -458,7 +462,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!laterDescription) return;
 
-    const edit = async (data, msg) => {
+    const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);
             return await message.fetchReply();
