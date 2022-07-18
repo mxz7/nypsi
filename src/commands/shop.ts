@@ -1,4 +1,11 @@
-import { CommandInteraction, Message, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import {
+    CommandInteraction,
+    Message,
+    ActionRowBuilder,
+    ButtonBuilder,
+    MessageActionRowComponentBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -65,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         pages.push(pageOfItems);
     }
 
-    const embed = new CustomEmbed(message.member).setFooter(`page ${page + 1}/${pages.length}`);
+    const embed = new CustomEmbed(message.member).setFooter({ text: `page ${page + 1}/${pages.length}` });
 
     embed.setHeader("shop", message.author.avatarURL());
 
@@ -133,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             true
                         );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`);
+                    newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
                     if (currentPage == 0) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
@@ -177,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             true
                         );
                     }
-                    newEmbed.setFooter(`page ${currentPage + 1}/${pages.length}`);
+                    newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
                     if (currentPage + 1 == lastPage) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                             new ButtonBuilder()
