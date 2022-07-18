@@ -67,12 +67,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let count = 0;
 
-    for (let m of members.keys()) {
-        m = members.get(m);
+    for (const m of members.keys()) {
+        const member = members.get(m);
 
         if (!(await userExists(m))) continue;
 
-        const inventory = await getInventory(m);
+        const inventory = await getInventory(member);
 
         if (inventory[selected.id]) {
             inventory[selected.id] += amount;
@@ -80,8 +80,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             inventory[selected.id] = amount;
         }
 
-        await setInventory(m, inventory);
-        logger.info(`${amount} ${selected.id} given to ${m.user.tag} (${m.user.id})`);
+        await setInventory(member, inventory);
+        logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
         count += amount;
     }
 
