@@ -8,7 +8,7 @@ const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const requiredBet = await getRequiredBetForXp(message.member);

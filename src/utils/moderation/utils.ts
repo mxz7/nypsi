@@ -71,14 +71,14 @@ export async function getCaseCount(guild: Guild) {
  *
  * @param {Guild} guild guild to create new case in
  * @param {String} caseType mute, unmute, kick, warn, ban, unban
- * @param {Array<String>} userIDs list of user ids
+ * @param {string[]} userIDs list of user ids
  * @param {String} moderator moderator issuing punishment
  * @param {String} command entire message
  */
 export async function newCase(
     guild: Guild,
     caseType: PunishmentType,
-    userIDs: Array<string> | string,
+    userIDs: string[] | string,
     moderator: string,
     command: string
 ) {
@@ -307,10 +307,10 @@ export async function getCase(guild: Guild, caseID: number) {
 /**
  *
  * @param {Guild} guild
- * @param {Array<String>} userIDs
+ * @param {string[]} userIDs
  * @param {Date} date
  */
-export async function newMute(guild: Guild, userIDs: Array<string>, date: Date) {
+export async function newMute(guild: Guild, userIDs: string[], date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }
@@ -328,10 +328,10 @@ export async function newMute(guild: Guild, userIDs: Array<string>, date: Date) 
 /**
  *
  * @param {Guild} guild
- * @param {Array<String>} userIDs
+ * @param {string[]} userIDs
  * @param {Date} date
  */
-export async function newBan(guild: Guild, userIDs: Array<string> | string, date: Date) {
+export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
     }

@@ -8,9 +8,9 @@ declare function require(name: string);
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: Array<string>) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const { snipe } = require("../nypsi.js");
 
     let channel: any = message.channel;

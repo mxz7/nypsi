@@ -10,7 +10,7 @@ const cmd = new Command("feet", "get a random foot image", Categories.NSFW).setA
 
 /**
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {

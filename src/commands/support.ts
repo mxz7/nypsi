@@ -6,7 +6,7 @@ const cmd = new Command("support", "join the nypsi support server", Categories.I
 /**
  *
  * @param {Message} message
- * @param {Array<String>} args
+ * @param {string[]} args
  */
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     return message.channel.send({ content: "discord.gg/hJTDNST" });
