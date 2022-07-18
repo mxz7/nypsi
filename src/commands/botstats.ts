@@ -10,6 +10,7 @@ import { deleteQueue, mentionQueue } from "../utils/users/utils.js";
 import * as os from "os";
 import { MStoTime } from "../utils/functions/date.js";
 import { aliasesSize, commandsSize } from "../utils/commandhandler";
+import prisma from "../utils/database/database";
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
@@ -29,6 +30,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const freeMem = Math.round(os.freemem() / 1024 / 1024);
     const memUsage = Math.round(totalMem - freeMem);
     const cpuUsage = await cpu.usage();
+
+    const usersDb = await prisma.user.count();
+    const economyDb = await prisma.economy.count();
+    const premDb = await prisma.premium.count();
 
     let memberCount = 0;
 
@@ -66,6 +71,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "\n" +
                 "**uptime** " +
                 uptime,
+            true
+        )
+        .addField(
+            "database",
+            `**users** ${usersDb.toLocaleString()}\n**economy** ${economyDb.toLocaleString()}\n**premium** ${premDb.toLocaleString()}`,
             true
         )
         .addField(
