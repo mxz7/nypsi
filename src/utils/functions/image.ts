@@ -2,8 +2,11 @@ import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, Webhook } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
+import { getGuild, requestDM } from "../../nypsi";
 import prisma from "../database/database";
+import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { RedditJSONPost } from "../models/Reddit";
 
 const imgur = new ImgurClient({
@@ -12,8 +15,6 @@ const imgur = new ImgurClient({
     clientSecret: process.env.IMGUR_CLIENTSECRET,
     refreshToken: process.env.IMGUR_REFRESHTOKEN,
 });
-
-declare function require(name: string);
 
 let uploadDisabled = false;
 
@@ -118,7 +119,6 @@ export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[
 
 export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
     if (!wholesomeWebhook) {
-        const { getGuild } = require("../../nypsi");
         const guild = await getGuild("747056029795221513");
 
         const webhooks = await guild.fetchWebhooks();
@@ -162,13 +162,11 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
         },
     });
 
-    const { CustomEmbed } = require("../models/EmbedBuilders");
-
     const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + id);
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
 
-    embed.setFooter(`$wholesome accept ${id} | $wholesome deny ${id}`);
+    embed.setFooter({ text: `$wholesome accept ${id} | $wholesome deny ${id}` });
 
     embed.setImage(image);
 
@@ -204,11 +202,8 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
 
     clearWholesomeCache();
 
-    const { requestDM } = require("../../nypsi");
-    const { getDMsEnabled } = require("../economy/utils");
-
     if (await getDMsEnabled(query.submitterId)) {
-        requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
+        await requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
     }
 
     return true;
