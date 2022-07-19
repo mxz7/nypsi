@@ -73,7 +73,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 ##### ✅ information
 
 -   nypsi is able to calculate join positions and join dates of any user in any server, this can be seen with `$join` or `$user`
--   there is also a `$lookup` command which allows you to lookup information about domain names and IP addresses
+-   there is also a `$server` command which allows you to see information about the current guild
 
 ### 🖼 screenshots
 
