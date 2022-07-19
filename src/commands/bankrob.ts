@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 2));
     }
 
-    if (args[0] == "status") {
+    if (args[0]) {
         let bankList = "";
 
         for (const bank1 of bankWorth.keys()) {

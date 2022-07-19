@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.3));
     }
 
-    if (args[0] == "status") {
+    if (args[0]) {
         let shopList = "";
 
         for (const shop1 of shopWorth.keys()) {
