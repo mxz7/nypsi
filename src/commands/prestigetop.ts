@@ -4,7 +4,10 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const cmd = new Command("prestigetop", "view top prestiges in the server", Categories.MONEY).setAliases(["topprestige"]);
+const cmd = new Command("prestigetop", "view top prestiges in the server", Categories.MONEY).setAliases([
+    "topprestige",
+    "ptop",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
