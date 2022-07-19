@@ -1957,13 +1957,13 @@ export async function deleteGuild(name: string) {
 
     guildExistsCache.delete(name);
 
-    await prisma.economyGuild.delete({
+    await prisma.economyGuildMember.deleteMany({
         where: {
             guildName: name,
         },
     });
 
-    await prisma.economyGuildMember.deleteMany({
+    await prisma.economyGuild.delete({
         where: {
             guildName: name,
         },
