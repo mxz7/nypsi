@@ -1,7 +1,7 @@
 import { topAmount } from "../utils/economy/utils.js";
 import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
 const cmd = new Command("baltop", "view top balances in the server", Categories.MONEY).setAliases(["top", "gangsters"]);
@@ -50,6 +50,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const filtered = balTop.filter(function (el) {
         return el != null;
     });
+
+    if (filtered.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+    }
 
     const embed = new CustomEmbed(message.member).setHeader("top " + filtered.length).setDescription(filtered.join("\n"));
 
