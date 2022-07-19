@@ -261,7 +261,7 @@ workers.set(5, Tailor);
 
 export class SpaceX extends Worker {
     constructor(level = 1, stored = 0) {
-        let perItem = 50;
+        let perItem = 75;
         let maxStorage = 215;
 
         for (let i = 1; i < level; i++) {
