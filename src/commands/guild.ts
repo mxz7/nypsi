@@ -11,6 +11,7 @@ import {
     Interaction,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { requestDM } from "../nypsi";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     addMember,
@@ -448,6 +449,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         await addCooldown(cmd.name, message.member, 30);
+
+        for (const guildMember of guild.members) {
+            const contributedMoney = guildMember.contributedMoney;
+
+            if (contributedMoney > 100) {
+                await updateBalance(
+                    guildMember.userId,
+                    (await getBalance(guildMember.userId)) + Math.floor(contributedMoney * 0.25)
+                );
+
+                const embed = new CustomEmbed().setColor("#5efb8f");
+
+                embed.setDescription(
+                    `since you contributed money to this guild, you have been repaid $**${Math.floor(
+                        contributedMoney * 0.25
+                    ).toLocaleString()}**`
+                );
+
+                await requestDM(guildMember.userId, `${guild.guildName} has been deleted`, false, embed);
+            }
+        }
 
         await deleteGuild(guild.guildName);
 
