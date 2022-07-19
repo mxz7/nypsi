@@ -87,21 +87,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             pageOfItems.push(item);
         }
+
         if (items[item].worth) {
-            let fee = 0.5;
-            if (items[item].emoji == ":coin:") {
-                fee = 0.95;
-            }
             const amount = inventory[item];
 
-            if (items[item].role == "fish" || items[item].role == "prey") {
-                const worth1 = Math.floor(items[item].worth * fee * amount);
-                worth += Math.floor(worth1 + worth1 * multi);
-            } else {
-                worth += Math.floor(items[item].worth * fee * amount);
-            }
-        } else {
-            worth += 1000;
+            worth += Math.floor(items[item].worth * amount);
         }
     }
 
