@@ -6,7 +6,7 @@ import { getEmbedColor } from "../premium/utils";
 const embedColorCache: Map<string, string> = new Map();
 
 export class CustomEmbed extends EmbedBuilder {
-    constructor(member?: GuildMember, text?: string) {
+    constructor(member?: GuildMember, text?: string, disableFooter = false) {
         super();
 
         if (member) {
@@ -34,10 +34,20 @@ export class CustomEmbed extends EmbedBuilder {
 
         const chance = Math.floor(Math.random() * 20);
 
-        if (chance == 7)
+        if (chance == 7 && !disableFooter)
             super.setFooter({
                 text: "nypsi.xyz",
             });
+
+        return this;
+    }
+
+    disableFooter() {
+        try {
+            delete this.data.footer;
+        } catch {
+            /* keep eslint happy */
+        }
 
         return this;
     }

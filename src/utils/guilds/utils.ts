@@ -491,7 +491,7 @@ export async function checkChristmasCountdown(guild: Guild) {
 
     return await channel
         .send({
-            embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
+            embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:").disableFooter()],
         })
         .then(() => {
             logger.log({
@@ -686,6 +686,7 @@ export function runCountdowns(client: Client) {
 
             embed.setDescription(message);
             embed.setColor("#111111");
+            embed.disableFooter();
 
             const guildToSend = await client.guilds.fetch(guildID).catch(() => {});
 
@@ -772,7 +773,13 @@ export function runChristmas(client: Client) {
 
             await channel
                 .send({
-                    embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:")],
+                    embeds: [
+                        new CustomEmbed()
+                            .setDescription(format)
+                            .setColor("#ff0000")
+                            .setTitle(":santa_tone1:")
+                            .disableFooter(),
+                    ],
                 })
                 .then(() => {
                     logger.log({
