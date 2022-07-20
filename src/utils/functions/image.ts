@@ -162,7 +162,10 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
         },
     });
 
-    const embed = new CustomEmbed().setColor("#111111").setTitle("wholesome suggestion #" + id);
+    const embed = new CustomEmbed()
+        .setColor("#111111")
+        .setTitle("wholesome suggestion #" + id)
+        .disableFooter();
 
     embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
 

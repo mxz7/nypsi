@@ -37,6 +37,7 @@ export async function showTopGlobalBal(client: Client) {
         embed.setTitle("top 10 richest users");
         embed.setDescription(baltop.join("\n"));
         embed.setColor("#111111");
+        embed.disableFooter();
 
         await channel.send({ embeds: [embed] });
         logger.log({
