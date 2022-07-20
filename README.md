@@ -72,7 +72,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 ##### 🏆 guilds
 
--   nypsi has a guild feature similar to hypixel's where you can create a guild, invite friends and grow it together. 
+-   nypsi has a guild feature similar to hypixel's where you can create a guild, invite friends and grow it together.
 -   guild upgrades will allow guild members to receive global perks on nypsi (such as xp, multipliers, etc)
 -   grow your guild and level up to become the top and receive awesome perks
 
