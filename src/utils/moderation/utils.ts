@@ -107,7 +107,7 @@ export async function addModLog(
         punished = await guild.client.users.fetch(userID).catch(() => {});
     }
 
-    const embed = new CustomEmbed();
+    const embed = new CustomEmbed().disableFooter();
     embed.setColor(modLogColors.get(caseType));
     embed.setTitle(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`);
     embed.setTimestamp();

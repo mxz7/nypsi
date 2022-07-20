@@ -118,6 +118,7 @@ setInterval(() => {
     embed.setColor("#111111");
     embed.setDescription(desc.join("\n"));
     embed.setTimestamp();
+    embed.disableFooter();
 
     lotteryHook.send({ embeds: [embed] });
 }, ms("30 minutes"));
@@ -279,7 +280,8 @@ export async function doVote(client: Client, vote: topgg.WebhookPayload) {
                     `+ **3**% multiplier, total: **${multi}**%\n` +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
-            );
+            )
+            .disableFooter();
 
         await member
             .send({ content: "thank you for voting!", embeds: [embed] })
@@ -1578,6 +1580,7 @@ async function doLottery(client: Client) {
             `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
         );
         embed.setColor("#111111");
+        embed.disableFooter();
 
         return lotteryHook.send({ embeds: [embed] });
     }
@@ -1613,6 +1616,7 @@ async function doLottery(client: Client) {
     );
     embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
     embed.setColor("#111111");
+    embed.disableFooter();
 
     await lotteryHook.send({ embeds: [embed] });
 
@@ -2156,6 +2160,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
                 "\n +**1**% multiplier" +
                 "\n +**1** max xp gain"
         );
+        embed.disableFooter();
 
         for (const member of guild.members) {
             const inventory = await getInventory(member.userId);
