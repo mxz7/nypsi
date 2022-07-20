@@ -12,7 +12,7 @@ veins.set("iron_ore", [1, 3, 7]);
 veins.set("gold_ore", [1, 2, 4]);
 veins.set("diamond", [1, 2]);
 
-const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY);
+const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs("https://docs.nypsi.xyz/eco/minecraft");
 
 cmd.slashEnabled = true;
 

@@ -36,7 +36,9 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
-const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN).setAliases(["cr", "reaction"]);
+const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
+    .setAliases(["cr", "reaction"])
+    .setDocs("https://docs.nypsi.xyz/chatreactions/");
 
 cmd.slashEnabled = true;
 cmd.slashData
