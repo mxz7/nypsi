@@ -24,6 +24,7 @@ import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
+import { listenForVotes } from "./utils/votehandler";
 
 const client = new Client({
     allowedMentions: {
@@ -262,6 +263,7 @@ setTimeout(() => {
             updateCache();
             runModerationChecks(client);
             getWebhooks(client);
+            listenForVotes();
         }, 10000);
 
         if (process.env.GITHUB_ACTION) {
