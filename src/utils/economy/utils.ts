@@ -430,7 +430,7 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     return max;
 }
 
-export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<string[]> {
+export async function topAmountGlobal(amount: number, client?: Client, anon = true): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
             money: { gt: 1000 },
@@ -438,15 +438,22 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
         select: {
             userId: true,
             money: true,
+            user: {
+                select: {
+                    lastKnownTag: true,
+                },
+            },
         },
     });
 
-    const userIDs = [];
-    const balances = new Map();
+    const userIDs: string[] = [];
+    const balances: Map<string, number> = new Map();
+    const usernames: Map<string, string> = new Map();
 
     for (const user of query) {
         userIDs.push(user.userId);
-        balances.set(user.userId, user.money);
+        balances.set(user.userId, Number(user.money));
+        usernames.set(user.userId, user.user.lastKnownTag);
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i));
@@ -470,16 +477,18 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
                 pos = "🥉";
             }
 
-            const member = await client.users.fetch(user);
+            let username = usernames.get(user);
 
-            let username = user;
+            if (client) {
+                const member = await client.users.fetch(user);
 
-            if (member) {
-                if (anon) {
-                    username = member.username;
-                } else {
+                if (member) {
                     username = member.tag;
                 }
+            }
+
+            if (anon) {
+                username = username.split("#")[0];
             }
 
             usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
