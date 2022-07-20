@@ -15,14 +15,13 @@ import prisma from "../utils/database/database";
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (message.author.id != "672793821850894347") return;
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
         return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 5);
+    await addCooldown(cmd.name, message.member, 15);
 
     const systemUptime = MStoTime(os.uptime() * 1000);
     const uptime = MStoTime(message.client.uptime);
