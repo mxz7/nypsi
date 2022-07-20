@@ -1,5 +1,5 @@
 import * as express from "express";
-import { logger } from "../logger";
+import { logger } from "./logger";
 import * as topgg from "@top-gg/sdk";
 import {
     addTicket,
@@ -12,14 +12,14 @@ import {
     setInventory,
     updateBalance,
     userExists,
-} from "../economy/utils";
-import prisma from "../database/database";
-import redis from "../database/redis";
+} from "./economy/utils";
+import prisma from "./database/database";
+import redis from "./database/redis";
 import ms = require("ms");
-import { addKarma, getKarma } from "../karma/utils";
-import { getTier, isPremium } from "../premium/utils";
-import { CustomEmbed } from "../models/EmbedBuilders";
-import { requestDM } from "../../nypsi";
+import { addKarma, getKarma } from "./karma/utils";
+import { getTier, isPremium } from "./premium/utils";
+import { CustomEmbed } from "./models/EmbedBuilders";
+import { requestDM } from "./../nypsi";
 
 const app = express();
 const webhook = new topgg.Webhook("123");
