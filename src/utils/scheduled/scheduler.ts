@@ -4,14 +4,12 @@ import { logger } from "../logger";
 
 const bree = new Bree({
     root: path.resolve("./jobs"),
-    outputWorkerMetadata: true,
 
-    workerMessageHandler: (message, metadata) => {
-        logger.info(`[${metadata.name}] ${message}`);
+    workerMessageHandler: (message) => {
+        logger.info(`[${message.name}] ${message.message}`);
     },
-    errorHandler: (message, metadata) => {
-        logger.error(`error running job ${metadata.name}`);
-        logger.error(message);
+    errorHandler: (message) => {
+        logger.error(`[${message.name}] ${message.message}`);
     },
 
     jobs: [
