@@ -105,6 +105,9 @@ client.on("shardError", (error1, shardID) => {
 client.on("shardReconnecting", (shardID) => {
     logger.info(`shard#${shardID} connecting`);
 });
+client.on("shardResume", (shardId) => {
+    logger.info(`shard#${shardId} resume`);
+});
 
 export function checkGuild(guildID: string) {
     const g = client.guilds.cache.find((gi) => gi.id == guildID);
