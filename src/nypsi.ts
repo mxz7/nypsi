@@ -17,10 +17,9 @@ import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
 import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
-import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils";
+import { runLotteryInterval, updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
-import { WebhookPayload } from "@top-gg/sdk";
 import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
@@ -137,10 +136,6 @@ function runChecks() {
         level: "auto",
         message: "guild count posted to top.gg: " + client.guilds.cache.size,
     });
-}
-
-export async function onVote(vote: WebhookPayload) {
-    doVote(client, vote);
 }
 
 export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
