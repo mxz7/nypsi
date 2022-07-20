@@ -1,11 +1,9 @@
-import * as express from "express";
-import * as topgg from "@top-gg/sdk";
 import { logger } from "../logger";
+import * as topgg from "@top-gg/sdk";
 import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import * as fs from "fs";
-import { addKarma, getKarma } from "../karma/utils";
 import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
@@ -22,26 +20,12 @@ import _ = require("lodash");
 
 declare function require(name: string): any;
 
-const webhook = new topgg.Webhook("123");
 const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
-
-const app = express();
 
 const bannedCache = new Map();
 const guildExistsCache = new Map();
 const guildUserCache = new Map();
 const guildRequirementsCache = new Map();
-
-app.post(
-    "/dblwebhook",
-    webhook.listener((vote) => {
-        logger.info(`received vote: ${vote.user}`);
-        const { onVote } = require("../../nypsi");
-        onVote(vote);
-    })
-);
-
-app.listen(5000);
 
 setInterval(async () => {
     const query = await prisma.economy.findMany({
@@ -179,127 +163,6 @@ async function updateCryptoWorth() {
 }
 
 setInterval(updateCryptoWorth, 1500000);
-
-export async function doVote(client: Client, vote: topgg.WebhookPayload) {
-    const { user } = vote;
-
-    if (!(await userExists(user))) {
-        logger.warn(`${user} doesnt exist`);
-        return;
-    }
-
-    const now = new Date().getTime();
-
-    const query = await prisma.economy.findUnique({
-        where: {
-            userId: user,
-        },
-        select: {
-            lastVote: true,
-        },
-    });
-
-    const lastVote = query.lastVote.getTime();
-
-    if (now - lastVote < 43200000) {
-        return logger.error(`${user} already voted`);
-    }
-
-    await prisma.economy.update({
-        where: {
-            userId: user,
-        },
-        data: {
-            lastVote: new Date(now),
-        },
-    });
-
-    redis.set(`cache:vote:${user}`, "true");
-    redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
-
-    let member: User | string = await client.users.fetch(user);
-
-    let id = false;
-    let memberID: string;
-
-    if (!member) {
-        member = user;
-        memberID = user;
-        id = true;
-    } else {
-        memberID = member.id;
-    }
-
-    let prestige = await getPrestige(memberID);
-
-    if (prestige > 15) prestige = 15;
-
-    const amount = 15000 * (prestige + 1);
-    const multi = Math.floor((await getMulti(memberID)) * 100);
-    const inventory = await getInventory(memberID);
-
-    await updateBalance(memberID, (await getBalance(memberID)) + amount);
-    addKarma(memberID, 10);
-
-    const tickets = await getTickets(memberID);
-
-    const prestigeBonus = Math.floor(((await getPrestige(memberID)) > 20 ? 20 : await getPrestige(memberID)) / 2.5);
-    const premiumBonus = Math.floor((await isPremium(memberID)) ? await getTier(memberID) : 0);
-    const karmaBonus = Math.floor((await getKarma(memberID)) / 100);
-
-    const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
-
-    if (tickets.length < max) {
-        await addTicket(memberID);
-    }
-
-    let crateAmount = Math.floor(prestige / 2 + 1);
-
-    if (crateAmount > 5) crateAmount = 5;
-
-    if (inventory["vote_crate"]) {
-        inventory["vote_crate"] += crateAmount;
-    } else {
-        inventory["vote_crate"] = crateAmount;
-    }
-
-    await setInventory(memberID, inventory);
-
-    logger.log({
-        level: "success",
-        message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
-    });
-
-    if (!id && (await getDMsEnabled(memberID)) && member instanceof User) {
-        const embed = new CustomEmbed()
-            .setColor("#5efb8f")
-            .setDescription(
-                "you have received the following: \n\n" +
-                    `+ $**${amount.toLocaleString()}**\n` +
-                    "+ **10** karma\n" +
-                    `+ **3**% multiplier, total: **${multi}**%\n` +
-                    `+ **${crateAmount}** vote crates` +
-                    `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
-            )
-            .disableFooter();
-
-        await member
-            .send({ content: "thank you for voting!", embeds: [embed] })
-            .then(() => {
-                if (member instanceof User) {
-                    logger.log({
-                        level: "success",
-                        message: `sent vote confirmation to ${member.tag}`,
-                    });
-                }
-            })
-            .catch(() => {
-                if (member instanceof User) {
-                    logger.warn(`failed to send vote confirmation to ${member.tag}`);
-                }
-            });
-    }
-}
 
 export function getPadlockPrice(): number {
     return padlockPrice;
