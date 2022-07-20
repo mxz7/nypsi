@@ -26,6 +26,18 @@ export class Command {
         this.description = description.toLowerCase();
         this.category = category.toLowerCase();
 
+        switch (category) {
+            case Categories.MONEY:
+                this.docs = "https://docs.nypsi.xyz/economy/";
+                break;
+            case Categories.MUSIC:
+                this.docs = "https://docs.nypsi.xyz/music/";
+                break;
+            case Categories.MODERATION:
+                this.docs = "https://docs.nypsi.xyz/moderation/";
+                break;
+        }
+
         this.slashEnabled = false;
 
         this.slashData = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
