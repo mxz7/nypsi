@@ -1,6 +1,5 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
-import ms = require("ms");
-import { checkGuild, eSnipe, getGuild, snipe } from "../../nypsi";
+import { eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
@@ -46,79 +45,7 @@ setInterval(() => {
     }
 }, 3600000);
 
-setInterval(async () => {
-    const query = await prisma.guild.findMany({
-        select: {
-            id: true,
-        },
-    });
-
-    for (const guild of query) {
-        const exists = checkGuild(guild.id);
-
-        if (!exists) {
-            await prisma.guildCounter.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guildChristmas.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guildCountdown.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.chatReactionStats.deleteMany({
-                where: {
-                    chatReactionGuildId: guild.id,
-                },
-            });
-            await prisma.chatReaction.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationMute.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationBan.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationCase.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderation.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guild.deleteMany({
-                where: {
-                    id: guild.id,
-                },
-            });
-
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from guild data`,
-            });
-        }
-    }
-    existsCooldown.clear();
-}, ms("2 days"));
-
 const fetchCooldown = new Set();
-const existsCooldown = new Set();
 const disableCache = new Map();
 const chatFilterCache = new Map();
 const snipeFilterCache = new Map();
@@ -154,7 +81,7 @@ export async function runCheck(guild: Guild) {
 }
 
 export async function hasGuild(guild: Guild): Promise<boolean> {
-    if (existsCooldown.has(guild.id)) return true;
+    if (await redis.exists(`cache:guild:exists:${guild.id}`)) return true;
     const query = await prisma.guild.findUnique({
         where: {
             id: guild.id,
@@ -165,12 +92,8 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
     });
 
     if (query) {
-        existsCooldown.add(guild.id);
-
-        setTimeout(() => {
-            if (!existsCooldown.has(guild.id)) return;
-            existsCooldown.delete(guild.id);
-        }, 43200000);
+        await redis.set(`cache:guild:exists:${guild.id}`, "1");
+        await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
         return true;
     } else {
         return false;
@@ -197,12 +120,8 @@ export async function createGuild(guild: Guild) {
         },
     });
 
-    existsCooldown.add(guild);
-
-    setTimeout(() => {
-        if (!existsCooldown.has(guild.id)) return;
-        existsCooldown.delete(guild.id);
-    }, 43200000);
+    await redis.set(`cache:guild:exists:${guild.id}`, 1);
+    await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
 }
 
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
