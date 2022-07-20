@@ -16,7 +16,6 @@ import ms = require("ms");
 import redis from "../database/redis";
 import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
-import _ = require("lodash");
 
 declare function require(name: string): any;
 
@@ -26,44 +25,6 @@ const bannedCache = new Map();
 const guildExistsCache = new Map();
 const guildUserCache = new Map();
 const guildRequirementsCache = new Map();
-
-setInterval(async () => {
-    const query = await prisma.economy.findMany({
-        select: {
-            userId: true,
-            workers: true,
-        },
-    });
-
-    for (const user of query) {
-        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
-
-        if (_.isEmpty(workers)) continue;
-
-        for (const w of Object.keys(workers)) {
-            const worker = workers[w];
-
-            const workerData = Worker.fromStorage(worker);
-
-            if (worker.stored < workerData.maxStorage) {
-                if (worker.stored + workerData.perInterval > workerData.maxStorage) {
-                    worker.stored = workerData.maxStorage;
-                } else {
-                    worker.stored += workerData.perInterval;
-                }
-            }
-        }
-
-        await prisma.economy.update({
-            where: {
-                userId: user.userId,
-            },
-            data: {
-                workers: workers as any,
-            },
-        });
-    }
-}, 5 * 60 * 1000);
 
 let items: { [key: string]: Item };
 

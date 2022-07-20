@@ -3,7 +3,7 @@ import path = require("path");
 import { logger } from "../logger";
 
 const bree = new Bree({
-    root: false,
+    root: path.resolve("./jobs"),
     outputWorkerMetadata: true,
 
     workerMessageHandler: (message, metadata) => {
@@ -24,6 +24,11 @@ const bree = new Bree({
             name: "topglobal",
             interval: "at 12:00am",
             path: path.join(__dirname, "jobs", "topglobal.js"),
+        },
+        {
+            name: "workers",
+            interval: "5m",
+            path: path.join(__dirname, "jobs", "workers.js"),
         },
     ],
 });
