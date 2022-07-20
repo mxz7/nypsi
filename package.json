@@ -25,6 +25,7 @@
     "@types/lodash": "^4.14.182",
     "@types/node-fetch": "^2.6.2",
     "better-sqlite3": "^7.6.2",
+    "bree": "^9.1.1",
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
