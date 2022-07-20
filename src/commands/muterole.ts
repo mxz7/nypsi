@@ -4,7 +4,9 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getPrefix } from "../utils/guilds/utils";
 import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils/moderation/utils";
 
-const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN).setPermissions(["MANAGE_SERVER"]);
+const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN)
+    .setPermissions(["MANAGE_SERVER"])
+    .setDocs("https://docs.nypsi.xyz/mod/muterole");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
