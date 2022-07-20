@@ -13,6 +13,7 @@ export class Command {
     public name: string;
     public description: string;
     public category: string;
+    public docs?: string;
     public permissions?: string[];
     public aliases?: string[];
     public slashData?: SlashCommandBuilder;
@@ -44,6 +45,15 @@ export class Command {
 
     public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void) {
         this.run = run;
+        return this;
+    }
+
+    public setDocs(url: string) {
+        if (!url.startsWith("https://docs.nypsi.xyz/")) {
+            throw new Error(`invalid nypsi docs url given for command: ${this.name}`);
+        }
+
+        this.docs = url;
         return this;
     }
 }
