@@ -1,7 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
-import { createUser, deleteUser, getBalance, updateBalance } from "../utils/economy/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -36,9 +35,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 lastCommand: new Date(),
             },
         });
-        await createUser("user_test");
-        await updateBalance("user_test", (await getBalance("user_test")) + 1000);
-        await deleteUser("user_test");
         await prisma.user.delete({
             where: {
                 id: "test_user",
