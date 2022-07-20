@@ -20,11 +20,10 @@ import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
 import { runLotteryInterval, updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
-import { showTopGlobalBal } from "./utils/scheduled/topglobal";
-import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 import { listenForVotes } from "./utils/votehandler";
+import startJobs from "./utils/scheduled/scheduler";
 
 const client = new Client({
     allowedMentions: {
@@ -257,13 +256,12 @@ setTimeout(() => {
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
             runCountdowns(client);
             runChristmas(client);
-            showTopGlobalBal(client);
-            purgeUsernames();
             runChecks();
             updateCache();
             runModerationChecks(client);
             getWebhooks(client);
             listenForVotes();
+            startJobs();
         }, 10000);
 
         if (process.env.GITHUB_ACTION) {
