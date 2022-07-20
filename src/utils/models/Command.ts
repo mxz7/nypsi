@@ -13,6 +13,7 @@ export class Command {
     public name: string;
     public description: string;
     public category: string;
+    public docs?: string;
     public permissions?: string[];
     public aliases?: string[];
     public slashData?: SlashCommandBuilder;
@@ -24,6 +25,18 @@ export class Command {
         this.name = name.toLowerCase();
         this.description = description.toLowerCase();
         this.category = category.toLowerCase();
+
+        switch (category) {
+            case Categories.MONEY:
+                this.docs = "https://docs.nypsi.xyz/economy/";
+                break;
+            case Categories.MUSIC:
+                this.docs = "https://docs.nypsi.xyz/music/";
+                break;
+            case Categories.MODERATION:
+                this.docs = "https://docs.nypsi.xyz/moderation/";
+                break;
+        }
 
         this.slashEnabled = false;
 
@@ -44,6 +57,15 @@ export class Command {
 
     public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void) {
         this.run = run;
+        return this;
+    }
+
+    public setDocs(url: string) {
+        if (!url.startsWith("https://docs.nypsi.xyz/")) {
+            throw new Error(`invalid nypsi docs url given for command: ${this.name}`);
+        }
+
+        this.docs = url;
         return this;
     }
 }

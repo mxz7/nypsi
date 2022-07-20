@@ -40,7 +40,9 @@ import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY).setAliases(["g", "clan"]);
+const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
+    .setAliases(["g", "clan"])
+    .setDocs("https://docs.nypsi.xyz/eco/guilds");
 
 cmd.slashEnabled = true;
 

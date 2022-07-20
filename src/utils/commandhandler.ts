@@ -270,6 +270,10 @@ async function helpCmd(message: Message, args: string[]) {
                 desc = desc + "\n**aliases** `" + prefix + cmd.aliases.join("`, `" + prefix) + "`";
             }
 
+            if (cmd.docs) {
+                desc += `\n**docs** ${cmd.docs}`;
+            }
+
             embed.setTitle(`${cmd.name} command`);
             embed.setDescription(desc);
         } else if (await getCommand(args[0].toLowerCase())) {
