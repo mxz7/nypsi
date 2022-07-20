@@ -173,7 +173,7 @@ export async function getWebhooks(client: Client) {
 
     logger.add(
         new DiscordTransport({
-            webhook: process.env.WEBHOOK_URL,
+            webhook: process.env.BOTLOGS_HOOK,
             useCodeblock: true,
         })
     );
