@@ -146,7 +146,7 @@ async function showUser(message, user) {
             }`,
             true
         )
-        .setFooter(`${await getKarma(user.id)} karma`);
+        .setFooter({ text: `${await getKarma(user.id)} karma` });
 
     if (await userExists(user.id)) {
         const voted = await hasVoted(user.id);
