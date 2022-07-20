@@ -70,10 +70,11 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 -   there are a lot of fun commands available for use, including `$reddit` which allows you to grab a random image from any subreddit, as well as `$ddos` which will generate a _fake_ ip address
 -   very simple method of creating small/large polls with the `$poll` command
 
-##### ✅ information
+##### 🏆 guilds
 
--   nypsi is able to calculate join positions and join dates of any user in any server, this can be seen with `$join` or `$user`
--   there is also a `$lookup` command which allows you to lookup information about domain names and IP addresses
+-   nypsi has a guild feature similar to hypixel's where you can create a guild, invite friends and grow it together. 
+-   guild upgrades will allow guild members to receive global perks on nypsi (such as xp, multipliers, etc)
+-   grow your guild and level up to become the top and receive awesome perks
 
 ### 🖼 screenshots
 
