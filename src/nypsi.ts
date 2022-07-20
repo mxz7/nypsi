@@ -23,7 +23,6 @@ import { runModerationChecks } from "./utils/moderation/utils";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 import { listenForVotes } from "./utils/votehandler";
-import startJobs from "./utils/scheduled/scheduler";
 
 const client = new Client({
     allowedMentions: {
@@ -138,6 +137,10 @@ function runChecks() {
     });
 }
 
+export function getGuilds() {
+    return client.guilds.cache.map((guild) => guild.id);
+}
+
 export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
@@ -238,6 +241,8 @@ export async function getGuild(guildID: string): Promise<Guild> {
 
     return guild;
 }
+
+import startJobs from "./utils/scheduled/scheduler";
 
 setTimeout(() => {
     logger.info("logging in...");
