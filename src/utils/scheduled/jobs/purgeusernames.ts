@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
+import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
-import { logger } from "../../logger";
 
 (async () => {
     const old = dayjs().subtract(180, "days").toDate();
@@ -11,5 +11,6 @@ import { logger } from "../../logger";
         },
     });
 
-    logger.log("auto", `${d.count.toLocaleString()} old usernames deleted from database`);
+    parentPort.postMessage(`${d.count.toLocaleString()} old usernames deleted from database`);
+    process.exit(0);
 })();

@@ -1,6 +1,6 @@
 import { WebhookClient } from "discord.js";
+import { parentPort } from "worker_threads";
 import { topAmountGlobal } from "../../economy/utils";
-import { logger } from "../../logger";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 
 (async () => {
@@ -18,12 +18,11 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
     await hook
         .send({ embeds: [embed] })
         .then(() => {
-            logger.log({
-                level: "auto",
-                message: "sent global bal top",
-            });
+            parentPort.postMessage("sent global baltop");
+            process.exit(0);
         })
         .catch(() => {
-            logger.error("failed to send gobal bal top");
+            parentPort.postMessage("failed to send global baltop");
+            process.exit(1);
         });
 })();
