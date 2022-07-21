@@ -267,7 +267,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const byTypeGamble = await prisma.economyStats.groupBy({
             where: {
-                gamble: true,
+                AND: [
+                    {
+                        gamble: true,
+                    },
+                    {
+                        NOT: { type: "rob" },
+                    },
+                ],
             },
             by: ["type"],
             _sum: {
@@ -299,7 +306,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const byItem = await prisma.economyStats.groupBy({
             where: {
-                gamble: false,
+                AND: [
+                    {
+                        gamble: false,
+                    },
+                    {
+                        NOT: { type: "rob" },
+                    },
+                ],
             },
             by: ["type"],
             _sum: {
