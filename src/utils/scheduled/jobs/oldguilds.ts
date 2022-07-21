@@ -2,8 +2,8 @@ import { parentPort, workerData } from "worker_threads";
 import prisma from "../../database/database";
 
 (async () => {
-    parentPort.postMessage(workerData.guilds);
-    return;
+    const guilds: string[] = workerData.guilds;
+
     const query = await prisma.guild.findMany({
         select: {
             id: true,
@@ -11,7 +11,7 @@ import prisma from "../../database/database";
     });
 
     for (const guild of query) {
-        const exists = workerData;
+        const exists = guilds.includes(guild.id);
 
         if (!exists) {
             await prisma.guildCounter.deleteMany({
@@ -65,10 +65,7 @@ import prisma from "../../database/database";
                 },
             });
 
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from guild data`,
-            });
+            parentPort.postMessage(`deleted guild ${guild.id} from database`);
         }
     }
 })();
