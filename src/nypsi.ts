@@ -17,7 +17,7 @@ import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
 import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
-import { runLotteryInterval, updateStats } from "./utils/economy/utils";
+import { updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
@@ -243,6 +243,7 @@ export async function getGuild(guildID: string): Promise<Guild> {
 }
 
 import startJobs from "./utils/scheduled/scheduler";
+import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
 
 setTimeout(() => {
     logger.info("logging in...");
