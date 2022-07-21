@@ -31,15 +31,12 @@ const assLinks = [
 ];
 const pornLinks = [
     "https://www.reddit.com/r/collegesluts/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/realgirls/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/legalteens/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/amateur/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/gonewild/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/gonewild18/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/collegeamateurs/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/irlgirls/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/camwhores/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/camsluts/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/cumsluts/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/cumfetish/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/creampies/top.json?limit=6969&t=month",
