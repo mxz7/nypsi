@@ -112,6 +112,13 @@ client.on("shardResume", (shardId) => {
     logger.info(`shard#${shardId} resume`);
 });
 
+process.on("unhandledRejection", (e: any) => {
+    const excludedReasons = [50013, 10008, 50001];
+
+    if (e.code && excludedReasons.includes(e.code)) return;
+    logger.error(`unhandled promise rejection: ${e.stack}`);
+});
+
 export function checkGuild(guildID: string) {
     const g = client.guilds.cache.find((gi) => gi.id == guildID);
 

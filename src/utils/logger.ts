@@ -78,8 +78,6 @@ const logger = winston.createLogger({
         }),
         new winston.transports.Console({
             level: "debug",
-            handleExceptions: true,
-            handleRejections: true,
         }),
     ],
 });

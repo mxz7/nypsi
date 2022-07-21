@@ -48,6 +48,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.react("✅");
     }
 
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
+
     let target = message.member;
 
     if (args.length >= 1) {
@@ -91,7 +95,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            return await message.reply(data as InteractionReplyOptions);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
         } else {
             return await message.channel.send(data);
         }

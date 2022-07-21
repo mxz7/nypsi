@@ -42,15 +42,23 @@ let wordList: string[];
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data as InteractionReplyOptions).catch();
-            const replyMsg = await message.fetchReply().catch();
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data).catch();
+            return await message.channel.send(data);
         }
     };
+
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
 
     if (games.has(message.author.id)) {
         return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
