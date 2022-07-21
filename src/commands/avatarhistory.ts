@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let history = await fetchAvatarHistory(member);
 
     if (history.length == 0) {
-        const url = await uploadImageToImgur(member.user.displayAvatarURL({ size: 256 }));
+        const url = await uploadImageToImgur(member.user.displayAvatarURL({ extension: "png", size: 256 }));
         if (url) {
             await addNewAvatar(member, url);
             history = await fetchAvatarHistory(member);
