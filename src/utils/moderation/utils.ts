@@ -345,7 +345,7 @@ export function runModerationChecks(client: Client) {
                 level: "auto",
                 message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
             });
-            requestUnmute(unmute.guildId, unmute.userId, client);
+            await requestUnmute(unmute.guildId, unmute.userId, client);
         }
 
         const query2 = await prisma.moderationBan.findMany({
@@ -496,7 +496,6 @@ async function requestUnban(guild: string | Guild, member: string, client: Clien
     guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn("unable to find guild");
         return;
     }
 
@@ -514,7 +513,6 @@ async function requestUnmute(guild: Guild | string, member: string, client: Clie
     guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn(`unable to find guild ${guild}`);
         return;
     }
 
