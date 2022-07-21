@@ -13,7 +13,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getInventory, getItems, createUser, userExists, getMulti } from "../utils/economy/utils";
+import { getInventory, getItems, createUser, userExists } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"]);
@@ -26,7 +26,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data as InteractionReplyOptions);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -35,6 +39,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return await message.channel.send(data);
         }
     };
+
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -78,7 +86,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const pages: string[][] = [];
     let pageOfItems: string[] = [];
     let worth = 0;
-    const multi = await getMulti(message.member);
 
     for (const item of itemIDs) {
         if (pageOfItems.length == 6) {
