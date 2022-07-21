@@ -41,7 +41,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data as InteractionReplyOptions);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
             const replyMsg = await message.fetchReply();
             if (replyMsg instanceof Message) {
                 return replyMsg;
@@ -50,6 +54,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return await message.channel.send(data);
         }
     };
+
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
 
     if (games.has(message.author.id)) {
         return send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] });
