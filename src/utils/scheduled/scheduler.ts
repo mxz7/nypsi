@@ -28,6 +28,7 @@ const bree = new Bree({
         },
         {
             name: "workers",
+            timeout: "5m",
             interval: "5m",
             path: path.join(__dirname, "jobs", "workers.js"),
         },
@@ -45,6 +46,12 @@ const bree = new Bree({
             name: "deterioratekarma",
             interval: "at 3:02am",
             path: path.join(__dirname, "jobs", "deterioratekarma.js"),
+        },
+        {
+            name: "lottotickets",
+            interval: "60m",
+            timeout: "60m",
+            path: path.join(__dirname, "jobs", "lotterytickets.js"),
         },
     ],
 });

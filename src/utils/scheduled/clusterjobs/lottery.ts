@@ -1,7 +1,7 @@
-import { Client, User } from "discord.js";
+import { Client, User, WebhookClient } from "discord.js";
 import shuffleArray = require("shuffle-array");
 import prisma from "../../database/database";
-import { getBalance, getDMsEnabled, lotteryHook, lotteryTicketPrice, updateBalance } from "../../economy/utils";
+import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
@@ -9,6 +9,8 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 
 async function doLottery(client: Client) {
     logger.info("performing lottery..");
+
+    const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 
     const tickets = await prisma.lotteryTicket.findMany();
 
@@ -24,7 +26,7 @@ async function doLottery(client: Client) {
         embed.setColor("#111111");
         embed.disableFooter();
 
-        return lotteryHook.send({ embeds: [embed] });
+        return hook.send({ embeds: [embed] });
     }
 
     const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
@@ -60,7 +62,7 @@ async function doLottery(client: Client) {
     embed.setColor("#111111");
     embed.disableFooter();
 
-    await lotteryHook.send({ embeds: [embed] });
+    await hook.send({ embeds: [embed] });
 
     if (await getDMsEnabled(user.id)) {
         embed.setTitle("you have won the lottery!");

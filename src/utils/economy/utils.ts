@@ -1,7 +1,7 @@
 import { logger } from "../logger";
 import * as topgg from "@top-gg/sdk";
 import { Item, LotteryTicket } from "../models/Economy";
-import { Client, Collection, Guild, GuildMember, WebhookClient } from "discord.js";
+import { Client, Collection, Guild, GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import * as fs from "fs";
 import { getTier, isPremium } from "../premium/utils";
@@ -32,37 +32,6 @@ const lotteryTicketPrice = 15000;
  * the goal is to have more tickets overall for a more random outcome
  */
 export { lotteryTicketPrice };
-
-const lotteryHookQueue = new Map();
-
-export const lotteryHook = new WebhookClient({
-    url: process.env.LOTTERY_HOOK,
-});
-
-setInterval(() => {
-    if (lotteryHookQueue.size == 0) return;
-
-    const desc = [];
-
-    for (const username of lotteryHookQueue.keys()) {
-        const amount = lotteryHookQueue.get(username);
-
-        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`);
-
-        lotteryHookQueue.delete(username);
-
-        if (desc.join("\n").length >= 1500) break;
-    }
-
-    const embed = new CustomEmbed();
-
-    embed.setColor("#111111");
-    embed.setDescription(desc.join("\n"));
-    embed.setTimestamp();
-    embed.disableFooter();
-
-    lotteryHook.send({ embeds: [embed] });
-}, ms("30 minutes"));
 
 export function loadItems(): string {
     let txt = "";
@@ -1388,11 +1357,7 @@ export async function addTicket(member: GuildMember | string) {
 
     if (!(member instanceof GuildMember)) return;
 
-    if (lotteryHookQueue.has(member.user.username)) {
-        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1);
-    } else {
-        lotteryHookQueue.set(member.user.username, 1);
-    }
+    await redis.hincrby("lotterytickets:queue", member.user.username, 1);
 }
 
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
