@@ -250,7 +250,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[0].toLowerCase() == "global" && message.author.id == "672793821850894347") {
         const gambleTotal = await prisma.economyStats.aggregate({
             where: {
-                gamble: true,
+                AND: [
+                    {
+                        gamble: true,
+                    },
+                    {
+                        NOT: { type: "rob" },
+                    },
+                ],
             },
             _sum: {
                 win: true,
@@ -343,7 +350,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const percent = ((item._sum.win / itemTotal._sum.win) * 100).toFixed(2);
 
-            itemMsg.push(` - **${item.type}** ${item._sum.win} (${percent}%)`);
+            itemMsg.push(` - **${item.type}** ${item._sum.win.toLocaleString()} (${percent}%)`);
         }
 
         embed.addField("item stats", itemMsg.join("\n"), true);
@@ -351,7 +358,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const robTotal = robStats._sum.win + robStats._sum.lose;
         const robPercent = ((robStats._sum.win / robTotal) * 100).toFixed(2);
 
-        embed.setFooter({ text: `rob: ${robStats._sum.win} / ${robTotal} (${robPercent}%)` });
+        embed.setFooter({
+            text: `rob: ${robStats._sum.win.toLocaleString()} / ${robTotal.toLocaleString()} (${robPercent}%)`,
+        });
 
         embed.setHeader("global stats", message.author.avatarURL());
         return message.channel.send({ embeds: [embed] });
