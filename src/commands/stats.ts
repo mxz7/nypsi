@@ -11,6 +11,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getStats } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import prisma from "../utils/database/database";
 
 const cmd = new Command("stats", "view your economy stats", Categories.MONEY);
 
@@ -246,6 +247,114 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return gambleStats();
     } else if (args[0].toLowerCase() == "item" || args[0].toLowerCase() == "items") {
         return itemStats();
+    } else if (args[0].toLowerCase() == "global" && message.author.id == "672793821850894347") {
+        const gambleTotal = await prisma.economyStats.aggregate({
+            where: {
+                gamble: true,
+            },
+            _sum: {
+                win: true,
+                lose: true,
+            },
+        });
+
+        const byTypeGamble = await prisma.economyStats.groupBy({
+            where: {
+                gamble: true,
+            },
+            by: ["type"],
+            _sum: {
+                win: true,
+                lose: true,
+            },
+            orderBy: {
+                _sum: {
+                    win: "desc",
+                },
+            },
+        });
+
+        const itemTotal = await prisma.economyStats.aggregate({
+            where: {
+                AND: [
+                    {
+                        gamble: false,
+                    },
+                    {
+                        NOT: { type: "rob" },
+                    },
+                ],
+            },
+            _sum: {
+                win: true,
+            },
+        });
+
+        const byItem = await prisma.economyStats.groupBy({
+            where: {
+                gamble: false,
+            },
+            by: ["type"],
+            _sum: {
+                win: true,
+            },
+            orderBy: {
+                _sum: {
+                    win: "desc",
+                },
+            },
+        });
+
+        const robStats = await prisma.economyStats.aggregate({
+            where: {
+                type: "rob",
+            },
+            _sum: {
+                win: true,
+                lose: true,
+            },
+        });
+
+        const embed = new CustomEmbed(message.member);
+
+        const gambleOverall = gambleTotal._sum.win + gambleTotal._sum.lose;
+        const gambleWinPercent = ((gambleTotal._sum.win / gambleOverall) * 100).toFixed(2);
+
+        const gambleMsg = [
+            `**total** ${gambleTotal._sum.win.toLocaleString()} / ${gambleOverall.toLocaleString()} (${gambleWinPercent}%)`,
+        ];
+
+        for (const gamble of byTypeGamble) {
+            const total = gamble._sum.win + gamble._sum.lose;
+
+            const percent = ((gamble._sum.win / total) * 100).toFixed(2);
+
+            gambleMsg.push(
+                ` - **${gamble.type}** ${gamble._sum.win.toLocaleString()} / ${total.toLocaleString()} (${percent}%)`
+            );
+        }
+
+        embed.addField("gamble wins", gambleMsg.join("\n"), true);
+
+        const itemMsg = [`**total** ${itemTotal._sum.win.toLocaleString()}`];
+
+        for (const item of byItem) {
+            if (itemMsg.length >= gambleMsg.length) break;
+
+            const percent = ((item._sum.win / itemTotal._sum.win) * 100).toFixed(2);
+
+            itemMsg.push(` - **${item.type}** ${item._sum.win} (${percent}%)`);
+        }
+
+        embed.addField("item stats", itemMsg.join("\n"), true);
+
+        const robTotal = robStats._sum.win + robStats._sum.lose;
+        const robPercent = ((robStats._sum.win / robTotal) * 100).toFixed(2);
+
+        embed.setFooter({ text: `rob: ${robStats._sum.win} / ${robTotal} (${robPercent}%)` });
+
+        embed.setHeader("global stats");
+        return message.channel.send({ embeds: [embed] });
     } else {
         return normalStats();
     }
