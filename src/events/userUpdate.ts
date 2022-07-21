@@ -35,7 +35,7 @@ async function doQueue() {
 
     if (!user) return;
 
-    const url = await uploadImageToImgur(user.displayAvatarURL({ size: 256 }));
+    const url = await uploadImageToImgur(user.displayAvatarURL({ extension: "png", size: 256 }));
 
     if (!url) return;
 
