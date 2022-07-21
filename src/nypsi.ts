@@ -27,6 +27,7 @@ import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
 import startJobs from "./utils/scheduled/scheduler";
 import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
 import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
+import { doChatReactions } from "./utils/scheduled/clusterjobs/chatreaction";
 
 const client = new Client({
     allowedMentions: {
@@ -260,13 +261,20 @@ setTimeout(() => {
 
         setTimeout(() => {
             runLotteryInterval(client);
+
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
+
             runCountdowns(client);
             runChristmas(client);
-            runChecks();
-            updateCache();
             runModerationChecks(client);
+            doChatReactions(client);
+
+            runChecks();
+
+            updateCache();
+
             getWebhooks(client);
+
             listenForVotes();
             startJobs();
         }, 10000);
