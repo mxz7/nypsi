@@ -19,7 +19,6 @@ import { getWebhooks, logger } from "./utils/logger";
 import { checkStats } from "./utils/guilds/utils";
 import { updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
-import { runModerationChecks } from "./utils/moderation/utils";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 import { listenForVotes } from "./utils/votehandler";
@@ -28,6 +27,7 @@ import startJobs from "./utils/scheduled/scheduler";
 import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
 import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
 import { doChatReactions } from "./utils/scheduled/clusterjobs/chatreaction";
+import { runModerationChecks } from "./utils/scheduled/clusterjobs/moderationchecks";
 
 const client = new Client({
     allowedMentions: {
