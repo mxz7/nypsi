@@ -41,6 +41,11 @@ const bree = new Bree({
                 },
             },
         },
+        {
+            name: "deterioratekarma",
+            interval: "at 3:02am",
+            path: path.join(__dirname, "jobs", "deterioratekarma.js"),
+        },
     ],
 });
 
