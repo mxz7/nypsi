@@ -1,4 +1,11 @@
-import { CommandInteraction, GuildMember, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
+import {
+    CommandInteraction,
+    GuildMember,
+    InteractionReplyOptions,
+    Message,
+    MessageOptions,
+    PermissionFlagsBits,
+} from "discord.js";
 import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
 import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -23,7 +30,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
         } else {
             return await message.channel.send(data);
         }
