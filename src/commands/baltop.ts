@@ -1,5 +1,5 @@
 import { topAmount } from "../utils/economy/utils.js";
-import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
@@ -11,11 +11,23 @@ cmd.slashEnabled = true;
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
         } else {
             return await message.channel.send(data);
         }
     };
+
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -40,10 +52,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
 
     if (amount < 5) amount = 5;
-
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
 
     const balTop = await topAmount(message.guild, amount);
 

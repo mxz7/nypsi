@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { profileExists, createProfile, newCase, deleteBan } from "../utils/moderation/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
@@ -16,7 +16,15 @@ cmd.slashData.addStringOption((option) =>
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            return await message.editReply(data);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
         } else {
             return await message.channel.send(data);
         }

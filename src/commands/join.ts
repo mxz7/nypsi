@@ -29,6 +29,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
+    if (!(message instanceof Message)) {
+        await message.deferReply();
+    }
+
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
@@ -81,8 +85,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 msg = await send({
                     embeds: [new CustomEmbed(message.member, `sorting ${membersSorted.length.toLocaleString()} members..`)],
                 });
-            } else {
-                await message.deferReply();
             }
             membersSorted = await workerSort(membersSorted, membersMap);
             if (message instanceof Message) {
