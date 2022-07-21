@@ -1,12 +1,11 @@
 import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
 import prisma from "../database/database";
+import redis from "../database/redis";
 import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { PunishmentType } from "../models/GuildStorage";
 
-const modLogQueue: Map<string, CustomEmbed[]> = new Map();
-const modLogHookCache: Map<string, WebhookClient> = new Map();
 const modLogColors: Map<PunishmentType, ColorResolvable> = new Map();
 
 modLogColors.set(PunishmentType.MUTE, "#ffffba");
@@ -130,15 +129,10 @@ export async function addModLog(
         embed.addField("reason", command);
     }
 
-    if (modLogQueue.has(guild.id)) {
-        modLogQueue.get(guild.id).push(embed);
-    } else {
-        modLogQueue.set(guild.id, [embed]);
-    }
+    await redis.lpush(`modlogs:${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function isModLogsEnabled(guild: Guild) {
-    if (modLogHookCache.has(guild.id)) return true;
     const query = await prisma.moderation.findUnique({
         where: {
             guildId: guild.id,
@@ -162,7 +156,6 @@ export async function setModLogs(guild: Guild, hook: string) {
             modlogs: hook,
         },
     });
-    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id);
 }
 
 export async function getModLogsHook(guild: Guild): Promise<WebhookClient | undefined> {
@@ -326,95 +319,6 @@ export async function isBanned(guild: Guild, member: GuildMember) {
     }
 }
 
-export function runModerationChecks(client: Client) {
-    setInterval(async () => {
-        const date = new Date();
-
-        const query1 = await prisma.moderationMute.findMany({
-            where: {
-                expire: { lte: date },
-            },
-            select: {
-                userId: true,
-                guildId: true,
-            },
-        });
-
-        for (const unmute of query1) {
-            logger.log({
-                level: "auto",
-                message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
-            });
-            requestUnmute(unmute.guildId, unmute.userId, client);
-        }
-
-        const query2 = await prisma.moderationBan.findMany({
-            where: {
-                expire: { lte: date },
-            },
-            select: {
-                userId: true,
-                guildId: true,
-            },
-        });
-
-        for (const unban of query2) {
-            logger.log({
-                level: "auto",
-                message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
-            });
-            await requestUnban(unban.guildId, unban.userId, client);
-        }
-
-        const query3 = await prisma.moderation.findMany({
-            where: {
-                NOT: { modlogs: "" },
-            },
-            select: {
-                modlogs: true,
-                guildId: true,
-            },
-        });
-
-        for (const modlog of query3) {
-            if (!modLogQueue.has(modlog.guildId) || modLogQueue.get(modlog.guildId).length == 0) continue;
-            let webhook: WebhookClient;
-
-            if (modLogHookCache.has(modlog.guildId)) {
-                webhook = modLogHookCache.get(modlog.guildId);
-            } else {
-                webhook = new WebhookClient({ url: modlog.modlogs });
-                modLogHookCache.set(modlog.guildId, webhook);
-            }
-
-            let embeds: CustomEmbed[];
-
-            if (modLogQueue.get(modlog.guildId).length > 10) {
-                const current = modLogQueue.get(modlog.guildId);
-                embeds = current.splice(0, 10);
-                modLogQueue.set(modlog.guildId, current);
-            } else {
-                embeds = modLogQueue.get(modlog.guildId);
-                modLogQueue.set(modlog.guildId, []);
-            }
-
-            webhook.send({ embeds: embeds }).catch(async (e) => {
-                logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
-                logger.error(e);
-
-                await prisma.moderation.update({
-                    where: {
-                        guildId: modlog.guildId,
-                    },
-                    data: {
-                        modlogs: "",
-                    },
-                });
-            });
-        }
-    }, 30000);
-}
-
 export async function setReason(guild: Guild, caseID: number, reason: string) {
     await prisma.moderationCase.updateMany({
         where: {
@@ -492,11 +396,10 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
     });
 }
 
-async function requestUnban(guild: string | Guild, member: string, client: Client) {
+export async function requestUnban(guild: string | Guild, member: string, client: Client) {
     guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn("unable to find guild");
         return;
     }
 
@@ -510,11 +413,10 @@ async function requestUnban(guild: string | Guild, member: string, client: Clien
     });
 }
 
-async function requestUnmute(guild: Guild | string, member: string, client: Client) {
+export async function requestUnmute(guild: Guild | string, member: string, client: Client) {
     guild = client.guilds.cache.find((g) => g.id == guild);
 
     if (!guild) {
-        logger.warn(`unable to find guild ${guild}`);
         return;
     }
 

@@ -1,22 +1,19 @@
 import { logger } from "../logger";
 import * as topgg from "@top-gg/sdk";
 import { Item, LotteryTicket } from "../models/Economy";
-import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
+import { Client, Collection, Guild, GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import * as fs from "fs";
 import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import { StatsProfile } from "../models/StatsProfile";
-import * as shufflearray from "shuffle-array";
 import fetch from "node-fetch";
 import workerSort from "../workers/sort";
-import { MStoTime } from "../functions/date";
 import ms = require("ms");
 import redis from "../database/redis";
 import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
-import _ = require("lodash");
 
 declare function require(name: string): any;
 
@@ -27,44 +24,6 @@ const guildExistsCache = new Map();
 const guildUserCache = new Map();
 const guildRequirementsCache = new Map();
 
-setInterval(async () => {
-    const query = await prisma.economy.findMany({
-        select: {
-            userId: true,
-            workers: true,
-        },
-    });
-
-    for (const user of query) {
-        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
-
-        if (_.isEmpty(workers)) continue;
-
-        for (const w of Object.keys(workers)) {
-            const worker = workers[w];
-
-            const workerData = Worker.fromStorage(worker);
-
-            if (worker.stored < workerData.maxStorage) {
-                if (worker.stored + workerData.perInterval > workerData.maxStorage) {
-                    worker.stored = workerData.maxStorage;
-                } else {
-                    worker.stored += workerData.perInterval;
-                }
-            }
-        }
-
-        await prisma.economy.update({
-            where: {
-                userId: user.userId,
-            },
-            data: {
-                workers: workers as any,
-            },
-        });
-    }
-}, 5 * 60 * 1000);
-
 let items: { [key: string]: Item };
 
 const lotteryTicketPrice = 15000;
@@ -73,39 +32,6 @@ const lotteryTicketPrice = 15000;
  * the goal is to have more tickets overall for a more random outcome
  */
 export { lotteryTicketPrice };
-
-let lotteryHook: WebhookClient;
-
-if (!process.env.GITHUB_ACTION) {
-    lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
-}
-
-const lotteryHookQueue = new Map();
-
-setInterval(() => {
-    if (lotteryHookQueue.size == 0) return;
-
-    const desc = [];
-
-    for (const username of lotteryHookQueue.keys()) {
-        const amount = lotteryHookQueue.get(username);
-
-        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`);
-
-        lotteryHookQueue.delete(username);
-
-        if (desc.join("\n").length >= 1500) break;
-    }
-
-    const embed = new CustomEmbed();
-
-    embed.setColor("#111111");
-    embed.setDescription(desc.join("\n"));
-    embed.setTimestamp();
-    embed.disableFooter();
-
-    lotteryHook.send({ embeds: [embed] });
-}, ms("30 minutes"));
 
 export function loadItems(): string {
     let txt = "";
@@ -430,7 +356,7 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     return max;
 }
 
-export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<string[]> {
+export async function topAmountGlobal(amount: number, client?: Client, anon = true): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
             money: { gt: 1000 },
@@ -438,15 +364,22 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
         select: {
             userId: true,
             money: true,
+            user: {
+                select: {
+                    lastKnownTag: true,
+                },
+            },
         },
     });
 
-    const userIDs = [];
-    const balances = new Map();
+    const userIDs: string[] = [];
+    const balances: Map<string, number> = new Map();
+    const usernames: Map<string, string> = new Map();
 
     for (const user of query) {
         userIDs.push(user.userId);
-        balances.set(user.userId, user.money);
+        balances.set(user.userId, Number(user.money));
+        usernames.set(user.userId, user.user.lastKnownTag);
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i));
@@ -470,16 +403,18 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
                 pos = "🥉";
             }
 
-            const member = await client.users.fetch(user);
+            let username = usernames.get(user);
 
-            let username = user;
+            if (client) {
+                const member = await client.users.fetch(user);
 
-            if (member) {
-                if (anon) {
-                    username = member.username;
-                } else {
+                if (member) {
                     username = member.tag;
                 }
+            }
+
+            if (anon) {
+                username = username.split("#")[0];
             }
 
             usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
@@ -1422,111 +1357,7 @@ export async function addTicket(member: GuildMember | string) {
 
     if (!(member instanceof GuildMember)) return;
 
-    if (lotteryHookQueue.has(member.user.username)) {
-        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1);
-    } else {
-        lotteryHookQueue.set(member.user.username, 1);
-    }
-}
-
-async function doLottery(client: Client) {
-    logger.info("performing lottery..");
-    const tickets = await prisma.lotteryTicket.findMany();
-
-    if (tickets.length < 100) {
-        logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
-
-        const embed = new CustomEmbed();
-
-        embed.setTitle("lottery cancelled");
-        embed.setDescription(
-            `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
-        );
-        embed.setColor("#111111");
-        embed.disableFooter();
-
-        return lotteryHook.send({ embeds: [embed] });
-    }
-
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
-
-    const shuffledTickets = shufflearray(tickets);
-
-    let chosen: LotteryTicket;
-    let user: User;
-
-    while (!user) {
-        chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
-
-        logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
-
-        user = await client.users.fetch(chosen.userId);
-    }
-
-    logger.log({
-        level: "success",
-        message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
-    });
-
-    await updateBalance(user.id, (await getBalance(user.id)) + total);
-
-    const embed = new CustomEmbed();
-
-    embed.setTitle("lottery winner");
-    embed.setDescription(
-        `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
-            `they have won a total of $**${total.toLocaleString()}**`
-    );
-    embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
-    embed.setColor("#111111");
-    embed.disableFooter();
-
-    await lotteryHook.send({ embeds: [embed] });
-
-    if (await getDMsEnabled(user.id)) {
-        embed.setTitle("you have won the lottery!");
-        embed.setDescription(
-            `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
-        );
-        embed.setColor("#111111");
-
-        await user
-            .send({ embeds: [embed] })
-            .then(() => {
-                logger.log({
-                    level: "success",
-                    message: "sent notification to winner",
-                });
-            })
-            .catch(() => {
-                logger.warn("failed to send notification to winner");
-            });
-    }
-
-    const { count } = await prisma.lotteryTicket.deleteMany();
-
-    logger.info(`${count.toLocaleString()} tickets deleted from database`);
-}
-
-export function runLotteryInterval(client: Client) {
-    const now = new Date();
-    const saturday = new Date();
-    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1);
-    saturday.setHours(0, 0, 0, 0);
-
-    const needed = saturday.getTime() - now.getTime();
-
-    setTimeout(() => {
-        doLottery(client);
-        setInterval(() => {
-            doLottery(client);
-        }, 86400 * 1000 * 7);
-    }, needed);
-
-    logger.log({
-        level: "auto",
-        message: `lottery will run in ${MStoTime(needed)}`,
-    });
+    await redis.hincrby("lotterytickets:queue", member.user.username, 1);
 }
 
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {

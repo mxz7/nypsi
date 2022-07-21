@@ -16,15 +16,18 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
-import { runLotteryInterval, updateStats } from "./utils/economy/utils";
+import { checkStats } from "./utils/guilds/utils";
+import { updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
-import { runModerationChecks } from "./utils/moderation/utils";
-import { showTopGlobalBal } from "./utils/scheduled/topglobal";
-import purgeUsernames from "./utils/scheduled/purgeusernames";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 import { listenForVotes } from "./utils/votehandler";
+import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
+import startJobs from "./utils/scheduled/scheduler";
+import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
+import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
+import { doChatReactions } from "./utils/scheduled/clusterjobs/chatreaction";
+import { runModerationChecks } from "./utils/scheduled/clusterjobs/moderationchecks";
 
 const client = new Client({
     allowedMentions: {
@@ -137,6 +140,10 @@ function runChecks() {
         level: "auto",
         message: "guild count posted to top.gg: " + client.guilds.cache.size,
     });
+}
+
+export function getGuilds() {
+    return client.guilds.cache.map((guild) => guild.id);
 }
 
 export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
@@ -254,16 +261,22 @@ setTimeout(() => {
 
         setTimeout(() => {
             runLotteryInterval(client);
+
             runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
+
             runCountdowns(client);
             runChristmas(client);
-            showTopGlobalBal(client);
-            purgeUsernames();
-            runChecks();
-            updateCache();
             runModerationChecks(client);
+            doChatReactions(client);
+
+            runChecks();
+
+            updateCache();
+
             getWebhooks(client);
+
             listenForVotes();
+            startJobs();
         }, 10000);
 
         if (process.env.GITHUB_ACTION) {

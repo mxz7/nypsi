@@ -1,9 +1,8 @@
-import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
-import ms = require("ms");
-import { checkGuild, eSnipe, getGuild, snipe } from "../../nypsi";
+import { Collection, Guild, GuildMember } from "discord.js";
+import { eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
-import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
+import { daysUntilChristmas } from "../functions/date";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
@@ -46,79 +45,7 @@ setInterval(() => {
     }
 }, 3600000);
 
-setInterval(async () => {
-    const query = await prisma.guild.findMany({
-        select: {
-            id: true,
-        },
-    });
-
-    for (const guild of query) {
-        const exists = checkGuild(guild.id);
-
-        if (!exists) {
-            await prisma.guildCounter.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guildChristmas.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guildCountdown.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.chatReactionStats.deleteMany({
-                where: {
-                    chatReactionGuildId: guild.id,
-                },
-            });
-            await prisma.chatReaction.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationMute.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationBan.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderationCase.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.moderation.deleteMany({
-                where: {
-                    guildId: guild.id,
-                },
-            });
-            await prisma.guild.deleteMany({
-                where: {
-                    id: guild.id,
-                },
-            });
-
-            logger.log({
-                level: "guild",
-                message: `deleted guild '${guild.id}' from guild data`,
-            });
-        }
-    }
-    existsCooldown.clear();
-}, ms("2 days"));
-
 const fetchCooldown = new Set();
-const existsCooldown = new Set();
 const disableCache = new Map();
 const chatFilterCache = new Map();
 const snipeFilterCache = new Map();
@@ -154,7 +81,7 @@ export async function runCheck(guild: Guild) {
 }
 
 export async function hasGuild(guild: Guild): Promise<boolean> {
-    if (existsCooldown.has(guild.id)) return true;
+    if (await redis.exists(`cache:guild:exists:${guild.id}`)) return true;
     const query = await prisma.guild.findUnique({
         where: {
             id: guild.id,
@@ -165,12 +92,8 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
     });
 
     if (query) {
-        existsCooldown.add(guild.id);
-
-        setTimeout(() => {
-            if (!existsCooldown.has(guild.id)) return;
-            existsCooldown.delete(guild.id);
-        }, 43200000);
+        await redis.set(`cache:guild:exists:${guild.id}`, "1");
+        await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
         return true;
     } else {
         return false;
@@ -197,12 +120,8 @@ export async function createGuild(guild: Guild) {
         },
     });
 
-    existsCooldown.add(guild);
-
-    setTimeout(() => {
-        if (!existsCooldown.has(guild.id)) return;
-        existsCooldown.delete(guild.id);
-    }, 43200000);
+    await redis.set(`cache:guild:exists:${guild.id}`, 1);
+    await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
 }
 
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
@@ -652,159 +571,5 @@ export async function deleteCountdown(guild: Guild | string, id: string | number
         where: {
             AND: [{ guildId: guildID }, { id: id }],
         },
-    });
-}
-
-export function runCountdowns(client: Client) {
-    const now = new Date();
-
-    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
-
-    if (now.getHours() < 3) {
-        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
-    }
-
-    const needed = new Date(Date.parse(d) + 10800000);
-
-    const runCountdowns = async () => {
-        const query = await prisma.guildCountdown.findMany();
-
-        for (const countdown of query) {
-            const guildID = countdown.guildId;
-
-            const days = daysUntil(new Date(countdown.date)) + 1;
-
-            let message;
-
-            if (days == 0) {
-                message = countdown.finalFormat;
-            } else {
-                message = countdown.format.split("%days%").join(days.toLocaleString());
-            }
-
-            const embed = new CustomEmbed();
-
-            embed.setDescription(message);
-            embed.setColor("#111111");
-            embed.disableFooter();
-
-            const guildToSend = await client.guilds.fetch(guildID).catch(() => {});
-
-            if (!guildToSend) continue;
-
-            const channel = guildToSend.channels.cache.find((ch) => ch.id == countdown.channel);
-
-            if (!channel) continue;
-
-            if (!(channel instanceof BaseGuildTextChannel)) continue;
-
-            await channel
-                .send({ embeds: [embed] })
-                .then(() => {
-                    logger.log({
-                        level: "auto",
-                        message: `sent custom countdown (${countdown.id}) in ${guildToSend.name} (${guildID})`,
-                    });
-                })
-                .catch(() => {
-                    logger.error(`error sending custom countdown (${countdown.id}) ${guildToSend.name} (${guildID})`);
-                });
-
-            if (days <= 0) {
-                await deleteCountdown(guildID, countdown.id);
-            }
-        }
-    };
-
-    setTimeout(async () => {
-        setInterval(() => {
-            runCountdowns();
-        }, 86400000);
-        runCountdowns();
-    }, needed.getTime() - now.getTime());
-
-    logger.log({
-        level: "auto",
-        message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
-    });
-}
-
-export function runChristmas(client: Client) {
-    const now = new Date();
-
-    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
-
-    if (now.getHours() < 3) {
-        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
-    }
-
-    const needed = new Date(Date.parse(d) + 10800000);
-
-    const runChristmasThing = async () => {
-        const query = await prisma.guildChristmas.findMany({
-            where: {
-                enabled: true,
-            },
-        });
-
-        for (const profile of query) {
-            const guild = client.guilds.cache.find((g) => g.id == profile.guildId);
-            if (!guild) continue;
-            const channel = guild.channels.cache.find((c) => c.id == profile.channel);
-
-            if (!channel) {
-                profile.enabled = false;
-                profile.channel = "none";
-                await setChristmasCountdown(guild, profile);
-                continue;
-            }
-
-            let format = profile.format;
-
-            const days = daysUntilChristmas();
-
-            format = format.split("%days%").join(daysUntilChristmas().toString());
-
-            if (days == "ITS CHRISTMAS") {
-                format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
-            }
-
-            if (!(channel instanceof BaseGuildTextChannel)) continue;
-
-            await channel
-                .send({
-                    embeds: [
-                        new CustomEmbed()
-                            .setDescription(format)
-                            .setColor("#ff0000")
-                            .setTitle(":santa_tone1:")
-                            .disableFooter(),
-                    ],
-                })
-                .then(() => {
-                    logger.log({
-                        level: "auto",
-                        message: `sent christmas countdown in ${guild.name} ~ ${format}`,
-                    });
-                })
-                .catch(async () => {
-                    logger.error(`error sending christmas countdown in ${guild.name}`);
-                    profile.enabled = false;
-                    profile.channel = "none";
-                    await setChristmasCountdown(guild, profile);
-                });
-        }
-    };
-
-    setTimeout(async () => {
-        setInterval(() => {
-            runChristmasThing();
-        }, 86400000);
-        runChristmasThing();
-    }, needed.getTime() - now.getTime());
-
-    logger.log({
-        level: "auto",
-        message: `christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
     });
 }

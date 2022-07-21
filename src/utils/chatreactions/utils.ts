@@ -1,130 +1,12 @@
-import { ChannelType, Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { logger } from "../logger";
 import fetch from "node-fetch";
 import prisma from "../database/database";
-import { getGuild } from "../../nypsi";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addCooldown, inCooldown } from "../guilds/utils";
 
-const currentChannels = new Set();
-const existsCache = new Set();
-const enabledCache = new Map();
-const lastGame = new Map();
-
-setInterval(async () => {
-    let count = 0;
-
-    const query = await prisma.chatReaction.findMany({
-        where: {
-            randomStart: true,
-        },
-        select: {
-            guildId: true,
-            randomChannels: true,
-            betweenEvents: true,
-            randomModifier: true,
-        },
-    });
-
-    for (const guildData of query) {
-        const guild = await getGuild(guildData.guildId);
-
-        if (!guild) {
-            continue;
-        }
-
-        const channels = guildData.randomChannels;
-
-        if (channels.length == 0) continue;
-
-        const now = new Date().getTime();
-
-        for (const ch of channels) {
-            if (lastGame.has(ch)) {
-                if (now >= lastGame.get(ch)) {
-                    lastGame.delete(ch);
-                } else {
-                    continue;
-                }
-            }
-
-            const channel = guild.channels.cache.find((cha) => cha.id == ch);
-
-            if (!channel) {
-                continue;
-            }
-
-            if (!channel.isTextBased()) return;
-            if (channel.isThread()) return;
-            if (channel.type == ChannelType.GuildVoice) return;
-            if (channel.type == ChannelType.GuildNews) return;
-
-            const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
-            let stop = false;
-
-            if (!messages) continue;
-
-            messages.forEach((m) => {
-                if (m.author.id == guild.client.user.id) {
-                    if (!m.embeds[0]) return;
-                    if (!m.embeds[0].author) return;
-                    if (m.embeds[0].author.name == "chat reaction") {
-                        stop = true;
-                        return;
-                    }
-                }
-            });
-
-            if (stop) {
-                continue;
-            }
-
-            const a = await startReaction(guild, channel);
-
-            if (a != "xoxo69") {
-                count++;
-            } else {
-                continue;
-            }
-
-            const base = guildData.betweenEvents;
-            let final;
-
-            if (guildData.randomModifier == 0) {
-                final = base;
-            } else {
-                const o = ["+", "-"];
-                let operator = o[Math.floor(Math.random() * o.length)];
-
-                if (base - guildData.randomModifier < 120) {
-                    operator = "+";
-                }
-
-                const amount = Math.floor(Math.random() * guildData.randomModifier);
-
-                if (operator == "+") {
-                    final = base + amount;
-                } else {
-                    final = base - amount;
-                }
-            }
-
-            const nextGame = new Date().getTime() + final * 1000;
-
-            lastGame.set(channel.id, nextGame);
-
-            continue;
-        }
-    }
-
-    if (count > 0) {
-        logger.log({
-            level: "auto",
-            message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
-        });
-    }
-}, 60000);
+const currentChannels = new Set<string>();
+const existsCache = new Set<string>();
 
 export async function createReactionProfile(guild: Guild) {
     await prisma.chatReaction.create({
@@ -238,8 +120,6 @@ export async function updateReactionSettings(
             timeout: settings.timeout,
         },
     });
-
-    if (enabledCache.has(guild.id)) enabledCache.delete(guild.id);
 }
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
