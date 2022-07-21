@@ -353,7 +353,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setFooter({ text: `rob: ${robStats._sum.win} / ${robTotal} (${robPercent}%)` });
 
-        embed.setHeader("global stats");
+        embed.setHeader("global stats", message.author.avatarURL());
         return message.channel.send({ embeds: [embed] });
     } else {
         return normalStats();
