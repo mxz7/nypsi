@@ -16,7 +16,7 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, runChristmas } from "./utils/guilds/utils";
+import { checkStats } from "./utils/guilds/utils";
 import { updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
@@ -26,6 +26,7 @@ import { listenForVotes } from "./utils/votehandler";
 import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
 import startJobs from "./utils/scheduled/scheduler";
 import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
+import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
 
 const client = new Client({
     allowedMentions: {
