@@ -16,13 +16,16 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
+import { checkStats, runChristmas } from "./utils/guilds/utils";
 import { updateStats } from "./utils/economy/utils";
 import { updateCache } from "./utils/imghandler";
 import { runModerationChecks } from "./utils/moderation/utils";
 import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import { SnipedMessage } from "./utils/models/Snipe";
 import { listenForVotes } from "./utils/votehandler";
+import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
+import startJobs from "./utils/scheduled/scheduler";
+import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
 
 const client = new Client({
     allowedMentions: {
@@ -241,9 +244,6 @@ export async function getGuild(guildID: string): Promise<Guild> {
 
     return guild;
 }
-
-import startJobs from "./utils/scheduled/scheduler";
-import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
 
 setTimeout(() => {
     logger.info("logging in...");
