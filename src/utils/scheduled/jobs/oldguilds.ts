@@ -68,4 +68,5 @@ import prisma from "../../database/database";
             parentPort.postMessage(`deleted guild ${guild.id} from database`);
         }
     }
+    process.exit(0);
 })();
