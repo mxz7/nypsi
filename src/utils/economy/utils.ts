@@ -1,5 +1,4 @@
 import { logger } from "../logger";
-import * as topgg from "@top-gg/sdk";
 import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -16,8 +15,6 @@ import prisma from "../database/database";
 import { createProfile, hasProfile } from "../users/utils";
 
 declare function require(name: string): any;
-
-const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
 
 const bannedCache = new Map();
 const guildExistsCache = new Map();
@@ -748,19 +745,6 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
             padlock: setting,
         },
     });
-}
-
-export function updateStats(guildCount: number, shardCount: number) {
-    topggStats.postStats({
-        serverCount: guildCount,
-        shardCount: shardCount,
-    });
-
-    // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
-    //     method: "POST",
-    //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
-    //     headers: { "Content-Type": "application/json", "Authorization": "removed token" }
-    // }) FOR POSTING TO DISCORD.BOTS.GG
 }
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {
