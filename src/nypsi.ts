@@ -1,5 +1,5 @@
 import { NypsiClient } from "./utils/models/Client";
-import { EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
+import { EmbedBuilder, GatewayIntentBits, MessageOptions, Options } from "discord.js";
 
 const client = new NypsiClient({
     allowedMentions: {
@@ -108,10 +108,6 @@ process.on("unhandledRejection", (e: any) => {
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
 
-export function getGuilds() {
-    return client.guilds.cache.map((guild) => guild.id);
-}
-
 export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
     logger.info(`DM requested with ${id}`);
     const member = await client.users.fetch(id);
@@ -197,20 +193,6 @@ export async function requestRemoveRole(id: string, roleID: string) {
     }
 
     return await user.roles.remove(role);
-}
-
-export async function getGuild(guildID: string): Promise<Guild> {
-    let a = true;
-
-    const guild = await client.guilds.fetch(guildID).catch(() => {
-        a = false;
-    });
-
-    if (!a) return undefined;
-
-    if (!guild) return undefined;
-
-    return guild;
 }
 
 setTimeout(() => {
