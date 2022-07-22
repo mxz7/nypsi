@@ -18,8 +18,6 @@ export class NypsiClient extends Client {
 
         setClusterId(this.shard.ids[0]);
 
-        console.log("cluster id set");
-
         return this;
     }
 
