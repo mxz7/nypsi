@@ -7,7 +7,7 @@ import { createProfile, hasProfile } from "../utils/users/utils";
 export default async function guildCreate(client: Client, guild: Guild) {
     logger.log({
         level: "guild",
-        message: `added to ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
+        message: `added to ${guild.name} (${guild.id})`,
     });
 
     if (!(await hasGuild(guild))) await createGuild(guild);
