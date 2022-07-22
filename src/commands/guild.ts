@@ -190,28 +190,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return showGuild(guild);
     }
 
-    if (args[0].toLowerCase() == "help") {
-        const embed = new CustomEmbed(message.member);
-
-        embed.setHeader("guild help");
-        embed.setDescription(
-            `${prefix}**guild create <name>** *creates a guild for you*\n` +
-                `${prefix}**guild invite <@member>** *invite's a user to your guild*\n` +
-                `${prefix}**guild leave** *leave your current guild*\n` +
-                `${prefix}**guild kick <tag>** *kick specified user out of your guild*\n` +
-                `${prefix}**guild delete** *deletes your guild*\n` +
-                `${prefix}**guild deposit <amount>** *deposit an amount of money into your guild*\n` +
-                `${prefix}**guild stats** *show the stats of your current guild*\n` +
-                `${prefix}**guild upgrade** *upgrade your guild to the next level*\n` +
-                `${prefix}**guild motd <motd>** *set your guilds motd*\n` +
-                `${prefix}**guild top** *shows top 5 guilds*\n` +
-                `${prefix}**guild <name>** *shows statistics for guild specified*`
-        );
-        embed.setFooter({ text: `you must be atleast prestige **1** to create a guild` });
-
-        return send({ embeds: [embed] });
-    }
-
     if (args[0].toLowerCase() == "create") {
         if ((await getPrestige(message.member)) < 1) {
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
@@ -652,6 +630,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader(`top ${args[1] ?? 5} guilds`, message.author.avatarURL());
 
         embed.setDescription(top.join("\n"));
+
+        return send({ embeds: [embed] });
+    }
+
+    if (args[0].toLowerCase() == "help") {
+        const embed = new CustomEmbed(message.member);
+
+        embed.setHeader("guild help");
+        embed.setDescription(
+            `${prefix}**guild create <name>** *creates a guild for you*\n` +
+                `${prefix}**guild invite <@member>** *invite's a user to your guild*\n` +
+                `${prefix}**guild leave** *leave your current guild*\n` +
+                `${prefix}**guild kick <tag>** *kick specified user out of your guild*\n` +
+                `${prefix}**guild delete** *deletes your guild*\n` +
+                `${prefix}**guild deposit <amount>** *deposit an amount of money into your guild*\n` +
+                `${prefix}**guild stats** *show the stats of your current guild*\n` +
+                `${prefix}**guild upgrade** *upgrade your guild to the next level*\n` +
+                `${prefix}**guild motd <motd>** *set your guilds motd*\n` +
+                `${prefix}**guild top** *shows top 5 guilds*\n` +
+                `${prefix}**guild <name>** *shows statistics for guild specified*`
+        );
+        embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
         return send({ embeds: [embed] });
     }
