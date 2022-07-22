@@ -110,16 +110,6 @@ process.on("unhandledRejection", (e: any) => {
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
 
-export function checkGuild(guildID: string) {
-    const g = client.guilds.cache.find((gi) => gi.id == guildID);
-
-    if (g) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 function runChecks() {
     checkStats();
 
