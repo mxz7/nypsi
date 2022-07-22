@@ -16,6 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { KarmaShopItem } from "../utils/models/Karmashop";
 import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
 import dayjs = require("dayjs");
+import { NypsiClient } from "../utils/models/Client";
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -373,7 +374,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
             setTimeout(async () => {
-                await setExpireDate(message.member, dayjs().add(15, "days").toDate());
+                await setExpireDate(message.member, dayjs().add(15, "days").toDate(), message.client as NypsiClient);
             }, 1000);
         }
 
