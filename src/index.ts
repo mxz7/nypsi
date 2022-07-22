@@ -1,5 +1,6 @@
 import { ShardingManager } from "discord.js";
 import "dotenv/config";
+import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
 // import { listenForVotes } from "./utils/votehandler";
@@ -23,19 +24,25 @@ startJobs();
 setTimeout(async () => {
     const userId = await manager.fetchClientValues("user.id");
 
-    return console.log(userId);
+    if (userId[0] != "678711738845102087") return;
 
-    // setInterval(() => {
-    //     updateStats(client.guilds.cache.size, client.options.shardCount);
-    //     logger.log({
-    //         level: "auto",
-    //         message: "guild count posted to top.gg: " + client.guilds.cache.size,
-    //     });
-    // }, 3600000);
+    const guildCount = (await manager
+        .fetchClientValues("guilds.cache.size")
+        .then((res) => res.reduce((a: any, b: any) => a + b))) as number;
 
-    // updateStats(client.guilds.cache.size, client.options.shardCount);
-    // logger.log({
-    //     level: "auto",
-    //     message: "guild count posted to top.gg: " + client.guilds.cache.size,
-    // });
+    const shardCount = manager.shards.size;
+
+    setInterval(() => {
+        updateStats(guildCount, shardCount);
+        logger.log({
+            level: "auto",
+            message: "guild count posted to top.gg: " + guildCount,
+        });
+    }, 3600000);
+
+    updateStats(guildCount, shardCount);
+    logger.log({
+        level: "auto",
+        message: "guild count posted to top.gg: " + guildCount,
+    });
 }, 60000);
