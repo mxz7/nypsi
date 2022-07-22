@@ -28,10 +28,9 @@ export class NypsiClient extends Client {
         updateCache();
         getWebhooks(this);
         runPremiumChecks();
+        updateCounters(this);
 
         if (!this.shard.ids.includes(0)) return;
-
-        updateCounters(this);
 
         runLotteryInterval(this);
 

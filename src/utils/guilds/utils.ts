@@ -1,10 +1,10 @@
-import { Client } from "discord-hybrid-sharding";
 import { Collection, Guild, GuildMember } from "discord.js";
-import { eSnipe, getGuild, snipe } from "../../nypsi";
+import { eSnipe, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntilChristmas } from "../functions/date";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
 setInterval(() => {
@@ -194,18 +194,29 @@ export async function setGuildCounter(guild: Guild, profile: any) {
     });
 }
 
-export function updateCounters(client: Client) {
+export function updateCounters(client: NypsiClient) {
     setInterval(async () => {
-        const query = await prisma.guildCounter.findMany({
-            where: {
-                enabled: true,
-            },
-        });
-
-        for (const profile of query) {
-            const guild = await getGuild(profile.guildId);
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
 
             if (!guild) continue;
+
+            const profile = await prisma.guildCounter
+                .findMany({
+                    where: {
+                        AND: [
+                            {
+                                guildId: guildId,
+                            },
+                            {
+                                enabled: true,
+                            },
+                        ],
+                    },
+                })
+                .then((res) => res[0]);
+
+            if (!profile) return;
 
             let memberCount: number;
 
