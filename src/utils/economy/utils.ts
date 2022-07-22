@@ -16,7 +16,6 @@ import workerSort from "../workers/sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 
-const bannedCache = new Map();
 const guildExistsCache = new Map();
 const guildUserCache = new Map();
 const guildRequirementsCache = new Map();
@@ -951,8 +950,8 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 }
 
 export async function isEcoBanned(id: string) {
-    if (bannedCache.has(id)) {
-        return bannedCache.get(id);
+    if (await redis.exists(`cache:economy:banned:${id}`)) {
+        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
     } else {
         const query = await prisma.economy.findUnique({
             where: {
@@ -964,15 +963,18 @@ export async function isEcoBanned(id: string) {
         });
 
         if (!query) {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
 
         if (query.banned) {
-            bannedCache.set(id, true);
+            await redis.set(`cache:economy:banned:${id}`, "t");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return true;
         } else {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
     }
@@ -999,7 +1001,7 @@ export async function toggleBan(id: string) {
         });
     }
 
-    bannedCache.delete(id);
+    await redis.del(id);
 }
 
 export async function reset() {
