@@ -7,9 +7,9 @@ import * as DiscordTransport from "winston-discord-webhook";
 const webhook: Map<string, Webhook> = new Map();
 const nextLogMsg: Map<string, string> = new Map();
 
-let clusterId: number;
+let clusterId: number | string;
 
-export function setClusterId(id: number) {
+export function setClusterId(id: number | string) {
     clusterId = id;
 }
 
