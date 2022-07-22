@@ -1,39 +1,39 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
+    CommandInteraction,
     GuildMember,
-    MessageEditOptions,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import {
-    userExists,
-    createUser,
-    getBalance,
-    updateBalance,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-} from "../utils/economy/utils.js";
 import * as shuffle from "shuffle-array";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const games = new Map();
+const games = new Map<string, { bet: any; win: any; deck: any; card: any; id: number; voted: any }>();
 
 const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).setAliases(["hl"]);
 

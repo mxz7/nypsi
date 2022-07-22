@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { getMember } from "../utils/functions/member";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { isPremium, getTier } from "../utils/premium/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { getTier, isPremium } from "../utils/premium/utils";
 
-const cache = new Map();
+const cache = new Map<string, number>();
 
 const cmd = new Command("pp", "accurate prediction of your pp size", Categories.FUN).setAliases([
     "penis",
