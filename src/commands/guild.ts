@@ -1,17 +1,16 @@
 import { EconomyGuild, EconomyGuildMember, User } from "@prisma/client";
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageOptions,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageEditOptions,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { requestDM } from "../nypsi";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     addMember,
@@ -35,8 +34,10 @@ import {
     userExists,
 } from "../utils/economy/utils";
 import { daysAgo, formatDate } from "../utils/functions/date";
+import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getPrefix } from "../utils/guilds/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -469,7 +470,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ).toLocaleString()}**`
                 );
 
-                await requestDM(guildMember.userId, `${guild.guildName} has been deleted`, false, embed);
+                await requestDM({
+                    memberId: guildMember.userId,
+                    content: `${guild.guildName} has been deleted`,
+                    client: message.client as NypsiClient,
+                    embed: embed,
+                });
             }
         }
 
@@ -509,7 +515,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
-        await addToGuildBank(guild.guildName, amount, message.member);
+        await addToGuildBank(guild.guildName, amount, message.member, message.client as NypsiClient);
 
         const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
 

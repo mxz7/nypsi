@@ -1,6 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import { requestDM } from "../nypsi";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import requestDM from "../utils/functions/requestdm";
+import { NypsiClient } from "../utils/models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command(
@@ -20,7 +21,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     args.shift();
 
-    const a = await requestDM(user, args.join(" "));
+    const a = await requestDM({
+        client: message.client as NypsiClient,
+        memberId: user,
+        content: args.join(" "),
+    });
 
     if (!(message instanceof Message)) return;
 

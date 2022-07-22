@@ -3,7 +3,7 @@ import "dotenv/config";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
-// import { listenForVotes } from "./utils/votehandler";
+import { listenForVotes } from "./utils/votehandler";
 
 setClusterId("main");
 
@@ -35,7 +35,7 @@ export async function getGuilds(): Promise<string[]> {
     return newGuildIds;
 }
 
-// listenForVotes();
+listenForVotes(manager);
 
 setTimeout(async () => {
     await startJobs();

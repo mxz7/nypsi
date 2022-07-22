@@ -1,20 +1,20 @@
-import { logger } from "../logger";
-import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember } from "discord.js";
-import { CustomEmbed } from "../models/EmbedBuilders";
-import * as fs from "fs";
-import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
-import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
-import { StatsProfile } from "../models/StatsProfile";
+import * as fs from "fs";
 import fetch from "node-fetch";
-import workerSort from "../workers/sort";
-import ms = require("ms");
-import redis from "../database/redis";
 import prisma from "../database/database";
+import redis from "../database/redis";
+import requestDM from "../functions/requestdm";
+import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
+import { Item, LotteryTicket } from "../models/Economy";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { StatsProfile } from "../models/StatsProfile";
+import { getTier, isPremium } from "../premium/utils";
 import { createProfile, hasProfile } from "../users/utils";
-
-declare function require(name: string): any;
+import workerSort from "../workers/sort";
+import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
+import ms = require("ms");
 
 const bannedCache = new Map();
 const guildExistsCache = new Map();
@@ -1653,7 +1653,7 @@ export async function deleteGuild(name: string) {
     });
 }
 
-export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+export async function addToGuildBank(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -1671,10 +1671,10 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+export async function addToGuildXP(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -1692,7 +1692,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
 export async function getMaxMembersForGuild(name: string) {
@@ -1806,7 +1806,7 @@ interface EconomyGuildMember {
     contributedXp: number;
 }
 
-async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): Promise<boolean> {
     if (typeof guild == "string") {
         guild = await getGuildByName(guild);
     }
@@ -1853,9 +1853,12 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
             await setInventory(member.userId, inventory);
 
             if (await getDMsEnabled(member.userId)) {
-                const { requestDM } = require("../../nypsi");
-
-                await requestDM(member.userId, `${guild.guildName} has been upgraded!`, false, embed);
+                await requestDM({
+                    memberId: member.userId,
+                    client: client,
+                    content: `${guild.guildName} has been upgraded!`,
+                    embed: embed,
+                });
             }
         }
 

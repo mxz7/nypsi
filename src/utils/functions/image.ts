@@ -2,12 +2,13 @@ import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
-import { requestDM } from "../../nypsi";
 import prisma from "../database/database";
 import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { RedditJSONPost } from "../models/Reddit";
+import requestDM from "./requestdm";
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
@@ -171,7 +172,7 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
     return true;
 }
 
-export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
+export async function acceptWholesomeImage(id: number, accepter: GuildMember, client: NypsiClient): Promise<boolean> {
     const query = await prisma.wholesomeSuggestion.findUnique({
         where: {
             id: id,
@@ -199,7 +200,11 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
     clearWholesomeCache();
 
     if (await getDMsEnabled(query.submitterId)) {
-        await requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
+        await requestDM({
+            memberId: query.submitterId,
+            client: client,
+            content: `your wholesome image (${query.image}) has been accepted`,
+        });
     }
 
     return true;

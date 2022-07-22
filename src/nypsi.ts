@@ -1,4 +1,4 @@
-import { EmbedBuilder, GatewayIntentBits, MessageOptions, Options } from "discord.js";
+import { GatewayIntentBits, Options } from "discord.js";
 import { NypsiClient } from "./utils/models/Client";
 
 const client = new NypsiClient({
@@ -107,52 +107,6 @@ process.on("unhandledRejection", (e: any) => {
     if (e.code && excludedReasons.includes(e.code)) return;
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
-
-export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
-    logger.info(`DM requested with ${id}`);
-    const member = await client.users.fetch(id);
-
-    let payload: MessageOptions = {
-        content: content,
-    };
-
-    if (embed) {
-        payload = {
-            content: content,
-            embeds: [embed],
-        };
-    }
-
-    if (member) {
-        await member
-            .send(payload)
-            .then(() => {
-                logger.log({
-                    level: "success",
-                    message: `successfully sent DM to ${member.tag} (${member.id})`,
-                });
-            })
-            .catch(async () => {
-                logger.warn(`failed to send DM to ${member.tag} (${member.id})`);
-                if (dmTekoh) {
-                    const tekoh = await client.users.fetch("672793821850894347");
-
-                    await tekoh.send({ content: `failed to send dm to ${id}` });
-                    await tekoh.send(payload);
-                }
-            });
-        return true;
-    } else {
-        logger.warn(`failed to send DM to ${member.id}`);
-        if (dmTekoh) {
-            const tekoh = await client.users.fetch("672793821850894347");
-
-            await tekoh.send({ content: `failed to send dm to ${id}` });
-            await tekoh.send(payload);
-        }
-        return false;
-    }
-}
 
 setTimeout(() => {
     logger.info("logging in...");
