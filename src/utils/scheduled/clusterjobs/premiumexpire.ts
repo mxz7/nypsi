@@ -1,7 +1,8 @@
 import prisma from "../../database/database";
+import { NypsiClient } from "../../models/Client";
 import { expireUser } from "../../premium/utils";
 
-export async function runPremiumChecks() {
+export async function runPremiumChecks(client: NypsiClient) {
     setInterval(async () => {
         const now = new Date();
 
@@ -15,7 +16,7 @@ export async function runPremiumChecks() {
         });
 
         for (const user of query) {
-            await expireUser(user.userId);
+            await expireUser(user.userId, client);
         }
     }, 600000);
 }

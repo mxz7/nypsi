@@ -1,13 +1,13 @@
-import { Client, ClientOptions } from "discord.js";
 import * as Cluster from "discord-hybrid-sharding";
-import { getWebhooks, setClusterId } from "../logger";
-import { doChatReactions } from "../scheduled/clusterjobs/chatreaction";
-import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
-import { updateCache } from "../imghandler";
-import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
-import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
+import { Client, ClientOptions } from "discord.js";
 import { runEconomySetup } from "../economy/utils";
 import { runChristmas, runCountdowns, updateCounters } from "../guilds/utils";
+import { updateCache } from "../imghandler";
+import { getWebhooks, setClusterId } from "../logger";
+import { doChatReactions } from "../scheduled/clusterjobs/chatreaction";
+import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
+import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
+import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 
 export class NypsiClient extends Client {
     public cluster: Cluster.Client;
@@ -25,7 +25,6 @@ export class NypsiClient extends Client {
     public runIntervals() {
         updateCache();
         getWebhooks(this);
-        runPremiumChecks();
         updateCounters(this);
         runCountdowns(this);
         runChristmas(this);
@@ -33,7 +32,7 @@ export class NypsiClient extends Client {
         if (!this.shard.ids.includes(0)) return;
 
         runLotteryInterval(this);
-
+        runPremiumChecks(this);
         runModerationChecks(this);
         doChatReactions(this);
     }

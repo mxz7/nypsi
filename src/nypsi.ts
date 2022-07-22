@@ -1,5 +1,5 @@
-import { NypsiClient } from "./utils/models/Client";
 import { EmbedBuilder, GatewayIntentBits, MessageOptions, Options } from "discord.js";
+import { NypsiClient } from "./utils/models/Client";
 
 const client = new NypsiClient({
     allowedMentions: {
@@ -40,20 +40,20 @@ const client = new NypsiClient({
     ],
 });
 
-import { loadCommands } from "./utils/commandhandler";
+import channelCreate from "./events/channelCreate";
 import guildCreate from "./events/guildCreate";
-import ready from "./events/ready";
 import guildDelete from "./events/guildDelete";
-import guildMemberUpdate from "./events/guildMemberUpdate";
 import guildMemberAdd from "./events/guildMemberAdd";
 import guildMemberRemove from "./events/guildMemberRemove";
+import guildMemberUpdate from "./events/guildMemberUpdate";
+import interactionCreate from "./events/interactionCreate";
+import messageCreate from "./events/message";
 import messageDelete from "./events/messageDelete";
 import messageUpdate from "./events/messageUpdate";
-import messageCreate from "./events/message";
-import channelCreate from "./events/channelCreate";
+import ready from "./events/ready";
 import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
-import interactionCreate from "./events/interactionCreate";
+import { loadCommands } from "./utils/commandhandler";
 import { logger } from "./utils/logger";
 import { SnipedMessage } from "./utils/models/Snipe";
 
@@ -152,47 +152,6 @@ export async function requestDM(id: string, content: string, dmTekoh = false, em
         }
         return false;
     }
-}
-
-export async function requestRemoveRole(id: string, roleID: string) {
-    const guild = await client.guilds.fetch("747056029795221513");
-
-    if (!guild) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch guild - user: ${id} role: ${roleID}` });
-    }
-
-    const role = await guild.roles.fetch(roleID);
-
-    if (!role) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch role - user: ${id} role: ${roleID}` });
-    }
-
-    const user = await guild.members.fetch(id);
-
-    if (!user) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch role - user: ${id} role: ${roleID}` });
-    }
-
-    // 747066190530347089 boost role
-    // 819870727834566696 silver role
-    // 819870846536646666 gold role
-
-    if (roleID == "819870727834566696") {
-        if (
-            user.roles.cache.find((r) => r.id == "747066190530347089") &&
-            !user.roles.cache.find((r) => r.id == "819870727834566696")
-        ) {
-            return "boost";
-        }
-    }
-
-    return await user.roles.remove(role);
 }
 
 setTimeout(() => {

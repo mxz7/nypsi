@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import { addKarma } from "../utils/karma/utils";
-import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils";
+import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/premium/utils";
 import { createProfile, hasProfile } from "../utils/users/utils";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
@@ -53,7 +53,8 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
             ) {
                 if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return;
                 if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return;
-                if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) expireUser(newMember.id);
+                if (newMember.roles.cache.find((r) => r.id == "819870727834566696"))
+                    setExpireDate(newMember.id, new Date(0));
             }
         }
     }

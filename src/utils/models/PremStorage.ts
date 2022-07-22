@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import { logger } from "../logger";
+import { NypsiClient } from "./Client";
 
 declare function require(name: string): any;
 
@@ -129,8 +130,8 @@ export class PremUser {
         }
     }
 
-    async expire(): Promise<PremUser | string> {
-        const { requestDM, requestRemoveRole } = require("../../nypsi");
+    async expire(client: NypsiClient): Promise<PremUser | string> {
+        const { requestDM } = require("../../nypsi");
 
         let roleID;
 
@@ -149,7 +150,7 @@ export class PremUser {
                 break;
         }
 
-        const e = await requestRemoveRole(this.id, roleID).catch((e: any) => {
+        const e = await requestRemoveRole(this.id, roleID, client).catch((e: any) => {
             logger.error(`error removing role (premium) ${this.id}`);
             logger.error(e);
         });
@@ -187,4 +188,38 @@ export enum status {
     INACTIVE = 0,
     ACTIVE = 1,
     REVOKED = 2,
+}
+
+async function requestRemoveRole(id: string, roleID: string, client: NypsiClient) {
+    const res = await client.shard.broadcastEval(
+        async (c, { guildId, memberId, roleId }) => {
+            const guild = await client.guilds.fetch(guildId).catch(() => {});
+
+            if (!guild) return;
+
+            const user = await guild.members.fetch(memberId).catch(() => {});
+
+            if (!user) return;
+
+            await guild.roles.fetch();
+
+            if (roleId == "819870727834566696") {
+                if (
+                    user.roles.cache.find((r) => r.id == "747066190530347089") &&
+                    !user.roles.cache.find((r) => r.id == "819870727834566696")
+                ) {
+                    return "boost";
+                }
+            }
+
+            return await user.roles.remove(roleId);
+        },
+        {
+            context: { guildId: "747056029795221513", memberId: id, roleId: roleID },
+        }
+    );
+
+    for (const r of res) {
+        if (r == "boost") return "boost";
+    }
 }

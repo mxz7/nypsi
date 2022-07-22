@@ -3,6 +3,7 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 import { formatDate } from "../functions/date";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { PremUser } from "../models/PremStorage";
 
 declare function require(name: string): any;
@@ -284,10 +285,10 @@ export async function renewUser(member: string) {
     }
 }
 
-export async function expireUser(member: string) {
+export async function expireUser(member: string, client: NypsiClient) {
     const profile = await getPremiumProfile(member);
 
-    const expire = await profile.expire();
+    const expire = await profile.expire(client);
 
     if (expire == "boost") {
         return renewUser(member);

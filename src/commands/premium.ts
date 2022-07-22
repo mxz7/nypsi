@@ -1,20 +1,19 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import {
-    isPremium,
-    getPremiumProfile,
-    setTier,
-    setEmbedColor,
-    setStatus,
-    addMember,
-    renewUser,
-    expireUser,
-    getUserCommand,
-    setExpireDate,
-} from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import {
+    addMember,
+    getPremiumProfile,
+    getUserCommand,
+    isPremium,
+    renewUser,
+    setEmbedColor,
+    setExpireDate,
+    setStatus,
+    setTier,
+} from "../utils/premium/utils";
 import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
@@ -203,9 +202,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        expireUser(args[1]);
+        setExpireDate(args[1], new Date(0));
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership expired")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
     }
 }
 

@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { expireUser, setTier } from "../utils/premium/utils";
+import { setExpireDate, setTier } from "../utils/premium/utils";
 
 export default async function guildMemberRemove(member: GuildMember) {
     if (member.guild.id != "747056029795221513") return;
@@ -12,7 +12,7 @@ export default async function guildMemberRemove(member: GuildMember) {
         } else if (member.roles.cache.has("819870590718181391")) {
             await setTier(member.user.id, 1);
         } else {
-            expireUser(member.user.id);
+            setExpireDate(member.user.id, new Date(0));
         }
     }
 }
