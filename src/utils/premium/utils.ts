@@ -9,23 +9,6 @@ declare function require(name: string): any;
 
 const colorCache = new Map();
 
-setInterval(async () => {
-    const now = new Date();
-
-    const query = await prisma.premium.findMany({
-        where: {
-            expireDate: { lte: now },
-        },
-        select: {
-            userId: true,
-        },
-    });
-
-    for (const user of query) {
-        await expireUser(user.userId);
-    }
-}, 600000);
-
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
     let id: string;
     if (member instanceof GuildMember) {

@@ -8,6 +8,7 @@ import { updateCache } from "../imghandler";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runCountdowns } from "../scheduled/clusterjobs/guildcountdowns";
 import { runChristmas } from "../scheduled/clusterjobs/guildchristmas";
+import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 
 export class NypsiClient extends Client {
     public cluster: Cluster.Client;
@@ -23,11 +24,13 @@ export class NypsiClient extends Client {
     }
 
     public runIntervals() {
+        updateCache();
+        getWebhooks(this);
+        runPremiumChecks();
+
         if (!this.shard.ids.includes(0)) return;
 
         runLotteryInterval(this);
-
-        //runPopularCommandsTimer(this, "747056029795221513", ["823672263693041705", "912710094955892817"]);
 
         runCountdowns(this);
         runChristmas(this);
@@ -35,9 +38,5 @@ export class NypsiClient extends Client {
         doChatReactions(this);
 
         // runChecks();
-
-        updateCache();
-
-        getWebhooks(this);
     }
 }
