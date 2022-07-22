@@ -8,12 +8,12 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    Client,
     CommandInteraction,
     GuildMember,
     Interaction,
     Message,
     MessageActionRowComponentBuilder,
+    WebhookClient,
 } from "discord.js";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
@@ -26,10 +26,10 @@ import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
+import { NypsiClient } from "./models/Client";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
-const popularCommands: Map<string, number> = new Map();
 const noLifers: Map<string, number> = new Map();
 const commandUses: Map<string, number> = new Map();
 const handcuffs: Map<string, Date> = new Map();
@@ -551,7 +551,7 @@ export async function runCommand(
             .catch(() => {
                 fail = true;
                 logger.info(`captcha (${message.author.id}) failed`);
-                failedCaptcha(message.member, message.client);
+                failedCaptcha(message.member);
                 return message.channel.send({
                     content:
                         message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
@@ -566,12 +566,12 @@ export async function runCommand(
 
         if (response.content.toLowerCase() == captcha.answer) {
             logger.info(`captcha (${message.author.id}) passed`);
-            passedCaptcha(message.member, message.client);
+            passedCaptcha(message.member);
             toggleLock(message.author.id);
             return response.react("✅");
         } else {
             logger.info(`captcha (${message.author.id}) failed`);
-            failedCaptcha(message.member, message.client);
+            failedCaptcha(message.member);
             return message.channel.send({
                 content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
             });
@@ -638,7 +638,7 @@ export async function runCommand(
             }
         }
 
-        updatePopularCommands(commands.get(aliases.get(cmd)).name, message.member);
+        updateCommandUses(message.member);
 
         if ((await getDisabledCommands(message.guild)).indexOf(aliases.get(cmd)) != -1) {
             if (message instanceof Message) {
@@ -684,7 +684,7 @@ export async function runCommand(
             }
         }
 
-        updatePopularCommands(commands.get(cmd).name, message.member);
+        updateCommandUses(message.member);
 
         if ((await getDisabledCommands(message.guild)).indexOf(cmd) != -1) {
             if (message instanceof Message) {
@@ -786,13 +786,7 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     });
 }
 
-function updatePopularCommands(command: string, member: GuildMember) {
-    if (popularCommands.has(command)) {
-        popularCommands.set(command, popularCommands.get(command) + 1);
-    } else {
-        popularCommands.set(command, 1);
-    }
-
+function updateCommandUses(member: GuildMember) {
     if (noLifers.has(member.user.tag)) {
         noLifers.set(member.user.tag, noLifers.get(member.user.tag) + 1);
     } else {
@@ -818,7 +812,7 @@ function updatePopularCommands(command: string, member: GuildMember) {
     }, 90000);
 }
 
-export function runPopularCommandsTimer(client: Client, serverID: string, channelID: string[]) {
+export function runCommandUseTimers(client: NypsiClient) {
     const now = new Date();
 
     let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
@@ -829,101 +823,31 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
 
     const needed = new Date(Date.parse(d) + 10800000);
 
-    const postPopularCommands = async () => {
-        const guild = await client.guilds.fetch(serverID);
-
-        if (!guild) {
-            return logger.error("unable to fetch guild for popular commands", serverID, channelID);
-        }
-
-        const channel = guild.channels.cache.find((ch) => ch.id == channelID[0]);
-
-        if (!channel) {
-            return logger.error("unable to find channel for popular commands", serverID, channelID);
-        }
-
-        const sortedCommands = new Map([...popularCommands.entries()].sort((a, b) => b[1] - a[1]));
-
-        const sortedNoLifers = new Map([...noLifers.entries()].sort((a, b) => b[1] - a[1]));
-
-        let msg = "";
-        let count = 1;
-
-        for (const [key, value] of sortedCommands) {
-            if (count >= 11) break;
-
-            let pos: string | number = count;
-
-            if (pos == 1) {
-                pos = "🥇";
-            } else if (pos == 2) {
-                pos = "🥈";
-            } else if (pos == 3) {
-                pos = "🥉";
-            }
-
-            msg += `${pos} \`$${key}\` used **${value.toLocaleString()}** times\n`;
-            count++;
-        }
-
-        const embed = new CustomEmbed();
-
-        embed.setTitle("top 10 commands from today");
-        embed.setDescription(msg);
-        embed.setColor("#111111");
-
-        if (client.uptime < 86400 * 1000) {
-            embed.setFooter({ text: "data is from less than 24 hours" });
-        } else {
-            const noLifer = sortedNoLifers.keys().next().value;
-
-            embed.setFooter({ text: `${noLifer} has no life (${sortedNoLifers.get(noLifer).toLocaleString()} commands)` });
-        }
-
-        if (!channel.isTextBased()) return;
-
-        await channel.send({ embeds: [embed] });
-        logger.log({
-            level: "auto",
-            message: "sent popular commands",
+    const postCommandUsers = async () => {
+        const hook = new WebhookClient({
+            url: process.env.ANTICHEAT_HOOK,
         });
 
-        popularCommands.clear();
-        noLifers.clear();
-    };
-
-    const postCommandUsers = async () => {
-        const guild = await client.guilds.fetch(serverID);
-
-        if (!guild) {
-            return logger.error("unable to fetch guild for popular commands", serverID, channelID);
-        }
-
-        const channel = guild.channels.cache.find((ch) => ch.id == channelID[1]);
-
-        if (!channel) {
-            return logger.error("unable to find channel for hourly command use log", serverID, channelID);
-        }
-
-        if (!channel.isTextBased()) return;
-
-        for (const user of commandUses.keys()) {
-            const uses = commandUses.get(user);
+        for (const user of noLifers.keys()) {
+            const uses = noLifers.get(user);
 
             const tag = client.users.cache.find((u) => u.id == user).tag;
 
-            if (uses > 25) {
-                await channel.send(
+            if (uses > 50) {
+                // TODO: CHANGE THIS TO ADJUST LATER
+                await hook.send(
                     `[${getTimestamp()}] **${tag}** (${user}) performed more than **${uses}** commands in an hour`
                 );
 
-                if (uses > 35) {
+                if (uses > 200) {
+                    // TODO: CHANGE THIS TO ADJUST LATER
                     toggleLock(user);
                     logger.info(`${tag} (${user}) has been given a captcha`);
-                    await channel.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`);
+                    await hook.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`);
                 }
             }
         }
+        noLifers.clear();
         return;
     };
 
@@ -946,13 +870,6 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
     };
 
     setTimeout(async () => {
-        setInterval(() => {
-            postPopularCommands();
-        }, 86400000);
-        postPopularCommands();
-    }, needed.getTime() - now.getTime());
-
-    setTimeout(async () => {
         setInterval(async () => {
             await postCommandUsers();
             setTimeout(updateKarma, 60000);
@@ -967,21 +884,10 @@ export function runPopularCommandsTimer(client: Client, serverID: string, channe
     });
 }
 
-async function failedCaptcha(member: GuildMember, client: Client) {
-    const serverID = "747056029795221513";
-    const channelID = "912710094955892817";
-
-    const guild = await client.guilds.fetch(serverID);
-
-    if (!guild) {
-        return logger.error("unable to fetch guild for captcha fail", serverID, channelID);
-    }
-
-    const channel = guild.channels.cache.find((ch) => ch.id == channelID);
-
-    if (!channel) {
-        return logger.error("unable to find channel for anticheat logs", serverID, channelID);
-    }
+async function failedCaptcha(member: GuildMember) {
+    const hook = new WebhookClient({
+        url: process.env.ANTICHEAT_HOOK,
+    });
 
     if (captchaFails.has(member.user.id)) {
         captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1);
@@ -989,30 +895,17 @@ async function failedCaptcha(member: GuildMember, client: Client) {
         captchaFails.set(member.user.id, 1);
     }
 
-    if (!channel.isTextBased()) return;
-
-    await channel.send(
+    await hook.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
             member.user.id
         )})`
     );
 }
 
-async function passedCaptcha(member: GuildMember, client: Client) {
-    const serverID = "747056029795221513";
-    const channelID = "912710094955892817";
-
-    const guild = await client.guilds.fetch(serverID);
-
-    if (!guild) {
-        return logger.error("unable to fetch guild for captcha pass", serverID, channelID);
-    }
-
-    const channel = guild.channels.cache.find((ch) => ch.id == channelID);
-
-    if (!channel) {
-        return logger.error("unable to find channel for anticheat logs", serverID, channelID);
-    }
+async function passedCaptcha(member: GuildMember) {
+    const hook = new WebhookClient({
+        url: process.env.ANTICHEAT_HOOK,
+    });
 
     if (captchaPasses.has(member.user.id)) {
         captchaPasses.set(member.user.id, captchaPasses.get(member.user.id) + 1);
@@ -1020,9 +913,7 @@ async function passedCaptcha(member: GuildMember, client: Client) {
         captchaPasses.set(member.user.id, 1);
     }
 
-    if (!channel.isTextBased()) return;
-
-    await channel.send(
+    await hook.send(
         `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
             member.user.id
         )})`
