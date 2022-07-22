@@ -55,12 +55,6 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import { loadCommands } from "./utils/commandhandler";
 import { logger } from "./utils/logger";
-import { SnipedMessage } from "./utils/models/Snipe";
-
-const snipe: Map<string, SnipedMessage> = new Map();
-const eSnipe: Map<string, SnipedMessage> = new Map();
-
-export { eSnipe, snipe };
 
 loadCommands();
 

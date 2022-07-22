@@ -1,11 +1,16 @@
 import { Collection, Guild, GuildMember } from "discord.js";
-import { eSnipe, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import { SnipedMessage } from "../models/Snipe";
+
+const snipe: Map<string, SnipedMessage> = new Map();
+const eSnipe: Map<string, SnipedMessage> = new Map();
+
+export { eSnipe, snipe };
 
 setInterval(() => {
     const now = new Date().getTime();
