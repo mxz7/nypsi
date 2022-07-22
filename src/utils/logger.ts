@@ -7,6 +7,12 @@ import * as DiscordTransport from "winston-discord-webhook";
 const webhook: Map<string, Webhook> = new Map();
 const nextLogMsg: Map<string, string> = new Map();
 
+let clusterId = 69;
+
+export function setClusterId(id: number) {
+    clusterId = id;
+}
+
 const format = winston.format.printf(({ level, message, timestamp }) => {
     let color = chalk.white;
     let prefix = `${chalk.bold.green("INFO")}`;
@@ -38,7 +44,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             break;
     }
 
-    return `${prefix} [${chalk.blackBright(timestamp)}] ${color(message)}`;
+    return `${prefix} [${chalk.blackBright(timestamp)} ${chalk.blackBright(clusterId)}] ${color(message)}`;
 });
 
 const levels = {

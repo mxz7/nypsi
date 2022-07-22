@@ -1,35 +1,7 @@
-const startUp = Date.now();
+import { NypsiClient } from "./utils/models/Client";
+import { EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 
-import "dotenv/config";
-import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler";
-import guildCreate from "./events/guildCreate";
-import ready from "./events/ready";
-import guildDelete from "./events/guildDelete";
-import guildMemberUpdate from "./events/guildMemberUpdate";
-import guildMemberAdd from "./events/guildMemberAdd";
-import guildMemberRemove from "./events/guildMemberRemove";
-import messageDelete from "./events/messageDelete";
-import messageUpdate from "./events/messageUpdate";
-import messageCreate from "./events/message";
-import channelCreate from "./events/channelCreate";
-import roleDelete from "./events/roleDelete";
-import userUpdate from "./events/userUpdate";
-import interactionCreate from "./events/interactionCreate";
-import { getWebhooks, logger } from "./utils/logger";
-import { checkStats } from "./utils/guilds/utils";
-import { updateStats } from "./utils/economy/utils";
-import { updateCache } from "./utils/imghandler";
-import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
-import { SnipedMessage } from "./utils/models/Snipe";
-import { listenForVotes } from "./utils/votehandler";
-import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
-import startJobs from "./utils/scheduled/scheduler";
-import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
-import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
-import { doChatReactions } from "./utils/scheduled/clusterjobs/chatreaction";
-import { runModerationChecks } from "./utils/scheduled/clusterjobs/moderationchecks";
-
-const client = new Client({
+const client = new NypsiClient({
     allowedMentions: {
         parse: ["users", "roles"],
     },
@@ -53,7 +25,7 @@ const client = new Client({
     rest: {
         offset: 0,
     },
-    shards: "auto",
+    // shards: "auto",
     intents: [
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.MessageContent,
@@ -68,6 +40,25 @@ const client = new Client({
     ],
 });
 
+import { loadCommands } from "./utils/commandhandler";
+import guildCreate from "./events/guildCreate";
+import ready from "./events/ready";
+import guildDelete from "./events/guildDelete";
+import guildMemberUpdate from "./events/guildMemberUpdate";
+import guildMemberAdd from "./events/guildMemberAdd";
+import guildMemberRemove from "./events/guildMemberRemove";
+import messageDelete from "./events/messageDelete";
+import messageUpdate from "./events/messageUpdate";
+import messageCreate from "./events/message";
+import channelCreate from "./events/channelCreate";
+import roleDelete from "./events/roleDelete";
+import userUpdate from "./events/userUpdate";
+import interactionCreate from "./events/interactionCreate";
+import { logger } from "./utils/logger";
+import { checkStats } from "./utils/guilds/utils";
+import { updateStats } from "./utils/economy/utils";
+import { SnipedMessage } from "./utils/models/Snipe";
+
 const snipe: Map<string, SnipedMessage> = new Map();
 const eSnipe: Map<string, SnipedMessage> = new Map();
 
@@ -75,7 +66,7 @@ export { eSnipe, snipe };
 
 loadCommands();
 
-client.once("ready", ready.bind(null, client, startUp));
+client.once("ready", ready.bind(null, client));
 if (!process.env.GITHUB_ACTION) {
     client.on("guildCreate", guildCreate.bind(null, client));
     client.on("guildDelete", guildDelete.bind(null, client));
@@ -267,23 +258,7 @@ setTimeout(() => {
         });
 
         setTimeout(() => {
-            runLotteryInterval(client);
-
-            runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
-
-            runCountdowns(client);
-            runChristmas(client);
-            runModerationChecks(client);
-            doChatReactions(client);
-
-            runChecks();
-
-            updateCache();
-
-            getWebhooks(client);
-
-            listenForVotes();
-            startJobs();
+            client.runIntervals();
         }, 10000);
 
         if (process.env.GITHUB_ACTION) {

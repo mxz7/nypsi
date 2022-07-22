@@ -34,21 +34,21 @@ export default function ready(client: Client, startUp: number) {
         });
     }, 30 * 60 * 1000);
 
-    let memberCount = 0;
+    // let memberCount = 0;
 
-    client.guilds.cache.forEach((g) => {
-        memberCount = memberCount + g.memberCount;
-    });
+    // client.guilds.cache.forEach((g) => {
+    //     memberCount = memberCount + g.memberCount;
+    // });
 
-    logger.info("server count: " + client.guilds.cache.size.toLocaleString());
-    logger.info("user count: " + memberCount.toLocaleString());
-    logger.info("commands count: " + commandsSize);
-    logger.info(`version: ${version}`);
+    // logger.info("server count: " + client.guilds.cache.size.toLocaleString());
+    // logger.info("user count: " + memberCount.toLocaleString());
+    // logger.info("commands count: " + commandsSize);
+    // logger.info(`version: ${version}`);
 
-    logger.info("logged in as " + client.user.tag);
+    // logger.info("logged in as " + client.user.tag);
 
-    const now = Date.now();
-    const timeTaken = (now - startUp) / 1000;
+    // const now = Date.now();
+    // const timeTaken = (now - startUp) / 1000;
 
-    logger.info(`time taken: ${timeTaken}s\n`);
+    // logger.info(`time taken: ${timeTaken}s\n`);
 }

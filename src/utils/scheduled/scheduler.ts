@@ -1,7 +1,7 @@
 import Bree = require("bree");
 import ms = require("ms");
 import path = require("path");
-import { getGuilds } from "../../nypsi";
+// import { getGuilds } from "../../nypsi";
 import { logger } from "../logger";
 
 const bree = new Bree({
