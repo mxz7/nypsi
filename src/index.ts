@@ -34,8 +34,9 @@ export async function getGuilds(): Promise<string[]> {
 
 // listenForVotes();
 
-setTimeout(() => {
-    startJobs();
+setTimeout(async () => {
+    await startJobs();
+    logger.info("jobs triggered");
 }, 60000);
 
 setTimeout(async () => {
