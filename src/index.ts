@@ -10,6 +10,9 @@ setClusterId("main");
 const manager = new ShardingManager(`${__dirname}/nypsi.js`, {
     token: process.env.BOT_TOKEN,
     totalShards: 2,
+
+    execArgv: ["--trace-warnings"],
+    shardArgs: ["--ansi", "--color"],
 });
 
 manager.on("shardCreate", (shard) => {
