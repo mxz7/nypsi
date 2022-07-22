@@ -9,6 +9,7 @@ import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runCountdowns } from "../scheduled/clusterjobs/guildcountdowns";
 import { runChristmas } from "../scheduled/clusterjobs/guildchristmas";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
+import { runEconomySetup } from "../economy/utils";
 
 export class NypsiClient extends Client {
     public cluster: Cluster.Client;
@@ -17,6 +18,8 @@ export class NypsiClient extends Client {
         super(options);
 
         setClusterId(this.shard.ids[0]);
+
+        runEconomySetup();
 
         return this;
     }

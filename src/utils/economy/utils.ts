@@ -51,21 +51,11 @@ export function loadItems(): string {
     return txt;
 }
 
-loadItems();
-
 function randomOffset() {
     return Math.floor(Math.random() * 50000);
 }
 
 let padlockPrice = 25000 + randomOffset();
-items["padlock"].worth = padlockPrice;
-logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-
-setInterval(() => {
-    padlockPrice = 25000 + randomOffset();
-    items["padlock"].worth = padlockPrice;
-    logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-}, 3600000);
 
 async function updateCryptoWorth() {
     let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json());
@@ -88,10 +78,21 @@ async function updateCryptoWorth() {
     logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString());
 }
 
-setInterval(updateCryptoWorth, 1500000);
-
 export function getPadlockPrice(): number {
     return padlockPrice;
+}
+
+export function runEconomySetup() {
+    setInterval(updateCryptoWorth, 1500000);
+
+    items["padlock"].worth = padlockPrice;
+
+    setInterval(() => {
+        padlockPrice = 25000 + randomOffset();
+        items["padlock"].worth = padlockPrice;
+    }, 3600000);
+
+    loadItems();
 }
 
 export async function hasVoted(member: GuildMember | string) {
