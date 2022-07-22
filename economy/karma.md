@@ -1,7 +1,7 @@
 ---
 layout: default
 title: karma
-description: how karma works on the bot
+description: how karma works on nypsi
 permalink: /eco/karma
 parent: economy
 ---
