@@ -1,11 +1,14 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("banner", "get a person's banner", Categories.INFO);
+const banner = new Command("banner", "get a person's banner", Categories.INFO);
+
+banner.setAliases(["bio"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+    const client = message.client;
     let member: GuildMember;
 
     if (args.length == 0) {
@@ -22,15 +25,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    const user = await message.client.users.fetch(member.user.id, { force: true });
+    const forcedMember = await client.users.fetch(member.user.id, { force: true });
 
-    const banner = user.bannerURL({ size: 512 });
+    const banner = forcedMember.bannerURL();
+    const accentColor = forcedMember.accentColor;
 
-    const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(banner);
+    const embed = new CustomEmbed(member).setHeader(forcedMember.tag);
+    if (banner) {
+        embed.setImage(`${forcedMember.bannerURL()}?size=2048`);
+    } else if (accentColor) {
+        embed.setColor(accentColor);
+        embed.setDescription("this user's banner color is `" + forcedMember.hexAccentColor + "`");
+    } else {
+        return message.channel.send({ embeds: [new ErrorEmbed("this user doesn't have a banner/accent color")] });
+    }
 
     return message.channel.send({ embeds: [embed] });
 }
 
-cmd.setRun(run);
+banner.setRun(run);
 
-module.exports = cmd;
+module.exports = banner;
