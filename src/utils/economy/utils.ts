@@ -16,7 +16,6 @@ import workerSort from "../workers/sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 
-const guildExistsCache = new Map();
 const guildUserCache = new Map();
 const guildRequirementsCache = new Map();
 
@@ -1639,8 +1638,6 @@ export async function createGuild(name: string, owner: GuildMember) {
 
 export async function deleteGuild(name: string) {
     guildUserCache.clear();
-
-    guildExistsCache.delete(name);
 
     await prisma.economyGuildMember.deleteMany({
         where: {
