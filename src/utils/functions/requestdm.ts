@@ -46,6 +46,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     }
 
     if (isNaN(shard)) {
+        logger.warn("user not found");
         return false;
     }
 
