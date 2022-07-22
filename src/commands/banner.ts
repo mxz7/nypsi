@@ -9,7 +9,6 @@ banner.setAliases(["bio"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const client = message.client;
-    const guild = message.guild;
     let member: GuildMember;
 
     if (args.length == 0) {
@@ -31,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const banner = forcedMember.bannerURL();
     const accentColor = forcedMember.accentColor;
 
-    let embed = new CustomEmbed(member).setHeader(forcedMember.tag);
+    const embed = new CustomEmbed(member).setHeader(forcedMember.tag);
     if (banner) {
         embed.setImage(`${forcedMember.bannerURL()}?size=2048`);
     } else if (accentColor) {
