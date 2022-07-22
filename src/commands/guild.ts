@@ -1,14 +1,14 @@
 import { EconomyGuild, EconomyGuildMember, User } from "@prisma/client";
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageOptions,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageEditOptions,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { requestDM } from "../nypsi";
@@ -639,17 +639,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setHeader("guild help");
         embed.setDescription(
-            `${prefix}**guild create <name>** *creates a guild for you*\n` +
-                `${prefix}**guild invite <@member>** *invite's a user to your guild*\n` +
+            `${prefix}**guild create <name>** *create a guild*\n` +
+                `${prefix}**guild invite <@member>** *invite a user to your guild*\n` +
                 `${prefix}**guild leave** *leave your current guild*\n` +
-                `${prefix}**guild kick <tag>** *kick specified user out of your guild*\n` +
-                `${prefix}**guild delete** *deletes your guild*\n` +
-                `${prefix}**guild deposit <amount>** *deposit an amount of money into your guild*\n` +
-                `${prefix}**guild stats** *show the stats of your current guild*\n` +
-                `${prefix}**guild upgrade** *upgrade your guild to the next level*\n` +
-                `${prefix}**guild motd <motd>** *set your guilds motd*\n` +
+                `${prefix}**guild kick <tag>** *kick user from your guild*\n` +
+                `${prefix}**guild delete** *delete your guild*\n` +
+                `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
+                `${prefix}**guild stats** *show contribution stats of your guild*\n` +
+                `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
+                `${prefix}**guild motd <motd>** *set guild motd*\n` +
                 `${prefix}**guild top** *shows top 5 guilds*\n` +
-                `${prefix}**guild <name>** *shows statistics for guild specified*`
+                `${prefix}**guild (name)** *show guild info*`
         );
         embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
