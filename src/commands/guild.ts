@@ -47,6 +47,7 @@ const cmd = new Command("guild", "create and manage your guild/clan", Categories
 cmd.slashEnabled = true;
 
 cmd.slashData
+    .addSubcommand((help) => help.setName("help").setDescription("view the help menu for guild commands"))
     .addSubcommand((create) =>
         create
             .setName("create")
@@ -193,26 +194,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member);
 
         embed.setHeader("guild help");
-        embed.addField("usage", `${prefix}guild <create/invite/> (reason) [-s] [-k]`);
-        embed.addField(
-            "help",
-            "**<>** required | **()** optional | **[]** parameter\n" +
-                "**<@users>** you can ban one or more members in one command (must tag them)\n" +
-                "**(reason)** reason for the ban, will be given to all banned members\n" +
-                "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
-                "**[-k]** if used, messages from banned members wont be deleted"
+        embed.setDescription(
+            `${prefix}**guild create <name>** *creates a guild for you*\n` +
+                `${prefix}**guild invite <@member>** *invite's a user to your guild*\n` +
+                `${prefix}**guild leave** *leave your current guild*\n` +
+                `${prefix}**guild kick <tag>** *kick specified user out of your guild*\n` +
+                `${prefix}**guild delete** *deletes your guild*\n` +
+                `${prefix}**guild deposit <amount>** *deposit an amount of money into your guild*\n` +
+                `${prefix}**guild stats** *show the stats of your current guild*\n` +
+                `${prefix}**guild upgrade** *upgrade your guild to the next level*\n` +
+                `${prefix}**guild motd <motd>** *set your guilds motd*\n` +
+                `${prefix}**guild top** *shows top 5 guilds*\n` +
+                `${prefix}**guild <name>** *shows statistics for guild specified*`
         );
-        embed.addField(
-            "examples",
-            `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s\n${prefix}ban @member 1d annoying`
-        );
+        embed.setFooter({ text: `you must be atleast prestige **1** to create a guild` });
 
         return send({ embeds: [embed] });
     }
 
     if (args[0].toLowerCase() == "create") {
         if ((await getPrestige(message.member)) < 1) {
-            return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
+            return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
         }
 
         if ((await getBalance(message.member)) < 500000) {
