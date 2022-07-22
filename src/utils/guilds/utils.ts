@@ -298,7 +298,7 @@ export function runCountdowns(client: NypsiClient) {
 
             if (!guild) continue;
 
-            const query = await prisma.guildCountdown.findFirst({
+            const query = await prisma.guildCountdown.findMany({
                 where: {
                     guildId: guildId,
                 },
@@ -358,6 +358,108 @@ export function runCountdowns(client: NypsiClient) {
     logger.log({
         level: "auto",
         message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    });
+}
+
+export function runChristmas(client: NypsiClient) {
+    const now = new Date();
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000);
+
+    const runChristmasThing = async () => {
+        const query = await prisma.guildChristmas.findMany({
+            where: {
+                enabled: true,
+            },
+        });
+
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
+
+            if (!guild) continue;
+
+            const profile = await prisma.guildChristmas.findFirst({
+                where: {
+                    AND: [
+                        {
+                            guildId: guildId,
+                        },
+                        {
+                            enabled: true,
+                        },
+                    ],
+                },
+            });
+
+            if (!query) continue;
+
+            const channel = guild.channels.cache.find((c) => c.id == profile.channel);
+
+            if (!channel) {
+                profile.enabled = false;
+                profile.channel = "none";
+                await setChristmasCountdown(guild, profile);
+                continue;
+            }
+
+            let format = profile.format;
+
+            const days = daysUntilChristmas();
+
+            format = format.split("%days%").join(daysUntilChristmas().toString());
+
+            if (days == "ITS CHRISTMAS") {
+                format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
+            }
+
+            if (!channel.isTextBased()) return;
+
+            await channel
+                .send({
+                    embeds: [
+                        new CustomEmbed()
+                            .setDescription(format)
+                            .setColor("#ff0000")
+                            .setTitle(":santa_tone1:")
+                            .disableFooter(),
+                    ],
+                })
+                .then(() => {
+                    logger.log({
+                        level: "auto",
+                        message: `sent christmas countdown in ${guild.name} ~ ${format}`,
+                    });
+                })
+                .catch(async () => {
+                    logger.error(`error sending christmas countdown in ${guild.name}`);
+                    profile.enabled = false;
+                    profile.channel = "none";
+                    await setChristmasCountdown(guild, profile);
+                });
+        }
+
+        for (const profile of query) {
+            const guild = client.guilds.cache.find((g) => g.id == profile.guildId);
+            if (!guild) continue;
+        }
+    };
+
+    setTimeout(async () => {
+        setInterval(() => {
+            runChristmasThing();
+        }, 86400000);
+        runChristmasThing();
+    }, needed.getTime() - now.getTime());
+
+    logger.log({
+        level: "auto",
+        message: `christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
     });
 }
 
