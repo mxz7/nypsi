@@ -3,6 +3,7 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { PunishmentType } from "../models/GuildStorage";
 
@@ -345,7 +346,7 @@ export async function deleteMute(guild: Guild, member: GuildMember | string) {
     });
 }
 
-export async function deleteBan(guild: Guild, member: GuildMember | string) {
+export async function deleteBan(guild: Guild | string, member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.id;
@@ -353,9 +354,16 @@ export async function deleteBan(guild: Guild, member: GuildMember | string) {
         id = member;
     }
 
+    let guildId: string;
+    if (guild instanceof Guild) {
+        guildId = guild.id;
+    } else {
+        guildId = guild;
+    }
+
     await prisma.moderationBan.deleteMany({
         where: {
-            AND: [{ userId: id }, { guildId: guild.id }],
+            AND: [{ userId: id }, { guildId: guildId }],
         },
     });
 }
@@ -396,21 +404,19 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
     });
 }
 
-export async function requestUnban(guild: string | Guild, member: string, client: Client) {
-    guild = client.guilds.cache.find((g) => g.id == guild);
+export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
+    await client.shard.broadcastEval(
+        async (c, { guildId, memberId }) => {
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
-    if (!guild) {
-        return;
-    }
+            if (!guild) return;
 
-    await deleteBan(guild, member);
+            await guild.members.unban(memberId, "ban expired").catch(() => {});
+        },
+        { context: { guildId: guildId, memberId: member } }
+    );
 
-    guild.members.unban(member, "ban expired");
-
-    logger.log({
-        level: "success",
-        message: "ban removed",
-    });
+    await deleteBan(guildId, member);
 }
 
 export async function requestUnmute(guild: Guild | string, member: string, client: Client) {

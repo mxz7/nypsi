@@ -1,10 +1,11 @@
-import { APIEmbed, Client, WebhookClient } from "discord.js";
+import { APIEmbed, WebhookClient } from "discord.js";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { logger } from "../../logger";
+import { NypsiClient } from "../../models/Client";
 import { requestUnban, requestUnmute } from "../../moderation/utils";
 
-export function runModerationChecks(client: Client) {
+export function runModerationChecks(client: NypsiClient) {
     setInterval(async () => {
         const date = new Date();
 
