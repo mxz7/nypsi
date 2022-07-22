@@ -216,7 +216,7 @@ export function updateCounters(client: NypsiClient) {
                 })
                 .then((res) => res[0]);
 
-            if (!profile) return;
+            if (!profile) continue;
 
             let memberCount: number;
 
