@@ -18,8 +18,25 @@ manager.on("shardCreate", (shard) => {
 
 manager.spawn();
 
+export async function getGuilds(): Promise<string[]> {
+    const guildIds = await manager.broadcastEval((c) => {
+        return c.guilds.cache.map((g) => g.id);
+    });
+
+    const newGuildIds: string[] = [];
+
+    for (const shardResponse of guildIds) {
+        shardResponse.forEach((id) => newGuildIds.push(id));
+    }
+
+    return newGuildIds;
+}
+
 // listenForVotes();
-startJobs();
+
+setTimeout(() => {
+    startJobs();
+}, 60000);
 
 setTimeout(async () => {
     const userId = await manager.fetchClientValues("user.id");

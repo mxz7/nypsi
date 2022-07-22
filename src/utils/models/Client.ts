@@ -38,7 +38,5 @@ export class NypsiClient extends Client {
         runChristmas(this);
         runModerationChecks(this);
         doChatReactions(this);
-
-        // runChecks();
     }
 }
