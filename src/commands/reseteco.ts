@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { reset } from "../utils/economy/utils";
 import { createCaptcha } from "../utils/functions/captcha";
 
-const cmd = new Command("reseteco", "reset economy except prestige", Categories.NONE);
+const cmd = new Command("reseteco", "reset economy except prestige and karma", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.author.id != "672793821850894347") return;
