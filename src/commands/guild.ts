@@ -189,6 +189,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return showGuild(guild);
     }
 
+    if (args[0].toLowerCase() == "help") {
+        const embed = new CustomEmbed(message.member);
+
+        embed.setHeader("guild help");
+        embed.addField("usage", `${prefix}guild <create/invite/> (reason) [-s] [-k]`);
+        embed.addField(
+            "help",
+            "**<>** required | **()** optional | **[]** parameter\n" +
+                "**<@users>** you can ban one or more members in one command (must tag them)\n" +
+                "**(reason)** reason for the ban, will be given to all banned members\n" +
+                "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
+                "**[-k]** if used, messages from banned members wont be deleted"
+        );
+        embed.addField(
+            "examples",
+            `${prefix}ban @member hacking\n${prefix}ban @member @member2 @member3 hacking\n${prefix}ban @member hacking -s\n${prefix}ban @member 1d annoying`
+        );
+
+        return send({ embeds: [embed] });
+    }
+
     if (args[0].toLowerCase() == "create") {
         if ((await getPrestige(message.member)) < 1) {
             return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
