@@ -2,7 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { eSnipe, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
-import { daysUntilChristmas } from "../functions/date";
+import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -279,6 +279,86 @@ export function updateCounters(client: NypsiClient) {
             }
         }
     }, 600000);
+}
+
+export function runCountdowns(client: NypsiClient) {
+    const now = new Date();
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000);
+
+    const doCountdowns = async () => {
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
+
+            if (!guild) continue;
+
+            const query = await prisma.guildCountdown.findMany({
+                where: {
+                    guildId: guildId,
+                },
+            });
+
+            if (!query) continue;
+
+            for (const countdown of query) {
+                const days = daysUntil(new Date(countdown.date)) + 1;
+
+                let message;
+
+                if (days == 0) {
+                    message = countdown.finalFormat;
+                } else {
+                    message = countdown.format.split("%days%").join(days.toLocaleString());
+                }
+
+                const embed = new CustomEmbed();
+
+                embed.setDescription(message);
+                embed.setColor("#111111");
+                embed.disableFooter();
+
+                const channel = guild.channels.cache.find((ch) => ch.id == countdown.channel);
+
+                if (!channel) continue;
+
+                if (!channel.isTextBased()) continue;
+
+                await channel
+                    .send({ embeds: [embed] })
+                    .then(() => {
+                        logger.log({
+                            level: "auto",
+                            message: `sent custom countdown (${countdown.id}) in ${guild.name} (${guildId})`,
+                        });
+                    })
+                    .catch(() => {
+                        logger.error(`error sending custom countdown (${countdown.id}) ${guild.name} (${guildId})`);
+                    });
+
+                if (days <= 0) {
+                    await deleteCountdown(guildId, countdown.id);
+                }
+            }
+        }
+    };
+
+    setTimeout(async () => {
+        setInterval(() => {
+            doCountdowns();
+        }, 86400000);
+        doCountdowns();
+    }, needed.getTime() - now.getTime());
+
+    logger.log({
+        level: "auto",
+        message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    });
 }
 
 export function addCooldown(guild: Guild, seconds: number) {
