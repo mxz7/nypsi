@@ -12,44 +12,46 @@ const eSnipe: Map<string, SnipedMessage> = new Map();
 
 export { eSnipe, snipe };
 
-setInterval(() => {
-    const now = new Date().getTime();
+export function runSnipeClearIntervals() {
+    setInterval(() => {
+        const now = new Date().getTime();
 
-    let snipeCount = 0;
-    let eSnipeCount = 0;
+        let snipeCount = 0;
+        let eSnipeCount = 0;
 
-    snipe.forEach((msg) => {
-        const diff = now - msg.createdTimestamp;
+        snipe.forEach((msg) => {
+            const diff = now - msg.createdTimestamp;
 
-        if (diff >= 43200000) {
-            snipe.delete(msg.channel.id);
-            snipeCount++;
-        }
-    });
-
-    if (snipeCount > 0) {
-        logger.log({
-            level: "auto",
-            message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
+            if (diff >= 43200000) {
+                snipe.delete(msg.channel.id);
+                snipeCount++;
+            }
         });
-    }
 
-    eSnipe.forEach((msg) => {
-        const diff = now - msg.createdTimestamp;
-
-        if (diff >= 43200000) {
-            eSnipe.delete(msg.channel.id);
-            eSnipeCount++;
+        if (snipeCount > 0) {
+            logger.log({
+                level: "auto",
+                message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
+            });
         }
-    });
 
-    if (eSnipeCount > 0) {
-        logger.log({
-            level: "auto",
-            message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
+        eSnipe.forEach((msg) => {
+            const diff = now - msg.createdTimestamp;
+
+            if (diff >= 43200000) {
+                eSnipe.delete(msg.channel.id);
+                eSnipeCount++;
+            }
         });
-    }
-}, 3600000);
+
+        if (eSnipeCount > 0) {
+            logger.log({
+                level: "auto",
+                message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
+            });
+        }
+    }, 3600000);
+}
 
 const fetchCooldown = new Set();
 const disableCache = new Map();
