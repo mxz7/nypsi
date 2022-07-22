@@ -298,7 +298,7 @@ export function runCountdowns(client: NypsiClient) {
 
             if (!guild) continue;
 
-            const query = await prisma.guildCountdown.findMany({
+            const query = await prisma.guildCountdown.findFirst({
                 where: {
                     guildId: guildId,
                 },
