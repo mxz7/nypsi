@@ -4,12 +4,12 @@ import { getWebhooks, setClusterId } from "../logger";
 import { doChatReactions } from "../scheduled/clusterjobs/chatreaction";
 import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { updateCache } from "../imghandler";
-// import { runPopularCommandsTimer } from "../commandhandler";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runCountdowns } from "../scheduled/clusterjobs/guildcountdowns";
 import { runChristmas } from "../scheduled/clusterjobs/guildchristmas";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runEconomySetup } from "../economy/utils";
+import { updateCounters } from "../guilds/utils";
 
 export class NypsiClient extends Client {
     public cluster: Cluster.Client;
@@ -30,6 +30,8 @@ export class NypsiClient extends Client {
         runPremiumChecks();
 
         if (!this.shard.ids.includes(0)) return;
+
+        updateCounters(this);
 
         runLotteryInterval(this);
 

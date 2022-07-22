@@ -1,5 +1,6 @@
 import { Client } from "discord.js";
 import { getCustomPresence, randomPresence } from "../utils/functions/presence";
+import { logger } from "../utils/logger";
 
 export default function ready(client: Client) {
     setTimeout(() => {

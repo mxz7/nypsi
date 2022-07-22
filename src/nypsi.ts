@@ -55,8 +55,6 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import interactionCreate from "./events/interactionCreate";
 import { logger } from "./utils/logger";
-import { checkStats } from "./utils/guilds/utils";
-import { updateStats } from "./utils/economy/utils";
 import { SnipedMessage } from "./utils/models/Snipe";
 
 const snipe: Map<string, SnipedMessage> = new Map();
@@ -109,26 +107,6 @@ process.on("unhandledRejection", (e: any) => {
     if (e.code && excludedReasons.includes(e.code)) return;
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
-
-function runChecks() {
-    checkStats();
-
-    if (client.user.id != "678711738845102087") return;
-
-    setInterval(() => {
-        updateStats(client.guilds.cache.size, client.options.shardCount);
-        logger.log({
-            level: "auto",
-            message: "guild count posted to top.gg: " + client.guilds.cache.size,
-        });
-    }, 3600000);
-
-    updateStats(client.guilds.cache.size, client.options.shardCount);
-    logger.log({
-        level: "auto",
-        message: "guild count posted to top.gg: " + client.guilds.cache.size,
-    });
-}
 
 export function getGuilds() {
     return client.guilds.cache.map((guild) => guild.id);

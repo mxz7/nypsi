@@ -1,3 +1,4 @@
+import { Client } from "discord-hybrid-sharding";
 import { Collection, Guild, GuildMember } from "discord.js";
 import { eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
@@ -193,7 +194,7 @@ export async function setGuildCounter(guild: Guild, profile: any) {
     });
 }
 
-export function checkStats() {
+export function updateCounters(client: Client) {
     setInterval(async () => {
         const query = await prisma.guildCounter.findMany({
             where: {

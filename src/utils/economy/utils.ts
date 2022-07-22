@@ -82,14 +82,14 @@ export function getPadlockPrice(): number {
 export function runEconomySetup() {
     setInterval(updateCryptoWorth, 1500000);
 
+    loadItems();
+
     items["padlock"].worth = padlockPrice;
 
     setInterval(() => {
         padlockPrice = 25000 + randomOffset();
         items["padlock"].worth = padlockPrice;
     }, 3600000);
-
-    loadItems();
 }
 
 export async function hasVoted(member: GuildMember | string) {
