@@ -1,8 +1,7 @@
 import dayjs = require("dayjs");
+import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 import { NypsiClient } from "./Client";
-
-declare function require(name: string): any;
 
 export class PremUser {
     public id: string;
@@ -131,8 +130,6 @@ export class PremUser {
     }
 
     async expire(client: NypsiClient): Promise<PremUser | string> {
-        const { requestDM } = require("../../nypsi");
-
         let roleID;
 
         switch (this.level) {
@@ -159,10 +156,11 @@ export class PremUser {
             return "boost";
         }
 
-        await requestDM(
-            this.id,
-            `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
-        ).catch(() => {});
+        await requestDM({
+            memberId: this.id,
+            client: client,
+            content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
+        }).catch(() => {});
 
         this.status = status.INACTIVE;
         this.level = 0;
