@@ -1,30 +1,30 @@
 const startUp = Date.now();
 
+import { WebhookPayload } from "@top-gg/sdk";
+import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
 import "dotenv/config";
-import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler";
+import channelCreate from "./events/channelCreate";
 import guildCreate from "./events/guildCreate";
-import ready from "./events/ready";
 import guildDelete from "./events/guildDelete";
-import guildMemberUpdate from "./events/guildMemberUpdate";
 import guildMemberAdd from "./events/guildMemberAdd";
 import guildMemberRemove from "./events/guildMemberRemove";
+import guildMemberUpdate from "./events/guildMemberUpdate";
+import interactionCreate from "./events/interactionCreate";
+import messageCreate from "./events/message";
 import messageDelete from "./events/messageDelete";
 import messageUpdate from "./events/messageUpdate";
-import messageCreate from "./events/message";
-import channelCreate from "./events/channelCreate";
+import ready from "./events/ready";
 import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
-import interactionCreate from "./events/interactionCreate";
-import { getWebhooks, logger } from "./utils/logger";
-import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
+import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler";
 import { doVote, runLotteryInterval, updateStats } from "./utils/economy/utils";
+import { checkStats, runChristmas, runCountdowns } from "./utils/guilds/utils";
 import { updateCache } from "./utils/imghandler";
-import { runModerationChecks } from "./utils/moderation/utils";
-import { WebhookPayload } from "@top-gg/sdk";
-import { showTopGlobalBal } from "./utils/scheduled/topglobal";
-import purgeUsernames from "./utils/scheduled/purgeusernames";
-import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
+import { getWebhooks, logger } from "./utils/logger";
 import { SnipedMessage } from "./utils/models/Snipe";
+import { runModerationChecks } from "./utils/moderation/utils";
+import purgeUsernames from "./utils/scheduled/purgeusernames";
+import { showTopGlobalBal } from "./utils/scheduled/topglobal";
 
 const client = new Client({
     allowedMentions: {
@@ -65,8 +65,8 @@ const client = new Client({
     ],
 });
 
-const snipe: Map<string, SnipedMessage> = new Map();
-const eSnipe: Map<string, SnipedMessage> = new Map();
+const snipe = new Map<string, SnipedMessage>();
+const eSnipe = new Map<string, SnipedMessage>();
 
 export { eSnipe, snipe };
 

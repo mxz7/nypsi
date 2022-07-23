@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getMember } from "../utils/functions/member";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cache = new Map();
+const cache = new Map<string, { msg: string; emoji: string }>();
 
 const cmd = new Command("boob", "accurate prediction of your boob size", Categories.FUN).setAliases(["howbigaremyboobies"]);
 

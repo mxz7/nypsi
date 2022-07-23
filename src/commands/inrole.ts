@@ -1,19 +1,19 @@
 import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     Collection,
     CommandInteraction,
     GuildMember,
-    Message,
-    ActionRowBuilder,
-    ButtonBuilder,
-    Role,
-    MessageActionRowComponentBuilder,
-    ButtonStyle,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
+    Role,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { inCooldown, addCooldown as addGuildCooldown, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown as addGuildCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY);
 
@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         addGuildCooldown(message.guild, 3600);
     }
 
-    const memberList = new Map();
+    const memberList = new Map<number, string[]>();
     let count = 0;
 
     members.forEach((m) => {

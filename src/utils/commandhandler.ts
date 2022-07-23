@@ -1,9 +1,5 @@
-import { table, getBorderCharacters } from "table";
-import * as fs from "fs";
 import { REST } from "@discordjs/rest";
 import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
-import { Command, NypsiCommandInteraction } from "./models/Command";
-import { getTimestamp, logger } from "./logger";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -15,31 +11,35 @@ import {
     Message,
     MessageActionRowComponentBuilder,
 } from "discord.js";
+import * as fs from "fs";
+import { getBorderCharacters, table } from "table";
+import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils";
+import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
+import { formatDate, MStoTime } from "./functions/date";
+import { getNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
+import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
+import { getTimestamp, logger } from "./logger";
+import { Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
 import { addUse, getCommand } from "./premium/utils";
-import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils";
-import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
-import { getNews } from "./functions/news";
-import { formatDate, MStoTime } from "./functions/date";
-import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
-const commands: Map<string, Command> = new Map();
-const aliases: Map<string, string> = new Map();
-const popularCommands: Map<string, number> = new Map();
-const noLifers: Map<string, number> = new Map();
-const commandUses: Map<string, number> = new Map();
-const handcuffs: Map<string, Date> = new Map();
-const captchaFails: Map<string, number> = new Map();
-const captchaPasses: Map<string, number> = new Map();
+const commands = new Map<string, Command>();
+const aliases = new Map<string, string>();
+const popularCommands = new Map<string, number>();
+const noLifers = new Map<string, number>();
+const commandUses = new Map<string, number>();
+const handcuffs = new Map<string, Date>();
+const captchaFails = new Map<string, number>();
+const captchaPasses = new Map<string, number>();
 
-const karmaCooldown: Set<string> = new Set();
-const xpCooldown: Set<string> = new Set();
-const cooldown: Set<string> = new Set();
-const openingCratesBlock = new Set();
+const karmaCooldown = new Set<string>();
+const xpCooldown = new Set<string>();
+const cooldown = new Set<string>();
+const openingCratesBlock = new Set<string>();
 
 const beingChecked: string[] = [];
 
@@ -164,7 +164,7 @@ export function reloadCommand(commandsArray: string[]) {
 async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
-    const helpCategories = new Map();
+    const helpCategories = new Map<string, Map<number, string[]>>();
 
     const prefix = await getPrefix(message.guild);
 
@@ -190,7 +190,7 @@ async function helpCmd(message: Message, args: string[]) {
 
             helpCategories.set(category, current);
         } else {
-            const pages = new Map();
+            const pages = new Map<number, string[]>();
 
             pages.set(1, [`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`]);
 

@@ -1,19 +1,19 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import fetch from "node-fetch";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { getLastfmUsername } from "../utils/users/utils";
-import { getPrefix } from "../utils/guilds/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { logger } from "../utils/logger";
 
 const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"]);
 
@@ -73,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("no track data")] });
     }
 
-    const pages: Map<number, string[]> = new Map();
+    const pages = new Map<number, string[]>();
 
     let count = 1;
 
