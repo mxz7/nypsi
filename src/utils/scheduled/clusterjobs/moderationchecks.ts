@@ -97,9 +97,11 @@ export function runModerationChecks(client: NypsiClient) {
             });
         }
 
-        logger.log({
-            level: "auto",
-            message: `${modLogCount.toLocaleString()} modlogs sent`,
-        });
+        if (modLogCount > 0) {
+            logger.log({
+                level: "auto",
+                message: `${modLogCount.toLocaleString()} modlogs sent`,
+            });
+        }
     }, 30000);
 }
