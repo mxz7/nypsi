@@ -2,6 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { startRestart } from "../utils/commandhandler";
 import { setCustomPresence } from "../utils/functions/presence";
 import { logger } from "../utils/logger";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -40,7 +41,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             setTimeout(() => {
                 logger.info("cluster shutting down...");
-                process.exit();
+                const client = message.client as NypsiClient;
+
+                client.cluster.evalOnManager(`this.clusters.get(${client.cluster.id}).respawn()`);
             }, 10000);
         }, 20000);
 

@@ -15,9 +15,18 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     shardArgs: ["--ansi", "--color"],
 });
 
+manager.extend(
+    new Cluster.HeartbeatManager({
+        interval: 2000,
+        maxMissedHeartbeats: 5,
+    })
+);
+
 manager.on("clusterCreate", (cluster) => {
     logger.info(`launched cluster ${cluster.id}`);
 });
+
+manager.on("debug", logger.info);
 
 manager.spawn();
 
