@@ -1,18 +1,18 @@
 import { Collection, GuildMember, Message, PermissionsBitField, ThreadMember, ThreadMemberManager } from "discord.js";
+import { cpu } from "node-os-utils";
 import { runCommand } from "../utils/commandhandler";
 import { userExists } from "../utils/economy/utils";
+import { encrypt } from "../utils/functions/string";
 import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
+import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
-import doCollection from "../utils/workers/mentions";
-import { cpu } from "node-os-utils";
-import { getKarma, getLastCommand } from "../utils/karma/utils";
-import ms = require("ms");
-import { encrypt } from "../utils/functions/string";
-import { addModLog } from "../utils/moderation/utils";
 import { PunishmentType } from "../utils/models/GuildStorage";
+import { addModLog } from "../utils/moderation/utils";
+import { getTier, isPremium } from "../utils/premium/utils";
 import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils";
+import doCollection from "../utils/workers/mentions";
+import ms = require("ms");
 import Database = require("better-sqlite3");
 
 const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
@@ -322,7 +322,7 @@ async function addMention() {
     } else {
         deleteMention.run(mention);
 
-        for (let i = 0; i < 49; i++) {
+        for (let i = 0; i < 25; i++) {
             mention = deleteQueue.shift();
 
             if (!mention) break;
@@ -342,11 +342,11 @@ async function addMention() {
     const old = currentInterval;
 
     if (cpuUsage > 90) {
-        currentInterval = 700;
+        currentInterval = 1000;
     } else if (cpuUsage > 80) {
-        currentInterval = 450;
+        currentInterval = 500;
     } else if (cpuUsage < 80) {
-        currentInterval = 125;
+        currentInterval = 300;
     } else {
         currentInterval = 125;
     }
