@@ -35,7 +35,7 @@ enum Response {
 
 const emojis = new Map<string, string>();
 const games = new Map<string, Game>();
-const karmaCooldown: Set<string> = new Set();
+const karmaCooldown = new Set<string>();
 
 let wordList: string[];
 
