@@ -15,7 +15,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     logger.info(`DM requested with ${options.memberId}`);
 
     if (options.client instanceof NypsiClient) {
-        const clusterHas = await options.client.shard.broadcastEval(
+        const clusterHas = await options.client.cluster.broadcastEval(
             async (c, { userId }) => {
                 const user = await c.users.fetch(userId).catch(() => {});
 
@@ -52,7 +52,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
             payload.embeds = [options.embed.toJSON()];
         }
 
-        const res = await options.client.shard.broadcastEval(
+        const res = await options.client.cluster.broadcastEval(
             async (c, { needed, memberId, payload }) => {
                 if (!c.shard.ids.includes(needed)) return false;
 

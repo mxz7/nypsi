@@ -1,4 +1,4 @@
-import { Client, Collection, Guild, GuildMember } from "discord.js";
+import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import fetch from "node-fetch";
@@ -349,7 +349,7 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     return max;
 }
 
-export async function topAmountGlobal(amount: number, client?: Client, anon = true): Promise<string[]> {
+export async function topAmountGlobal(amount: number, client?: NypsiClient, anon = true): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
             money: { gt: 1000 },
@@ -397,7 +397,7 @@ export async function topAmountGlobal(amount: number, client?: Client, anon = tr
             let username: string;
 
             if (client) {
-                const res = await client.shard.broadcastEval(
+                const res = await client.cluster.broadcastEval(
                     async (c, { userId }) => {
                         const user = await c.users.fetch(userId);
 
