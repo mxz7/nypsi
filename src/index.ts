@@ -12,11 +12,6 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
 
     execArgv: ["--trace-warnings"],
     shardArgs: ["--ansi", "--color"],
-
-    keepAlive: {
-        interval: 10000,
-        maxMissedHeartbeats: 2,
-    },
 });
 
 manager.extend(
