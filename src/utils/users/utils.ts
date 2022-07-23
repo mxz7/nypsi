@@ -137,6 +137,8 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
         id = member;
     }
 
+    if (!hasProfile(id)) return undefined;
+
     if (optCache.has(id)) {
         return optCache.get(id);
     }
