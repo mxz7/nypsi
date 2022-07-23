@@ -1909,3 +1909,11 @@ export async function topGuilds(limit = 5) {
 
     return out;
 }
+
+export async function startOpeningCrates(member: GuildMember) {
+    await redis.set(`economy:crates:block:${member.user.id}`, "y");
+}
+
+export async function stopOpeningCrates(member: GuildMember) {
+    await redis.del(`economy:crates:block:${member.user.id}`);
+}

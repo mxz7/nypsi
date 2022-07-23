@@ -1,9 +1,5 @@
-import { table, getBorderCharacters } from "table";
-import * as fs from "fs";
 import { REST } from "@discordjs/rest";
 import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
-import { Command, NypsiCommandInteraction } from "./models/Command";
-import { getTimestamp, logger } from "./logger";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -15,18 +11,23 @@ import {
     MessageActionRowComponentBuilder,
     WebhookClient,
 } from "discord.js";
+import * as fs from "fs";
+import { getBorderCharacters, table } from "table";
+import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils";
+import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
+import { formatDate, MStoTime } from "./functions/date";
+import { getNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
+import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
+import { getTimestamp, logger } from "./logger";
+import { Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
 import { addUse, getCommand } from "./premium/utils";
-import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils";
-import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
-import { getNews } from "./functions/news";
-import { formatDate, MStoTime } from "./functions/date";
-import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
-import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
+import redis from "./database/redis";
 import { NypsiClient } from "./models/Client";
+import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
 const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
@@ -39,7 +40,6 @@ const captchaPasses: Map<string, number> = new Map();
 const karmaCooldown: Set<string> = new Set();
 const xpCooldown: Set<string> = new Set();
 const cooldown: Set<string> = new Set();
-const openingCratesBlock = new Set();
 
 const beingChecked: string[] = [];
 
@@ -630,7 +630,10 @@ export async function runCommand(
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             }
-        } else if (commands.get(aliases.get(cmd)).category == "money" && openingCratesBlock.has(message.author.id)) {
+        } else if (
+            commands.get(aliases.get(cmd)).category == "money" &&
+            (await redis.exists(`economy:crates:block:${message.author.id}`))
+        ) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             } else {
@@ -934,14 +937,6 @@ export function addHandcuffs(id: string) {
 
 export function startRestart() {
     restarting = true;
-}
-
-export function startOpeningCrates(member: GuildMember) {
-    openingCratesBlock.add(member.user.id);
-}
-
-export function stopOpeningCrates(member: GuildMember) {
-    openingCratesBlock.delete(member.user.id);
 }
 
 export async function uploadGuildCommands(guildID: string, clientID: string) {
