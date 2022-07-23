@@ -7,16 +7,6 @@ import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import ms = require("ms");
-import { getGuild } from "../../nypsi";
-import prisma from "../database/database";
-import { addCooldown, inCooldown } from "../guilds/utils";
-import { logger } from "../logger";
-import { CustomEmbed } from "../models/EmbedBuilders";
-
-const currentChannels = new Set<string>();
-const existsCache = new Set<string>();
-const enabledCache = new Map<string, number>();
-const lastGame = new Map<string, number>();
 
 const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();

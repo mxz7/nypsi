@@ -56,7 +56,7 @@ export function runSnipeClearIntervals() {
 const fetchCooldown = new Set<string>();
 const disableCache = new Map<string, string[]>();
 const chatFilterCache = new Map<string, string[]>();
-const snipeFilterCache = new Map<string, string[]();
+const snipeFilterCache = new Map<string, string[]>();
 
 export async function runCheck(guild: Guild) {
     if (!(await hasGuild(guild))) await createGuild(guild);

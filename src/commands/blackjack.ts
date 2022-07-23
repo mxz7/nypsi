@@ -30,7 +30,6 @@ import {
 } from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

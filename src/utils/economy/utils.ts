@@ -394,13 +394,25 @@ export async function topAmountGlobal(amount: number, client?: Client, anon = tr
                 pos = "🥉";
             }
 
-            let username = usernames.get(user);
+            let username: string;
 
             if (client) {
-                const member = await client.users.fetch(user);
+                const res = await client.shard.broadcastEval(
+                    async (c, { userId }) => {
+                        const user = await c.users.fetch(userId);
 
-                if (member) {
-                    username = member.tag;
+                        if (user) {
+                            return user.tag;
+                        }
+                    },
+                    { context: { userId: user } }
+                );
+
+                for (const i of res) {
+                    if (i.includes("#")) {
+                        username = i;
+                        break;
+                    }
                 }
             }
 
