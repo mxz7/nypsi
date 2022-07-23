@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "**server count** " +
                 guildCount.toLocaleString() +
                 "\n" +
-                "**user count** " +
+                "**users cached** " +
                 userCount.toLocaleString() +
                 "\n" +
                 "**total commands** " +
