@@ -55,6 +55,8 @@ export function runModerationChecks(client: NypsiClient) {
             },
         });
 
+        let modLogCount = 0;
+
         for (const modlog of query3) {
             if (!(await redis.exists(`modlogs:${modlog.guildId}`)) || (await redis.llen(`modlogs:${modlog.guildId}`)) == 0)
                 continue;
@@ -78,7 +80,9 @@ export function runModerationChecks(client: NypsiClient) {
                 }
             }
 
-            webhook.send({ embeds: embeds }).catch(async (e) => {
+            modLogCount += embeds.length;
+
+            await webhook.send({ embeds: embeds }).catch(async (e) => {
                 logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
                 logger.error(e);
 
@@ -92,5 +96,10 @@ export function runModerationChecks(client: NypsiClient) {
                 });
             });
         }
+
+        logger.log({
+            level: "auto",
+            message: `${modLogCount.toLocaleString()} modlogs sent`,
+        });
     }, 30000);
 }
