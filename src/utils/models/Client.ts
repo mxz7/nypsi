@@ -1,10 +1,10 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
+import { doChatReactions } from "../chatreactions/utils";
 import { runEconomySetup } from "../economy/utils";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
 import { getWebhooks, setClusterId } from "../logger";
-import { doChatReactions } from "../scheduled/clusterjobs/chatreaction";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
@@ -29,12 +29,12 @@ export class NypsiClient extends Client {
         runCountdowns(this);
         runChristmas(this);
         runSnipeClearIntervals();
+        doChatReactions(this);
 
         if (!this.shard.ids.includes(0)) return;
 
         runLotteryInterval(this);
         runPremiumChecks(this);
         runModerationChecks(this);
-        doChatReactions(this);
     }
 }
