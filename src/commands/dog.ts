@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const dogLinks = Array.from(dogCache.keys());
 
-    const subredditChoice: any = dogLinks[Math.floor(Math.random() * dogLinks.length)];
+    const subredditChoice = dogLinks[Math.floor(Math.random() * dogLinks.length)];
 
     const allowed = dogCache.get(subredditChoice);
 

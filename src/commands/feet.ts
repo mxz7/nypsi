@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const feetLinks = Array.from(feetCache.keys());
 
-    const subredditChoice: any = feetLinks[Math.floor(Math.random() * feetLinks.length)];
+    const subredditChoice = feetLinks[Math.floor(Math.random() * feetLinks.length)];
 
     const allowed = feetCache.get(subredditChoice);
 
