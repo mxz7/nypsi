@@ -1,8 +1,8 @@
-import { logger } from "./logger";
 import fetch from "node-fetch";
+import { logger } from "./logger";
 import { RedditJSON, RedditJSONPost } from "./models/Reddit";
 
-const images: Map<string, Map<string, RedditJSONPost[]>> = new Map();
+const images = new Map<string, Map<string, RedditJSONPost[]>>();
 
 const bdsmLinks = [
     "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
