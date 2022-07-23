@@ -417,18 +417,25 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 }
 
 export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
-    await client.shard.broadcastEval(
+    const res = await client.shard.broadcastEval(
         async (c, { guildId, memberId }) => {
             const guild = await c.guilds.fetch(guildId).catch(() => {});
 
-            if (!guild) return;
+            if (!guild) return "guild";
 
-            await guild.members.unban(memberId, "ban expired").catch(() => {});
+            let fail = false;
+            await guild.members.unban(memberId, "ban expired").catch(() => {
+                fail = true;
+            });
+            if (fail) return "unban";
+            return true;
         },
         { context: { guildId: guildId, memberId: member } }
     );
 
-    await deleteBan(guildId, member);
+    if (res.includes(true)) {
+        await deleteBan(guildId, member);
+    }
 }
 
 export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
