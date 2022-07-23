@@ -608,7 +608,11 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
         count++;
     }
 
-    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg);
+    return new Map<string, string>()
+        .set("wins", winsMsg)
+        .set("second", secondMsg)
+        .set("third", thirdMsg)
+        .set("overall", overallMsg);
 }
 
 export async function getBlacklisted(guild: Guild) {
