@@ -86,7 +86,7 @@ const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 async function cacheUpdate(links: string[], name: string) {
     const start = new Date().getTime();
 
-    const map: Map<string, RedditJSONPost[]> = new Map();
+    const map = new Map<string, RedditJSONPost[]>();
 
     let amount = 0;
     for (const link of links) {
