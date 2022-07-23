@@ -5,7 +5,7 @@ import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("restartshard", "restartshard", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("restartcluster", "restartcluster", Categories.NONE).setPermissions(["bot owner"]);
 
 let confirm = false;
 
@@ -33,19 +33,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ],
         });
 
-        logger.info("shard shutting down soon...");
+        logger.info("cluster shutting down soon...");
 
         setTimeout(() => {
-            logger.info("sharrd shutting down in 10 seconds...");
+            logger.info("cluster shutting down in 10 seconds...");
 
             setTimeout(() => {
-                logger.info("shard shutting down...");
+                logger.info("cluster shutting down...");
                 process.exit();
             }, 10000);
         }, 20000);
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, "✅ current shard will shut down soon")],
+            embeds: [new CustomEmbed(message.member, "✅ current cluster will shut down soon")],
         });
     }
 }
