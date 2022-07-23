@@ -13,7 +13,7 @@ import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/users/utils";
+import { clearUsernameHistory, fetchUsernameHistory, hasProfile, isTracking } from "../utils/users/utils";
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
     "un",
@@ -51,6 +51,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 5);
+
+    if (!(await hasProfile(member))) {
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, "this user has no username history")],
+        });
+    }
 
     const isUserTracking = await isTracking(member);
 
