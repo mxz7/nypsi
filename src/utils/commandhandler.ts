@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getXp, isEcoBanned, updateXp, userExists } from "./economy/utils";
+import { getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews } from "./functions/news";
@@ -33,7 +33,6 @@ const commands: Map<string, Command> = new Map();
 const aliases: Map<string, string> = new Map();
 const noLifers: Map<string, number> = new Map();
 const commandUses: Map<string, number> = new Map();
-const handcuffs: Map<string, Date> = new Map();
 const captchaFails: Map<string, number> = new Map();
 const captchaPasses: Map<string, number> = new Map();
 
@@ -604,10 +603,10 @@ export async function runCommand(
             }
         }
 
-        if (commands.get(aliases.get(cmd)).category == "money" && handcuffs.has(message.author.id)) {
-            const init = handcuffs.get(message.member.user.id);
+        if (commands.get(aliases.get(cmd)).category == "money" && (await isHandcuffed(message.author.id))) {
+            const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init.getTime()) / 1000);
+            const diff = Math.round((curr - init) / 1000);
             const time = 60 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -659,10 +658,10 @@ export async function runCommand(
             }
         }
 
-        if (commands.get(cmd).category == "money" && handcuffs.has(message.author.id)) {
-            const init = handcuffs.get(message.member.user.id);
+        if (commands.get(cmd).category == "money" && (await isHandcuffed(message.author.id))) {
+            const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
-            const diff = Math.round((curr - init.getTime()) / 1000);
+            const diff = Math.round((curr - init) / 1000);
             const time = 120 - diff;
 
             const minutes = Math.floor(time / 60);
@@ -921,18 +920,6 @@ async function passedCaptcha(member: GuildMember) {
             member.user.id
         )})`
     );
-}
-
-export function isHandcuffed(id: string): boolean {
-    return handcuffs.has(id);
-}
-
-export function addHandcuffs(id: string) {
-    handcuffs.set(id, new Date());
-
-    setTimeout(() => {
-        handcuffs.delete(id);
-    }, 60000);
 }
 
 export function startRestart() {

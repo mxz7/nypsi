@@ -6,25 +6,26 @@ import {
     MessageEditOptions,
     MessageOptions,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import {
-    getItems,
-    getInventory,
-    setInventory,
-    userExists,
-    createUser,
-    hasPadlock,
-    setPadlock,
-    getDMsEnabled,
-    addItemUse,
-    openCrate,
-} from "../utils/economy/utils";
-import { getPrefix } from "../utils/guilds/utils";
-import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
-import { addHandcuffs, isHandcuffed } from "../utils/commandhandler";
+import {
+    addHandcuffs,
+    addItemUse,
+    createUser,
+    getDMsEnabled,
+    getInventory,
+    getItems,
+    hasPadlock,
+    isHandcuffed,
+    openCrate,
+    setInventory,
+    setPadlock,
+    userExists,
+} from "../utils/economy/utils";
+import { getMember } from "../utils/functions/member";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"]);
 
@@ -439,7 +440,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return send({ embeds: [new ErrorEmbed("bit of self bondage huh")] });
                 }
 
-                if (isHandcuffed(handcuffsTarget.user.id)) {
+                if (await isHandcuffed(handcuffsTarget.user.id)) {
                     return send({
                         embeds: [new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)],
                     });
@@ -447,7 +448,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await addItemUse(message.member, selected.id);
 
-                addHandcuffs(handcuffsTarget.id);
+                await addHandcuffs(handcuffsTarget.id);
 
                 inventory["handcuffs"]--;
 

@@ -1917,3 +1917,12 @@ export async function startOpeningCrates(member: GuildMember) {
 export async function stopOpeningCrates(member: GuildMember) {
     await redis.del(`economy:crates:block:${member.user.id}`);
 }
+
+export async function isHandcuffed(id: string): Promise<boolean> {
+    return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
+}
+
+export async function addHandcuffs(id: string) {
+    await redis.set(`economy:handcuffed:${id}`, Date.now());
+    await redis.expire(`economy:handcuffed:${id}`, 60);
+}
