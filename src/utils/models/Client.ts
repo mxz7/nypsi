@@ -17,7 +17,7 @@ export class NypsiClient extends Client {
 
         this.cluster = new Cluster.Client(this);
 
-        setClusterId(this.shard.ids[0]);
+        setClusterId(this.cluster.id);
 
         runEconomySetup();
 
@@ -33,7 +33,7 @@ export class NypsiClient extends Client {
         runSnipeClearIntervals();
         doChatReactions(this);
 
-        if (!this.shard.ids.includes(0)) return;
+        if (this.cluster.id != 0) return;
 
         runLotteryInterval(this);
         runPremiumChecks(this);

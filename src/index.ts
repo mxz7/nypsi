@@ -9,7 +9,7 @@ setClusterId("main");
 
 const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     token: process.env.BOT_TOKEN,
-    totalShards: 2,
+    totalClusters: 2,
 
     execArgv: ["--trace-warnings"],
     shardArgs: ["--ansi", "--color"],

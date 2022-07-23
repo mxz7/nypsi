@@ -17,10 +17,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     if (options.client instanceof NypsiClient) {
         const clusterHas = await options.client.cluster.broadcastEval(
             async (c, { userId }) => {
-                const user = await c.users.fetch(userId).catch(() => {});
+                const client = c as NypsiClient;
+                const user = await client.users.fetch(userId).catch(() => {});
 
                 if (user) {
-                    return c.shard.ids[0];
+                    return client.cluster.id;
                 } else {
                     return "not-found";
                 }
@@ -54,9 +55,10 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
 
         const res = await options.client.cluster.broadcastEval(
             async (c, { needed, memberId, payload }) => {
-                if (!c.shard.ids.includes(needed)) return false;
+                const client = c as NypsiClient;
+                if (client.cluster.id != needed) return false;
 
-                const user = await c.users.fetch(memberId).catch(() => {});
+                const user = await client.users.fetch(memberId).catch(() => {});
 
                 if (!user) return false;
 
@@ -93,10 +95,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     } else {
         const clusterHas = await options.client.broadcastEval(
             async (c, { userId }) => {
-                const user = await c.users.fetch(userId).catch(() => {});
+                const client = c as NypsiClient;
+                const user = await client.users.fetch(userId).catch(() => {});
 
                 if (user) {
-                    return c.shard.ids[0];
+                    return client.cluster.id;
                 } else {
                     return "not-found";
                 }
@@ -130,9 +133,10 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
 
         const res = await options.client.broadcastEval(
             async (c, { needed, memberId, payload }) => {
-                if (!c.shard.ids.includes(needed)) return false;
+                const client = c as NypsiClient;
+                if (client.cluster.id != needed) return false;
 
-                const user = await c.users.fetch(memberId).catch(() => {});
+                const user = await client.users.fetch(memberId).catch(() => {});
 
                 if (!user) return false;
 
