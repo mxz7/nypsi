@@ -36,10 +36,10 @@ const handcuffs = new Map<string, Date>();
 const captchaFails = new Map<string, number>();
 const captchaPasses = new Map<string, number>();
 
-const karmaCooldown: Set<string> = new Set();
-const xpCooldown: Set<string> = new Set();
-const cooldown: Set<string> = new Set();
-const openingCratesBlock = new Set();
+const karmaCooldown = new Set<string>();
+const xpCooldown = new Set<string>();
+const cooldown = new Set<string>();
+const openingCratesBlock = new Set<string>();
 
 const beingChecked: string[] = [];
 
