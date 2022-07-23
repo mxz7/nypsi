@@ -1,10 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { profileExists, getAllCases } from "../utils/moderation/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { getMember } from "../utils/functions/member";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { getAllCases, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
@@ -38,8 +38,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        const topStaff = new Map();
-        const topMembers = new Map();
+        const topStaff = new Map<string, number>();
+        const topMembers = new Map<string, number>();
 
         let deletedCaseCount = 0;
 
