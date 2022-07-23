@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const bdsmLinks = Array.from(bdsmCache.keys());
 
-    const subredditChoice: any = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)];
+    const subredditChoice = bdsmLinks[Math.floor(Math.random() * bdsmLinks.length)];
 
     const allowed = bdsmCache.get(subredditChoice);
 
