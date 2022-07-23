@@ -579,11 +579,11 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
     });
 
     const userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         userIDs.push(user.userId);
-        balances.set(user.userId, user.money);
+        balances.set(user.userId, Number(user.money));
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i));
@@ -652,12 +652,12 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
     });
 
     let userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         if (members.has(user.userId)) {
             userIDs.push(user.userId);
-            balances.set(user.userId, user.money);
+            balances.set(user.userId, Number(user.money));
         }
     }
 
@@ -729,12 +729,12 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
     });
 
     let userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         if (members.find((member) => member.user.id == user.userId)) {
             userIDs.push(user.userId);
-            balances.set(user.userId, user.money);
+            balances.set(user.userId, Number(user.money));
         }
     }
 
