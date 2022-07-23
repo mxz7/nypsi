@@ -1,15 +1,14 @@
 import { ChannelType, Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import ms = require("ms");
 import fetch from "node-fetch";
 import prisma from "../database/database";
 import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import ms = require("ms");
 
 const currentChannels = new Set<string>();
-const existsCache = new Set<string>();
 const lastGame = new Map<string, number>();
 
 export function doChatReactions(client: NypsiClient) {
@@ -137,10 +136,6 @@ export async function createReactionProfile(guild: Guild) {
 }
 
 export async function hasReactionProfile(guild: Guild) {
-    if (existsCache.has(guild.id)) {
-        return true;
-    }
-
     const query = await prisma.chatReaction.findUnique({
         where: {
             guildId: guild.id,
@@ -151,7 +146,6 @@ export async function hasReactionProfile(guild: Guild) {
     });
 
     if (query) {
-        existsCache.add(guild.id);
         return true;
     } else {
         return false;
