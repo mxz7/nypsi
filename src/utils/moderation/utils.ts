@@ -434,30 +434,44 @@ export async function requestUnban(guildId: string, member: string, client: Nyps
 export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
     const muteRoleId = await getMuteRole(guildId);
 
-    await client.shard.broadcastEval(
+    const res = await client.shard.broadcastEval(
         async (c, { guildId, memberId, muteRoleId }) => {
             const guild = await c.guilds.fetch(guildId).catch(() => {});
 
-            if (!guild) return;
+            if (!guild) return "guild";
 
             const member = await guild.members.fetch(memberId).catch(() => {});
 
-            if (!member) return;
+            if (!member) return "member";
 
             let role = muteRoleId;
 
-            if (muteRoleId == "") {
-                role = guild.roles.cache.find((r) => r.name == "muted").id;
+            try {
+                if (muteRoleId == "" || muteRoleId == "default") {
+                    const roles = await guild.roles.fetch();
+                    role = roles.find((r) => r.name == "muted").id;
+                } else {
+                    role = (await guild.roles.fetch(muteRoleId)).id;
+                }
+            } catch {
+                return "role";
             }
 
-            await member.roles.remove(role, "mute expired").catch(() => {});
+            let fail = false;
+            await member.roles.remove(role, "mute expired").catch(() => {
+                fail = true;
+            });
+            if (fail) return "role";
+            return true;
         },
         {
             context: { guildId: guildId, memberId: member, muteRoleId: muteRoleId },
         }
     );
 
-    await deleteMute(guildId, member);
+    if (res.includes(true) || res.includes("member") || res.includes("role")) {
+        await deleteMute(guildId, member);
+    }
 }
 
 export async function getMutedUsers(guild: Guild) {
