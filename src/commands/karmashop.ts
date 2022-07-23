@@ -1,21 +1,21 @@
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { isKarmaShopOpen, getKarma, openKarmaShop, closeKarmaShop, removeKarma } from "../utils/karma/utils";
-import { inPlaceSort } from "fast-sort";
-import { isPremium, getTier, setExpireDate } from "../utils/premium/utils";
-import { updateXp, getXp, userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import dayjs = require("dayjs");
+import { createUser, getInventory, getXp, setInventory, updateXp, userExists } from "../utils/economy/utils";
+import { closeKarmaShop, getKarma, isKarmaShopOpen, openKarmaShop, removeKarma } from "../utils/karma/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { KarmaShopItem } from "../utils/models/Karmashop";
+import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
+import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -23,7 +23,7 @@ declare function require(name: string): any;
 
 const items: { [key: string]: KarmaShopItem } = require("../../data/karmashop.json");
 
-const amount = new Map();
+const amount = new Map<string, number>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);

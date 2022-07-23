@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cache = new Map();
+const cache = new Map<string, number>();
 
 const cmd = new Command("slut", "measure how much of a slut you are", Categories.FUN).setAliases([
     "howslut",

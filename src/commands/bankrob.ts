@@ -1,17 +1,17 @@
-import {
-    getBalance,
-    createUser,
-    updateBalance,
-    userExists,
-    getInventory,
-    setInventory,
-    addItemUse,
-} from "../utils/economy/utils.js";
 import { CommandInteraction, Message } from "discord.js";
 import * as shuffle from "shuffle-array";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addItemUse,
+    createUser,
+    getBalance,
+    getInventory,
+    setInventory,
+    updateBalance,
+    userExists,
+} from "../utils/economy/utils.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const bankWorth = new Map();
+    const bankWorth = new Map<string, number>();
 
     if ((await getBalance(message.member)) > 100000000) {
         bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 0.01));

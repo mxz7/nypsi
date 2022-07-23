@@ -1,25 +1,25 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
-    MessageEditOptions,
+    CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { isPremium } from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
-import { userExists } from "../utils/economy/utils";
-import { getKarma, getLastCommand } from "../utils/karma/utils";
-import ms = require("ms");
-import { decrypt } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { userExists } from "../utils/economy/utils";
+import { decrypt } from "../utils/functions/string";
+import { getPrefix } from "../utils/guilds/utils";
+import { getKarma, getLastCommand } from "../utils/karma/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { isPremium } from "../utils/premium/utils";
+import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
+import ms = require("ms");
 
 const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([
     "mentions",
@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
     }
 
-    const pages = new Map();
+    const pages = new Map<number, string[]>();
 
     for (const i of mentions) {
         if (pages.size == 0) {

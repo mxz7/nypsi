@@ -24,7 +24,7 @@ import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOption
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
 
-const playerCooldown = new Set();
+const playerCooldown = new Set<string>();
 
 const cmd = new Command("rob", "rob other server members", Categories.MONEY).setAliases(["steal"]);
 

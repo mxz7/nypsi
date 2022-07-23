@@ -1,9 +1,9 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { getDMsEnabled } from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import redis from "../utils/database/redis.js";
+import { getDMsEnabled } from "../utils/economy/utils.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { MilfSearchData } from "../utils/models/Sex.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
@@ -16,7 +16,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
 
-const looking: Map<string, MilfSearchData> = new Map();
+const looking = new Map<string, MilfSearchData>();
 
 const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
 

@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { updateXp, getXp, userExists, createUser } from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { createUser, getXp, updateXp, userExists } from "../utils/economy/utils.js";
+import { getMember } from "../utils/functions/member.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cache = new Map();
+const cache = new Map<string, number>();
 
 const cmd = new Command("furry", "measure how much of a furry you are", Categories.FUN).setAliases([
     "howfurry",

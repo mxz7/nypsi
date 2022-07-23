@@ -24,7 +24,7 @@ const cmd = new Command("profile", "view your raw data stored in nypsi's databas
 ]);
 const db = new Database("./out/data/storage.db");
 
-const cooldown = new Set();
+const cooldown = new Set<string>();
 
 // @ts-expect-error ts doesnt like that
 BigInt.prototype.toJSON = function () {

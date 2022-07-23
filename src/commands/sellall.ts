@@ -1,17 +1,17 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    getItems,
+    createUser,
     getBalance,
     getInventory,
-    updateBalance,
-    setInventory,
+    getItems,
     getMulti,
+    setInventory,
+    updateBalance,
     userExists,
-    createUser,
 } from "../utils/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY);
 
@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const inventory = await getInventory(message.member);
 
-    const selected = new Map();
+    const selected = new Map<string, number>();
 
     for (const item of Array.from(Object.keys(inventory))) {
         if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {

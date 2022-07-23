@@ -1,16 +1,16 @@
 import Database = require("better-sqlite3");
 import { Collection, Guild, GuildMember, Message, ThreadMember, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import ms = require("ms");
 import fetch from "node-fetch";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { cleanString } from "../functions/string";
+import ms = require("ms");
 
 const db = new Database("./out/data/storage.db");
-const optCache = new Map();
-const lastfmUsernameCache = new Map();
-const lastKnownTagCooldown = new Set();
+const optCache = new Map<string, boolean>();
+const lastfmUsernameCache = new Map<string, string>();
+const lastKnownTagCooldown = new Set<string>();
 
 export interface MentionQueueItem {
     type: string;
@@ -33,10 +33,9 @@ interface MentionData {
 const mentionQueue: MentionQueueItem[] = [];
 
 export { mentionQueue };
+export { deleteQueue };
 
 const deleteQueue: string[] = [];
-
-export { deleteQueue };
 
 export async function hasProfile(member: GuildMember | string) {
     let id: string;

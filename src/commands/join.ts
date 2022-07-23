@@ -14,7 +14,7 @@ cmd.slashData.addUserOption((option) =>
     option.setName("user").setDescription("view join position for this user").setRequired(false)
 );
 
-const sortCache = new Map();
+const sortCache = new Map<string, string[]>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member: GuildMember;
@@ -70,12 +70,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
         membersSorted = sortCache.get(message.guild.id);
     } else if (message.guild.memberCount < 69420) {
-        const membersMap = new Map();
+        const membersMap = new Map<string, number>();
 
         members.forEach((m) => {
             if (m.joinedTimestamp) {
                 membersSorted.push(m.id);
-                membersMap.set(m.id, m.joinedAt);
+                membersMap.set(m.id, m.joinedTimestamp);
             }
         });
 
