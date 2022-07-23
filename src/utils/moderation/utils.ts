@@ -5,9 +5,9 @@ import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { PunishmentType } from "../models/GuildStorage";
 
-const modLogQueue: Map<string, CustomEmbed[]> = new Map();
-const modLogHookCache: Map<string, WebhookClient> = new Map();
-const modLogColors: Map<PunishmentType, ColorResolvable> = new Map();
+const modLogQueue = new Map<string, CustomEmbed[]>();
+const modLogHookCache = new Map<string, WebhookClient>();
+const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
 modLogColors.set(PunishmentType.MUTE, "#ffffba");
 modLogColors.set(PunishmentType.BAN, "#ffb3ba");

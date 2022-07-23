@@ -7,7 +7,7 @@ import { PremUser } from "../models/PremStorage";
 
 declare function require(name: string): any;
 
-const colorCache = new Map();
+const colorCache = new Map<string, `#${string}` | "default">();
 
 setInterval(async () => {
     const now = new Date();
@@ -218,7 +218,7 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
         },
     });
 
-    colorCache.set(member, query.embedColor);
+    colorCache.set(member, query.embedColor as `#${string}` | "default");
 
     return query.embedColor as `#${string}` | "default";
 }

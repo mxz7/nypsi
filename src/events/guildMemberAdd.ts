@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import { createGuild, hasGuild, runCheck } from "../utils/guilds/utils";
 import { deleteMute, getMuteRole, isMuted, profileExists } from "../utils/moderation/utils";
 
-const queue = new Set();
+const queue = new Set<string>();
 
 export default async function guildMemberAdd(member: GuildMember) {
     if (!(await hasGuild(member.guild))) await createGuild(member.guild);

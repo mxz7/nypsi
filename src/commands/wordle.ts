@@ -1,5 +1,4 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import ms = require("ms");
 import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
@@ -8,6 +7,7 @@ import { addKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { addWordleGame, getWordleStats } from "../utils/users/utils";
+import ms = require("ms");
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
 
@@ -33,9 +33,9 @@ enum Response {
     LOSE,
 }
 
-const emojis: Map<string, string> = new Map();
-const games: Map<string, Game> = new Map();
-const karmaCooldown: Set<string> = new Set();
+const emojis = new Map<string, string>();
+const games = new Map<string, Game>();
+const karmaCooldown = new Set<string>();
 
 let wordList: string[];
 

@@ -1,8 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { userExists, createUser, getInventory, getItems, addItemUse, setInventory } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addItemUse, createUser, getInventory, getItems, setInventory, userExists } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", Categories.MONEY);
 
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addItemUse(message.member, "furnace");
 
-    const smelted = new Map();
+    const smelted = new Map<string, number>();
 
     for (const ore of ores) {
         if (smelted.has(ore)) {

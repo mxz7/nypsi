@@ -4,8 +4,8 @@ import * as winston from "winston";
 import "winston-daily-rotate-file";
 import * as DiscordTransport from "winston-discord-webhook";
 
-const webhook: Map<string, Webhook> = new Map();
-const nextLogMsg: Map<string, string> = new Map();
+const webhook = new Map<string, Webhook>();
+const nextLogMsg = new Map<string, string>();
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
     let color = chalk.white;

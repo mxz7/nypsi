@@ -13,7 +13,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     }
 
     let target: GuildMember;
-    const possible = new Map();
+    const possible = new Map<number, GuildMember>();
 
     if (members.size > 1000) {
         const id = await chooseMember(members, memberName);

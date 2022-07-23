@@ -1,40 +1,40 @@
 import {
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    CommandInteraction,
-    TextChannel,
-    GuildMember,
-    PermissionFlagsBits,
-    Channel,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
-    MessageEditOptions,
+    Channel,
+    CommandInteraction,
+    GuildMember,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
+    PermissionFlagsBits,
+    TextChannel,
 } from "discord.js";
 import {
     createReactionProfile,
-    hasReactionProfile,
-    startReaction,
-    getReactionStats,
-    hasReactionStatsProfile,
     createReactionStatsProfile,
+    deleteStats,
+    getBlacklisted,
+    getReactionSettings,
+    getReactionStats,
     getServerLeaderboard,
     getWordList,
-    updateWords,
-    getReactionSettings,
-    updateReactionSettings,
-    getBlacklisted,
+    hasReactionProfile,
+    hasReactionStatsProfile,
     setBlacklisted,
-    deleteStats,
+    startReaction,
+    updateReactionSettings,
+    updateWords,
 } from "../utils/chatreactions/utils";
-import { getPrefix } from "../utils/guilds/utils";
-import { isPremium } from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
     .setAliases(["cr", "reaction"])
@@ -758,7 +758,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 );
                 embed.setHeader("chat reactions");
             } else {
-                const pages = new Map();
+                const pages = new Map<number, string[]>();
 
                 for (const word of words) {
                     if (pages.size == 0) {

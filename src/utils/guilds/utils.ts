@@ -1,11 +1,11 @@
 import { BaseGuildTextChannel, Client, Collection, Guild, GuildMember } from "discord.js";
-import ms = require("ms");
 import { checkGuild, eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import ms = require("ms");
 
 setInterval(() => {
     const now = new Date().getTime();
@@ -117,11 +117,11 @@ setInterval(async () => {
     existsCooldown.clear();
 }, ms("2 days"));
 
-const fetchCooldown = new Set();
-const existsCooldown = new Set();
-const disableCache = new Map();
-const chatFilterCache = new Map();
-const snipeFilterCache = new Map();
+const fetchCooldown = new Set<string>();
+const existsCooldown = new Set<string>();
+const disableCache = new Map<string, string[]>();
+const chatFilterCache = new Map<string, string[]>();
+const snipeFilterCache = new Map<string, string[]>();
 
 export async function runCheck(guild: Guild) {
     if (!(await hasGuild(guild))) await createGuild(guild);
@@ -197,7 +197,7 @@ export async function createGuild(guild: Guild) {
         },
     });
 
-    existsCooldown.add(guild);
+    existsCooldown.add(guild.id);
 
     setTimeout(() => {
         if (!existsCooldown.has(guild.id)) return;
