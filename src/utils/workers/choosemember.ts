@@ -1,5 +1,5 @@
 import { Collection, GuildMember } from "discord.js";
-import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 
 export default function chooseMember(members: Collection<string, GuildMember>, targetName: string): Promise<string | null> {
     return new Promise((resolve, reject) => {
@@ -16,7 +16,7 @@ export default function chooseMember(members: Collection<string, GuildMember>, t
 
 if (!isMainThread) {
     let target: GuildMember;
-    const possible = new Map();
+    const possible = new Map<number, GuildMember>();
     const members: Collection<string, GuildMember> = workerData[0];
     const memberName: string = workerData[1];
 
