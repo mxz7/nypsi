@@ -14,7 +14,7 @@ cmd.slashData.addUserOption((option) =>
     option.setName("user").setDescription("view join position for this user").setRequired(false)
 );
 
-const sortCache = new Map();
+const sortCache = new Map<string, string[]>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member: GuildMember;
