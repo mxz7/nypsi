@@ -9,10 +9,14 @@ setClusterId("main");
 
 const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     token: process.env.BOT_TOKEN,
-    totalClusters: 2,
 
     execArgv: ["--trace-warnings"],
     shardArgs: ["--ansi", "--color"],
+
+    keepAlive: {
+        interval: 10000,
+        maxMissedHeartbeats: 2,
+    },
 });
 
 manager.extend(
@@ -26,7 +30,9 @@ manager.on("clusterCreate", (cluster) => {
     logger.info(`launched cluster ${cluster.id}`);
 });
 
-manager.on("debug", logger.info);
+manager.on("debug", (m) => {
+    logger.debug(m);
+});
 
 manager.spawn();
 
