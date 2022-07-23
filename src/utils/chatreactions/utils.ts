@@ -1,12 +1,131 @@
-import { Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { ChannelType, Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import fetch from "node-fetch";
 import prisma from "../database/database";
-import { CustomEmbed } from "../models/EmbedBuilders";
 import { addCooldown, inCooldown } from "../guilds/utils";
+import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import ms = require("ms");
 
 const currentChannels = new Set<string>();
-const existsCache = new Set<string>();
+const lastGame = new Map<string, number>();
+
+export function doChatReactions(client: NypsiClient) {
+    setInterval(async () => {
+        let count = 0;
+
+        for (const guildId of client.guilds.cache.keys()) {
+            const guildData = await prisma.chatReaction.findFirst({
+                where: {
+                    AND: [{ guildId: guildId }, { randomStart: true }],
+                },
+                select: {
+                    guildId: true,
+                    randomChannels: true,
+                    betweenEvents: true,
+                    randomModifier: true,
+                },
+            });
+
+            if (!guildData) continue;
+
+            const guild = client.guilds.cache.get(guildId);
+
+            if (!guild) continue;
+
+            const channels = guildData.randomChannels;
+
+            if (channels.length == 0) continue;
+
+            const now = new Date().getTime();
+
+            for (const ch of channels) {
+                if (lastGame.has(ch)) {
+                    if (now >= lastGame.get(ch)) {
+                        lastGame.delete(ch);
+                    } else {
+                        continue;
+                    }
+                }
+
+                const channel = guild.channels.cache.find((cha) => cha.id == ch);
+
+                if (!channel) {
+                    continue;
+                }
+
+                if (!channel.isTextBased()) return;
+                if (channel.isThread()) return;
+                if (channel.type == ChannelType.GuildVoice) return;
+                if (channel.type == ChannelType.GuildNews) return;
+
+                const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
+                let stop = false;
+
+                if (!messages) continue;
+
+                messages.forEach((m) => {
+                    if (m.author.id == guild.client.user.id) {
+                        if (!m.embeds[0]) return;
+                        if (!m.embeds[0].author) return;
+                        if (m.embeds[0].author.name == "chat reaction") {
+                            stop = true;
+                            return;
+                        }
+                    }
+                });
+
+                if (stop) {
+                    continue;
+                }
+
+                const a = await startReaction(guild, channel);
+
+                if (a != "xoxo69") {
+                    count++;
+                } else {
+                    continue;
+                }
+
+                const base = guildData.betweenEvents;
+                let final;
+
+                if (guildData.randomModifier == 0) {
+                    final = base;
+                } else {
+                    const o = ["+", "-"];
+                    let operator = o[Math.floor(Math.random() * o.length)];
+
+                    if (base - guildData.randomModifier < 120) {
+                        operator = "+";
+                    }
+
+                    const amount = Math.floor(Math.random() * guildData.randomModifier);
+
+                    if (operator == "+") {
+                        final = base + amount;
+                    } else {
+                        final = base - amount;
+                    }
+                }
+
+                const nextGame = new Date().getTime() + final * 1000;
+
+                lastGame.set(channel.id, nextGame);
+
+                continue;
+            }
+        }
+
+        if (count > 0) {
+            logger.log({
+                level: "auto",
+                message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
+            });
+        }
+    }, ms("10m"));
+}
 
 export async function createReactionProfile(guild: Guild) {
     await prisma.chatReaction.create({
@@ -17,10 +136,6 @@ export async function createReactionProfile(guild: Guild) {
 }
 
 export async function hasReactionProfile(guild: Guild) {
-    if (existsCache.has(guild.id)) {
-        return true;
-    }
-
     const query = await prisma.chatReaction.findUnique({
         where: {
             guildId: guild.id,
@@ -31,7 +146,6 @@ export async function hasReactionProfile(guild: Guild) {
     });
 
     if (query) {
-        existsCache.add(guild.id);
         return true;
     } else {
         return false;

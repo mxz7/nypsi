@@ -1,7 +1,7 @@
 import Bree = require("bree");
 import ms = require("ms");
 import path = require("path");
-import { getGuilds } from "../../nypsi";
+import { getGuilds } from "../..";
 import { logger } from "../logger";
 
 const bree = new Bree({
@@ -59,11 +59,11 @@ const bree = new Bree({
 export default async function startJobs() {
     await bree.start();
 
-    bree.config.jobs[3].worker.workerData.guilds = getGuilds();
+    bree.config.jobs[3].worker.workerData.guilds = await getGuilds();
 
     // await bree.run();
 
-    setInterval(() => {
-        bree.config.jobs[3].worker.workerData.guilds = getGuilds();
+    setInterval(async () => {
+        bree.config.jobs[3].worker.workerData.guilds = await getGuilds();
     }, ms("1 day"));
 }

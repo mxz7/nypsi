@@ -1,49 +1,57 @@
 import { Collection, Guild, GuildMember } from "discord.js";
-import { eSnipe, getGuild, snipe } from "../../nypsi";
 import prisma from "../database/database";
 import redis from "../database/redis";
-import { daysUntilChristmas } from "../functions/date";
+import { daysUntil, daysUntilChristmas, MStoTime } from "../functions/date";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import { SnipedMessage } from "../models/Snipe";
 
-setInterval(() => {
-    const now = new Date().getTime();
+const snipe: Map<string, SnipedMessage> = new Map();
+const eSnipe: Map<string, SnipedMessage> = new Map();
 
-    let snipeCount = 0;
-    let eSnipeCount = 0;
+export { eSnipe, snipe };
 
-    snipe.forEach((msg) => {
-        const diff = now - msg.createdTimestamp;
+export function runSnipeClearIntervals() {
+    setInterval(() => {
+        const now = new Date().getTime();
 
-        if (diff >= 43200000) {
-            snipe.delete(msg.channel.id);
-            snipeCount++;
-        }
-    });
+        let snipeCount = 0;
+        let eSnipeCount = 0;
 
-    if (snipeCount > 0) {
-        logger.log({
-            level: "auto",
-            message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
+        snipe.forEach((msg) => {
+            const diff = now - msg.createdTimestamp;
+
+            if (diff >= 43200000) {
+                snipe.delete(msg.channel.id);
+                snipeCount++;
+            }
         });
-    }
 
-    eSnipe.forEach((msg) => {
-        const diff = now - msg.createdTimestamp;
-
-        if (diff >= 43200000) {
-            eSnipe.delete(msg.channel.id);
-            eSnipeCount++;
+        if (snipeCount > 0) {
+            logger.log({
+                level: "auto",
+                message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
+            });
         }
-    });
 
-    if (eSnipeCount > 0) {
-        logger.log({
-            level: "auto",
-            message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
+        eSnipe.forEach((msg) => {
+            const diff = now - msg.createdTimestamp;
+
+            if (diff >= 43200000) {
+                eSnipe.delete(msg.channel.id);
+                eSnipeCount++;
+            }
         });
-    }
-}, 3600000);
+
+        if (eSnipeCount > 0) {
+            logger.log({
+                level: "auto",
+                message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
+            });
+        }
+    }, 3600000);
+}
 
 const fetchCooldown = new Set();
 const disableCache = new Map();
@@ -193,18 +201,29 @@ export async function setGuildCounter(guild: Guild, profile: any) {
     });
 }
 
-export function checkStats() {
+export function updateCounters(client: NypsiClient) {
     setInterval(async () => {
-        const query = await prisma.guildCounter.findMany({
-            where: {
-                enabled: true,
-            },
-        });
-
-        for (const profile of query) {
-            const guild = await getGuild(profile.guildId);
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
 
             if (!guild) continue;
+
+            const profile = await prisma.guildCounter
+                .findMany({
+                    where: {
+                        AND: [
+                            {
+                                guildId: guildId,
+                            },
+                            {
+                                enabled: true,
+                            },
+                        ],
+                    },
+                })
+                .then((res) => res[0]);
+
+            if (!profile) continue;
 
             let memberCount: number;
 
@@ -267,6 +286,188 @@ export function checkStats() {
             }
         }
     }, 600000);
+}
+
+export function runCountdowns(client: NypsiClient) {
+    const now = new Date();
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000);
+
+    const doCountdowns = async () => {
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
+
+            if (!guild) continue;
+
+            const query = await prisma.guildCountdown.findMany({
+                where: {
+                    guildId: guildId,
+                },
+            });
+
+            if (!query) continue;
+
+            for (const countdown of query) {
+                const days = daysUntil(new Date(countdown.date)) + 1;
+
+                let message;
+
+                if (days == 0) {
+                    message = countdown.finalFormat;
+                } else {
+                    message = countdown.format.split("%days%").join(days.toLocaleString());
+                }
+
+                const embed = new CustomEmbed();
+
+                embed.setDescription(message);
+                embed.setColor("#111111");
+                embed.disableFooter();
+
+                const channel = guild.channels.cache.find((ch) => ch.id == countdown.channel);
+
+                if (!channel) continue;
+
+                if (!channel.isTextBased()) continue;
+
+                await channel
+                    .send({ embeds: [embed] })
+                    .then(() => {
+                        logger.log({
+                            level: "auto",
+                            message: `sent custom countdown (${countdown.id}) in ${guild.name} (${guildId})`,
+                        });
+                    })
+                    .catch(() => {
+                        logger.error(`error sending custom countdown (${countdown.id}) ${guild.name} (${guildId})`);
+                    });
+
+                if (days <= 0) {
+                    await deleteCountdown(guildId, countdown.id);
+                }
+            }
+        }
+    };
+
+    setTimeout(async () => {
+        setInterval(() => {
+            doCountdowns();
+        }, 86400000);
+        doCountdowns();
+    }, needed.getTime() - now.getTime());
+
+    logger.log({
+        level: "auto",
+        message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    });
+}
+
+export function runChristmas(client: NypsiClient) {
+    const now = new Date();
+
+    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
+
+    if (now.getHours() < 3) {
+        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
+    }
+
+    const needed = new Date(Date.parse(d) + 10800000);
+
+    const runChristmasThing = async () => {
+        const query = await prisma.guildChristmas.findMany({
+            where: {
+                enabled: true,
+            },
+        });
+
+        for (const guildId of client.guilds.cache.keys()) {
+            const guild = await client.guilds.fetch(guildId);
+
+            if (!guild) continue;
+
+            const profile = await prisma.guildChristmas.findFirst({
+                where: {
+                    AND: [
+                        {
+                            guildId: guildId,
+                        },
+                        {
+                            enabled: true,
+                        },
+                    ],
+                },
+            });
+
+            if (!query) continue;
+
+            const channel = guild.channels.cache.find((c) => c.id == profile.channel);
+
+            if (!channel) {
+                profile.enabled = false;
+                profile.channel = "none";
+                await setChristmasCountdown(guild, profile);
+                continue;
+            }
+
+            let format = profile.format;
+
+            const days = daysUntilChristmas();
+
+            format = format.split("%days%").join(daysUntilChristmas().toString());
+
+            if (days == "ITS CHRISTMAS") {
+                format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
+            }
+
+            if (!channel.isTextBased()) return;
+
+            await channel
+                .send({
+                    embeds: [
+                        new CustomEmbed()
+                            .setDescription(format)
+                            .setColor("#ff0000")
+                            .setTitle(":santa_tone1:")
+                            .disableFooter(),
+                    ],
+                })
+                .then(() => {
+                    logger.log({
+                        level: "auto",
+                        message: `sent christmas countdown in ${guild.name} ~ ${format}`,
+                    });
+                })
+                .catch(async () => {
+                    logger.error(`error sending christmas countdown in ${guild.name}`);
+                    profile.enabled = false;
+                    profile.channel = "none";
+                    await setChristmasCountdown(guild, profile);
+                });
+        }
+
+        for (const profile of query) {
+            const guild = client.guilds.cache.find((g) => g.id == profile.guildId);
+            if (!guild) continue;
+        }
+    };
+
+    setTimeout(async () => {
+        setInterval(() => {
+            runChristmasThing();
+        }, 86400000);
+        runChristmasThing();
+    }, needed.getTime() - now.getTime());
+
+    logger.log({
+        level: "auto",
+        message: `christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
+    });
 }
 
 export function addCooldown(guild: Guild, seconds: number) {

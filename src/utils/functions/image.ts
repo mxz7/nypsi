@@ -1,13 +1,14 @@
 import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
-import { GuildMember, Webhook } from "discord.js";
+import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
-import { getGuild, requestDM } from "../../nypsi";
 import prisma from "../database/database";
 import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { RedditJSONPost } from "../models/Reddit";
+import requestDM from "./requestdm";
 
 const imgur = new ImgurClient({
     // accessToken: process.env.IMGUR_ACCESSTOKEN,
@@ -24,7 +25,9 @@ setInterval(() => {
     logger.info("imgur upload count reset");
 }, 86400000);
 
-let wholesomeWebhook: Webhook;
+const wholesomeWebhook = new WebhookClient({
+    url: process.env.WHOLESOME_HOOK,
+});
 
 let wholesomeCache: WholesomeImage[];
 
@@ -118,15 +121,6 @@ export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[
 }
 
 export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
-    if (!wholesomeWebhook) {
-        const guild = await getGuild("747056029795221513");
-
-        const webhooks = await guild.fetchWebhooks();
-
-        wholesomeWebhook = await webhooks.find((w) => w.id == "846092969396142080");
-        logger.info(`wholesome webhook assigned as ${wholesomeWebhook.id}`);
-    }
-
     const query1 = await prisma.wholesomeImage.findUnique({
         where: {
             image: image,
@@ -178,7 +172,7 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
     return true;
 }
 
-export async function acceptWholesomeImage(id: number, accepter: GuildMember): Promise<boolean> {
+export async function acceptWholesomeImage(id: number, accepter: GuildMember, client: NypsiClient): Promise<boolean> {
     const query = await prisma.wholesomeSuggestion.findUnique({
         where: {
             id: id,
@@ -206,7 +200,11 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember): P
     clearWholesomeCache();
 
     if (await getDMsEnabled(query.submitterId)) {
-        await requestDM(query.submitterId, `your wholesome image (${query.image}) has been accepted`, true);
+        await requestDM({
+            memberId: query.submitterId,
+            client: client,
+            content: `your wholesome image (${query.image}) has been accepted`,
+        });
     }
 
     return true;

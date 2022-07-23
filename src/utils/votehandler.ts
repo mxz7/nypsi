@@ -1,6 +1,8 @@
-import * as express from "express";
-import { logger } from "./logger";
 import * as topgg from "@top-gg/sdk";
+import { ShardingManager } from "discord.js";
+import * as express from "express";
+import prisma from "./database/database";
+import redis from "./database/redis";
 import {
     addTicket,
     getBalance,
@@ -13,30 +15,29 @@ import {
     updateBalance,
     userExists,
 } from "./economy/utils";
-import prisma from "./database/database";
-import redis from "./database/redis";
-import ms = require("ms");
+import requestDM from "./functions/requestdm";
 import { addKarma, getKarma } from "./karma/utils";
-import { getTier, isPremium } from "./premium/utils";
+import { logger } from "./logger";
 import { CustomEmbed } from "./models/EmbedBuilders";
-import { requestDM } from "./../nypsi";
+import { getTier, isPremium } from "./premium/utils";
+import ms = require("ms");
 
 const app = express();
 const webhook = new topgg.Webhook("123");
 
-export function listenForVotes() {
+export function listenForVotes(manager: ShardingManager) {
     app.post(
         "/dblwebhook",
         webhook.listener((vote) => {
             logger.info(`received vote: ${vote.user}`);
-            doVote(vote);
+            doVote(vote, manager);
         })
     );
 
     app.listen(5000);
 }
 
-async function doVote(vote: topgg.WebhookPayload) {
+async function doVote(vote: topgg.WebhookPayload, manager: ShardingManager) {
     const { user } = vote;
 
     if (!(await userExists(user))) {
@@ -126,7 +127,12 @@ async function doVote(vote: topgg.WebhookPayload) {
             )
             .disableFooter();
 
-        const res = await requestDM(user, "thank you for voting!", false, embed);
+        const res = await requestDM({
+            memberId: user,
+            client: manager,
+            content: "thank you for voting!",
+            embed: embed,
+        });
 
         if (res) {
             logger.log({

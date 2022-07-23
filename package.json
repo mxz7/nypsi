@@ -2,7 +2,7 @@
   "name": "nypsi",
   "version": "4.1.5",
   "description": "",
-  "main": "dist/nypsi.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "npx eslint . && npx prettier --check",
     "format": "prettier --write .",
@@ -31,6 +31,7 @@
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.4",
     "discord-api-types": "^0.36.2",
+    "discord-hybrid-sharding": "^1.6.7",
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",

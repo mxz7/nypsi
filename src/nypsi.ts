@@ -1,35 +1,7 @@
-const startUp = Date.now();
+import { GatewayIntentBits, Options } from "discord.js";
+import { NypsiClient } from "./utils/models/Client";
 
-import "dotenv/config";
-import { loadCommands, runPopularCommandsTimer } from "./utils/commandhandler";
-import guildCreate from "./events/guildCreate";
-import ready from "./events/ready";
-import guildDelete from "./events/guildDelete";
-import guildMemberUpdate from "./events/guildMemberUpdate";
-import guildMemberAdd from "./events/guildMemberAdd";
-import guildMemberRemove from "./events/guildMemberRemove";
-import messageDelete from "./events/messageDelete";
-import messageUpdate from "./events/messageUpdate";
-import messageCreate from "./events/message";
-import channelCreate from "./events/channelCreate";
-import roleDelete from "./events/roleDelete";
-import userUpdate from "./events/userUpdate";
-import interactionCreate from "./events/interactionCreate";
-import { getWebhooks, logger } from "./utils/logger";
-import { checkStats } from "./utils/guilds/utils";
-import { updateStats } from "./utils/economy/utils";
-import { updateCache } from "./utils/imghandler";
-import { Client, EmbedBuilder, GatewayIntentBits, Guild, MessageOptions, Options } from "discord.js";
-import { SnipedMessage } from "./utils/models/Snipe";
-import { listenForVotes } from "./utils/votehandler";
-import { runLotteryInterval } from "./utils/scheduled/clusterjobs/lottery";
-import startJobs from "./utils/scheduled/scheduler";
-import { runCountdowns } from "./utils/scheduled/clusterjobs/guildcountdowns";
-import { runChristmas } from "./utils/scheduled/clusterjobs/guildchristmas";
-import { doChatReactions } from "./utils/scheduled/clusterjobs/chatreaction";
-import { runModerationChecks } from "./utils/scheduled/clusterjobs/moderationchecks";
-
-const client = new Client({
+const client = new NypsiClient({
     allowedMentions: {
         parse: ["users", "roles"],
     },
@@ -53,7 +25,7 @@ const client = new Client({
     rest: {
         offset: 0,
     },
-    shards: "auto",
+    // shards: "auto",
     intents: [
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.MessageContent,
@@ -68,14 +40,25 @@ const client = new Client({
     ],
 });
 
-const snipe: Map<string, SnipedMessage> = new Map();
-const eSnipe: Map<string, SnipedMessage> = new Map();
-
-export { eSnipe, snipe };
+import channelCreate from "./events/channelCreate";
+import guildCreate from "./events/guildCreate";
+import guildDelete from "./events/guildDelete";
+import guildMemberAdd from "./events/guildMemberAdd";
+import guildMemberRemove from "./events/guildMemberRemove";
+import guildMemberUpdate from "./events/guildMemberUpdate";
+import interactionCreate from "./events/interactionCreate";
+import messageCreate from "./events/message";
+import messageDelete from "./events/messageDelete";
+import messageUpdate from "./events/messageUpdate";
+import ready from "./events/ready";
+import roleDelete from "./events/roleDelete";
+import userUpdate from "./events/userUpdate";
+import { loadCommands } from "./utils/commandhandler";
+import { logger } from "./utils/logger";
 
 loadCommands();
 
-client.once("ready", ready.bind(null, client, startUp));
+client.once("ready", ready.bind(null, client));
 if (!process.env.GITHUB_ACTION) {
     client.on("guildCreate", guildCreate.bind(null, client));
     client.on("guildDelete", guildDelete.bind(null, client));
@@ -119,141 +102,6 @@ process.on("unhandledRejection", (e: any) => {
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
 
-export function checkGuild(guildID: string) {
-    const g = client.guilds.cache.find((gi) => gi.id == guildID);
-
-    if (g) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function runChecks() {
-    checkStats();
-
-    if (client.user.id != "678711738845102087") return;
-
-    setInterval(() => {
-        updateStats(client.guilds.cache.size, client.options.shardCount);
-        logger.log({
-            level: "auto",
-            message: "guild count posted to top.gg: " + client.guilds.cache.size,
-        });
-    }, 3600000);
-
-    updateStats(client.guilds.cache.size, client.options.shardCount);
-    logger.log({
-        level: "auto",
-        message: "guild count posted to top.gg: " + client.guilds.cache.size,
-    });
-}
-
-export function getGuilds() {
-    return client.guilds.cache.map((guild) => guild.id);
-}
-
-export async function requestDM(id: string, content: string, dmTekoh = false, embed?: EmbedBuilder): Promise<boolean> {
-    logger.info(`DM requested with ${id}`);
-    const member = await client.users.fetch(id);
-
-    let payload: MessageOptions = {
-        content: content,
-    };
-
-    if (embed) {
-        payload = {
-            content: content,
-            embeds: [embed],
-        };
-    }
-
-    if (member) {
-        await member
-            .send(payload)
-            .then(() => {
-                logger.log({
-                    level: "success",
-                    message: `successfully sent DM to ${member.tag} (${member.id})`,
-                });
-            })
-            .catch(async () => {
-                logger.warn(`failed to send DM to ${member.tag} (${member.id})`);
-                if (dmTekoh) {
-                    const tekoh = await client.users.fetch("672793821850894347");
-
-                    await tekoh.send({ content: `failed to send dm to ${id}` });
-                    await tekoh.send(payload);
-                }
-            });
-        return true;
-    } else {
-        logger.warn(`failed to send DM to ${member.id}`);
-        if (dmTekoh) {
-            const tekoh = await client.users.fetch("672793821850894347");
-
-            await tekoh.send({ content: `failed to send dm to ${id}` });
-            await tekoh.send(payload);
-        }
-        return false;
-    }
-}
-
-export async function requestRemoveRole(id: string, roleID: string) {
-    const guild = await client.guilds.fetch("747056029795221513");
-
-    if (!guild) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch guild - user: ${id} role: ${roleID}` });
-    }
-
-    const role = await guild.roles.fetch(roleID);
-
-    if (!role) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch role - user: ${id} role: ${roleID}` });
-    }
-
-    const user = await guild.members.fetch(id);
-
-    if (!user) {
-        const tekoh = await client.users.fetch("672793821850894347");
-
-        return await tekoh.send({ content: `failed to fetch role - user: ${id} role: ${roleID}` });
-    }
-
-    // 747066190530347089 boost role
-    // 819870727834566696 silver role
-    // 819870846536646666 gold role
-
-    if (roleID == "819870727834566696") {
-        if (
-            user.roles.cache.find((r) => r.id == "747066190530347089") &&
-            !user.roles.cache.find((r) => r.id == "819870727834566696")
-        ) {
-            return "boost";
-        }
-    }
-
-    return await user.roles.remove(role);
-}
-
-export async function getGuild(guildID: string): Promise<Guild> {
-    let a = true;
-
-    const guild = await client.guilds.fetch(guildID).catch(() => {
-        a = false;
-    });
-
-    if (!a) return undefined;
-
-    if (!guild) return undefined;
-
-    return guild;
-}
-
 setTimeout(() => {
     logger.info("logging in...");
     client.login(process.env.BOT_TOKEN).then(() => {
@@ -267,23 +115,7 @@ setTimeout(() => {
         });
 
         setTimeout(() => {
-            runLotteryInterval(client);
-
-            runPopularCommandsTimer(client, "747056029795221513", ["823672263693041705", "912710094955892817"]);
-
-            runCountdowns(client);
-            runChristmas(client);
-            runModerationChecks(client);
-            doChatReactions(client);
-
-            runChecks();
-
-            updateCache();
-
-            getWebhooks(client);
-
-            listenForVotes();
-            startJobs();
+            client.runIntervals();
         }, 10000);
 
         if (process.env.GITHUB_ACTION) {

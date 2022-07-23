@@ -61,4 +61,5 @@ import redis from "../../database/redis";
     }
 
     parentPort.postMessage(`${total} total karma deteriorated`);
+    process.exit(0);
 })();

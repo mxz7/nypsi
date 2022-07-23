@@ -1,11 +1,17 @@
 import * as chalk from "chalk";
-import { Client, User, Webhook } from "discord.js";
+import { Client, User, WebhookClient } from "discord.js";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
 import * as DiscordTransport from "winston-discord-webhook";
 
-const webhook: Map<string, Webhook> = new Map();
+const webhook: Map<string, WebhookClient> = new Map();
 const nextLogMsg: Map<string, string> = new Map();
+
+let clusterId: number | string;
+
+export function setClusterId(id: number | string) {
+    clusterId = id;
+}
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
     let color = chalk.white;
@@ -38,7 +44,9 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             break;
     }
 
-    return `${prefix} [${chalk.blackBright(timestamp)}] ${color(message)}`;
+    return `${prefix} [${chalk.blackBright(timestamp)}${
+        typeof clusterId != "undefined" ? ` ${chalk.blackBright(clusterId)}` : ""
+    }] ${color(message)}`;
 });
 
 const levels = {
@@ -78,6 +86,8 @@ const logger = winston.createLogger({
         }),
         new winston.transports.Console({
             level: "debug",
+            handleExceptions: true,
+            handleRejections: true,
         }),
     ],
 });
@@ -144,28 +154,19 @@ export function getTimestamp(): string {
 export async function getWebhooks(client: Client) {
     if (client.user.id != "678711738845102087") return;
 
-    const guild = await client.guilds.fetch("747056029795221513");
+    webhook.set(
+        "pay",
+        new WebhookClient({
+            url: process.env.PAYMENTS_HOOK,
+        })
+    );
 
-    if (!guild) {
-        return logger.error("UNABLE TO GET GUILD FOR LOGS");
-    }
-
-    const webhooks = await guild.fetchWebhooks();
-
-    const paymentLogs = await webhooks.find((w) => w.id == "832299144186036266");
-
-    webhook.set("pay", paymentLogs);
-    logger.info(`payment logs webhook running ${paymentLogs.id}`);
-
-    const gambleLogs = await webhooks.find((w) => w.id == "832299675309965333");
-
-    webhook.set("gamble", gambleLogs);
-    logger.info(`gamble logs webhook running ${gambleLogs.id}`);
-
-    const sqlLogs = await webhooks.find((w) => w.id == "845028787681755176");
-
-    webhook.set("sql", sqlLogs);
-    logger.info(`sql logs webhook running ${sqlLogs.id}`);
+    webhook.set(
+        "gamble",
+        new WebhookClient({
+            url: process.env.GAMBLE_HOOK,
+        })
+    );
 
     runLogs();
 

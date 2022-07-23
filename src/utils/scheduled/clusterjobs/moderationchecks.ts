@@ -1,10 +1,11 @@
-import { APIEmbed, Client, WebhookClient } from "discord.js";
+import { APIEmbed, WebhookClient } from "discord.js";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { logger } from "../../logger";
+import { NypsiClient } from "../../models/Client";
 import { requestUnban, requestUnmute } from "../../moderation/utils";
 
-export function runModerationChecks(client: Client) {
+export function runModerationChecks(client: NypsiClient) {
     setInterval(async () => {
         const date = new Date();
 
@@ -54,6 +55,8 @@ export function runModerationChecks(client: Client) {
             },
         });
 
+        let modLogCount = 0;
+
         for (const modlog of query3) {
             if (!(await redis.exists(`modlogs:${modlog.guildId}`)) || (await redis.llen(`modlogs:${modlog.guildId}`)) == 0)
                 continue;
@@ -62,7 +65,7 @@ export function runModerationChecks(client: Client) {
                 url: modlog.modlogs,
             });
 
-            let embeds: APIEmbed[];
+            const embeds: APIEmbed[] = [];
 
             if ((await redis.llen(`modlogs:${modlog.guildId}`)) > 10) {
                 const current = await redis.lpop(`modlogs:${modlog.guildId}`, 10);
@@ -77,7 +80,9 @@ export function runModerationChecks(client: Client) {
                 }
             }
 
-            webhook.send({ embeds: embeds }).catch(async (e) => {
+            modLogCount += embeds.length;
+
+            await webhook.send({ embeds: embeds }).catch(async (e) => {
                 logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
                 logger.error(e);
 
@@ -89,6 +94,13 @@ export function runModerationChecks(client: Client) {
                         modlogs: "",
                     },
                 });
+            });
+        }
+
+        if (modLogCount > 0) {
+            logger.log({
+                level: "auto",
+                message: `${modLogCount.toLocaleString()} modlogs sent`,
             });
         }
     }, 30000);

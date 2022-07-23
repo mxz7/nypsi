@@ -38,4 +38,5 @@ import { Worker, WorkerStorageData } from "../../economy/workers";
             },
         });
     }
+    process.exit(0);
 })();

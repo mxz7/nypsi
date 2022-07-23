@@ -19,6 +19,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { NypsiClient } from "../utils/models/Client.js";
 
 const games = new Map();
 const abcde = new Map();
@@ -433,7 +434,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
             const guild = await getGuildByUser(message.member);
 
             if (guild) {
-                await addToGuildXP(guild.guildName, earnedXp, message.member);
+                await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
             }
         }
 

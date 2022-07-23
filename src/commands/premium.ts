@@ -1,21 +1,21 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import {
-    isPremium,
-    getPremiumProfile,
-    setTier,
-    setEmbedColor,
-    setStatus,
-    addMember,
-    renewUser,
-    expireUser,
-    getUserCommand,
-    setExpireDate,
-} from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import {
+    addMember,
+    getPremiumProfile,
+    getUserCommand,
+    isPremium,
+    renewUser,
+    setEmbedColor,
+    setExpireDate,
+    setStatus,
+    setTier,
+} from "../utils/premium/utils";
 import dayjs = require("dayjs");
+import { NypsiClient } from "../utils/models/Client";
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
     .setAliases(["patreon", "donate", "prem"])
@@ -135,7 +135,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         switch (args[1].toLowerCase()) {
             case "level":
-                await setTier(args[2], parseInt(args[3]));
+                await setTier(args[2], parseInt(args[3]), message.client as NypsiClient);
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, `✅ tier changed to ${args[3]}`)],
                 });
@@ -154,7 +154,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 date = date.add(parseInt(args[3]), "days");
 
-                await setExpireDate(args[2], date.toDate());
+                await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
                 });
@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 date = date.subtract(parseInt(args[3]), "days");
 
-                await setExpireDate(args[2], date.toDate());
+                await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
                 return message.channel.send({
                     embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
                 });
@@ -177,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        await addMember(args[1], parseInt(args[2]));
+        await addMember(args[1], parseInt(args[2]), message.client as NypsiClient);
 
         return message.channel.send({
             embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
@@ -191,7 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        await renewUser(args[1]);
+        await renewUser(args[1], message.client as NypsiClient);
 
         return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
     } else if (args[0].toLowerCase() == "expire") {
@@ -203,9 +203,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
-        expireUser(args[1]);
+        setExpireDate(args[1], new Date(0), message.client as NypsiClient);
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership expired")] });
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
     }
 }
 

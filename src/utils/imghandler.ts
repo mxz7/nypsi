@@ -84,11 +84,8 @@ const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=mon
 const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 
 async function cacheUpdate(links: string[], name: string) {
-    const start = new Date().getTime();
-
     const map: Map<string, RedditJSONPost[]> = new Map();
 
-    let amount = 0;
     for (const link of links) {
         const res: RedditJSON = await fetch(link).then((a) => a.json());
 
@@ -107,20 +104,12 @@ async function cacheUpdate(links: string[], name: string) {
 
         if (allowed) {
             map.set(link, allowed);
-            amount += allowed.length;
         } else {
             logger.error(`no images @ ${link}`);
         }
     }
 
     images.set(name, map);
-
-    const end = new Date().getTime();
-    const total = (end - start) / 1000 + "s";
-    logger.log({
-        level: "img",
-        message: `${amount.toLocaleString()} ${name} images loaded (${total})`,
-    });
 }
 
 export async function updateCache() {

@@ -2,29 +2,12 @@ import { GuildMember } from "discord.js";
 import prisma from "../database/database";
 import redis from "../database/redis";
 import { formatDate } from "../functions/date";
+import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
 import { PremUser } from "../models/PremStorage";
 
-declare function require(name: string): any;
-
 const colorCache = new Map();
-
-setInterval(async () => {
-    const now = new Date();
-
-    const query = await prisma.premium.findMany({
-        where: {
-            expireDate: { lte: now },
-        },
-        select: {
-            userId: true,
-        },
-    });
-
-    for (const user of query) {
-        await expireUser(user.userId);
-    }
-}, 600000);
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
     let id: string;
@@ -101,7 +84,7 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     return query.level;
 }
 
-export async function addMember(member: GuildMember | string, level: number) {
+export async function addMember(member: GuildMember | string, level: number, client: NypsiClient) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -129,13 +112,13 @@ export async function addMember(member: GuildMember | string, level: number) {
 
     logger.info(`premium level ${level} given to ${id}`);
 
-    const { requestDM } = require("../../nypsi");
-    requestDM(
-        id,
-        `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
+    await requestDM({
+        memberId: id,
+        client: client,
+        content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
             profile.expireDate
-        )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`
-    );
+        )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
+    });
 
     await redis.del(`cache:premium:level:${id}`);
 }
@@ -157,7 +140,7 @@ export async function getPremiumProfile(member: GuildMember | string): Promise<P
     return createPremUser(query);
 }
 
-export async function setTier(member: GuildMember | string, level: number) {
+export async function setTier(member: GuildMember | string, level: number, client: NypsiClient) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -176,8 +159,11 @@ export async function setTier(member: GuildMember | string, level: number) {
 
     logger.info(`premium level updated to ${level} for ${id}`);
 
-    const { requestDM } = require("../../nypsi");
-    requestDM(id, `your membership has been updated to **${PremUser.getLevelString(level)}**`);
+    await requestDM({
+        memberId: id,
+        client: client,
+        content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
+    });
 
     await redis.del(`cache:premium:level:${id}`);
 }
@@ -277,7 +263,7 @@ export async function setStatus(member: GuildMember | string, status: number) {
     });
 }
 
-export async function renewUser(member: string) {
+export async function renewUser(member: string, client: NypsiClient) {
     const profile = await getPremiumProfile(member);
 
     profile.renew();
@@ -291,8 +277,11 @@ export async function renewUser(member: string) {
         },
     });
 
-    const { requestDM } = require("../../nypsi");
-    requestDM(member, `your membership has been renewed until **${formatDate(profile.expireDate)}**`);
+    await requestDM({
+        memberId: member,
+        client: client,
+        content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
+    });
 
     await redis.del(`cache:premium:level:${member}`);
 
@@ -301,13 +290,13 @@ export async function renewUser(member: string) {
     }
 }
 
-export async function expireUser(member: string) {
+export async function expireUser(member: string, client: NypsiClient) {
     const profile = await getPremiumProfile(member);
 
-    const expire = await profile.expire();
+    const expire = await profile.expire(client);
 
     if (expire == "boost") {
-        return renewUser(member);
+        return renewUser(member, client);
     }
 
     await prisma.premium.delete({
@@ -434,7 +423,7 @@ export async function addUse(id: string) {
     });
 }
 
-export async function setExpireDate(member: GuildMember | string, date: Date) {
+export async function setExpireDate(member: GuildMember | string, date: Date, client: NypsiClient) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -451,8 +440,11 @@ export async function setExpireDate(member: GuildMember | string, date: Date) {
         },
     });
 
-    const { requestDM } = require("../../nypsi");
-    requestDM(id, `your membership will now expire on **${formatDate(date)}**`);
+    await requestDM({
+        memberId: id,
+        client: client,
+        content: `your membership will now expire on **${formatDate(date)}**`,
+    });
 }
 
 export function createPremUser(query: any) {

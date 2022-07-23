@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
+import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
-
-declare function require(name: string): any;
+import { NypsiClient } from "./Client";
 
 export class PremUser {
     public id: string;
@@ -129,9 +129,7 @@ export class PremUser {
         }
     }
 
-    async expire(): Promise<PremUser | string> {
-        const { requestDM, requestRemoveRole } = require("../../nypsi");
-
+    async expire(client: NypsiClient): Promise<PremUser | string> {
         let roleID;
 
         switch (this.level) {
@@ -149,7 +147,7 @@ export class PremUser {
                 break;
         }
 
-        const e = await requestRemoveRole(this.id, roleID).catch((e: any) => {
+        const e = await requestRemoveRole(this.id, roleID, client).catch((e: any) => {
             logger.error(`error removing role (premium) ${this.id}`);
             logger.error(e);
         });
@@ -158,10 +156,11 @@ export class PremUser {
             return "boost";
         }
 
-        await requestDM(
-            this.id,
-            `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`
-        ).catch(() => {});
+        await requestDM({
+            memberId: this.id,
+            client: client,
+            content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
+        }).catch(() => {});
 
         this.status = status.INACTIVE;
         this.level = 0;
@@ -187,4 +186,38 @@ export enum status {
     INACTIVE = 0,
     ACTIVE = 1,
     REVOKED = 2,
+}
+
+async function requestRemoveRole(id: string, roleID: string, client: NypsiClient) {
+    const res = await client.shard.broadcastEval(
+        async (c, { guildId, memberId, roleId }) => {
+            const guild = await client.guilds.fetch(guildId).catch(() => {});
+
+            if (!guild) return;
+
+            const user = await guild.members.fetch(memberId).catch(() => {});
+
+            if (!user) return;
+
+            await guild.roles.fetch();
+
+            if (roleId == "819870727834566696") {
+                if (
+                    user.roles.cache.find((r) => r.id == "747066190530347089") &&
+                    !user.roles.cache.find((r) => r.id == "819870727834566696")
+                ) {
+                    return "boost";
+                }
+            }
+
+            return await user.roles.remove(roleId);
+        },
+        {
+            context: { guildId: "747056029795221513", memberId: id, roleId: roleID },
+        }
+    );
+
+    for (const r of res) {
+        if (r == "boost") return "boost";
+    }
 }

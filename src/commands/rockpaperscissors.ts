@@ -20,6 +20,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble } from "../utils/logger.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { NypsiClient } from "../utils/models/Client.js";
 
 const cmd = new Command("rockpaperscissors", "play rock paper scissors", Categories.MONEY).setAliases(["rps"]);
 
@@ -247,7 +248,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const guild = await getGuildByUser(message.member);
 
                 if (guild) {
-                    await addToGuildXP(guild.guildName, earnedXp, message.member);
+                    await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
                 }
             }
 

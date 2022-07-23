@@ -1,28 +1,20 @@
-import { logger } from "../logger";
-import * as topgg from "@top-gg/sdk";
-import { Item, LotteryTicket } from "../models/Economy";
 import { Client, Collection, Guild, GuildMember } from "discord.js";
-import { CustomEmbed } from "../models/EmbedBuilders";
-import * as fs from "fs";
-import { getTier, isPremium } from "../premium/utils";
 import { inPlaceSort } from "fast-sort";
-import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
-import { StatsProfile } from "../models/StatsProfile";
+import * as fs from "fs";
 import fetch from "node-fetch";
-import workerSort from "../workers/sort";
-import ms = require("ms");
-import redis from "../database/redis";
 import prisma from "../database/database";
+import redis from "../database/redis";
+import requestDM from "../functions/requestdm";
+import { logger } from "../logger";
+import { NypsiClient } from "../models/Client";
+import { GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { StatsProfile } from "../models/StatsProfile";
+import { getTier, isPremium } from "../premium/utils";
 import { createProfile, hasProfile } from "../users/utils";
-
-declare function require(name: string): any;
-
-const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
-
-const bannedCache = new Map();
-const guildExistsCache = new Map();
-const guildUserCache = new Map();
-const guildRequirementsCache = new Map();
+import workerSort from "../workers/sort";
+import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
+import ms = require("ms");
 
 let items: { [key: string]: Item };
 
@@ -51,21 +43,11 @@ export function loadItems(): string {
     return txt;
 }
 
-loadItems();
-
 function randomOffset() {
     return Math.floor(Math.random() * 50000);
 }
 
 let padlockPrice = 25000 + randomOffset();
-items["padlock"].worth = padlockPrice;
-logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-
-setInterval(() => {
-    padlockPrice = 25000 + randomOffset();
-    items["padlock"].worth = padlockPrice;
-    logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-}, 3600000);
 
 async function updateCryptoWorth() {
     let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json());
@@ -88,10 +70,21 @@ async function updateCryptoWorth() {
     logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString());
 }
 
-setInterval(updateCryptoWorth, 1500000);
-
 export function getPadlockPrice(): number {
     return padlockPrice;
+}
+
+export function runEconomySetup() {
+    setInterval(updateCryptoWorth, 1500000);
+
+    loadItems();
+
+    items["padlock"].worth = padlockPrice;
+
+    setInterval(() => {
+        padlockPrice = 25000 + randomOffset();
+        items["padlock"].worth = padlockPrice;
+    }, 3600000);
 }
 
 export async function hasVoted(member: GuildMember | string) {
@@ -749,19 +742,6 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
     });
 }
 
-export function updateStats(guildCount: number, shardCount: number) {
-    topggStats.postStats({
-        serverCount: guildCount,
-        shardCount: shardCount,
-    });
-
-    // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
-    //     method: "POST",
-    //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
-    //     headers: { "Content-Type": "application/json", "Authorization": "removed token" }
-    // }) FOR POSTING TO DISCORD.BOTS.GG
-}
-
 export async function getPrestige(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -966,8 +946,8 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 }
 
 export async function isEcoBanned(id: string) {
-    if (bannedCache.has(id)) {
-        return bannedCache.get(id);
+    if (await redis.exists(`cache:economy:banned:${id}`)) {
+        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
     } else {
         const query = await prisma.economy.findUnique({
             where: {
@@ -979,15 +959,18 @@ export async function isEcoBanned(id: string) {
         });
 
         if (!query) {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
 
         if (query.banned) {
-            bannedCache.set(id, true);
+            await redis.set(`cache:economy:banned:${id}`, "t");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return true;
         } else {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
     }
@@ -1014,7 +997,7 @@ export async function toggleBan(id: string) {
         });
     }
 
-    bannedCache.delete(id);
+    await redis.del(id);
 }
 
 export async function reset() {
@@ -1591,10 +1574,10 @@ export async function getGuildByUser(member: GuildMember | string) {
 
     let guildName: string;
 
-    if (guildUserCache.has(id)) {
-        guildName = guildUserCache.get(id);
+    if (await redis.exists(`cache:economy:guild:user:${id}`)) {
+        guildName = await redis.get(`cache:economy:guild:user:${id}`);
 
-        if (!guildName) return undefined;
+        if (guildName == "noguild") return undefined;
     } else {
         const query = await prisma.economyGuildMember.findUnique({
             where: {
@@ -1619,8 +1602,12 @@ export async function getGuildByUser(member: GuildMember | string) {
         });
 
         if (!query || !query.guild) {
-            guildUserCache.set(id, undefined);
+            await redis.set(`cache:economy:guild:user:${id}`, "noguild");
+            await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
             return undefined;
+        } else {
+            await redis.set(`cache:economy:guild:user:${id}`, query.guild.guildName);
+            await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
         }
 
         return query.guild;
@@ -1645,16 +1632,10 @@ export async function createGuild(name: string, owner: GuildMember) {
         },
     });
 
-    if (guildUserCache.has(owner.user.id)) {
-        guildUserCache.delete(owner.user.id);
-    }
+    await redis.del(`cache:economy:guild:user:${owner.user.id}`);
 }
 
 export async function deleteGuild(name: string) {
-    guildUserCache.clear();
-
-    guildExistsCache.delete(name);
-
     await prisma.economyGuildMember.deleteMany({
         where: {
             guildName: name,
@@ -1668,7 +1649,7 @@ export async function deleteGuild(name: string) {
     });
 }
 
-export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+export async function addToGuildBank(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -1686,10 +1667,10 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+export async function addToGuildXP(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -1707,7 +1688,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
 export async function getMaxMembersForGuild(name: string) {
@@ -1716,9 +1697,9 @@ export async function getMaxMembersForGuild(name: string) {
     return guild.level * 3;
 }
 
-export async function getRequiredForGuildUpgrade(name: string): Promise<{ money: number; xp: number }> {
-    if (guildRequirementsCache.has(name)) {
-        return guildRequirementsCache.get(name);
+export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
+    if (await redis.exists(`cache:economy:guild:requirements:${name}`)) {
+        return JSON.parse(await redis.get(`cache:economy:guild:requirements:${name}`));
     }
 
     const guild = await getGuildByName(name);
@@ -1729,10 +1710,14 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<{ money:
     const bonusMoney = 100000 * guild.members.length;
     const bonusXP = 75 * guild.members.length;
 
-    guildRequirementsCache.set(name, {
-        money: baseMoney + bonusMoney,
-        xp: baseXP + bonusXP,
-    });
+    await redis.set(
+        `cache:economy:guild:requirements:${name}`,
+        JSON.stringify({
+            money: baseMoney + bonusMoney,
+            xp: baseXP + bonusXP,
+        })
+    );
+    await redis.expire(`cache:economy:guild:requirements:${name}`, ms("1 hour") / 1000);
 
     return {
         money: baseMoney + bonusMoney,
@@ -1755,9 +1740,7 @@ export async function addMember(name: string, member: GuildMember) {
         },
     });
 
-    if (guildUserCache.has(member.user.id)) {
-        guildUserCache.delete(member.user.id);
-    }
+    await redis.del(`cache:economy:guild:user:${member.user.id}`);
 
     return true;
 }
@@ -1768,14 +1751,13 @@ export enum RemoveMemberMode {
 }
 
 export async function removeMember(member: string, mode: RemoveMemberMode) {
-    guildUserCache.clear();
-
     if (mode == RemoveMemberMode.ID) {
         await prisma.economyGuildMember.delete({
             where: {
                 userId: member,
             },
         });
+        await redis.del(`cache:economy:guild:user:${member}`);
         return true;
     } else {
         const user = await prisma.user.findFirst({
@@ -1797,7 +1779,11 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
             },
         });
 
-        if (x) return true;
+        if (x) {
+            await redis.del(`cache:economy:guild:user:${x.userId}`);
+
+            return true;
+        }
         return false;
     }
 }
@@ -1821,7 +1807,7 @@ interface EconomyGuildMember {
     contributedXp: number;
 }
 
-async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): Promise<boolean> {
     if (typeof guild == "string") {
         guild = await getGuildByName(guild);
     }
@@ -1843,7 +1829,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
         logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
-        guildRequirementsCache.clear();
+        await redis.del(`cache:economy:guild:requirements:${guild.guildName}`);
 
         const embed = new CustomEmbed().setColor("#5efb8f");
 
@@ -1868,9 +1854,12 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
             await setInventory(member.userId, inventory);
 
             if (await getDMsEnabled(member.userId)) {
-                const { requestDM } = require("../../nypsi");
-
-                await requestDM(member.userId, `${guild.guildName} has been upgraded!`, false, embed);
+                await requestDM({
+                    memberId: member.userId,
+                    client: client,
+                    content: `${guild.guildName} has been upgraded!`,
+                    embed: embed,
+                });
             }
         }
 
@@ -1919,4 +1908,21 @@ export async function topGuilds(limit = 5) {
     }
 
     return out;
+}
+
+export async function startOpeningCrates(member: GuildMember) {
+    await redis.set(`economy:crates:block:${member.user.id}`, "y");
+}
+
+export async function stopOpeningCrates(member: GuildMember) {
+    await redis.del(`economy:crates:block:${member.user.id}`);
+}
+
+export async function isHandcuffed(id: string): Promise<boolean> {
+    return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
+}
+
+export async function addHandcuffs(id: string) {
+    await redis.set(`economy:handcuffed:${id}`, Date.now());
+    await redis.expire(`economy:handcuffed:${id}`, 60);
 }

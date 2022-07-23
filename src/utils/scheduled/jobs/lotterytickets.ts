@@ -31,4 +31,6 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
     embed.disableFooter();
 
     hook.send({ embeds: [embed] });
+
+    process.exit(0);
 })();
