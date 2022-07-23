@@ -577,7 +577,7 @@ export async function runCommand(
         }
     }
 
-    if (restarting) {
+    if (restarting || (await redis.get("nypsi:restarting")) == "t") {
         if (message.author.id == "672793821850894347" && message instanceof Message) {
             message.react("💀");
         } else {
