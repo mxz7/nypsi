@@ -10,7 +10,7 @@ import ms = require("ms");
 const db = new Database("./out/data/storage.db");
 const optCache = new Map<string, boolean>();
 const lastfmUsernameCache = new Map<string, string>();
-const lastKnownTagCooldown = new Set();
+const lastKnownTagCooldown = new Set<string>();
 
 export interface MentionQueueItem {
     type: string;
