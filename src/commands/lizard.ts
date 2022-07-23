@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const lizardLinks = Array.from(lizardCache.keys());
 
-    const subredditChoice: any = lizardLinks[Math.floor(Math.random() * lizardLinks.length)];
+    const subredditChoice = lizardLinks[Math.floor(Math.random() * lizardLinks.length)];
 
     const allowed = lizardCache.get(subredditChoice);
 

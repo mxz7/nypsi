@@ -37,7 +37,7 @@ const games = new Map<
     string,
     {
         bet: number;
-        win?: any;
+        win?: number;
         deck: string[];
         cards: string[];
         nextCard: string;

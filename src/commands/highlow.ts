@@ -33,7 +33,7 @@ import { gamble, logger } from "../utils/logger.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const games = new Map<string, { bet: any; win: any; deck: any; card: any; id: number; voted: any }>();
+const games = new Map<string, { bet: number; win: number; deck: string[]; card: string; id: number; voted: number }>();
 
 const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).setAliases(["hl"]);
 

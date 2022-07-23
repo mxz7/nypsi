@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const birbLinks = Array.from(birbCache.keys());
 
-    const subredditChoice: any = birbLinks[Math.floor(Math.random() * birbLinks.length)];
+    const subredditChoice = birbLinks[Math.floor(Math.random() * birbLinks.length)];
 
     const allowed = birbCache.get(subredditChoice);
 

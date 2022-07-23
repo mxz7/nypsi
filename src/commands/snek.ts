@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const snekLinks = Array.from(snekCache.keys());
 
-    const subredditChoice: any = snekLinks[Math.floor(Math.random() * snekLinks.length)];
+    const subredditChoice = snekLinks[Math.floor(Math.random() * snekLinks.length)];
 
     const allowed = snekCache.get(subredditChoice);
 
