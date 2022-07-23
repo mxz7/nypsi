@@ -164,7 +164,7 @@ export function reloadCommand(commandsArray: string[]) {
 async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
-    const helpCategories = new Map();
+    const helpCategories = new Map<string, Map<number, string[]>>();
 
     const prefix = await getPrefix(message.guild);
 
