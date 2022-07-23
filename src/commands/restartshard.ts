@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { startRestart } from "../utils/commandhandler";
-import { logger } from "../utils/logger";
 import { setCustomPresence } from "../utils/functions/presence";
+import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command("shutdown", "shutdown bot", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("restartshard", "restartshard", Categories.NONE).setPermissions(["bot owner"]);
 
 let confirm = false;
 
@@ -33,19 +33,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ],
         });
 
-        logger.info("nypsi shutting down soon...");
+        logger.info("shard shutting down soon...");
 
         setTimeout(() => {
-            logger.info("nypsi shutting down in 10 seconds...");
+            logger.info("sharrd shutting down in 10 seconds...");
 
             setTimeout(() => {
-                logger.info("nypsi shutting down...");
+                logger.info("shard shutting down...");
                 process.exit();
             }, 10000);
         }, 20000);
 
         return message.channel.send({
-            embeds: [new CustomEmbed(message.member, "✅ bot will shut down soon")],
+            embeds: [new CustomEmbed(message.member, "✅ current shard will shut down soon")],
         });
     }
 }
