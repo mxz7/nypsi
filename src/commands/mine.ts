@@ -1,10 +1,10 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { userExists, createUser, getInventory, getItems, setInventory, addItemUse } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addItemUse, createUser, getInventory, getItems, setInventory, userExists } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const veins = new Map();
+const veins = new Map<string, number[]>();
 
 veins.set("cobblestone", [5, 7, 15, 25]);
 veins.set("coal", [2, 4, 5, 8]);

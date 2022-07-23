@@ -1,19 +1,19 @@
 import {
-    CommandInteraction,
-    GuildMember,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    MessageActionRowComponentBuilder,
+    CommandInteraction,
+    GuildMember,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { fetchUsernameHistory, clearUsernameHistory, isTracking } from "../utils/users/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/users/utils";
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
     "un",
@@ -62,12 +62,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const pages = new Map();
+    const pages = new Map<number, { value: string; date: Date }[]>();
 
     for (const item of history) {
         if (pages.size == 0) {
             if (!isUserTracking) {
-                pages.set(1, [{ value: "[tracking disabled]", date: Date.now() }, item]);
+                pages.set(1, [{ value: "[tracking disabled]", date: new Date() }, item]);
             } else {
                 pages.set(1, [item]);
             }

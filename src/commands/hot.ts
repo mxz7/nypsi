@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getMember } from "../utils/functions/member";
-import { updateBalance, getBalance, userExists, createUser } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { createUser, getBalance, updateBalance, userExists } from "../utils/economy/utils";
+import { getMember } from "../utils/functions/member";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cache = new Map();
+const cache = new Map<string, number>();
 
 const cmd = new Command("hot", "measure how hot you are", Categories.FUN).setAliases(["howhot", "sexy"]);
 

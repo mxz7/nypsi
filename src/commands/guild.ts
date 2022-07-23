@@ -94,7 +94,7 @@ cmd.slashData
 
 const filter = ["nig", "fag", "queer", "delete", "inv", "create", "leave", "stats", "top", "hitler", "kick", "forcekick"];
 
-const invited: Set<string> = new Set();
+const invited = new Set<string>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {

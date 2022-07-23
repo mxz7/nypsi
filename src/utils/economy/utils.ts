@@ -1,23 +1,23 @@
-import * as express from "express";
 import * as topgg from "@top-gg/sdk";
+import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
+import * as express from "express";
+import { inPlaceSort } from "fast-sort";
+import * as fs from "fs";
+import fetch from "node-fetch";
+import * as shufflearray from "shuffle-array";
+import prisma from "../database/database";
+import redis from "../database/redis";
+import { MStoTime } from "../functions/date";
+import { addKarma, getKarma } from "../karma/utils";
 import { logger } from "../logger";
 import { Item, LotteryTicket } from "../models/Economy";
-import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import * as fs from "fs";
-import { addKarma, getKarma } from "../karma/utils";
-import { getTier, isPremium } from "../premium/utils";
-import { inPlaceSort } from "fast-sort";
-import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import { StatsProfile } from "../models/StatsProfile";
-import * as shufflearray from "shuffle-array";
-import fetch from "node-fetch";
-import workerSort from "../workers/sort";
-import { MStoTime } from "../functions/date";
-import ms = require("ms");
-import redis from "../database/redis";
-import prisma from "../database/database";
+import { getTier, isPremium } from "../premium/utils";
 import { createProfile, hasProfile } from "../users/utils";
+import workerSort from "../workers/sort";
+import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
+import ms = require("ms");
 import _ = require("lodash");
 
 declare function require(name: string): any;
@@ -27,10 +27,10 @@ const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
 
 const app = express();
 
-const bannedCache = new Map();
-const guildExistsCache = new Map();
-const guildUserCache = new Map();
-const guildRequirementsCache = new Map();
+const bannedCache = new Map<string, boolean>();
+const guildExistsCache = new Map<string, boolean>();
+const guildUserCache = new Map<string, string>();
+const guildRequirementsCache = new Map<string, { money: number; xp: number }>();
 
 app.post(
     "/dblwebhook",
@@ -96,7 +96,7 @@ if (!process.env.GITHUB_ACTION) {
     lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 }
 
-const lotteryHookQueue = new Map();
+const lotteryHookQueue = new Map<string, number>();
 
 setInterval(() => {
     if (lotteryHookQueue.size == 0) return;
@@ -579,11 +579,11 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
     });
 
     const userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         userIDs.push(user.userId);
-        balances.set(user.userId, user.money);
+        balances.set(user.userId, Number(user.money));
     }
 
     inPlaceSort(userIDs).desc((i) => balances.get(i));
@@ -652,12 +652,12 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
     });
 
     let userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         if (members.has(user.userId)) {
             userIDs.push(user.userId);
-            balances.set(user.userId, user.money);
+            balances.set(user.userId, Number(user.money));
         }
     }
 
@@ -729,12 +729,12 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
     });
 
     let userIDs = [];
-    const balances = new Map();
+    const balances = new Map<string, number>();
 
     for (const user of query) {
         if (members.find((member) => member.user.id == user.userId)) {
             userIDs.push(user.userId);
-            balances.set(user.userId, user.money);
+            balances.set(user.userId, Number(user.money));
         }
     }
 
@@ -806,7 +806,7 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
     });
 
     let userIDs = [];
-    const prestiges = new Map();
+    const prestiges = new Map<string, number>();
 
     for (const user of query) {
         if (members.find((member) => member.user.id == user.userId)) {

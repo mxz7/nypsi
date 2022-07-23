@@ -1,13 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { logger } from "../utils/logger";
-import { cleanString } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { cleanString } from "../utils/functions/string";
+import { getPrefix } from "../utils/guilds/utils";
+import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cache = new Map();
+const cache = new Map<string, { hypixel: string; mojang: string }>();
 
 const BASE = 10_000;
 const GROWTH = 2_500;
@@ -15,7 +15,7 @@ const REVERSE_PQ_PREFIX = -(BASE - 0.5 * GROWTH) / GROWTH;
 const REVERSE_CONST = REVERSE_PQ_PREFIX * REVERSE_PQ_PREFIX;
 const GROWTH_DIVIDES_2 = 2 / GROWTH;
 
-const ranks = new Map();
+const ranks = new Map<string, string>();
 
 ranks.set("MVP_PLUS", "MVP+");
 ranks.set("MVP", "MVP");

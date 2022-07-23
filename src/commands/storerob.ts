@@ -1,16 +1,16 @@
+import { CommandInteraction, Message } from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
-    getBalance,
+    addItemUse,
     createUser,
+    getBalance,
+    getInventory,
+    setInventory,
     updateBalance,
     userExists,
-    setInventory,
-    getInventory,
-    addItemUse,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("storerob", "attempt to rob a store for a reward", Categories.MONEY).setAliases(["shoprob"]);
 
@@ -23,7 +23,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const shopWorth = new Map();
+    const shopWorth = new Map<string, number>();
 
     if ((await getBalance(message.member)) > 100000000) {
         shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.0005));
