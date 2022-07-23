@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member)
-        .setHeader("nypsi stats")
+        .setHeader(`nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`, client.user.avatarURL())
         .addField(
             "bot",
             "**server count** " +
@@ -73,10 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 commandsSize +
                 "\n" +
                 "**total aliases** " +
-                aliasesSize +
-                "\n" +
-                "**uptime** " +
-                uptime,
+                aliasesSize,
             true
         )
         .addField(
@@ -102,9 +99,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "system",
             `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n**cpu** ${cpuUsage}%\n**uptime** ${systemUptime}`,
             true
-        );
+        )
+        .addField("cluster", `**uptime** ${uptime}`, true);
 
-    embed.setFooter({ text: `v${version} | cluster: ${currentCluster + 1}/${clusterCount} | shard: ${currentShard}` });
+    embed.setFooter({ text: `v${version} | shard: ${currentShard}` });
 
     message.channel.send({ embeds: [embed] });
 }
