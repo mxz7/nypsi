@@ -1,16 +1,16 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import workerSort from "../utils/workers/sort";
-import { inCooldown, addCooldown } from "../utils/guilds/utils";
 import { inPlaceSort } from "fast-sort";
-import { getKarma } from "../utils/karma/utils";
-import { getMember } from "../utils/functions/member";
 import { formatDate } from "../utils/functions/date";
+import { getMember } from "../utils/functions/member";
+import { addCooldown, inCooldown } from "../utils/guilds/utils";
+import { getKarma } from "../utils/karma/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import workerSort from "../utils/workers/sort";
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"]);
 
-const sortCache = new Map();
+const sortCache = new Map<string, string[]>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     let member;
