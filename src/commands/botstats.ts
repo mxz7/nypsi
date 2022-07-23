@@ -41,12 +41,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const currentCluster = client.cluster.id;
     const currentShard = message.guild.shardId;
 
-    let memberCount = 0;
-
-    const guilds = message.client.guilds.cache;
-    guilds.forEach((g) => {
-        memberCount = memberCount + g.memberCount;
-    });
+    const userCount: number = await client.cluster
+        .broadcastEval("this.users.cache.size")
+        .then((res) => res.reduce((a, b) => a + b));
+    const guildCount: number = await client.cluster
+        .broadcastEval("this.guilds.cache.size")
+        .then((res) => res.reduce((a, b) => a + b));
 
     let collections = 0;
     let mentions = 0;
@@ -64,10 +64,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .addField(
             "bot",
             "**server count** " +
-                guilds.size.toLocaleString() +
+                guildCount.toLocaleString() +
                 "\n" +
                 "**user count** " +
-                memberCount.toLocaleString() +
+                userCount.toLocaleString() +
                 "\n" +
                 "**total commands** " +
                 commandsSize +
