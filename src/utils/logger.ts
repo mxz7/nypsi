@@ -4,8 +4,8 @@ import * as winston from "winston";
 import "winston-daily-rotate-file";
 import * as DiscordTransport from "winston-discord-webhook";
 
-const webhook: Map<string, WebhookClient> = new Map();
-const nextLogMsg: Map<string, string> = new Map();
+const webhook = new Map<string, WebhookClient>();
+const nextLogMsg = new Map<string, string>();
 
 let clusterId: number | string;
 

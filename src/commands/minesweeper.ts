@@ -1,28 +1,37 @@
+import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
-    userExists,
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
     createUser,
-    getBalance,
     formatBet,
+    getBalance,
+    getGuildByUser,
+    getMulti,
+    getXp,
     updateBalance,
     updateXp,
-    getXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
+    userExists,
 } from "../utils/economy/utils.js";
-import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
 
-const games = new Map();
-const abcde = new Map();
+const games = new Map<
+    string,
+    {
+        bet: number;
+        win: number;
+        grid: string[];
+        id: number;
+        voted: number;
+    }
+>();
+
+const abcde = new Map<string, number>();
 const possibleLetters = ["a", "b", "c", "d", "e"];
 const possibleNumbers = ["1", "2", "3", "4", "5"];
 

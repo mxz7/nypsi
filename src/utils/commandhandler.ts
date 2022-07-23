@@ -29,16 +29,16 @@ import redis from "./database/redis";
 import { NypsiClient } from "./models/Client";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
-const commands: Map<string, Command> = new Map();
-const aliases: Map<string, string> = new Map();
-const noLifers: Map<string, number> = new Map();
-const commandUses: Map<string, number> = new Map();
-const captchaFails: Map<string, number> = new Map();
-const captchaPasses: Map<string, number> = new Map();
+const commands = new Map<string, Command>();
+const aliases = new Map<string, string>();
+const noLifers = new Map<string, number>();
+const commandUses = new Map<string, number>();
+const captchaFails = new Map<string, number>();
+const captchaPasses = new Map<string, number>();
 
-const karmaCooldown: Set<string> = new Set();
-const xpCooldown: Set<string> = new Set();
-const cooldown: Set<string> = new Set();
+const karmaCooldown = new Set<string>();
+const xpCooldown = new Set<string>();
+const cooldown = new Set<string>();
 
 const beingChecked: string[] = [];
 
@@ -163,7 +163,7 @@ export function reloadCommand(commandsArray: string[]) {
 async function helpCmd(message: Message, args: string[]) {
     logCommand(message, args);
 
-    const helpCategories = new Map();
+    const helpCategories = new Map<string, Map<number, string[]>>();
 
     const prefix = await getPrefix(message.guild);
 
@@ -189,7 +189,7 @@ async function helpCmd(message: Message, args: string[]) {
 
             helpCategories.set(category, current);
         } else {
-            const pages = new Map();
+            const pages = new Map<number, string[]>();
 
             pages.set(1, [`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`]);
 

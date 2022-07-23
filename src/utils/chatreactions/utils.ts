@@ -7,6 +7,16 @@ import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import ms = require("ms");
+import { getGuild } from "../../nypsi";
+import prisma from "../database/database";
+import { addCooldown, inCooldown } from "../guilds/utils";
+import { logger } from "../logger";
+import { CustomEmbed } from "../models/EmbedBuilders";
+
+const currentChannels = new Set<string>();
+const existsCache = new Set<string>();
+const enabledCache = new Map<string, number>();
+const lastGame = new Map<string, number>();
 
 const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();
@@ -284,7 +294,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
     const start = new Date().getTime();
 
-    const winners: Map<number, { mention: string; time: string; member: GuildMember }> = new Map();
+    const winners = new Map<number, { mention: string; time: string; member: GuildMember }>();
     const winnersIDs: string[] = [];
 
     let waiting = false;
@@ -468,13 +478,13 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     });
 
     const usersWins = [];
-    const winsStats = new Map();
+    const winsStats = new Map<string, number>();
     const usersSecond = [];
-    const secondStats = new Map();
+    const secondStats = new Map<string, number>();
     const usersThird = [];
-    const thirdStats = new Map();
+    const thirdStats = new Map<string, number>();
     const overallWins = [];
-    const overallStats = new Map();
+    const overallStats = new Map<string, number>();
 
     const query = await prisma.chatReactionStats.findMany({
         where: {
@@ -602,7 +612,11 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
         count++;
     }
 
-    return new Map().set("wins", winsMsg).set("second", secondMsg).set("third", thirdMsg).set("overall", overallMsg);
+    return new Map<string, string>()
+        .set("wins", winsMsg)
+        .set("second", secondMsg)
+        .set("third", thirdMsg)
+        .set("overall", overallMsg);
 }
 
 export async function getBlacklisted(guild: Guild) {

@@ -1,7 +1,7 @@
+import { WholesomeSuggestion } from "@prisma/client";
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, MessageReaction, User } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { formatDate } from "../utils/functions/date";
 import {
     acceptWholesomeImage,
     clearWholesomeCache,
@@ -13,12 +13,11 @@ import {
     suggestWholesomeImage,
     uploadImageToImgur,
 } from "../utils/functions/image";
-import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { NypsiClient } from "../utils/models/Client";
 
-const uploadCooldown = new Map();
+const uploadCooldown = new Map<string, number>();
 
 const cmd = new Command("wholesome", "get a random wholesome picture", Categories.FUN).setAliases([
     "iloveyou",
@@ -128,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ],
                 });
             } else {
-                uploadCooldown.set(message.member.id, new Date());
+                uploadCooldown.set(message.member.id, new Date().getTime());
 
                 setTimeout(() => {
                     uploadCooldown.delete(message.author.id);
@@ -260,7 +259,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const queue = await getAllSuggestions();
 
-        const pages = new Map();
+        const pages = new Map<number, WholesomeSuggestion[]>();
 
         if (queue.length > 6) {
             for (const image of queue) {
@@ -333,8 +332,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     for (const image of pages.get(currentPage)) {
                         newEmbed.addField(
-                            image.id,
-                            `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image})`
+                            image.id.toString(),
+                            `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`
                         );
                     }
 
@@ -350,8 +349,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     for (const image of pages.get(currentPage)) {
                         newEmbed.addField(
-                            image.id,
-                            `**suggested** ${image.submitter} (${image.submitter_id})\n**url** ${image.image})`
+                            image.id.toString(),
+                            `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`
                         );
                     }
 

@@ -5,7 +5,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { PunishmentType } from "../models/GuildStorage";
 
-const modLogColors: Map<PunishmentType, ColorResolvable> = new Map();
+const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
 modLogColors.set(PunishmentType.MUTE, "#ffffba");
 modLogColors.set(PunishmentType.BAN, "#ffb3ba");

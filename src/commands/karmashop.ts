@@ -24,7 +24,7 @@ declare function require(name: string): any;
 
 const items: { [key: string]: KarmaShopItem } = require("../../data/karmashop.json");
 
-const amount = new Map();
+const amount = new Map<string, number>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);

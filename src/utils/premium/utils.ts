@@ -7,7 +7,7 @@ import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { PremUser } from "../models/PremStorage";
 
-const colorCache = new Map();
+const colorCache = new Map<string, `#${string}` | "default">();
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
     let id: string;
@@ -204,7 +204,7 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
         },
     });
 
-    colorCache.set(member, query.embedColor);
+    colorCache.set(member, query.embedColor as `#${string}` | "default");
 
     return query.embedColor as `#${string}` | "default";
 }

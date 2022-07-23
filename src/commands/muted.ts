@@ -1,13 +1,13 @@
 import {
-    CommandInteraction,
-    GuildMember,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    PermissionFlagsBits,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
+    GuildMember,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
+    PermissionFlagsBits,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    const pages: Map<number, string[]> = new Map();
+    const pages = new Map<number, string[]>();
 
     for (const m of muted) {
         const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});

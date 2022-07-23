@@ -48,6 +48,7 @@ const cmd = new Command("guild", "create and manage your guild/clan", Categories
 cmd.slashEnabled = true;
 
 cmd.slashData
+    .addSubcommand((help) => help.setName("help").setDescription("view the help menu for guild commands"))
     .addSubcommand((create) =>
         create
             .setName("create")
@@ -108,7 +109,7 @@ const filter = [
     "noguild",
 ];
 
-const invited: Set<string> = new Set();
+const invited = new Set<string>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
@@ -206,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[0].toLowerCase() == "create") {
         if ((await getPrestige(message.member)) < 1) {
-            return send({ embeds: [new ErrorEmbed("you must be atleast prestige **1** to create a guild")] });
+            return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
         }
 
         if ((await getBalance(message.member)) < 500000) {
@@ -649,6 +650,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader(`top ${args[1] ?? 5} guilds`, message.author.avatarURL());
 
         embed.setDescription(top.join("\n"));
+
+        return send({ embeds: [embed] });
+    }
+
+    if (args[0].toLowerCase() == "help") {
+        const embed = new CustomEmbed(message.member);
+
+        embed.setHeader("guild help");
+        embed.setDescription(
+            `${prefix}**guild create <name>** *create a guild*\n` +
+                `${prefix}**guild invite <@member>** *invite a user to your guild*\n` +
+                `${prefix}**guild leave** *leave your current guild*\n` +
+                `${prefix}**guild kick <tag>** *kick user from your guild*\n` +
+                `${prefix}**guild delete** *delete your guild*\n` +
+                `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
+                `${prefix}**guild stats** *show contribution stats of your guild*\n` +
+                `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
+                `${prefix}**guild motd <motd>** *set guild motd*\n` +
+                `${prefix}**guild top** *shows top 5 guilds*\n` +
+                `${prefix}**guild (name)** *show guild info*`
+        );
+        embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
         return send({ embeds: [embed] });
     }

@@ -1,19 +1,19 @@
 import { ChannelType, CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    userExists,
+    calcMaxBet,
     createUser,
-    getInventory,
-    getItems,
     formatBet,
     getBalance,
-    calcMaxBet,
+    getInventory,
+    getItems,
     updateBalance,
+    userExists,
 } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { RaceDetails, RaceUserDetails } from "../utils/models/StreetRace";
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"]);
@@ -52,8 +52,8 @@ cmd.slashData
             )
     );
 
-const races: Map<string, RaceDetails> = new Map();
-const carCooldown = new Map();
+const races = new Map<string, RaceDetails>();
+const carCooldown = new Map<string, string[]>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const msg = await message.channel.send({ embeds: [embed] });
 
-        const usersMap: Map<string, RaceUserDetails> = new Map();
+        const usersMap = new Map<string, RaceUserDetails>();
 
         const game = {
             channel: message.channel,

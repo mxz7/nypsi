@@ -1,40 +1,53 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
+    CommandInteraction,
     GuildMember,
-    MessageEditOptions,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import {
-    userExists,
-    createUser,
-    getBalance,
-    updateBalance,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-} from "../utils/economy/utils.js";
 import * as shuffle from "shuffle-array";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
-const games = new Map();
+const games = new Map<
+    string,
+    {
+        bet: number;
+        deck: string[];
+        cards: string[];
+        dealerCards: string[];
+        id: number;
+        first: boolean;
+        dealerPlay: boolean;
+        voted: number;
+    }
+>();
 
 const cmd = new Command("blackjack", "play blackjack", Categories.MONEY).setAliases(["bj", "blowjob"]);
 
@@ -99,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "blackjack works exactly how it would in real life\n" +
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/blackjack.js#L128)"
+                "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)"
         ).setHeader("blackjack help");
 
         return send({ embeds: [embed] });

@@ -1,4 +1,4 @@
-const workers: Map<number, Constructor<Worker>> = new Map();
+const workers = new Map<number, Constructor<Worker>>();
 
 interface Settings {
     maxStorage: number;

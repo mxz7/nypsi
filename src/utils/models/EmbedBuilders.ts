@@ -3,7 +3,7 @@ import redis from "../database/redis";
 import { getColor } from "../functions/color";
 import { getEmbedColor } from "../premium/utils";
 
-const embedColorCache: Map<string, string> = new Map();
+const embedColorCache = new Map<string, string>();
 
 export class CustomEmbed extends EmbedBuilder {
     constructor(member?: GuildMember, text?: string, disableFooter = false) {

@@ -1,40 +1,49 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
+    CommandInteraction,
     GuildMember,
-    MessageEditOptions,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import {
-    userExists,
-    createUser,
-    getBalance,
-    updateBalance,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-} from "../utils/economy/utils.js";
 import * as shuffle from "shuffle-array";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
-
-const games = new Map();
+const games = new Map<
+    string,
+    {
+        bet: number;
+        win?: any;
+        deck: string[];
+        cards: string[];
+        nextCard: string;
+        id: number;
+        voted: number;
+    }
+>();
 
 const cmd = new Command("yablon", "play yablon", Categories.MONEY).setAliases(["yb"]);
 
@@ -95,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "yablon works exactly how it would in real life\n" +
                 "when you create a game, a full 52 deck is shuffled in a random order\n" +
                 "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-                "view the code for this [here](https://github.com/tekohxd/nypsi/blob/master/commands/yablon.js#L123)"
+                "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/yablon.ts)"
         ).setHeader("yablon help");
 
         return send({ embeds: [embed] });

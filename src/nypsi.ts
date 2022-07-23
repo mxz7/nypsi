@@ -2,6 +2,7 @@ import { GatewayIntentBits, Options } from "discord.js";
 import { NypsiClient } from "./utils/models/Client";
 
 const client = new NypsiClient({
+
     allowedMentions: {
         parse: ["users", "roles"],
     },

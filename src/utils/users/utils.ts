@@ -8,7 +8,8 @@ import { cleanString } from "../functions/string";
 import ms = require("ms");
 
 const db = new Database("./out/data/storage.db");
-const lastKnownTagCooldown = new Set();
+
+const lastKnownTagCooldown = new Set<string>();
 
 export interface MentionQueueItem {
     type: string;
