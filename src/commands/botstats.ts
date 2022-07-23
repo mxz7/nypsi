@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             true
         );
 
-    embed.setFooter({ text: `v${version} | cluster: ${currentCluster + 1}/${clusterCount} - [${currentShard}]` });
+    embed.setFooter({ text: `v${version} | cluster: ${currentCluster + 1}/${clusterCount} | shard: ${currentShard}` });
 
     message.channel.send({ embeds: [embed] });
 }
