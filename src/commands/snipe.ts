@@ -1,6 +1,6 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Channel, CommandInteraction, GuildMember, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"]);
 
@@ -9,7 +9,7 @@ declare function require(name: string): any;
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const { snipe } = require("../nypsi.js");
 
-    let channel: any = message.channel;
+    let channel: Channel = message.channel;
 
     if (args.length == 1) {
         if (!message.mentions.channels.first()) {
@@ -17,6 +17,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         channel = message.mentions.channels.first();
+
+        if (channel.isDMBased()) return;
+        if (channel.isThread()) return;
 
         if (!channel.members.find((m: GuildMember) => m.user.id == message.author.id)) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });

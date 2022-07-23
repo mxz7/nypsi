@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const boobLinks = Array.from(boobCache.keys());
 
-    const subredditChoice: any = boobLinks[Math.floor(Math.random() * boobLinks.length)];
+    const subredditChoice = boobLinks[Math.floor(Math.random() * boobLinks.length)];
 
     const allowed = boobCache.get(subredditChoice);
 

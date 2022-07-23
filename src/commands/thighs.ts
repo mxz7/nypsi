@@ -39,9 +39,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const thighsLinks = Array.from(thighsCache.keys());
 
-    const subredditChoice: any = thighsLinks[Math.floor(Math.random() * thighsLinks.length)];
+    const subredditChoice = thighsLinks[Math.floor(Math.random() * thighsLinks.length)];
 
-    const allowed = await thighsCache.get(subredditChoice);
+    const allowed = thighsCache.get(subredditChoice);
 
     const chosen = allowed[Math.floor(Math.random() * allowed.length)];
 

@@ -313,7 +313,6 @@ export async function uploadImageToImgur(url: string): Promise<string> {
     }
 
     logger.info(`uploaded (${boobies.data.link})`);
-    console.log(boobies.data);
     return boobies.data.link;
 }
 
