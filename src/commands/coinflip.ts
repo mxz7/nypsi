@@ -25,7 +25,7 @@ import { gamble } from "../utils/logger.js";
 import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
-const waiting: Set<string> = new Set();
+const waiting = new Set<string>();
 
 const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories.MONEY).setAliases(["cf"]);
 
