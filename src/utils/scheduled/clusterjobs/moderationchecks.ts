@@ -63,7 +63,7 @@ export function runModerationChecks(client: NypsiClient) {
                 url: modlog.modlogs,
             });
 
-            let embeds: APIEmbed[];
+            const embeds: APIEmbed[] = [];
 
             if ((await redis.llen(`modlogs:${modlog.guildId}`)) > 10) {
                 const current = await redis.lpop(`modlogs:${modlog.guildId}`, 10);
