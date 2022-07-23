@@ -138,7 +138,8 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
 
     if (await redis.exists(`cache:user:tracking:${id}`)) {
         return (await redis.get(`cache:user:tracking:${id}`)) == "t" ? true : false;
-    }
+
+    if (!hasProfile(id)) return undefined;
 
     const query = await prisma.user.findUnique({
         where: {
