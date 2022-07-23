@@ -22,6 +22,19 @@ manager.extend(
 );
 
 manager.on("clusterCreate", (cluster) => {
+    cluster.on("ready", () => {
+        logger.info(`cluster ${cluster.id} ready`);
+    });
+    cluster.on("death", () => {
+        logger.info(`cluster ${cluster.id} died`);
+    });
+    cluster.on("disconnect", () => {
+        logger.info(`cluster ${cluster.id} disconnected. respawning..`);
+        cluster.respawn();
+    });
+    cluster.on("reconnecting", () => {
+        logger.info(`cluster ${cluster.id} reconnecting..`);
+    });
     logger.info(`launched cluster ${cluster.id}`);
 });
 
