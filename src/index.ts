@@ -12,6 +12,9 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
 
     execArgv: ["--trace-warnings"],
     shardArgs: ["--ansi", "--color"],
+
+    // totalShards: 4,
+    // shardsPerClusters: 2, force clusters on beta bot
 });
 
 manager.extend(
