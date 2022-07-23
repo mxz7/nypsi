@@ -117,8 +117,8 @@ setInterval(async () => {
     existsCooldown.clear();
 }, ms("2 days"));
 
-const fetchCooldown = new Set();
-const existsCooldown = new Set();
+const fetchCooldown = new Set<string>();
+const existsCooldown = new Set<string>();
 const disableCache = new Map<string, string[]>();
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
@@ -197,7 +197,7 @@ export async function createGuild(guild: Guild) {
         },
     });
 
-    existsCooldown.add(guild);
+    existsCooldown.add(guild.id);
 
     setTimeout(() => {
         if (!existsCooldown.has(guild.id)) return;
