@@ -1,5 +1,5 @@
 import * as topgg from "@top-gg/sdk";
-import { ShardingManager } from "discord.js";
+import { Manager } from "discord-hybrid-sharding";
 import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
@@ -25,7 +25,7 @@ import ms = require("ms");
 const app = express();
 const webhook = new topgg.Webhook("123");
 
-export function listenForVotes(manager: ShardingManager) {
+export function listenForVotes(manager: Manager) {
     app.post(
         "/dblwebhook",
         webhook.listener((vote) => {
@@ -37,7 +37,7 @@ export function listenForVotes(manager: ShardingManager) {
     app.listen(5000);
 }
 
-async function doVote(vote: topgg.WebhookPayload, manager: ShardingManager) {
+async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     const { user } = vote;
 
     if (!(await userExists(user))) {

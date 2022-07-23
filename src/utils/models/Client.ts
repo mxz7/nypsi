@@ -15,6 +15,8 @@ export class NypsiClient extends Client {
     constructor(options: ClientOptions) {
         super(options);
 
+        this.cluster = new Cluster.Client(this);
+
         setClusterId(this.shard.ids[0]);
 
         runEconomySetup();

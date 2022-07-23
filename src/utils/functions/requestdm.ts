@@ -1,4 +1,5 @@
-import { MessageOptions, MessagePayload, ShardingManager } from "discord.js";
+import { Manager } from "discord-hybrid-sharding";
+import { MessageOptions, MessagePayload } from "discord.js";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -7,7 +8,7 @@ interface RequestDMOptions {
     memberId: string;
     content: string;
     embed?: CustomEmbed;
-    client: NypsiClient | ShardingManager;
+    client: NypsiClient | Manager;
 }
 
 export default async function requestDM(options: RequestDMOptions): Promise<boolean> {

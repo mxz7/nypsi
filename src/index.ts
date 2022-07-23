@@ -1,4 +1,4 @@
-import { ShardingManager } from "discord.js";
+import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
@@ -7,7 +7,7 @@ import { listenForVotes } from "./utils/votehandler";
 
 setClusterId("main");
 
-const manager = new ShardingManager(`${__dirname}/nypsi.js`, {
+const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     token: process.env.BOT_TOKEN,
     totalShards: 2,
 
@@ -15,8 +15,8 @@ const manager = new ShardingManager(`${__dirname}/nypsi.js`, {
     shardArgs: ["--ansi", "--color"],
 });
 
-manager.on("shardCreate", (shard) => {
-    logger.info(`launched shard ${shard.id}`);
+manager.on("clusterCreate", (cluster) => {
+    logger.info(`launched cluster ${cluster.id}`);
 });
 
 manager.spawn();
@@ -51,7 +51,7 @@ setTimeout(async () => {
         .fetchClientValues("guilds.cache.size")
         .then((res) => res.reduce((a: any, b: any) => a + b))) as number;
 
-    const shardCount = manager.shards.size;
+    const shardCount = manager.clusterList.length;
 
     setInterval(() => {
         updateStats(guildCount, shardCount);
