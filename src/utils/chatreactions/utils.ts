@@ -7,8 +7,8 @@ import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
-const currentChannels = new Set();
-const existsCache = new Set();
+const currentChannels = new Set<string>();
+const existsCache = new Set<string>();
 const enabledCache = new Map<string, number>();
 const lastGame = new Map<string, number>();
 
