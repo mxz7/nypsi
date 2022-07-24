@@ -30,7 +30,8 @@ import {
 } from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble, logger } from "../utils/logger.js";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { NypsiClient } from "../utils/models/Client.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const games = new Map<string, { bet: number; win: number; deck: string[]; card: string; id: number; voted: number }>();
@@ -361,7 +362,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
             const guild = await getGuildByUser(message.member);
 
             if (guild) {
-                await addToGuildXP(guild.guildName, earnedXp, message.member);
+                await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
             }
         }
 

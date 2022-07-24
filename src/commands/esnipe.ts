@@ -1,5 +1,5 @@
 import { Channel, CommandInteraction, Message } from "discord.js";
-import { eSnipe } from "../nypsi";
+import { eSnipe } from "../utils/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 

@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import fetch from "node-fetch";
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getSkin } from "mc-names";
+import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("skin", "view the skin of a minecraft account", Categories.MINECRAFT);
 
@@ -35,6 +35,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const skin = await getSkin(username);
+
+    if (!skin) {
+        return message.channel.send({ embeds: [new ErrorEmbed("error while fetching skin. please try again")] });
+    }
 
     const embed = new CustomEmbed(message.member, `[download](https://mc-heads.net/download/${uuid.id})`)
         .setTitle(uuid.name)

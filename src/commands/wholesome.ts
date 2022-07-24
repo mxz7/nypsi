@@ -15,8 +15,9 @@ import {
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const uploadCooldown = new Map<string, number>();
 
@@ -190,7 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] });
         }
 
-        const res = await acceptWholesomeImage(parseInt(args[1]), message.member);
+        const res = await acceptWholesomeImage(parseInt(args[1]), message.member, message.client as NypsiClient);
 
         if (!res) {
             return send({

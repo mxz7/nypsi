@@ -16,3 +16,8 @@ export interface LotteryTicket {
     userId: string;
     id: number;
 }
+
+export interface GuildUpgradeRequirements {
+    money: number;
+    xp: number;
+}
