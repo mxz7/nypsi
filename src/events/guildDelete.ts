@@ -11,7 +11,7 @@ export default async function guildDelete(client: Client, guild: Guild) {
 
     logger.log({
         level: "guild",
-        message: `removed from ${guild.name} (${guild.id}) new count: ${client.guilds.cache.size}`,
+        message: `removed from ${guild.name} (${guild.id})`,
     });
 
     await setPrefix(guild, "$");

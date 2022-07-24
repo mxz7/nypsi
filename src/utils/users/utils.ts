@@ -8,8 +8,7 @@ import { cleanString } from "../functions/string";
 import ms = require("ms");
 
 const db = new Database("./out/data/storage.db");
-const optCache = new Map<string, boolean>();
-const lastfmUsernameCache = new Map<string, string>();
+
 const lastKnownTagCooldown = new Set<string>();
 
 export interface MentionQueueItem {
@@ -137,11 +136,11 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
         id = member;
     }
 
-    if (!hasProfile(id)) return undefined;
-
-    if (optCache.has(id)) {
-        return optCache.get(id);
+    if (await redis.exists(`cache:user:tracking:${id}`)) {
+        return (await redis.get(`cache:user:tracking:${id}`)) == "t" ? true : false;
     }
+
+    if (!hasProfile(id)) return undefined;
 
     const query = await prisma.user.findUnique({
         where: {
@@ -153,10 +152,12 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
     });
 
     if (query.tracking) {
-        optCache.set(id, true);
+        await redis.set(`cache:user:tracking:${id}`, "t");
+        await redis.expire(`cache:user:tracking:${id}`, ms("1 hour") / 1000);
         return true;
     } else {
-        optCache.set(id, false);
+        await redis.set(`cache:user:tracking:${id}`, "f");
+        await redis.expire(`cache:user:tracking:${id}`, ms("1 hour") / 1000);
         return false;
     }
 }
@@ -178,9 +179,7 @@ export async function disableTracking(member: GuildMember | string) {
         },
     });
 
-    if (optCache.has(id)) {
-        optCache.delete(id);
-    }
+    await redis.del(`cache:user:tracking:${id}`);
 }
 
 export async function enableTracking(member: GuildMember | string) {
@@ -200,9 +199,7 @@ export async function enableTracking(member: GuildMember | string) {
         },
     });
 
-    if (optCache.has(id)) {
-        optCache.delete(id);
-    }
+    await redis.del(`cache:user:tracking:${id}`);
 }
 
 export async function addNewUsername(member: GuildMember | string, username: string) {
@@ -237,6 +234,9 @@ export async function fetchUsernameHistory(member: GuildMember | string) {
         select: {
             value: true,
             date: true,
+        },
+        orderBy: {
+            date: "desc",
         },
     });
 
@@ -324,8 +324,8 @@ export async function getLastfmUsername(member: GuildMember | string) {
         id = member;
     }
 
-    if (lastfmUsernameCache.has(id)) {
-        return lastfmUsernameCache.get(id);
+    if (await redis.exists(`cache:user:lastfm:${id}`)) {
+        return await redis.get(`cache:user:lastfm:${id}`);
     } else {
         const query = await prisma.user.findUnique({
             where: {
@@ -337,7 +337,8 @@ export async function getLastfmUsername(member: GuildMember | string) {
         });
 
         if (query && query.lastfmUsername) {
-            lastfmUsernameCache.set(id, query.lastfmUsername);
+            await redis.set(`cache:user:lastfm:${id}`, query.lastfmUsername);
+            await redis.expire(`cache:user:lastfm:${id}`, ms("1 hour") / 1000);
             return query.lastfmUsername;
         } else {
             return undefined;
@@ -361,9 +362,7 @@ export async function setLastfmUsername(member: GuildMember, username: string) {
 
     if (res.error && res.error == 6) return false;
 
-    if (lastfmUsernameCache.has(member.user.id)) {
-        lastfmUsernameCache.delete(member.user.id);
-    }
+    await redis.del(`cache:user:lastfm:${id}`);
 
     await prisma.user.update({
         where: {

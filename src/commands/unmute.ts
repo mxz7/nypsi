@@ -6,12 +6,12 @@ import {
     MessageOptions,
     PermissionFlagsBits,
 } from "discord.js";
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
-import { profileExists, createProfile, newCase, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
+import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { createProfile, deleteMute, getMuteRole, isMuted, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
@@ -99,8 +99,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let muteRole = await message.guild.roles.fetch(await getMuteRole(message.guild));
     let mode = "role";
 
-    if (!(await getMuteRole(message.guild))) {
-        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+    if (!muteRole) {
+        const roles = await message.guild.roles.fetch();
+        muteRole = roles.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
