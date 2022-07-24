@@ -1,11 +1,3 @@
----
-layout: default
-title: crates
-description: explanation for crates
-permalink: /eco/crates
-parent: economy
----
-
 # crates
 
 ## how do i get a crate?

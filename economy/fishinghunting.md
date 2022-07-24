@@ -1,11 +1,3 @@
----
-layout: default
-title: fishing / hunting
-description: how fishing and hunting works with nypsi
-permalink: /eco/fishingandhunting
-parent: economy
----
-
 # fishing and hunting
 
 ## how do i get a fishing rod / gun?

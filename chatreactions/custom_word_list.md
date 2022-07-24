@@ -1,11 +1,3 @@
----
-layout: default
-title: creating a custom word list
-description: explanation for how to create a custom word list for nypsi chat reactions
-permalink: /chat/wordlist
-parent: chat reactions
----
-
 # creating a custom word list
 
 ## default

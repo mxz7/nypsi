@@ -1,11 +1,3 @@
----
-layout: default
-title: guilds
-description: explanation for how nypsi guilds work
-permalink: /eco/guilds
-parent: economy
----
-
 # guilds
 
 ## what are guilds

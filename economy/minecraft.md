@@ -1,11 +1,3 @@
----
-layout: default
-title: minecraft items
-description: explanation for the minecraft items
-permalink: /eco/minecraft
-parent: economy
----
-
 # minecraft items
 
 ## pickaxes

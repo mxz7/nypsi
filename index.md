@@ -1,11 +1,3 @@
----
-layout: default
-title: nypsi docs
-nav_order: 1
-description: documentation for nypsi
-permalink: /
----
-
 # nypsi documentation
 
 ## invite to your server

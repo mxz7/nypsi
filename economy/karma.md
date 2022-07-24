@@ -1,11 +1,3 @@
----
-layout: default
-title: karma
-description: how karma works on nypsi
-permalink: /eco/karma
-parent: economy
----
-
 # karma
 
 ## how to get karma

@@ -1,11 +1,3 @@
----
-layout: default
-title: commands
-description: explanation of punishment commands for nypsi
-permalink: /mod/commands
-parent: moderation
----
-
 # commands
 
 ## multi-user

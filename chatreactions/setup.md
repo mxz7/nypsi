@@ -1,11 +1,3 @@
----
-layout: default
-title: setting up chat reactions
-description: explanation for how to setup chat reactions and customise settings
-permalink: /chat/setup
-parent: chat reactions
----
-
 # chat reactions setup
 
 ## enabling automatic start

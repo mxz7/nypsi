@@ -1,11 +1,3 @@
----
-layout: default
-title: quick setup
-nav_order: 2
-description: quick setup for nypsi
-permalink: /setup
----
-
 # quick setup
 
 ## 1. setting custom prefix

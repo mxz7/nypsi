@@ -1,11 +1,3 @@
----
-layout: default
-title: music
-nav_order: 3
-description: music explanation for nypsi
-permalink: /music
----
-
 # last.fm integration
 
 ## getting started

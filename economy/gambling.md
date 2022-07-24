@@ -1,11 +1,3 @@
----
-layout: default
-title: gambling
-description: gambling explanation
-permalink: /eco/gambling
-parent: economy
----
-
 # gambling
 
 ## maximum bet
