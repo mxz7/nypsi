@@ -6,7 +6,7 @@ import { getKarma, removeKarma } from "../utils/karma/utils";
 import { getPrefix } from "../utils/guilds/utils";
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO).setDocs(
-    "https://docs.nypsi.xyz/eco/karma"
+    "https://docs.nypsi.xyz/economy/karma"
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
