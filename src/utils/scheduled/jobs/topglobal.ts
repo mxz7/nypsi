@@ -1,18 +1,16 @@
-import { parentPort } from "worker_threads";
-import { CustomEmbed } from "../../models/EmbedBuilders";
-import { WebhookClient } from "discord.js";
-import prisma from "../../database/database";
+import { EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { parentPort } from "worker_threads";
+import prisma from "../../database/database";
 
 (async () => {
     const baltop = await topAmountGlobal(10, true);
 
-    const embed = new CustomEmbed();
+    const embed = new EmbedBuilder();
 
     embed.setTitle("top 10 richest users");
     embed.setDescription(baltop.join("\n"));
     embed.setColor("#111111");
-    embed.disableFooter();
 
     const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });
 
