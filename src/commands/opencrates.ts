@@ -1,11 +1,17 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { startOpeningCrates, stopOpeningCrates } from "../utils/commandhandler";
-import { getInventory, getItems, openCrate, getDMsEnabled } from "../utils/economy/utils";
-import { getPrefix } from "../utils/guilds/utils";
-import { isPremium, getTier } from "../utils/premium/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import {
+    getDMsEnabled,
+    getInventory,
+    getItems,
+    openCrate,
+    startOpeningCrates,
+    stopOpeningCrates,
+} from "../utils/economy/utils";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("opencrates", "open all of your crates with one command", Categories.MONEY);
 

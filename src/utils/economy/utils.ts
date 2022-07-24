@@ -1,16 +1,13 @@
-import * as topgg from "@top-gg/sdk";
-import { Client, Collection, Guild, GuildMember, User, WebhookClient } from "discord.js";
-import * as express from "express";
+import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import fetch from "node-fetch";
-import * as shufflearray from "shuffle-array";
 import prisma from "../database/database";
 import redis from "../database/redis";
-import { MStoTime } from "../functions/date";
-import { addKarma, getKarma } from "../karma/utils";
+import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
-import { Item, LotteryTicket } from "../models/Economy";
+import { NypsiClient } from "../models/Client";
+import { GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
@@ -18,68 +15,6 @@ import { createProfile, hasProfile } from "../users/utils";
 import workerSort from "../workers/sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
-import _ = require("lodash");
-
-declare function require(name: string): any;
-
-const webhook = new topgg.Webhook("123");
-const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
-
-const app = express();
-
-const bannedCache = new Map<string, boolean>();
-const guildExistsCache = new Map<string, boolean>();
-const guildUserCache = new Map<string, string>();
-const guildRequirementsCache = new Map<string, { money: number; xp: number }>();
-
-app.post(
-    "/dblwebhook",
-    webhook.listener((vote) => {
-        logger.info(`received vote: ${vote.user}`);
-        const { onVote } = require("../../nypsi");
-        onVote(vote);
-    })
-);
-
-app.listen(5000);
-
-setInterval(async () => {
-    const query = await prisma.economy.findMany({
-        select: {
-            userId: true,
-            workers: true,
-        },
-    });
-
-    for (const user of query) {
-        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
-
-        if (_.isEmpty(workers)) continue;
-
-        for (const w of Object.keys(workers)) {
-            const worker = workers[w];
-
-            const workerData = Worker.fromStorage(worker);
-
-            if (worker.stored < workerData.maxStorage) {
-                if (worker.stored + workerData.perInterval > workerData.maxStorage) {
-                    worker.stored = workerData.maxStorage;
-                } else {
-                    worker.stored += workerData.perInterval;
-                }
-            }
-        }
-
-        await prisma.economy.update({
-            where: {
-                userId: user.userId,
-            },
-            data: {
-                workers: workers as any,
-            },
-        });
-    }
-}, 5 * 60 * 1000);
 
 let items: { [key: string]: Item };
 
@@ -89,39 +24,6 @@ const lotteryTicketPrice = 15000;
  * the goal is to have more tickets overall for a more random outcome
  */
 export { lotteryTicketPrice };
-
-let lotteryHook: WebhookClient;
-
-if (!process.env.GITHUB_ACTION) {
-    lotteryHook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
-}
-
-const lotteryHookQueue = new Map<string, number>();
-
-setInterval(() => {
-    if (lotteryHookQueue.size == 0) return;
-
-    const desc = [];
-
-    for (const username of lotteryHookQueue.keys()) {
-        const amount = lotteryHookQueue.get(username);
-
-        desc.push(`**${username}** has bought **${amount}** lottery ticket${amount > 1 ? "s" : ""}`);
-
-        lotteryHookQueue.delete(username);
-
-        if (desc.join("\n").length >= 1500) break;
-    }
-
-    const embed = new CustomEmbed();
-
-    embed.setColor("#111111");
-    embed.setDescription(desc.join("\n"));
-    embed.setTimestamp();
-    embed.disableFooter();
-
-    lotteryHook.send({ embeds: [embed] });
-}, ms("30 minutes"));
 
 export function loadItems(): string {
     let txt = "";
@@ -141,21 +43,11 @@ export function loadItems(): string {
     return txt;
 }
 
-loadItems();
-
 function randomOffset() {
     return Math.floor(Math.random() * 50000);
 }
 
 let padlockPrice = 25000 + randomOffset();
-items["padlock"].worth = padlockPrice;
-logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-
-setInterval(() => {
-    padlockPrice = 25000 + randomOffset();
-    items["padlock"].worth = padlockPrice;
-    logger.info("padlock price updated: $" + padlockPrice.toLocaleString());
-}, 3600000);
 
 async function updateCryptoWorth() {
     let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json());
@@ -178,131 +70,21 @@ async function updateCryptoWorth() {
     logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString());
 }
 
-setInterval(updateCryptoWorth, 1500000);
-
-export async function doVote(client: Client, vote: topgg.WebhookPayload) {
-    const { user } = vote;
-
-    if (!(await userExists(user))) {
-        logger.warn(`${user} doesnt exist`);
-        return;
-    }
-
-    const now = new Date().getTime();
-
-    const query = await prisma.economy.findUnique({
-        where: {
-            userId: user,
-        },
-        select: {
-            lastVote: true,
-        },
-    });
-
-    const lastVote = query.lastVote.getTime();
-
-    if (now - lastVote < 43200000) {
-        return logger.error(`${user} already voted`);
-    }
-
-    await prisma.economy.update({
-        where: {
-            userId: user,
-        },
-        data: {
-            lastVote: new Date(now),
-        },
-    });
-
-    redis.set(`cache:vote:${user}`, "true");
-    redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
-
-    let member: User | string = await client.users.fetch(user);
-
-    let id = false;
-    let memberID: string;
-
-    if (!member) {
-        member = user;
-        memberID = user;
-        id = true;
-    } else {
-        memberID = member.id;
-    }
-
-    let prestige = await getPrestige(memberID);
-
-    if (prestige > 15) prestige = 15;
-
-    const amount = 15000 * (prestige + 1);
-    const multi = Math.floor((await getMulti(memberID)) * 100);
-    const inventory = await getInventory(memberID);
-
-    await updateBalance(memberID, (await getBalance(memberID)) + amount);
-    addKarma(memberID, 10);
-
-    const tickets = await getTickets(memberID);
-
-    const prestigeBonus = Math.floor(((await getPrestige(memberID)) > 20 ? 20 : await getPrestige(memberID)) / 2.5);
-    const premiumBonus = Math.floor((await isPremium(memberID)) ? await getTier(memberID) : 0);
-    const karmaBonus = Math.floor((await getKarma(memberID)) / 100);
-
-    const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
-
-    if (tickets.length < max) {
-        await addTicket(memberID);
-    }
-
-    let crateAmount = Math.floor(prestige / 2 + 1);
-
-    if (crateAmount > 5) crateAmount = 5;
-
-    if (inventory["vote_crate"]) {
-        inventory["vote_crate"] += crateAmount;
-    } else {
-        inventory["vote_crate"] = crateAmount;
-    }
-
-    await setInventory(memberID, inventory);
-
-    logger.log({
-        level: "success",
-        message: `vote processed for ${memberID} ${member instanceof User ? `(${member.tag})` : ""}`,
-    });
-
-    if (!id && (await getDMsEnabled(memberID)) && member instanceof User) {
-        const embed = new CustomEmbed()
-            .setColor("#5efb8f")
-            .setDescription(
-                "you have received the following: \n\n" +
-                    `+ $**${amount.toLocaleString()}**\n` +
-                    "+ **10** karma\n" +
-                    `+ **3**% multiplier, total: **${multi}**%\n` +
-                    `+ **${crateAmount}** vote crates` +
-                    `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
-            )
-            .disableFooter();
-
-        await member
-            .send({ content: "thank you for voting!", embeds: [embed] })
-            .then(() => {
-                if (member instanceof User) {
-                    logger.log({
-                        level: "success",
-                        message: `sent vote confirmation to ${member.tag}`,
-                    });
-                }
-            })
-            .catch(() => {
-                if (member instanceof User) {
-                    logger.warn(`failed to send vote confirmation to ${member.tag}`);
-                }
-            });
-    }
-}
-
 export function getPadlockPrice(): number {
     return padlockPrice;
+}
+
+export function runEconomySetup() {
+    setInterval(updateCryptoWorth, 1500000);
+
+    loadItems();
+
+    items["padlock"].worth = padlockPrice;
+
+    setInterval(() => {
+        padlockPrice = 25000 + randomOffset();
+        items["padlock"].worth = padlockPrice;
+    }, 3600000);
 }
 
 export async function hasVoted(member: GuildMember | string) {
@@ -567,7 +349,7 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
     return max;
 }
 
-export async function topAmountGlobal(amount: number, client: Client, anon: boolean): Promise<string[]> {
+export async function topAmountGlobal(amount: number, client?: NypsiClient, anon = true): Promise<string[]> {
     const query = await prisma.economy.findMany({
         where: {
             money: { gt: 1000 },
@@ -575,10 +357,15 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
         select: {
             userId: true,
             money: true,
+            user: {
+                select: {
+                    lastKnownTag: true,
+                },
+            },
         },
     });
 
-    const userIDs = [];
+    const userIDs: string[] = [];
     const balances = new Map<string, number>();
 
     for (const user of query) {
@@ -607,16 +394,30 @@ export async function topAmountGlobal(amount: number, client: Client, anon: bool
                 pos = "🥉";
             }
 
-            const member = await client.users.fetch(user);
+            let username: string;
 
-            let username = user;
+            if (client) {
+                const res = await client.cluster.broadcastEval(
+                    async (c, { userId }) => {
+                        const user = await c.users.fetch(userId);
 
-            if (member) {
-                if (anon) {
-                    username = member.username;
-                } else {
-                    username = member.tag;
+                        if (user) {
+                            return user.tag;
+                        }
+                    },
+                    { context: { userId: user } }
+                );
+
+                for (const i of res) {
+                    if (i.includes("#")) {
+                        username = i;
+                        break;
+                    }
                 }
+            }
+
+            if (anon) {
+                username = username.split("#")[0];
             }
 
             usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
@@ -951,19 +752,6 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
     });
 }
 
-export function updateStats(guildCount: number, shardCount: number) {
-    topggStats.postStats({
-        serverCount: guildCount,
-        shardCount: shardCount,
-    });
-
-    // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
-    //     method: "POST",
-    //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
-    //     headers: { "Content-Type": "application/json", "Authorization": "removed token" }
-    // }) FOR POSTING TO DISCORD.BOTS.GG
-}
-
 export async function getPrestige(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1168,8 +956,8 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 }
 
 export async function isEcoBanned(id: string) {
-    if (bannedCache.has(id)) {
-        return bannedCache.get(id);
+    if (await redis.exists(`cache:economy:banned:${id}`)) {
+        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
     } else {
         const query = await prisma.economy.findUnique({
             where: {
@@ -1181,15 +969,18 @@ export async function isEcoBanned(id: string) {
         });
 
         if (!query) {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
 
         if (query.banned) {
-            bannedCache.set(id, true);
+            await redis.set(`cache:economy:banned:${id}`, "t");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return true;
         } else {
-            bannedCache.set(id, false);
+            await redis.set(`cache:economy:banned:${id}`, "f");
+            await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
     }
@@ -1216,7 +1007,7 @@ export async function toggleBan(id: string) {
         });
     }
 
-    bannedCache.delete(id);
+    await redis.del(id);
 }
 
 export async function reset() {
@@ -1559,111 +1350,7 @@ export async function addTicket(member: GuildMember | string) {
 
     if (!(member instanceof GuildMember)) return;
 
-    if (lotteryHookQueue.has(member.user.username)) {
-        lotteryHookQueue.set(member.user.username, lotteryHookQueue.get(member.user.username) + 1);
-    } else {
-        lotteryHookQueue.set(member.user.username, 1);
-    }
-}
-
-async function doLottery(client: Client) {
-    logger.info("performing lottery..");
-    const tickets = await prisma.lotteryTicket.findMany();
-
-    if (tickets.length < 100) {
-        logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
-
-        const embed = new CustomEmbed();
-
-        embed.setTitle("lottery cancelled");
-        embed.setDescription(
-            `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
-        );
-        embed.setColor("#111111");
-        embed.disableFooter();
-
-        return lotteryHook.send({ embeds: [embed] });
-    }
-
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
-
-    const shuffledTickets = shufflearray(tickets);
-
-    let chosen: LotteryTicket;
-    let user: User;
-
-    while (!user) {
-        chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
-
-        logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
-
-        user = await client.users.fetch(chosen.userId);
-    }
-
-    logger.log({
-        level: "success",
-        message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
-    });
-
-    await updateBalance(user.id, (await getBalance(user.id)) + total);
-
-    const embed = new CustomEmbed();
-
-    embed.setTitle("lottery winner");
-    embed.setDescription(
-        `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
-            `they have won a total of $**${total.toLocaleString()}**`
-    );
-    embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
-    embed.setColor("#111111");
-    embed.disableFooter();
-
-    await lotteryHook.send({ embeds: [embed] });
-
-    if (await getDMsEnabled(user.id)) {
-        embed.setTitle("you have won the lottery!");
-        embed.setDescription(
-            `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`
-        );
-        embed.setColor("#111111");
-
-        await user
-            .send({ embeds: [embed] })
-            .then(() => {
-                logger.log({
-                    level: "success",
-                    message: "sent notification to winner",
-                });
-            })
-            .catch(() => {
-                logger.warn("failed to send notification to winner");
-            });
-    }
-
-    const { count } = await prisma.lotteryTicket.deleteMany();
-
-    logger.info(`${count.toLocaleString()} tickets deleted from database`);
-}
-
-export function runLotteryInterval(client: Client) {
-    const now = new Date();
-    const saturday = new Date();
-    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1);
-    saturday.setHours(0, 0, 0, 0);
-
-    const needed = saturday.getTime() - now.getTime();
-
-    setTimeout(() => {
-        doLottery(client);
-        setInterval(() => {
-            doLottery(client);
-        }, 86400 * 1000 * 7);
-    }, needed);
-
-    logger.log({
-        level: "auto",
-        message: `lottery will run in ${MStoTime(needed)}`,
-    });
+    await redis.hincrby("lotterytickets:queue", member.user.username, 1);
 }
 
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
@@ -1897,10 +1584,10 @@ export async function getGuildByUser(member: GuildMember | string) {
 
     let guildName: string;
 
-    if (guildUserCache.has(id)) {
-        guildName = guildUserCache.get(id);
+    if (await redis.exists(`cache:economy:guild:user:${id}`)) {
+        guildName = await redis.get(`cache:economy:guild:user:${id}`);
 
-        if (!guildName) return undefined;
+        if (guildName == "noguild") return undefined;
     } else {
         const query = await prisma.economyGuildMember.findUnique({
             where: {
@@ -1925,8 +1612,12 @@ export async function getGuildByUser(member: GuildMember | string) {
         });
 
         if (!query || !query.guild) {
-            guildUserCache.set(id, undefined);
+            await redis.set(`cache:economy:guild:user:${id}`, "noguild");
+            await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
             return undefined;
+        } else {
+            await redis.set(`cache:economy:guild:user:${id}`, query.guild.guildName);
+            await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
         }
 
         return query.guild;
@@ -1951,16 +1642,10 @@ export async function createGuild(name: string, owner: GuildMember) {
         },
     });
 
-    if (guildUserCache.has(owner.user.id)) {
-        guildUserCache.delete(owner.user.id);
-    }
+    await redis.del(`cache:economy:guild:user:${owner.user.id}`);
 }
 
 export async function deleteGuild(name: string) {
-    guildUserCache.clear();
-
-    guildExistsCache.delete(name);
-
     await prisma.economyGuildMember.deleteMany({
         where: {
             guildName: name,
@@ -1974,7 +1659,7 @@ export async function deleteGuild(name: string) {
     });
 }
 
-export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+export async function addToGuildBank(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -1992,10 +1677,10 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+export async function addToGuildXP(name: string, amount: number, member: GuildMember, client: NypsiClient) {
     await prisma.economyGuild.update({
         where: {
             guildName: name,
@@ -2013,7 +1698,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
         },
     });
 
-    return checkUpgrade(name);
+    return checkUpgrade(name, client);
 }
 
 export async function getMaxMembersForGuild(name: string) {
@@ -2022,9 +1707,9 @@ export async function getMaxMembersForGuild(name: string) {
     return guild.level * 3;
 }
 
-export async function getRequiredForGuildUpgrade(name: string): Promise<{ money: number; xp: number }> {
-    if (guildRequirementsCache.has(name)) {
-        return guildRequirementsCache.get(name);
+export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
+    if (await redis.exists(`cache:economy:guild:requirements:${name}`)) {
+        return JSON.parse(await redis.get(`cache:economy:guild:requirements:${name}`));
     }
 
     const guild = await getGuildByName(name);
@@ -2035,10 +1720,14 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<{ money:
     const bonusMoney = 100000 * guild.members.length;
     const bonusXP = 75 * guild.members.length;
 
-    guildRequirementsCache.set(name, {
-        money: baseMoney + bonusMoney,
-        xp: baseXP + bonusXP,
-    });
+    await redis.set(
+        `cache:economy:guild:requirements:${name}`,
+        JSON.stringify({
+            money: baseMoney + bonusMoney,
+            xp: baseXP + bonusXP,
+        })
+    );
+    await redis.expire(`cache:economy:guild:requirements:${name}`, ms("1 hour") / 1000);
 
     return {
         money: baseMoney + bonusMoney,
@@ -2061,9 +1750,7 @@ export async function addMember(name: string, member: GuildMember) {
         },
     });
 
-    if (guildUserCache.has(member.user.id)) {
-        guildUserCache.delete(member.user.id);
-    }
+    await redis.del(`cache:economy:guild:user:${member.user.id}`);
 
     return true;
 }
@@ -2074,14 +1761,13 @@ export enum RemoveMemberMode {
 }
 
 export async function removeMember(member: string, mode: RemoveMemberMode) {
-    guildUserCache.clear();
-
     if (mode == RemoveMemberMode.ID) {
         await prisma.economyGuildMember.delete({
             where: {
                 userId: member,
             },
         });
+        await redis.del(`cache:economy:guild:user:${member}`);
         return true;
     } else {
         const user = await prisma.user.findFirst({
@@ -2103,7 +1789,11 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
             },
         });
 
-        if (x) return true;
+        if (x) {
+            await redis.del(`cache:economy:guild:user:${x.userId}`);
+
+            return true;
+        }
         return false;
     }
 }
@@ -2127,7 +1817,7 @@ interface EconomyGuildMember {
     contributedXp: number;
 }
 
-async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): Promise<boolean> {
     if (typeof guild == "string") {
         guild = await getGuildByName(guild);
     }
@@ -2149,7 +1839,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
         logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
-        guildRequirementsCache.clear();
+        await redis.del(`cache:economy:guild:requirements:${guild.guildName}`);
 
         const embed = new CustomEmbed().setColor("#5efb8f");
 
@@ -2174,9 +1864,12 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
             await setInventory(member.userId, inventory);
 
             if (await getDMsEnabled(member.userId)) {
-                const { requestDM } = require("../../nypsi");
-
-                await requestDM(member.userId, `${guild.guildName} has been upgraded!`, false, embed);
+                await requestDM({
+                    memberId: member.userId,
+                    client: client,
+                    content: `${guild.guildName} has been upgraded!`,
+                    embed: embed,
+                });
             }
         }
 
@@ -2225,4 +1918,21 @@ export async function topGuilds(limit = 5) {
     }
 
     return out;
+}
+
+export async function startOpeningCrates(member: GuildMember) {
+    await redis.set(`economy:crates:block:${member.user.id}`, "y");
+}
+
+export async function stopOpeningCrates(member: GuildMember) {
+    await redis.del(`economy:crates:block:${member.user.id}`);
+}
+
+export async function isHandcuffed(id: string): Promise<boolean> {
+    return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
+}
+
+export async function addHandcuffs(id: string) {
+    await redis.set(`economy:handcuffed:${id}`, Date.now());
+    await redis.expire(`economy:handcuffed:${id}`, 60);
 }

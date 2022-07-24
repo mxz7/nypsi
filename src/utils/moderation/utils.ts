@@ -1,12 +1,10 @@
-import { Client, ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
+import { ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
 import prisma from "../database/database";
-import { addCooldown, inCooldown } from "../guilds/utils";
-import { logger } from "../logger";
+import redis from "../database/redis";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { PunishmentType } from "../models/GuildStorage";
 
-const modLogQueue = new Map<string, CustomEmbed[]>();
-const modLogHookCache = new Map<string, WebhookClient>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
 modLogColors.set(PunishmentType.MUTE, "#ffffba");
@@ -130,15 +128,10 @@ export async function addModLog(
         embed.addField("reason", command);
     }
 
-    if (modLogQueue.has(guild.id)) {
-        modLogQueue.get(guild.id).push(embed);
-    } else {
-        modLogQueue.set(guild.id, [embed]);
-    }
+    await redis.lpush(`modlogs:${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function isModLogsEnabled(guild: Guild) {
-    if (modLogHookCache.has(guild.id)) return true;
     const query = await prisma.moderation.findUnique({
         where: {
             guildId: guild.id,
@@ -162,7 +155,6 @@ export async function setModLogs(guild: Guild, hook: string) {
             modlogs: hook,
         },
     });
-    if (modLogHookCache.has(guild.id)) modLogHookCache.delete(guild.id);
 }
 
 export async function getModLogsHook(guild: Guild): Promise<WebhookClient | undefined> {
@@ -326,95 +318,6 @@ export async function isBanned(guild: Guild, member: GuildMember) {
     }
 }
 
-export function runModerationChecks(client: Client) {
-    setInterval(async () => {
-        const date = new Date();
-
-        const query1 = await prisma.moderationMute.findMany({
-            where: {
-                expire: { lte: date },
-            },
-            select: {
-                userId: true,
-                guildId: true,
-            },
-        });
-
-        for (const unmute of query1) {
-            logger.log({
-                level: "auto",
-                message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
-            });
-            requestUnmute(unmute.guildId, unmute.userId, client);
-        }
-
-        const query2 = await prisma.moderationBan.findMany({
-            where: {
-                expire: { lte: date },
-            },
-            select: {
-                userId: true,
-                guildId: true,
-            },
-        });
-
-        for (const unban of query2) {
-            logger.log({
-                level: "auto",
-                message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
-            });
-            await requestUnban(unban.guildId, unban.userId, client);
-        }
-
-        const query3 = await prisma.moderation.findMany({
-            where: {
-                NOT: { modlogs: "" },
-            },
-            select: {
-                modlogs: true,
-                guildId: true,
-            },
-        });
-
-        for (const modlog of query3) {
-            if (!modLogQueue.has(modlog.guildId) || modLogQueue.get(modlog.guildId).length == 0) continue;
-            let webhook: WebhookClient;
-
-            if (modLogHookCache.has(modlog.guildId)) {
-                webhook = modLogHookCache.get(modlog.guildId);
-            } else {
-                webhook = new WebhookClient({ url: modlog.modlogs });
-                modLogHookCache.set(modlog.guildId, webhook);
-            }
-
-            let embeds: CustomEmbed[];
-
-            if (modLogQueue.get(modlog.guildId).length > 10) {
-                const current = modLogQueue.get(modlog.guildId);
-                embeds = current.splice(0, 10);
-                modLogQueue.set(modlog.guildId, current);
-            } else {
-                embeds = modLogQueue.get(modlog.guildId);
-                modLogQueue.set(modlog.guildId, []);
-            }
-
-            webhook.send({ embeds: embeds }).catch(async (e) => {
-                logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
-                logger.error(e);
-
-                await prisma.moderation.update({
-                    where: {
-                        guildId: modlog.guildId,
-                    },
-                    data: {
-                        modlogs: "",
-                    },
-                });
-            });
-        }
-    }, 30000);
-}
-
 export async function setReason(guild: Guild, caseID: number, reason: string) {
     await prisma.moderationCase.updateMany({
         where: {
@@ -426,22 +329,29 @@ export async function setReason(guild: Guild, caseID: number, reason: string) {
     });
 }
 
-export async function deleteMute(guild: Guild, member: GuildMember | string) {
+export async function deleteMute(guild: Guild | string, member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.id;
     } else {
         id = member;
+    }
+
+    let guildId: string;
+    if (guild instanceof Guild) {
+        guildId = guild.id;
+    } else {
+        guildId = guild;
     }
 
     await prisma.moderationMute.deleteMany({
         where: {
-            AND: [{ userId: id }, { guildId: guild.id }],
+            AND: [{ userId: id }, { guildId: guildId }],
         },
     });
 }
 
-export async function deleteBan(guild: Guild, member: GuildMember | string) {
+export async function deleteBan(guild: Guild | string, member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.id;
@@ -449,17 +359,31 @@ export async function deleteBan(guild: Guild, member: GuildMember | string) {
         id = member;
     }
 
+    let guildId: string;
+    if (guild instanceof Guild) {
+        guildId = guild.id;
+    } else {
+        guildId = guild;
+    }
+
     await prisma.moderationBan.deleteMany({
         where: {
-            AND: [{ userId: id }, { guildId: guild.id }],
+            AND: [{ userId: id }, { guildId: guildId }],
         },
     });
 }
 
-export async function getMuteRole(guild: Guild) {
+export async function getMuteRole(guild: Guild | string) {
+    let guildId: string;
+    if (guild instanceof Guild) {
+        guildId = guild.id;
+    } else {
+        guildId = guild;
+    }
+
     const query = await prisma.moderation.findUnique({
         where: {
-            guildId: guild.id,
+            guildId: guildId,
         },
         select: {
             muteRole: true,
@@ -492,79 +416,69 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
     });
 }
 
-async function requestUnban(guild: string | Guild, member: string, client: Client) {
-    guild = client.guilds.cache.find((g) => g.id == guild);
+export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
+    const res = await client.cluster.broadcastEval(
+        async (c, { guildId, memberId }) => {
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
-    if (!guild) {
-        logger.warn("unable to find guild");
-        return;
+            if (!guild) return "guild";
+
+            let fail = false;
+            await guild.members.unban(memberId, "ban expired").catch(() => {
+                fail = true;
+            });
+            if (fail) return "unban";
+            return true;
+        },
+        { context: { guildId: guildId, memberId: member } }
+    );
+
+    if (res.includes(true)) {
+        await deleteBan(guildId, member);
     }
-
-    await deleteBan(guild, member);
-
-    guild.members.unban(member, "ban expired");
-
-    logger.log({
-        level: "success",
-        message: "ban removed",
-    });
 }
 
-async function requestUnmute(guild: Guild | string, member: string, client: Client) {
-    guild = client.guilds.cache.find((g) => g.id == guild);
+export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
+    const muteRoleId = await getMuteRole(guildId);
 
-    if (!guild) {
-        logger.warn(`unable to find guild ${guild}`);
-        return;
-    }
+    const res = await client.cluster.broadcastEval(
+        async (c, { guildId, memberId, muteRoleId }) => {
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
-    let members;
+            if (!guild) return "guild";
 
-    if (inCooldown(guild)) {
-        members = guild.members.cache;
-    } else {
-        members = await guild.members.fetch();
+            const member = await guild.members.fetch(memberId).catch(() => {});
 
-        addCooldown(guild, 3600);
-    }
+            if (!member) return "member";
 
-    let newMember: void | GuildMember = members.find((m) => m.id == member);
+            let role = muteRoleId;
 
-    if (!newMember) {
-        newMember = await guild.members.fetch(member).catch(() => {
-            newMember = undefined;
-        });
-        if (!newMember) {
-            logger.warn("unable to find member, deleting mute..");
-            return await deleteMute(guild, member);
+            try {
+                if (muteRoleId == "" || muteRoleId == "default") {
+                    const roles = await guild.roles.fetch();
+                    role = roles.find((r) => r.name == "muted").id;
+                } else {
+                    role = (await guild.roles.fetch(muteRoleId)).id;
+                }
+            } catch {
+                return "role";
+            }
+
+            let fail = false;
+            await member.roles.remove(role, "mute expired").catch(() => {
+                fail = true;
+            });
+            if (fail) return "role";
+            return true;
+        },
+        {
+            context: { guildId: guildId, memberId: member, muteRoleId: muteRoleId },
         }
+    );
+
+    if (res.includes(true) || res.includes("member") || res.includes("role")) {
+        await deleteMute(guildId, member);
     }
-
-    await guild.roles.fetch();
-
-    const muteRoleID = await getMuteRole(guild);
-
-    let muteRole = guild.roles.cache.find((r) => r.id == muteRoleID);
-
-    if (!muteRoleID || muteRoleID == "") {
-        muteRole = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
-    }
-
-    if (!muteRole) {
-        logger.warn("unable to find mute role, deleting mute..");
-        return await deleteMute(guild, newMember);
-    }
-
-    await deleteMute(guild, member);
-
-    logger.log({
-        level: "success",
-        message: "mute deleted",
-    });
-
-    return await newMember.roles.remove(muteRole).catch(() => {
-        logger.error("couldnt remove mute role");
-    });
 }
 
 export async function getMutedUsers(guild: Guild) {

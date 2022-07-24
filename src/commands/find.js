@@ -18,11 +18,15 @@ const { getPeaks } = require("../utils/guilds/utils");
 const { getKarma, getLastCommand } = require("../utils/karma/utils");
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils");
 const { formatDate, daysAgo } = require("../utils/functions/date");
+const { NypsiClient } = require("../utils/models/Client");
+const { fetchUsernameHistory } = require("../utils/users/utils");
 
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message, args) {
     if (message.member.user.id != "672793821850894347") return;
+
+    const client = message.client;
 
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member);
@@ -35,7 +39,21 @@ async function run(message, args) {
     } else if (args[0].toLowerCase() == "gid") {
         if (args.length == 1) return message.react("❌");
 
-        const guild = await message.client.guilds.fetch(args[1]);
+        let guild = await client.cluster.broadcastEval(
+            async (c, { guildId }) => {
+                const g = await c.guilds.fetch(guildId);
+
+                return g;
+            },
+            { context: { guildId: args[1] } }
+        );
+
+        for (const res of guild) {
+            if (res.id) {
+                guild = res;
+                break;
+            }
+        }
 
         if (!guild) return message.react("❌");
 
@@ -45,7 +63,21 @@ async function run(message, args) {
 
         args.shift();
 
-        const guild = message.client.guilds.cache.find((g) => g.name.includes(args.join(" ")));
+        let guild = await client.cluster.broadcastEval(
+            (c, { guildId }) => {
+                const g = c.guilds.cache.find((g) => g.name.includes(guildId));
+
+                return g;
+            },
+            { context: { guildId: args.join(" ") } }
+        );
+
+        for (const res of guild) {
+            if (res.id) {
+                guild = res;
+                break;
+            }
+        }
 
         if (!guild) return message.react("❌");
 
@@ -53,7 +85,21 @@ async function run(message, args) {
     } else if (args[0].toLowerCase() == "id") {
         if (args.length == 1) return message.react("❌");
 
-        const user = await message.client.users.fetch(args[1]);
+        let user = await client.cluster.broadcastEval(
+            async (c, { userId }) => {
+                const g = await c.users.fetch(userId);
+
+                return g;
+            },
+            { context: { userId: args[1] } }
+        );
+
+        for (const res of user) {
+            if (res.username) {
+                user = res;
+                break;
+            }
+        }
 
         if (!user) return message.react("❌");
 
@@ -63,9 +109,26 @@ async function run(message, args) {
 
         args.shift();
 
-        const user = message.client.users.cache.find((u) => u.tag.includes(args.join(" ")));
+        let user = await client.cluster.broadcastEval(
+            async (c, { userId }) => {
+                const g = await c.users.cache.find((u) => {
+                    return `${u.username}#${u.discriminator}`.includes(userId);
+                });
 
-        if (!user) return message.react("❌");
+                return g;
+            },
+            { context: { userId: args.join(" ") } }
+        );
+
+        for (const res of user) {
+            if (!res) continue;
+            if (res.username) {
+                user = res;
+                break;
+            }
+        }
+
+        if (!user || user instanceof Array) return message.react("❌");
 
         return showUser(message, user);
     } else if (args[0].toLowerCase() == "top") {
@@ -78,27 +141,16 @@ async function run(message, args) {
 }
 
 async function showGuild(message, guild) {
-    let balTop = await topAmount(guild, 5);
+    const owner = guild.ownerId;
 
-    const filtered = balTop.filter(function (el) {
-        return el != null;
-    });
-
-    balTop = filtered.join("\n");
-
-    const owner = await guild.members.fetch(guild.ownerId);
-
-    const invites = await guild.invites
-        .fetch()
-        .then((invites) => Array.from(invites.keys()))
-        .catch(() => {});
+    const invites = guild.invites.cache;
 
     const embed = new CustomEmbed(message.member)
         .setDescription(`\`${guild.id}\``)
         .setTitle(guild.name)
         .addField(
             "info",
-            `**owner** ${owner.user.tag} (${owner.user.id})
+            `**owner** ${owner}
             **created** ${formatDate(guild.createdAt)}`,
             true
         )
@@ -113,22 +165,10 @@ async function showGuild(message, guild) {
         embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)]);
     }
 
-    if (balTop.length > 0) {
-        embed.addField("top bal", balTop);
-    }
-
     return message.channel.send({ embeds: [embed] });
 }
 
 async function showUser(message, user) {
-    const guilds = [];
-
-    message.client.guilds.cache.forEach((g) => {
-        if (g.members.cache.find((u) => u.id == user.id)) {
-            guilds.push(`\`${g.id}\``);
-        }
-    });
-
     const embed = new CustomEmbed(message.member)
         .setTitle(user.tag)
         .setDescription(
@@ -164,8 +204,19 @@ async function showUser(message, user) {
         );
     }
 
-    if (guilds.length > 0) {
-        embed.addField("guilds", guilds.join(" "));
+    const usernameHistory = await fetchUsernameHistory(user.id);
+
+    if (usernameHistory.length > 0) {
+        let msg = "";
+
+        let count = 0;
+        for (const un of usernameHistory) {
+            if (count >= 10) break;
+            msg += `\`${un.value}\` | \`${formatDate(un.date)}\`\n`;
+            count++;
+        }
+
+        embed.addField("username history", msg, true);
     }
 
     return message.channel.send({ embeds: [embed] });
