@@ -2,8 +2,8 @@ import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { redditImage } from "../utils/functions/image";
 import { images } from "../utils/imghandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("hands", "get a random hand image. horny slut", Categories.NSFW).setAliases(["hand"]);
 
@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
     }
 
-    if (handCache.size <= 2) {
+    if (handCache.size <= 1) {
         return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
     }
 
