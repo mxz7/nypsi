@@ -11,7 +11,6 @@ import {
     MessageOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { requestDM } from "../nypsi";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     addMember,
@@ -35,8 +34,10 @@ import {
     userExists,
 } from "../utils/economy/utils";
 import { daysAgo, formatDate } from "../utils/functions/date";
+import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getPrefix } from "../utils/guilds/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -92,7 +93,21 @@ cmd.slashData
     )
     .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"));
 
-const filter = ["nig", "fag", "queer", "delete", "inv", "create", "leave", "stats", "top", "hitler", "kick", "forcekick"];
+const filter = [
+    "nig",
+    "fag",
+    "queer",
+    "delete",
+    "inv",
+    "create",
+    "leave",
+    "stats",
+    "top",
+    "hitler",
+    "kick",
+    "forcekick",
+    "noguild",
+];
 
 const invited = new Set<string>();
 
@@ -470,7 +485,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ).toLocaleString()}**`
                 );
 
-                await requestDM(guildMember.userId, `${guild.guildName} has been deleted`, false, embed);
+                await requestDM({
+                    memberId: guildMember.userId,
+                    content: `${guild.guildName} has been deleted`,
+                    client: message.client as NypsiClient,
+                    embed: embed,
+                });
             }
         }
 
@@ -510,7 +530,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
-        await addToGuildBank(guild.guildName, amount, message.member);
+        await addToGuildBank(guild.guildName, amount, message.member, message.client as NypsiClient);
 
         const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
 

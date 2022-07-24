@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { addKarma } from "../utils/karma/utils";
-import { addMember, expireUser, getTier, isPremium, renewUser, setTier } from "../utils/premium/utils";
+import { NypsiClient } from "../utils/models/Client";
+import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/premium/utils";
 import { createProfile, hasProfile } from "../utils/users/utils";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
@@ -35,11 +36,11 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
             if (await isPremium(newMember.user.id)) {
                 if (tier <= (await getTier(newMember.user.id))) return;
 
-                await setTier(newMember.user.id, tier);
-                await renewUser(newMember.user.id);
+                await setTier(newMember.user.id, tier, newMember.client as NypsiClient);
+                await renewUser(newMember.user.id, newMember.client as NypsiClient);
             } else {
                 if (!(await hasProfile(newMember.user.id))) await createProfile(newMember.user);
-                await addMember(newMember.user.id, tier);
+                await addMember(newMember.user.id, tier, newMember.client as NypsiClient);
                 await addKarma(newMember.user.id, 50);
             }
         } else if (oldMember.roles.cache.size > newMember.roles.cache.size) {
@@ -53,7 +54,8 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
             ) {
                 if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return;
                 if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return;
-                if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) expireUser(newMember.id);
+                if (newMember.roles.cache.find((r) => r.id == "819870727834566696"))
+                    setExpireDate(newMember.id, new Date(0), newMember.client as NypsiClient);
             }
         }
     }

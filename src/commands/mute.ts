@@ -7,12 +7,12 @@ import {
     Role,
     ThreadChannel,
 } from "discord.js";
-import { profileExists, createProfile, newCase, newMute, isMuted, deleteMute, getMuteRole } from "../utils/moderation/utils";
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
+import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { createProfile, deleteMute, getMuteRole, isMuted, newCase, newMute, profileExists } from "../utils/moderation/utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -132,8 +132,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let muteRole: Role = await message.guild.roles.fetch(await getMuteRole(message.guild));
 
-    if (!(await getMuteRole(message.guild))) {
-        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+    if (!muteRole) {
+        const roles = await message.guild.roles.fetch();
+        muteRole = roles.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {

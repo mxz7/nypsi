@@ -1,6 +1,5 @@
 import { Message, PermissionFlagsBits } from "discord.js";
-import { eSnipe } from "../nypsi";
-import { createGuild, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils";
+import { createGuild, eSnipe, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { addModLog } from "../utils/moderation/utils";
 
