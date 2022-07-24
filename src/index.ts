@@ -45,6 +45,14 @@ manager.on("debug", (m) => {
     logger.debug(m);
 });
 
+process.on("unhandledRejection", (e) => {
+    logger.error(e);
+});
+
+process.on("uncaughtException", (e) => {
+    logger.error(e);
+});
+
 manager.spawn();
 
 export async function getGuilds(): Promise<string[]> {
