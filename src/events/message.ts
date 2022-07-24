@@ -362,14 +362,4 @@ async function addMention() {
     exports.mentionQueue = mentionQueue;
 }
 
-function cleanMentions() {
-    const limit = Math.floor((Date.now() - 86400000 * 3) / 1000); // 3 days
-
-    const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit);
-
-    if (changes > 0) logger.info(`${changes} mentions deleted`);
-}
-
-setInterval(cleanMentions, 3600 * 1000);
-
 export { workerCount };
