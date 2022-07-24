@@ -6,7 +6,7 @@ import { logger } from "../logger";
 
 const bree = new Bree({
     root: path.resolve("./jobs"),
-    // logger: false,
+    logger: false,
 
     workerMessageHandler: (message) => {
         if (message.message) {
