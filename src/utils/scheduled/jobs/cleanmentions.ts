@@ -5,7 +5,7 @@ import { parentPort } from "worker_threads";
 const db = new Database("./out/data/storage.db");
 
 (() => {
-    const limit = Math.floor(dayjs().subtract(1, "day").unix() / 1000);
+    const limit = Math.floor(dayjs().subtract(1, "month").unix() / 1000);
 
     const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit);
 
