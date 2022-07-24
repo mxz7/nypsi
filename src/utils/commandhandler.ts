@@ -411,6 +411,24 @@ export async function runCommand(
     if (!message.channel.isTextBased()) return;
     if (message.channel.isDMBased()) return;
 
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel)) {
+        if (message instanceof Message) {
+            return message.member
+                .send("i don't have access to that channel. please contact server staff if this is an error")
+                .catch(() => {});
+        } else {
+            return message
+                .reply({
+                    embeds: [
+                        new ErrorEmbed(
+                            "i don't have access to this channel. please contact server staff if this is an error"
+                        ),
+                    ],
+                })
+                .catch(() => {});
+        }
+    }
+
     if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
         return message.member
             .send(
