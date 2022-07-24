@@ -74,7 +74,7 @@ listenForVotes(manager);
 setTimeout(async () => {
     await startJobs();
     logger.info("jobs triggered");
-}, 60000);
+}, 300000);
 
 setTimeout(async () => {
     const userId = await manager.fetchClientValues("user.id");
