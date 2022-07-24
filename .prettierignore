@@ -1,7 +1,0 @@
-*.json
-*.yml
-
-# *.md
-
-!lists.json
-!items.json
