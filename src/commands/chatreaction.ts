@@ -38,7 +38,7 @@ import { isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
     .setAliases(["cr", "reaction"])
-    .setDocs("https://docs.nypsi.xyz/chatreactions/");
+    .setDocs("https://docs.nypsi.xyz/chatreactions/setup");
 
 cmd.slashEnabled = true;
 cmd.slashData
