@@ -36,6 +36,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const skin = await getSkin(username);
 
+    console.log(skin);
+
     if (!skin) {
         return message.channel.send({ embeds: [new ErrorEmbed("error while fetching skin. please try again")] });
     }
