@@ -1,13 +1,8 @@
 import { User } from "discord.js";
-console.log("1");
 import { getPrestige, userExists } from "../utils/economy/utils";
-console.log(2);
 import { uploadImageToImgur } from "../utils/functions/image";
-console.log(3);
 import { isPremium } from "../utils/premium/utils";
-console.log(4);
 import { addNewAvatar, addNewUsername, hasProfile, isTracking, updateLastKnowntag } from "../utils/users/utils";
-console.log(7);
 
 const queue: User[] = [];
 let interval: NodeJS.Timer;

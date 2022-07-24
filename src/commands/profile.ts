@@ -1,21 +1,21 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import prisma from "../utils/database/database";
-import { logger } from "../utils/logger";
 import * as fs from "fs/promises";
-import Database = require("better-sqlite3");
+import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
+import prisma from "../utils/database/database";
 import { getDMsEnabled } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
+import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import Database = require("better-sqlite3");
 
 const cmd = new Command("profile", "view your raw data stored in nypsi's database", Categories.INFO).setAliases([
     "data",
