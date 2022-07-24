@@ -1,6 +1,7 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options } from "discord.js";
 import { NypsiClient } from "./utils/models/Client";
+console.log("69");
 
 console.log("z");
 const client = new NypsiClient({
@@ -45,19 +46,33 @@ const client = new NypsiClient({
 console.log("x");
 
 import channelCreate from "./events/channelCreate";
+console.log("1");
 import guildCreate from "./events/guildCreate";
+console.log("2");
 import guildDelete from "./events/guildDelete";
+console.log("3");
 import guildMemberAdd from "./events/guildMemberAdd";
+console.log("4");
 import guildMemberRemove from "./events/guildMemberRemove";
+console.log("5");
 import guildMemberUpdate from "./events/guildMemberUpdate";
+console.log("6");
 import interactionCreate from "./events/interactionCreate";
+console.log("7");
 import messageCreate from "./events/message";
+console.log("8");
 import messageDelete from "./events/messageDelete";
+console.log("9");
 import messageUpdate from "./events/messageUpdate";
+console.log("10");
 import ready from "./events/ready";
+console.log("11");
 import roleDelete from "./events/roleDelete";
+console.log("12");
 import userUpdate from "./events/userUpdate";
+console.log("13");
 import { loadCommands } from "./utils/commandhandler";
+console.log("14");
 import { logger } from "./utils/logger";
 console.log("b");
 loadCommands();
