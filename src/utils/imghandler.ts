@@ -46,6 +46,10 @@ const feetLinks = [
     "https://www.reddit.com/r/feetpics/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/Feet_NSFW/top.json?limit=6969&t=month",
 ];
+const handLinks = [
+    "https://www.reddit.com/r/ManHands/top.json?limit=6969&t=month",
+    "https://www.reddit.com/r/hands/top.json?limit=6969&t=month",
+];
 const birbLinks = [
     "https://www.reddit.com/r/birb/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/budgies/top.json?limit=6969&t=month",
@@ -124,6 +128,7 @@ export async function updateCache() {
     await cacheUpdate(assLinks, "ass");
     await cacheUpdate(pornLinks, "porn");
     await cacheUpdate(feetLinks, "feet");
+    await cacheUpdate(handLinks, "hands");
     await cacheUpdate(birbLinks, "birb");
     await cacheUpdate(catLinks, "cat");
     await cacheUpdate(dogLinks, "dog");
