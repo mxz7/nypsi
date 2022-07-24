@@ -19,12 +19,12 @@ const bree = new Bree({
 
     jobs: [
         {
-            name: "purgeusernames",
+            name: "purge-usernames",
             interval: "at 3:00am",
             path: path.join(__dirname, "jobs", "purgeusernames.js"),
         },
         {
-            name: "topglobal",
+            name: "top-global",
             interval: "at 12:00am",
             path: path.join(__dirname, "jobs", "topglobal.js"),
         },
@@ -35,7 +35,7 @@ const bree = new Bree({
             path: path.join(__dirname, "jobs", "workers.js"),
         },
         {
-            name: "deleteguilds",
+            name: "delete-guilds",
             interval: "at 3:01am",
             path: path.join(__dirname, "jobs", "oldguilds.js"),
             worker: {
@@ -45,14 +45,19 @@ const bree = new Bree({
             },
         },
         {
-            name: "deterioratekarma",
+            name: "deteriorate-karma",
             interval: "at 3:02am",
             path: path.join(__dirname, "jobs", "deterioratekarma.js"),
         },
         {
-            name: "lottotickets",
+            name: "lottery-tickets",
             interval: "60m",
             path: path.join(__dirname, "jobs", "lotterytickets.js"),
+        },
+        {
+            name: "clean-mentions",
+            interval: "60m",
+            path: path.join(__dirname, "jobs", "cleanmentions.js"),
         },
     ],
 });

@@ -11,6 +11,9 @@ import prisma from "../../database/database";
         },
     });
 
-    parentPort.postMessage(`${d.count.toLocaleString()} old usernames deleted from database`);
+    if (d.count > 0) {
+        parentPort.postMessage(`${d.count.toLocaleString()} old usernames deleted from database`);
+    }
+
     process.exit(0);
 })();
