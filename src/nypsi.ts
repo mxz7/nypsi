@@ -2,6 +2,7 @@ import * as Cluster from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options } from "discord.js";
 import { NypsiClient } from "./utils/models/Client";
 
+console.log("z");
 const client = new NypsiClient({
     allowedMentions: {
         parse: ["users", "roles"],
@@ -41,6 +42,7 @@ const client = new NypsiClient({
         GatewayIntentBits.GuildMessageReactions,
     ],
 });
+console.log("x");
 
 import channelCreate from "./events/channelCreate";
 import guildCreate from "./events/guildCreate";
