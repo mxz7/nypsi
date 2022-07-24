@@ -1,6 +1,5 @@
-import { WebhookClient } from "discord.js";
+import { EmbedBuilder, WebhookClient } from "discord.js";
 import redis from "../../database/redis";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 
 (async () => {
     const hook = new WebhookClient({
@@ -23,14 +22,13 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
         if (desc.join("\n").length >= 500) break;
     }
 
-    const embed = new CustomEmbed();
+    const embed = new EmbedBuilder();
 
     embed.setColor("#111111");
     embed.setDescription(desc.join("\n"));
     embed.setTimestamp();
-    embed.disableFooter();
 
-    hook.send({ embeds: [embed] });
+    await hook.send({ embeds: [embed] });
 
     process.exit(0);
 })();

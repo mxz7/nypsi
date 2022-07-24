@@ -52,7 +52,6 @@ const bree = new Bree({
         {
             name: "lottotickets",
             interval: "60m",
-            timeout: "60m",
             path: path.join(__dirname, "jobs", "lotterytickets.js"),
         },
     ],
