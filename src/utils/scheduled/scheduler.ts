@@ -23,11 +23,11 @@ const bree = new Bree({
             interval: "at 3:00am",
             path: path.join(__dirname, "jobs", "purgeusernames.js"),
         },
-        // {
-        //     name: "top-global",
-        //     interval: "at 12:00am",
-        //     path: path.join(__dirname, "jobs", "topglobal.js"),
-        // },
+        {
+            name: "top-global",
+            interval: "at 12:00am",
+            path: path.join(__dirname, "jobs", "topglobal.js"),
+        },
         {
             name: "workers",
             timeout: "5m",
