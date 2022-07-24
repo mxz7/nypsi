@@ -35,7 +35,15 @@ async function doQueue() {
 
     if (!user) return;
 
-    const url = await uploadImageToImgur(user.displayAvatarURL({ extension: "png", size: 256 }));
+    let uploadUrl = user.displayAvatarURL({ size: 256 });
+
+    if (uploadUrl.endsWith("webp")) {
+        uploadUrl = user.displayAvatarURL({ extension: "gif", size: 256 });
+    } else {
+        uploadUrl = user.displayAvatarURL({ extension: "png", size: 256 });
+    }
+
+    const url = await uploadImageToImgur(uploadUrl);
 
     if (!url) return;
 
