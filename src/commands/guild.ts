@@ -43,7 +43,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
     .setAliases(["g", "clan"])
-    .setDocs("https://docs.nypsi.xyz/eco/guilds");
+    .setDocs("https://docs.nypsi.xyz/economy/guilds");
 
 cmd.slashEnabled = true;
 

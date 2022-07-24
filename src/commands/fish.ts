@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
             embeds: [
                 new ErrorEmbed(
-                    "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/eco/fishingandhunting)"
+                    "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishinghunting)"
                 ),
             ],
         });

@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
             embeds: [
                 new ErrorEmbed(
-                    "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/eco/fishingandhunting)"
+                    "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"
                 ),
             ],
         });
