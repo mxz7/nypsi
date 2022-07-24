@@ -363,6 +363,9 @@ export async function topAmountGlobal(amount: number, client?: NypsiClient, anon
                 },
             },
         },
+        orderBy: {
+            money: "desc",
+        },
     });
 
     const userIDs: string[] = [];
@@ -450,6 +453,9 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
             userId: true,
             money: true,
         },
+        orderBy: {
+            money: "desc",
+        },
     });
 
     let userIDs = [];
@@ -527,6 +533,9 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
             userId: true,
             money: true,
         },
+        orderBy: {
+            money: "asc",
+        },
     });
 
     let userIDs = [];
@@ -603,6 +612,9 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
         select: {
             userId: true,
             prestige: true,
+        },
+        orderBy: {
+            prestige: "desc",
         },
     });
 
