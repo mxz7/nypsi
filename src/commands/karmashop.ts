@@ -11,12 +11,12 @@ import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, getInventory, getXp, setInventory, updateXp, userExists } from "../utils/economy/utils";
 import { closeKarmaShop, getKarma, isKarmaShopOpen, openKarmaShop, removeKarma } from "../utils/karma/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { KarmaShopItem } from "../utils/models/Karmashop";
 import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
 import dayjs = require("dayjs");
-import { NypsiClient } from "../utils/models/Client";
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -42,20 +42,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    if (!isKarmaShopOpen()) {
+    if (!isKarmaShopOpen() && message.guild.id == "747056029795221513") {
         const embed = new CustomEmbed(message.member);
 
-        if (message.guild.id != "747056029795221513") {
-            embed.setDescription(
-                "the karma shop is currently **closed**\nthe karma shop can **only be** accessed in the official nypsi server."
-            );
-        } else {
-            embed.setDescription(
-                "the karma shop is currently **closed**\nkeep notifications enabled to see when the karmashop is opened!"
-            );
-        }
+        embed.setDescription(
+            "the karma shop is currently **closed**\nkeep notifications enabled to see when the karma shop is opened!"
+        );
 
         return message.channel.send({ embeds: [embed] });
+    }
+
+    if (message.guild.id != "747056029795221513") {
+        return message.channel.send({
+            content: "discord.gg/hJTDNST",
+            embeds: [
+                new CustomEmbed(message.member, "the karma shop can **only be** accessed in the official nypsi server"),
+            ],
+        });
     }
 
     let limit = 15;
