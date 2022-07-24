@@ -4,7 +4,9 @@ import { addItemUse, createUser, getInventory, getItems, setInventory, userExist
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("smelt", "smelt your ores into ingots with coal", Categories.MONEY);
+const cmd = new Command("smelt", "smelt your ores into ingots with coal", Categories.MONEY).setDocs(
+    "https://docs.nypsi.xyz/economy/minecraft"
+);
 
 cmd.slashEnabled = true;
 

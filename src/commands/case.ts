@@ -18,7 +18,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("case", "get information about a given case", Categories.MODERATION)
     .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
-    .setDocs("https://docs.nypsi.xyz/mod/cases");
+    .setDocs("https://docs.nypsi.xyz/moderation/cases");
 
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) =>

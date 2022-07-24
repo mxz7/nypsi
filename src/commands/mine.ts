@@ -12,7 +12,9 @@ veins.set("iron_ore", [1, 3, 7]);
 veins.set("gold_ore", [1, 2, 4]);
 veins.set("diamond", [1, 2]);
 
-const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs("https://docs.nypsi.xyz/eco/minecraft");
+const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs(
+    "https://docs.nypsi.xyz/economy/minecraft"
+);
 
 cmd.slashEnabled = true;
 
@@ -62,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
             embeds: [
                 new ErrorEmbed(
-                    "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/eco/minecraft)"
+                    "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)"
                 ),
             ],
         });
