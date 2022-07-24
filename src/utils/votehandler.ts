@@ -35,6 +35,8 @@ export function listenForVotes(manager: Manager) {
     );
 
     app.listen(5000);
+
+    logger.info("listening for votes..");
 }
 
 async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
