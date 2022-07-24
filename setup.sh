@@ -8,4 +8,4 @@ mkdir backup
 cd ..
 mkdir logs
 cd ..
-mv .env.example .env
+cp -i .env.example .env
