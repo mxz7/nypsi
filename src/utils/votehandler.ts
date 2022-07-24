@@ -111,11 +111,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
     await setInventory(user, inventory);
 
-    logger.log({
-        level: "success",
-        message: `vote processed for ${user}`,
-    });
-
     if (await getDMsEnabled(user)) {
         const embed = new CustomEmbed()
             .setColor("#5efb8f")
@@ -139,7 +134,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         if (res) {
             logger.log({
                 level: "success",
-                message: `sent vote confirmation to ${user}`,
+                message: `vote processed for ${user}`,
             });
         } else {
             logger.warn(`failed to send vote confirmation to ${user}`);
