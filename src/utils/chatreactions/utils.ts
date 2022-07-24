@@ -124,7 +124,7 @@ export function doChatReactions(client: NypsiClient) {
                 message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
             });
         }
-    }, ms("10m"));
+    }, ms("15m"));
 }
 
 export async function createReactionProfile(guild: Guild) {
