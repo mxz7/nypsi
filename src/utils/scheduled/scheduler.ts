@@ -9,7 +9,9 @@ const bree = new Bree({
     logger: false,
 
     workerMessageHandler: (message) => {
-        logger.info(`[${message.name}] ${message.message}`);
+        if (message.message) {
+            logger.info(`[${message.name}] ${message.message}`);
+        }
     },
     errorHandler: (message) => {
         logger.error(`[${message.name}] ${message.message}`);
