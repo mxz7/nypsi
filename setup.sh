@@ -1,5 +1,6 @@
 mkdir out
 mkdir temp
+mkdir jobs
 cd out
 mkdir data
 cd data
