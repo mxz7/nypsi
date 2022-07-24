@@ -57,8 +57,9 @@ import roleDelete from "./events/roleDelete";
 import userUpdate from "./events/userUpdate";
 import { loadCommands } from "./utils/commandhandler";
 import { logger } from "./utils/logger";
-
+console.log("b");
 loadCommands();
+console.log("c");
 
 client.once("ready", ready.bind(null, client));
 if (!process.env.GITHUB_ACTION) {
@@ -110,6 +111,8 @@ process.on("unhandledRejection", (e: any) => {
     if (e.code && excludedReasons.includes(e.code)) return;
     logger.error(`unhandled promise rejection: ${e.stack}`);
 });
+
+console.log("a");
 
 setTimeout(() => {
     logger.info("logging in...");
