@@ -171,6 +171,14 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
         multi += guild.level - 1;
     }
 
+    const boosters = await getBoosters(id);
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts == "multi") {
+            multi += items[boosterId].boosterEffect.effect;
+        }
+    }
+
     multi = Math.floor(multi);
 
     multi = multi / 100;
