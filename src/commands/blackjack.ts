@@ -78,10 +78,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
     }
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 

@@ -66,10 +66,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (games.has(message.author.id)) {
         return send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] });
     }

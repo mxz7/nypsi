@@ -36,10 +36,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (args.length == 0 || !args[0]) {
         const embed = new CustomEmbed(message.member)
             .setHeader("warn help")

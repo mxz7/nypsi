@@ -120,10 +120,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             await message.editReply(data);

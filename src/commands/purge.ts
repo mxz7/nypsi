@@ -87,10 +87,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await message.channel.bulkDelete(collecteda);
     }
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (amount <= 100) {
         await message.channel.bulkDelete(amount, true).catch();
     } else {
