@@ -29,6 +29,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
     const args = [""];
 
+    await interaction.deferReply();
+
     const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
             case ApplicationCommandOptionType.User:

@@ -74,10 +74,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     const prefix = await getPrefix(message.guild);
 
     const help = () => {
