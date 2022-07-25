@@ -15,7 +15,7 @@ import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
 import { getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
-import { formatDate, MStoTime } from "./functions/date";
+import { formatDate } from "./functions/date";
 import { getNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
@@ -835,25 +835,15 @@ function updateCommandUses(member: GuildMember) {
 }
 
 export function runCommandUseTimers(client: NypsiClient) {
-    const now = new Date();
-
-    let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
-
-    if (now.getHours() < 3) {
-        d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
-    }
-
-    const needed = new Date(Date.parse(d) + 10800000);
-
     const postCommandUsers = async () => {
         const hook = new WebhookClient({
             url: process.env.ANTICHEAT_HOOK,
         });
 
-        for (const user of noLifers.keys()) {
-            const uses = noLifers.get(user);
+        for (const tag of noLifers.keys()) {
+            const uses = noLifers.get(tag);
 
-            const tag = client.users.cache.find((u) => u.id == user).tag;
+            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag).id;
 
             if (uses > 50) {
                 // TODO: CHANGE THIS TO ADJUST LATER
@@ -899,11 +889,6 @@ export function runCommandUseTimers(client: NypsiClient) {
         await postCommandUsers();
         setTimeout(updateKarma, 60000);
     }, 3600000);
-
-    logger.log({
-        level: "auto",
-        message: `popular commands will run in ${MStoTime(needed.getTime() - now.getTime())}`,
-    });
 }
 
 async function failedCaptcha(member: GuildMember) {
