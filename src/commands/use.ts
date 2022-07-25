@@ -9,9 +9,11 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
 import {
+    addBooster,
     addHandcuffs,
     addItemUse,
     createUser,
+    getBoosters,
     getDMsEnabled,
     getInventory,
     getItems,
@@ -27,7 +29,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"]);
+const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -152,6 +154,72 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}mine`)] });
     } else if (selected.id.includes("furnace")) {
         return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}smelt`)] });
+    }
+
+    if (selected.role == "booster") {
+        let boosters = await getBoosters(message.member);
+
+        const counts = new Map<string, number>();
+
+        for (const boosterId of boosters.keys()) {
+            if (counts.has(boosterId)) {
+                counts.set(boosterId, counts.get(boosterId) + 1);
+            } else {
+                counts.set(boosterId, 1);
+            }
+        }
+
+        if (selected.stackable) {
+            if (boosters.get(selected.id)) {
+                if (counts.get(selected.id) >= selected.max) {
+                    return send({
+                        embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
+                    });
+                }
+            } else {
+                return send({ embeds: [new ErrorEmbed(`**${selected.name}** cannot be stacked`)] });
+            }
+        }
+
+        inventory[selected.id]--;
+
+        if (inventory[selected.id] <= 0) {
+            delete inventory[selected.id];
+        }
+
+        await setInventory(message.member, inventory);
+        await addItemUse(message.member, selected.id);
+        await addBooster(message.member, selected.id);
+
+        boosters = await getBoosters(message.member);
+
+        const embed = new CustomEmbed(message.member).setHeader("boosters", message.author.avatarURL());
+
+        const currentBoosters: string[] = [];
+
+        counts.clear();
+
+        for (const boosterId of boosters.keys()) {
+            if (counts.has(boosterId)) {
+                counts.set(boosterId, counts.get(boosterId) + 1);
+            } else {
+                counts.set(boosterId, 1);
+            }
+        }
+
+        for (const boosterId of boosters.keys()) {
+            const booster = boosters.get(boosterId);
+            currentBoosters.push(
+                `**${items[boosterId].name}** ${items[boosterId].emoji}${
+                    counts.get(boosterId) > 1 ? ` \`x${counts.get(boosterId)}\` - next expires in` : " - expires in"
+                } <t:${booster.expire / 1000}:R>`
+            );
+        }
+
+        embed.setDescription(`you have activated **${selected.id}**`);
+        embed.addField("current boosters", currentBoosters.join("\n"));
+
+        return send({ embeds: [embed] });
     }
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
