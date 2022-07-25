@@ -1,6 +1,7 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import { doChatReactions } from "../chatreactions/utils";
+import { runCommandUseTimers } from "../commandhandler";
 import { runEconomySetup } from "../economy/utils";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
@@ -32,6 +33,7 @@ export class NypsiClient extends Client {
         runChristmas(this);
         runSnipeClearIntervals();
         doChatReactions(this);
+        runCommandUseTimers(this);
 
         if (this.cluster.id != 0) return;
 
