@@ -32,9 +32,6 @@ interface MentionData {
 const mentionQueue: MentionQueueItem[] = [];
 
 export { mentionQueue };
-export { deleteQueue };
-
-const deleteQueue: string[] = [];
 
 export async function hasProfile(member: GuildMember | string) {
     let id: string;
