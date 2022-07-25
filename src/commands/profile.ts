@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await m.edit({ embeds: [embed], components: [] });
 
-        logger.info(`fetching user data for ${message.author.tag}...`);
+        logger.info(`fetching data for ${message.author.tag}...`);
         const userData = await prisma.user.findUnique({
             where: {
                 id: message.author.id,
@@ -102,14 +102,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             },
         });
 
-        logger.info(`fetching chat reaction stats data for ${message.author.tag}`);
+        const moderationCases = await prisma.moderationCase.findMany({
+            where: {
+                user: message.author.id,
+            },
+            select: {
+                caseId: true,
+                command: true,
+                deleted: true,
+                guildId: true,
+                moderation: false,
+                time: true,
+                type: true,
+                user: true,
+                moderator: false,
+            },
+        });
+
+        const moderationMutes = await prisma.moderationMute.findMany({
+            where: {
+                userId: message.author.id,
+            },
+        });
+
+        const moderationBans = await prisma.moderationBan.findMany({
+            where: {
+                userId: message.author.id,
+            },
+        });
+
         const chatReactionStats = await prisma.chatReactionStats.findMany({
             where: {
                 userId: message.author.id,
             },
         });
 
-        logger.info(`fetching mentions data for ${message.author.tag}`);
         const mentionsTargetedData = await prisma.mention.findMany({
             where: {
                 targetId: message.author.id,
@@ -123,7 +150,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const file = `temp/${message.author.id}.txt`;
 
-        logger.info("packing into text file...");
+        logger.info(`packing into text file for ${message.author.tag}...`);
+
         await fs.writeFile(
             file,
             `nypsi data for ${message.author.id} (${
@@ -131,19 +159,40 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
         );
         await fs.appendFile(file, JSON.stringify(userData, null, 2));
+
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(moderationCases, null, 2));
+
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(moderationMutes, null, 2));
+
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(moderationBans, null, 2));
+
         await fs.appendFile(
             file,
             "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n"
         );
         await fs.appendFile(file, JSON.stringify(chatReactionStats, null, 2));
+
         await fs.appendFile(
             file,
             "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targetted at you)\n----------\n\n"
         );
         await fs.appendFile(file, JSON.stringify(mentionsTargetedData, null, 2));
+
         await fs.appendFile(
             file,
-            "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on discord tag)\n----------\n\n"
+            "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on current tag)\n----------\n\n"
         );
         await fs.appendFile(file, JSON.stringify(mentionsSenderData, null, 2));
 
