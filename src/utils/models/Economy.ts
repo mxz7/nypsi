@@ -21,3 +21,9 @@ export interface GuildUpgradeRequirements {
     money: number;
     xp: number;
 }
+
+export interface Booster {
+    boosterId: string;
+    expire: Date;
+    count: number;
+}
