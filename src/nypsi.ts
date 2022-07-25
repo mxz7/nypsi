@@ -97,19 +97,19 @@ client.on("shardResume", (shardId) => {
     logger.info(`shard#${shardId} resume`);
 });
 
-process.on("uncaughtException", (e: any) => {
-    const excludedReasons = [50013, 10008, 50001];
+// process.on("uncaughtException", (e: any) => {
+//     const excludedReasons = [50013, 10008, 50001];
 
-    if (e.code && excludedReasons.includes(e.code)) return;
-    logger.error(`unhandled promise rejection: ${e.stack}`);
-});
+//     if (e.code && excludedReasons.includes(e.code)) return;
+//     logger.error(`unhandled promise rejection: ${e.stack}`);
+// });
 
-process.on("unhandledRejection", (e: any) => {
-    const excludedReasons = [50013, 10008, 50001];
+// process.on("unhandledRejection", (e: any) => {
+//     const excludedReasons = [50013, 10008, 50001];
 
-    if (e.code && excludedReasons.includes(e.code)) return;
-    logger.error(`unhandled promise rejection: ${e.stack}`);
-});
+//     if (e.code && excludedReasons.includes(e.code)) return;
+//     logger.error(`unhandled promise rejection: ${e.stack}`);
+// });
 
 setTimeout(() => {
     logger.info("logging in...");
