@@ -57,8 +57,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const booster = boosters.get(boosterId);
         desc.push(
             `**${items[boosterId].name}** ${items[boosterId].emoji}${
-                counts.get(boosterId) > 1 ? ` \`x${counts.get(boosterId)}\` - next expires in` : " - expires in"
-            } <t:${booster.expire / 1000}:R>`
+                counts.get(boosterId) > 1 ? ` \`x${counts.get(boosterId)}\` - next expires` : " - expires"
+            } <t:${Math.round(booster.expire / 1000)}:R>`
         );
     }
 
