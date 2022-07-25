@@ -1,14 +1,14 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("f", "pay your respects", Categories.FUN);
 
@@ -49,16 +49,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     collector.on("collect", async (i): Promise<any> => {
         if (reactions.includes(i.user.id) || i.deferred) {
-            const reply = await i.fetchReply().catch(() => {});
+            await i.deferUpdate();
 
-            if (!reply) {
+            if (reactions.includes(i.user.id)) {
                 return await i
-                    .reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
+                    .followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
                     .catch(() => {});
             }
         }
-
-        await i.deferUpdate().catch(() => {});
 
         reactions.push(i.user.id);
 
