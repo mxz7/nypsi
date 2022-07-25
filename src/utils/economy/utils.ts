@@ -1962,7 +1962,21 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
     if (cache) {
         if (_.isEmpty(JSON.parse(cache))) return new Map();
-        return new Map(Object.entries(JSON.parse(cache)));
+
+        const map = new Map<string, Booster>(Object.entries(JSON.parse(cache)));
+
+        for (const key of map.keys()) {
+            if (map.get(key).expire.getTime() <= Date.now()) {
+                await prisma.booster.delete({
+                    where: {
+                        id: map.get(key).id,
+                    },
+                });
+                map.delete(key);
+            }
+        }
+
+        return map;
     }
 
     const query = await prisma.booster.findMany({
@@ -1979,7 +1993,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     const map = new Map<string, Booster>();
 
     for (const booster of query) {
-        if (booster.expire.getTime() < Date.now()) {
+        if (booster.expire.getTime() <= Date.now()) {
             await prisma.booster.delete({
                 where: {
                     id: booster.id,
@@ -1990,7 +2004,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         if (map.get(booster.boosterId)) {
             map.get(booster.boosterId).count++;
         } else {
-            map.set(booster.boosterId, { boosterId: booster.boosterId, count: 1, expire: booster.expire });
+            map.set(booster.boosterId, { boosterId: booster.boosterId, count: 1, expire: booster.expire, id: booster.id });
         }
     }
 
