@@ -4,6 +4,8 @@ import prisma from "../../database/database";
 (async () => {
     const guilds: string[] = workerData.guilds;
 
+    if (guilds.length < 5000) return parentPort.postMessage("less than 5k guilds. not running.");
+
     const query = await prisma.guild.findMany({
         select: {
             id: true,
