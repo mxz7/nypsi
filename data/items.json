@@ -644,5 +644,35 @@
             "effect": 0.5,
             "time": 600
         }
+    },
+    "worm": {
+        "id": "worm",
+        "name": "worm",
+        "emoji": "🪱",
+        "description": "increased luck when fishing",
+        "rarity": 1,
+        "role": "booster",
+        "worth": 75000,
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": "fish",
+            "time": 3600
+        }
+    },
+    "medicine": {
+        "id": "medicine",
+        "name": "experimental medicine",
+        "emoji": "💉",
+        "description": "inject yourself with this experimental medicine to increase your multiplier 😳. the more you inject, the higher it increases",
+        "rarity": 1,
+        "role": "booster",
+        "worth": 100000,
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": "multi",
+            "effect": 2,
+            "time": 1800
+        }
     }
 }
