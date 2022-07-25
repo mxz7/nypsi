@@ -230,7 +230,7 @@ async function addMention() {
         const members = mention.members;
 
         if (members.size > 1000) {
-            if (workerCount >= 2) {
+            if (workerCount >= 4) {
                 mentionQueue.push(mention);
                 return;
             }
