@@ -845,7 +845,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
             const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag).id;
 
-            if (uses > 50) {
+            if (uses > 60) {
                 // TODO: CHANGE THIS TO ADJUST LATER
                 await hook.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`);
 
