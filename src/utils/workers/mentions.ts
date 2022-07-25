@@ -1,10 +1,9 @@
-import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import { Mention } from "@prisma/client";
+import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
+import prisma from "../database/database";
+import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../users/utils";
 import ms = require("ms");
-import Database = require("better-sqlite3");
-import { encrypt } from "../functions/string";
-
-const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
 
 export default function doCollection(array: MentionQueueItem): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -23,9 +22,9 @@ if (!isMainThread) {
     setTimeout(() => {
         parentPort.postMessage(1);
     }, ms("1 hour"));
-    const insertMention = db.prepare(
-        "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
-    );
+    let currentData: Mention[] = [];
+    let inserting = false;
+
     const collection = workerData[0];
 
     const members = collection.members;
@@ -44,7 +43,19 @@ if (!isMainThread) {
 
     const a = Array.from(members.keys());
 
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
+        if (inserting) return;
+
+        if (currentData.length >= 500) {
+            inserting = true;
+            await prisma.mention.createMany({
+                data: currentData,
+                skipDuplicates: true,
+            });
+            currentData = [];
+            inserting = false;
+        }
+
         const memberID = a.shift();
 
         const member = members.get(memberID);
@@ -60,22 +71,27 @@ if (!isMainThread) {
             if (!channelMembers.has(memberID)) return;
         }
 
-        try {
-            insertMention.run(
-                collection.guildId,
-                member.user.id,
-                Math.floor(collection.message.createdTimestamp / 1000),
-                `${collection.message.author.username}#${collection.message.author.discriminator}`,
-                collection.url,
-                content
-            );
-        } catch (e) {
-            if (e.code != "SQLITE_BUSY") throw e;
-        }
+        currentData.push({
+            guildId: collection.guildId,
+            targetId: member.user.id,
+            date: new Date(collection.message.createdTimestamp),
+            url: collection.url,
+            content: content,
+            userTag: `${collection.message.author.username}#${collection.message.author.discriminator}`,
+        });
 
         if (a.length == 0) {
+            if (currentData.length > 0) {
+                inserting = true;
+                await prisma.mention.createMany({
+                    data: currentData,
+                    skipDuplicates: true,
+                });
+                currentData = [];
+                inserting = false;
+            }
+
             clearInterval(interval);
-            db.close();
             parentPort.postMessage(0);
             process.exit(0);
         }
