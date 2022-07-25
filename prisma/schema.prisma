@@ -277,3 +277,14 @@ model PremiumCommand {
   content String
   uses    Int    @default(0)
 }
+
+model Mention {
+  guildId  String
+  targetId String
+  date     DateTime
+  userTag  String
+  url      String   @id
+  content  String
+
+  @@index([guildId], type: Hash)
+}

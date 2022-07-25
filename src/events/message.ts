@@ -1,6 +1,8 @@
+import { Mention } from "@prisma/client";
 import { Collection, GuildMember, Message, PermissionsBitField, ThreadMember, ThreadMemberManager } from "discord.js";
 import { cpu } from "node-os-utils";
 import { runCommand } from "../utils/commandhandler";
+import prisma from "../utils/database/database";
 import { userExists } from "../utils/economy/utils";
 import { encrypt } from "../utils/functions/string";
 import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
@@ -9,20 +11,12 @@ import { logger } from "../utils/logger";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { addModLog } from "../utils/moderation/utils";
-import { getTier, isPremium } from "../utils/premium/utils";
-import { deleteQueue, mentionQueue, MentionQueueItem } from "../utils/users/utils";
+import { isPremium } from "../utils/premium/utils";
+import { mentionQueue, MentionQueueItem } from "../utils/users/utils";
 import doCollection from "../utils/workers/mentions";
 import ms = require("ms");
-import Database = require("better-sqlite3");
 
-const db = new Database("./out/data/storage.db", { fileMustExist: true, timeout: 15000 });
-const addMentionToDatabase = db.prepare(
-    "INSERT INTO mentions (guild_id, target_id, date, user_tag, url, content) VALUES (?, ?, ?, ?, ?, ?)"
-);
-const fetchMentions = db.prepare("SELECT url FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC");
-const deleteMention = db.prepare("DELETE FROM mentions WHERE url = ?");
 let mentionInterval: NodeJS.Timer;
-let workerCount = 0;
 
 export default async function messageCreate(message: Message) {
     if (message.author.bot) return;
@@ -190,17 +184,37 @@ export default async function messageCreate(message: Message) {
 
 let currentInterval = 150;
 let lastChange = 0;
+let currentData: Mention[] = [];
+let workerCount = 0;
+let inserting = false;
 
 async function addMention() {
+    if (inserting) return;
     let mention: MentionQueueItem | string;
 
+    if (currentData.length >= 500) {
+        inserting = true;
+        await prisma.mention.createMany({
+            data: currentData,
+            skipDuplicates: true,
+        });
+        currentData = [];
+        inserting = false;
+    }
+
     if (mentionQueue.length == 0) {
-        if (deleteQueue.length == 0) {
-            clearInterval(mentionInterval);
-            mentionInterval = undefined;
-            currentInterval = 150;
-        } else {
-            mention = deleteQueue.shift();
+        clearInterval(mentionInterval);
+        mentionInterval = undefined;
+        currentInterval = 150;
+
+        if (currentData.length > 0) {
+            inserting = true;
+            await prisma.mention.createMany({
+                data: currentData,
+                skipDuplicates: true,
+            });
+            currentData = [];
+            inserting = false;
         }
     } else {
         mention = mentionQueue.shift();
@@ -299,42 +313,30 @@ async function addMention() {
 
         const content: string = encrypt(data.content);
 
-        addMentionToDatabase.run(guild, target, Math.floor(data.date / 1000), data.user, data.link, content);
-
-        const mentions = fetchMentions.all(guild, target);
-
-        let limit = 6;
-
-        if (await isPremium(target)) {
-            const tier = await getTier(target);
-
-            limit += tier * 2;
-        }
-
-        if (mentions.length > limit) {
-            mentions.splice(0, limit);
-
-            for (const m of mentions) {
-                if (deleteQueue.indexOf(m.url) != -1) return;
-                deleteQueue.push(m.url);
-            }
-        }
-    } else {
-        deleteMention.run(mention);
-
-        for (let i = 0; i < 25; i++) {
-            mention = deleteQueue.shift();
-
-            if (!mention) break;
-
-            deleteMention.run(mention);
-        }
+        currentData.push({
+            guildId: guild,
+            content: content,
+            url: data.link,
+            date: new Date(data.date),
+            targetId: target,
+            userTag: data.user,
+        });
     }
 
-    if (mentionQueue.length == 0 && deleteQueue.length == 0) {
+    if (mentionQueue.length == 0) {
         clearInterval(mentionInterval);
         mentionInterval = undefined;
         currentInterval = 150;
+
+        if (currentData.length > 0) {
+            inserting = true;
+            await prisma.mention.createMany({
+                data: currentData,
+                skipDuplicates: true,
+            });
+            currentData = [];
+            inserting = false;
+        }
     }
 
     const cpuUsage = await cpu.usage();

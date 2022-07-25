@@ -1,16 +1,19 @@
-import Database = require("better-sqlite3");
 import dayjs = require("dayjs");
 import { parentPort } from "worker_threads";
+import prisma from "../../database/database";
 
-const db = new Database("./out/data/storage.db");
+(async () => {
+    const limit = dayjs().subtract(1, "month").toDate();
 
-(() => {
-    const limit = Math.floor(dayjs().subtract(1, "month").unix() / 1000);
+    const c = await prisma.mention.deleteMany({
+        where: {
+            date: { lte: limit },
+        },
+    });
 
-    const { changes } = db.prepare("DELETE FROM mentions WHERE date < ?").run(limit);
-
-    if (changes > 0) {
-        parentPort.postMessage(`${changes} mentions deleted`);
+    if (c.count > 0) {
+        parentPort.postMessage(`${c.count} mentions deleted`);
     }
+
     process.exit(0);
 })();
