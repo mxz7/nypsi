@@ -245,7 +245,14 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
             }
         }
 
-        await edit({ embeds: [embed] });
+        let fail = false;
+        await edit({ embeds: [embed] }).catch(() => {
+            fail = true;
+        });
+        if (fail) {
+            games.delete(message.author.id);
+            return;
+        }
 
         if (res == Response.CONTINUE) {
             return play(message);
