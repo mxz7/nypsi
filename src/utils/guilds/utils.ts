@@ -380,12 +380,6 @@ export function runChristmas(client: NypsiClient) {
     const needed = new Date(Date.parse(d) + 10800000);
 
     const runChristmasThing = async () => {
-        const query = await prisma.guildChristmas.findMany({
-            where: {
-                enabled: true,
-            },
-        });
-
         for (const guildId of client.guilds.cache.keys()) {
             const guild = await client.guilds.fetch(guildId);
 
@@ -404,7 +398,7 @@ export function runChristmas(client: NypsiClient) {
                 },
             });
 
-            if (!query) continue;
+            if (!profile) continue;
 
             const channel = guild.channels.cache.find((c) => c.id == profile.channel);
 
@@ -449,11 +443,6 @@ export function runChristmas(client: NypsiClient) {
                     profile.channel = "none";
                     await setChristmasCountdown(guild, profile);
                 });
-        }
-
-        for (const profile of query) {
-            const guild = client.guilds.cache.find((g) => g.id == profile.guildId);
-            if (!guild) continue;
         }
     };
 
