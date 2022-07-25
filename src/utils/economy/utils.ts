@@ -2001,7 +2001,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
             });
         }
 
-        if (map.get(booster.boosterId)) {
+        if (map.get(booster.boosterId) && items[booster.boosterId].stackable) {
             map.get(booster.boosterId).count++;
         } else {
             map.set(booster.boosterId, { boosterId: booster.boosterId, count: 1, expire: booster.expire, id: booster.id });
