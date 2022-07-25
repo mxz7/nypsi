@@ -10,6 +10,13 @@ export interface Item {
     rarity?: number;
     boobies?: string;
     ingot?: string;
+    stackable?: boolean;
+    max?: number;
+    boosterEffect?: {
+        boosts: string;
+        effect: number;
+        time: number;
+    };
 }
 
 export interface LotteryTicket {
