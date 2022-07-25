@@ -51,6 +51,6 @@
         "id": "basic_crate",
         "cost": 35,
         "unlimited": false,
-        "items_left": 100
+        "items_left": 150
     }
 }
