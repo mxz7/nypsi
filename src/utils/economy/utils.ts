@@ -2013,3 +2013,22 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
     return map;
 }
+
+export async function addBooster(member: GuildMember | string, boosterId: string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    await prisma.booster.create({
+        data: {
+            boosterId: boosterId,
+            expire: new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
+            userId: id,
+        },
+    });
+
+    await redis.del(`cache:economy:boosters:${id}`);
+}
