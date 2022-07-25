@@ -847,11 +847,9 @@ export function runCommandUseTimers(client: NypsiClient) {
 
             if (uses > 50) {
                 // TODO: CHANGE THIS TO ADJUST LATER
-                await hook.send(
-                    `[${getTimestamp()}] **${tag}** (${user}) performed more than **${uses}** commands in an hour`
-                );
+                await hook.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`);
 
-                if (uses > 200) {
+                if (uses > 75) {
                     // TODO: CHANGE THIS TO ADJUST LATER
                     toggleLock(user);
                     logger.info(`${tag} (${user}) has been given a captcha`);
@@ -865,11 +863,11 @@ export function runCommandUseTimers(client: NypsiClient) {
 
     const updateKarma = async () => {
         for (const user of commandUses.keys()) {
-            let modifier = 2;
+            let modifier = 3;
 
-            if ((await getKarma(user)) > 200) modifier = 3;
-            if ((await getKarma(user)) > 400) modifier = 4;
-            if ((await getKarma(user)) > 500) modifier = 5;
+            if ((await getKarma(user)) > 200) modifier = 4;
+            if ((await getKarma(user)) > 400) modifier = 5;
+            if ((await getKarma(user)) > 500) modifier = 7;
 
             const amount = Math.floor(commandUses.get(user) / modifier);
 
