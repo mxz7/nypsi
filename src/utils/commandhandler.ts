@@ -843,17 +843,25 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag).id;
+            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag)?.id;
 
             if (uses > 60) {
                 // TODO: CHANGE THIS TO ADJUST LATER
-                await hook.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`);
+                await hook.send(
+                    `[${getTimestamp()}] **${tag}** (${
+                        typeof user === "string" ? `${user}` : "invalid id"
+                    }) performed **${uses}** commands in an hour`
+                );
 
                 if (uses > 75) {
                     // TODO: CHANGE THIS TO ADJUST LATER
                     toggleLock(user);
-                    logger.info(`${tag} (${user}) has been given a captcha`);
-                    await hook.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`);
+                    logger.info(`${tag} (${typeof user === "string" ? `${user}` : "invalid id"}) has been given a captcha`);
+                    await hook.send(
+                        `[${getTimestamp()}] **${tag}** (${
+                            typeof user === "string" ? `${user}` : "invalid id"
+                        }) has been given a captcha`
+                    );
                 }
             }
         }
