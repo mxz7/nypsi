@@ -1999,6 +1999,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
                     id: booster.id,
                 },
             });
+
+            continue;
         }
 
         map.set(booster.boosterId, {
