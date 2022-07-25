@@ -218,9 +218,12 @@ export async function getCases(guild: Guild, userID: string) {
         where: {
             AND: [{ guildId: guild.id }, { user: userID }],
         },
+        orderBy: {
+            time: "desc",
+        },
     });
 
-    return query.reverse();
+    return query;
 }
 
 export async function getAllCases(guild: Guild) {
@@ -234,9 +237,12 @@ export async function getAllCases(guild: Guild) {
             type: true,
             deleted: true,
         },
+        orderBy: {
+            time: "desc",
+        },
     });
 
-    return query.reverse();
+    return query;
 }
 
 export async function getCase(guild: Guild, caseID: number) {
