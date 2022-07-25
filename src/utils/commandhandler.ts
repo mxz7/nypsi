@@ -418,7 +418,7 @@ export async function runCommand(
                 .catch(() => {});
         } else {
             return message
-                .reply({
+                .editReply({
                     embeds: [
                         new ErrorEmbed(
                             "i don't have access to this channel. please contact server staff if this is an error"
@@ -605,7 +605,7 @@ export async function runCommand(
                     embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                 });
             } else {
-                return message.reply({
+                return message.editReply({
                     embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                 });
             }
@@ -643,7 +643,7 @@ export async function runCommand(
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             } else {
-                return message.reply({
+                return message.editReply({
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             }
@@ -654,7 +654,7 @@ export async function runCommand(
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             } else {
-                return message.reply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
+                return message.editReply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             }
         }
 
@@ -664,7 +664,7 @@ export async function runCommand(
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {
-                return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+                return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
             }
         }
         commands.get(aliases.get(cmd)).run(message, args);
@@ -699,7 +699,7 @@ export async function runCommand(
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             } else {
-                return message.reply({
+                return message.editReply({
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             }
@@ -711,7 +711,7 @@ export async function runCommand(
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
             } else {
-                return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+                return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
             }
         }
         commands.get(cmd).run(message, args);
