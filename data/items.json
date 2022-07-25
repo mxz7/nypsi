@@ -368,7 +368,7 @@
         "description": "a potato.",
         "rarity": 0,
         "role": "sellable",
-        "worth": 250
+        "worth": 5000
     },
     "tooth": {
         "id": "tooth",
