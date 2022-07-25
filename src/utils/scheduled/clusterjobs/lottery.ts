@@ -1,11 +1,11 @@
 import { Client, User, WebhookClient } from "discord.js";
-import shuffleArray = require("shuffle-array");
 import prisma from "../../database/database";
 import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import shuffleArray = require("shuffle-array");
 
 async function doLottery(client: Client) {
     logger.info("performing lottery..");
@@ -85,6 +85,8 @@ async function doLottery(client: Client) {
     }
 
     const { count } = await prisma.lotteryTicket.deleteMany();
+
+    await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
 
     logger.info(`${count.toLocaleString()} tickets deleted from database`);
 }
