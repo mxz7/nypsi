@@ -15,14 +15,12 @@ import { getPrefix } from "../utils/guilds/utils";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import Database = require("better-sqlite3");
 
 const cmd = new Command("profile", "view your raw data stored in nypsi's database", Categories.INFO).setAliases([
     "data",
     "viewdata",
     "showmemydatazuckerberg",
 ]);
-const db = new Database("./out/data/storage.db");
 
 const cooldown = new Set<string>();
 
@@ -112,8 +110,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
 
         logger.info(`fetching mentions data for ${message.author.tag}`);
-        const mentionsTargetedData = db.prepare("select * from mentions where target_id = ?").all(message.author.id);
-        const mentionsSenderData = db.prepare("select * from mentions where user_tag = ?").all(message.author.tag);
+        const mentionsTargetedData = await prisma.mention.findMany({
+            where: {
+                targetId: message.author.id,
+            },
+        });
+        const mentionsSenderData = await prisma.mention.findMany({
+            where: {
+                userTag: message.author.tag,
+            },
+        });
 
         const file = `temp/${message.author.id}.txt`;
 
