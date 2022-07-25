@@ -6,6 +6,8 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("boosters", "view your current active boosters", Categories.NSFW).setAliases(["booster"]);
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
