@@ -327,6 +327,16 @@ async function addMention() {
         clearInterval(mentionInterval);
         mentionInterval = undefined;
         currentInterval = 150;
+
+        if (currentData.length > 0) {
+            inserting = true;
+            await prisma.mention.createMany({
+                data: currentData,
+                skipDuplicates: true,
+            });
+            currentData = [];
+            inserting = false;
+        }
     }
 
     const cpuUsage = await cpu.usage();
