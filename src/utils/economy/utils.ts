@@ -1565,6 +1565,18 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     if (earned > max) earned = max;
 
+    const boosters = await getBoosters(member);
+
+    let boosterEffect = 0;
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts == "xp") {
+            boosterEffect += items[boosterId].boosterEffect.effect;
+        }
+    }
+
+    earned += boosterEffect * earned;
+
     return earned;
 }
 
