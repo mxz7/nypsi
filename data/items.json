@@ -629,5 +629,20 @@
         "speed": 1,
         "aliases": ["chav", "corsa"],
         "worth": 5000
+    },
+    "redbull": {
+        "id": "redbull",
+        "name": "red bull",
+        "emoji": "<:nypsi_redbull:1001210452832964648>",
+        "description": "50% shorter cooldowns for 10 minutes",
+        "rarity": 2,
+        "role": "booster",
+        "worth": 100000,
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": "cooldown",
+            "effect": 0.5,
+            "time": 600
+        }
     }
 }
