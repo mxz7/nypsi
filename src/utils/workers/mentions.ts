@@ -95,5 +95,5 @@ if (!isMainThread) {
             parentPort.postMessage(0);
             process.exit(0);
         }
-    }, 50);
+    }, 25);
 }
