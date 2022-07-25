@@ -7,7 +7,7 @@ import redis from "../database/redis";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
-import { GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
+import { Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
@@ -15,6 +15,7 @@ import { createProfile, hasProfile } from "../users/utils";
 import workerSort from "../workers/sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
+import _ = require("lodash");
 
 let items: { [key: string]: Item };
 
@@ -1947,4 +1948,54 @@ export async function isHandcuffed(id: string): Promise<boolean> {
 export async function addHandcuffs(id: string) {
     await redis.set(`economy:handcuffed:${id}`, Date.now());
     await redis.expire(`economy:handcuffed:${id}`, 60);
+}
+
+export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster>> {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const cache = await redis.get(`cache:economy:boosters:${id}`);
+
+    if (cache) {
+        if (_.isEmpty(JSON.parse(cache))) return new Map();
+        return new Map(Object.entries(JSON.parse(cache)));
+    }
+
+    const query = await prisma.booster.findMany({
+        where: {
+            userId: id,
+        },
+        select: {
+            boosterId: true,
+            expire: true,
+            id: true,
+        },
+    });
+
+    const map = new Map<string, Booster>();
+
+    for (const booster of query) {
+        if (booster.expire.getTime() < Date.now()) {
+            await prisma.booster.delete({
+                where: {
+                    id: booster.id,
+                },
+            });
+        }
+
+        if (map.get(booster.boosterId)) {
+            map.get(booster.boosterId).count++;
+        } else {
+            map.set(booster.boosterId, { boosterId: booster.boosterId, count: 1, expire: booster.expire });
+        }
+    }
+
+    await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
+    await redis.expire(`cache:economy:boosters:${id}`, 300);
+
+    return map;
 }
