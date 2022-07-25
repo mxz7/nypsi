@@ -290,6 +290,9 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
             value: true,
             date: true,
         },
+        orderBy: {
+            date: "desc",
+        },
     });
 
     inPlaceSort(query).desc((u) => u.date);
