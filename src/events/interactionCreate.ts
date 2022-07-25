@@ -8,6 +8,7 @@ import {
     InteractionType,
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
+import { logger } from "../utils/logger";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
@@ -29,7 +30,12 @@ export default async function interactionCreate(interaction: Interaction) {
 
     const args = [""];
 
-    await interaction.deferReply();
+    let fail = false;
+    await interaction.deferReply().catch(() => {
+        logger.warn(`failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`);
+        fail = true;
+    });
+    if (fail) return;
 
     const parseArgument = async (arg: CommandInteractionOption) => {
         switch (arg.type) {
