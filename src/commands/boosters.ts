@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         desc.push(
             `**${items[boosterId].name}** ${items[boosterId].emoji}${
                 booster.count > 1 ? ` \`x${booster.count}\` - next expires in` : " - expires in"
-            } <t:${booster.expire.getTime()}:R>`
+            } <t:${booster.expire.getTime() / 1000}:R>`
         );
     }
 
