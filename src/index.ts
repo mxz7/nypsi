@@ -1,5 +1,6 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
+import ms = require("ms");
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
@@ -12,6 +13,11 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
 
     execArgv: ["--trace-warnings"],
     shardArgs: ["--ansi", "--color"],
+
+    restarts: {
+        max: 5,
+        interval: ms("1 hour"),
+    },
 
     // totalShards: 4,
     shardsPerClusters: 3, // force clusters
