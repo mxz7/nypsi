@@ -1966,7 +1966,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         const map = new Map<string, Booster>(Object.entries(JSON.parse(cache)));
 
         for (const key of map.keys()) {
-            if (map.get(key).expire.getTime() <= Date.now()) {
+            if (map.get(key).expire <= Date.now()) {
                 await prisma.booster.delete({
                     where: {
                         id: map.get(key).id,
@@ -2005,7 +2005,12 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
             if (map.get(booster.boosterId).count >= items[booster.boosterId].max) continue;
             map.get(booster.boosterId).count++;
         } else {
-            map.set(booster.boosterId, { boosterId: booster.boosterId, count: 1, expire: booster.expire, id: booster.id });
+            map.set(booster.boosterId, {
+                boosterId: booster.boosterId,
+                count: 1,
+                expire: booster.expire.getTime(),
+                id: booster.id,
+            });
         }
     }
 
