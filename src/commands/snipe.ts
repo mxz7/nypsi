@@ -1,14 +1,11 @@
 import { Channel, CommandInteraction, GuildMember, Message } from "discord.js";
+import { snipe } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"]);
 
-declare function require(name: string): any;
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const { snipe } = require("../nypsi.js");
-
     let channel: Channel = message.channel;
 
     if (args.length == 1) {
