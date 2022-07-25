@@ -398,7 +398,7 @@ export function runChristmas(client: NypsiClient) {
                 },
             });
 
-            if (!profile) continue;
+            if (!profile || !profile.channel) continue;
 
             const channel = guild.channels.cache.find((c) => c.id == profile.channel);
 
