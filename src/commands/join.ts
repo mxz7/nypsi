@@ -29,10 +29,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {

@@ -51,10 +51,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (
         !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles) ||
         !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)

@@ -39,10 +39,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (
         !message.member.permissions.has(PermissionFlagsBits.ManageChannels) ||
         !message.member.permissions.has(PermissionFlagsBits.ManageMessages)
