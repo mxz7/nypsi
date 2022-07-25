@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js";
 import redis from "./database/redis";
+import { getBoosters, getItems } from "./economy/utils";
 import { getPrefix } from "./guilds/utils";
 import { ErrorEmbed } from "./models/EmbedBuilders";
 import { getTier, isPremium } from "./premium/utils";
@@ -86,13 +87,20 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
 async function calculateCooldownLength(seconds: number, member: GuildMember): Promise<number> {
     if (await isPremium(member)) {
         if ((await getTier(member)) == 4) {
-            return Math.round(seconds * 0.25);
+            seconds = seconds * 0.25;
         } else {
-            return Math.round(seconds * 0.5);
+            seconds = seconds * 0.5;
         }
-    } else {
-        return seconds;
     }
+
+    const boosters = await getBoosters(member);
+    const items = getItems();
+
+    if (Array.from(boosters.keys()).includes("redbull")) {
+        seconds = seconds * items["redbull"].boosterEffect.effect;
+    }
+
+    return Math.ceil(seconds);
 }
 
 interface CooldownData {
