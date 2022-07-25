@@ -352,6 +352,15 @@
         "role": "item",
         "worth": 300000
     },
+    "cookie": {
+        "id": "cookie",
+        "name": "cookie",
+        "emoji": "🍪",
+        "description": "yum yum",
+        "rarity": 0,
+        "role": "sellable",
+        "worth": 10000
+    },
     "potato": {
         "id": "potato",
         "name": "potato",
