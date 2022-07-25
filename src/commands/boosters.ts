@@ -43,11 +43,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
+    const counts = new Map<string, number>();
+
+    for (const boosterId of boosters.keys()) {
+        if (counts.has(boosterId)) {
+            counts.set(boosterId, counts.get(boosterId) + 1);
+        } else {
+            counts.set(boosterId, 1);
+        }
+    }
+
     for (const boosterId of boosters.keys()) {
         const booster = boosters.get(boosterId);
         desc.push(
             `**${items[boosterId].name}** ${items[boosterId].emoji}${
-                booster.count > 1 ? ` \`x${booster.count}\` - next expires in` : " - expires in"
+                counts.get(boosterId) > 1 ? ` \`x${counts.get(boosterId)}\` - next expires in` : " - expires in"
             } <t:${booster.expire / 1000}:R>`
         );
     }

@@ -32,6 +32,5 @@ export interface GuildUpgradeRequirements {
 export interface Booster {
     boosterId: string;
     expire: number;
-    count: number;
     id: string;
 }
