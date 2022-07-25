@@ -1,21 +1,22 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    userExists,
+    addItemUse,
     createUser,
+    getBalance,
+    getBoosters,
     getInventory,
     getItems,
-    setInventory,
     getMaxBitcoin,
     getMaxEthereum,
-    updateBalance,
-    getBalance,
-    updateXp,
     getXp,
-    addItemUse,
+    setInventory,
+    updateBalance,
+    updateXp,
+    userExists,
 } from "../utils/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("fish", "go to a pond and fish", Categories.MONEY);
 
@@ -116,6 +117,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         times = 2;
     } else if (fishingRod == "incredible_fishing_rod") {
         times = 3;
+    }
+
+    const boosters = await getBoosters(message.member);
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts == "fish") {
+            times++;
+        }
     }
 
     const foundItems = [];
