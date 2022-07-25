@@ -41,9 +41,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let target2;
 
     if (args.length == 0) {
-        if (!(message instanceof Message)) {
-            await message.deferReply();
-        }
         target1 = message.member;
 
         const members: string[] = [];

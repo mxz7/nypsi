@@ -32,10 +32,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (!message.member.permissions.has(PermissionFlagsBits.BanMembers)) {
         if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
             return send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] });

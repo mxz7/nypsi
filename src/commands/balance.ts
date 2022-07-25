@@ -48,10 +48,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.react("✅");
     }
 
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     let target = message.member;
 
     if (args.length >= 1) {

@@ -29,10 +29,6 @@ cmd.slashData
     .addSubcommand((tickets) => tickets.setName("tickets").setDescription("view your current tickets"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!(message instanceof Message)) {
-        await message.deferReply();
-    }
-
     if (!(await userExists(message.member))) await createUser(message.member);
 
     const tickets = await getTickets(message.member);
