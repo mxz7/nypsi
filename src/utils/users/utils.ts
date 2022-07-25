@@ -1,4 +1,3 @@
-import Database = require("better-sqlite3");
 import { Collection, Guild, GuildMember, Message, ThreadMember, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import fetch from "node-fetch";
@@ -6,8 +5,6 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 import { cleanString } from "../functions/string";
 import ms = require("ms");
-
-const db = new Database("./out/data/storage.db");
 
 const lastKnownTagCooldown = new Set<string>();
 
@@ -375,9 +372,7 @@ export async function setLastfmUsername(member: GuildMember, username: string) {
     return true;
 }
 
-type UserMention = { date: number; user_tag: string; url: string; content: string };
-
-export function fetchUserMentions(guild: Guild, member: GuildMember | string, amount = 100): UserMention[] {
+export async function fetchUserMentions(guild: Guild, member: GuildMember | string, amount = 100) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -385,17 +380,25 @@ export function fetchUserMentions(guild: Guild, member: GuildMember | string, am
         id = member;
     }
 
-    const mentions = db
-        .prepare(
-            "SELECT date, user_tag, url, content FROM mentions WHERE guild_id = ? AND target_id = ? ORDER BY date DESC LIMIT ?"
-        )
-        .all(guild.id, id, amount);
+    const mentions = await prisma.mention.findMany({
+        where: {
+            AND: [{ guildId: guild.id }, { targetId: id }],
+        },
+        orderBy: {
+            date: "desc",
+        },
+        take: amount,
+    });
 
     return mentions;
 }
 
-export function deleteUserMentions(guild: Guild, member: GuildMember) {
-    db.prepare("DELETE FROM mentions WHERE guild_id = ? AND target_id = ?").run(guild.id, member.user.id);
+export async function deleteUserMentions(guild: Guild, member: GuildMember) {
+    await prisma.mention.deleteMany({
+        where: {
+            AND: [{ guildId: guild.id }, { targetId: member.user.id }],
+        },
+    });
 }
 
 export async function getWordleStats(member: GuildMember) {
