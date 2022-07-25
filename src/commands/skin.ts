@@ -34,14 +34,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
     }
 
+    if (uuid.error) {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
+    }
+
     const skin = await getSkin(username);
 
     if (!skin) {
-        console.log(skin);
-        const d = await getSkin(username);
-        console.log(d);
-        console.log(username);
-        console.log(uuid);
         return message.channel.send({ embeds: [new ErrorEmbed("error while fetching skin. please try again")] });
     }
 
