@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate") {
+    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate" && selected.role != "booster") {
         return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
     }
 
@@ -132,6 +132,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "crate") {
         cooldownLength = 5;
+    } else if (selected.role == "booster") {
+        cooldownLength = 10;
     }
 
     await addCooldown(cmd.name, message.member, cooldownLength);
