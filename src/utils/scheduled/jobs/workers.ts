@@ -1,4 +1,5 @@
 import _ = require("lodash");
+import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
 import { Worker, WorkerStorageData } from "../../economy/workers";
 
@@ -11,32 +12,36 @@ import { Worker, WorkerStorageData } from "../../economy/workers";
     });
 
     for (const user of query) {
-        const workers: { [key: string]: WorkerStorageData } = user.workers as any;
+        try {
+            const workers: { [key: string]: WorkerStorageData } = user.workers as any;
 
-        if (_.isEmpty(workers)) continue;
+            if (_.isEmpty(workers)) continue;
 
-        for (const w of Object.keys(workers)) {
-            const worker = workers[w];
+            for (const w of Object.keys(workers)) {
+                const worker = workers[w];
 
-            const workerData = Worker.fromStorage(worker);
+                const workerData = Worker.fromStorage(worker);
 
-            if (worker.stored < workerData.maxStorage) {
-                if (worker.stored + workerData.perInterval > workerData.maxStorage) {
-                    worker.stored = workerData.maxStorage;
-                } else {
-                    worker.stored += workerData.perInterval;
+                if (worker.stored < workerData.maxStorage) {
+                    if (worker.stored + workerData.perInterval > workerData.maxStorage) {
+                        worker.stored = workerData.maxStorage;
+                    } else {
+                        worker.stored += workerData.perInterval;
+                    }
                 }
             }
-        }
 
-        await prisma.economy.update({
-            where: {
-                userId: user.userId,
-            },
-            data: {
-                workers: workers as any,
-            },
-        });
+            await prisma.economy.update({
+                where: {
+                    userId: user.userId,
+                },
+                data: {
+                    workers: workers as any,
+                },
+            });
+        } catch (e) {
+            parentPort.postMessage(`error: ${e}`);
+        }
     }
     process.exit(0);
 })();
