@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
     );
 
     let msg: Message;
@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
                 });
                 if (currentPage == 1) {
-                    (row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId("⬅")
                             .setLabel("back")
@@ -141,9 +141,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setCustomId("➡")
                             .setLabel("next")
                             .setStyle(ButtonStyle.Primary)
-                            .setDisabled(false)
-                    )),
-                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Primary);
+                            .setDisabled(false),
+                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+                    );
                 } else {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                         new ButtonBuilder()
@@ -156,7 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setLabel("next")
                             .setStyle(ButtonStyle.Primary)
                             .setDisabled(false),
-                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Primary)
+                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
                     );
                 }
                 await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -185,7 +185,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setLabel("next")
                             .setStyle(ButtonStyle.Primary)
                             .setDisabled(true),
-                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Primary)
+                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
                     );
                 } else {
                     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -199,7 +199,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setLabel("next")
                             .setStyle(ButtonStyle.Primary)
                             .setDisabled(false),
-                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Primary)
+                        new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
                     );
                 }
                 await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -211,9 +211,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (res) {
                 await reaction.followUp({
                     embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
+                    ephemeral: true,
                 });
             } else {
-                await reaction.followUp({ embeds: [new CustomEmbed(message.member, "failed to delete this avatar")] });
+                await reaction.followUp({
+                    embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
+                    ephemeral: true,
+                });
             }
 
             return pageManager();
