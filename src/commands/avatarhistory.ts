@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const embed = new CustomEmbed(message.member)
-        .setHeader(member.user.tag)
+        .setHeader("your avatar history")
         .setImage(history[index].value)
         .setFooter({ text: formatDate(history[index].date) });
 
@@ -125,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage--;
 
-                newEmbed.setHeader(member.user.tag);
+                newEmbed.setHeader("your avatar history");
                 newEmbed.setImage(history[currentPage - 1].value);
                 newEmbed.setFooter({
                     text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
@@ -168,7 +168,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
                 currentPage++;
 
-                newEmbed.setHeader(member.user.tag);
+                newEmbed.setHeader("your avatar history");
                 newEmbed.setImage(history[currentPage - 1].value);
                 newEmbed.setFooter({
                     text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
