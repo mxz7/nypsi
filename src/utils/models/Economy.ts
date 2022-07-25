@@ -26,4 +26,5 @@ export interface Booster {
     boosterId: string;
     expire: Date;
     count: number;
+    id: string;
 }
