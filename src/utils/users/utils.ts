@@ -78,13 +78,15 @@ export async function createProfile(member: User | string) {
         id = member;
     }
 
-    await prisma.user.create({
-        data: {
-            id: id,
-            lastKnownTag: username,
-            lastCommand: new Date(0),
-        },
-    });
+    await prisma.user
+        .create({
+            data: {
+                id: id,
+                lastKnownTag: username,
+                lastCommand: new Date(0),
+            },
+        })
+        .catch(() => {});
     await redis.del(`cache:user:exists:${id}`);
 }
 
