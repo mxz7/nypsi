@@ -674,5 +674,19 @@
             "effect": 2,
             "time": 1800
         }
+    },
+    "vote_booster": {
+        "id": "vote_booster",
+        "name": "vote booster",
+        "emoji": "⚡",
+        "description": "obtained from voting",
+        "rarity": 1000,
+        "worth": 0,
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": "multi",
+            "effect": 3,
+            "time": 43200
+        }
     }
 }
