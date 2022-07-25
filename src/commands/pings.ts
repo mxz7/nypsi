@@ -17,7 +17,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/premium/utils";
 import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import ms = require("ms");
 
@@ -75,7 +75,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const mentions = fetchUserMentions(message.guild, message.member);
+    let limit = 5;
+
+    if (await isPremium(message.author.id)) {
+        const tier = await getTier(message.author.id);
+
+        limit += tier * 2;
+    }
+
+    const mentions = await fetchUserMentions(message.guild, message.member, limit);
 
     if (!mentions || mentions.length == 0) {
         return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
@@ -86,17 +94,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const i of mentions) {
         if (pages.size == 0) {
             const page1 = [];
-            page1.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`);
+            page1.push(
+                `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
+            );
             pages.set(1, page1);
         } else {
             const lastPage = pages.size;
 
             if (pages.get(lastPage).length >= 3) {
                 const newPage = [];
-                newPage.push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`);
+                newPage.push(
+                    `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${
+                        i.url
+                    })`
+                );
                 pages.set(lastPage + 1, newPage);
             } else {
-                pages.get(lastPage).push(`<t:${i.date}:R>|6|9|**${i.user_tag}**: ${decrypt(i.content)}\n[jump](${i.url})`);
+                pages
+                    .get(lastPage)
+                    .push(
+                        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${
+                            i.url
+                        })`
+                    );
             }
         }
     }

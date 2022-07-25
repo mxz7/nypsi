@@ -11,7 +11,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.j
 import prisma from "../utils/database/database";
 import { MStoTime } from "../utils/functions/date.js";
 import { NypsiClient } from "../utils/models/Client";
-import { deleteQueue, mentionQueue } from "../utils/users/utils.js";
+import { mentionQueue } from "../utils/users/utils.js";
 
 const cmd = new Command("botstats", "view stats for the bot", Categories.INFO);
 
@@ -89,8 +89,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 collections.toLocaleString() +
                 "\n-- **mentions** " +
                 mentions.toLocaleString() +
-                "\n-- **deletable** " +
-                deleteQueue.length.toLocaleString() +
                 "\n-- **workers** " +
                 workerCount.toLocaleString(),
             true
