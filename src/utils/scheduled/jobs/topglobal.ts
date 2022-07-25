@@ -40,6 +40,9 @@ async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {
                 },
             },
         },
+        orderBy: {
+            money: "desc",
+        },
     });
 
     const userIDs: string[] = [];
@@ -77,6 +80,11 @@ async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {
 
             if (anon) {
                 username = username.split("#")[0];
+            }
+
+            if (!username || username == "") {
+                count--;
+                continue;
             }
 
             usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
