@@ -1,19 +1,19 @@
 import {
-    CommandInteraction,
-    GuildMember,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
-    MessageEditOptions,
+    CommandInteraction,
+    GuildMember,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { getMember } from "../utils/functions/member";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const avatar = new Command("avatar", "get a person's avatar", Categories.INFO);
 
@@ -60,9 +60,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
-            await message.reply(data as InteractionReplyOptions);
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
             const replyMsg = await message.fetchReply();
-            return replyMsg;
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
         } else {
             return await message.channel.send(data);
         }
