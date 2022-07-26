@@ -9,6 +9,7 @@ import { getWebhooks, setClusterId } from "../logger";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
+import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 
 export class NypsiClient extends Client {
     public cluster: Cluster.Client;
@@ -38,6 +39,7 @@ export class NypsiClient extends Client {
         if (this.cluster.id != 0) return;
 
         runLotteryInterval(this);
+        runPremiumCrateInterval(this);
         runPremiumChecks(this);
         runModerationChecks(this);
     }
