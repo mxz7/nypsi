@@ -46,6 +46,11 @@ manager.on("clusterCreate", (cluster) => {
     cluster.on("reconnecting", () => {
         logger.info(`cluster ${cluster.id} reconnecting..`);
     });
+    cluster.on("message", (message) => {
+        if (message == "restart") {
+            manager.recluster.start({ restartMode: "gracefulSwitch" });
+        }
+    });
     logger.info(`launched cluster ${cluster.id}`);
 });
 
