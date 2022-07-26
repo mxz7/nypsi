@@ -1,17 +1,17 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    getItems,
+    createUser,
     getBalance,
     getInventory,
-    updateBalance,
-    setInventory,
+    getItems,
     getMulti,
+    setInventory,
+    updateBalance,
     userExists,
-    createUser,
 } from "../utils/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("sell", "sell items", Categories.MONEY);
 
@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
 
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 5);
 
     inventory[selected.id] -= amount;
 
