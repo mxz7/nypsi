@@ -678,7 +678,7 @@
     },
     "vote_booster": {
         "id": "vote_booster",
-        "name": "vote booster",
+        "name": "vote bonus",
         "emoji": "⚡",
         "description": "obtained from voting",
         "rarity": 1000,
