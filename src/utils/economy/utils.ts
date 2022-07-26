@@ -174,7 +174,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     const boosters = await getBoosters(id);
 
     for (const boosterId of boosters.keys()) {
-        if (items[boosterId].boosterEffect.boosts == "multi") {
+        if (items[boosterId].boosterEffect.boosts.includes("multi")) {
             multi += items[boosterId].boosterEffect.effect;
         }
     }
@@ -1619,7 +1619,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
     let boosterEffect = 0;
 
     for (const boosterId of boosters.keys()) {
-        if (items[boosterId].boosterEffect.boosts == "xp") {
+        if (items[boosterId].boosterEffect.boosts.includes("xp")) {
             boosterEffect += items[boosterId].boosterEffect.effect;
         }
     }

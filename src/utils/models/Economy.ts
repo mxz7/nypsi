@@ -13,7 +13,7 @@ export interface Item {
     stackable?: boolean;
     max?: number;
     boosterEffect?: {
-        boosts: string;
+        boosts: string[];
         effect: number;
         time: number;
     };

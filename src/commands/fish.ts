@@ -103,14 +103,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addItemUse(message.member, fishingRod);
 
-    inventory[fishingRod]--;
-
-    if (inventory[fishingRod] <= 0) {
-        delete inventory[fishingRod];
-    }
-
-    await setInventory(message.member, inventory);
-
     let times = 1;
 
     if (fishingRod == "fishing_rod") {
@@ -121,10 +113,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const boosters = await getBoosters(message.member);
 
+    let unbreaking = false;
+
     for (const boosterId of boosters.keys()) {
-        if (items[boosterId].boosterEffect.boosts == "fish") {
-            times++;
+        if (items[boosterId].boosterEffect.boosts.includes("fish")) {
+            if (items[boosterId].id == "unbreaking") {
+                unbreaking = true;
+            } else {
+                times++;
+            }
         }
+    }
+
+    if (!unbreaking) {
+        inventory[fishingRod]--;
+
+        if (inventory[fishingRod] <= 0) {
+            delete inventory[fishingRod];
+        }
+
+        await setInventory(message.member, inventory);
     }
 
     const foundItems = [];

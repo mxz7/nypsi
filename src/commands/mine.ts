@@ -80,18 +80,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const mineItems = Array.from(Object.keys(items));
 
-    inventory[pickaxe]--;
-
-    if (inventory[pickaxe] <= 0) {
-        delete inventory[pickaxe];
-    }
-
-    await setInventory(message.member, inventory);
-
     const boosters = await getBoosters(message.member);
 
     let times = 2;
     let multi = 0;
+    let unbreakable = false;
 
     if (pickaxe == "iron_pickaxe") {
         times = 3;
@@ -105,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].role == "booster") {
-            if (items[boosterId].boosterEffect.boosts == "mine") {
+            if (items[boosterId].boosterEffect.boosts.includes("mine")) {
                 switch (items[boosterId].id) {
                     case "fortune":
                         multi += items[boosterId].boosterEffect.effect;
@@ -113,9 +106,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     case "efficiency":
                         times += items[boosterId].boosterEffect.effect;
                         break;
+                    case "unbreaking":
+                        unbreakable = true;
+                        break;
                 }
             }
         }
+    }
+
+    if (!unbreakable) {
+        inventory[pickaxe]--;
+
+        if (inventory[pickaxe] <= 0) {
+            delete inventory[pickaxe];
+        }
+
+        await setInventory(message.member, inventory);
     }
 
     const foundItems = [];

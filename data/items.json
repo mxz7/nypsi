@@ -707,6 +707,22 @@
             "time": 3600
         }
     },
+    "unbreaking": {
+        "id": "unbreaking",
+        "name": "unbreaking enchantment",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "when mining, fishing or hunting it will not reduce durability",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 3,
+        "boosterEffect": {
+            "boosts": ["mine", "fish", "hunt"],
+            "effect": 0.5,
+            "time": 3600
+        }
+    },
     "efficiency": {
         "id": "efficiency",
         "name": "efficiency enchantment",

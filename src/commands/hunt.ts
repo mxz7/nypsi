@@ -1,8 +1,16 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { userExists, createUser, getInventory, getItems, setInventory, addItemUse } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import {
+    addItemUse,
+    createUser,
+    getBoosters,
+    getInventory,
+    getItems,
+    setInventory,
+    userExists,
+} from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("hunt", "go to a field and hunt", Categories.MONEY);
 
@@ -62,20 +70,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const huntItems = Array.from(Object.keys(items));
 
-    inventory[gun]--;
-
-    if (inventory[gun] <= 0) {
-        delete inventory[gun];
-    }
-
-    await setInventory(message.member, inventory);
-
     let times = 1;
 
     if (gun == "gun") {
         times = 2;
     } else if (gun == "incredible_gun") {
         times = 3;
+    }
+
+    const boosters = await getBoosters(message.member);
+    let unbreaking = false;
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts.includes("hunt")) {
+            if (items[boosterId].id == "unbreaking") {
+                unbreaking = true;
+            } else {
+                times++;
+            }
+        }
+    }
+
+    if (!unbreaking) {
+        inventory[gun]--;
+
+        if (inventory[gun] <= 0) {
+            delete inventory[gun];
+        }
+
+        await setInventory(message.member, inventory);
     }
 
     for (let i = 0; i < 13; i++) {
