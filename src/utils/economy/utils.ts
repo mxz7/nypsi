@@ -1028,7 +1028,7 @@ export async function toggleBan(id: string) {
         });
     }
 
-    await redis.del(id);
+    await redis.del(`cache:economy:banned:${id}`);
 }
 
 export async function reset() {
@@ -1077,6 +1077,16 @@ export async function reset() {
         });
 
         updated++;
+
+        await redis.del(`cache:economy:exists:${user.userId}`);
+        await redis.del(`cache:economy:banned:${user.userId}`);
+        await redis.del(`cache:economy:prestige:${user.userId}`);
+        await redis.del(`cache:economy:exists:${user.userId}`);
+        await redis.del(`cache:economy:xp:${user.userId}`);
+        await redis.del(`cache:economy:balance:${user.userId}`);
+        await redis.del(`cache:economy:boosters:${user.userId}`);
+        await redis.del(`economy:handcuffed:${user.userId}`);
+        await redis.del(`cache:economy:guild:user:${user.userId}`);
     }
 
     return updated + deleted;
@@ -1996,6 +2006,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
                             id: booster.id,
                         },
                     });
+
+                    await redis.del(`cache:economy:boosters:${id}`);
 
                     boosters.splice(boosters.indexOf(booster), 1);
                     map.set(key, boosters);
