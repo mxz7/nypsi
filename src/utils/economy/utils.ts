@@ -2101,8 +2101,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         }
     }
 
-    // await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
-    // await redis.expire(`cache:economy:boosters:${id}`, 300);
+    await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
+    await redis.expire(`cache:economy:boosters:${id}`, 300);
 
     return map;
 }
