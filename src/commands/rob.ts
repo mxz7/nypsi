@@ -1,28 +1,28 @@
-import { getMember } from "../utils/functions/member";
-import {
-    userExists,
-    updateBalance,
-    createUser,
-    getBalance,
-    hasPadlock,
-    setPadlock,
-    getXp,
-    updateXp,
-    getDMsEnabled,
-    hasVoted,
-    isEcoBanned,
-    addRob,
-    getInventory,
-    setInventory,
-    addItemUse,
-    getGuildByUser,
-} from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
+import {
+    addItemUse,
+    addRob,
+    createUser,
+    getBalance,
+    getDMsEnabled,
+    getGuildByUser,
+    getInventory,
+    getXp,
+    hasPadlock,
+    hasVoted,
+    isEcoBanned,
+    setInventory,
+    setPadlock,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
+import { getMember } from "../utils/functions/member";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const playerCooldown = new Set<string>();
 
@@ -208,7 +208,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         const chance = Math.floor(Math.random() * 22);
 
-        if (chance > 8) {
+        if (chance > 6) {
             robberySuccess = true;
 
             const amount = Math.floor(Math.random() * 35) + 5;
