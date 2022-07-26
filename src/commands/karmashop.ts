@@ -61,12 +61,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    let limit = 15;
+    let limit = 7;
 
     if (await isPremium(message.author.id)) {
-        limit = 20;
+        limit = 15;
         if ((await getTier(message.author.id)) == 4) {
-            limit = 50;
+            limit = 25;
         }
     }
 
