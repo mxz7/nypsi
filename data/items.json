@@ -352,6 +352,15 @@
         "role": "item",
         "worth": 300000
     },
+    "cookie": {
+        "id": "cookie",
+        "name": "cookie",
+        "emoji": "🍪",
+        "description": "yum yum",
+        "rarity": 0,
+        "role": "sellable",
+        "worth": 10000
+    },
     "potato": {
         "id": "potato",
         "name": "potato",
@@ -359,7 +368,7 @@
         "description": "a potato.",
         "rarity": 0,
         "role": "sellable",
-        "worth": 250
+        "worth": 5000
     },
     "tooth": {
         "id": "tooth",
@@ -620,5 +629,162 @@
         "speed": 1,
         "aliases": ["chav", "corsa"],
         "worth": 5000
+    },
+    "redbull": {
+        "id": "redbull",
+        "name": "red bull",
+        "emoji": "<:nypsi_redbull:1001210452832964648>",
+        "description": "50% shorter cooldowns for 25 minutes",
+        "rarity": 2,
+        "role": "booster",
+        "worth": 100000,
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["cooldown"],
+            "effect": 0.5,
+            "time": 1500
+        }
+    },
+    "worm": {
+        "id": "worm",
+        "name": "worm",
+        "emoji": "🪱",
+        "description": "increased luck when fishing",
+        "rarity": 1,
+        "role": "booster",
+        "worth": 75000,
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["fish"],
+            "effect": 1,
+            "time": 3600
+        }
+    },
+    "multi_potion": {
+        "id": "multi_potion",
+        "name": "multiplier potion",
+        "emoji": "<:nypsi_potion:1001463080582131843>",
+        "description": "increase your multipler by 3%",
+        "rarity": 1,
+        "worth": 100000,
+        "role": "booster",
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": ["multi"],
+            "effect": 3,
+            "time": 1800
+        }
+    },
+    "vote_booster": {
+        "id": "vote_booster",
+        "name": "vote bonus",
+        "emoji": "⚡",
+        "description": "obtained from voting",
+        "rarity": 1000,
+        "worth": 0,
+        "stackable": false,
+        "role": "booster",
+        "boosterEffect": {
+            "boosts": ["multi"],
+            "effect": 3,
+            "time": 43200
+        }
+    },
+    "fortune": {
+        "id": "fortune",
+        "name": "fortune",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "enchant your pickaxe with fortune",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 3,
+        "boosterEffect": {
+            "boosts": ["mine"],
+            "effect": 0.5,
+            "time": 3600
+        }
+    },
+    "unbreaking": {
+        "id": "unbreaking",
+        "name": "unbreaking",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "when mining, fishing or hunting it will not reduce durability",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 3,
+        "boosterEffect": {
+            "boosts": ["mine", "fish", "hunt"],
+            "effect": 0.5,
+            "time": 3600
+        }
+    },
+    "efficiency": {
+        "id": "efficiency",
+        "name": "efficiency",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "enchant your pickaxe with efficiency",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 4,
+        "boosterEffect": {
+            "boosts": ["mine"],
+            "effect": 1,
+            "time": 3600
+        }
+    },
+    "xp_potion": {
+        "id": "xp_potion",
+        "name": "xp potion",
+        "emoji": "<:nypsi_potion:1001463080582131843>",
+        "description": "earn 50% more xp",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": ["xp"],
+            "effect": 0.5,
+            "time": 1800
+        }
+    },
+    "prestige_booster": {
+        "id": "prestige_booster",
+        "name": "prestige bonus",
+        "emoji": "✨",
+        "description": "double xp",
+        "rarity": 69,
+        "worth": 0,
+        "role": "booster",
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": ["xp"],
+            "effect": 1,
+            "time": 21600
+        }
+    },
+    "lucky_7": {
+        "id": "lucky_7",
+        "name": "lucky 7",
+        "aliases": ["7"],
+        "emoji": "<:nypsi_7:1001553113368506538>",
+        "description": "improved chances for slots",
+        "rarity": 2,
+        "worth": 500000,
+        "role": "booster",
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["slots"],
+            "effect": "improves slots win chance to 60%",
+            "time": 450
+        }
     }
 }
