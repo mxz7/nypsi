@@ -845,16 +845,14 @@ export function runCommandUseTimers(client: NypsiClient) {
 
             const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag)?.id;
 
-            if (uses > 60) {
-                // TODO: CHANGE THIS TO ADJUST LATER
+            if (uses > 100) {
                 await hook.send(
                     `[${getTimestamp()}] **${tag}** (${
                         typeof user === "string" ? `${user}` : "invalid id"
                     }) performed **${uses}** commands in an hour`
                 );
 
-                if (uses > 75) {
-                    // TODO: CHANGE THIS TO ADJUST LATER
+                if (uses > 125) {
                     toggleLock(user);
                     logger.info(`${tag} (${typeof user === "string" ? `${user}` : "invalid id"}) has been given a captcha`);
                     await hook.send(
