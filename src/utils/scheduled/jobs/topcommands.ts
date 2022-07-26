@@ -13,7 +13,7 @@ import redis from "../../database/redis";
         commands.push(cmd);
     }
 
-    inPlaceSort(commands).desc((i) => topCommands[i]);
+    inPlaceSort(commands).desc((i) => parseInt(topCommands[i]));
 
     const msg: string[] = [];
 
