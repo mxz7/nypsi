@@ -1,6 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getPrefix } from "../utils/guilds/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import {
@@ -15,7 +16,6 @@ import {
     setTier,
 } from "../utils/premium/utils";
 import dayjs = require("dayjs");
-import { NypsiClient } from "../utils/models/Client";
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
     .setAliases(["patreon", "donate", "prem"])
@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.addField(
                 "payment methods",
-                "[ko-fi](https://ko-fi.com/tekoh/tiers)\n[patreon](https://patreon.com/nypsi)\n\n" +
+                "[ko-fi](https://ko-fi.com/tekoh/tiers)\n[patreon](https://patreon.com/join/nypsi)\n\n" +
                     "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
             );
 

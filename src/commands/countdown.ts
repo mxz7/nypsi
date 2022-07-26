@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getCountdowns, getPrefix, addCountdown, deleteCountdown } from "../utils/guilds/utils";
-import { isPremium, getTier } from "../utils/premium/utils";
 import { daysUntil, formatDate } from "../utils/functions/date";
+import { addCountdown, deleteCountdown, getCountdowns, getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
     .setAliases(["countdowns"])
@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let error = `you have reached the maximum amount of countdowns for this server (${max})`;
 
             if (max == 1) {
-                error += "\n\nbecome a patreon to upgrade this limt (https://patreon.com/nypsi)";
+                error += "\n\nbecome a patreon to upgrade this limt (https://patreon.com/join/nypsi)";
             } else if (max != 5) {
                 error += "\n\nyou can upgrade your subscription to get access to more countdowns per server";
             }
