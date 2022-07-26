@@ -220,6 +220,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (multi > 0) {
                 amount += amount * multi;
+                amount = Math.floor(amount);
+                if (amount > 64) amount = 64;
             }
         }
 
