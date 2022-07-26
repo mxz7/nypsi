@@ -650,9 +650,9 @@
         "name": "worm",
         "emoji": "🪱",
         "description": "increased luck when fishing",
-        "rarity": 1,
+        "rarity": 0,
         "role": "booster",
-        "worth": 75000,
+        "worth": 50000,
         "stackable": false,
         "boosterEffect": {
             "boosts": ["fish"],
