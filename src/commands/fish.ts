@@ -145,6 +145,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (items[i].role == "prey") continue;
                 if (items[i].role == "tool") continue;
                 if (items[i].role == "car") continue;
+                if (items[i].role == "booster") continue;
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && fishingRod == "incredible_fishing_rod") {
