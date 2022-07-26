@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setHeader("data request", message.author.avatarURL());
 
-    embed.setDescription("you can request and view all of your data stored by nypsi (excluding moderation data)");
+    embed.setDescription("you can request and view all of your data stored by nypsi");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle(ButtonStyle.Success)
