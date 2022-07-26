@@ -1,6 +1,14 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addItemUse, createUser, getInventory, getItems, setInventory, userExists } from "../utils/economy/utils";
+import {
+    addItemUse,
+    createUser,
+    getBoosters,
+    getInventory,
+    getItems,
+    setInventory,
+    userExists,
+} from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -80,7 +88,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(message.member, inventory);
 
+    const boosters = await getBoosters(message.member);
+
     let times = 2;
+    let multi = 0;
 
     if (pickaxe == "iron_pickaxe") {
         times = 3;
@@ -90,6 +101,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (let i = 0; i < 13; i++) {
         mineItems.push("nothing");
+    }
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].role == "booster") {
+            if (items[boosterId].boosterEffect.boosts == "mine") {
+                switch (items[boosterId].id) {
+                    case "fortune":
+                        multi += items[boosterId].boosterEffect.effect;
+                        break;
+                }
+            }
+        }
     }
 
     const foundItems = [];
@@ -191,6 +214,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (veins.has(chosen)) {
             amount = veins.get(chosen)[Math.floor(Math.random() * veins.get(chosen).length)] * (times - 1);
+
+            if (multi > 0) {
+                amount += amount * multi;
+            }
         }
 
         if (inventory[chosen]) {

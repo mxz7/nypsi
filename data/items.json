@@ -688,5 +688,20 @@
             "effect": 3,
             "time": 43200
         }
+    },
+    "fortune": {
+        "id": "fortune",
+        "name": "fortune enchantment",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "enchant your pickaxe with efficiency",
+        "rarity": 1,
+        "worth": 75000,
+        "stackable": true,
+        "max": 3,
+        "boosterEffect": {
+            "boosts": "mine",
+            "effect": 0.5,
+            "time": 3600
+        }
     }
 }
