@@ -45,23 +45,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    const counts = new Map<string, number>();
-
     for (const boosterId of boosters.keys()) {
-        if (counts.has(boosterId)) {
-            counts.set(boosterId, counts.get(boosterId) + 1);
+        if (boosters.get(boosterId).length == 1) {
+            desc.push(
+                `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
+                    boosters.get(boosterId)[0].expire / 1000
+                )}:R>`
+            );
         } else {
-            counts.set(boosterId, 1);
-        }
-    }
+            let lowest = boosters.get(boosterId)[0].expire;
 
-    for (const boosterId of boosters.keys()) {
-        const booster = boosters.get(boosterId);
-        desc.push(
-            `**${items[boosterId].name}** ${items[boosterId].emoji}${
-                counts.get(boosterId) > 1 ? ` \`x${counts.get(boosterId)}\` - next expires` : " - expires"
-            } <t:${Math.round(booster.expire / 1000)}:R>`
-        );
+            for (const booster of boosters.get(boosterId)) {
+                if (booster.expire < lowest) lowest = booster.expire;
+            }
+
+            desc.push(
+                `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
+                    boosters.get(boosterId).length
+                }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
+            );
+        }
     }
 
     embed.setDescription(desc.join("\n"));

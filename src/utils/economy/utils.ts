@@ -1970,7 +1970,7 @@ export async function addHandcuffs(id: string) {
     await redis.expire(`economy:handcuffed:${id}`, 60);
 }
 
-export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster>> {
+export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1983,16 +1983,22 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     if (cache) {
         if (_.isEmpty(JSON.parse(cache))) return new Map();
 
-        const map = new Map<string, Booster>(Object.entries(JSON.parse(cache)));
+        const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
 
         for (const key of map.keys()) {
-            if (map.get(key).expire <= Date.now()) {
-                await prisma.booster.delete({
-                    where: {
-                        id: map.get(key).id,
-                    },
-                });
-                map.delete(key);
+            const boosters = map.get(key);
+
+            for (const booster of boosters) {
+                if (booster.expire <= Date.now()) {
+                    await prisma.booster.delete({
+                        where: {
+                            id: booster.id,
+                        },
+                    });
+
+                    boosters.splice(boosters.indexOf(booster), 1);
+                    map.set(key, boosters);
+                }
             }
         }
 
@@ -2010,7 +2016,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         },
     });
 
-    const map = new Map<string, Booster>();
+    const map = new Map<string, Booster[]>();
 
     for (const booster of query) {
         if (booster.expire.getTime() <= Date.now()) {
@@ -2023,15 +2029,29 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
             continue;
         }
 
-        map.set(booster.boosterId, {
-            boosterId: booster.boosterId,
-            expire: booster.expire.getTime(),
-            id: booster.id,
-        });
+        if (map.has(booster.boosterId)) {
+            const c = map.get(booster.boosterId);
+
+            c.push({
+                boosterId: booster.boosterId,
+                expire: booster.expire.getTime(),
+                id: booster.id,
+            });
+
+            map.set(booster.boosterId, c);
+        } else {
+            map.set(booster.boosterId, [
+                {
+                    boosterId: booster.boosterId,
+                    expire: booster.expire.getTime(),
+                    id: booster.id,
+                },
+            ]);
+        }
     }
 
-    await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
-    await redis.expire(`cache:economy:boosters:${id}`, 300);
+    // await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
+    // await redis.expire(`cache:economy:boosters:${id}`, 300);
 
     return map;
 }
