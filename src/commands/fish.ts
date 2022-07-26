@@ -1,21 +1,22 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    userExists,
+    addItemUse,
     createUser,
+    getBalance,
+    getBoosters,
     getInventory,
     getItems,
-    setInventory,
     getMaxBitcoin,
     getMaxEthereum,
-    updateBalance,
-    getBalance,
-    updateXp,
     getXp,
-    addItemUse,
+    setInventory,
+    updateBalance,
+    updateXp,
+    userExists,
 } from "../utils/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("fish", "go to a pond and fish", Categories.MONEY);
 
@@ -102,20 +103,36 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addItemUse(message.member, fishingRod);
 
-    inventory[fishingRod]--;
-
-    if (inventory[fishingRod] <= 0) {
-        delete inventory[fishingRod];
-    }
-
-    await setInventory(message.member, inventory);
-
     let times = 1;
 
     if (fishingRod == "fishing_rod") {
         times = 2;
     } else if (fishingRod == "incredible_fishing_rod") {
         times = 3;
+    }
+
+    const boosters = await getBoosters(message.member);
+
+    let unbreaking = false;
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts.includes("fish")) {
+            if (items[boosterId].id == "unbreaking") {
+                unbreaking = true;
+            } else {
+                times++;
+            }
+        }
+    }
+
+    if (!unbreaking) {
+        inventory[fishingRod]--;
+
+        if (inventory[fishingRod] <= 0) {
+            delete inventory[fishingRod];
+        }
+
+        await setInventory(message.member, inventory);
     }
 
     const foundItems = [];

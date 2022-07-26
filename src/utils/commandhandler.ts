@@ -13,9 +13,9 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import { getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
-import { formatDate } from "./functions/date";
+import { formatDate, MStoTime } from "./functions/date";
 import { getNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
@@ -27,6 +27,7 @@ import { addUse, getCommand } from "./premium/utils";
 import { version } from "../../package.json";
 import redis from "./database/redis";
 import { NypsiClient } from "./models/Client";
+import { Item } from "./models/Economy";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 
 const commands = new Map<string, Command>();
@@ -239,6 +240,28 @@ async function helpCmd(message: Message, args: string[]) {
         if (args[0].toLowerCase() == "gamble") args[0] = "money";
         if (args[0].toLowerCase() == "gambling") args[0] = "money";
 
+        const items = getItems();
+
+        let selectedItem: Item;
+        const searchTag = args.join(" ");
+
+        for (const itemName of Array.from(Object.keys(items))) {
+            const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+            if (searchTag == itemName) {
+                selectedItem = items[itemName];
+                break;
+            } else if (searchTag == itemName.split("_").join("")) {
+                selectedItem = items[itemName];
+                break;
+            } else if (aliases.indexOf(searchTag) != -1) {
+                selectedItem = items[itemName];
+                break;
+            } else if (searchTag == items[itemName].name) {
+                selectedItem = items[itemName];
+                break;
+            }
+        }
+
         if (helpCategories.has(args[0].toLowerCase())) {
             const pages = helpCategories.get(args[0].toLowerCase());
 
@@ -284,8 +307,69 @@ async function helpCmd(message: Message, args: string[]) {
                     member ? ` owned by ${member.toString()}` : ""
                 }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`
             );
+        } else if (selectedItem) {
+            embed.setTitle(`${selectedItem.emoji} ${selectedItem.name}`);
+
+            const desc: string[] = [`**id** \`${selectedItem.id}\``, `**description** ${selectedItem.description}`];
+
+            if (selectedItem.aliases) {
+                desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
+            }
+
+            if (selectedItem.worth) {
+                desc.push(`**worth** $${selectedItem.worth.toLocaleString()}`);
+            }
+
+            if (selectedItem.rarity) {
+                const rarityMap = new Map<number, string>();
+
+                rarityMap.set(0, "common");
+                rarityMap.set(1, "uncommon");
+                rarityMap.set(2, "rare");
+                rarityMap.set(3, "very rare");
+                rarityMap.set(4, "exotic");
+
+                let rarity = rarityMap.get(selectedItem.rarity);
+
+                if (!rarity) {
+                    rarity = "not obtainable through crates";
+                }
+
+                desc.push(`**rarity** ${rarity}`);
+            }
+
+            if (selectedItem.role) {
+                desc.push(`**role** ${selectedItem.role}`);
+                if (selectedItem.role == "booster") {
+                    embed.addField(
+                        "booster info",
+                        `**boosts** ${selectedItem.boosterEffect.boosts}\n**effect** ${
+                            selectedItem.boosterEffect.effect
+                        }\n**time** ${MStoTime(
+                            selectedItem.boosterEffect.time * 1000
+                        )}\n\nyou can activate your booster with ${prefix}**activate <booster>**`
+                    );
+                } else if (selectedItem.role == "car") {
+                    embed.addField(
+                        "car info",
+                        `**speed** ${selectedItem.speed}\n\ncars are used for street races (${prefix}**streetrace**)`
+                    );
+                } else if (selectedItem.role == "collectable") {
+                    embed.addField(
+                        "collectable info",
+                        "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them"
+                    );
+                } else if (selectedItem.role == "sellable" || selectedItem.role == "prey" || selectedItem.role == "fish") {
+                    embed.addField(
+                        "sellable",
+                        `this item is just meant to be sold. you can use the ${prefix}**sellall** command to do so quickly`
+                    );
+                }
+            }
+
+            embed.setDescription(desc.join("\n"));
         } else {
-            return message.channel.send({ embeds: [new ErrorEmbed("unknown command")] });
+            return message.channel.send({ embeds: [new ErrorEmbed("unknown command or item")] });
         }
     }
 

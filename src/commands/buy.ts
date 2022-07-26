@@ -1,19 +1,19 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    getItems,
+    createUser,
     getBalance,
     getInventory,
+    getItems,
     getMaxBitcoin,
     getMaxEthereum,
-    updateBalance,
     setInventory,
+    updateBalance,
     userExists,
-    createUser,
 } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("buy", "buy items from the shop", Categories.MONEY);
 
@@ -71,7 +71,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         selected.role == "fish" ||
         selected.role == "car" ||
         selected.role == "sellable" ||
-        selected.role == "ore"
+        selected.role == "ore" ||
+        selected.role == "booster"
     ) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
     }

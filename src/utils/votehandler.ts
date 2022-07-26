@@ -4,6 +4,7 @@ import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
 import {
+    addBooster,
     addTicket,
     getBalance,
     getDMsEnabled,
@@ -73,6 +74,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         },
     });
 
+    await addBooster(user, "vote_booster");
+
     redis.set(`cache:vote:${user}`, "true");
     redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
 
@@ -101,7 +104,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
     let crateAmount = Math.floor(prestige / 2 + 1);
 
-    if (crateAmount > 5) crateAmount = 5;
+    if (crateAmount > 3) crateAmount = 3;
 
     if (inventory["vote_crate"]) {
         inventory["vote_crate"] += crateAmount;
