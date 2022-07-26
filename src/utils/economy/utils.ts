@@ -1577,7 +1577,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     earned += boosterEffect * earned;
 
-    return earned;
+    return Math.floor(earned);
 }
 
 export async function getGuildByName(name: string) {
