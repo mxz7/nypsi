@@ -1341,12 +1341,50 @@ export async function deleteUser(member: GuildMember | string) {
         id = member;
     }
 
+    const guild = await getGuildByUser(member);
+
+    if (guild) {
+        if (guild.ownerId == id) {
+            await prisma.economyGuildMember.deleteMany({
+                where: { guildName: guild.guildName },
+            });
+
+            await prisma.economyGuild.delete({
+                where: {
+                    guildName: guild.guildName,
+                },
+            });
+        } else {
+            await prisma.economyGuildMember.delete({
+                where: {
+                    userId: id,
+                },
+            });
+        }
+    }
+
+    await prisma.booster.deleteMany({
+        where: { userId: id },
+    });
+    await prisma.economyStats.deleteMany({
+        where: {
+            economyUserId: id,
+        },
+    });
     await prisma.economy.delete({
         where: {
             userId: id,
         },
     });
+
     await redis.del(`cache:economy:exists:${id}`);
+    await redis.del(`cache:economy:banned:${id}`);
+    await redis.del(`cache:economy:prestige:${id}`);
+    await redis.del(`cache:economy:exists:${id}`);
+    await redis.del(`cache:economy:xp:${id}`);
+    await redis.del(`cache:economy:balance:${id}`);
+    await redis.del(`cache:economy:boosters:${id}`);
+    await redis.del(`cache:economy:guild:user:${id}`);
 }
 
 export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
