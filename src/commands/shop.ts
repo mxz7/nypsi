@@ -1,17 +1,17 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getItems } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getItems } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"]);
 
@@ -54,7 +54,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             items[item].role == "collectable" ||
             items[item].role == "car" ||
             items[item].role == "sellable" ||
-            items[item].role == "ore"
+            items[item].role == "ore" ||
+            items[item].role == "booster"
         )
             continue;
         if (pageOfItems.length == 6) {
