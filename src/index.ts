@@ -1,10 +1,10 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
-import ms = require("ms");
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
 import { listenForVotes } from "./utils/votehandler";
+import ms = require("ms");
 
 setClusterId("main");
 
@@ -29,6 +29,8 @@ manager.extend(
         maxMissedHeartbeats: 5,
     })
 );
+
+manager.extend(new Cluster.ReClusterManager());
 
 manager.on("clusterCreate", (cluster) => {
     cluster.on("ready", () => {
