@@ -70,6 +70,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
+    const edit = async (data: MessageEditOptions, msg: Message) => {
+        if (!(message instanceof Message)) {
+            await message.editReply(data);
+            return await message.fetchReply();
+        } else {
+            return await msg.edit(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -211,10 +220,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
+        embed.setDescription(`activating **${selected.id}** booster...`);
+
+        const msg = await send({ embeds: [embed] });
+
         embed.setDescription(`you have activated **${selected.id}**`);
         embed.addField("current boosters", currentBoosters.join("\n"));
 
-        return send({ embeds: [embed] });
+        setTimeout(() => {
+            return edit({ embeds: [embed] }, msg);
+        }, 1000);
+        return;
     }
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
@@ -531,15 +547,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const msg = await send({ embeds: [embed] });
 
     if (!laterDescription) return;
-
-    const edit = async (data: MessageEditOptions, msg: Message) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await msg.edit(data);
-        }
-    };
 
     setTimeout(() => {
         embed.setDescription(laterDescription);
