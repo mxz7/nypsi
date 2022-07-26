@@ -634,7 +634,7 @@
         "id": "redbull",
         "name": "red bull",
         "emoji": "<:nypsi_redbull:1001210452832964648>",
-        "description": "50% shorter cooldowns for 10 minutes",
+        "description": "50% shorter cooldowns for 25 minutes",
         "rarity": 2,
         "role": "booster",
         "worth": 100000,
@@ -642,7 +642,7 @@
         "boosterEffect": {
             "boosts": "cooldown",
             "effect": 0.5,
-            "time": 600
+            "time": 1500
         }
     },
     "worm": {
