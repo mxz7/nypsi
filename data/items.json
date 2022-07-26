@@ -693,7 +693,7 @@
     },
     "fortune": {
         "id": "fortune",
-        "name": "fortune enchantment",
+        "name": "fortune",
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "enchant your pickaxe with fortune",
         "rarity": 1,
@@ -709,7 +709,7 @@
     },
     "unbreaking": {
         "id": "unbreaking",
-        "name": "unbreaking enchantment",
+        "name": "unbreaking",
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "when mining, fishing or hunting it will not reduce durability",
         "rarity": 1,
@@ -725,7 +725,7 @@
     },
     "efficiency": {
         "id": "efficiency",
-        "name": "efficiency enchantment",
+        "name": "efficiency",
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "enchant your pickaxe with efficiency",
         "rarity": 1,
