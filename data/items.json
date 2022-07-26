@@ -721,5 +721,21 @@
             "effect": 1,
             "time": 3600
         }
+    },
+    "potion": {
+        "id": "potion",
+        "name": "xp potion",
+        "emoji": "<:nypsi_potion:1001463080582131843>",
+        "description": "earn 15% more xp",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": "xp",
+            "effect": 0.15,
+            "time": 3600
+        }
     }
 }
