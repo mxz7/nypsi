@@ -660,14 +660,14 @@
             "time": 3600
         }
     },
-    "medicine": {
-        "id": "medicine",
-        "name": "experimental medicine",
-        "emoji": "💉",
-        "description": "inject yourself with this experimental medicine to increase your multiplier 😳. the more you inject, the higher it increases",
+    "multi_potion": {
+        "id": "multi_potion",
+        "name": "xp potion",
+        "emoji": "<:nypsi_potion:1001463080582131843>",
+        "description": "increase your multipler by 3%",
         "rarity": 1,
-        "role": "booster",
         "worth": 100000,
+        "role": "booster",
         "stackable": true,
         "max": 5,
         "boosterEffect": {
@@ -739,8 +739,8 @@
             "time": 3600
         }
     },
-    "potion": {
-        "id": "potion",
+    "xp_potion": {
+        "id": "multi_potion",
         "name": "xp potion",
         "emoji": "<:nypsi_potion:1001463080582131843>",
         "description": "earn 50% more xp",
