@@ -116,6 +116,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (aliases.indexOf(searchTag) != -1) {
             selected = itemName;
             break;
+        } else if (searchTag == items[itemName].name) {
+            selected = itemName;
+            break;
         }
     }
 
