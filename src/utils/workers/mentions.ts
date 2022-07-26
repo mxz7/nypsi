@@ -48,37 +48,41 @@ if (!isMainThread) {
 
         if (currentData.length >= 500) {
             inserting = true;
-            await prisma.mention.createMany({
-                data: currentData,
-                skipDuplicates: true,
-            });
+            await prisma.mention
+                .createMany({
+                    data: currentData,
+                    skipDuplicates: true,
+                })
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }
 
-        const memberID = a.shift();
+        for (let i = 0; i < 15; i++) {
+            const memberID = a.shift();
 
-        const member = members.get(memberID);
+            const member = members.get(memberID);
 
-        if (!member) return;
-        if (member.user.bot) return;
-        if (member.user.id == collection.message.author.id) return;
+            if (!member) return;
+            if (member.user.bot) return;
+            if (member.user.id == collection.message.author.id) return;
 
-        try {
-            if (!channelMembers.has(memberID)) return;
-        } catch {
-            channelMembers = channelMembers.cache;
-            if (!channelMembers.has(memberID)) return;
+            try {
+                if (!channelMembers.has(memberID)) return;
+            } catch {
+                channelMembers = channelMembers.cache;
+                if (!channelMembers.has(memberID)) return;
+            }
+
+            currentData.push({
+                guildId: collection.guildId,
+                targetId: member.user.id,
+                date: new Date(collection.message.createdTimestamp),
+                url: collection.url,
+                content: content,
+                userTag: `${collection.message.author.username}#${collection.message.author.discriminator}`,
+            });
         }
-
-        currentData.push({
-            guildId: collection.guildId,
-            targetId: member.user.id,
-            date: new Date(collection.message.createdTimestamp),
-            url: collection.url,
-            content: content,
-            userTag: `${collection.message.author.username}#${collection.message.author.discriminator}`,
-        });
 
         if (a.length == 0) {
             if (currentData.length > 0) {
