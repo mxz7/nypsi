@@ -532,7 +532,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 } else {
                     if (settings.randomChannels.length >= max) {
                         const embed = new ErrorEmbed(
-                            `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/nypsi) to have more`
+                            `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/join/nypsi) to have more`
                         );
 
                         if (max > 1) {

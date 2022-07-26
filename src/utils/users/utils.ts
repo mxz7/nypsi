@@ -289,6 +289,7 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
         select: {
             value: true,
             date: true,
+            id: true,
         },
         orderBy: {
             date: "desc",
@@ -298,6 +299,20 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
     inPlaceSort(query).desc((u) => u.date);
 
     return query;
+}
+
+export async function deleteAvatar(id: string) {
+    let res = true;
+    await prisma.username
+        .delete({
+            where: {
+                id: id,
+            },
+        })
+        .catch(() => {
+            res = false;
+        });
+    return res;
 }
 
 export async function clearAvatarHistory(member: GuildMember | string) {

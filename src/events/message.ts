@@ -106,7 +106,7 @@ export default async function messageCreate(message: Message) {
                 });
 
                 if (!mentionInterval) {
-                    mentionInterval = setInterval(async () => await addMention(), 150);
+                    mentionInterval = setInterval(async () => await addMention(), 75);
                 }
             } else {
                 if (message.mentions.roles.first()) {
@@ -135,7 +135,7 @@ export default async function messageCreate(message: Message) {
                     });
 
                     if (!mentionInterval) {
-                        mentionInterval = setInterval(async () => await addMention(), 150);
+                        mentionInterval = setInterval(async () => await addMention(), 75);
                     }
                 }
 
@@ -174,7 +174,7 @@ export default async function messageCreate(message: Message) {
                     }
 
                     if (!mentionInterval) {
-                        mentionInterval = setInterval(async () => await addMention(), 150);
+                        mentionInterval = setInterval(async () => await addMention(), 75);
                     }
                 }
             }
@@ -230,7 +230,7 @@ async function addMention() {
         const members = mention.members;
 
         if (members.size > 1000) {
-            if (workerCount >= 2) {
+            if (workerCount >= 4) {
                 mentionQueue.push(mention);
                 return;
             }
@@ -350,7 +350,7 @@ async function addMention() {
     } else if (cpuUsage < 80) {
         currentInterval = 300;
     } else {
-        currentInterval = 125;
+        currentInterval = 75;
     }
 
     if (currentInterval != old) {

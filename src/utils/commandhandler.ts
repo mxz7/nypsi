@@ -754,6 +754,7 @@ export async function runCommand(
         commands.get(aliases.get(cmd)).run(message, args);
         await updateLastCommand(message.member);
         await redis.hincrby("nypsi:topcommands", commands.get(aliases.get(cmd)).name, 1);
+        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
     } else {
         if (commands.get(cmd).category == "money") {
             if (await isEcoBanned(message.author.id)) {
@@ -801,6 +802,7 @@ export async function runCommand(
         commands.get(cmd).run(message, args);
         await updateLastCommand(message.member);
         await redis.hincrby("nypsi:topcommands", commands.get(cmd).name, 1);
+        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
     }
 
     let cmdName = cmd;
@@ -927,17 +929,23 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag).id;
+            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag)?.id;
 
-            if (uses > 50) {
-                // TODO: CHANGE THIS TO ADJUST LATER
-                await hook.send(`[${getTimestamp()}] **${tag}** (${user}) performed **${uses}** commands in an hour`);
+            if (uses > 100) {
+                await hook.send(
+                    `[${getTimestamp()}] **${tag}** (${
+                        typeof user === "string" ? `${user}` : "invalid id"
+                    }) performed **${uses}** commands in an hour`
+                );
 
-                if (uses > 75) {
-                    // TODO: CHANGE THIS TO ADJUST LATER
+                if (uses > 150) {
                     toggleLock(user);
-                    logger.info(`${tag} (${user}) has been given a captcha`);
-                    await hook.send(`[${getTimestamp()}] **${tag}** (${user}) has been given a captcha`);
+                    logger.info(`${tag} (${typeof user === "string" ? `${user}` : "invalid id"}) has been given a captcha`);
+                    await hook.send(
+                        `[${getTimestamp()}] **${tag}** (${
+                            typeof user === "string" ? `${user}` : "invalid id"
+                        }) has been given a captcha`
+                    );
                 }
             }
         }

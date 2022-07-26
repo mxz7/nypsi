@@ -5,7 +5,9 @@ import redis from "../../database/redis";
 
 (async () => {
     const topCommands = await redis.hgetall("nypsi:topcommands");
+    const topUsers = await redis.hgetall("nypsi:topcommands:user");
     await redis.del("nypsi:topcommands");
+    await redis.del("nypsi:topcommands:user");
 
     const commands: string[] = [];
 
@@ -13,7 +15,14 @@ import redis from "../../database/redis";
         commands.push(cmd);
     }
 
-    inPlaceSort(commands).desc((i) => topCommands[i]);
+    const users: string[] = [];
+
+    for (const user of Object.keys(topUsers)) {
+        users.push(user);
+    }
+
+    inPlaceSort(commands).desc((i) => parseInt(topCommands[i]));
+    inPlaceSort(users).desc((i) => parseInt(topUsers[i]));
 
     const msg: string[] = [];
 
@@ -40,6 +49,7 @@ import redis from "../../database/redis";
     embed.setTitle("top 10 commands");
     embed.setDescription(msg.join("\n"));
     embed.setColor("#111111");
+    embed.setFooter({ text: `${users[0]} has no life (${parseInt(topUsers[users[0]]).toLocaleString()} commands)` });
 
     const hook = new WebhookClient({ url: process.env.TOPCOMMANDS_HOOK });
 
