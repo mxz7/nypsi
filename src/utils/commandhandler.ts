@@ -670,6 +670,7 @@ export async function runCommand(
         commands.get(aliases.get(cmd)).run(message, args);
         await updateLastCommand(message.member);
         await redis.hincrby("nypsi:topcommands", commands.get(aliases.get(cmd)).name, 1);
+        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
     } else {
         if (commands.get(cmd).category == "money") {
             if (await isEcoBanned(message.author.id)) {
@@ -717,6 +718,7 @@ export async function runCommand(
         commands.get(cmd).run(message, args);
         await updateLastCommand(message.member);
         await redis.hincrby("nypsi:topcommands", commands.get(cmd).name, 1);
+        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
     }
 
     let cmdName = cmd;
