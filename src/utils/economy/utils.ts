@@ -1032,6 +1032,7 @@ export async function toggleBan(id: string) {
 }
 
 export async function reset() {
+    await prisma.booster.deleteMany();
     await prisma.economyStats.deleteMany();
     await prisma.economyGuildMember.deleteMany();
     await prisma.economyGuild.deleteMany();
