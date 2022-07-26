@@ -220,11 +220,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        embed.setDescription(`activating **${selected.id}** booster...`);
+        embed.setDescription(`activating **${selected.name}** booster...`);
 
         const msg = await send({ embeds: [embed] });
 
-        embed.setDescription(`you have activated **${selected.id}**`);
+        embed.setDescription(`you have activated **${selected.name}**`);
         embed.addField("current boosters", currentBoosters.join("\n"));
 
         setTimeout(() => {
