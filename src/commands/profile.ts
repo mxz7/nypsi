@@ -92,6 +92,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 Economy: {
                     include: {
                         EconomyStats: true,
+                        Boosters: true,
                     },
                 },
                 EconomyGuild: true,
