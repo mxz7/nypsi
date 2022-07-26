@@ -1,10 +1,10 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
-import ms = require("ms");
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
 import { listenForVotes } from "./utils/votehandler";
+import ms = require("ms");
 
 setClusterId("main");
 
@@ -30,6 +30,8 @@ manager.extend(
     })
 );
 
+manager.extend(new Cluster.ReClusterManager());
+
 manager.on("clusterCreate", (cluster) => {
     cluster.on("ready", () => {
         logger.info(`cluster ${cluster.id} ready`);
@@ -43,6 +45,11 @@ manager.on("clusterCreate", (cluster) => {
     });
     cluster.on("reconnecting", () => {
         logger.info(`cluster ${cluster.id} reconnecting..`);
+    });
+    cluster.on("message", (message) => {
+        if (message == "restart") {
+            manager.recluster.start({ restartMode: "gracefulSwitch" });
+        }
     });
     logger.info(`launched cluster ${cluster.id}`);
 });
