@@ -82,10 +82,14 @@ export class NypsiClient extends Client {
             this.on("roleDelete", roleDelete.bind(null));
             this.on("userUpdate", userUpdate.bind(null));
             this.on("interactionCreate", interactionCreate.bind(null));
+
+            setTimeout(() => {
+                this.runIntervals();
+            }, 5000);
         });
     }
 
-    public runIntervals() {
+    private runIntervals() {
         updateCache();
         getWebhooks(this);
         updateCounters(this);
