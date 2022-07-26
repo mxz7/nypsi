@@ -194,10 +194,12 @@ async function addMention() {
 
     if (currentData.length >= 500) {
         inserting = true;
-        await prisma.mention.createMany({
-            data: currentData,
-            skipDuplicates: true,
-        });
+        await prisma.mention
+            .createMany({
+                data: currentData,
+                skipDuplicates: true,
+            })
+            .catch(() => {});
         currentData = [];
         inserting = false;
     }
@@ -209,10 +211,12 @@ async function addMention() {
 
         if (currentData.length > 0) {
             inserting = true;
-            await prisma.mention.createMany({
-                data: currentData,
-                skipDuplicates: true,
-            });
+            await prisma.mention
+                .createMany({
+                    data: currentData,
+                    skipDuplicates: true,
+                })
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }
@@ -307,20 +311,22 @@ async function addMention() {
             count++;
         }
     } else if (typeof mention != "string" && mention.type == "mention") {
-        const guild = mention.guildId;
-        const data = mention.data;
-        const target = mention.target;
+        for (let i = 0; i < 25; i++) {
+            const guild = mention.guildId;
+            const data = mention.data;
+            const target = mention.target;
 
-        const content: string = encrypt(data.content);
+            const content: string = encrypt(data.content);
 
-        currentData.push({
-            guildId: guild,
-            content: content,
-            url: data.link,
-            date: new Date(data.date),
-            targetId: target,
-            userTag: data.user,
-        });
+            currentData.push({
+                guildId: guild,
+                content: content,
+                url: data.link,
+                date: new Date(data.date),
+                targetId: target,
+                userTag: data.user,
+            });
+        }
     }
 
     if (mentionQueue.length == 0) {
@@ -330,10 +336,12 @@ async function addMention() {
 
         if (currentData.length > 0) {
             inserting = true;
-            await prisma.mention.createMany({
-                data: currentData,
-                skipDuplicates: true,
-            });
+            await prisma.mention
+                .createMany({
+                    data: currentData,
+                    skipDuplicates: true,
+                })
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }
