@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
-import { isPremium, getTier, getEmbedColor, setEmbedColor } from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getEmbedColor, getTier, isPremium, setEmbedColor } from "../utils/premium/utils";
 
 const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", Categories.UTILITY).setAliases([
     "setcolour",
@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         const embed = new CustomEmbed(message.member);
 
-        embed.setDescription(`**color** #${await getEmbedColor(
+        embed.setDescription(`**color** ${await getEmbedColor(
             message.author.id
         )}\n\nuse \`${prefix}setcolor <hex color code>\` to change this
         you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`);
