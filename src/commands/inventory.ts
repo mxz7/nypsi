@@ -1,20 +1,20 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    InteractionReplyOptions,
-    MessageOptions,
-    MessageEditOptions,
+    CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getInventory, getItems, createUser, userExists } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { createUser, getInventory, getItems, userExists } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"]);
 
@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const item = items[i];
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
+            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${item.description}`,
             true
         );
     }
@@ -174,7 +174,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
+                            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${
+                                item.description
+                            }`,
                             true
                         );
                     }
@@ -220,7 +222,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** -- ${inventory[item.id].toLocaleString()}\n${item.description}`,
+                            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${
+                                item.description
+                            }`,
                             true
                         );
                     }
