@@ -784,7 +784,7 @@
         "boosterEffect": {
             "boosts": ["slots"],
             "effect": "improves slots win chance to 60%",
-            "time": 450
+            "time": 300
         }
     }
 }
