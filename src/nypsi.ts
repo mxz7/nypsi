@@ -59,15 +59,5 @@ setTimeout(() => {
                 },
             ],
         });
-
-        setTimeout(() => {
-            client.runIntervals();
-        }, 10000);
-
-        if (process.env.GITHUB_ACTION) {
-            setTimeout(() => {
-                process.exit(0);
-            }, 30000);
-        }
     });
 }, 500);
