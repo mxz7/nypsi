@@ -29,7 +29,7 @@ join the support server: [`https://discord.gg/hJTDNST`](https://discord.gg/hJTDN
 
 ### 💰 patreon
 
-gimme ur moneis ):< - haha joking but seriously check out the patreon it would help me massively, you also get benefits with the bot!!! [`https://patreon.com/nypsi`](https://patreon.com/nypsi)
+gimme ur moneis ):< - haha joking but seriously check out the patreon it would help me massively, you also get benefits with the bot!!! [`https://patreon.com/join/nypsi`](https://patreon.com/join/nypsi)
 
 ### 🌵 features
 
