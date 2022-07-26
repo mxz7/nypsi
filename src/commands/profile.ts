@@ -120,6 +120,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             },
         });
 
+        const moderationCasesModerator = await prisma.moderationCase.findMany({
+            where: {
+                moderator: message.author.tag,
+            },
+        });
+
         const moderationMutes = await prisma.moderationMute.findMany({
             where: {
                 userId: message.author.id,
@@ -163,9 +169,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await fs.appendFile(
             file,
-            "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA\n----------\n\n"
+            "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n"
         );
         await fs.appendFile(file, JSON.stringify(moderationCases, null, 2));
+
+        await fs.appendFile(
+            file,
+            "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n"
+        );
+        await fs.appendFile(file, JSON.stringify(moderationCasesModerator, null, 2));
 
         await fs.appendFile(
             file,
