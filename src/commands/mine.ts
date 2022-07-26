@@ -110,6 +110,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     case "fortune":
                         multi += items[boosterId].boosterEffect.effect;
                         break;
+                    case "efficiency":
+                        times += items[boosterId].boosterEffect.effect;
+                        break;
                 }
             }
         }

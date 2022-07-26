@@ -683,6 +683,7 @@
         "rarity": 1000,
         "worth": 0,
         "stackable": false,
+        "role": "booster",
         "boosterEffect": {
             "boosts": "multi",
             "effect": 3,
@@ -693,14 +694,31 @@
         "id": "fortune",
         "name": "fortune enchantment",
         "emoji": "<a:nypsi_book:1001459250163359786>",
-        "description": "enchant your pickaxe with efficiency",
+        "description": "enchant your pickaxe with fortune",
         "rarity": 1,
         "worth": 75000,
+        "role": "booster",
         "stackable": true,
         "max": 3,
         "boosterEffect": {
             "boosts": "mine",
             "effect": 0.5,
+            "time": 3600
+        }
+    },
+    "efficiency": {
+        "id": "efficiency",
+        "name": "efficiency enchantment",
+        "emoji": "<a:nypsi_book:1001459250163359786>",
+        "description": "enchant your pickaxe with efficiency",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "booster",
+        "stackable": true,
+        "max": 4,
+        "boosterEffect": {
+            "boosts": "mine",
+            "effect": 1,
             "time": 3600
         }
     }
