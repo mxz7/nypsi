@@ -1,5 +1,6 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ActivityType, CommandInteraction, Message } from "discord.js";
 import { setCustomPresence } from "../utils/functions/presence";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("presence", "set custom a presence for nypsi", Categories.NONE);
@@ -10,15 +11,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 0) {
         setCustomPresence("");
     } else {
-        setCustomPresence(args.join(" "));
+        if (args[0].startsWith("https://www.youtube.com")) {
+            setCustomPresence(args.join(" "));
 
-        message.client.user.setPresence({
-            activities: [
-                {
-                    name: args.join(" "),
+            (message.client as NypsiClient).cluster.broadcastEval(
+                (c, { args }) => {
+                    const url = args.shift();
+                    c.user.setPresence({
+                        activities: [
+                            {
+                                type: ActivityType.Streaming,
+                                url: url,
+                                name: args.join(" "),
+                            },
+                        ],
+                    });
                 },
-            ],
-        });
+                { context: { args: args } }
+            );
+        } else {
+            setCustomPresence(args.join(" "));
+
+            (message.client as NypsiClient).cluster.broadcastEval(
+                (c, { args }) => {
+                    c.user.setPresence({
+                        activities: [
+                            {
+                                type: ActivityType.Playing,
+                                name: args.join(" "),
+                            },
+                        ],
+                    });
+                },
+                { context: { args: args } }
+            );
+        }
     }
 }
 
