@@ -15,6 +15,7 @@ import roleDelete from "../../events/roleDelete";
 import userUpdate from "../../events/userUpdate";
 import { doChatReactions } from "../chatreactions/utils";
 import { runCommandUseTimers } from "../commandhandler";
+import redis from "../database/redis";
 import { runEconomySetup } from "../economy/utils";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
@@ -62,7 +63,8 @@ export class NypsiClient extends Client {
 
         this.once("ready", ready.bind(null, this));
 
-        this.cluster.on("ready", () => {
+        this.cluster.on("ready", async () => {
+            await redis.del("nypsi:restarting");
             this.on("guildCreate", guildCreate.bind(null, this));
             this.on("guildDelete", guildDelete.bind(null, this));
             this.rest.on("rateLimited", (rate) => {
