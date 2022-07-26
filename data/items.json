@@ -740,7 +740,7 @@
         }
     },
     "xp_potion": {
-        "id": "multi_potion",
+        "id": "xp_potion",
         "name": "xp potion",
         "emoji": "<:nypsi_potion:1001463080582131843>",
         "description": "earn 50% more xp",
