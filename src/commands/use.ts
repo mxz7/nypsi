@@ -176,7 +176,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
                     });
                 }
-            } else {
+            }
+        } else {
+            if (boosters.get(selected.id)) {
                 return send({ embeds: [new ErrorEmbed(`**${selected.name}** cannot be stacked`)] });
             }
         }
