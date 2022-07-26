@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
-import { hasVoted, userExists, createUser, getPrestige, getMulti } from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { createUser, getMulti, getPrestige, hasVoted, userExists } from "../utils/economy/utils.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command(
@@ -21,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const multi = Math.floor((await getMulti(message.member)) * 100);
     let crateAmount = Math.floor(prestige / 2 + 1);
 
-    if (crateAmount > 5) crateAmount = 5;
+    if (crateAmount > 3) crateAmount = 3;
 
     const embed = new CustomEmbed(message.member, "https://top.gg/bot/678711738845102087/vote")
         .setURL("https://top.gg/bot/678711738845102087/vote")
