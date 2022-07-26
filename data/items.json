@@ -640,7 +640,7 @@
         "worth": 100000,
         "stackable": false,
         "boosterEffect": {
-            "boosts": "cooldown",
+            "boosts": ["cooldown"],
             "effect": 0.5,
             "time": 1500
         }
@@ -655,7 +655,7 @@
         "worth": 75000,
         "stackable": false,
         "boosterEffect": {
-            "boosts": "fish",
+            "boosts": ["fish"],
             "effect": 1,
             "time": 3600
         }
@@ -671,7 +671,7 @@
         "stackable": true,
         "max": 5,
         "boosterEffect": {
-            "boosts": "multi",
+            "boosts": ["multi"],
             "effect": 3,
             "time": 1800
         }
@@ -686,7 +686,7 @@
         "stackable": false,
         "role": "booster",
         "boosterEffect": {
-            "boosts": "multi",
+            "boosts": ["multi"],
             "effect": 3,
             "time": 43200
         }
@@ -702,7 +702,7 @@
         "stackable": true,
         "max": 3,
         "boosterEffect": {
-            "boosts": "mine",
+            "boosts": ["mine"],
             "effect": 0.5,
             "time": 3600
         }
@@ -734,7 +734,7 @@
         "stackable": true,
         "max": 4,
         "boosterEffect": {
-            "boosts": "mine",
+            "boosts": ["mine"],
             "effect": 1,
             "time": 3600
         }
@@ -750,7 +750,7 @@
         "stackable": true,
         "max": 5,
         "boosterEffect": {
-            "boosts": "xp",
+            "boosts": ["xp"],
             "effect": 0.5,
             "time": 1800
         }
@@ -766,9 +766,25 @@
         "stackable": true,
         "max": 5,
         "boosterEffect": {
-            "boosts": "xp",
+            "boosts": ["xp"],
             "effect": 1,
             "time": 21600
+        }
+    },
+    "lucky_7": {
+        "id": "lucky_7",
+        "name": "lucky 7",
+        "aliases": ["7"],
+        "emoji": "<:nypsi_7:1001553113368506538>",
+        "description": "improved chances for slots",
+        "rarity": 2,
+        "worth": 500000,
+        "role": "booster",
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["slots"],
+            "effect": "improves slots win chance to 60%",
+            "time": 450
         }
     }
 }
