@@ -63,15 +63,15 @@ if (!isMainThread) {
 
             const member = members.get(memberID);
 
-            if (!member) return;
-            if (member.user.bot) return;
-            if (member.user.id == collection.message.author.id) return;
+            if (!member) continue;
+            if (member.user.bot) continue;
+            if (member.user.id == collection.message.author.id) continue;
 
             try {
-                if (!channelMembers.has(memberID)) return;
+                if (!channelMembers.has(memberID)) continue;
             } catch {
                 channelMembers = channelMembers.cache;
-                if (!channelMembers.has(memberID)) return;
+                if (!channelMembers.has(memberID)) continue;
             }
 
             currentData.push({
@@ -87,10 +87,12 @@ if (!isMainThread) {
         if (a.length == 0) {
             if (currentData.length > 0) {
                 inserting = true;
-                await prisma.mention.createMany({
-                    data: currentData,
-                    skipDuplicates: true,
-                });
+                await prisma.mention
+                    .createMany({
+                        data: currentData,
+                        skipDuplicates: true,
+                    })
+                    .catch(() => {});
                 currentData = [];
                 inserting = false;
             }
@@ -99,5 +101,5 @@ if (!isMainThread) {
             parentPort.postMessage(0);
             process.exit(0);
         }
-    }, 25);
+    }, 35);
 }
