@@ -7,7 +7,7 @@ import redis from "../database/redis";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
-import { GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
+import { Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
@@ -15,6 +15,7 @@ import { createProfile, hasProfile } from "../users/utils";
 import workerSort from "../workers/sort";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
+import _ = require("lodash");
 
 let items: { [key: string]: Item };
 
@@ -168,6 +169,14 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
     if (guild) {
         multi += guild.level - 1;
+    }
+
+    const boosters = await getBoosters(id);
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts.includes("multi")) {
+            multi += items[boosterId].boosterEffect.effect;
+        }
     }
 
     multi = Math.floor(multi);
@@ -1019,10 +1028,11 @@ export async function toggleBan(id: string) {
         });
     }
 
-    await redis.del(id);
+    await redis.del(`cache:economy:banned:${id}`);
 }
 
 export async function reset() {
+    await prisma.booster.deleteMany();
     await prisma.economyStats.deleteMany();
     await prisma.economyGuildMember.deleteMany();
     await prisma.economyGuild.deleteMany();
@@ -1067,6 +1077,16 @@ export async function reset() {
         });
 
         updated++;
+
+        await redis.del(`cache:economy:exists:${user.userId}`);
+        await redis.del(`cache:economy:banned:${user.userId}`);
+        await redis.del(`cache:economy:prestige:${user.userId}`);
+        await redis.del(`cache:economy:exists:${user.userId}`);
+        await redis.del(`cache:economy:xp:${user.userId}`);
+        await redis.del(`cache:economy:balance:${user.userId}`);
+        await redis.del(`cache:economy:boosters:${user.userId}`);
+        await redis.del(`economy:handcuffed:${user.userId}`);
+        await redis.del(`cache:economy:guild:user:${user.userId}`);
     }
 
     return updated + deleted;
@@ -1321,12 +1341,50 @@ export async function deleteUser(member: GuildMember | string) {
         id = member;
     }
 
+    const guild = await getGuildByUser(member);
+
+    if (guild) {
+        if (guild.ownerId == id) {
+            await prisma.economyGuildMember.deleteMany({
+                where: { guildName: guild.guildName },
+            });
+
+            await prisma.economyGuild.delete({
+                where: {
+                    guildName: guild.guildName,
+                },
+            });
+        } else {
+            await prisma.economyGuildMember.delete({
+                where: {
+                    userId: id,
+                },
+            });
+        }
+    }
+
+    await prisma.booster.deleteMany({
+        where: { userId: id },
+    });
+    await prisma.economyStats.deleteMany({
+        where: {
+            economyUserId: id,
+        },
+    });
     await prisma.economy.delete({
         where: {
             userId: id,
         },
     });
+
     await redis.del(`cache:economy:exists:${id}`);
+    await redis.del(`cache:economy:banned:${id}`);
+    await redis.del(`cache:economy:prestige:${id}`);
+    await redis.del(`cache:economy:exists:${id}`);
+    await redis.del(`cache:economy:xp:${id}`);
+    await redis.del(`cache:economy:balance:${id}`);
+    await redis.del(`cache:economy:boosters:${id}`);
+    await redis.del(`cache:economy:guild:user:${id}`);
 }
 
 export async function getTickets(member: GuildMember | string): Promise<LotteryTicket[]> {
@@ -1556,7 +1614,19 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     if (earned > max) earned = max;
 
-    return earned;
+    const boosters = await getBoosters(member);
+
+    let boosterEffect = 0;
+
+    for (const boosterId of boosters.keys()) {
+        if (items[boosterId].boosterEffect.boosts.includes("xp")) {
+            boosterEffect += items[boosterId].boosterEffect.effect;
+        }
+    }
+
+    earned += boosterEffect * earned;
+
+    return Math.floor(earned);
 }
 
 export async function getGuildByName(name: string) {
@@ -1947,4 +2017,111 @@ export async function isHandcuffed(id: string): Promise<boolean> {
 export async function addHandcuffs(id: string) {
     await redis.set(`economy:handcuffed:${id}`, Date.now());
     await redis.expire(`economy:handcuffed:${id}`, 60);
+}
+
+export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const cache = await redis.get(`cache:economy:boosters:${id}`);
+
+    if (cache) {
+        if (_.isEmpty(JSON.parse(cache))) return new Map();
+
+        const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
+
+        for (const key of map.keys()) {
+            const boosters = map.get(key);
+
+            for (const booster of boosters) {
+                if (booster.expire <= Date.now()) {
+                    await prisma.booster.delete({
+                        where: {
+                            id: booster.id,
+                        },
+                    });
+
+                    await redis.del(`cache:economy:boosters:${id}`);
+
+                    boosters.splice(boosters.indexOf(booster), 1);
+                    map.set(key, boosters);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    const query = await prisma.booster.findMany({
+        where: {
+            userId: id,
+        },
+        select: {
+            boosterId: true,
+            expire: true,
+            id: true,
+        },
+    });
+
+    const map = new Map<string, Booster[]>();
+
+    for (const booster of query) {
+        if (booster.expire.getTime() <= Date.now()) {
+            await prisma.booster.delete({
+                where: {
+                    id: booster.id,
+                },
+            });
+
+            continue;
+        }
+
+        if (map.has(booster.boosterId)) {
+            const c = map.get(booster.boosterId);
+
+            c.push({
+                boosterId: booster.boosterId,
+                expire: booster.expire.getTime(),
+                id: booster.id,
+            });
+
+            map.set(booster.boosterId, c);
+        } else {
+            map.set(booster.boosterId, [
+                {
+                    boosterId: booster.boosterId,
+                    expire: booster.expire.getTime(),
+                    id: booster.id,
+                },
+            ]);
+        }
+    }
+
+    // await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
+    // await redis.expire(`cache:economy:boosters:${id}`, 300);
+
+    return map;
+}
+
+export async function addBooster(member: GuildMember | string, boosterId: string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    await prisma.booster.create({
+        data: {
+            boosterId: boosterId,
+            expire: new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
+            userId: id,
+        },
+    });
+
+    await redis.del(`cache:economy:boosters:${id}`);
 }

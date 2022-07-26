@@ -1,30 +1,31 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
-    getXp,
-    getPrestigeRequirement,
+    addBooster,
+    calcMaxBet,
+    createUser,
     getBankBalance,
+    getInventory,
+    getMulti,
+    getPrestige,
+    getPrestigeRequirement,
     getPrestigeRequirementBal,
+    getXp,
+    setInventory,
+    setPrestige,
     updateBankBalance,
     updateXp,
-    getPrestige,
-    setPrestige,
     userExists,
-    createUser,
-    getMulti,
-    calcMaxBet,
-    getInventory,
-    setInventory,
 } from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
@@ -142,6 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         await setInventory(message.member, inventory);
+        await addBooster(message.member, "prestige_booster");
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
@@ -154,7 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ((await getPrestige(message.member)) + 1)
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
-                `you have also received **${amount}** basic crate${amount > 1 ? "s" : ""}`
+                `you have received **${amount}** basic crate${amount > 1 ? "s" : ""} and a **double xp** booster for 6 hours`
         );
 
         await msg.edit({ embeds: [embed], components: [] });

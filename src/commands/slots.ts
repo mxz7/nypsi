@@ -1,19 +1,4 @@
 import {
-    getBalance,
-    createUser,
-    updateBalance,
-    userExists,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-} from "../utils/economy/utils.js";
-import {
     CommandInteraction,
     InteractionReplyOptions,
     InteractionResponse,
@@ -21,12 +6,28 @@ import {
     MessageEditOptions,
     MessageOptions,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getBoosters,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble } from "../utils/logger.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const multipliers = {
     "🍒": 5,
@@ -161,51 +162,112 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const two = reel2[Math.floor(Math.random() * reel2.length)];
     let three = reel3[Math.floor(Math.random() * reel3.length)];
 
-    /**
-     * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
-     */
+    const boosters = await getBoosters(message.member);
 
-    if (one != two && two != three && one != three) {
-        const chance = Math.floor(Math.random() * 41);
-        const chanceScore = 4;
-        const chanceScore2 = 8;
+    let increasedLuck = false;
 
-        if (chance < chanceScore) {
-            one = two;
-        } else if (chance < chanceScore2) {
-            three = two;
+    for (const booster of boosters.keys()) {
+        if (boosters.get(booster)[0].boosterId == "lucky_7") {
+            increasedLuck = true;
+            break;
         }
     }
 
-    if (two == three && one != two) {
-        const chance = Math.floor(Math.random() * 12);
-        const chanceScore = 7;
+    if (increasedLuck) {
+        /**
+         * the shit below results in an approximate 60% win rate overtime, resulting in an overall very high gain, without counting multiplier
+         */
 
-        if (chance < chanceScore) {
-            one = two;
+        if (one != two && two != three && one != three) {
+            const chance = Math.floor(Math.random() * 6);
+            const chanceScore = 4;
+            const chanceScore2 = 3;
+
+            if (chance < chanceScore) {
+                one = two;
+            } else if (chance < chanceScore2) {
+                three = two;
+            }
         }
-    }
 
-    if (one == two && one != three) {
-        const chance = Math.floor(Math.random() * 12);
-        const chanceScore = 6;
+        if (two == three && one != two) {
+            const chance = Math.floor(Math.random() * 12);
+            const chanceScore = 7;
 
-        if (chance < chanceScore) {
-            three = two;
+            if (chance < chanceScore) {
+                one = two;
+            }
         }
-    }
 
-    if (one == two && one == three && one != "🍒" && one != "🍋") {
-        const chance = Math.floor(Math.random() * 10);
+        if (one == two && one != three) {
+            const chance = Math.floor(Math.random() * 12);
+            const chanceScore = 6;
 
-        if (chance < 4) {
-            one == "🍋";
-            two == "🍋";
-            three == "🍋";
-        } else if (chance < 2) {
-            one == "🍒";
-            two == "🍒";
-            three == "🍒";
+            if (chance < chanceScore) {
+                three = two;
+            }
+        }
+
+        if (one == two && one == three && one != "🍒" && one != "🍋") {
+            const chance = Math.floor(Math.random() * 10);
+
+            if (chance < 4) {
+                one == "🍋";
+                two == "🍋";
+                three == "🍋";
+            } else if (chance < 2) {
+                one == "🍒";
+                two == "🍒";
+                three == "🍒";
+            }
+        }
+    } else {
+        /**
+         * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
+         */
+
+        if (one != two && two != three && one != three) {
+            const chance = Math.floor(Math.random() * 41);
+            const chanceScore = 4;
+            const chanceScore2 = 8;
+
+            if (chance < chanceScore) {
+                one = two;
+            } else if (chance < chanceScore2) {
+                three = two;
+            }
+        }
+
+        if (two == three && one != two) {
+            const chance = Math.floor(Math.random() * 12);
+            const chanceScore = 7;
+
+            if (chance < chanceScore) {
+                one = two;
+            }
+        }
+
+        if (one == two && one != three) {
+            const chance = Math.floor(Math.random() * 12);
+            const chanceScore = 6;
+
+            if (chance < chanceScore) {
+                three = two;
+            }
+        }
+
+        if (one == two && one == three && one != "🍒" && one != "🍋") {
+            const chance = Math.floor(Math.random() * 10);
+
+            if (chance < 4) {
+                one == "🍋";
+                two == "🍋";
+                three == "🍋";
+            } else if (chance < 2) {
+                one == "🍒";
+                two == "🍒";
+                three == "🍒";
+            }
         }
     }
 
