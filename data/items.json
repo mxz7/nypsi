@@ -656,6 +656,7 @@
         "stackable": false,
         "boosterEffect": {
             "boosts": "fish",
+            "effect": 1,
             "time": 3600
         }
     },
