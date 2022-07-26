@@ -4,7 +4,6 @@ import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
 import {
-    addBooster,
     addTicket,
     getBalance,
     getDMsEnabled,
@@ -73,8 +72,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
             lastVote: new Date(now),
         },
     });
-
-    await addBooster(user, "vote_booster");
 
     redis.set(`cache:vote:${user}`, "true");
     redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
