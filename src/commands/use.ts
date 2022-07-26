@@ -9,9 +9,11 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
 import {
+    addBooster,
     addHandcuffs,
     addItemUse,
     createUser,
+    getBoosters,
     getDMsEnabled,
     getInventory,
     getItems,
@@ -27,7 +29,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open"]);
+const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -68,6 +70,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
+    const edit = async (data: MessageEditOptions, msg: Message) => {
+        if (!(message instanceof Message)) {
+            await message.editReply(data);
+            return await message.fetchReply();
+        } else {
+            return await msg.edit(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -105,6 +116,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (aliases.indexOf(searchTag) != -1) {
             selected = itemName;
             break;
+        } else if (searchTag == items[itemName].name) {
+            selected = itemName;
+            break;
         }
     }
 
@@ -124,7 +138,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate") {
+    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate" && selected.role != "booster") {
         return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
     }
 
@@ -132,6 +146,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "crate") {
         cooldownLength = 5;
+    } else if (selected.role == "booster") {
+        cooldownLength = 10;
     }
 
     await addCooldown(cmd.name, message.member, cooldownLength);
@@ -150,6 +166,74 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}mine`)] });
     } else if (selected.id.includes("furnace")) {
         return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}smelt`)] });
+    }
+
+    if (selected.role == "booster") {
+        let boosters = await getBoosters(message.member);
+
+        if (selected.stackable) {
+            if (boosters.has(selected.id)) {
+                if (boosters.get(selected.id).length >= selected.max) {
+                    return send({
+                        embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
+                    });
+                }
+            }
+        } else {
+            if (boosters.has(selected.id)) {
+                return send({ embeds: [new ErrorEmbed(`**${selected.name}** cannot be stacked`)] });
+            }
+        }
+
+        inventory[selected.id]--;
+
+        if (inventory[selected.id] <= 0) {
+            delete inventory[selected.id];
+        }
+
+        await setInventory(message.member, inventory);
+        await addItemUse(message.member, selected.id);
+        await addBooster(message.member, selected.id);
+
+        boosters = await getBoosters(message.member);
+
+        const embed = new CustomEmbed(message.member).setHeader("boosters", message.author.avatarURL());
+
+        const currentBoosters: string[] = [];
+
+        for (const boosterId of boosters.keys()) {
+            if (boosters.get(boosterId).length == 1) {
+                currentBoosters.push(
+                    `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
+                        boosters.get(boosterId)[0].expire / 1000
+                    )}:R>`
+                );
+            } else {
+                let lowest = boosters.get(boosterId)[0].expire;
+
+                for (const booster of boosters.get(boosterId)) {
+                    if (booster.expire < lowest) lowest = booster.expire;
+                }
+
+                currentBoosters.push(
+                    `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
+                        boosters.get(boosterId).length
+                    }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
+                );
+            }
+        }
+
+        embed.setDescription(`activating **${selected.name}** booster...`);
+
+        const msg = await send({ embeds: [embed] });
+
+        embed.setDescription(`you have activated **${selected.name}**`);
+        embed.addField("current boosters", currentBoosters.join("\n"));
+
+        setTimeout(() => {
+            return edit({ embeds: [embed] }, msg);
+        }, 1000);
+        return;
     }
 
     const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
@@ -466,15 +550,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const msg = await send({ embeds: [embed] });
 
     if (!laterDescription) return;
-
-    const edit = async (data: MessageEditOptions, msg: Message) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await msg.edit(data);
-        }
-    };
 
     setTimeout(() => {
         embed.setDescription(laterDescription);

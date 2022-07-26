@@ -40,7 +40,17 @@ model Economy {
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
 
+  Boosters     Booster[]
   EconomyStats EconomyStats[]
+}
+
+model Booster {
+  id        String   @id @default(uuid())
+  userId    String
+  boosterId String
+  expire    DateTime
+
+  Economy Economy @relation(fields: [userId], references: [userId])
 }
 
 model EconomyStats {
