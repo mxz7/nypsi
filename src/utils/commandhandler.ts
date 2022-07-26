@@ -854,7 +854,7 @@ export function runCommandUseTimers(client: NypsiClient) {
                     }) performed **${uses}** commands in an hour`
                 );
 
-                if (uses > 125) {
+                if (uses > 150) {
                     toggleLock(user);
                     logger.info(`${tag} (${typeof user === "string" ? `${user}` : "invalid id"}) has been given a captcha`);
                     await hook.send(
