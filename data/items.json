@@ -754,5 +754,21 @@
             "effect": 0.5,
             "time": 3600
         }
+    },
+    "prestige_booster": {
+        "id": "prestige_booster",
+        "name": "prestige bonus",
+        "emoji": "✨",
+        "description": "double xp",
+        "rarity": 69,
+        "worth": 0,
+        "role": "booster",
+        "stackable": true,
+        "max": 5,
+        "boosterEffect": {
+            "boosts": "xp",
+            "effect": 1,
+            "time": 21600
+        }
     }
 }
