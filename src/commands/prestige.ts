@@ -13,6 +13,7 @@ import {
     calcMaxBet,
     createUser,
     getBankBalance,
+    getBoosters,
     getInventory,
     getMulti,
     getPrestige,
@@ -143,7 +144,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         await setInventory(message.member, inventory);
-        await addBooster(message.member, "prestige_booster");
+
+        const boosters = await getBoosters(message.member);
+
+        if (!boosters.get("prestige_booster")) await addBooster(message.member, "prestige_booster");
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
