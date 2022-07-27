@@ -4,6 +4,8 @@ import redis from "../utils/database/redis";
 import {
     addItemUse,
     addRob,
+    addToGuildXP,
+    calcEarnedXp,
     createUser,
     getBalance,
     getDMsEnabled,
@@ -11,7 +13,6 @@ import {
     getInventory,
     getXp,
     hasPadlock,
-    hasVoted,
     isEcoBanned,
     setInventory,
     setPadlock,
@@ -21,6 +22,7 @@ import {
 } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -220,11 +222,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed2.setColor("#5efb8f");
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
-            const voted = await hasVoted(message.member);
+            const earnedXp = await calcEarnedXp(message.member, 6942069);
 
-            if (voted) {
-                await updateXp(message.member, (await getXp(message.member)) + 1);
-                embed2.setFooter({ text: "+1xp" });
+            if (earnedXp > 0) {
+                await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+                embed2.setFooter({ text: `+${earnedXp}xp` });
+
+                const guild = await getGuildByUser(message.member);
+
+                if (guild) {
+                    await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
+                }
             }
 
             embed3.setTitle("you have been robbed");
