@@ -8,7 +8,6 @@ import {
     getBalance,
     getDMsEnabled,
     getInventory,
-    getMulti,
     getPrestige,
     getTickets,
     setInventory,
@@ -81,7 +80,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     if (prestige > 15) prestige = 15;
 
     const amount = 15000 * (prestige + 1);
-    const multi = Math.floor((await getMulti(user)) * 100);
     const inventory = await getInventory(user);
 
     await updateBalance(user, (await getBalance(user)) + amount);
@@ -118,7 +116,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
                     "+ **10** karma\n" +
-                    `+ **3**% multiplier, total: **${multi}**%\n` +
+                    "+ **3**% multiplier\n" +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
