@@ -61,7 +61,7 @@ const reel2 = [
 ];
 const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒", "🍒"];
 
-const cmd = new Command("slots", "play slots", Categories.MONEY);
+const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["bet", "slot"]);
 
 cmd.slashEnabled = true;
 
