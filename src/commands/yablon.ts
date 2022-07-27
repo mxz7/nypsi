@@ -439,7 +439,6 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         } else {
             newEmbed.setDescription(
                 "**bet** $" +
-                    bet.toLocaleString() +
                     Math.round(bet).toLocaleString() +
                     "\n\n**winner!!**\n**you win** $" +
                     winnings.toLocaleString()
