@@ -10,7 +10,6 @@ export class CustomEmbed extends EmbedBuilder {
         super();
 
         if (member) {
-            checkPremium(member.user.id);
             const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
 
             if (color && color != "none") {
@@ -20,6 +19,7 @@ export class CustomEmbed extends EmbedBuilder {
                     super.setColor(color);
                 }
             } else {
+                checkPremium(member.user.id);
                 super.setColor(getColor(member));
             }
         }
@@ -217,11 +217,11 @@ async function checkPremium(id: string) {
         embedColorCache.set(id, embedColor);
         setTimeout(() => {
             embedColorCache.delete(id);
-        }, 300 * 1000);
+        }, 900 * 1000);
     } else {
         embedColorCache.set(id, "none");
         setTimeout(() => {
             embedColorCache.delete(id);
-        }, 300 * 1000);
+        }, 900 * 1000);
     }
 }
