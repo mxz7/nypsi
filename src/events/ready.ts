@@ -2,8 +2,8 @@ import { Client } from "discord.js";
 import { getCustomPresence, randomPresence } from "../utils/functions/presence";
 
 export default function ready(client: Client) {
-    setTimeout(() => {
-        if (getCustomPresence()) return;
+    setTimeout(async () => {
+        if (await getCustomPresence()) return;
         const presence = randomPresence();
 
         client.user.setPresence({
@@ -16,8 +16,8 @@ export default function ready(client: Client) {
         });
     }, 15000);
 
-    setInterval(() => {
-        if (getCustomPresence()) return;
+    setInterval(async () => {
+        if (await getCustomPresence()) return;
         const presence = randomPresence();
 
         client.user.setPresence({

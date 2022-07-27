@@ -1,21 +1,6 @@
-import { Client } from "discord.js";
 import { getRandomCommand } from "../commandhandler";
+import redis from "../database/redis";
 import { daysUntilChristmas } from "./date";
-
-let current = "";
-
-export function updatePresence(presence = "", client: Client) {
-    current = presence;
-
-    client.user.setPresence({
-        status: "dnd",
-        activities: [
-            {
-                name: current,
-            },
-        ],
-    });
-}
 
 export function randomPresence(): string {
     const possibilities = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "x0x", "xmas"];
@@ -37,14 +22,10 @@ export function randomPresence(): string {
     return game;
 }
 
-export function getCustomPresence(): null | string {
-    if (current === "") {
-        return null;
-    } else {
-        return current;
-    }
+export async function getCustomPresence() {
+    return await redis.get("nypsi:presence");
 }
 
-export function setCustomPresence(text?: string) {
-    current = text;
+export async function setCustomPresence(text?: string) {
+    await redis.set("nypsi:presence", text);
 }
