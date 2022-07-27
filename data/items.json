@@ -753,7 +753,7 @@
         "boosterEffect": {
             "boosts": ["xp"],
             "effect": 1,
-            "time": 21600
+            "time": 10800
         }
     },
     "lucky_7": {
