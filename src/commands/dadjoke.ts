@@ -54,8 +54,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const chosen = cached[Math.floor(Math.random() * cached.length)].data;
 
-    embed.setHeader(`/u${chosen.author}`);
+    embed.setHeader(`u/${chosen.author}`);
     embed.setTitle(chosen.title);
+    embed.setURL(chosen.url);
     embed.setDescription(chosen.selftext);
 
     return send({ embeds: [embed] }).catch(() => {
