@@ -347,12 +347,12 @@ async function helpCmd(message: Message, args: string[]) {
                             selectedItem.boosterEffect.effect
                         }\n**time** ${MStoTime(
                             selectedItem.boosterEffect.time * 1000
-                        )}\n\nyou can activate your booster with ${prefix}**activate <booster>**`
+                        )}\nyou can activate your booster with ${prefix}**activate <booster>**`
                     );
                 } else if (selectedItem.role == "car") {
                     embed.addField(
                         "car info",
-                        `**speed** ${selectedItem.speed}\n\ncars are used for street races (${prefix}**streetrace**)`
+                        `**speed** ${selectedItem.speed}\ncars are used for street races (${prefix}**streetrace**)`
                     );
                 } else if (selectedItem.role == "collectable") {
                     embed.addField(

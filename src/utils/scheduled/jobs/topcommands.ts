@@ -40,7 +40,7 @@ import redis from "../../database/redis";
             pos = "🥉";
         }
 
-        msg.push(`${pos} \`$${cmd}\` used **${topCommands[cmd]}** times`);
+        msg.push(`${pos} \`$${cmd}\` used **${parseInt(topCommands[cmd]).toLocaleString()}** times`);
         count++;
     }
 
