@@ -1,7 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("addemoji", "add an emoji from a different server to your server", Categories.UTILITY)
@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0 && message instanceof Message && !message.attachments.first()) {
         return send({
-            embeds: [new ErrorEmbed(`${prefix}addemoji <emoji>`).setTitle("`❌` usage")],
+            embeds: [new ErrorEmbed(`${prefix}addemoji <emoji>`)],
         });
     }
 
