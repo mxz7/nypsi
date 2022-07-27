@@ -63,6 +63,12 @@ export class NypsiClient extends Client {
 
         this.once("ready", ready.bind(null, this));
 
+        this.cluster.on("message", (message) => {
+            if (message._sRequest) {
+                if (message.alive) message.reply({ alive: true });
+            }
+        });
+
         this.cluster.on("ready", async () => {
             await redis.del("nypsi:restarting");
             this.on("guildCreate", guildCreate.bind(null, this));
