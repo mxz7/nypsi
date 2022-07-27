@@ -1,5 +1,6 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
+import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import startJobs from "./utils/scheduled/scheduler";
@@ -23,13 +24,6 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     shardsPerClusters: 3, // force clusters
 });
 
-manager.extend(
-    new Cluster.HeartbeatManager({
-        interval: 5000,
-        maxMissedHeartbeats: 5,
-    })
-);
-
 manager.extend(new Cluster.ReClusterManager());
 
 manager.on("clusterCreate", (cluster) => {
@@ -52,6 +46,15 @@ manager.on("clusterCreate", (cluster) => {
         }
     });
     logger.info(`launched cluster ${cluster.id}`);
+
+    setInterval(async () => {
+        const heartbeat = await sendHeartbeat(cluster).catch(() => {});
+
+        if (!heartbeat) {
+            logger.warn(`cluster ${cluster.id} missed heartbeat`);
+            addFailedHeatbeat(cluster);
+        }
+    }, 7000);
 });
 
 manager.on("debug", (m) => {
