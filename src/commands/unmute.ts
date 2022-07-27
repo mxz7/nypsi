@@ -96,11 +96,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let mode = "role";
 
     if (!muteRole) {
-        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
     }
 
-    if (!muteRole) {
-        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
+    if (!muteRole && mode == "role") {
+        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole && mode == "role") {
