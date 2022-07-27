@@ -1,20 +1,20 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
+    addTicket,
+    createUser,
+    getBalance,
+    getPrestige,
     getTickets,
     lotteryTicketPrice,
-    userExists,
-    createUser,
-    getPrestige,
-    getBalance,
     updateBalance,
-    addTicket,
+    userExists,
 } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
 import { getKarma } from "../utils/karma/utils";
-import { isPremium, getTier } from "../utils/premium/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
 
@@ -93,10 +93,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         let amount = 1;
-
-        if (args.length == 1) {
-            return send({ embeds: [new CustomEmbed(message.member, "😐")] });
-        }
 
         if (parseInt(args[1])) {
             amount = parseInt(args[1]);
