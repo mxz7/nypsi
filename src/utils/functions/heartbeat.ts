@@ -14,15 +14,15 @@ export async function sendHeartbeat(cluster: Cluster) {
         });
         setTimeout(() => {
             reject("no response from cluster");
-        }, 2500);
+        }, 5000);
     });
 }
 
-export function addFailedHeatbeat(cluster: Cluster) {
+export async function addFailedHeatbeat(cluster: Cluster) {
     if (failedHeartbeats.has(cluster.id)) {
         if (failedHeartbeats.get(cluster.id) >= 5) {
             logger.info(`respawning cluster ${cluster.id} due to missing heart beats`);
-            cluster.respawn();
+            await cluster.respawn();
             failedHeartbeats.delete(cluster.id);
         } else {
             failedHeartbeats.set(cluster.id, failedHeartbeats.get(cluster.id) + 1);
