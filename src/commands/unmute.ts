@@ -136,6 +136,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         });
                     });
             } else {
+                if (message.mentions.members.size == 1) {
+                    return send({
+                        embeds: [new ErrorEmbed(`**${m.user.tag}** does not have the muted role (${muteRole.toString()})`)],
+                    });
+                }
                 failed.push(m.user);
             }
             if (fail) break;
