@@ -1796,7 +1796,7 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
 
     const guild = await getGuildByName(name);
 
-    const baseMoney = 1900000 * Math.pow(guild.level, 2);
+    const baseMoney = 5000000 * Math.pow(guild.level, 2);
     const baseXP = 1425 * Math.pow(guild.level, 2);
 
     const bonusMoney = 100000 * guild.members.length;
