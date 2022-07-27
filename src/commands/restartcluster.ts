@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         startRestart();
 
-        setCustomPresence("rebooting..");
+        await setCustomPresence("rebooting..");
 
         message.client.user.setPresence({
             activities: [
