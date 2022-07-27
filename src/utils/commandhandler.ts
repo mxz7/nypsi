@@ -18,7 +18,7 @@ import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
-import { addKarma, getKarma, updateLastCommand } from "./karma/utils";
+import { addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
 import { getTimestamp, logger } from "./logger";
 import { Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
@@ -29,6 +29,7 @@ import redis from "./database/redis";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
+import dayjs = require("dayjs");
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
@@ -929,23 +930,31 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            const user = client.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag)?.id;
-
             if (uses > 100) {
+                const res = await client.cluster.broadcastEval((c) => {
+                    const user = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
+
+                    if (user) {
+                        return user.id;
+                    }
+                });
+
+                const id = res.find((x) => typeof x === "string");
+
                 await hook.send(
                     `[${getTimestamp()}] **${tag}** (${
-                        typeof user === "string" ? `${user}` : "invalid id"
+                        typeof id === "string" ? `${id}` : "invalid id"
                     }) performed **${uses}** commands in an hour`
                 );
 
-                if (uses > 150) {
-                    toggleLock(user);
-                    logger.info(`${tag} (${typeof user === "string" ? `${user}` : "invalid id"}) has been given a captcha`);
-                    await hook.send(
-                        `[${getTimestamp()}] **${tag}** (${
-                            typeof user === "string" ? `${user}` : "invalid id"
-                        }) has been given a captcha`
-                    );
+                if (uses > 150 && typeof id === "string") {
+                    const lastCommand = await getLastCommand(id);
+
+                    if (dayjs().subtract(5, "minutes").unix() > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
+
+                    toggleLock(id);
+                    logger.info(`${tag} (${id}) has been given a captcha`);
+                    await hook.send(`[${getTimestamp()}] **${tag}** (${id}) has been given a captcha`);
                 }
             }
         }
