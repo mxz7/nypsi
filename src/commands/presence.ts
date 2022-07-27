@@ -9,10 +9,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message.author.id != "672793821850894347") return;
 
     if (args.length == 0) {
-        setCustomPresence("");
+        await setCustomPresence("");
     } else {
         if (args[0].startsWith("https://www.youtube.com")) {
-            setCustomPresence(args.join(" "));
+            await setCustomPresence(args.join(" "));
 
             (message.client as NypsiClient).cluster.broadcastEval(
                 (c, { args }) => {
@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 { context: { args: args } }
             );
         } else {
-            setCustomPresence(args.join(" "));
+            await setCustomPresence(args.join(" "));
 
             (message.client as NypsiClient).cluster.broadcastEval(
                 (c, { args }) => {

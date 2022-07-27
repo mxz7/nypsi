@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await redis.set("nypsi:restarting", "t");
 
-        setCustomPresence("rebooting..");
+        await setCustomPresence("rebooting..");
 
         const client = message.client as NypsiClient;
 
