@@ -766,7 +766,7 @@ export async function runCommand(
             const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
             const diff = Math.round((curr - init) / 1000);
-            const time = 120 - diff;
+            const time = 60 - diff;
 
             const minutes = Math.floor(time / 60);
             const seconds = time - minutes * 60;
