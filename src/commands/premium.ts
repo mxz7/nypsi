@@ -46,7 +46,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (profile.level < 4) {
-                description += "\n\nyou can upgrade your tier at https://www.patreon.com/nypsi";
+                description +=
+                    "\n\nyou can upgrade your tier at [patreon](https://www.patreon.com/nypsi) or [ko-fi](https://ko-fi.com/tekoh/tiers)";
             }
 
             embed.setDescription(description);
