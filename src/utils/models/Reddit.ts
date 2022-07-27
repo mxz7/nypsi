@@ -15,5 +15,6 @@ export interface RedditJSONPost {
         author: string;
         subreddit_name_prefixed: string;
         over_18: boolean;
+        selftext: string;
     };
 }
