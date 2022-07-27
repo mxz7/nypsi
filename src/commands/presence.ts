@@ -1,4 +1,4 @@
-import { ActivityType, CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import { setCustomPresence } from "../utils/functions/presence";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -20,7 +20,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     c.user.setPresence({
                         activities: [
                             {
-                                type: ActivityType.Streaming,
+                                type: 1,
                                 url: url,
                                 name: args.join(" "),
                             },
@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     c.user.setPresence({
                         activities: [
                             {
-                                type: ActivityType.Playing,
+                                type: 0,
                                 name: args.join(" "),
                             },
                         ],
