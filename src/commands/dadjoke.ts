@@ -11,6 +11,8 @@ const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dad
     "dj",
 ]);
 
+cmd.slashEnabled = true;
+
 const url = "https://www.reddit.com/r/dadjokes/top.json?limit=69&t=week";
 
 let cached: RedditJSONPost[] = [];
