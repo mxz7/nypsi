@@ -96,8 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let mode = "role";
 
     if (!muteRole) {
-        const roles = await message.guild.roles.fetch();
-        muteRole = roles.find((r) => r.name.toLowerCase() == "muted");
+        muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) {
