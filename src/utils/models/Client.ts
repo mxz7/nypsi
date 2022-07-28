@@ -93,7 +93,7 @@ export class NypsiClient extends Client {
 
             setTimeout(() => {
                 this.runIntervals();
-            }, 5000);
+            }, 30000);
         });
     }
 
