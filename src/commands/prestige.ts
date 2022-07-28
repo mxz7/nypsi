@@ -147,7 +147,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const boosters = await getBoosters(message.member);
 
-        if (!boosters.get("prestige_booster")) await addBooster(message.member, "prestige_booster");
+        let booster = false;
+
+        if (!boosters.get("prestige_booster")) {
+            await addBooster(message.member, "prestige_booster");
+            booster = true;
+        }
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
@@ -160,7 +165,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     ((await getPrestige(message.member)) + 1)
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
-                `you have received **${amount}** basic crate${amount > 1 ? "s" : ""} and a **double xp** booster for 6 hours`
+                `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
+                    booster ? "and a **double xp** booster for 3 hours" : ""
+                }`
         );
 
         await msg.edit({ embeds: [embed], components: [] });
