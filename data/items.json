@@ -52,7 +52,8 @@
         "description": "product of smelting iron ore",
         "worth": 25000,
         "role": "sellable",
-        "rarity": 69
+        "rarity": 69,
+        "aliases": ["iron"]
     },
     "gold_ingot": {
         "id": "gold_ingot",
@@ -61,7 +62,8 @@
         "description": "product of smelting gold ore",
         "worth": 45000,
         "role": "sellable",
-        "rarity": 69
+        "rarity": 69,
+        "aliases": ["gold"]
     },
     "diamond": {
         "id": "diamond",
