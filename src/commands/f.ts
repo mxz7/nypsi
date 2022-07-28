@@ -37,8 +37,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);
 
+    const customId = `${content}-${new Date().getTime()}`;
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId("boobies")
+        new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId(customId)
     );
 
     await message.channel.send({ embeds: [embed], components: [row] });
@@ -48,21 +49,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const collector = message.channel.createMessageComponentCollector({ time: 60000 });
 
     collector.on("collect", async (i): Promise<any> => {
-        if (reactions.includes(i.user.id) || i.deferred) {
+        if (i.customId == customId) {
             await i.deferUpdate();
-
-            if (reactions.includes(i.user.id)) {
-                return await i
-                    .followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
-                    .catch(() => {});
+            if (reactions.includes(i.user.id) || i.deferred) {
+                if (reactions.includes(i.user.id)) {
+                    return await i
+                        .followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
+                        .catch(() => {});
+                }
             }
+
+            reactions.push(i.user.id);
+
+            return await message.channel.send({
+                embeds: [new CustomEmbed(message.member, `${i.user.toString()} has paid respects to **${args.join(" ")}**`)],
+            });
         }
-
-        reactions.push(i.user.id);
-
-        return await message.channel.send({
-            embeds: [new CustomEmbed(message.member, `${i.user.toString()} has paid respects to **${args.join(" ")}**`)],
-        });
     });
 
     collector.on("end", async () => {
