@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             itemsUsed += stats.items[item];
         }
 
-        const commandUses = parseInt(await redis.hget("nypsi:topcommands:users", message.author.tag));
+        const commandUses = parseInt(await redis.hget("nypsi:topcommands:user", message.author.tag));
 
         const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
 
