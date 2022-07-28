@@ -546,6 +546,14 @@ export async function runCommand(
                 "if this error still shows, check channel specific permissions",
         });
     }
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)) {
+        return message.channel.send({
+            content:
+                "❌ i don't have the `use external emojis` permission, this is a required permission for nypsi to work\n\n" +
+                "to fix this go to: server settings -> roles -> find my role and enable `use external emojis`\n" +
+                "if this error still shows, check channel specific permissions",
+        });
+    }
 
     if (cmd == "help" && message instanceof Message) {
         return helpCmd(message, args);
