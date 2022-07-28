@@ -14,8 +14,8 @@ export function setClusterId(id: number | string) {
 }
 
 const format = winston.format.printf(({ level, message, timestamp }) => {
-    let color = chalk.white;
-    let prefix = `${chalk.bold.green("INFO")}`;
+    let color = chalk.reset;
+    let prefix = `${chalk.green("[info]")}`;
 
     switch (level) {
         case "guild":
@@ -28,25 +28,24 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             color = chalk.cyan;
             break;
         case "success":
-        case "img":
             color = chalk.green;
             break;
         case "error":
             color = chalk.red;
-            prefix = `${chalk.bold.redBright("ERROR")}`;
+            prefix = `${chalk.bold.redBright("[error]")}`;
             break;
         case "warn":
             color = chalk.yellowBright;
-            prefix = `${chalk.bold.yellowBright("WARN")}`;
+            prefix = `${chalk.bold.yellowBright("[warn]")}`;
             break;
         case "debug":
-            prefix = `${chalk.bold.gray("DEBUG")}`;
+            prefix = `${chalk.gray("[debug]")}`;
             break;
     }
 
-    return `${prefix} [${chalk.blackBright(timestamp)}${
-        typeof clusterId != "undefined" ? ` ${chalk.blackBright(clusterId)}` : ""
-    }] ${color(message)}`;
+    return `[${chalk.blackBright(timestamp)}] [${
+        typeof clusterId != "undefined" ? `${chalk.blackBright(clusterId)}` : ""
+    }] ${prefix} ${color(message)}`;
 });
 
 const levels = {
