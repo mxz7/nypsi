@@ -102,7 +102,6 @@ export function loadCommands() {
 
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }));
-        if (process.env.GITHUB_ACTION) process.exit(1);
     }
 
     logger.info(`${commands.size.toLocaleString()} commands loaded`);
