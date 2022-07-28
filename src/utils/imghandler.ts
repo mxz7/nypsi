@@ -24,9 +24,7 @@ const assLinks = [
     "https://www.reddit.com/r/facedownassup/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/assinthong/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/buttplug/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/TheUnderbun/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/booty/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/WomenBendingOver/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/thickwhitegirls/top.json?limit=6969&t=month",
 ];
 const pornLinks = [
@@ -34,11 +32,7 @@ const pornLinks = [
     "https://www.reddit.com/r/legalteens/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/amateur/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/gonewild/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/gonewild18/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/collegeamateurs/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/camwhores/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/cumsluts/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/cumfetish/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/creampies/top.json?limit=6969&t=month",
 ];
 const feetLinks = [
