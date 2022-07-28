@@ -98,7 +98,7 @@ export async function addModLog(
     moderator: string,
     command: string,
     caseID: number,
-    channel?: string
+    channelId?: string
 ) {
     let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
@@ -120,8 +120,8 @@ export async function addModLog(
     if (moderator != "nypsi") {
         embed.addField("moderator", moderator, true);
     } else {
-        if (channel) {
-            embed.addField("moderator", `nypsi in <#${channel}>`, true);
+        if (channelId) {
+            embed.addField("moderator", `nypsi in <#${channelId}>`, true);
         } else {
             embed.addField("moderator", "nypsi", true);
         }
