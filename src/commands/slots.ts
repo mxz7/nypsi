@@ -29,37 +29,98 @@ import { NypsiClient } from "../utils/models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
+const staticEmojis = new Map<string, string>();
+const animatedEmojis = new Map<string, string>();
+
+animatedEmojis.set("melon-1", "<a:nypsi_slots:1002211861665681528>");
+animatedEmojis.set("melon-2", "<a:nypsi_slots:1002211843919581297>");
+animatedEmojis.set("melon-3", "<a:nypsi_slots:1002211850001334393>");
+animatedEmojis.set("grape-1", "<a:nypsi_slots:1002211855424557076>");
+animatedEmojis.set("grape-2", "<a:nypsi_slots:1002211853088329858>");
+animatedEmojis.set("grape-3", "<a:nypsi_slots:1002211862873653289>");
+animatedEmojis.set("orange-1", "<a:nypsi_slots:1002211842740998264>");
+animatedEmojis.set("orange-2", "<a:nypsi_slots:1002211848789168240>");
+animatedEmojis.set("orange-3", "<a:nypsi_slots:1002211859979583488>");
+animatedEmojis.set("lemon-1", "<a:nypsi_slots:1002211851293179965>");
+animatedEmojis.set("lemon-2", "<a:nypsi_slots:1002211847690264586>");
+animatedEmojis.set("lemon-3", "<a:nypsi_slots:1002211845651832944>");
+animatedEmojis.set("cherry-1", "<a:nypsi_slots:1002211857832083548>");
+animatedEmojis.set("cherry-2", "<a:nypsi_slots:1002211854212407316>");
+animatedEmojis.set("cherry-3", "<a:nypsi_slots:1002211856913543288>");
+
+staticEmojis.set("cherry", "<:nypsi_cherry:1002213896821669990>");
+staticEmojis.set("lemon", "<:nypsi_lemon:1002213899682189393>");
+staticEmojis.set("orange", "<:nypsi_orange:1002213895013941284>");
+staticEmojis.set("grape", "<:nypsi_grape:1002213898319057036>");
+staticEmojis.set("melon", "<:nypsi_melon:1002213901724831764>");
+
 const multipliers = {
-    "🍒": 5,
-    "🍋": 3,
-    "🍊": 2.5,
-    "🍇": 2,
-    "🍉": 1.5,
+    cherry: 5,
+    lemon: 3,
+    orange: 2.5,
+    grape: 2,
+    melon: 1.5,
 };
 
-const reel1 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒"];
-const reel2 = [
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍉",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍇",
-    "🍊",
-    "🍊",
-    "🍊",
-    "🍊",
-    "🍋",
-    "🍋",
-    "🍋",
-    "🍒",
-    "🍒",
+const reel1 = [
+    "melon-1",
+    "melon-1",
+    "melon-1",
+    "melon-1",
+    "melon-1",
+    "grape-1",
+    "grape-1",
+    "grape-1",
+    "grape-1",
+    "orange-1",
+    "orange-1",
+    "orange-1",
+    "orange-1",
+    "lemon-1",
+    "lemon-1",
+    "cherry-1",
 ];
-const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒", "🍒"];
+const reel2 = [
+    "melon-2",
+    "melon-2",
+    "melon-2",
+    "melon-2",
+    "melon-2",
+    "grape-2",
+    "grape-2",
+    "grape-2",
+    "grape-2",
+    "grape-2",
+    "orange-2",
+    "orange-2",
+    "orange-2",
+    "orange-2",
+    "lemon-2",
+    "lemon-2",
+    "lemon-2",
+    "cherry-2",
+    "cherry-2",
+];
+const reel3 = [
+    "melon-3",
+    "melon-3",
+    "melon-3",
+    "melon-3",
+    "melon-3",
+    "melon-3",
+    "grape-3",
+    "grape-3",
+    "grape-3",
+    "grape-3",
+    "grape-3",
+    "orange-3",
+    "orange-3",
+    "orange-3",
+    "lemon-3",
+    "lemon-3",
+    "cherry-3",
+    "cherry-3",
+];
 
 const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["bet", "slot"]);
 
@@ -112,9 +173,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 1 && args[0] == "info") {
         let txt = "";
 
-        for (const item in multipliers) {
-            // @ts-expect-error uhh its weird
-            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]}**x**\n`;
+        for (const item of Object.keys(multipliers)) {
+            txt += `${staticEmojis.get(item)} | ${staticEmojis.get(item)} | ${staticEmojis.get(item)} **||** ${
+                // @ts-expect-error its weird
+                multipliers[item]
+            }**x**\n`;
         }
 
         const embed = new CustomEmbed(message.member).setHeader("win board").setDescription(txt);
@@ -178,47 +241,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
          * the shit below results in an approximate 60% win rate overtime, resulting in an overall very high gain, without counting multiplier
          */
 
-        if (one != two && two != three && one != three) {
+        if (
+            one.split("-")[0] != two.split("-")[0] &&
+            two.split("-")[0] != three.split("-")[0] &&
+            one.split("-")[0] != three.split("-")[0]
+        ) {
             const chance = Math.floor(Math.random() * 6);
             const chanceScore = 4;
             const chanceScore2 = 3;
 
             if (chance < chanceScore) {
-                one = two;
+                one = two.split("-")[0] + "-1";
             } else if (chance < chanceScore2) {
-                three = two;
+                three = two.split("-")[0] + "-3";
             }
         }
 
-        if (two == three && one != two) {
+        if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
             const chance = Math.floor(Math.random() * 12);
             const chanceScore = 7;
 
             if (chance < chanceScore) {
-                one = two;
+                one = two.split("-")[0] + "-1";
             }
         }
 
-        if (one == two && one != three) {
+        if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
             const chance = Math.floor(Math.random() * 12);
             const chanceScore = 6;
 
             if (chance < chanceScore) {
-                three = two;
-            }
-        }
-
-        if (one == two && one == three && one != "🍒" && one != "🍋") {
-            const chance = Math.floor(Math.random() * 10);
-
-            if (chance < 4) {
-                one == "🍋";
-                two == "🍋";
-                three == "🍋";
-            } else if (chance < 2) {
-                one == "🍒";
-                two == "🍒";
-                three == "🍒";
+                three = two.split("-")[0] + "-3";
             }
         }
     } else {
@@ -226,47 +279,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
          * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
          */
 
-        if (one != two && two != three && one != three) {
+        if (
+            one.split("-")[0] != two.split("-")[0] &&
+            two.split("-")[0] != three.split("-")[0] &&
+            one.split("-")[0] != three.split("-")[0]
+        ) {
             const chance = Math.floor(Math.random() * 41);
             const chanceScore = 4;
             const chanceScore2 = 8;
 
             if (chance < chanceScore) {
-                one = two;
+                one = two.split("-")[0] + "-1";
             } else if (chance < chanceScore2) {
-                three = two;
+                three = two.split("-")[0] + "-3";
             }
         }
 
-        if (two == three && one != two) {
+        if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
             const chance = Math.floor(Math.random() * 12);
             const chanceScore = 7;
 
             if (chance < chanceScore) {
-                one = two;
+                one = two.split("-")[0] + "-1";
             }
         }
 
-        if (one == two && one != three) {
+        if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
             const chance = Math.floor(Math.random() * 12);
             const chanceScore = 6;
 
             if (chance < chanceScore) {
-                three = two;
-            }
-        }
-
-        if (one == two && one == three && one != "🍒" && one != "🍋") {
-            const chance = Math.floor(Math.random() * 10);
-
-            if (chance < 4) {
-                one == "🍋";
-                two == "🍋";
-                three == "🍋";
-            } else if (chance < 2) {
-                one == "🍒";
-                two == "🍒";
-                three == "🍒";
+                three = two.split("-")[0] + "-3";
             }
         }
     }
@@ -274,13 +317,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let win = false;
     let winnings = 0;
 
-    if (one == two && two == three) {
+    if (one.split("-")[0] == two.split("-")[0] && two.split("-")[0] == three.split("-")[0]) {
         // @ts-expect-error uhh its weird
-        const multiplier = multipliers[one];
+        const multiplier = multipliers[one.split("-")[0]];
 
         win = true;
         winnings = Math.round(multiplier * bet);
-    } else if (one == two) {
+    } else if (one.split("-")[0] == two.split("-")[0]) {
         win = true;
         winnings = Math.round(bet * 1.2);
     }
@@ -309,11 +352,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(
         message.member,
         "~~---------------~~\n" +
-            one +
+            animatedEmojis.get(one) +
             " **|** " +
-            two +
+            animatedEmojis.get(two) +
             " **|** " +
-            three +
+            animatedEmojis.get(three) +
             "\n~~---------------~~\n**bet** $" +
             bet.toLocaleString()
     ).setHeader("slots", message.author.avatarURL());
@@ -328,6 +371,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     send({ embeds: [embed] }).then(async (m) => {
+        embed.setDescription(
+            "~~---------------~~\n" +
+                staticEmojis.get(one.split("-")[0]) +
+                " **|** " +
+                staticEmojis.get(two.split("-")[0]) +
+                " **|** " +
+                staticEmojis.get(three.split("-")[0]) +
+                "\n~~---------------~~\n**bet** $" +
+                bet.toLocaleString()
+        );
+
         if (win) {
             if (multi > 0) {
                 embed.addField(
@@ -364,7 +418,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setTimeout(() => {
             edit({ embeds: [embed] }, m);
-        }, 1500);
+        }, 2250);
     });
 
     gamble(message.author, "slots", bet, win, winnings);
