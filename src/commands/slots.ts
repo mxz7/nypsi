@@ -29,6 +29,31 @@ import { NypsiClient } from "../utils/models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
+const staticEmojis = new Map<string, string>();
+const animatedEmojis = new Map<string, string>();
+
+animatedEmojis.set("melon-1", "<a:nypsi_slots:1002211861665681528>");
+animatedEmojis.set("melon-2", "<a:nypsi_slots:1002211843919581297>");
+animatedEmojis.set("melon-3", "<a:nypsi_slots:1002211850001334393>");
+animatedEmojis.set("grape-1", "<a:nypsi_slots:1002211855424557076>");
+animatedEmojis.set("grape-2", "<a:nypsi_slots:1002211853088329858>");
+animatedEmojis.set("grape-3", "<a:nypsi_slots:1002211862873653289>");
+animatedEmojis.set("orange-1", "<a:nypsi_slots:1002211842740998264>");
+animatedEmojis.set("orange-2", "<a:nypsi_slots:1002211848789168240>");
+animatedEmojis.set("orange-3", "<a:nypsi_slots:1002211859979583488>");
+animatedEmojis.set("lemon-1", "<a:nypsi_slots:1002211851293179965>");
+animatedEmojis.set("lemon-2", "<a:nypsi_slots:1002211847690264586>");
+animatedEmojis.set("lemon-3", "<a:nypsi_slots:1002211845651832944>");
+animatedEmojis.set("cherry-1", "<a:nypsi_slots:1002211857832083548>");
+animatedEmojis.set("cherry-2", "<a:nypsi_slots:1002211854212407316>");
+animatedEmojis.set("cherry-3", "<a:nypsi_slots:1002211856913543288>");
+
+staticEmojis.set("cherry", "<:nypsi_cherry:1002213896821669990>");
+staticEmojis.set("lemon", "<:nypsi_lemon:1002213899682189393>");
+staticEmojis.set("orange", "<:nypsi_orange:1002213895013941284>");
+staticEmojis.set("grape", "<:nypsi_grape:1002213898319057036>");
+staticEmojis.set("melon", "<:nypsi_melon:1002213901724831764>");
+
 const multipliers = {
     "🍒": 5,
     "🍋": 3,
