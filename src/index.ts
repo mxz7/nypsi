@@ -16,7 +16,7 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     shardArgs: ["--ansi", "--color"],
 
     restarts: {
-        max: 5,
+        max: 10,
         interval: ms("1 hour"),
     },
 
