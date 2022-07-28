@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         for (const item in multipliers) {
             // @ts-expect-error uhh its weird
-            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]} **x\n`;
+            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]}**x**\n`;
         }
 
         const embed = new CustomEmbed(message.member).setHeader("win board").setDescription(txt);
