@@ -49,7 +49,7 @@
         "emoji": "📦",
         "description": "a basic crate will be added to your inventory",
         "id": "basic_crate",
-        "cost": 35,
+        "cost": 50,
         "unlimited": false,
         "items_left": 150
     }
