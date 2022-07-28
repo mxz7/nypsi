@@ -9,6 +9,7 @@ import {
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import prisma from "../utils/database/database";
+import redis from "../utils/database/redis";
 import { getStats } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -41,6 +42,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             itemsUsed += stats.items[item];
         }
 
+        const commandUses = parseInt(await redis.hget("nypsi:topcommands:users", message.author.tag));
+
         const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
 
         embed.addField(
@@ -58,6 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             true
         );
         embed.addField("items", `**${itemsUsed.toLocaleString()}** item use${itemsUsed == 1 ? "d" : "s"}`, true);
+        embed.setFooter({ text: `you have done ${commandUses.toLocaleString()} commands today` });
 
         return message.channel.send({ embeds: [embed] });
     };
