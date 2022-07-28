@@ -80,6 +80,8 @@ export function runModerationChecks(client: NypsiClient) {
                 }
             }
 
+            embeds.reverse();
+
             modLogCount += embeds.length;
 
             await webhook.send({ embeds: embeds }).catch(async (e) => {
