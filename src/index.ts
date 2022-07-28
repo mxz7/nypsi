@@ -1,5 +1,6 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
+import { clearInterval } from "timers";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
@@ -8,6 +9,8 @@ import { listenForVotes } from "./utils/votehandler";
 import ms = require("ms");
 
 setClusterId("main");
+
+let heartBeatIntervals: NodeJS.Timer[] = [];
 
 const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
     token: process.env.BOT_TOKEN,
@@ -20,7 +23,7 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
         interval: ms("1 hour"),
     },
 
-    // totalShards: 4,
+    totalShards: 6,
     shardsPerClusters: 3, // force clusters
 });
 
@@ -29,6 +32,16 @@ manager.extend(new Cluster.ReClusterManager());
 manager.on("clusterCreate", (cluster) => {
     cluster.on("ready", () => {
         logger.info(`cluster ${cluster.id} ready`);
+
+        const interval = setInterval(async () => {
+            const heartbeat = await sendHeartbeat(cluster).catch(() => {});
+
+            if (!heartbeat) {
+                logger.warn(`cluster ${cluster.id} missed heartbeat`);
+                addFailedHeatbeat(cluster);
+            }
+        }, 7000);
+        heartBeatIntervals.push(interval);
     });
     cluster.on("death", () => {
         logger.info(`cluster ${cluster.id} died`);
@@ -43,18 +56,11 @@ manager.on("clusterCreate", (cluster) => {
     cluster.on("message", (message) => {
         if (message == "restart") {
             manager.recluster.start({ restartMode: "gracefulSwitch" });
+            heartBeatIntervals.forEach((i) => clearInterval(i));
+            heartBeatIntervals = [];
         }
     });
     logger.info(`launched cluster ${cluster.id}`);
-
-    setInterval(async () => {
-        const heartbeat = await sendHeartbeat(cluster).catch(() => {});
-
-        if (!heartbeat) {
-            logger.warn(`cluster ${cluster.id} missed heartbeat`);
-            addFailedHeatbeat(cluster);
-        }
-    }, 7000);
 });
 
 manager.on("debug", (m) => {
