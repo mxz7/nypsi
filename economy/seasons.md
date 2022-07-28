@@ -8,5 +8,5 @@ completely reset. meaning prestige 0.
 
 ## why?
 
-its a good way to keep economy fresh and under control 🙂. and at the end of every season, the top 5 balancesm globally get
+its a good way to keep economy fresh and under control 🙂. and at the end of every season, the top 5 balances globally get
 rewards, such as nypsi premium & real money
