@@ -58,8 +58,7 @@ export async function newCase(
     caseType: PunishmentType,
     userIDs: string[] | string,
     moderator: string,
-    command: string,
-    channel?: string
+    command: string
 ) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
@@ -121,12 +120,15 @@ export async function addModLog(
     if (moderator != "nypsi") {
         embed.addField("moderator", moderator, true);
     } else {
-        embed.addField("moderator", "nypsi", true);
+        if (channel) {
+            embed.addField("moderator", `nypsi in <#${channel}>`, true);
+        } else {
+            embed.addField("moderator", "nypsi", true);
+        }
     }
 
     if (caseType == PunishmentType.FILTER_VIOLATION) {
         embed.addField("message content", command);
-        embed.addField("channel", `<#${channel}> (${channel})`);
     } else {
         embed.addField("reason", command);
     }
