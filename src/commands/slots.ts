@@ -121,7 +121,6 @@ const reel3 = [
     "cherry-3",
     "cherry-3",
 ];
-const reel3 = ["🍉", "🍉", "🍉", "🍉", "🍉", "🍉", "🍇", "🍇", "🍇", "🍇", "🍇", "🍊", "🍊", "🍊", "🍋", "🍋", "🍒", "🍒"];
 
 const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["bet", "slot"]);
 
@@ -174,9 +173,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 1 && args[0] == "info") {
         let txt = "";
 
-        for (const item in multipliers) {
-            // @ts-expect-error uhh its weird
-            txt += `${item} | ${item} | ${item} **||** ${multipliers[item]}**x**\n`;
+        for (const item of Object.keys(multipliers)) {
+            txt += `${staticEmojis.get(item)} | ${staticEmojis.get(item)} | ${staticEmojis.get(item)} **||** ${
+                // @ts-expect-error its weird
+                multipliers[item]
+            }**x**\n`;
         }
 
         const embed = new CustomEmbed(message.member).setHeader("win board").setDescription(txt);
