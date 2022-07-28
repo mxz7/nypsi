@@ -58,7 +58,8 @@ export async function newCase(
     caseType: PunishmentType,
     userIDs: string[] | string,
     moderator: string,
-    command: string
+    command: string,
+    channel: string
 ) {
     if (!(userIDs instanceof Array)) {
         userIDs = [userIDs];
@@ -87,7 +88,7 @@ export async function newCase(
 
         if (!(await isModLogsEnabled(guild))) return;
 
-        addModLog(guild, caseType, userID, moderator, command, caseCount);
+        addModLog(guild, caseType, userID, moderator, command, caseCount, channel);
     }
 }
 
@@ -97,7 +98,8 @@ export async function addModLog(
     userID: string,
     moderator: string,
     command: string,
-    caseID: number
+    caseID: number,
+    channel?: string
 ) {
     let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
@@ -124,6 +126,7 @@ export async function addModLog(
 
     if (caseType == PunishmentType.FILTER_VIOLATION) {
         embed.addField("message content", command);
+        embed.addField("channel", `<#${channel}> (${channel})`);
     } else {
         embed.addField("reason", command);
     }
