@@ -939,13 +939,16 @@ export function runCommandUseTimers(client: NypsiClient) {
             const uses = noLifers.get(tag);
 
             if (uses > 100) {
-                const res = await client.cluster.broadcastEval((c) => {
-                    const user = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
+                const res = await client.cluster.broadcastEval(
+                    (c, { tag }) => {
+                        const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
 
-                    if (user) {
-                        return user.id;
-                    }
-                });
+                        if (foundUser) {
+                            return foundUser.id;
+                        }
+                    },
+                    { context: { tag: tag } }
+                );
 
                 const id = res.find((x) => typeof x === "string");
 
