@@ -60,15 +60,7 @@ export default async function messageCreate(message: Message) {
 
         for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
-                addModLog(
-                    message.guild,
-                    PunishmentType.FILTER_VIOLATION,
-                    message.author.id,
-                    "nypsi",
-                    content.join(" "),
-                    -1,
-                    message.channel.id
-                );
+                addModLog(message.guild, PunishmentType.FILTER_VIOLATION, message.author.id, "nypsi", content.join(" "), -1);
                 return await message.delete().catch(() => {});
             }
         }
