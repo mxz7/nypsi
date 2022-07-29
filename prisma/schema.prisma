@@ -33,7 +33,7 @@ model Economy {
   padlock  Boolean @default(false)
   dms      Boolean @default(true)
 
-  lastDaily DateTime
+  lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
   lastVote  DateTime
 
   dailyStreak Int @default(0)
