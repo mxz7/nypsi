@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
 import { CommandInteraction, Message } from "discord.js";
-import { getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     getBalance,
     getDailyStreak,
@@ -23,6 +23,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [embed] });
     }
+
+    await addCooldown(cmd.name, message.member, 90);
 
     const lastDaily = await getLastDaily(message.member);
 
