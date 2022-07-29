@@ -8,6 +8,9 @@ const client = new NypsiClient({
     },
     makeCache: Options.cacheWithLimits({
         MessageManager: 100,
+        GuildEmojiManager: 0,
+        GuildInviteManager: 0,
+        GuildStickerManager: 0,
     }),
     sweepers: {
         messages: {
@@ -36,7 +39,6 @@ const client = new NypsiClient({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildWebhooks,
-        GatewayIntentBits.GuildInvites,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMessageReactions,
     ],
