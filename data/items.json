@@ -781,7 +781,7 @@
         "emoji": "🎟️",
         "description": "add one day to your daily streak",
         "rarity": 0,
-        "worth": 65000,
-        "role": "item"
+        "worth": 50000,
+        "role": "tool"
     }
 }
