@@ -73,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member);
     embed.setHeader("daily", message.author.avatarURL());
-    embed.setDescription(`+$**${total.toLocaleString()}**\ndaily streak: \`${streak}\``);
+    embed.setDescription(`+$**${total.toLocaleString()}**\ndaily streak: \`${streak + 1}\``);
 
     if (xp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + xp);
