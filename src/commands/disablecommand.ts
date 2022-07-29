@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await updateDisabledCommands(message.guild, filter);
 
-        const embed = new CustomEmbed(message.member, "✅ disabled commands have been").setHeader("disabled commands");
+        const embed = new CustomEmbed(message.member, "✅ disabled commands have been reset").setHeader("disabled commands");
 
         return message.channel.send({ embeds: [embed] });
     } else {
