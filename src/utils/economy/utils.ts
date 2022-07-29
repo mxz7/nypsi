@@ -706,6 +706,7 @@ export async function createUser(member: GuildMember | string) {
         data: {
             userId: id,
             lastVote: new Date(0),
+            lastDaily: new Date(0),
         },
     });
     await redis.del(`cache:economy:exists:${id}`);
