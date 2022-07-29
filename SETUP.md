@@ -15,8 +15,6 @@ install nodejs on your WSL. [tutorial](https://www.digitalocean.com/community/tu
 -   run `git clone https://github.com/tekoh/nypsi`
 -   run `cd nypsi`
 -   run the ./setup.sh file
--   you will need to create `anticheat.ts` in src/utils/functions
--   create an exported function called 'a' that does nothing, this will act as dummy anticheat so that your version of nypsi will run
 -   run `npm install` this will install all packages needed for nypsi
 -   run `npx tsc` this will compile the typescript into javascript
 -   run `sudo apt install redis-server` and install the package
