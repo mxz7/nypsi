@@ -2126,3 +2126,62 @@ export async function addBooster(member: GuildMember | string, boosterId: string
 
     await redis.del(`cache:economy:boosters:${id}`);
 }
+
+export async function getLastDaily(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            lastDaily: true,
+        },
+    });
+
+    return query.lastDaily;
+}
+
+export async function updateLastDaily(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    await prisma.economy.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            lastDaily: new Date(),
+            dailyStreak: { increment: 1 },
+        },
+    });
+}
+
+export async function getDailyStreak(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            dailyStreak: true,
+        },
+    });
+
+    return query.dailyStreak;
+}
