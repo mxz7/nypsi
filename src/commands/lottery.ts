@@ -92,9 +92,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [embed] });
         }
 
-        let amount = 1;
+        let amount: number;
 
-        if (parseInt(args[1])) {
+        if (!args[1]) {
+            amount = 1;
+        } else if (parseInt(args[1])) {
             amount = parseInt(args[1]);
         } else if (args[1].toLowerCase() == "all" || args[1].toLowerCase() == "max") {
             amount = max;

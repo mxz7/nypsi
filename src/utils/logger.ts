@@ -178,7 +178,6 @@ export async function getWebhooks(client: Client) {
 }
 
 function runLogs() {
-    if (process.env.GITHUB_ACTION) return;
     setInterval(() => {
         webhook.forEach((v, k) => {
             const msg = nextLogMsg.get(k);

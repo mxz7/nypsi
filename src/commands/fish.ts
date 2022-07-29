@@ -146,10 +146,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (items[i].role == "tool") continue;
                 if (items[i].role == "car") continue;
                 if (items[i].role == "booster") continue;
+                if (items[i].id == "cobblestone") continue;
+                if (items[i].id == "iron_ore") continue;
+                if (items[i].id == "gold_ore") continue;
+
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && fishingRod == "incredible_fishing_rod") {
                         if (items[i].role == "fish") {
+                            fishItemsModified.push(i);
+                            fishItemsModified.push(i);
+                            fishItemsModified.push(i);
                             fishItemsModified.push(i);
                             fishItemsModified.push(i);
                             fishItemsModified.push(i);
@@ -167,11 +174,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             fishItemsModified.push(i);
                             fishItemsModified.push(i);
                             fishItemsModified.push(i);
+                            fishItemsModified.push(i);
+                            fishItemsModified.push(i);
+                            fishItemsModified.push(i);
                         }
                         fishItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 2 && fishingRod != "terrible_fishing_rod") {
                     if (items[i].role == "fish") {
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);
@@ -200,11 +213,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
                     }
                     fishItemsModified.push(i);
                     fishItemsModified.push(i);
                 } else if (items[i].rarity == 0) {
                     if (items[i].role == "fish") {
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
+                        fishItemsModified.push(i);
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);
                         fishItemsModified.push(i);

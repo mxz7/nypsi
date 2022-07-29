@@ -102,7 +102,6 @@ export function loadCommands() {
 
     if (failedTable.length != 0) {
         console.log(table(failedTable, { border: getBorderCharacters("ramac") }));
-        if (process.env.GITHUB_ACTION) process.exit(1);
     }
 
     logger.info(`${commands.size.toLocaleString()} commands loaded`);
@@ -707,14 +706,18 @@ export async function runCommand(
 
     logCommand(message, args);
 
-    if (alias) {
-        if (commands.get(aliases.get(cmd)).category == "money") {
-            if (await isEcoBanned(message.author.id)) {
-                return;
-            }
-        }
+    let command: Command;
 
-        if (commands.get(aliases.get(cmd)).category == "money" && (await isHandcuffed(message.author.id))) {
+    if (alias) {
+        command = commands.get(aliases.get(cmd));
+    } else {
+        command = commands.get(cmd);
+    }
+
+    if (command.category == "money") {
+        if (await isEcoBanned(message.author.id)) {
+            return;
+        } else if (await isHandcuffed(message.author.id)) {
             const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
             const diff = Math.round((curr - init) / 1000);
@@ -740,87 +743,31 @@ export async function runCommand(
                     embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
                 });
             }
-        } else if (
-            commands.get(aliases.get(cmd)).category == "money" &&
-            (await redis.exists(`economy:crates:block:${message.author.id}`))
-        ) {
+        } else if (await redis.exists(`economy:crates:block:${message.author.id}`)) {
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             } else {
                 return message.editReply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             }
         }
-
-        updateCommandUses(message.member);
-
-        if ((await getDisabledCommands(message.guild)).indexOf(aliases.get(cmd)) != -1) {
-            if (message instanceof Message) {
-                return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
-            } else {
-                return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
-            }
-        }
-        commands.get(aliases.get(cmd)).run(message, args);
-        await updateLastCommand(message.member);
-        await redis.hincrby("nypsi:topcommands", commands.get(aliases.get(cmd)).name, 1);
-        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
-    } else {
-        if (commands.get(cmd).category == "money") {
-            if (await isEcoBanned(message.author.id)) {
-                return;
-            }
-        }
-
-        if (commands.get(cmd).category == "money" && (await isHandcuffed(message.author.id))) {
-            const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
-            const curr = new Date().getTime();
-            const diff = Math.round((curr - init) / 1000);
-            const time = 60 - diff;
-
-            const minutes = Math.floor(time / 60);
-            const seconds = time - minutes * 60;
-
-            let remaining: string;
-
-            if (minutes != 0) {
-                remaining = `${minutes}m${seconds}s`;
-            } else {
-                remaining = `${seconds}s`;
-            }
-
-            if (message instanceof Message) {
-                return message.channel.send({
-                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
-                });
-            } else {
-                return message.editReply({
-                    embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
-                });
-            }
-        }
-
-        updateCommandUses(message.member);
-
-        if ((await getDisabledCommands(message.guild)).indexOf(cmd) != -1) {
-            if (message instanceof Message) {
-                return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
-            } else {
-                return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
-            }
-        }
-        commands.get(cmd).run(message, args);
-        await updateLastCommand(message.member);
-        await redis.hincrby("nypsi:topcommands", commands.get(cmd).name, 1);
-        await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
     }
 
-    let cmdName = cmd;
-
-    if (alias) {
-        cmdName = aliases.get(cmd);
+    if ((await getDisabledCommands(message.guild)).includes(command.name)) {
+        if (message instanceof Message) {
+            return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
+        } else {
+            return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+        }
     }
 
-    if (getCmdCategory(cmdName) == "money") {
+    command.run(message, args);
+
+    updateCommandUses(message.member);
+    await updateLastCommand(message.member);
+    await redis.hincrby("nypsi:topcommands", command.name, 1);
+    await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
+
+    if (command.category == "money") {
         if (!message.member) return;
 
         setTimeout(async () => {
