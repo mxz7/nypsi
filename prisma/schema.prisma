@@ -36,6 +36,8 @@ model Economy {
   lastDaily DateTime
   lastVote  DateTime
 
+  dailyStreak Int @default(0)
+
   inventory Json @default("{}")
   workers   Json @default("{}")
 
