@@ -64,6 +64,11 @@ const bree = new Bree({
             interval: "at 12:00am",
             path: path.join(__dirname, "jobs", "topcommands.js"),
         },
+        {
+            name: "daily-streak",
+            interval: "30m",
+            path: path.join(__dirname, "jobs", "dailystreak.js"),
+        },
     ],
 });
 
