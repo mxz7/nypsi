@@ -773,5 +773,15 @@
             "effect": "improves slots win chance to 60%",
             "time": 450
         }
+    },
+    "streak_token": {
+        "id": "streak_token",
+        "name": "streak token",
+        "aliases": ["streak"],
+        "emoji": "🎟️",
+        "description": "add one day to your daily streak",
+        "rarity": 0,
+        "worth": 65000,
+        "role": "item"
     }
 }
