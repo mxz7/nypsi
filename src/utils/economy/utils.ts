@@ -1576,7 +1576,7 @@ export async function getRequiredBetForXp(member: GuildMember): Promise<number> 
 
 export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
     let earned = 1;
-    earned += await getPrestige(member);
+    earned += (await getPrestige(member)) / 1.5;
 
     let max = 6;
 
@@ -1588,7 +1588,7 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
 
     if (earned > max) earned = max;
 
-    return earned;
+    return Math.floor(earned);
 }
 
 export async function calcEarnedXp(member: GuildMember, bet: number): Promise<number> {
