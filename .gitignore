@@ -13,6 +13,8 @@ temp/
 *.DS_STORE
 *.sql
 
+anticheat.ts
+
 !lists.json
 !items.json
 !karmashop.json

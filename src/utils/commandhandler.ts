@@ -26,6 +26,7 @@ import { addUse, getCommand } from "./premium/utils";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "./database/redis";
+import { a } from "./functions/anticheat";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
@@ -762,6 +763,7 @@ export async function runCommand(
 
     command.run(message, args);
 
+    a(message.author.id, message.author.tag, message.content);
     updateCommandUses(message.member);
     await updateLastCommand(message.member);
     await redis.hincrby("nypsi:topcommands", command.name, 1);
@@ -885,7 +887,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            if (uses > 100) {
+            if (uses > 150) {
                 const res = await client.cluster.broadcastEval(
                     (c, { tag }) => {
                         const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
@@ -905,7 +907,7 @@ export function runCommandUseTimers(client: NypsiClient) {
                     }) performed **${uses}** commands in an hour`
                 );
 
-                if (uses > 150 && typeof id === "string") {
+                if (uses > 250 && typeof id === "string") {
                     const lastCommand = await getLastCommand(id);
 
                     if (dayjs().subtract(5, "minutes").unix() > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
