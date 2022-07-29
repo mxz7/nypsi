@@ -56,7 +56,7 @@ const bree = new Bree({
         },
         {
             name: "clean-mentions",
-            interval: "6h",
+            interval: "at 11:59pm",
             path: path.join(__dirname, "jobs", "cleanmentions.js"),
         },
         {
