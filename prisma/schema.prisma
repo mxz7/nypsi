@@ -26,16 +26,20 @@ model User {
 }
 
 model Economy {
-  money     BigInt   @default(500)
-  bank      Int      @default(9500)
-  xp        Int      @default(0)
-  prestige  Int      @default(0)
-  padlock   Boolean  @default(false)
-  dms       Boolean  @default(true)
+  money    BigInt  @default(500)
+  bank     Int     @default(9500)
+  xp       Int     @default(0)
+  prestige Int     @default(0)
+  padlock  Boolean @default(false)
+  dms      Boolean @default(true)
+
+  lastDaily DateTime
   lastVote  DateTime
-  inventory Json     @default("{}")
-  workers   Json     @default("{}")
-  banned    Boolean  @default(false)
+
+  inventory Json @default("{}")
+  workers   Json @default("{}")
+
+  banned Boolean @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
@@ -68,7 +72,6 @@ model EconomyStats {
 model Premium {
   level      Int
   embedColor String   @default("default")
-  lastDaily  DateTime
   lastWeekly DateTime
   status     Int      @default(1)
   startDate  DateTime
