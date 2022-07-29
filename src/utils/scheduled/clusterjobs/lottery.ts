@@ -60,7 +60,6 @@ async function doLottery(client: Client) {
     );
     embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
     embed.setColor("#111111");
-    embed.disableFooter();
 
     await hook.send({ embeds: [embed] });
 

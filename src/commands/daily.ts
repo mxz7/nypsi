@@ -1,12 +1,21 @@
+import dayjs = require("dayjs");
 import { CommandInteraction, Message } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import { createUser, getBalance, getMulti, updateBalance, userExists } from "../utils/economy/utils.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import {
+    getBalance,
+    getDailyStreak,
+    getLastDaily,
+    getXp,
+    updateBalance,
+    updateLastDaily,
+    updateXp,
+} from "../utils/economy/utils";
+import { MStoTime } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getLastDaily, getTier, isPremium, setLastDaily } from "../utils/premium/utils";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
-const cmd = new Command("daily", "get your daily bonus (premium only)", Categories.MONEY);
+const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
@@ -17,108 +26,61 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 90);
 
-    if (!(await userExists(message.member))) {
-        await createUser(message.member);
-    }
+    const lastDaily = await getLastDaily(message.member);
 
-    const prefix = await getPrefix(message.guild);
-
-    const notValidForYou = () => {
-        const embed = new CustomEmbed(message.member, `${prefix}daily is for BRONZE tier and higher`).setFooter({
-            text: `${prefix}patreon`,
+    if (lastDaily.getTime() > dayjs().subtract(1, "day").unix() * 1000) {
+        const diff = lastDaily.getTime() - dayjs().subtract(1, "day").unix() * 1000;
+        return message.channel.send({
+            embeds: [new ErrorEmbed(`you can get your next daily bonus in **${MStoTime(diff)}**`)],
         });
+    }
 
-        return message.channel.send({ embeds: [embed] });
-    };
+    const streak = await getDailyStreak(message.member);
 
-    if (!(await isPremium(message.author.id))) {
-        return notValidForYou();
-    } else {
-        if ((await getTier(message.author.id)) < 1) {
-            return notValidForYou();
-        }
+    const base = 20000;
 
-        const now = new Date();
-        const lastDaily = await getLastDaily(message.author.id);
-        const diff = now.getTime() - lastDaily.getTime();
+    let streakBonus = 850;
 
-        if (diff >= 86400000) {
-            await setLastDaily(message.author.id, now);
+    if (await isPremium(message.member)) {
+        const tier = await getTier(message.member);
 
-            let amount = 75000;
-            const multi = await getMulti(message.member);
-
-            let description = `$${(await getBalance(message.member)).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
-
-            if (multi > 0) {
-                amount = amount + Math.round(amount * multi);
-                description = `$${(
-                    await getBalance(message.member)
-                ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
-                    multi * 100
-                ).toLocaleString()}**% bonus)`;
-            }
-
-            await updateBalance(message.member, (await getBalance(message.member)) + amount);
-
-            const embed = new CustomEmbed(message.member, description);
-
-            return message.channel.send({ embeds: [embed] }).then((msg) => {
-                setTimeout(async () => {
-                    embed.setDescription(`new balance: $**${(await getBalance(message.member)).toLocaleString()}**`);
-                    msg.edit({ embeds: [embed] });
-                }, 2000);
-            });
-        } else {
-            const timeRemaining = Math.abs(86400000 - diff);
-            const dd = timeUntil(new Date().getTime() + timeRemaining);
-
-            const embed = new CustomEmbed(
-                message.member,
-                "you have already used your daily reward! come back in **" + dd + "**"
-            );
-
-            return message.channel.send({ embeds: [embed] });
+        switch (tier) {
+            case 1:
+                streakBonus = 900;
+                break;
+            case 2:
+                streakBonus = 950;
+                break;
+            case 3:
+                streakBonus = 1000;
+                break;
+            case 4:
+                streakBonus = 1100;
+                break;
         }
     }
-}
 
-function timeUntil(date: number) {
-    const ms = Math.floor(date - new Date().getTime());
+    const total = base + streakBonus * streak;
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    const daysms = ms % (24 * 60 * 60 * 1000);
-    const hours = Math.floor(daysms / (60 * 60 * 1000));
-    const hoursms = ms % (60 * 60 * 1000);
-    const minutes = Math.floor(hoursms / (60 * 1000));
-    const minutesms = ms % (60 * 1000);
-    const sec = Math.floor(minutesms / 1000);
+    let xp = 0;
 
-    let output = "";
-
-    if (days > 0) {
-        output = output + days + "d ";
+    if (streak > 35) {
+        xp = Math.floor((streak - 35) / 15);
     }
 
-    if (hours > 0) {
-        output = output + hours + "h ";
+    await updateBalance(message.member, (await getBalance(message.member)) + total);
+    await updateLastDaily(message.member);
+
+    const embed = new CustomEmbed(message.member);
+    embed.setHeader("daily", message.author.avatarURL());
+    embed.setDescription(`+$**${total.toLocaleString()}**\ndaily streak: \`${streak + 1}\``);
+
+    if (xp > 0) {
+        await updateXp(message.member, (await getXp(message.member)) + xp);
+        embed.setFooter({ text: `+${xp}xp` });
     }
 
-    if (minutes > 0) {
-        output = output + minutes + "m ";
-    }
-
-    if (sec > 0) {
-        output = output + sec + "s";
-    } else if (output != "") {
-        output = output.substr(0, output.length - 1);
-    }
-
-    if (output == "") {
-        output = "0s";
-    }
-
-    return output;
+    return message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

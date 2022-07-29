@@ -7,6 +7,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
 import {
     addBooster,
@@ -495,6 +496,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 embed.setDescription("locking chastity cage...");
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
+                break;
+
+            case "streak_token":
+                const query = await prisma.economy.update({
+                    where: {
+                        userId: message.author.id,
+                    },
+                    data: {
+                        dailyStreak: { increment: 1 },
+                    },
+                    select: {
+                        dailyStreak: true,
+                    },
+                });
+
+                embed.setDescription("applying token...");
+                laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
                 break;
 
             case "handcuffs":
