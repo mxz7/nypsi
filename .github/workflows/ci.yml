@@ -65,5 +65,5 @@ jobs:
                       cd ~/nypsi
                       git pull
                       git status
-                      npm ci
+                      npm i
                       npx tsc
