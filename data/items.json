@@ -81,7 +81,7 @@
         "description": "used to smelt ore",
         "worth": 50000,
         "role": "tool",
-        "rarity": 1
+        "rarity": 0
     },
     "iron_ore": {
         "id": "iron_ore",
@@ -362,6 +362,15 @@
         "rarity": 0,
         "role": "sellable",
         "worth": 10000
+    },
+    "cake": {
+        "id": "cake",
+        "name": "cake",
+        "emoji": "<:nypsi_cake:1002977512630001725>",
+        "description": "yum yum 😋",
+        "rarity": 3,
+        "role": "sellable",
+        "worth": 50000
     },
     "potato": {
         "id": "potato",
