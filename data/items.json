@@ -774,6 +774,16 @@
             "time": 450
         }
     },
+    "stolen_credit_card": {
+        "id": "stolen_credit_card",
+        "name": "stolen credit card",
+        "aliases": ["scc", "credit", "card", "cc"],
+        "emoji": "💳",
+        "description": "increase your bank limit by $1,000-$500,000",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "tool"
+    },
     "streak_token": {
         "id": "streak_token",
         "name": "streak token",

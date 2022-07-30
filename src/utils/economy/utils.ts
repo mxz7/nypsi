@@ -293,7 +293,7 @@ export async function getBankBalance(member: GuildMember): Promise<number> {
         },
     });
 
-    return query.bank;
+    return Number(query.bank);
 }
 
 export async function updateBankBalance(member: GuildMember, amount: number) {
@@ -303,6 +303,17 @@ export async function updateBankBalance(member: GuildMember, amount: number) {
         },
         data: {
             bank: amount,
+        },
+    });
+}
+
+export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            bankStorage: { increment: amount },
         },
     });
 }
@@ -349,13 +360,24 @@ export async function updateXp(member: GuildMember, amount: number) {
 }
 
 export async function getMaxBankBalance(member: GuildMember): Promise<number> {
+    const base = await prisma.economy
+        .findUnique({
+            where: {
+                userId: member.user.id,
+            },
+            select: {
+                bankStorage: true,
+            },
+        })
+        .then((q) => Number(q.bankStorage));
+
     const xp = await getXp(member);
     const constant = 550;
     const starting = 15000;
     const bonus = xp * constant;
     const max = bonus + starting;
 
-    return max;
+    return max + base;
 }
 
 export async function topAmountGlobal(amount: number, client?: NypsiClient, anon = true): Promise<string[]> {
