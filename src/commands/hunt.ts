@@ -116,70 +116,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && gun == "incredible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 3) {
                     const chance = Math.floor(Math.random() * 3);
                     if (chance == 2 && gun != "terrible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 2 && gun != "terrible_gun") {
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
+                    for (let x = 0; x < 7; x++) {
+                        huntItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 1) {
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
+                    for (let x = 0; x < 15; x++) {
+                        huntItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 0) {
                     if (gun == "incredible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 7; x++) {
+                            huntItemsModified.push(i);
+                        }
                     } else {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 25; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 }
             }

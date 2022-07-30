@@ -1516,12 +1516,9 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
                 } else if (items[i].rarity == 1) {
                     for (let x = 0; x < 2; x++) {
                         crateItemsModified.push(i);
-                        crateItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 0) {
                     for (let x = 0; x < 3; x++) {
-                        crateItemsModified.push(i);
-                        crateItemsModified.push(i);
                         crateItemsModified.push(i);
                     }
                 }
