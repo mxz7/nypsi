@@ -5,6 +5,7 @@ import {
     Message,
     MessageOptions,
     PermissionFlagsBits,
+    Role,
 } from "discord.js";
 import { getExactMember } from "../utils/functions/member";
 import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
@@ -92,25 +93,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const members = message.mentions.members;
 
-    let muteRole = await message.guild.roles.fetch(await getMuteRole(message.guild));
+    const guildMuteRole = await getMuteRole(message.guild);
+
+    let muteRole: Role;
     let mode = "role";
 
-    if (!muteRole) {
-        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
-    }
-
-    if (!muteRole && mode == "role") {
+    if (!guildMuteRole || guildMuteRole == "default") {
         muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
-    }
 
-    if (!muteRole && mode == "role") {
-        return send({
-            embeds: [
-                new ErrorEmbed(
-                    `no mute role could be found, set one with ${prefix}muterole, or create a role called "muted"`
-                ),
-            ],
-        });
+        if (!muteRole) {
+            return send({ embeds: [new ErrorEmbed("failed to find role called `muted`")] });
+        }
+    } else if (guildMuteRole == "timeout") {
+        mode = "timeout";
+    } else {
+        muteRole = await message.guild.roles.fetch(guildMuteRole);
+
+        if (!muteRole) {
+            return send({ embeds: [new ErrorEmbed(`failed to find muterole: ${guildMuteRole}`)] });
+        }
     }
 
     let count = 0;
