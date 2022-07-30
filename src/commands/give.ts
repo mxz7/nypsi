@@ -186,7 +186,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setInventory(message.member, inventory);
     await setInventory(target, targetInventory);
 
-    payment(message.author, target.user, selected.worth * amount);
+    payment(message.author, target.user, selected.sell * amount);
 
     if (selected.id == "ring") {
         return message.channel.send({

@@ -20,8 +20,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        `**worth** $${bitcoin.worth.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
-            bitcoinAmount * bitcoin.worth
+        `**worth** $${bitcoin.sell.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
+            bitcoinAmount * bitcoin.sell
         ).toLocaleString()})`
     )
         .setFooter({ text: "not real bitcoin, although it reflects current worth in USD" })
