@@ -1467,6 +1467,14 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
     ];
 
     for (const i of Array.from(Object.keys(items))) {
+        if (
+            items[i].role == "fish" ||
+            items[i].role == "prey" ||
+            items[i].id == "gold_ore" ||
+            items[i].id == "iron_ore" ||
+            items[i].id == "cobblestone"
+        )
+            continue;
         crateItems.push(i);
     }
 
@@ -1506,16 +1514,22 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
                 } else if (items[i].rarity == 2) {
                     crateItemsModified.push(i);
                 } else if (items[i].rarity == 1) {
-                    crateItemsModified.push(i);
-                    crateItemsModified.push(i);
+                    for (let x = 0; x < 2; x++) {
+                        crateItemsModified.push(i);
+                        crateItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 0) {
-                    crateItemsModified.push(i);
+                    for (let x = 0; x < 3; x++) {
+                        crateItemsModified.push(i);
+                        crateItemsModified.push(i);
+                        crateItemsModified.push(i);
+                    }
+                }
+            } else {
+                for (let x = 0; x < 2; x++) {
                     crateItemsModified.push(i);
                     crateItemsModified.push(i);
                 }
-            } else {
-                crateItemsModified.push(i);
-                crateItemsModified.push(i);
             }
         }
 
