@@ -81,7 +81,7 @@
         "description": "used to smelt ore",
         "worth": 50000,
         "role": "tool",
-        "rarity": 1
+        "rarity": 0
     },
     "iron_ore": {
         "id": "iron_ore",
