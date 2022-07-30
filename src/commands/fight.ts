@@ -259,6 +259,9 @@ class Fight {
 
     public homeHit() {
         const damage = this.person1.hit();
+
+        if (!damage) return;
+
         this.person2.takeHit(damage);
 
         this.updateLog(`${this.home.user.username} hits ${this.away.user.username} for ${damage}hp`);
@@ -268,14 +271,20 @@ class Fight {
         if (this.person1.heals <= 0) {
             return false;
         }
-        this.person1.heal();
+        const r = this.person1.heal();
 
-        this.updateLog(`${this.home.user.username} heals 25hp`);
+        if (r) {
+            this.updateLog(`${this.home.user.username} heals 25hp`);
+        }
+
         return true;
     }
 
     public awayHit() {
         const damage = this.person2.hit();
+
+        if (!damage) return;
+
         this.person1.takeHit(damage);
 
         this.updateLog(`${this.away.user.username} hits ${this.home.user.username} for ${damage}hp`);
@@ -285,9 +294,11 @@ class Fight {
         if (this.person2.heals <= 0) {
             return false;
         }
-        this.person2.heal();
+        const r = this.person2.heal();
 
-        this.updateLog(`${this.away.user.username} heals 25hp`);
+        if (r) {
+            this.updateLog(`${this.away.user.username} heals 25hp`);
+        }
         return true;
     }
 
@@ -389,17 +400,26 @@ class FightCharacter {
     public damageGiven: number;
     public damageReceived: number;
 
+    private lastHit: number;
+    private lastHeal: number;
+
     constructor() {
         this.health = 100;
         this.heals = 3;
         this.damageGiven = 0;
         this.damageReceived = 0;
+        this.lastHit = Date.now();
+        this.lastHeal = Date.now();
     }
 
     public hit() {
+        if (this.lastHit > Date.now() - 350) return null;
+
         const damage = Math.floor(Math.random() * 10) + 3;
 
         this.damageGiven += damage;
+
+        this.lastHit = Date.now();
 
         return damage;
     }
@@ -410,9 +430,12 @@ class FightCharacter {
     }
 
     public heal() {
+        if (this.lastHeal > Date.now() - 350) return false;
         this.heals -= 1;
 
         this.health += 25;
+        this.lastHeal = Date.now();
+        return true;
     }
 }
 
