@@ -11,7 +11,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createUser, getInventory, setInventory, userExists } from "../utils/economy/utils";
+import { addGamble, createUser, getInventory, getStats, setInventory, userExists } from "../utils/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -59,6 +59,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader("fight", message.author.avatarURL());
 
         embed.setDescription(`${prefix}**fight <member>** *challenge another member to a fight*`);
+
+        const stats = (await getStats(message.member)).gamble["fight"];
+
+        if (stats) {
+            embed.setFooter({ text: `you are ${stats.wins}-${stats.lose}` });
+        }
 
         return send({ embeds: [embed] });
     }
@@ -313,13 +319,19 @@ class Fight {
             stats: undefined,
         };
 
+        let loser: GuildMember;
+
         if (this.person1.health <= 0) {
             winner.member = this.away;
             winner.stats = this.person2;
+
+            loser = this.home;
         }
         if (this.person2.health <= 0) {
             winner.member = this.home;
             winner.stats = this.person1;
+
+            loser = this.away;
         }
 
         if (await userExists(winner.member.user.id)) {
@@ -333,7 +345,13 @@ class Fight {
 
             await setInventory(winner.member.user.id, inventory);
 
+            await addGamble(winner.member, "fight", true);
+
             embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
+        }
+
+        if (await userExists(loser.user.id)) {
+            await addGamble(loser, "fight", false);
         }
 
         embed.setHeader(`${this.home.user.username} vs ${this.away.user.username}`);
