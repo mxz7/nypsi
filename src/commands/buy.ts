@@ -72,7 +72,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         selected.role == "car" ||
         selected.role == "sellable" ||
         selected.role == "ore" ||
-        selected.role == "booster"
+        selected.role == "booster" ||
+        selected.role == "tool"
     ) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
     }

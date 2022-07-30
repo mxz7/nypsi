@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 1800);
+    await addCooldown(cmd.name, message.member, 300);
 
     await addItemUse(message.member, gun);
 
@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setInventory(message.member, inventory);
     }
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 15; i++) {
         huntItems.push("nothing");
     }
 
@@ -116,70 +116,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && gun == "incredible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 3) {
                     const chance = Math.floor(Math.random() * 3);
                     if (chance == 2 && gun != "terrible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 2 && gun != "terrible_gun") {
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
+                    for (let x = 0; x < 7; x++) {
+                        huntItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 1) {
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
-                    huntItemsModified.push(i);
+                    for (let x = 0; x < 15; x++) {
+                        huntItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 0) {
                     if (gun == "incredible_gun") {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 7; x++) {
+                            huntItemsModified.push(i);
+                        }
                     } else {
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
-                        huntItemsModified.push(i);
+                        for (let x = 0; x < 25; x++) {
+                            huntItemsModified.push(i);
+                        }
                     }
                 }
             }
