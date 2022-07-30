@@ -688,23 +688,6 @@ export async function runCommand(
         }
     }
 
-    if (restarting || (await redis.get("nypsi:restarting")) == "t") {
-        if (message.author.id == "672793821850894347" && message instanceof Message) {
-            message.react("💀");
-        } else {
-            logCommand(message, args);
-            if (message instanceof Message) {
-                return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
-                });
-            } else {
-                return message.editReply({
-                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
-                });
-            }
-        }
-    }
-
     logCommand(message, args);
 
     let command: Command;
@@ -716,6 +699,22 @@ export async function runCommand(
     }
 
     if (command.category == "money") {
+        if (restarting || (await redis.get("nypsi:restarting")) == "t") {
+            if (message.author.id == "672793821850894347" && message instanceof Message) {
+                message.react("💀");
+            } else {
+                if (message instanceof Message) {
+                    return message.channel.send({
+                        embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+                    });
+                } else {
+                    return message.editReply({
+                        embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+                    });
+                }
+            }
+        }
+
         if (await isEcoBanned(message.author.id)) {
             return;
         } else if (await isHandcuffed(message.author.id)) {
