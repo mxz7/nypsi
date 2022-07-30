@@ -108,6 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .then(async (collected) => {
             await collected.deferUpdate();
             await m.delete();
+            waiting.delete(message.author.id);
             return collected.customId;
         })
         .catch(async () => {
