@@ -18,7 +18,6 @@ import {
     getDMsEnabled,
     getInventory,
     getItems,
-    getMaxBankBalance,
     hasPadlock,
     increaseBaseBankStorage,
     isHandcuffed,
@@ -521,10 +520,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const amount = Math.floor(Math.random() * 499000) + 1000;
                 await increaseBaseBankStorage(message.member, amount);
 
-                embed.setDescription("fetching stolen info...");
-                laterDescription = `"fetching stolen info..."\n\nyour new max bank balance is: $**${(
-                    await getMaxBankBalance(message.member)
-                ).toLocaleString()}**`;
+                embed.setDescription("using stolen credit card...");
+                laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
                 break;
 
             case "handcuffs":
