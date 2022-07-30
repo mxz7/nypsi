@@ -1078,10 +1078,6 @@ export async function reset() {
     let updated = 0;
 
     for (const user of query) {
-        const prestige = user.prestige;
-        const lastVote = user.lastVote;
-        const dms = user.dms;
-
         await prisma.economy.update({
             where: {
                 userId: user.userId,
@@ -1089,11 +1085,9 @@ export async function reset() {
             data: {
                 money: 500,
                 bank: 9500,
+                bankStorage: 5000,
                 xp: 0,
-                prestige: prestige,
                 padlock: false,
-                dms: dms,
-                lastVote: lastVote,
                 inventory: {},
                 workers: {},
             },
