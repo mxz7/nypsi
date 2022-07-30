@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!hasFurnace) {
         return message.channel.send({
-            embeds: [new ErrorEmbed("you need a furnace to bake. furnaces can be found in crates or bought from the shop")],
+            embeds: [new ErrorEmbed("you need a furnace to bake. furnaces can be found in crates")],
         });
     }
 
