@@ -3,7 +3,8 @@ export interface Item {
     name: string;
     emoji: string;
     description: string;
-    worth?: number;
+    buy?: number;
+    sell?: number;
     role?: string;
     aliases?: string[];
     speed?: number;

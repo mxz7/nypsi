@@ -48,7 +48,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!hasFurnace) {
         return send({
-            embeds: [new ErrorEmbed("you need a furnace to smelt ore. furnaces can be found in crates")],
+            embeds: [
+                new ErrorEmbed("you need a furnace to smelt ore. furnaces can be found in crates or bought from the shop"),
+            ],
         });
     }
 
