@@ -29,7 +29,7 @@ async function doLottery(client: Client) {
         return hook.send({ embeds: [embed] });
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
+    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.75);
 
     const shuffledTickets = shuffleArray(tickets);
 
