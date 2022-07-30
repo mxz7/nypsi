@@ -236,6 +236,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     .then(() => count++)
                     .catch(() => {
                         fail = true;
+                        console.log(muteRole);
+                        console.log(Array.from(message.guild.roles.cache.keys()));
+
                         return send({
                             embeds: [
                                 new ErrorEmbed(
