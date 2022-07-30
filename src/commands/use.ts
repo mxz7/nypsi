@@ -512,6 +512,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     },
                 });
 
+                inventory["streak_token"]--;
+
+                if (inventory["streak_token"] <= 0) {
+                    delete inventory["streak_token"];
+                }
+
                 embed.setDescription("applying token...");
                 laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
                 break;
@@ -519,6 +525,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             case "stolen_credit_card":
                 const amount = Math.floor(Math.random() * 499000) + 1000;
                 await increaseBaseBankStorage(message.member, amount);
+
+                inventory["stolen_credit_card"]--;
+
+                if (inventory["stolen_credit_card"] <= 0) {
+                    delete inventory["stolen_creidt_card"];
+                }
 
                 embed.setDescription("using stolen credit card...");
                 laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
