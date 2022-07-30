@@ -361,7 +361,7 @@
         "description": "yum yum",
         "rarity": 0,
         "role": "sellable",
-        "worth": 10000
+        "worth": 2500
     },
     "cake": {
         "id": "cake",
