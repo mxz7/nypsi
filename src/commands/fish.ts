@@ -101,6 +101,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (items[i].id == "cobblestone") continue;
         if (items[i].id == "iron_ore") continue;
         if (items[i].id == "gold_ore") continue;
+        if (items[i].id == "coal") continue;
+        if (items[i].id == "iron_ingot") continue;
+        if (items[i].id == "gold_ingot") continue;
         fishItems.push(i);
     }
 
