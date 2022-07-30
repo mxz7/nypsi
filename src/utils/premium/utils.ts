@@ -103,7 +103,6 @@ export async function addMember(member: GuildMember | string, level: number, cli
             level: level,
             startDate: start,
             expireDate: expire,
-            lastDaily: new Date(0),
             lastWeekly: new Date(0),
         },
     });
@@ -209,24 +208,6 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
     return query.embedColor as `#${string}` | "default";
 }
 
-export async function setLastDaily(member: GuildMember | string, date: Date) {
-    let id: string;
-    if (member instanceof GuildMember) {
-        id = member.user.id;
-    } else {
-        id = member;
-    }
-
-    await prisma.premium.update({
-        where: {
-            userId: id,
-        },
-        data: {
-            lastDaily: date,
-        },
-    });
-}
-
 export async function setLastWeekly(member: GuildMember | string, date: Date) {
     let id: string;
     if (member instanceof GuildMember) {
@@ -320,19 +301,6 @@ export async function expireUser(member: string, client: NypsiClient) {
     if (colorCache.has(member)) {
         colorCache.delete(member);
     }
-}
-
-export async function getLastDaily(member: string) {
-    const query = await prisma.premium.findUnique({
-        where: {
-            userId: member,
-        },
-        select: {
-            lastDaily: true,
-        },
-    });
-
-    return query.lastDaily;
 }
 
 export async function getLastWeekly(member: string) {

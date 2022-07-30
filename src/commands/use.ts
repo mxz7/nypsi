@@ -7,6 +7,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
 import {
     addBooster,
@@ -18,6 +19,7 @@ import {
     getInventory,
     getItems,
     hasPadlock,
+    increaseBaseBankStorage,
     isHandcuffed,
     openCrate,
     setInventory,
@@ -142,12 +144,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
     }
 
-    let cooldownLength = 30;
+    let cooldownLength = 10;
 
     if (selected.role == "crate") {
         cooldownLength = 5;
     } else if (selected.role == "booster") {
-        cooldownLength = 10;
+        cooldownLength = 5;
     }
 
     await addCooldown(cmd.name, message.member, cooldownLength);
@@ -495,6 +497,31 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 embed.setDescription("locking chastity cage...");
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
+                break;
+
+            case "streak_token":
+                const query = await prisma.economy.update({
+                    where: {
+                        userId: message.author.id,
+                    },
+                    data: {
+                        dailyStreak: { increment: 1 },
+                    },
+                    select: {
+                        dailyStreak: true,
+                    },
+                });
+
+                embed.setDescription("applying token...");
+                laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
+                break;
+
+            case "stolen_credit_card":
+                const amount = Math.floor(Math.random() * 499000) + 1000;
+                await increaseBaseBankStorage(message.member, amount);
+
+                embed.setDescription("using stolen credit card...");
+                laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
                 break;
 
             case "handcuffs":
