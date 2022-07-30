@@ -73,14 +73,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 300);
 
     const fishItems = [
-        "money:1000",
-        "money:5000",
-        "money:10000",
-        "money:20000",
-        "xp:5",
-        "xp:10",
-        "xp:15",
-        "xp:25",
         "nothing",
         "nothing",
         "nothing",
@@ -102,6 +94,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ];
 
     for (const i of Array.from(Object.keys(items))) {
+        if (items[i].role == "prey") continue;
+        if (items[i].role == "tool") continue;
+        if (items[i].role == "car") continue;
+        if (items[i].role == "booster") continue;
+        if (items[i].id == "cobblestone") continue;
+        if (items[i].id == "iron_ore") continue;
+        if (items[i].id == "gold_ore") continue;
         fishItems.push(i);
     }
 
@@ -146,14 +145,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         for (const i of fishItems) {
             if (items[i]) {
-                if (items[i].role == "prey") continue;
-                if (items[i].role == "tool") continue;
-                if (items[i].role == "car") continue;
-                if (items[i].role == "booster") continue;
-                if (items[i].id == "cobblestone") continue;
-                if (items[i].id == "iron_ore") continue;
-                if (items[i].id == "gold_ore") continue;
-
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && fishingRod == "incredible_fishing_rod") {
