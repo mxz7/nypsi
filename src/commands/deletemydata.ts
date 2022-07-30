@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setHeader("data deletion request", message.author.avatarURL());
 
-    embed.setDescription("by doing this, you will lose **all** of your data. this includes a full wipe on econonmy.");
+    embed.setDescription("by doing this, you will lose **all** of your data. this includes a full wipe on economy.");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("delete").setStyle(ButtonStyle.Danger)
