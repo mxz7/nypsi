@@ -128,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (response != "y") {
         embed.setDescription("fight request denied");
-        return await m.edit({ embeds: [embed] });
+        return await m.edit({ embeds: [embed], components: [] });
     }
 
     await m.delete();
@@ -210,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const health = fight.getHealth();
 
-        if (health.home < 0 || health.away < 0) {
+        if (health.home <= 0 || health.away <= 0) {
             if (ended) return;
             ended = true;
             const embed = await fight.end();
