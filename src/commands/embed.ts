@@ -53,6 +53,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(message instanceof Message)) return;
 
+    embed.setFooter({ text: `sent by: ${message.author.tag}` });
+
     message.channel
         .send({ embeds: [embed] })
         .then(() => {
