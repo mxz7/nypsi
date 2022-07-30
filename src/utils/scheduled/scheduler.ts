@@ -51,7 +51,7 @@ const bree = new Bree({
         },
         {
             name: "lottery-tickets",
-            interval: "60m",
+            interval: "30m",
             path: path.join(__dirname, "jobs", "lotterytickets.js"),
         },
         {
