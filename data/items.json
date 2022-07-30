@@ -363,6 +363,15 @@
         "role": "sellable",
         "worth": 10000
     },
+    "cake": {
+        "id": "cake",
+        "name": "cake",
+        "emoji": "<:nypsi_cake:1002977512630001725>",
+        "description": "yum yum 😋",
+        "rarity": 3,
+        "role": "sellable",
+        "worth": 50000
+    },
     "potato": {
         "id": "potato",
         "name": "potato",
