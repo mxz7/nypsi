@@ -113,7 +113,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
             await collected.deferUpdate();
-            await m.delete();
             waiting.delete(message.author.id);
             return collected.customId;
         })
@@ -131,6 +130,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("fight request denied");
         return await m.edit({ embeds: [embed] });
     }
+
+    await m.delete();
 
     const countdownEmbed = new CustomEmbed(message.member).setHeader(
         `${message.author.username} vs ${target.user.username}`
