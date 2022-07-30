@@ -293,7 +293,7 @@ export async function getBankBalance(member: GuildMember): Promise<number> {
         },
     });
 
-    return query.bank;
+    return Number(query.bank);
 }
 
 export async function updateBankBalance(member: GuildMember, amount: number) {
@@ -303,6 +303,17 @@ export async function updateBankBalance(member: GuildMember, amount: number) {
         },
         data: {
             bank: amount,
+        },
+    });
+}
+
+export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            bankStorage: { increment: amount },
         },
     });
 }
@@ -349,13 +360,24 @@ export async function updateXp(member: GuildMember, amount: number) {
 }
 
 export async function getMaxBankBalance(member: GuildMember): Promise<number> {
+    const base = await prisma.economy
+        .findUnique({
+            where: {
+                userId: member.user.id,
+            },
+            select: {
+                bankStorage: true,
+            },
+        })
+        .then((q) => Number(q.bankStorage));
+
     const xp = await getXp(member);
     const constant = 550;
     const starting = 15000;
     const bonus = xp * constant;
     const max = bonus + starting;
 
-    return max;
+    return max + base;
 }
 
 export async function topAmountGlobal(amount: number, client?: NypsiClient, anon = true): Promise<string[]> {
@@ -706,6 +728,7 @@ export async function createUser(member: GuildMember | string) {
         data: {
             userId: id,
             lastVote: new Date(0),
+            lastDaily: new Date(0),
         },
     });
     await redis.del(`cache:economy:exists:${id}`);
@@ -1055,10 +1078,6 @@ export async function reset() {
     let updated = 0;
 
     for (const user of query) {
-        const prestige = user.prestige;
-        const lastVote = user.lastVote;
-        const dms = user.dms;
-
         await prisma.economy.update({
             where: {
                 userId: user.userId,
@@ -1066,11 +1085,9 @@ export async function reset() {
             data: {
                 money: 500,
                 bank: 9500,
+                bankStorage: 5000,
                 xp: 0,
-                prestige: prestige,
                 padlock: false,
-                dms: dms,
-                lastVote: lastVote,
                 inventory: {},
                 workers: {},
             },
@@ -1444,6 +1461,14 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
     ];
 
     for (const i of Array.from(Object.keys(items))) {
+        if (
+            items[i].role == "fish" ||
+            items[i].role == "prey" ||
+            items[i].id == "gold_ore" ||
+            items[i].id == "iron_ore" ||
+            items[i].id == "cobblestone"
+        )
+            continue;
         crateItems.push(i);
     }
 
@@ -1483,16 +1508,19 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
                 } else if (items[i].rarity == 2) {
                     crateItemsModified.push(i);
                 } else if (items[i].rarity == 1) {
-                    crateItemsModified.push(i);
-                    crateItemsModified.push(i);
+                    for (let x = 0; x < 2; x++) {
+                        crateItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 0) {
-                    crateItemsModified.push(i);
+                    for (let x = 0; x < 3; x++) {
+                        crateItemsModified.push(i);
+                    }
+                }
+            } else {
+                for (let x = 0; x < 2; x++) {
                     crateItemsModified.push(i);
                     crateItemsModified.push(i);
                 }
-            } else {
-                crateItemsModified.push(i);
-                crateItemsModified.push(i);
             }
         }
 
@@ -2127,4 +2155,63 @@ export async function addBooster(member: GuildMember | string, boosterId: string
     });
 
     await redis.del(`cache:economy:boosters:${id}`);
+}
+
+export async function getLastDaily(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            lastDaily: true,
+        },
+    });
+
+    return query.lastDaily;
+}
+
+export async function updateLastDaily(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    await prisma.economy.update({
+        where: {
+            userId: id,
+        },
+        data: {
+            lastDaily: new Date(),
+            dailyStreak: { increment: 1 },
+        },
+    });
+}
+
+export async function getDailyStreak(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            dailyStreak: true,
+        },
+    });
+
+    return query.dailyStreak;
 }

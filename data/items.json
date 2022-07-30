@@ -50,7 +50,7 @@
         "name": "iron",
         "emoji": "<:nypsi_iron:959442548064141362>",
         "description": "product of smelting iron ore",
-        "worth": 25000,
+        "worth": 17000,
         "role": "sellable",
         "rarity": 69,
         "aliases": ["iron"]
@@ -60,7 +60,7 @@
         "name": "gold",
         "emoji": "<:nypsi_gold:959443010205126656>",
         "description": "product of smelting gold ore",
-        "worth": 45000,
+        "worth": 25000,
         "role": "sellable",
         "rarity": 69,
         "aliases": ["gold"]
@@ -70,7 +70,7 @@
         "name": "diamond",
         "emoji": "<:nypsi_diamond:959443043377897502>",
         "description": "found when mining",
-        "worth": 100000,
+        "worth": 75000,
         "role": "sellable",
         "rarity": 3
     },
@@ -773,5 +773,25 @@
             "effect": "improves slots win chance to 60%",
             "time": 450
         }
+    },
+    "stolen_credit_card": {
+        "id": "stolen_credit_card",
+        "name": "stolen credit card",
+        "aliases": ["scc", "credit", "card", "cc"],
+        "emoji": "💳",
+        "description": "increase your bank limit by $1,000-$500,000",
+        "rarity": 1,
+        "worth": 75000,
+        "role": "tool"
+    },
+    "streak_token": {
+        "id": "streak_token",
+        "name": "streak token",
+        "aliases": ["streak"],
+        "emoji": "🎟️",
+        "description": "add one day to your daily streak",
+        "rarity": 0,
+        "worth": 50000,
+        "role": "tool"
     }
 }
