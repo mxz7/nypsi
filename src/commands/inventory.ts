@@ -91,10 +91,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             pageOfItems.push(item);
         }
 
-        if (items[item].worth) {
+        if (items[item].sell) {
             const amount = inventory[item];
 
-            worth += Math.floor(items[item].worth * amount);
+            worth += Math.floor(items[item].sell * amount);
         }
     }
 

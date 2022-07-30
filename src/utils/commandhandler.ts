@@ -317,8 +317,12 @@ async function helpCmd(message: Message, args: string[]) {
                 desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
             }
 
-            if (selectedItem.worth) {
-                desc.push(`**worth** $${selectedItem.worth.toLocaleString()}`);
+            if (selectedItem.buy) {
+                desc.push(`**buy** $${selectedItem.buy.toLocaleString()}`);
+            }
+
+            if (selectedItem.sell) {
+                desc.push(`**sell** $${selectedItem.buy.toLocaleString()}`);
             }
 
             if (selectedItem.rarity) {

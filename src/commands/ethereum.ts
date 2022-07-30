@@ -20,8 +20,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
         message.member,
-        `**worth** $${ethereum.worth.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
-            ethereumAmount * ethereum.worth
+        `**worth** $${ethereum.sell.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
+            ethereumAmount * ethereum.sell
         ).toLocaleString()})`
     )
         .setFooter({ text: "not real ethereum, although it reflects current worth in USD" })

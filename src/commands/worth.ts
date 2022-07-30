@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { userExists, createUser, getItems, getMulti } from "../utils/economy/utils";
+import { createUser, getItems, getMulti, userExists } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("worth", "check the worth of items", Categories.MONEY).setAliases(["price"]);
 
@@ -59,20 +59,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount > 250) amount = 250;
 
-    let worth = Math.floor(selected.worth * 0.5 * amount);
+    let worth = Math.floor(selected.sell * amount);
 
     const multi = await getMulti(message.member);
 
     if (selected.role == "fish" || selected.role == "prey") {
         worth = Math.floor(worth + worth * multi);
     } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
-        if (!selected.worth) {
+        if (!selected.sell) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
             });
         }
-        worth = Math.floor(selected.worth * 0.95 * amount);
-    } else if (!selected.worth) {
+        worth = Math.floor(selected.sell * 0.95 * amount);
+    } else if (!selected.sell) {
         worth = 1000 * amount;
     }
 

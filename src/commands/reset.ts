@@ -45,18 +45,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let itemIDs = Array.from(Object.keys(inventory));
 
     for (const item of itemIDs) {
-        if (items[item].worth) {
-            let fee = 0.5;
-            if (items[item].emoji == ":coin:") {
-                fee = 0.95;
-            }
+        if (items[item].sell) {
             const amount = inventory[item];
 
             if (items[item].role == "fish" || items[item].role == "prey") {
-                const worth1 = Math.floor(items[item].worth * fee * amount);
+                const worth1 = Math.floor(items[item].sell * amount);
                 inventoryWorth += Math.floor(worth1 + worth1 * multi);
             } else {
-                inventoryWorth += Math.floor(items[item].worth * fee * amount);
+                inventoryWorth += Math.floor(items[item].sell * 0.95 * amount);
             }
         } else {
             inventoryWorth += 1000;
@@ -108,18 +104,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         itemIDs = Array.from(Object.keys(inventory));
 
         for (const item of itemIDs) {
-            if (items[item].worth) {
-                let fee = 0.5;
-                if (items[item].emoji == ":coin:") {
-                    fee = 0.95;
-                }
+            if (items[item].sell) {
                 const amount = inventory[item];
 
                 if (items[item].role == "fish" || items[item].role == "prey") {
-                    const worth1 = Math.floor(items[item].worth * fee * amount);
+                    const worth1 = Math.floor(items[item].sell * amount);
                     inventoryWorth += Math.floor(worth1 + worth1 * multi);
                 } else {
-                    inventoryWorth += Math.floor(items[item].worth * fee * amount);
+                    inventoryWorth += Math.floor(items[item].sell * 0.95 * amount);
                 }
             } else {
                 inventoryWorth += 1000;
