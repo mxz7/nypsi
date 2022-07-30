@@ -928,7 +928,7 @@ export async function setPrestige(member: GuildMember, amount: number) {
 }
 
 export async function getPrestigeRequirement(member: GuildMember): Promise<number> {
-    const constant = 750;
+    const constant = 500;
     const extra = (await getPrestige(member)) * constant;
 
     return 500 + extra;
