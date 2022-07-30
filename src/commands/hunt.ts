@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setInventory(message.member, inventory);
     }
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 15; i++) {
         huntItems.push("nothing");
     }
 

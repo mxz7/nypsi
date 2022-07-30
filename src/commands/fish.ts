@@ -95,6 +95,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "nothing",
         "nothing",
         "nothing",
+        "nothing",
+        "nothing",
+        "nothing",
+        "nothing",
     ];
 
     for (const i of Array.from(Object.keys(items))) {
