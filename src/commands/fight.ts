@@ -219,15 +219,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return;
         }
 
-        if (lastUpdate < Date.now() - 1500) {
+        if (lastUpdate < Date.now() - 1000) {
+            lastUpdate = Date.now();
             const embed = fight.renderEmbed();
             if (ended) return;
 
             embed.disableFooter();
 
             await msg.edit({ embeds: [embed] });
-
-            lastUpdate = Date.now();
             return;
         }
     });
