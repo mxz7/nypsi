@@ -1306,6 +1306,11 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
         },
     });
 
+    if (!query) {
+        if (!(await userExists(id))) await createUser(id);
+        return {};
+    }
+
     if (!query.inventory) {
         return {};
     }
