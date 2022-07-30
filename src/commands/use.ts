@@ -145,12 +145,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
     }
 
-    let cooldownLength = 30;
+    let cooldownLength = 10;
 
     if (selected.role == "crate") {
         cooldownLength = 5;
     } else if (selected.role == "booster") {
-        cooldownLength = 10;
+        cooldownLength = 5;
     }
 
     await addCooldown(cmd.name, message.member, cooldownLength);
