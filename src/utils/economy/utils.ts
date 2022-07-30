@@ -293,7 +293,7 @@ export async function getBankBalance(member: GuildMember): Promise<number> {
         },
     });
 
-    return query.bank;
+    return Number(query.bank);
 }
 
 export async function updateBankBalance(member: GuildMember, amount: number) {
@@ -303,6 +303,17 @@ export async function updateBankBalance(member: GuildMember, amount: number) {
         },
         data: {
             bank: amount,
+        },
+    });
+}
+
+export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            bankStorage: { increment: amount },
         },
     });
 }
