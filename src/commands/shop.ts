@@ -47,18 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let pageOfItems: string[] = [];
     for (const item of itemIDs) {
-        if (!items[item].worth) continue;
-        if (
-            items[item].role == "prey" ||
-            items[item].role == "fish" ||
-            items[item].role == "collectable" ||
-            items[item].role == "car" ||
-            items[item].role == "sellable" ||
-            items[item].role == "ore" ||
-            items[item].role == "booster" ||
-            items[item].role == "tool"
-        )
-            continue;
+        if (!items[item].buy) continue;
         if (pageOfItems.length == 6) {
             pages.push(pageOfItems);
             pageOfItems = [item];
@@ -83,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const item = items[i];
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
+            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
             true
         );
     }
@@ -132,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
                             true
                         );
                     }
@@ -176,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**worth** $${item.worth.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
                             true
                         );
                     }
