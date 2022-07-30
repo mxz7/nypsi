@@ -1,8 +1,8 @@
 type StatsData = { economyUserId: string; type: string; win: number; lose: number; gamble: boolean };
 
 export class StatsProfile {
-    public gamble: any;
-    public items: any;
+    public gamble: { [key: string]: { wins: number; lose: number } };
+    public items: { [key: string]: number };
     public rob: { wins: number; lose: number };
     constructor(data: StatsData[]) {
         this.gamble = {};
