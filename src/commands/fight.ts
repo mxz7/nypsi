@@ -260,7 +260,7 @@ class Fight {
         }
         this.person1.heal();
 
-        this.updateLog(`${this.home.user.username} heals25hp`);
+        this.updateLog(`${this.home.user.username} heals 25hp`);
         return true;
     }
 
@@ -326,12 +326,16 @@ class Fight {
             winner.stats = this.person2;
 
             loser = this.home;
+
+            this.updateLog(`${loser.user.username} died`);
         }
         if (this.person2.health <= 0) {
             winner.member = this.home;
             winner.stats = this.person1;
 
             loser = this.away;
+
+            this.updateLog(`${loser.user.username} died`);
         }
 
         if (await userExists(winner.member.user.id)) {
