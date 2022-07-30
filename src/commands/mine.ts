@@ -82,17 +82,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const boosters = await getBoosters(message.member);
 
-    let times = 2;
+    let times = 1;
     let multi = 0;
     let unbreakable = false;
 
     if (pickaxe == "iron_pickaxe") {
-        times = 3;
+        times = 2;
     } else if (pickaxe == "diamond_pickaxe") {
-        times = 4;
+        times = 3;
     }
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 20; i++) {
         mineItems.push("nothing");
     }
 
@@ -101,10 +101,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (items[boosterId].boosterEffect.boosts.includes("mine")) {
                 switch (items[boosterId].id) {
                     case "fortune":
-                        multi += items[boosterId].boosterEffect.effect;
+                        let chance = Math.floor(Math.random() * 5);
+                        if (chance > 2) {
+                            multi += items[boosterId].boosterEffect.effect;
+                        }
                         break;
                     case "efficiency":
-                        times += items[boosterId].boosterEffect.effect;
+                        chance = Math.floor(Math.random() * 5);
+                        if (chance > 2) {
+                            times += items[boosterId].boosterEffect.effect;
+                        }
                         break;
                     case "unbreaking":
                         unbreakable = true;
